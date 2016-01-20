@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<TextArea fx:id="goalView" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+	VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" minHeight="0" minWidth="0"
+	AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+	AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+	text="Hier koennten Goals angezeigt werden. Ziel 1, Ziel 2">
+</TextArea>

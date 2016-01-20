@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="6.14.1">
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\ComponentFactory.java">
+<error line="0" severity="warning" message="package-info.java fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocPackageCheck"/>
+<error line="20" severity="warning" message="Die Klasse ComponentFactory sollte als final deklariert sein, da alle ihre Konstruktoren private sind." source="com.puppycrawl.tools.checkstyle.checks.design.FinalClassCheck"/>
+<error line="22" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="27" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="29" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="38" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="58" column="9" severity="warning" message="Überflüssiger Modifier &apos;public&apos;." source="com.puppycrawl.tools.checkstyle.checks.modifier.RedundantModifierCheck"/>
+<error line="58" column="34" severity="warning" message="Der Parameter l sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="58" column="45" severity="warning" message="Erwartete Tag @param für &apos;l&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="58" column="48" severity="warning" message="Der Parameter p sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="58" column="55" severity="warning" message="Erwartete Tag @param für &apos;p&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="66" severity="warning" message="Fehlender @return-Tag." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="66" column="17" severity="warning" message="Erwartete Tag @param für &apos;&lt;T&gt;&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="74" severity="warning" message="Fehlender @return-Tag." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="79" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="92" column="35" severity="warning" message="Der Parameter id sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="92" column="46" severity="warning" message="Der Parameter resource sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="95" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="109" column="33" severity="warning" message="Der Parameter id sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="109" column="40" severity="warning" message="Erwartete Tag @param für &apos;id&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="117" severity="warning" message="Fehlender @return-Tag." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="117" column="33" severity="warning" message="Der Parameter id sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="117" column="40" severity="warning" message="Erwartete Tag @param für &apos;id&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="126" severity="warning" message="Fehlender @return-Tag." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="126" column="32" severity="warning" message="Der Parameter id sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="126" column="39" severity="warning" message="Erwartete Tag @param für &apos;id&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="136" column="44" severity="warning" message="Unerwarteter schließender HTML-Tag: &lt;/t&gt;, if a component with this ID is" source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="139" column="13" severity="warning" message="Erwartete Tag @param für &apos;&lt;T&gt;&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="139" column="32" severity="warning" message="Der Parameter id sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="158" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="164" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="177" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="177" column="36" severity="warning" message="Der Parameter resourceDir sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="177" column="43" severity="warning" message="&apos;resourceDir&apos; verbirgt ein Feld." source="com.puppycrawl.tools.checkstyle.checks.coding.HiddenFieldCheck"/>
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\IconFactory.java">
+<error line="39" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="39" column="18" severity="warning" message="Modifier &apos;static&apos; weicht von der empfohlenen Modifier-Reihenfolge aus der Java-Sprachdefinition ab." source="com.puppycrawl.tools.checkstyle.checks.modifier.ModifierOrderCheck"/>
+<error line="40" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="40" column="18" severity="warning" message="Modifier &apos;static&apos; weicht von der empfohlenen Modifier-Reihenfolge aus der Java-Sprachdefinition ab." source="com.puppycrawl.tools.checkstyle.checks.modifier.ModifierOrderCheck"/>
+<error line="41" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="41" column="18" severity="warning" message="Modifier &apos;static&apos; weicht von der empfohlenen Modifier-Reihenfolge aus der Java-Sprachdefinition ab." source="com.puppycrawl.tools.checkstyle.checks.modifier.ModifierOrderCheck"/>
+<error line="42" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="42" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="42" column="18" severity="warning" message="Modifier &apos;static&apos; weicht von der empfohlenen Modifier-Reihenfolge aus der Java-Sprachdefinition ab." source="com.puppycrawl.tools.checkstyle.checks.modifier.ModifierOrderCheck"/>
+<error line="45" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="45" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="45" column="18" severity="warning" message="Modifier &apos;static&apos; weicht von der empfohlenen Modifier-Reihenfolge aus der Java-Sprachdefinition ab." source="com.puppycrawl.tools.checkstyle.checks.modifier.ModifierOrderCheck"/>
+<error line="46" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="46" column="18" severity="warning" message="Modifier &apos;static&apos; weicht von der empfohlenen Modifier-Reihenfolge aus der Java-Sprachdefinition ab." source="com.puppycrawl.tools.checkstyle.checks.modifier.ModifierOrderCheck"/>
+<error line="47" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="47" column="18" severity="warning" message="Modifier &apos;static&apos; weicht von der empfohlenen Modifier-Reihenfolge aus der Java-Sprachdefinition ab." source="com.puppycrawl.tools.checkstyle.checks.modifier.ModifierOrderCheck"/>
+<error line="48" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="48" column="18" severity="warning" message="Modifier &apos;static&apos; weicht von der empfohlenen Modifier-Reihenfolge aus der Java-Sprachdefinition ab." source="com.puppycrawl.tools.checkstyle.checks.modifier.ModifierOrderCheck"/>
+<error line="51" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="51" column="18" severity="warning" message="Modifier &apos;static&apos; weicht von der empfohlenen Modifier-Reihenfolge aus der Java-Sprachdefinition ab." source="com.puppycrawl.tools.checkstyle.checks.modifier.ModifierOrderCheck"/>
+<error line="52" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="52" column="18" severity="warning" message="Modifier &apos;static&apos; weicht von der empfohlenen Modifier-Reihenfolge aus der Java-Sprachdefinition ab." source="com.puppycrawl.tools.checkstyle.checks.modifier.ModifierOrderCheck"/>
+<error line="53" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="53" column="18" severity="warning" message="Modifier &apos;static&apos; weicht von der empfohlenen Modifier-Reihenfolge aus der Java-Sprachdefinition ab." source="com.puppycrawl.tools.checkstyle.checks.modifier.ModifierOrderCheck"/>
+<error line="79" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\NUI.java">
+<error line="4" column="8" severity="warning" message="Nicht benutztes import - java.util.Arrays." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="11" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="19" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="19" column="24" severity="warning" message="Variable &apos;initialProofFile&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="21" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="21" column="29" severity="warning" message="Der Parameter args sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="22" severity="warning" message="Das &apos;if&apos;-Konstrukt muss &apos;{}&apos; benutzen." source="com.puppycrawl.tools.checkstyle.checks.blocks.NeedBracesCheck"/>
+<error line="22" column="11" severity="warning" message="Nach &apos;if&apos; folgt kein Leerzeichen." source="com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck"/>
+<error line="23" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="27" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="30" column="5" severity="warning" message="Die Methode &apos;start&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="31" column="23" severity="warning" message="Der Parameter stage sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\controller\NUIController.java">
+<error line="0" severity="warning" message="package-info.java fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocPackageCheck"/>
+<error line="6" column="8" severity="warning" message="Nicht benutztes import - java.util.Arrays." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="25" column="8" severity="warning" message="Nicht benutztes import - javafx.stage.FileChooser.ExtensionFilter." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="31" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="41" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="46" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="51" column="9" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="51" column="15" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="51" column="23" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="51" column="30" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="51" column="38" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="54" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="59" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="64" severity="warning" message="Fehlender @return-Tag." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="81" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="82" column="10" severity="warning" message="Variable &apos;left&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="83" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="84" column="10" severity="warning" message="Variable &apos;middle&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="85" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="86" column="10" severity="warning" message="Variable &apos;right&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="87" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="88" column="10" severity="warning" message="Variable &apos;bottom&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="89" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="90" column="12" severity="warning" message="Variable &apos;root&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="91" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="92" column="11" severity="warning" message="Variable &apos;statustext&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="93" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="94" column="17" severity="warning" message="Variable &apos;contextMenu&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="95" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="96" column="16" severity="warning" message="&apos;ButtonProofView&apos; entspricht nicht dem Muster &apos;^[a-z][a-zA-Z0-9]*$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck"/>
+<error line="96" column="16" severity="warning" message="Variable &apos;ButtonProofView&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="97" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="98" column="16" severity="warning" message="&apos;ButtonGoalView&apos; entspricht nicht dem Muster &apos;^[a-z][a-zA-Z0-9]*$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck"/>
+<error line="98" column="16" severity="warning" message="Variable &apos;ButtonGoalView&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="99" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="100" column="16" severity="warning" message="&apos;ButtonOpenProofsView&apos; entspricht nicht dem Muster &apos;^[a-z][a-zA-Z0-9]*$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck"/>
+<error line="100" column="16" severity="warning" message="Variable &apos;ButtonOpenProofsView&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="101" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="102" column="16" severity="warning" message="&apos;ButtonTreeView&apos; entspricht nicht dem Muster &apos;^[a-z][a-zA-Z0-9]*$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck"/>
+<error line="102" column="16" severity="warning" message="Variable &apos;ButtonTreeView&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="103" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="104" column="17" severity="warning" message="Variable &apos;toggleGroup0&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="105" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="106" column="17" severity="warning" message="Variable &apos;toggleGroup1&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="107" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="108" column="17" severity="warning" message="Variable &apos;toggleGroup2&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="109" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="110" column="17" severity="warning" message="Variable &apos;toggleGroup3&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="112" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="115" column="5" severity="warning" message="Die Methode &apos;initialize&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="123" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="128" column="65" severity="warning" message="&apos;3&apos; sollte durch eine Konstante definiert sein." source="com.puppycrawl.tools.checkstyle.checks.coding.MagicNumberCheck"/>
+<error line="134" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="137" column="5" severity="warning" message="Die Methode &apos;handleCloseWindow&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="138" column="56" severity="warning" message="Erwartete Tag @param für &apos;e&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="147" column="39" severity="warning" message="Der Parameter e sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="147" column="51" severity="warning" message="Erwartete Tag @param für &apos;e&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="149" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="152" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="153" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="158" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="164" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="168" column="56" severity="warning" message="Erwartete Tag @param für &apos;e&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="172" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="176" column="5" severity="warning" message="Die Methode &apos;handleLoadComponent&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="177" column="58" severity="warning" message="Erwartete Tag @param für &apos;e&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="202" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="214" column="5" severity="warning" message="Die Methode &apos;getPane&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="229" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="241" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="241" column="5" severity="warning" message="Die Methode &apos;createOrMoveOrHideComponent&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="242" column="26" severity="warning" message="Erwartete Tag @param für &apos;componentResource&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="247" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="265" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="276" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="282" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="285" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="287" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="294" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="294" column="5" severity="warning" message="Die Methode &apos;registerKeyListener&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="294" column="37" severity="warning" message="Der Parameter k sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="294" column="45" severity="warning" message="Erwartete Tag @param für &apos;k&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="294" column="48" severity="warning" message="Der Parameter modifiers sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="294" column="58" severity="warning" message="Erwartete Tag @param für &apos;modifiers&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="294" column="69" severity="warning" message="Der Parameter e sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="294" column="92" severity="warning" message="Erwartete Tag @param für &apos;e&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="301" severity="warning" message="Das &apos;if&apos;-Konstrukt muss &apos;{}&apos; benutzen." source="com.puppycrawl.tools.checkstyle.checks.blocks.NeedBracesCheck"/>
+<error line="302" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="314" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="315" column="37" severity="warning" message="Der Bedingungsoperator sollte vermieden werden." source="com.puppycrawl.tools.checkstyle.checks.coding.AvoidInlineConditionalsCheck"/>
+<error line="318" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="323" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="323" column="5" severity="warning" message="Die Methode &apos;unregisterKeyListener&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="323" column="39" severity="warning" message="Der Parameter k sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="323" column="47" severity="warning" message="Erwartete Tag @param für &apos;k&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="323" column="57" severity="warning" message="Erwartete Tag @throws für &apos;IllegalArgumentException&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="327" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="332" column="55" severity="warning" message="Erwartete Tag @param für &apos;k&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="335" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="362" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\controller\SearchViewController.java">
+<error line="24" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTypeCheck"/>
+<error line="26" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="27" column="15" severity="warning" message="&apos;SearchTextField&apos; entspricht nicht dem Muster &apos;^[a-z][a-zA-Z0-9]*$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck"/>
+<error line="27" column="15" severity="warning" message="Variable &apos;SearchTextField&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="28" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="29" column="12" severity="warning" message="&apos;PreviousButton&apos; entspricht nicht dem Muster &apos;^[a-z][a-zA-Z0-9]*$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck"/>
+<error line="29" column="12" severity="warning" message="Variable &apos;PreviousButton&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="30" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="31" column="12" severity="warning" message="&apos;NextButton&apos; entspricht nicht dem Muster &apos;^[a-z][a-zA-Z0-9]*$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck"/>
+<error line="31" column="12" severity="warning" message="Variable &apos;NextButton&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="32" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="33" column="12" severity="warning" message="&apos;SearchButton&apos; entspricht nicht dem Muster &apos;^[a-z][a-zA-Z0-9]*$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck"/>
+<error line="33" column="12" severity="warning" message="Variable &apos;SearchButton&apos; muss private sein." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
+<error line="35" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="37" column="5" severity="warning" message="Die Methode &apos;initialize&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="38" column="28" severity="warning" message="Der Parameter location sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="38" column="42" severity="warning" message="Der Parameter resources sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="45" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="47" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="47" column="33" severity="warning" message="Der Parameter observable sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="47" column="49" severity="warning" message="Vor &apos;?&apos; befindet sich kein Leerzeichen." source="com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck"/>
+<error line="47" column="79" severity="warning" message="Der Parameter oldValue sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="48" column="21" severity="warning" message="Der Parameter newValue sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="60" column="5" severity="warning" message="Die Methode &apos;handleSearchButton&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="60" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="60" column="36" severity="warning" message="Der Parameter e sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="62" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="74" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="93" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="98" column="5" severity="warning" message="Die Methode &apos;handleNextButton&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="98" column="34" severity="warning" message="Der Parameter e sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="98" column="46" severity="warning" message="Erwartete Tag @param für &apos;e&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="106" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="123" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="127" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="129" column="9" severity="warning" message="&apos;}&apos; in Spalte 9 sollte auf der gleichen Linie wie der nächste Teil einer Multi-Block-Anweisung sein." source="com.puppycrawl.tools.checkstyle.checks.blocks.RightCurlyCheck"/>
+<error line="132" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="155" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="158" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="158" column="38" severity="warning" message="Der Parameter e sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="162" column="5" severity="warning" message="Die Methode &apos;handleEnterKey&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="162" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="162" column="32" severity="warning" message="Der Parameter e sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="163" severity="warning" message="Das &apos;if&apos;-Konstrukt muss &apos;{}&apos; benutzen." source="com.puppycrawl.tools.checkstyle.checks.blocks.NeedBracesCheck"/>
+<error line="165" severity="warning" message="Das &apos;else&apos;-Konstrukt muss &apos;{}&apos; benutzen." source="com.puppycrawl.tools.checkstyle.checks.blocks.NeedBracesCheck"/>
+<error line="169" column="5" severity="warning" message="Die Methode &apos;performFocusRequest&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="169" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="169" column="38" severity="warning" message="Vor &apos;{&apos; befindet sich kein Leerzeichen." source="com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck"/>
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\controller\TreeViewController.java">
+<error line="68" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="75" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="80" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="83" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="85" column="29" severity="warning" message="&apos;}&apos; in Spalte 29 sollte auf der gleichen Linie wie der nächste Teil einer Multi-Block-Anweisung sein." source="com.puppycrawl.tools.checkstyle.checks.blocks.RightCurlyCheck"/>
+<error line="88" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="96" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="100" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="109" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="123" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="146" column="43" severity="warning" message="Der Parameter file sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="146" column="48" severity="warning" message="Erwartete Tag @param für &apos;file&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="155" column="8" severity="warning" message="Nicht benutztes @param-Tag für &apos;proofFileName&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="157" severity="warning" message="Nicht benutzter Javadoc-Tag." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="160" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="169" column="8" severity="warning" message="Nicht benutztes @param-Tag für &apos;proofFileName&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="173" column="40" severity="warning" message="Erwartete Tag @param für &apos;proofFile&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="175" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="175" column="28" severity="warning" message="Vor &apos;?&apos; befindet sich kein Leerzeichen." source="com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck"/>
+<error line="175" column="29" severity="warning" message="Nach &apos;?&apos; folgt kein Leerzeichen." source="com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck"/>
+<error line="179" column="9" severity="warning" message="&apos;}&apos; in Spalte 9 sollte auf der gleichen Linie wie der nächste Teil einer Multi-Block-Anweisung sein." source="com.puppycrawl.tools.checkstyle.checks.blocks.RightCurlyCheck"/>
+<error line="191" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="195" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="195" column="38" severity="warning" message="Der Parameter t sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="203" severity="warning" message="Fehlender @return-Tag." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="205" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTypeCheck"/>
+<error line="217" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="225" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="234" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="243" column="5" severity="warning" message="Die Methode &apos;scrollToAndSelect&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="243" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="243" column="35" severity="warning" message="Der Parameter nextLargerIdx sollte als &apos;final&apos; deklariert sein." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
+<error line="244" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="245" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="245" column="49" severity="warning" message="&apos;5&apos; sollte durch eine Konstante definiert sein." source="com.puppycrawl.tools.checkstyle.checks.coding.MagicNumberCheck"/>
+<error line="245" column="52" severity="warning" message="Der Bedingungsoperator sollte vermieden werden." source="com.puppycrawl.tools.checkstyle.checks.coding.AvoidInlineConditionalsCheck"/>
+<error line="245" column="87" severity="warning" message="&apos;5&apos; sollte durch eine Konstante definiert sein." source="com.puppycrawl.tools.checkstyle.checks.coding.MagicNumberCheck"/>
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\guitests\NUITest.java">
+<error line="0" severity="warning" message="package-info.java fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocPackageCheck"/>
+<error line="14" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="26" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="27" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="28" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="31" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="32" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="33" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="34" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="37" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="38" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="39" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="40" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="41" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="44" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="45" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="46" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="47" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="50" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="53" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="55" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="60" column="5" severity="warning" message="Die Methode &apos;getRootNode&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="68" column="5" severity="warning" message="Die Methode &apos;testFileMenu&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="68" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="87" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="95" column="5" severity="warning" message="Die Methode &apos;testToggleGroup0&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="95" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="103" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="106" column="5" severity="warning" message="Die Methode &apos;testToggleGroup1&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="106" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="114" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="117" column="5" severity="warning" message="Die Methode &apos;testToggleGroup2&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="117" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="125" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="128" column="5" severity="warning" message="Die Methode &apos;testToggleGroup3&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="128" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="136" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="139" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="153" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="154" column="71" severity="warning" message="Erwartete Tag @param für &apos;view&apos;." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="158" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="162" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="168" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="170" column="22" severity="warning" message="&apos;DIRECTION_MIDDLE&apos; entspricht nicht dem Muster &apos;^[a-z][a-zA-Z0-9]*$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.LocalFinalVariableNameCheck"/>
+<error line="174" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="179" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="184" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\guitests\NUITestSuite.java">
+<error line="6" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTypeCheck"/>
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\guitests\TreeViewTest.java">
+<error line="14" severity="warning" message="Der erste Satz sollte mit einem Punkt abschließen." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
+<error line="24" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"/>
+<error line="26" column="5" severity="warning" message="Die Methode &apos;getRootNode&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="34" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="35" severity="warning" message="Zeile länger als 80 Zeichen" source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="40" column="5" severity="warning" message="Die Methode &apos;testTreeNavigation&apos; ist nicht für Vererbung entworfen - muss abstract, final oder leer sein." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
+<error line="40" column="5" severity="warning" message="Javadoc-Kommentar fehlt." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
+<error line="44" column="29" severity="warning" message="&apos;15&apos; sollte durch eine Konstante definiert sein." source="com.puppycrawl.tools.checkstyle.checks.coding.MagicNumberCheck"/>
+<error line="48" column="29" severity="warning" message="&apos;25&apos; sollte durch eine Konstante definiert sein." source="com.puppycrawl.tools.checkstyle.checks.coding.MagicNumberCheck"/>
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\prooftree\NUIBranchNode.java">
+<error line="32" column="59" severity="warning" message="&apos;proofParentNode&apos; verbirgt ein Feld." source="com.puppycrawl.tools.checkstyle.checks.coding.HiddenFieldCheck"/>
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\prooftree\NUIInnerNode.java">
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\prooftree\NUILeafNode.java">
+<error line="24" column="57" severity="warning" message="&apos;proofNode&apos; verbirgt ein Feld." source="com.puppycrawl.tools.checkstyle.checks.coding.HiddenFieldCheck"/>
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\prooftree\NUINode.java">
+<error line="169" column="52" severity="warning" message="&apos;interactive&apos; verbirgt ein Feld." source="com.puppycrawl.tools.checkstyle.checks.coding.HiddenFieldCheck"/>
+<error line="192" column="47" severity="warning" message="&apos;active&apos; verbirgt ein Feld." source="com.puppycrawl.tools.checkstyle.checks.coding.HiddenFieldCheck"/>
+<error line="213" column="49" severity="warning" message="&apos;hasNotes&apos; verbirgt ein Feld." source="com.puppycrawl.tools.checkstyle.checks.coding.HiddenFieldCheck"/>
+<error line="234" column="45" severity="warning" message="&apos;label&apos; verbirgt ein Feld." source="com.puppycrawl.tools.checkstyle.checks.coding.HiddenFieldCheck"/>
+<error line="248" column="47" severity="warning" message="&apos;parent&apos; verbirgt ein Feld." source="com.puppycrawl.tools.checkstyle.checks.coding.HiddenFieldCheck"/>
+<error line="255" column="53" severity="warning" message="&apos;isHighlighted&apos; verbirgt ein Feld." source="com.puppycrawl.tools.checkstyle.checks.coding.HiddenFieldCheck"/>
+<error line="269" column="51" severity="warning" message="&apos;isVisible&apos; verbirgt ein Feld." source="com.puppycrawl.tools.checkstyle.checks.coding.HiddenFieldCheck"/>
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\prooftree\ProofTreeActions.java">
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\prooftree\ProofTreeCell.java">
+<error line="46" column="44" severity="warning" message="&apos;icf&apos; verbirgt ein Feld." source="com.puppycrawl.tools.checkstyle.checks.coding.HiddenFieldCheck"/>
+<error line="55" column="42" severity="warning" message="&apos;icon&apos; verbirgt ein Feld." source="com.puppycrawl.tools.checkstyle.checks.coding.HiddenFieldCheck"/>
+<error line="151" column="9" severity="warning" message="&apos;}&apos; in Spalte 9 sollte auf der gleichen Linie wie der nächste Teil einer Multi-Block-Anweisung sein." source="com.puppycrawl.tools.checkstyle.checks.blocks.RightCurlyCheck"/>
+<error line="155" column="9" severity="warning" message="&apos;}&apos; in Spalte 9 sollte auf der gleichen Linie wie der nächste Teil einer Multi-Block-Anweisung sein." source="com.puppycrawl.tools.checkstyle.checks.blocks.RightCurlyCheck"/>
+<error line="160" column="9" severity="warning" message="&apos;}&apos; in Spalte 9 sollte auf der gleichen Linie wie der nächste Teil einer Multi-Block-Anweisung sein." source="com.puppycrawl.tools.checkstyle.checks.blocks.RightCurlyCheck"/>
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\prooftree\ProofTreeContextMenu.java">
+<error line="51" column="57" severity="warning" message="&apos;treeItem&apos; verbirgt ein Feld." source="com.puppycrawl.tools.checkstyle.checks.coding.HiddenFieldCheck"/>
+<error line="52" column="37" severity="warning" message="&apos;treeView&apos; verbirgt ein Feld." source="com.puppycrawl.tools.checkstyle.checks.coding.HiddenFieldCheck"/>
+<error line="52" column="65" severity="warning" message="&apos;icf&apos; verbirgt ein Feld." source="com.puppycrawl.tools.checkstyle.checks.coding.HiddenFieldCheck"/>
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\prooftree\ProofTreeStyle.java">
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\prooftree\ProofTreeVisualizer.java">
+<error line="35" column="56" severity="warning" message="&apos;proofTreeView&apos; verbirgt ein Feld." source="com.puppycrawl.tools.checkstyle.checks.coding.HiddenFieldCheck"/>
+</file>
+<file name="G:\5_studies_BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\prooftree\package-info.java">
+</file>
+</checkstyle>

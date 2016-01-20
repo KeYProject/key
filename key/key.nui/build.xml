@@ -108,7 +108,7 @@
 
 	<!-- Definition of target CHECKSTYLE -->
 	<target name="checkstyle" description="Generates Checkstyle Report.">
-		<checkstyle config="${basedir}/config/checkstyle/sun_checks.xml" classpath="${basedir}/ant-lib/checkstyle/checkstyle-6.14.1-all.jar">
+		<checkstyle config="${basedir}/config/checkstyle/bp_checks.xml" classpath="${basedir}/ant-lib/checkstyle/checkstyle-6.14.1-all.jar">
 			<fileset dir="${basedir}/src" includes="**/*.java" />
 			<formatter type="xml" tofile="${basedir}/reports/checkstyle_${time.stamp}.xml" />
 		</checkstyle>
