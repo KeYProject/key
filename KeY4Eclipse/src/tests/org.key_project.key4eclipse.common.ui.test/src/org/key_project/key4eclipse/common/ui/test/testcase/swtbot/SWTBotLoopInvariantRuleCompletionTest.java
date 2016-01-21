@@ -1,4 +1,4 @@
-package org.key_project.key4eclipse.common.ui.test.testcase;
+package org.key_project.key4eclipse.common.ui.test.testcase.swtbot;
 
 import java.io.File;
 
@@ -35,7 +35,7 @@ import de.uka.ilkd.key.proof.Proof;
  * @author Viktor Pfanschilling
  *
  */
-public class LoopInvariantRuleCompletionTest extends TestCase {
+public class SWTBotLoopInvariantRuleCompletionTest extends TestCase {
    /**
     * The workbench bot this test uses.
     */
