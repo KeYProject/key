@@ -123,56 +123,6 @@ public class LoopInvariantRuleCompletionTest extends TestCase {
    }
    
    /**
-    * Tests whether re-opening the dialog restores the specification.
-    * Currently disabled until I figure out how to prune the proof.
-    */
-   private final void testRestore() throws Exception {
-      try {
-         setupTest("LoopInvariantExample.proof");
-         Node n = proof.root();
-         //Not sure if this results in the right node.
-         //If not, clickContextMenu will raise a WidgetNotFound Exception.
-         while (!n.leaf()) {
-            n = n.child(0);
-         }
-         final Node tgt = n;
-         
-         //Open Dialog, apply modified Invariant
-         openLIDialog("Loop Invariant");
-         dialogShell.bot().text("i >= 0 & i <= _array.length").setText("i > -1 & i <= _array.length");
-         dialogShell.bot().button("Finish").click();
-         dialogShell = null;
-         
-         //prune away the change.
-         IRunnableWithException run = new AbstractRunnableWithException() {
-            @Override
-            public void run() {
-               try {
-                  ImmutableList<Node> asd = proof.pruneProof(tgt, true);
-                  System.out.println("proofresult");
-                  System.out.println(asd);
-               } catch (Exception e) {
-                  setException(e);
-               }
-            }
-         };
-         Display.getDefault().syncExec(run);
-         if (run.getException() != null) {
-            throw run.getException();
-         }
-         //editor.setFocus();
-         
-         openLIDialog("Loop Invariant");
-         
-         assertNotNull(dialogShell.bot().text("i > -1 & i <= _array.length"));
-         dialogShell.bot().button("Finish").click();
-         dialogShell = null;
-      } finally {
-         restore();
-      }
-   }
-   
-   /**
     * Tests whether additional heaps are displayed in the dialog.
     */
    @Test
