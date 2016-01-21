@@ -87,6 +87,8 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
       finally {
          shell.setVisible(false);
          shell.dispose();
+         proof.dispose();
+         environment.dispose();
       }
    }
    
@@ -157,6 +159,8 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 		} finally {
        		shell.setVisible(false);
        		shell.dispose();
+       		proof.dispose();
+            environment.dispose();
 		}
    	}
    
@@ -226,6 +230,8 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 			} finally {
 	       		shell.setVisible(false);
 	       		shell.dispose();
+	       		proof.dispose();
+	            environment.dispose();
 			}
    }
    
@@ -307,6 +313,8 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 		} finally {
        		shell.setVisible(false);
        		shell.dispose();
+       		proof.dispose();
+            environment.dispose();
 		}
    }
    

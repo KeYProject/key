@@ -547,8 +547,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 						start = children[0];
 						index += 1;
 						children = start.getChildren();
+						current = start.getProofNode();
 					}
-					current = start.getProofNode();
 				}
 				// search node in the proof tree when the node is not in the symbolic execution tree and the last node of the symbolic execution tree is a leaf
 				if (children.length == 0) {
