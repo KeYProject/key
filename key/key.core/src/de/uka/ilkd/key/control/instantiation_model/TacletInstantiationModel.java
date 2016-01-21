@@ -247,4 +247,12 @@ public class TacletInstantiationModel {
         return nss.programVariables();
     }
 
+    /**
+     * Gets the services in use by this object.
+     * @return this model's Services
+     */
+    public Services getServices() {
+        return services;
+    }
+
 }

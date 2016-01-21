@@ -40,10 +40,13 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
    private KeYEnvironment<DefaultUserInterfaceControl> environment;
 
    @Test
-   public void test() throws Exception {
-      setupTest("");
-      Thread.sleep(20000);
-      //openLIDialog(rulename);
+   public void initialTest() throws Exception {
+      try{
+         setupTest("allLeft.proof");
+         openLIDialog("orall", "allLeft");
+      } finally{
+         restore();
+      }
    }
 
    /**
@@ -67,7 +70,7 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
       // Create test project
       IJavaProject project = TestUtilsUtil.createJavaProject("TacletMatchWizardPageTest");
       IFolder src = project.getProject().getFolder("src");
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/loopInvariantExample", src);
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/tacletMatchWizardExample", src);
       
       editor = null;
       // Get local file in operating system of folder src 
@@ -110,10 +113,10 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
     * opens a taclet Dialog.
     * @param rule The name of the rule to be applied
     */
-   private void openLIDialog(String rule) {
+   private void openLIDialog(String location, String rule) {
       //click context menu / text we're looking for: The first { should be the start of the update.
       final SWTBotStyledText styledText = editor.bot().styledText();
-      Point point = TestUtilsUtil.selectText(styledText, "{");
+      Point point = TestUtilsUtil.selectText(styledText, location);
       point.x = point.x - 1;
       
       TestUtilsUtil.setCursorLocation(styledText, point.x, point.y);
