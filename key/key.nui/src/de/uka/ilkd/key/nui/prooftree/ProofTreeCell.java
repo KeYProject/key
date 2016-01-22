@@ -62,7 +62,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     @Override
     protected final void updateItem(final NUINode item, final boolean empty) {
         // remove styles from last items
-        getStyleClass().remove(ProofTreeStyle.CSS_NODE_HIGHLIGHTED);
+        getStyleClass().remove(ProofTreeStyle.CSS_NODE_HIGHLIGHT);
 
         super.updateItem(item, empty);
 
@@ -90,22 +90,23 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         }
 
         if (item.isHighlighted()) {
-            this.getStyleClass().add(ProofTreeStyle.CSS_NODE_HIGHLIGHTED);
+            this.getStyleClass().add(ProofTreeStyle.CSS_NODE_HIGHLIGHT);
         }
 
         // workaround to display an icon next to a label
         setText(null);
-        if (icon != null) {
+        
+        if (icon == null) {
+            setGraphic(label);
+        } else {
             final HBox hbox = new HBox();
             hbox.setSpacing(ICON_SPACING);
 
-            Label iconLabel = new Label();
+            final Label iconLabel = new Label();
             iconLabel.setGraphic(icon);
 
             hbox.getChildren().addAll(iconLabel, label);
             setGraphic(hbox);
-        } else {
-            setGraphic(label);
         }
     }
 
@@ -116,7 +117,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      */
     private void decorateAsInnerNode() {
         if (getItem().isInteractive()) {
-            setIcon(icf.getImage(IconFactory.KEY_INNER_NODE_INTERACTIVE));
+            setIcon(icf.getImage(IconFactory.INODE_INTERACTIVE));
         }
     }
 
@@ -127,14 +128,14 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     private void decorateAsBranchNode() {
         label.getStyleClass().add(ProofTreeStyle.CSS_NODE_BRANCH);
         if (getItem().isClosed()) {
-            label.getStyleClass().add(ProofTreeStyle.CSS_NODE_CLOSED);
-            setIcon(icf.getImage(IconFactory.KEY_BRANCH_NODE_CLOSED));
-        } else {
             if (getItem().isLinked()) {
-                setIcon(icf.getImage(IconFactory.KEY_BRANCH_NODE_LINKED));
+                setIcon(icf.getImage(IconFactory.BRANCH_LINKED));
             } else {
-                setIcon(icf.getImage(IconFactory.KEY_BRANCH_NODE_OPEN));
-            }	
+                label.getStyleClass().add(ProofTreeStyle.CSS_NODE_CLOSED);
+                setIcon(icf.getImage(IconFactory.BRANCH_CLOSED));
+            }
+        } else {
+            setIcon(icf.getImage(IconFactory.BRANCH_OPEN));
         }
     }
 
@@ -146,21 +147,21 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         label.getStyleClass().add(ProofTreeStyle.CSS_NODE_LEAF);
         // leaf node is a closed goal
         if (getItem().isClosed()) {
-            setIcon(icf.getImage(IconFactory.KEY_LEAF_NODE_CLOSED));
+            setIcon(icf.getImage(IconFactory.LEAF_CLOSED));
             label.getStyleClass().add(ProofTreeStyle.CSS_NODE_CLOSED);
         }
         else if (getItem().isLinked()) {
-            setIcon(icf.getImage(IconFactory.KEY_LEAF_NODE_LINKED));
+            setIcon(icf.getImage(IconFactory.LEAF_LINKED));
             label.getStyleClass().add(ProofTreeStyle.CSS_NODE_LINKED);
         }
         // leaf node is an interactive node
         else if (getItem().isInteractive()) {
-            setIcon(icf.getImage(IconFactory.KEY_LEAF_NODE_INTERACTIVE));
+            setIcon(icf.getImage(IconFactory.LEAF_INTERACTIVE));
             label.getStyleClass().add(ProofTreeStyle.CSS_NODE_INTERACTIVE);
         }
         // else: leaf node must be an open goal
         else {
-            setIcon(icf.getImage(IconFactory.KEY_LEAF_NODE_OPEN));
+            setIcon(icf.getImage(IconFactory.LEAF_OPEN));
             label.getStyleClass().add(ProofTreeStyle.CSS_NODE_OPEN);
         }
     }

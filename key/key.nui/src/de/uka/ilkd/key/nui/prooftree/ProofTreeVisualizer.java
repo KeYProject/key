@@ -19,7 +19,7 @@ public class ProofTreeVisualizer {
 	/**
 	 * The fx tree view for displaying the NUI tree.
 	 */
-	private TreeView<NUINode> proofTreeView;
+	private final TreeView<NUINode> proofTreeView;
 
 	/**
 	 * The root node of the NUI tree.
@@ -57,7 +57,7 @@ public class ProofTreeVisualizer {
 		}
 		
 		// create fx root node
-		TreeItem<NUINode> rootNode = new TreeItem<NUINode>(nuiRoot);
+		final TreeItem<NUINode> rootNode = new TreeItem<NUINode>(nuiRoot);
 		
 		// convert the NUITree to a FXTree 
 		convertNUITreeToFXTree(nuiRoot, rootNode);
@@ -71,10 +71,10 @@ public class ProofTreeVisualizer {
 	 * is used as an intermediate representation 
 	 * (decorated abstract tree).
 	 * 
-	 * @param p The proof tree to load
+	 * @param proof The proof tree to load
 	 */
-	public final void loadProofTree(final Proof p) {
-		Node pRoot = p.root();
+	public final void loadProofTree(final Proof proof) {
+		final Node pRoot = proof.root();
 		
 		// Create a new branch node (as root node) and 
 		// assign the appropriate label
@@ -100,14 +100,14 @@ public class ProofTreeVisualizer {
 	 */
 	private void addProofTreeToNUITree(final Node proofNode, 
 			final NUIBranchNode parent) {
-		Proof p = proofNode.proof();
+		final Proof proof = proofNode.proof();
 		NUINode newNode;
 		// Create NUI node -----------------------------------------------------
 		if (proofNode.leaf()) {
-			NUILeafNode leafNode = new NUILeafNode(proofNode);
+			final NUILeafNode leafNode = new NUILeafNode(proofNode);
 			newNode = leafNode;
 		} else {
-			NUIInnerNode innerNode = new NUIInnerNode(proofNode);
+			final NUIInnerNode innerNode = new NUIInnerNode(proofNode);
 			newNode = innerNode;
 		}
 		// Add created node to parent
@@ -115,25 +115,25 @@ public class ProofTreeVisualizer {
 		newNode.setParent(parent);
 
 		// Set NUI fields ------------------------------------------------------
-		assignNUIFields(proofNode, p, newNode);
+		assignNUIFields(proofNode, proof, newNode);
 		newNode.setSerialNumber(String.valueOf(proofNode.serialNr()));
 
 		// Add children of current node proofNode to parent --------------------
-		int numChildren = proofNode.childrenCount();
+		final int numChildren = proofNode.childrenCount();
 		if (numChildren == 1) {
 			addProofTreeToNUITree(proofNode.child(0), parent);
 		} else if (numChildren > 1) {
 			// for each child create a branch node and add it to parent
-			for (Iterator<Node> childrenIterator = proofNode.childrenIterator();
+			for (final Iterator<Node> childrenIterator = proofNode.childrenIterator();
 					childrenIterator.hasNext();) {
 				// get next child
-				Node child = childrenIterator.next();
+				final Node child = childrenIterator.next();
 
 				// create NUIBranch and set fields
-				NUIBranchNode branchNode = new NUIBranchNode(proofNode);
+				final NUIBranchNode branchNode = new NUIBranchNode(proofNode);
 				String branchLabel = child.getNodeInfo().getBranchLabel();
 				if (branchLabel == null) {
-					int caseNumber = (child.parent().getChildNr(child) + 1);
+					final int caseNumber = (child.parent().getChildNr(child) + 1);
 					branchLabel = "Case " + caseNumber;
 				}
 				branchNode.setSerialNumber(branchLabel.replace(" ", "_"));
@@ -163,20 +163,20 @@ public class ProofTreeVisualizer {
 	 */
 	private void assignNUIFields(final Node proofNode, final Proof proof, 
 			final NUINode newNode) {
-		Goal g = proof.getGoal(proofNode);
+		final Goal goal = proof.getGoal(proofNode);
 		if (proofNode.leaf()) {
-			if (g != null) {
-				// node has a goal
-				newNode.setClosed(proofNode.isClosed());
-				newNode.setInteractive(!g.isAutomatic());
-				
-				if (g.isLinked()) {
-					setNUINodeLinkedTrue(newNode);
-				}
-			} else {
-				// node has no open goal -> node must be closed
-				newNode.setClosed(true);
-			}
+		    if (goal == null) {
+		        // node has no open goal -> node must be closed
+                newNode.setClosed(true);
+		    } else {
+		        // node has a goal
+                newNode.setClosed(proofNode.isClosed());
+                newNode.setInteractive(!goal.isAutomatic());
+                
+                if (goal.isLinked()) {
+                    setNUINodeLinkedTrue(newNode);
+                }
+		    }
 		} else {
 			// node is not a leaf
 			newNode.setClosed(proofNode.isClosed());
@@ -184,7 +184,7 @@ public class ProofTreeVisualizer {
 					getInteractiveRuleApplication());
 		}
 		// Set parameters which exist at all nodes
-		String nodeName = proofNode.serialNr() + ": " + proofNode.name();
+		final String nodeName = proofNode.serialNr() + ": " + proofNode.name();
 		newNode.setLabel(nodeName);
 		newNode.setHasNotes(proofNode.getNodeInfo().getNotes() != null);
 		newNode.setActive(proofNode.getNodeInfo().getActiveStatement() != null);
@@ -198,7 +198,7 @@ public class ProofTreeVisualizer {
 	private void setNUINodeLinkedTrue(final NUINode newNode) {
 		newNode.setLinked(true);
 		
-		NUINode parent = newNode.getParent();
+		final NUINode parent = newNode.getParent();
 		if (parent != null) {
 			setNUINodeLinkedTrue(parent);
 		}
@@ -230,7 +230,7 @@ public class ProofTreeVisualizer {
 		//fxTreeNode.getValue().setId(nuiNode.getSerialNumber());
 
 		// Convert child nodes recursively into TreeItem<Label> objects
-		for (NUINode child : nuiNode.getChildren()) {
+		for (final NUINode child : nuiNode.getChildren()) {
 
 			// Assign fx:id to child node (needed for test purposes)
 			//TODO what test?
@@ -238,16 +238,14 @@ public class ProofTreeVisualizer {
 			//Label l = new Label(child.getLabel());
 			//l.setId(child.getSerialNumber());
 
-			TreeItem<NUINode> fxNode = new TreeItem<NUINode>(child);
+			final TreeItem<NUINode> fxNode = new TreeItem<NUINode>(child);
 			fxTreeNode.getChildren().add(fxNode);
 
 			// if child is of type branch node -> add children recursively
 			if (child instanceof NUIBranchNode) {
-				NUIBranchNode childBranch = (NUIBranchNode) child;
+				final NUIBranchNode childBranch = (NUIBranchNode) child;
 				convertNUITreeToFXTree(childBranch, fxNode);
 			}
 		}
 	}
-
-
 }

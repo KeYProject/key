@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+import de.uka.ilkd.key.nui.controller.NUIController;
+import de.uka.ilkd.key.nui.controller.NUIController.Place;
 import javafx.scene.control.TreeItem;
 
 /**
@@ -22,7 +24,7 @@ public final class ProofTreeActions {
 	 */
 	public static void expandAll(final TreeItem<NUINode> rootTreeItem) {
 		rootTreeItem.setExpanded(true);
-		for (TreeItem<NUINode> child : rootTreeItem.getChildren()) {
+		for (final TreeItem<NUINode> child : rootTreeItem.getChildren()) {
 			expandAll(child);
 		}
 	}
@@ -38,9 +40,12 @@ public final class ProofTreeActions {
 			expandAll(child);
 		}
 		
-		TreeItem<NUINode> nextSibling = treeItem.nextSibling();
-		if (nextSibling != null) {
-			expandBelow(nextSibling);
+		// only expand siblings in case of no branch node
+		if (!(treeItem.getValue() instanceof NUIBranchNode)) {
+		    final TreeItem<NUINode> nextSibling = treeItem.nextSibling();
+		    if (nextSibling != null) {
+		        expandBelow(nextSibling);
+		    }
 		}
 	}
 	
@@ -65,11 +70,31 @@ public final class ProofTreeActions {
 			collapseAll(child);
 		}
 		
-		TreeItem<NUINode> nextSibling = treeItem.nextSibling();
-		if (nextSibling != null) {
-			collapseBelow(nextSibling);
-		}
+	    // only expand siblings in case of no branch node
+        if (!(treeItem.getValue() instanceof NUIBranchNode)) {
+            final TreeItem<NUINode> nextSibling = treeItem.nextSibling();
+            if (nextSibling != null) {
+                collapseBelow(nextSibling);
+            }
+        }
 	}
+	
+	 /**
+     * Opens the search view.
+     */
+    public static void openSearchView() {
+        Place p = NUIController.getInstance().getPlaceComponent().
+                get("treeView");
+        
+        try {
+            NUIController.getInstance().createOrMoveOrHideComponent(
+                    ".searchView", p, ".searchView.fxml");
+        } catch (IllegalArgumentException e) {
+            NUIController.getInstance().createOrMoveOrHideComponent(
+                    ".searchView", NUIController.Place.HIDDEN, 
+                    ".searchView.fxml");
+        }
+    }
 	
 	/**
 	 * Repaints a tree item in its treeView.
@@ -79,7 +104,7 @@ public final class ProofTreeActions {
 	 * @param treeItem the treeItem to refresh
 	 */
 	public static void refreshTreeItem(final TreeItem<NUINode> treeItem) {
-		int index = treeItem.getParent().getChildren().indexOf(treeItem);
+		final int index = treeItem.getParent().getChildren().indexOf(treeItem);
 		treeItem.getParent().getChildren().set(index, treeItem);
 	}
 }
