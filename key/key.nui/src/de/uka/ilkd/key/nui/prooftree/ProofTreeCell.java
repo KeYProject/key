@@ -127,16 +127,15 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      */
     private void decorateAsBranchNode() {
         label.getStyleClass().add(ProofTreeStyle.CSS_NODE_BRANCH);
-        // node is OPEN
-        if (!(getItem().isClosed())) {
-        	setIcon(icf.getImage(IconFactory.BRANCH_OPEN));
-        // node is LINKED
-        } else if (getItem().isLinked()) {
-        	setIcon(icf.getImage(IconFactory.BRANCH_LINKED));
-        // node is CLOSED
+        if (getItem().isClosed()) {
+            if (getItem().isLinked()) {
+                setIcon(icf.getImage(IconFactory.BRANCH_LINKED));
+            } else {
+                label.getStyleClass().add(ProofTreeStyle.CSS_NODE_CLOSED);
+                setIcon(icf.getImage(IconFactory.BRANCH_CLOSED));
+            }
         } else {
-        	label.getStyleClass().add(ProofTreeStyle.CSS_NODE_CLOSED);
-            setIcon(icf.getImage(IconFactory.BRANCH_CLOSED));
+            setIcon(icf.getImage(IconFactory.BRANCH_OPEN));
         }
     }
 
