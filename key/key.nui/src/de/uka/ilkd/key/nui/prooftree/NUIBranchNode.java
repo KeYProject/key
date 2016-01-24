@@ -75,4 +75,19 @@ public class NUIBranchNode extends NUINode {
 	public final void addChild(final NUINode child) {
 		this.children.add(child);
 	}
+	
+	/**
+	 * Checks if all branch node children are marked as linked
+	 * @return true iff all branch node children are linked
+	 */
+	public boolean hasOnlyLinkedBranchChildren() {
+	    for (NUINode child : children)
+	    {
+	        if(child instanceof NUIBranchNode && !child.isLinked()) {
+	            return false;
+	        }
+	    }
+	    
+	    return true;
+	}
 }
