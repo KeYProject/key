@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.nui.prooftree;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -15,6 +17,11 @@ import javafx.scene.control.TreeView;
  * @version 1.1
  */
 public class ProofTreeVisualizer {
+    
+    /**
+     * The label used for the root.
+     */
+    private final String rootLabel = "Proof Tree";
 	
 	/**
 	 * The fx tree view for displaying the NUI tree.
@@ -25,6 +32,11 @@ public class ProofTreeVisualizer {
 	 * The root node of the NUI tree.
 	 */
 	private NUIBranchNode nuiRoot;
+	
+	/**
+	 * A list of leafs that are marked as linked.
+	 */
+	private List<NUINode> linkedLeafs;
 
 	/**
 	 * Creates a new TreeConverter object.
@@ -80,11 +92,19 @@ public class ProofTreeVisualizer {
 		// assign the appropriate label
 		nuiRoot = new NUIBranchNode(pRoot);
 		assignNUIFields(pRoot, pRoot.proof(), nuiRoot);
-		String label = "Proof_Tree"; //TODO
+		String label = rootLabel;
 		nuiRoot.setLabel(label);
+		
+		// reset linked leafs
+		linkedLeafs = new LinkedList<NUINode>();
 		
 		// Convert recursively the ProofTree to a NUITree
 		addProofTreeToNUITree(pRoot, nuiRoot);
+		
+		// set linked leafs
+		for(NUINode linkedLeaf : linkedLeafs) {
+		    setNUINodeLinkedTrue(linkedLeaf);
+		}
 	}
 
 	/**
@@ -92,6 +112,10 @@ public class ProofTreeVisualizer {
 	 * NUITree parent.
 	 * This works by converting the given node, adding it to the parents, 
 	 * and recursively calling itself with the children.
+     * The linked field will be not set because it needs the full tree to
+     * work properly. Linked leafs will be put into the field 'linkedLeafs'.
+     * Please empty the field 'linkedLeafs' before calling and call the
+     * method setNUINodeLinkedTrue afer
 	 * 
 	 * @param proofNode {@link de.uka.ilkd.key.proof.Node}
 	 *            the proof tree root node for the tree to add to the NUITree
@@ -153,6 +177,8 @@ public class ProofTreeVisualizer {
 	/**
 	 * Add the required information to the newNode based on the information
 	 * given by the proofNode and the proof.
+	 * The linked field will be not set because it needs the full tree to
+	 * work properly. Linked leafs will be put into the field 'linkedLeafs'.
 	 * 
 	 * @param proofNode
 	 *            The proof node used to determine properties of the newNode.
@@ -174,7 +200,7 @@ public class ProofTreeVisualizer {
                 newNode.setInteractive(!goal.isAutomatic());
                 
                 if (goal.isLinked()) {
-                    setNUINodeLinkedTrue(newNode);
+                    linkedLeafs.add(newNode);
                 }
 		    }
 		} else {
@@ -192,15 +218,22 @@ public class ProofTreeVisualizer {
 
 	/**
 	 * Sets for a node the field interactive = true and propagates this.
-	 * information to its parents
+	 * information to its parents.
+	 * This method should be called only if the full NUITree was created.
+	 * Otherwise it will work not correctly.
 	 * @param newNode the node for that interactive should be set true
 	 */
 	private void setNUINodeLinkedTrue(final NUINode newNode) {
 		newNode.setLinked(true);
 		
+		// propagate linked information to parent
 		final NUINode parent = newNode.getParent();
-		if (parent != null) {
-			setNUINodeLinkedTrue(parent);
+		if (parent != null && parent instanceof NUIBranchNode) {
+		    final NUIBranchNode parentBranch = (NUIBranchNode) parent;
+		    if (parentBranch.hasOnlyLinkedBranchChildren()) {
+		        // if parent has only linked branch children, mark as linked.
+		        setNUINodeLinkedTrue(parentBranch);
+		    }
 		}
 	}
 
@@ -225,18 +258,8 @@ public class ProofTreeVisualizer {
 	private void convertNUITreeToFXTree(final NUIBranchNode nuiNode, 
 			final TreeItem<NUINode> fxTreeNode) {
 
-		// Assign fx:id to branch node (needed for test purposes)
-		//TODO what test?
-		//fxTreeNode.getValue().setId(nuiNode.getSerialNumber());
-
 		// Convert child nodes recursively into TreeItem<Label> objects
 		for (final NUINode child : nuiNode.getChildren()) {
-
-			// Assign fx:id to child node (needed for test purposes)
-			//TODO what test?
-			//NUINode l = new NUINode(child);
-			//Label l = new Label(child.getLabel());
-			//l.setId(child.getSerialNumber());
 
 			final TreeItem<NUINode> fxNode = new TreeItem<NUINode>(child);
 			fxTreeNode.getChildren().add(fxNode);
