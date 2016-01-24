@@ -29,7 +29,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 /**
- * Controller for the main GUI which is displayed when the program was started
+ * Controller for the main GUI which is displayed when the program was started.
  * 
  * @author Florian Breitfelder
  * @author Patrick Jattke
@@ -37,344 +37,330 @@ import javafx.scene.input.KeyEvent;
  *
  */
 public class NUIController implements Initializable {
-    /**
-     * Stores the position of components added to the SplitPane
-     */
-    private ObservableMap<String, Place> placeComponent = new ObservableMapWrapper<>(new HashMap<>());
+	/**
+	 * Stores the position of components added to the SplitPane.
+	 */
+	private ObservableMap<String, Place> placeComponent = new ObservableMapWrapper<>(new HashMap<>());
 
-    /**
-     * Provides an enum for the available places to avoid
-     * hard-to-find-typo-bugs.
-     */
-    public enum Place {
-        LEFT, MIDDLE, RIGHT, BOTTOM, HIDDEN
-    }
+	/**
+	 * Provides an enum for the available places in the main window.
+	 */
+	public enum Place {
+		LEFT, MIDDLE, RIGHT, BOTTOM, HIDDEN
+	}
 
-    /**
-     * Singleton.
-     */
-    private static NUIController instance;
+	/**
+	 * Singleton.
+	 */
+	private static NUIController instance;
 
-    /**
-     * Implements the Singleton pattern.
-     * 
-     * @return the single instance of <tt>this</tt>
-     */
-    public static NUIController getInstance() {
-        if (instance == null) {
-            instance = new NUIController();
-            return instance;
-        }
-        else {
-            return instance;
-        }
-    }
-    
-    /**
-     * @return the placeComponent
-     */
-    public final ObservableMap<String, Place> getPlaceComponent() {
-        return placeComponent;
-    }
+	/**
+	 * Implements the Singleton pattern.
+	 * 
+	 * @return the single instance of <tt>this</tt>
+	 */
+	public static NUIController getInstance() {
+		if (instance == null) {
+			instance = new NUIController();
+			return instance;
+		} else {
+			return instance;
+		}
+	}
 
-    // Definition of GUI fields
-    @FXML
-    VBox left;
-    @FXML
-    VBox middle;
-    @FXML
-    VBox right;
-    @FXML
-    HBox bottom;
-    @FXML
-    Parent root;
-    @FXML
-    Label statustext;
-    @FXML
-    ContextMenu contextMenu;
-    @FXML
-    MenuButton ButtonProofView;
-    @FXML
-    MenuButton ButtonGoalView;
-    @FXML
-    MenuButton ButtonOpenProofsView;
-    @FXML
-    MenuButton ButtonTreeView;
-    @FXML
-    ToggleGroup toggleGroup0;
-    @FXML
-    ToggleGroup toggleGroup1;
-    @FXML
-    ToggleGroup toggleGroup2;
-    @FXML
-    ToggleGroup toggleGroup3;
+	/**
+	 * @return the placeComponent
+	 */
+	public final ObservableMap<String, Place> getPlaceComponent() {
+		return placeComponent;
+	}
 
-    /**
-     * Loads the default components of the GUI
-     */
-    @Override
-    public void initialize(final URL location, final ResourceBundle resources) {
-        // Load default components
-        createOrMoveOrHideComponent("treeView", Place.LEFT, "treeView.fxml");
-        createOrMoveOrHideComponent("proofView", Place.RIGHT, "proofView.fxml");
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                TreeViewController t = ComponentFactory.getInstance().getController("treeView");
-                t.loadExampleProof();
-            }
-        });
-        // Select appropriate menu item entries
-        toggleGroup2.selectToggle(toggleGroup2.getToggles().get(3));
-        toggleGroup3.selectToggle(toggleGroup3.getToggles().get(1));
+	// Definition of GUI fields
+	@FXML
+	private VBox left;
+	@FXML
+	private VBox middle;
+	@FXML
+	private VBox right;
+	@FXML
+	private HBox bottom;
+	@FXML
+	private Parent root;
+	@FXML
+	private Label statustext;
+	@FXML
+	private ContextMenu contextMenu;
+	@FXML
+	private ToggleGroup toggleGroup0;
+	@FXML
+	private ToggleGroup toggleGroup1;
+	@FXML
+	private ToggleGroup toggleGroup2;
+	@FXML
+	private ToggleGroup toggleGroup3;
 
-        instance = this; // TODO this is ugly
-    }
+	/**
+	 * Loads the default components of the GUI.
+	 */
+	@Override
+	public final void initialize(final URL location, final ResourceBundle resources) {
+		// Load default components
+		createOrMoveOrHideComponent("treeView", Place.LEFT, "treeView.fxml");
+		createOrMoveOrHideComponent("proofView", Place.RIGHT, "proofView.fxml");
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				TreeViewController t = ComponentFactory.getInstance().getController("treeView");
+				t.loadExampleProof();
+			}
+		});
+		// Select appropriate menu item entries
+		final int POSITION_TREEVIEW = 3; // 3: left view
+		final int POSITION_PROOFVIEW = 2; // 2: right view
+		toggleGroup2.selectToggle(toggleGroup2.getToggles().get(POSITION_TREEVIEW));
+		toggleGroup3.selectToggle(toggleGroup3.getToggles().get(POSITION_PROOFVIEW));
 
-    /**
-     * Handles user input if user clicks "Close" in the file menu
-     */
-    @FXML
-    protected void handleCloseWindow(final ActionEvent e) {
-        Platform.exit();
-    }
+		instance = this; // TODO this is ugly
+	}
 
-    /**
-     * 
-     * @param e
-     */
-    @FXML
-    public final void handleOpenProof(ActionEvent e) {
-        if (!ComponentFactory.getInstance().hasComponent("treeView")) {
-            statustext.setText("TreeView not found, opening a tree is not possible");
-        }
-        else {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setInitialDirectory(new File("resources/de/uka/ilkd/key/examples"));
-            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Proof files",
-                    "*.proof");
-            fileChooser.getExtensionFilters().add(extFilter);
-            File file = fileChooser.showOpenDialog(contextMenu);
-            // only load proof if any selection was made
-            if (file != null) {
-                TreeViewController t = ComponentFactory.getInstance().getController("treeView");
-                t.loadAndDisplayProof(file);
-            }
-        }
-    }
+	/**
+	 * Handles user input if user clicks "Close" in the file menu.
+	 */
+	@FXML
+	protected final void handleCloseWindow(final ActionEvent e) {
+		Platform.exit();
+	}
 
-    /**
-     * Handles user input if user clicks "About KeY" in the file menu
-     */
-    @FXML
-    protected void handleAboutWindow(final ActionEvent e) {
+	/**
+	 * 
+	 * @param e
+	 */
+	@FXML
+	public final void handleOpenProof(final ActionEvent e) {
+		if (!ComponentFactory.getInstance().hasComponent("treeView")) {
+			statustext.setText("TreeView not found, opening a tree is not possible");
+		} else {
+			FileChooser fileChooser = new FileChooser();
+			fileChooser.setInitialDirectory(new File("resources/de/uka/ilkd/key/examples"));
+			FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Proof files", "*.proof");
+			fileChooser.getExtensionFilters().add(extFilter);
+			File file = fileChooser.showOpenDialog(contextMenu);
+			// only load proof if any selection was made
+			if (file != null) {
+				TreeViewController t = ComponentFactory.getInstance().getController("treeView");
+				t.loadAndDisplayProof(file);
+			}
+		}
+	}
 
-    }
+	/**
+	 * Handles user input if user clicks "About KeY" in the file menu.
+	 */
+	@FXML
+	protected void handleAboutWindow(final ActionEvent e) {
 
-    /**
-     * Handles user input if the user adds, deletes or moves GUI components by
-     * using the file menu
-     */
-    @FXML
-    protected void handleLoadComponent(final ActionEvent e) {
-        RadioMenuItem clickedItem = (RadioMenuItem) e.getSource();
-        String componentName = (String) // e.g. "treeView", "proofView"
-        clickedItem.getParentMenu().getProperties().get("componentName");
+	}
 
-        Place place;
+	/**
+	 * Handles user input if the user adds, deletes or moves GUI components by
+	 * using the file menu.
+	 */
+	@FXML
+	protected final void handleLoadComponent(final ActionEvent e) {
+		RadioMenuItem clickedItem = (RadioMenuItem) e.getSource();
+		String componentName = (String) // e.g. "treeView", "proofView"
+		clickedItem.getParentMenu().getProperties().get("componentName");
 
-        switch (clickedItem.getText()) {
-        case "left":
-            place = Place.LEFT;
-            break;
-        case "middle":
-            place = Place.MIDDLE;
-            break;
-        case "right":
-            place = Place.RIGHT;
-            break;
-        case "bottom":
-            place = Place.BOTTOM;
-            break;
-        default:
-            place = Place.HIDDEN;
-            break;
-        }
+		Place place;
 
-        String componentResource = (String) clickedItem.getParentMenu().getProperties()
-                .get("componentResource");
+		switch (clickedItem.getText()) {
+		case "left":
+			place = Place.LEFT;
+			break;
+		case "middle":
+			place = Place.MIDDLE;
+			break;
+		case "right":
+			place = Place.RIGHT;
+			break;
+		case "bottom":
+			place = Place.BOTTOM;
+			break;
+		default:
+			place = Place.HIDDEN;
+			break;
+		}
 
-        createOrMoveOrHideComponent(componentName, place, componentResource);
-    }
+		String componentResource = (String) clickedItem.getParentMenu().getProperties().get("componentResource");
 
-    /**
-     * @param p
-     *            a {@link Place}
-     * @return the respective Pane
-     * @throws IllegalArgumentException
-     *             p == HIDDEN
-     */
-    protected Pane getPane(final Place p) throws IllegalArgumentException {
-        switch (p) {
-        case MIDDLE:
-            return middle;
-        case BOTTOM:
-            return bottom;
-        case LEFT:
-            return left;
-        case RIGHT:
-            return right;
-        default:
-            throw new IllegalArgumentException();
-        }
-    }
+		createOrMoveOrHideComponent(componentName, place, componentResource);
+	}
 
-    /**
-     * TODO
-     * 
-     * @param componentName
-     *            – the Component to create / relocate / hide
-     * @param place
-     *            – the place where
-     * @param componentResource
-     * @throws IllegalArgumentException
-     *             The Component componentName already exists in the Place
-     *             place.
-     */
-    public void createOrMoveOrHideComponent(final String componentName, final Place place,
-            final String componentResource) throws IllegalArgumentException {
-        // Does the component already exist?
-        // Then the user wants to either change its place or to hide it
-        if (placeComponent.containsKey(componentName)) {
-            Node existingcomponent = null;
-            for (Node n : getPane(placeComponent.get(componentName)).getChildren()) {
-                if (n.getId().equals(componentName)) {
-                    existingcomponent = n;
-                    break;
-                }
-            }
-            // Add Component to the respective Pane
-            // (the list's observer will automatically remove it
-            // from the Pane where it currently is listed)
-            // and update its position in the posComponent Map.
-            if (place == Place.HIDDEN) {
-                // for (Node n :
-                // getPane(placeComponent.get(componentName)).getChildren()) {
-                // if (n.getId().equals(componentName)) {
-                // unregisterKeyListener(n.get);
-                // }
-                // }
+	/**
+	 * @param p
+	 *            a {@link Place}
+	 * @return the respective Pane
+	 * @throws IllegalArgumentException
+	 *             p == HIDDEN
+	 */
+	protected final Pane getPane(final Place p) throws IllegalArgumentException {
+		switch (p) {
+		case MIDDLE:
+			return middle;
+		case BOTTOM:
+			return bottom;
+		case LEFT:
+			return left;
+		case RIGHT:
+			return right;
+		default:
+			throw new IllegalArgumentException();
+		}
+	}
 
-                getPane(placeComponent.get(componentName)).getChildren().remove(existingcomponent);
-                placeComponent.remove(componentName);
-                statustext.setText("View " + componentName + " hidden.");
-                ComponentFactory.getInstance().deleteComponent(componentName);
-            }
-            else {
-                getPane(place).getChildren().add(existingcomponent);
-                placeComponent.replace(componentName, place);
-            }
-        }
-        else {
-            if (place != Place.HIDDEN) {
-                // Component did not already exist, thus it must be created
-                placeComponent.put(componentName, place);
-                Parent newComponent = ComponentFactory.getInstance().createComponent(componentName,
-                        componentResource);
-                getPane(place).getChildren().add(newComponent);
-            }
-        }
-    }
+	/**
+	 * TODO
+	 * 
+	 * @param componentName
+	 *            – the Component to create / relocate / hide
+	 * @param place
+	 *            – the place where
+	 * @param componentResource
+	 * @throws IllegalArgumentException
+	 *             The Component componentName already exists in the Place
+	 *             place.
+	 */
+	public final void createOrMoveOrHideComponent(final String componentName, final Place place,
+			final String componentResource) throws IllegalArgumentException {
+		// Does the component already exist?
+		// Then the user wants to either change its place or to hide it
+		if (placeComponent.containsKey(componentName)) {
+			Node existingcomponent = null;
+			for (Node n : getPane(placeComponent.get(componentName)).getChildren()) {
+				if (n.getId().equals(componentName)) {
+					existingcomponent = n;
+					break;
+				}
+			}
+			// Add Component to the respective Pane
+			// (the list's observer will automatically remove it
+			// from the Pane where it currently is listed)
+			// and update its position in the posComponent Map.
+			if (place == Place.HIDDEN) {
+				// for (Node n :
+				// getPane(placeComponent.get(componentName)).getChildren()) {
+				// if (n.getId().equals(componentName)) {
+				// unregisterKeyListener(n.get);
+				// }
+				// }
 
-    /**
-     * TODO
-     */
-    private Map<KeyCode, SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>> keyEventHandlers = new HashMap<>();
+				getPane(placeComponent.get(componentName)).getChildren().remove(existingcomponent);
+				placeComponent.remove(componentName);
+				statustext.setText("View " + componentName + " hidden.");
+				ComponentFactory.getInstance().deleteComponent(componentName);
+			} else {
+				getPane(place).getChildren().add(existingcomponent);
+				placeComponent.replace(componentName, place);
+			}
+		} else {
+			if (place != Place.HIDDEN) {
+				// Component did not already exist, thus it must be created
+				placeComponent.put(componentName, place);
+				Parent newComponent = ComponentFactory.getInstance().createComponent(componentName, componentResource);
+				getPane(place).getChildren().add(newComponent);
+			}
+		}
+	}
 
-    /**
-     * TODO JavaDoc
-     * 
-     * FIXME this does not allow to register the same key with different modifiers, e.g. Enter and Shift-Enter
-     * 
-     * @throws IllegalArgumentException
-     *             -- that key is already in use or modifiers does not entirely
-     *             consist of modifiers
-     */
-    public void registerKeyListener(KeyCode k, KeyCode[] modifiers, EventHandler<KeyEvent> e)
-            throws IllegalArgumentException {
+	/**
+	 * TODO
+	 */
+	private Map<KeyCode, SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>> keyEventHandlers = new HashMap<>();
 
-        if (modifiers != null) {
-            for (KeyCode c : modifiers) {
-                // blame Java for the fact that I cannot make the compiler do
-                // this check
-                if (!c.isModifierKey())
-                    throw new IllegalArgumentException(
-                            "You submitted an illegal modifiers list for the key " + k);
-            }
-        }
-        if (keyEventHandlers.containsKey(k)) {
-            // TODO this should better be done when the view is going to be
-            // hidden
-            // TODO this should be implemented using WeakHandles
-            // this is just a workaround to make the tests work again
-            unregisterKeyListener(k);
-            // throw new IllegalArgumentException(
-            // "The key you submitted (" + k + ") was already in use.");
-        }
+	/**
+	 * TODO JavaDoc
+	 * 
+	 * FIXME this does not allow to register the same key with different
+	 * modifiers, e.g. Enter and Shift-Enter
+	 * 
+	 * @throws IllegalArgumentException
+	 *             -- that key is already in use or modifiers does not entirely
+	 *             consist of modifiers
+	 */
+	public final void registerKeyListener(final KeyCode k, final KeyCode[] modifiers, final EventHandler<KeyEvent> e)
+			throws IllegalArgumentException {
 
-        keyEventHandlers.put(k, new SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>(e,
-                (modifiers == null) ? new KeyCode[0] : modifiers));
-    }
+		if (modifiers != null) {
+			for (KeyCode c : modifiers) {
+				// blame Java for the fact that I cannot make the compiler do
+				// this check
+				if (!c.isModifierKey()) {
+					throw new IllegalArgumentException("You submitted an illegal modifiers list for the key " + k);
+				}
+			}
+		}
+		if (keyEventHandlers.containsKey(k)) {
+			// TODO this should better be done when the view is going to be
+			// hidden
+			// TODO this should be implemented using WeakHandles
+			// this is just a workaround to make the tests work again
+			unregisterKeyListener(k);
+			// throw new IllegalArgumentException(
+			// "The key you submitted (" + k + ") was already in use.");
+		}
 
-    /**
-     * TODO
-     * 
-     * @throws IllegalArgumentException
-     */
-    public void unregisterKeyListener(KeyCode k) throws IllegalArgumentException {
-        keyEventHandlers.remove(k);
-    }
+		keyEventHandlers.put(k, new SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>(e,
+				(modifiers == null) ? new KeyCode[0] : modifiers));
+	}
 
-    /**
-     * TODO
-     * 
-     * @param k
-     */
-    public final void handleKeyPressed(final KeyEvent k) {
+	/**
+	 * TODO
+	 * 
+	 * @throws IllegalArgumentException
+	 */
+	public final void unregisterKeyListener(final KeyCode k) throws IllegalArgumentException {
+		keyEventHandlers.remove(k);
+	}
 
-        // Registered Key Handlers
-        SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]> e = keyEventHandlers
-                .get(k.getCode());
+	/**
+	 * TODO
+	 * 
+	 * @param k
+	 */
+	public final void handleKeyPressed(final KeyEvent k) {
 
-        if (e != null) {
-            for (KeyCode keyCode : e.getValue()) {
-                switch (keyCode) {
-                case ALT:
-                    if (!k.isAltDown()) {
-                        return;
-                    }
-                    break;
-                case CONTROL:
-                    if (!k.isControlDown()) {
-                        return;
-                    }
-                    break;
-                case META:
-                    if (!k.isMetaDown()) {
-                        return;
-                    }
-                    break;
-                case SHIFT:
-                    if (!k.isShiftDown()) {
-                        return;
-                    }
-                    break;
-                default:
-                    throw new IllegalArgumentException(
-                            "You submitted an illegal modifiers list for the key " + k.getCode());
-                }
-            }
-            e.getKey().handle(k);
-        }
-    }
+		// Registered Key Handlers
+		SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]> e = keyEventHandlers.get(k.getCode());
+
+		if (e != null) {
+			for (KeyCode keyCode : e.getValue()) {
+				switch (keyCode) {
+				case ALT:
+					if (!k.isAltDown()) {
+						return;
+					}
+					break;
+				case CONTROL:
+					if (!k.isControlDown()) {
+						return;
+					}
+					break;
+				case META:
+					if (!k.isMetaDown()) {
+						return;
+					}
+					break;
+				case SHIFT:
+					if (!k.isShiftDown()) {
+						return;
+					}
+					break;
+				default:
+					throw new IllegalArgumentException(
+							"You submitted an illegal modifiers list for the key " + k.getCode());
+				}
+			}
+			e.getKey().handle(k);
+		}
+	}
 }
