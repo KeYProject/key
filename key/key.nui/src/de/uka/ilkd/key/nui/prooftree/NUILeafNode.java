@@ -27,7 +27,7 @@ public class NUILeafNode extends NUINode {
     }
 
     /**
-     * Returns the proof node of the leaf node.
+     * Returns the corresponding proof node of the leaf node.
      * 
      * @return proofNode
      * 			The proof node of the leaf node.
