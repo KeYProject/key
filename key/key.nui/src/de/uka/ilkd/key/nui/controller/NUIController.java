@@ -296,7 +296,9 @@ public class NUIController implements Initializable {
     private Map<KeyCode, SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>> keyEventHandlers = new HashMap<>();
 
     /**
-     * TODO
+     * TODO JavaDoc
+     * 
+     * FIXME this does not allow to register the same key with different modifiers, e.g. Enter and Shift-Enter
      * 
      * @throws IllegalArgumentException
      *             -- that key is already in use or modifiers does not entirely
@@ -317,6 +319,7 @@ public class NUIController implements Initializable {
         if (keyEventHandlers.containsKey(k)) {
             // TODO this should better be done when the view is going to be
             // hidden
+            // TODO this should be implemented using WeakHandles
             // this is just a workaround to make the tests work again
             unregisterKeyListener(k);
             // throw new IllegalArgumentException(

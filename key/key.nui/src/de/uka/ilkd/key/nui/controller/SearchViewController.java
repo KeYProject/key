@@ -10,13 +10,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 public class SearchViewController implements Initializable {
 
     public static final String NAME = ".searchView";
 
     public static final String RESOURCE = ".searchView.fxml";
-    
+
     @FXML
     TextField SearchTextField;
     @FXML
@@ -26,14 +28,24 @@ public class SearchViewController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        NUIController.getInstance().registerKeyListener(KeyCode.ENTER,
+                new KeyCode[] {}, (event) -> {
+                    if(event.isShiftDown()){
+                        PreviousButton.fire();    
+                    } else {
+                        NextButton.fire();
+                    }
+                });
+
         Platform.runLater(() -> {
-                SearchTextField.requestFocus();
+            SearchTextField.requestFocus();
         });
 
         SearchTextField.textProperty().addListener((obs, oldText, newText) -> {
-            NextButton.setDisable(newText.isEmpty()); 
+            NextButton.setDisable(newText.isEmpty());
             PreviousButton.setDisable(newText.isEmpty());
-            TreeViewController tVC = ComponentFactory.getInstance().getController(TreeViewController.NAME);
+            TreeViewController tVC = ComponentFactory.getInstance()
+                    .getController(TreeViewController.NAME);
             tVC.search(newText);
         });
     }
@@ -41,10 +53,12 @@ public class SearchViewController implements Initializable {
     /**
      * To be called if the NextButton is clicked.
      * 
-     * @param e the <tt>ActionEvent</tt> being fired by clicking that button.
+     * @param e
+     *            the <tt>ActionEvent</tt> being fired by clicking that button.
      */
     public void handleNextButton(ActionEvent e) {
-        TreeViewController t = ComponentFactory.getInstance().getController(TreeViewController.NAME);
+        TreeViewController t = ComponentFactory.getInstance()
+                .getController(TreeViewController.NAME);
         t.selectAndIfNeededScrollToNextSearchResult();
     }
 
@@ -53,10 +67,12 @@ public class SearchViewController implements Initializable {
      * 
      * TODO currently does not work
      * 
-     * @param e the <tt>ActionEvent</tt> being fired by clicking that button.
+     * @param e
+     *            the <tt>ActionEvent</tt> being fired by clicking that button.
      */
     public void handlePreviousButton(ActionEvent e) {
-        TreeViewController t = ComponentFactory.getInstance().getController(TreeViewController.NAME);
+        TreeViewController t = ComponentFactory.getInstance()
+                .getController(TreeViewController.NAME);
         t.selectAndIfNeededScrollToPreviousSearchResult();
     }
 
