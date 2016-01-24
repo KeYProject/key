@@ -2,11 +2,14 @@ package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.WeakHashMap;
+import java.util.concurrent.Callable;
+
+import com.sun.xml.internal.org.jvnet.staxex.NamespaceContextEx.Binding;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.ComponentFactory;
 import de.uka.ilkd.key.nui.IconFactory;
@@ -19,6 +22,15 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.binding.ObjectBinding;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
+import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -38,6 +50,19 @@ import javafx.util.Callback;
  * @version 1.1
  */
 public class TreeViewController implements Initializable {
+    public static final String NAME = "treeView";
+
+    /**
+     * The IconFactory used to create icons for the proof tree nodes.
+     */
+    private final IconFactory icf;
+
+    /**
+     * A <tt>WeakHashMap</tt> storing the <tt>ProofTreeCells</tt> currently
+     * existing.
+     */
+    private WeakHashMap<ProofTreeCell, DoubleBinding> proofTreeCells = new WeakHashMap<>();
+
     /**
      * The proofTree view of the GUI.
      */
@@ -45,14 +70,17 @@ public class TreeViewController implements Initializable {
     private TreeView<NUINode> proofTreeView;
 
     /**
+     * An ObservableList storing the Items matching a <tt/>search()<tt/>
+     */
+    private ObservableList<TreeItem<NUINode>> searchMatches = FXCollections
+            .observableList(new LinkedList<TreeItem<NUINode>>());
+
+    private List<TreeItem<NUINode>> treeItems;
+
+    /**
      * The visualizer for displaying a proof tree.
      */
     private ProofTreeVisualizer visualizer;
-
-    /**
-     * The IconFactory used to create icons for the proof tree nodes.
-     */
-    private final IconFactory icf;
 
     /**
      * The constructor.
@@ -66,51 +94,54 @@ public class TreeViewController implements Initializable {
      */
     @Override
     public final void initialize(final URL location, final ResourceBundle resources) {
+        Platform.runLater(() -> {
 
-        // Register KeyEvent
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                NUIController.getInstance().registerKeyListener(KeyCode.F,
-                        new KeyCode[] { KeyCode.CONTROL }, new EventHandler<KeyEvent>() {
-                    @Override
-                    public void handle(final KeyEvent e) {
-                        if (NUIController.getInstance().getPlaceComponent()
-                                .containsKey("treeView")) {
-                            Place p = NUIController.getInstance().getPlaceComponent()
-                                    .get("treeView");
-                            try {
-                                NUIController.getInstance().createOrMoveOrHideComponent(
-                                        ".searchView", p, ".searchView.fxml");
-                            }
-                            catch (IllegalArgumentException ex) {
-                                // SearchView already exists
-                                SearchViewController c = ComponentFactory.getInstance()
-                                        .getController(".searchView");
-                                c.performFocusRequest();
-                            }
-                        }
+            // Look for changes to TreeViews Place. If changed and searchView is
+            // visible, also change searchView's Place.
+            NUIController.getInstance().getPlaceComponent()
+                    .addListener(new MapChangeListener<String, Place>() {
+                @Override
+                public void onChanged(Change<? extends String, ? extends Place> change) {
+                    if (change.getKey().equals(NAME) && NUIController.getInstance()
+                            .getPlaceComponent().containsKey(SearchViewController.NAME)) {
+                        NUIController.getInstance().createOrMoveOrHideComponent(
+                                SearchViewController.NAME, change.getValueAdded(),
+                                SearchViewController.RESOURCE);
                     }
-                });
+                }
+            });
 
-                NUIController.getInstance().registerKeyListener(KeyCode.ESCAPE, null,
-                        new EventHandler<KeyEvent>() {
-                    @Override
-                    public void handle(final KeyEvent e) {
-                        NUIController.getInstance().createOrMoveOrHideComponent(".searchView",
-                                Place.HIDDEN, ".searchView.fxml");
+            // Register KeyEvent
+            NUIController.getInstance().registerKeyListener(KeyCode.F,
+                    new KeyCode[] { KeyCode.CONTROL }, (event) -> {
+                if (NUIController.getInstance().getPlaceComponent().containsKey(NAME)) {
+                    try {
+                        NUIController.getInstance().createOrMoveOrHideComponent(
+                                SearchViewController.NAME,
+                                NUIController.getInstance().getPlaceComponent().get(NAME),
+                                SearchViewController.RESOURCE);
                     }
-                });
+                    catch (IllegalArgumentException ex) {
+                        // SearchView already exists
+                        SearchViewController c = ComponentFactory.getInstance()
+                                .getController(SearchViewController.NAME);
+                        c.performFocusRequest();
+                    }
+                }
+            });
 
-            }
+            NUIController.getInstance().registerKeyListener(KeyCode.ESCAPE, null, (event) -> {
+                NUIController.getInstance().createOrMoveOrHideComponent(SearchViewController.NAME,
+                        Place.HIDDEN, SearchViewController.RESOURCE);
+                searchMatches.clear();
+            });
         });
 
         // set cell factory for rendering cells
-        proofTreeView.setCellFactory(new Callback<TreeView<NUINode>, TreeCell<NUINode>>() {
-            @Override
-            public TreeCell<NUINode> call(final TreeView<NUINode> p) {
-                return new ProofTreeCell(icf);
-            }
+        proofTreeView.setCellFactory((treeItem) -> {
+            ProofTreeCell c = new ProofTreeCell(icf, searchMatches);
+            Platform.runLater(() -> registerTreeCell(c));
+            return c;
         });
 
         // Create a new tree visualizer instance for processing the conversion
@@ -129,23 +160,16 @@ public class TreeViewController implements Initializable {
     }
 
     /**
-     * Displays a proof in the proofTreeView.
-     * 
-     * @param proof
-     *            The proof file which should be displayed
-     */
-    private void displayProof(final Proof proof) {
-        visualizer.loadProofTree(proof);
-        visualizer.visualizeProofTree();
-    }
-
-    /**
+     * Loads and displays a file containing a KeY proof. May fail and/or throw
+     * various exceptions if the file does not exist or does not contain a valid
+     * proof.
      * 
      * @param file
+     *            The proof file to load.
      */
     public final void loadAndDisplayProof(File file) {
         displayProof(loadProof(file));
-        searchMap = null;
+        searchMatches.clear();
     }
 
     /**
@@ -159,7 +183,193 @@ public class TreeViewController implements Initializable {
     public final void loadExampleProof() {
         File proofFile = new File("resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof");
         loadAndDisplayProof(proofFile);
-        searchMap = null;
+        searchMatches.clear();
+    }
+
+    /**
+     * This method should be called every time a new TreeCell is being created.
+     * <tt>this</tt> will reference the ProofTreeCell in a WeakHandle in order
+     * to find out which TreeItems currently are visible to the user.
+     *
+     * @param t
+     *            the ProofTreeCell to register.
+     */
+    private void registerTreeCell(ProofTreeCell t) {
+        proofTreeCells.put(t,
+                Bindings.createDoubleBinding(() -> t.getHeight(), t.heightProperty()));
+    }
+
+    /**
+     * Searches the <tt>Label</tt>s of the <tt>TreeItems</tt> in the underlying
+     * <tt>ProofTree</tt> for a given term. Highlights all the matches.<br/>
+     * It is possible to use this for an incremental search, but doing so is
+     * inefficient because the list storing the matches from the last search is
+     * being emptied on every call. <br/>
+     * <br/>
+     * <b><tt>TODO</tt> optimize this for incremental search by buffering the
+     * last search term.</b>
+     * 
+     * @param term
+     *            The String to search for.
+     */
+    public final void search(String term) {
+        // remove old matches
+        searchMatches.clear();
+        // exit if no search term specified
+        if (term.isEmpty())
+            return;
+
+        // iterate over all the TreeItems and add them to searchMatches if they
+        // match the search
+        for (TreeItem<NUINode> t : getTreeItems()) {
+            if (t.getValue().getLabel().toLowerCase().contains(term.toLowerCase())) {
+                searchMatches.add(t);
+            }
+        }
+    }
+
+    /**
+     * Selects the next item in searchMatches. Scrolls the ProofTreeView if that
+     * item is not visible to the user. Expands the ProofTreeView as needed.
+     * Only to be used together with <tt>TreeViewController.search()</tt>.
+     */
+    public void selectAndIfNeededScrollToNextSearchResult() {
+        // catch bad calls
+        if (searchMatches.isEmpty() || searchMatches == null)
+            return;
+
+        TreeItem<NUINode> currentlySelectedItem = proofTreeView.getSelectionModel()
+                .getSelectedItem();
+        TreeItem<NUINode> itemToSelect;
+
+        /*
+         * start from the top if a) no item is selected b) an item is selected
+         * that is not a search result c) the selected item is the last search
+         * result
+         */
+        if (currentlySelectedItem == null || !searchMatches.contains(currentlySelectedItem)
+                || searchMatches.size() == searchMatches.indexOf(currentlySelectedItem) + 1) {
+            itemToSelect = searchMatches.get(0);
+        }
+        else {
+            itemToSelect = searchMatches.get(searchMatches.indexOf(currentlySelectedItem) + 1);
+        }
+        // if the treeItem is not in an expanded branch of the tree, the tree
+        // must be expanded accordingly
+        if (proofTreeView.getRow(itemToSelect) == -1) {
+            for (TreeItem<NUINode> t = itemToSelect; t.getParent() != null
+                    && !t.getParent().isExpanded(); t = t.getParent()) {
+                t.setExpanded(true);
+            }
+        }
+
+        // select the item
+        proofTreeView.getSelectionModel().select(itemToSelect);
+
+        // if none of the treeCells contain the item we have just selected,
+        // we need to scroll to make it visible
+        if (proofTreeCells.keySet().stream().noneMatch(x -> (x.getTreeItem() == itemToSelect))) {
+            proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex());
+        }
+
+    }
+    
+    /**
+     * Selects the previous item in searchMatches. Scrolls the ProofTreeView if that
+     * item is not visible to the user. Expands the ProofTreeView as needed.
+     * Only to be used together with <tt>TreeViewController.search()</tt>.
+     */
+    public void selectAndIfNeededScrollToPreviousSearchResult(){
+        // catch bad calls
+        if (searchMatches.isEmpty() || searchMatches == null)
+            return;
+
+        TreeItem<NUINode> currentlySelectedItem = proofTreeView.getSelectionModel()
+                .getSelectedItem();
+        TreeItem<NUINode> itemToSelect;
+
+        /*
+         * start from the bottom if a) no item is selected b) an item is selected
+         * that is not a search result c) the selected item is the first search
+         * result
+         */
+        if (currentlySelectedItem == null || !searchMatches.contains(currentlySelectedItem)
+                || currentlySelectedItem == searchMatches.get(0)) {
+            itemToSelect = searchMatches.get(searchMatches.size()-1);
+        }
+        else {
+            itemToSelect = searchMatches.get(searchMatches.indexOf(currentlySelectedItem) -1);
+        }
+        // if the treeItem is not in an expanded branch of the tree, the tree
+        // must be expanded accordingly
+        if (proofTreeView.getRow(itemToSelect) == -1) {
+            for (TreeItem<NUINode> t = itemToSelect; t.getParent() != null
+                    && !t.getParent().isExpanded(); t = t.getParent()) {
+                t.setExpanded(true);
+            }
+        }
+
+        // select the item
+        proofTreeView.getSelectionModel().select(itemToSelect);
+
+        // if none of the treeCells contain the item we have just selected,
+        // we need to scroll to make it visible
+        if (proofTreeCells.keySet().stream().noneMatch(x -> (x.getTreeItem() == itemToSelect))) {
+            proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex() - ((int)(proofTreeCells.size() /2)));
+        }
+    }
+
+    /**
+     * Displays a proof in the proofTreeView.
+     * 
+     * @param proof
+     *            The proof file which should be displayed
+     */
+    private void displayProof(final Proof proof) {
+        visualizer.loadProofTree(proof);
+        visualizer.visualizeProofTree();
+    }
+
+    /**
+     * Recursively walks through the tree, storing all items in the List being
+     * returned
+     * 
+     * @return a List of all the TreeItems in the underlying ProofTreeView
+     */
+    private List<TreeItem<NUINode>> getTreeItems() {
+        if (treeItems == null) {
+            class TreeToListHelper {
+                /**
+                 * Parses a Tree, beginning at <b>t</b>, and adds to list every
+                 * TreeItem that is a child of <b>root</b> or of its children
+                 * <b>l</b>.
+                 * 
+                 * @param root
+                 *            Where to start parsing
+                 * @param list
+                 *            Where all the TreeItems are added to
+                 * @return <b>list</b>, but with all the TreeItems appended to
+                 *         it
+                 */
+                private List<TreeItem<NUINode>> treeToList(final TreeItem<NUINode> root,
+                        final List<TreeItem<NUINode>> list) {
+                    if (root == null || list == null) {
+                        throw new IllegalArgumentException();
+                    }
+                    list.add(root);
+                    if (!root.getChildren().isEmpty()) {
+                        for (TreeItem<NUINode> ti : root.getChildren()) {
+                            list.addAll(treeToList(ti, new LinkedList<TreeItem<NUINode>>()));
+                        }
+                    }
+                    return list;
+                }
+            }
+            treeItems = (new TreeToListHelper()).treeToList(proofTreeView.getRoot(),
+                    new LinkedList<TreeItem<NUINode>>());
+        }
+
+        return treeItems;
     }
 
     /**
@@ -181,68 +391,5 @@ public class TreeViewController implements Initializable {
             e.printStackTrace();
             return null;
         }
-    }
-
-    /**
-     * Stores all the Labels in the tree and their respective TreeItems.
-     */
-    private HashMap<String, TreeItem<NUINode>> searchMap;
-
-    public final int getCurrentlySelectedItemsIndex() {
-        return proofTreeView.getSelectionModel().getSelectedIndex();
-    }
-
-    public final int getTreeItemsRow(TreeItem<NUINode> t) {
-        return proofTreeView.getRow(t);
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public final Map<String, TreeItem<NUINode>> getSearchMap() {
-
-        class TreeToListHelper {
-            /**
-             * Parses a Tree, beginning at <b>t</b>, and adds to list every
-             * TreeItem that is a child of <b>root</b> or of its children
-             * <b>l</b>.
-             * 
-             * @param root
-             *            Where to start parsing
-             * @param list
-             *            Where all the TreeItems are added to
-             * @return <b>list</b>, but with all the TreeItems appended to it
-             */
-            private List<TreeItem<NUINode>> treeToList(final TreeItem<NUINode> root,
-                    final List<TreeItem<NUINode>> list) {
-                if (root == null || list == null) {
-                    throw new IllegalArgumentException();
-                }
-                list.add(root);
-                if (!root.getChildren().isEmpty()) {
-                    for (TreeItem<NUINode> ti : root.getChildren()) {
-                        list.addAll(treeToList(ti, new LinkedList<TreeItem<NUINode>>()));
-                    }
-                }
-                return list;
-            }
-        }
-
-        if (searchMap == null) {
-            searchMap = new HashMap<>();
-            List<TreeItem<NUINode>> l = (new TreeToListHelper()).treeToList(proofTreeView.getRoot(),
-                    new LinkedList<TreeItem<NUINode>>());
-            for (TreeItem<NUINode> t : l) {
-                searchMap.put(t.getValue().getLabel(), t);
-            }
-        }
-        return searchMap;
-    }
-
-    public void scrollToAndSelect(int nextLargerIdx) {
-        // TODO this is a workaround as I was not able to make this thing scroll to middle
-        proofTreeView.scrollTo((nextLargerIdx < 5) ? nextLargerIdx : (nextLargerIdx - 5));
-        proofTreeView.getSelectionModel().select(nextLargerIdx);
     }
 }

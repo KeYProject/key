@@ -60,12 +60,6 @@ public abstract class NUINode {
 	private NUINode parent;
 
 	/**
-	 * Marks if the node should be highlighted e.g. in case that it is searched
-	 * for.
-	 */
-	private boolean isHighlighted;
-
-	/**
 	 * Marks if the node is currently visible in the treeView.
 	 */
 	private boolean isVisible = true;
@@ -252,25 +246,6 @@ public abstract class NUINode {
 	}
 
 	/**
-	 * Sets the highlighted field of the node.
-	 * 
-	 * @param isHighlighted
-	 *            marks if the node should be highlighted
-	 */
-	public final void setHighlighting(final boolean isHighlighted) {
-		this.isHighlighted = isHighlighted;
-	}
-
-	/**
-	 * Returns information about the node's highlighting property.
-	 * 
-	 * @return true if the node is highlighted, else false
-	 */
-	public final boolean isHighlighted() {
-		return isHighlighted;
-	}
-
-	/**
 	 * Sets the visibility of the node.
 	 * 
 	 * @param isVisible
@@ -287,5 +262,10 @@ public abstract class NUINode {
 	 */
 	public final boolean isVisible() {
 		return isVisible;
+	}
+	
+	@Override
+	public String toString(){
+	    return getLabel();
 	}
 }
