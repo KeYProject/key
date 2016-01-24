@@ -9,7 +9,6 @@
    <children>
       <Button fx:id="PreviousButton" onAction="#handlePreviousButton" disable="true" layoutX="214.0" layoutY="6.0" mnemonicParsing="false" text="&lt;" textAlignment="CENTER" />
       <Button fx:id="NextButton" onAction="#handleNextButton" disable="true" layoutX="243.0" layoutY="6.0" mnemonicParsing="false" text="&gt;" textAlignment="CENTER" />
-      <TextField fx:id="SearchTextField" onAction="#handleSearchButton" layoutX="6.0" layoutY="6.0" promptText="Search..." />
-      <Button fx:id="SearchButton" onAction="#handleSearchButton" disable="true" layoutX="180.0" layoutY="6.0" mnemonicParsing="false" text="S" />
+      <TextField fx:id="SearchTextField" onAction="#handleNextButton" layoutX="6.0" layoutY="6.0" promptText="Search..." />
    </children>
 </AnchorPane>
