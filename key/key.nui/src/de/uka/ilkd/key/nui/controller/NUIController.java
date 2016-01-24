@@ -48,22 +48,21 @@ public class NUIController implements Initializable {
 	private HashMap<String, Place> placeComponent = new HashMap<>();
 
 	/**
-	 * TODO
-	 * 
+	 * Provides an enum for the available places to avoid hard-to-find-typo-bugs. 
 	 */
 	public enum Place {
 		LEFT, MIDDLE, RIGHT, BOTTOM, HIDDEN
 	}
 
 	/**
-	 * TODO this is ugly
+	 * Singleton.
 	 */
 	private static NUIController instance;
 
 	/**
-	 * TODO this is ugly
+	 * Implements the Singleton pattern. 
 	 * 
-	 * @return
+	 * @return the single instance of <tt>this</tt>
 	 */
 	public static NUIController getInstance() {
 		if (instance == null) {
