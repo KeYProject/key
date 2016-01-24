@@ -38,7 +38,7 @@ public class NUI extends Application {
 	 */
 	@Override
 	public final void start(final Stage stage) {
-		ComponentFactory.setInstance("components/");
+		ComponentFactory.setResourceDirectory("components/");
 		final Parent root = ComponentFactory.getInstance().createNUISceneGraph();
 
 		// Load scene and set preferences

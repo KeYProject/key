@@ -27,7 +27,7 @@ public class TreeViewTest extends GuiTest {
     public Parent getRootNode() {
     	// Retrieve component factory and create treeView
     	ComponentFactory factory = ComponentFactory.getInstance();
-    	ComponentFactory.setInstance("components/");
+    	ComponentFactory.setResourceDirectory("components/");
     	root = factory.createComponent("treeView", "treeView.fxml");
     	
     	// Get controller and load default proof file

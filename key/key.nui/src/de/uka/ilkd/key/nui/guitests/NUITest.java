@@ -60,7 +60,7 @@ public class NUITest extends GuiTest {
 	@Override
 	public Parent getRootNode() {
 		ComponentFactory factory = ComponentFactory.getInstance();
-		ComponentFactory.setInstance("components/");
+		ComponentFactory.setResourceDirectory("components/");
 		root = factory.createNUISceneGraph();
 		return root;
 	}
