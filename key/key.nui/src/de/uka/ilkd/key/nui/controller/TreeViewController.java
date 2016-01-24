@@ -6,6 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
+import java.util.concurrent.Callable;
+
+import com.sun.xml.internal.org.jvnet.staxex.NamespaceContextEx.Binding;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.ComponentFactory;
@@ -21,7 +24,12 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
+import javafx.beans.binding.ObjectBinding;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -50,7 +58,8 @@ public class TreeViewController implements Initializable {
     private final IconFactory icf;
 
     /**
-     * A <tt>WeakHashMap</tt> storing the <tt>ProofTreeCells</tt> currently existing.
+     * A <tt>WeakHashMap</tt> storing the <tt>ProofTreeCells</tt> currently
+     * existing.
      */
     private WeakHashMap<ProofTreeCell, DoubleBinding> proofTreeCells = new WeakHashMap<>();
 
@@ -85,54 +94,54 @@ public class TreeViewController implements Initializable {
      */
     @Override
     public final void initialize(final URL location, final ResourceBundle resources) {
+        Platform.runLater(() -> {
 
-        // Register KeyEvent
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                NUIController.getInstance().registerKeyListener(KeyCode.F,
-                        new KeyCode[] { KeyCode.CONTROL }, new EventHandler<KeyEvent>() {
-                    @Override
-                    public void handle(final KeyEvent e) {
-                        if (NUIController.getInstance().getPlaceComponent()
-                                .containsKey("treeView")) {
-                            Place p = NUIController.getInstance().getPlaceComponent()
-                                    .get("treeView");
-                            try {
-                                NUIController.getInstance().createOrMoveOrHideComponent(
-                                        ".searchView", p, ".searchView.fxml");
-                            }
-                            catch (IllegalArgumentException ex) {
-                                // SearchView already exists
-                                SearchViewController c = ComponentFactory.getInstance()
-                                        .getController(".searchView");
-                                c.performFocusRequest();
-                            }
-                        }
+            // Look for changes to TreeViews Place. If changed and searchView is
+            // visible, also change searchView's Place.
+            NUIController.getInstance().getPlaceComponent()
+                    .addListener(new MapChangeListener<String, Place>() {
+                @Override
+                public void onChanged(Change<? extends String, ? extends Place> change) {
+                    if (change.getKey().equals(NAME) && NUIController.getInstance()
+                            .getPlaceComponent().containsKey(SearchViewController.NAME)) {
+                        NUIController.getInstance().createOrMoveOrHideComponent(
+                                SearchViewController.NAME, change.getValueAdded(),
+                                SearchViewController.RESOURCE);
                     }
-                });
+                }
+            });
 
-                NUIController.getInstance().registerKeyListener(KeyCode.ESCAPE, null,
-                        new EventHandler<KeyEvent>() {
-                    @Override
-                    public void handle(final KeyEvent e) {
-                        NUIController.getInstance().createOrMoveOrHideComponent(".searchView",
-                                Place.HIDDEN, ".searchView.fxml");
-                        searchMatches.clear();
+            // Register KeyEvent
+            NUIController.getInstance().registerKeyListener(KeyCode.F,
+                    new KeyCode[] { KeyCode.CONTROL }, (event) -> {
+                if (NUIController.getInstance().getPlaceComponent().containsKey(NAME)) {
+                    try {
+                        NUIController.getInstance().createOrMoveOrHideComponent(
+                                SearchViewController.NAME,
+                                NUIController.getInstance().getPlaceComponent().get(NAME),
+                                SearchViewController.RESOURCE);
                     }
-                });
+                    catch (IllegalArgumentException ex) {
+                        // SearchView already exists
+                        SearchViewController c = ComponentFactory.getInstance()
+                                .getController(SearchViewController.NAME);
+                        c.performFocusRequest();
+                    }
+                }
+            });
 
-            }
+            NUIController.getInstance().registerKeyListener(KeyCode.ESCAPE, null, (event) -> {
+                NUIController.getInstance().createOrMoveOrHideComponent(SearchViewController.NAME,
+                        Place.HIDDEN, SearchViewController.RESOURCE);
+                searchMatches.clear();
+            });
         });
 
         // set cell factory for rendering cells
-        proofTreeView.setCellFactory(new Callback<TreeView<NUINode>, TreeCell<NUINode>>() {
-            @Override
-            public TreeCell<NUINode> call(final TreeView<NUINode> p) {
-                ProofTreeCell c = new ProofTreeCell(icf, searchMatches);
-                Platform.runLater(() -> registerTreeCell(c));
-                return c;
-            }
+        proofTreeView.setCellFactory((treeItem) -> {
+            ProofTreeCell c = new ProofTreeCell(icf, searchMatches);
+            Platform.runLater(() -> registerTreeCell(c));
+            return c;
         });
 
         // Create a new tree visualizer instance for processing the conversion
@@ -155,7 +164,8 @@ public class TreeViewController implements Initializable {
      * various exceptions if the file does not exist or does not contain a valid
      * proof.
      * 
-     * @param file The proof file to load.
+     * @param file
+     *            The proof file to load.
      */
     public final void loadAndDisplayProof(File file) {
         displayProof(loadProof(file));
@@ -209,11 +219,12 @@ public class TreeViewController implements Initializable {
         if (term.isEmpty())
             return;
 
-        // iterate over all the TreeItems and add them to searchMatches if they match the search
+        // iterate over all the TreeItems and add them to searchMatches if they
+        // match the search
         for (TreeItem<NUINode> t : getTreeItems()) {
             if (t.getValue().getLabel().toLowerCase().contains(term.toLowerCase())) {
                 searchMatches.add(t);
-        }
+            }
         }
     }
 
@@ -230,12 +241,12 @@ public class TreeViewController implements Initializable {
         TreeItem<NUINode> currentlySelectedItem = proofTreeView.getSelectionModel()
                 .getSelectedItem();
         TreeItem<NUINode> itemToSelect;
-        
-        /* start from the top if
-         * a) no item is selected
-         * b) an item is selected that is not a search result
-         * c) the selected item is the last search result
-         */                        
+
+        /*
+         * start from the top if a) no item is selected b) an item is selected
+         * that is not a search result c) the selected item is the last search
+         * result
+         */
         if (currentlySelectedItem == null || !searchMatches.contains(currentlySelectedItem)
                 || searchMatches.size() == searchMatches.indexOf(currentlySelectedItem) + 1) {
             itemToSelect = searchMatches.get(0);
@@ -259,7 +270,7 @@ public class TreeViewController implements Initializable {
         // we need to scroll to make it visible
         if (proofTreeCells.keySet().stream().noneMatch(x -> (x.getTreeItem() == itemToSelect))) {
             proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex());
-    }
+        }
 
     }
 
@@ -282,33 +293,33 @@ public class TreeViewController implements Initializable {
      */
     private List<TreeItem<NUINode>> getTreeItems() {
         if (treeItems == null) {
-        class TreeToListHelper {
-            /**
-             * Parses a Tree, beginning at <b>t</b>, and adds to list every
-             * TreeItem that is a child of <b>root</b> or of its children
-             * <b>l</b>.
-             * 
-             * @param root
-             *            Where to start parsing
-             * @param list
-             *            Where all the TreeItems are added to
+            class TreeToListHelper {
+                /**
+                 * Parses a Tree, beginning at <b>t</b>, and adds to list every
+                 * TreeItem that is a child of <b>root</b> or of its children
+                 * <b>l</b>.
+                 * 
+                 * @param root
+                 *            Where to start parsing
+                 * @param list
+                 *            Where all the TreeItems are added to
                  * @return <b>list</b>, but with all the TreeItems appended to
                  *         it
-             */
-            private List<TreeItem<NUINode>> treeToList(final TreeItem<NUINode> root,
-                    final List<TreeItem<NUINode>> list) {
-                if (root == null || list == null) {
-                    throw new IllegalArgumentException();
-                }
-                list.add(root);
-                if (!root.getChildren().isEmpty()) {
-                    for (TreeItem<NUINode> ti : root.getChildren()) {
-                        list.addAll(treeToList(ti, new LinkedList<TreeItem<NUINode>>()));
+                 */
+                private List<TreeItem<NUINode>> treeToList(final TreeItem<NUINode> root,
+                        final List<TreeItem<NUINode>> list) {
+                    if (root == null || list == null) {
+                        throw new IllegalArgumentException();
                     }
+                    list.add(root);
+                    if (!root.getChildren().isEmpty()) {
+                        for (TreeItem<NUINode> ti : root.getChildren()) {
+                            list.addAll(treeToList(ti, new LinkedList<TreeItem<NUINode>>()));
+                        }
+                    }
+                    return list;
                 }
-                return list;
             }
-        }
             treeItems = (new TreeToListHelper()).treeToList(proofTreeView.getRoot(),
                     new LinkedList<TreeItem<NUINode>>());
         }

@@ -14,6 +14,8 @@ import javafx.scene.control.TextField;
 public class SearchViewController implements Initializable {
 
     public static final String NAME = ".searchView";
+
+    public static final String RESOURCE = ".searchView.fxml";
     
     @FXML
     TextField SearchTextField;
