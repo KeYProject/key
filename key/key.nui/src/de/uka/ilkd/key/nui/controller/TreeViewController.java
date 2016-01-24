@@ -273,6 +273,51 @@ public class TreeViewController implements Initializable {
         }
 
     }
+    
+    /**
+     * Selects the previous item in searchMatches. Scrolls the ProofTreeView if that
+     * item is not visible to the user. Expands the ProofTreeView as needed.
+     * Only to be used together with <tt>TreeViewController.search()</tt>.
+     */
+    public void selectAndIfNeededScrollToPreviousSearchResult(){
+        // catch bad calls
+        if (searchMatches.isEmpty() || searchMatches == null)
+            return;
+
+        TreeItem<NUINode> currentlySelectedItem = proofTreeView.getSelectionModel()
+                .getSelectedItem();
+        TreeItem<NUINode> itemToSelect;
+
+        /*
+         * start from the bottom if a) no item is selected b) an item is selected
+         * that is not a search result c) the selected item is the first search
+         * result
+         */
+        if (currentlySelectedItem == null || !searchMatches.contains(currentlySelectedItem)
+                || currentlySelectedItem == searchMatches.get(0)) {
+            itemToSelect = searchMatches.get(searchMatches.size()-1);
+        }
+        else {
+            itemToSelect = searchMatches.get(searchMatches.indexOf(currentlySelectedItem) -1);
+        }
+        // if the treeItem is not in an expanded branch of the tree, the tree
+        // must be expanded accordingly
+        if (proofTreeView.getRow(itemToSelect) == -1) {
+            for (TreeItem<NUINode> t = itemToSelect; t.getParent() != null
+                    && !t.getParent().isExpanded(); t = t.getParent()) {
+                t.setExpanded(true);
+            }
+        }
+
+        // select the item
+        proofTreeView.getSelectionModel().select(itemToSelect);
+
+        // if none of the treeCells contain the item we have just selected,
+        // we need to scroll to make it visible
+        if (proofTreeCells.keySet().stream().noneMatch(x -> (x.getTreeItem() == itemToSelect))) {
+            proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex() - ((int)(proofTreeCells.size() /2)));
+        }
+    }
 
     /**
      * Displays a proof in the proofTreeView.

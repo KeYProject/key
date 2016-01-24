@@ -31,6 +31,8 @@ public class SearchViewController implements Initializable {
         });
 
         SearchTextField.textProperty().addListener((obs, oldText, newText) -> {
+            NextButton.setDisable(newText.isEmpty()); 
+            PreviousButton.setDisable(newText.isEmpty());
             TreeViewController tVC = ComponentFactory.getInstance().getController(TreeViewController.NAME);
             tVC.search(newText);
         });
@@ -54,7 +56,8 @@ public class SearchViewController implements Initializable {
      * @param e the <tt>ActionEvent</tt> being fired by clicking that button.
      */
     public void handlePreviousButton(ActionEvent e) {
-        // TODO
+        TreeViewController t = ComponentFactory.getInstance().getController(TreeViewController.NAME);
+        t.selectAndIfNeededScrollToPreviousSearchResult();
     }
 
     /**
