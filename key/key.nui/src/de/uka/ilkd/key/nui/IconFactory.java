@@ -2,6 +2,7 @@ package de.uka.ilkd.key.nui;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Map;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -10,62 +11,72 @@ import javafx.scene.image.ImageView;
  * Factory for creation of Icons shown in the proof tree.
  * 
  * @author Patrick Jattke
- *
+ * @author Matthias Schultheis
  */
 public class IconFactory {
 
 	/**
 	 * The width of produced icons in pixels.
 	 */
-	private final int iconSizeX;
+	private final int iconSizeWidth;
 	
 	/**
 	 * The height of produced icons in pixels.
 	 */
-	private final int iconSizeY;
+	private final int iconSizeHeight;
 
 	/**
-	 * TODO
 	 * the relative path to the root folder where icons can be found.
 	 */
-	private static String folderRoot = "components/images/TreeViewController/";
+	private static String folderRoot = "components/images/";
 	
 	/**
-	 * An Hashmap for storing loaded icons.
+	 * An HashMap for storing loaded icon images.
 	 */
-	private HashMap<String, Image> icons = new HashMap<String, Image>();
+	private final Map<String, Image> icons = new HashMap<String, Image>();
 
 	// Inner Nodes
-	public final static String KEY_BRANCH_NODE_OPEN = "openBranch.png";
-	public final static String KEY_BRANCH_NODE_CLOSED = "closedBranch.png";
-	public final static String KEY_BRANCH_NODE_LINKED = "linkedBranch.png";
-	public final static String KEY_INNER_NODE_INTERACTIVE = "interactiveNode.png";
+	/** file name of open branch node icon. */
+	public static final String BRANCH_OPEN = "openBranch.png";
+	/** file name of closed branch node icon. */
+	public static final String BRANCH_CLOSED = "closedBranch.png";
+	/** file name of linked branch node icon. */
+	public static final String BRANCH_LINKED = "linkedBranch.png";
+	/** file name of interactive inner node icon. */
+	public static final String INODE_INTERACTIVE = "interactiveNode.png";
 
 	// Leafs
-	public final static String KEY_LEAF_NODE_INTERACTIVE = "interactiveGoal.png";
-	public final static String KEY_LEAF_NODE_CLOSED = "closedGoal.png";
-	public final static String KEY_LEAF_NODE_OPEN = "openGoal.png";
-	public final static String KEY_LEAF_NODE_LINKED = "linkedNode.png";
+	/** file name of interactive leaf node icon. */
+	public static final String LEAF_INTERACTIVE = "interactiveGoal.png";
+	/** file name of closed leaf node icon. */
+	public static final String LEAF_CLOSED = "closedGoal.png";
+	/** file name of open leaf node icon. */
+	public static final String LEAF_OPEN = "openGoal.png";
+	/** file name of linked leaf node icon. */
+	public static final String LEAF_LINKED = "linkedNode.png";
 	
 	// Context Menu
-	public final static String EXPAND = "expand.png";
-	public final static String COLLAPSE = "collapse.png";
-	public final static String SEARCH = "search.png";
+	/** file name of expand icon. */
+	public static final String EXPAND = "expand.png";
+	/** file name of collapse icon. */
+	public static final String COLLAPSE = "collapse.png";
+	/** file name of search icon. */
+	public static final String SEARCH = "search.png";
 	
 	/**
 	 * The constructor.
-	 * @param x the width of icons in pixels.
-	 * @param y the height of icons in pixels.
+	 * @param width the width of icons in pixels.
+	 * @param height the height of icons in pixels.
 	 */
-	public IconFactory(final int x, final int y) {
-		this.iconSizeX = x;
-		this.iconSizeY = y;
+	public IconFactory(final int width, final int height) {
+		this.iconSizeWidth = width;
+		this.iconSizeHeight = height;
 	}
 
 	/**
 	 * Returns an ImageView (scaled image) based on the given imageFilename in
-	 * the directory folderRoot
-	 * If the image was demanded once before the stored image will be returned.
+	 * the directory folderRoot.
+	 * If the image was demanded once before a stored image will be returned.
 	 * 
 	 * @param imageConstant
 	 *            The name of the image, e. g. IconFactory.KEY_INNER_NODE_OPEN
@@ -81,28 +92,27 @@ public class IconFactory {
 			img = new Image(istream);
 			icons.put(imageConstant, img);
 		}
-		return scaleIcon(img, iconSizeX, iconSizeY);
+		return scaleIcon(img, iconSizeWidth, iconSizeHeight);
 	}
 
 	/**
 	 * Scales an given image to a desired size indicated by x (width) and y
-	 * (height) and returns a ImageView with the scaled image in it. Uses the
-	 * smoothing option.
+	 * (height) and returns a ImageView with the scaled image in it.
 	 * 
 	 * @param image
 	 *            The image which should be scaled
-	 * @param x
+	 * @param width
 	 *            The desired width
-	 * @param y
+	 * @param height
 	 *            The desired height
 	 * @return an ImageView containing the scaled Image
 	 */
-	private ImageView scaleIcon(final Image image, final int x, final int y) {
-		final ImageView v = new ImageView(image);
-		v.setFitWidth(x);
-		v.setFitHeight(y);
-		v.setSmooth(true);
-		return v;
+	private ImageView scaleIcon(final Image image, final int width, final int height) {
+		final ImageView view = new ImageView(image);
+		view.setFitWidth(width);
+		view.setFitHeight(height);
+		view.setSmooth(true);
+		return view;
 	}
 
 }

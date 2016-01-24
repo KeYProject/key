@@ -37,7 +37,7 @@ public final class ProofTreeStyle {
     public static final String CSS_NODE_ACTIVE  = "active_node";
     
     /** CSS class for an highlighted node. */
-    public static final String CSS_NODE_HIGHLIGHTED  = "highlighted_node";
+    public static final String CSS_NODE_HIGHLIGHT  = "highlighted_node";
     
     
 	/**
