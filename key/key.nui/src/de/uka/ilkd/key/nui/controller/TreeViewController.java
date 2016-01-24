@@ -142,8 +142,8 @@ public class TreeViewController implements Initializable {
         String cssPath = this.getClass().getResource("../components/treeView.css").toExternalForm();
         visualizer.addStylesheet(cssPath);
 
-        if (NUI.initialProofFile != null) {
-            loadAndDisplayProof(NUI.initialProofFile);
+        if (NUI.getInitialProofFile() != null) {
+            loadAndDisplayProof(NUI.getInitialProofFile());
         }
     }
 

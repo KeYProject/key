@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Represents a branch node. Is used to create a graphical representation of
- * a proof tree consisting of {@link de.uka.ilkd.key.proof.Node} objects.
+ * Represents a branch node. Is used to create a graphical representation of a
+ * proof tree consisting of {@link de.uka.ilkd.key.proof.Node} objects.
  * 
  * @author Matthias Schultheis
  * @author Patrick Jattke
@@ -31,7 +32,7 @@ public class NUIBranchNode extends NUINode {
 	 */
 	public NUIBranchNode(final de.uka.ilkd.key.proof.Node proofParentNode) {
 		super();
-		
+
 		this.proofParentNode = proofParentNode;
 		children = new LinkedList<NUINode>();
 	}
@@ -51,16 +52,14 @@ public class NUIBranchNode extends NUINode {
 	 * @param parent
 	 *            The node to set as parent node of the branch node.
 	 */
-	public final void setProofParentNode(final de.uka.ilkd.key.proof.Node 
-			parent) {
+	public final void setProofParentNode(final de.uka.ilkd.key.proof.Node parent) {
 		this.proofParentNode = parent;
 	}
 
 	/**
 	 * Returns a list of children of the branch node.
 	 * 
-	 * @return children
-	 * 			A LinkedList of the branch node's children. 
+	 * @return children A LinkedList of the branch node's children.
 	 */
 	public final List<NUINode> getChildren() {
 		return children;
@@ -75,19 +74,18 @@ public class NUIBranchNode extends NUINode {
 	public final void addChild(final NUINode child) {
 		this.children.add(child);
 	}
-	
+
 	/**
-	 * Checks if all branch node children are marked as linked
+	 * Checks if all branch node children are marked as linked.
+	 * 
 	 * @return true iff all branch node children are linked
 	 */
-	public boolean hasOnlyLinkedBranchChildren() {
-	    for (NUINode child : children)
-	    {
-	        if(child instanceof NUIBranchNode && !child.isLinked()) {
-	            return false;
-	        }
-	    }
-	    
-	    return true;
+	public final boolean hasOnlyLinkedBranchChildren() {
+		for (NUINode child : children) {
+			if (child instanceof NUIBranchNode && !child.isLinked()) {
+				return false; 
+			}
+		}
+		return true;
 	}
 }
