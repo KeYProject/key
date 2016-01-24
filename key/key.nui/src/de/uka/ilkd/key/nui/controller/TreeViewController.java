@@ -6,10 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
-import java.util.concurrent.Callable;
-
-import com.sun.xml.internal.org.jvnet.staxex.NamespaceContextEx.Binding;
-
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.ComponentFactory;
 import de.uka.ilkd.key.nui.IconFactory;
@@ -24,22 +20,14 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
-import javafx.beans.binding.ObjectBinding;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.util.Callback;
 
 /**
  * Controller for the treeView GUI element to visualize proofs.

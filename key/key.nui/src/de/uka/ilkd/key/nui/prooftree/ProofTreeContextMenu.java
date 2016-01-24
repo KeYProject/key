@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.nui.prooftree;
 
 import de.uka.ilkd.key.nui.IconFactory;
-import de.uka.ilkd.key.nui.controller.NUIController;
-import de.uka.ilkd.key.nui.controller.NUIController.Place;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
