@@ -137,8 +137,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
     * Checks the user input for validity and updates the page complete state.
     */
    protected void updatePageComplete() {
-      setPageComplete(false);
-      setErrorMessage("Functionality is not available yet.");
+      validationViewUpdate();
    }
    
    private void mkTacletView(Composite parent){
@@ -265,7 +264,15 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
    }
    
    private void validationViewUpdate(){
-      validationText.setText(getCurrentModel().getStatusString());
+      String status = getCurrentModel().getStatusString();
+      validationText.setText(status);
+      if (status.equals("Instantiation is OK.")){
+         setErrorMessage(null);
+         setPageComplete(true);
+      } else {
+         setErrorMessage("Instantiation has errors. Check the input validation result.");
+         setPageComplete(false);
+      }
    }
    
    private void mkSpecification(String name, final int id){
