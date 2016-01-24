@@ -69,7 +69,8 @@ public class NUIController implements Initializable {
 		if (instance == null) {
 			instance = new NUIController();
 			return instance;
-		} else {
+        }
+        else {
 			return instance;
 		}
 	}
@@ -151,10 +152,12 @@ public class NUIController implements Initializable {
 	public final void handleOpenProof(ActionEvent e) {
 		if (!ComponentFactory.getInstance().hasComponent("treeView")) {
 			statustext.setText("TreeView not found, opening a tree is not possible");
-		} else {
+        }
+        else {
 			FileChooser fileChooser = new FileChooser();
 			fileChooser.setInitialDirectory(new File("resources/de/uka/ilkd/key/examples"));
-			FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Proof files", "*.proof");
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Proof files",
+                    "*.proof");
 			fileChooser.getExtensionFilters().add(extFilter);
 			File file = fileChooser.showOpenDialog(contextMenu);
 			// only load proof if any selection was made
@@ -203,7 +206,8 @@ public class NUIController implements Initializable {
 			break;
 		}
 
-		String componentResource = (String) clickedItem.getParentMenu().getProperties().get("componentResource");
+        String componentResource = (String) clickedItem.getParentMenu().getProperties()
+                .get("componentResource");
 
 		createOrMoveOrHideComponent(componentName, place, componentResource);
 	}
@@ -269,15 +273,19 @@ public class NUIController implements Initializable {
 				getPane(placeComponent.get(componentName)).getChildren().remove(existingcomponent);
 				placeComponent.remove(componentName);
 				statustext.setText("View " + componentName + " hidden.");
-			} else {
+                ComponentFactory.getInstance().deleteComponent(componentName);
+            }
+            else {
 				getPane(place).getChildren().add(existingcomponent);
 				placeComponent.replace(componentName, place);
 			}
-		} else {
+        }
+        else {
 			if (place != Place.HIDDEN) {
 				// Component did not already exist, thus it must be created
 				placeComponent.put(componentName, place);
-				Parent newComponent = ComponentFactory.getInstance().createComponent(componentName, componentResource);
+                Parent newComponent = ComponentFactory.getInstance().createComponent(componentName,
+                        componentResource);
 				getPane(place).getChildren().add(newComponent);
 			}
 		}
@@ -303,7 +311,8 @@ public class NUIController implements Initializable {
 				// blame Java for the fact that I cannot make the compiler do
 				// this check
 				if (!c.isModifierKey())
-					throw new IllegalArgumentException("You submitted an illegal modifiers list for the key " + k);
+                    throw new IllegalArgumentException(
+                            "You submitted an illegal modifiers list for the key " + k);
 			}
 		}
 		if (keyEventHandlers.containsKey(k)) {
@@ -336,7 +345,8 @@ public class NUIController implements Initializable {
 	public final void handleKeyPressed(final KeyEvent k) {
 
 		// Registered Key Handlers
-		SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]> e = keyEventHandlers.get(k.getCode());
+        SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]> e = keyEventHandlers
+                .get(k.getCode());
 
 		if (e != null) {
 			for (KeyCode keyCode : e.getValue()) {

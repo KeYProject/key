@@ -24,58 +24,63 @@ public class ComponentFactory {
 	 */
 	private static String resourceDir;
 
+    /**
+     * Singleton.
+     */
 	private static ComponentFactory instance;
 
+    /**
+     * Singleton.
+     * 
+     * @return the single instance of <tt>this</tt>
+     */
 	public static ComponentFactory getInstance() {
 		if (instance == null) {
 			instance = new ComponentFactory();
 			return instance;
-		} else {
+        }
+        else {
 			return instance;
 		}
 	}
 
+    /**
+     * Singleton constructor.
+     */
 	private ComponentFactory() {
 
 	}
 
 	/**
+     * This class encapsulates a
+     * java.util.AbstractMap.SimpleImmutableEntry<FXMLLoader, Parent> just to
+     * make the ComponentFactory more readable.
 	 * 
 	 * @author Stefan Pilot
 	 *
 	 */
 	private class ComponentMapEntry {
-		/**
-		 * 
-		 */
 		private SimpleImmutableEntry<FXMLLoader, Parent> e;
 
-		/**
-		 * 
-		 * @param l
-		 * @param p
-		 */
 		public ComponentMapEntry(FXMLLoader l, Parent p) {
 			e = new SimpleImmutableEntry<>(l, p);
 		}
 
-		/**
-		 * 
-		 * @return
-		 */
 		public <T> T getController() {
 			return e.getKey().getController();
 		}
 
-		/**
-		 * 
-		 * @return
-		 */
 		public Parent getComponent() {
 			return e.getValue();
 		}
 	}
 
+    /**
+     * A HashMap storing the components created by <tt>this</tt>, or to be more
+     * precise, it stores the Parent to provide references to the actual
+     * components and the FXMLLoader to provide references to the respective
+     * Controllers.
+     */
 	private Map<String, ComponentMapEntry> componentMap = new HashMap<>();
 
 	/**
@@ -92,49 +97,61 @@ public class ComponentFactory {
 	public Parent createComponent(String id, String resource) {
 		Parent component = null;
 		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource(ComponentFactory.resourceDir + resource));
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(ComponentFactory.resourceDir + resource));
 			component = loader.load();
 			component.setId(id);
 			componentMap.put(id, new ComponentMapEntry(loader, component));
-		} catch (IOException e) {
+        }
+        catch (IOException e) {
 			e.printStackTrace();
 		}
 		return component;
 	}
 
 	/**
+     * Deletes all references to a certain component stored by <tt>this</tt>
 	 * 
 	 * @param id
+     *            The Components FXID or another identifier specified at
+     *            construction.
 	 */
 	public void deleteComponent(String id) {
 		componentMap.remove(id);
 	}
 
 	/**
+     * Checks whether a certain component is currently being stored.
 	 * 
 	 * @param id
+     *            The Components FXID or another identifier specified at
+     *            construction.
 	 */
 	public boolean hasComponent(String id) {
 		return componentMap.containsKey(id);
 	}
 
 	/**
+     * Returns a reference to a certain NUI Component.
 	 * 
 	 * @param id
-	 * @return
+     *            The Components FXID or another identifier specified at
+     *            construction.
+     * @return A reference.
 	 */
 	public Parent getComponent(String id) {
 		return componentMap.get(id).getComponent();
 	}
 
 	/**
-	 * Returns a controller for a given component specified by ID.<br/>
+     * Returns a controller for a given component specified by their FXID.<br/>
 	 * 
 	 * @param id
-	 *            the Components ID
+     *            The Components FXID or another identifier specified at
+     *            construction.
 	 * 
-	 * @return the Controller, or <t> null </t>, if a component with this ID is
-	 *         not currently stored
+     * @return the Controller, or <t> null </t>, if no component with this ID is
+     *         currently stored
 	 */
 	public <T> T getController(String id) {
 		if (hasComponent(id)) {
@@ -144,19 +161,19 @@ public class ComponentFactory {
 	}
 
 	/**
-	 * Creates and returns the JavaFX scenegraph for the application window TODO
-	 * this tends to return null sometimes. But when exactly?
+     * Creates and returns the JavaFX scenegraph for the application window.
 	 * 
 	 * @return returns the JavaFX scenegraph for the application window
-	 * @throws Exception
 	 */
 	public Parent createNUISceneGraph() {
 		// Set default language bundle
 		ResourceBundle bundle = null;
 
 		try {
-			bundle = new PropertyResourceBundle(getClass().getResourceAsStream("bundle_en_EN.properties"));
-		} catch (IOException e) {
+            bundle = new PropertyResourceBundle(
+                    getClass().getResourceAsStream("bundle_en_EN.properties"));
+        }
+        catch (IOException e) {
 			e.printStackTrace();
 		}
 
@@ -167,13 +184,15 @@ public class ComponentFactory {
 
 		try {
 			root = loader.load();
-		} catch (IOException e) {
+        }
+        catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		return root;
 	}
 
+    // TODO what is this? eliminate or document.
 	public static void setInstance(String resourceDir) {
 		ComponentFactory.resourceDir = resourceDir;
 	}

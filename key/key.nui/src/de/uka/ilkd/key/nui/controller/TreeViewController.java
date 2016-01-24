@@ -151,7 +151,9 @@ public class TreeViewController implements Initializable {
     }
 
     /**
-     * Displays a proof in the proofTreeView.
+     * Loads and displays a file containing a KeY proof. May fail and/or throw
+     * various exceptions if the file does not exist or does not contain a valid
+     * proof.
      * 
      * @param file The proof file to load.
      */
@@ -290,7 +292,8 @@ public class TreeViewController implements Initializable {
              *            Where to start parsing
              * @param list
              *            Where all the TreeItems are added to
-             * @return <b>list</b>, but with all the TreeItems appended to it
+                 * @return <b>list</b>, but with all the TreeItems appended to
+                 *         it
              */
             private List<TreeItem<NUINode>> treeToList(final TreeItem<NUINode> root,
                     final List<TreeItem<NUINode>> list) {

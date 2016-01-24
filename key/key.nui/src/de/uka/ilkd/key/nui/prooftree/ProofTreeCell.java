@@ -93,8 +93,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
             return;
         }
 
-        setContextMenu(new ProofTreeContextMenu(getTreeItem(), getTreeView(), 
-                icf));
+        setContextMenu(new ProofTreeContextMenu(getTreeItem(), getTreeView(), icf));
 
         // reset label and icon
         label = new Label(item.getLabel() + " ");
@@ -111,10 +110,6 @@ public class ProofTreeCell extends TreeCell<NUINode> {
             decorateAsLeafNode();
         }
 
-        // if (item.isHighlighted()) {
-        // this.getStyleClass().add(ProofTreeStyle.CSS_NODE_HIGHLIGHTED);
-        // }
-
         // workaround to display an icon next to a label
         setText(null);
         if (icon != null) {
@@ -126,15 +121,15 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 
             hbox.getChildren().addAll(iconLabel, label);
             setGraphic(hbox);
-        } else {
+        }
+        else {
             setGraphic(label);
         }
     }
 
-
     /**
-     * Decorates the cell as InnerNode by modifying label and icon
-     * Assigns CSS style classes and icon images.
+     * Decorates the cell as InnerNode by modifying label and icon Assigns CSS
+     * style classes and icon images.
      */
     private void decorateAsInnerNode() {
         if (getItem().isInteractive()) {
@@ -143,26 +138,28 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     }
 
     /**
-     * Decorates the cell as BranchNode by modifying label and icon
-     * Assigns CSS style classes and icon images.
+     * Decorates the cell as BranchNode by modifying label and icon Assigns CSS
+     * style classes and icon images.
      */
     private void decorateAsBranchNode() {
         label.getStyleClass().add(ProofTreeStyle.CSS_NODE_BRANCH);
         if (getItem().isClosed()) {
             label.getStyleClass().add(ProofTreeStyle.CSS_NODE_CLOSED);
             setIcon(icf.getImage(IconFactory.KEY_BRANCH_NODE_CLOSED));
-        } else {
+        }
+        else {
             if (getItem().isLinked()) {
                 setIcon(icf.getImage(IconFactory.KEY_BRANCH_NODE_LINKED));
-            } else {
+            }
+            else {
                 setIcon(icf.getImage(IconFactory.KEY_BRANCH_NODE_OPEN));
             }	
         }
     }
 
     /**
-     * Decorates the cell as LeafNode by modifying label and icon
-     * Assigns CSS style classes and icon images.
+     * Decorates the cell as LeafNode by modifying label and icon Assigns CSS
+     * style classes and icon images.
      */
     private void decorateAsLeafNode() {
         label.getStyleClass().add(ProofTreeStyle.CSS_NODE_LEAF);

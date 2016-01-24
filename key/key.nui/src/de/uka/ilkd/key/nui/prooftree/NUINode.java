@@ -276,4 +276,9 @@ public abstract class NUINode {
 	public final boolean isVisible() {
 	    return isVisible;
 	}
+	
+	@Override
+	public String toString(){
+	    return getLabel();
+	}
 }
