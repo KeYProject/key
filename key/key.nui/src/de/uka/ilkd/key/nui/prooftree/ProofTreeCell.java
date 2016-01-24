@@ -1,13 +1,18 @@
 package de.uka.ilkd.key.nui.prooftree;
 
 import de.uka.ilkd.key.nui.IconFactory;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeCell;
+import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
 /**
  * This class is responsible for rendering of a tree cell.
+ * 
  * @author  Matthias Schultheis
  * @version 1.0
  */
@@ -38,19 +43,37 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      */
     private ImageView icon;
 
+    private BooleanBinding matchesSearch;
+
     /**
      * The constructor of the ProofTreeCell.
      * 
-     * @param icf the icon factory used to display node icons
+     * @param icf
+     *            the icon factory used to display node icons
      */
-    public ProofTreeCell(final IconFactory icf) {
+    public ProofTreeCell(final IconFactory icf, ObservableList<TreeItem<NUINode>> searchMatches) {
         super();
-
         this.icf = icf;
+
+        matchesSearch = Bindings.createBooleanBinding(() -> searchMatches.contains(getTreeItem()),
+                treeItemProperty(), searchMatches);
+
+        matchesSearch.addListener((obs, didMatchSearch, nowMatchesSearch) -> {
+            ObservableList<String> l = getStyleClass();
+            String s = ProofTreeStyle.CSS_NODE_HIGHLIGHTED;
+            if (nowMatchesSearch) {
+                if (!l.contains(s))
+                    l.add(s);
+            }
+            else {
+                l.remove(s);
+            }
+        });
     }
 
     /**
-     * @param icon the icon to set
+     * @param icon
+     *            the icon to set
      */
     private void setIcon(final ImageView icon) {
         this.icon = icon;
@@ -61,9 +84,6 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      */
     @Override
     protected final void updateItem(final NUINode item, final boolean empty) {
-        // remove styles from last items
-        getStyleClass().remove(ProofTreeStyle.CSS_NODE_HIGHLIGHTED);
-
         super.updateItem(item, empty);
 
         // if null node, display nothing
@@ -83,15 +103,17 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         // set decoration (style, icon)
         if (item instanceof NUIInnerNode) {
             decorateAsInnerNode();
-        } else if (item instanceof NUIBranchNode) {
+        }
+        else if (item instanceof NUIBranchNode) {
             decorateAsBranchNode();
-        } else if (item instanceof NUILeafNode) {
+        }
+        else if (item instanceof NUILeafNode) {
             decorateAsLeafNode();
         }
 
-        if (item.isHighlighted()) {
-            this.getStyleClass().add(ProofTreeStyle.CSS_NODE_HIGHLIGHTED);
-        }
+        // if (item.isHighlighted()) {
+        // this.getStyleClass().add(ProofTreeStyle.CSS_NODE_HIGHLIGHTED);
+        // }
 
         // workaround to display an icon next to a label
         setText(null);

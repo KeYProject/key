@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.WeakHashMap;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.ComponentFactory;
 import de.uka.ilkd.key.nui.IconFactory;
@@ -17,6 +19,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -36,6 +42,18 @@ import javafx.util.Callback;
  * @version 1.1
  */
 public class TreeViewController implements Initializable {
+    public static final String NAME = "treeView";
+
+    /**
+     * The IconFactory used to create icons for the proof tree nodes.
+     */
+    private final IconFactory icf;
+
+    /**
+     * A <tt>WeakHashMap</tt> storing the <tt>ProofTreeCells</tt> currently existing.
+     */
+    private WeakHashMap<ProofTreeCell, DoubleBinding> proofTreeCells = new WeakHashMap<>();
+
     /**
      * The proofTree view of the GUI.
      */
@@ -43,14 +61,17 @@ public class TreeViewController implements Initializable {
     private TreeView<NUINode> proofTreeView;
 
     /**
+     * An ObservableList storing the Items matching a <tt/>search()<tt/>
+     */
+    private ObservableList<TreeItem<NUINode>> searchMatches = FXCollections
+            .observableList(new LinkedList<TreeItem<NUINode>>());
+
+    private List<TreeItem<NUINode>> treeItems;
+
+    /**
      * The visualizer for displaying a proof tree.
      */
     private ProofTreeVisualizer visualizer;
-
-    /**
-     * The IconFactory used to create icons for the proof tree nodes.
-     */
-    private final IconFactory icf;
 
     /**
      * The constructor.
@@ -97,6 +118,7 @@ public class TreeViewController implements Initializable {
                     public void handle(final KeyEvent e) {
                         NUIController.getInstance().createOrMoveOrHideComponent(".searchView",
                                 Place.HIDDEN, ".searchView.fxml");
+                        searchMatches.clear();
                     }
                 });
 
@@ -107,7 +129,9 @@ public class TreeViewController implements Initializable {
         proofTreeView.setCellFactory(new Callback<TreeView<NUINode>, TreeCell<NUINode>>() {
             @Override
             public TreeCell<NUINode> call(final TreeView<NUINode> p) {
-                return new ProofTreeCell(icf);
+                ProofTreeCell c = new ProofTreeCell(icf, searchMatches);
+                Platform.runLater(() -> registerTreeCell(c));
+                return c;
             }
         });
 
@@ -129,21 +153,11 @@ public class TreeViewController implements Initializable {
     /**
      * Displays a proof in the proofTreeView.
      * 
-     * @param proof
-     *            The proof file which should be displayed
-     */
-    private void displayProof(final Proof proof) {
-        visualizer.loadProofTree(proof);
-        visualizer.visualizeProofTree();
-    }
-
-    /**
-     * 
-     * @param file
+     * @param file The proof file to load.
      */
     public final void loadAndDisplayProof(File file) {
         displayProof(loadProof(file));
-        items = null;
+        searchMatches.clear();
     }
 
     /**
@@ -157,49 +171,115 @@ public class TreeViewController implements Initializable {
     public final void loadExampleProof() {
         File proofFile = new File("resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof");
         loadAndDisplayProof(proofFile);
-        items = null;
+        searchMatches.clear();
     }
 
     /**
-     * Loads the given proof file. Checks if the proof file exists and the proof
-     * is not null, and fails if the proof could not be loaded.
+     * This method should be called every time a new TreeCell is being created.
+     * <tt>this</tt> will reference the ProofTreeCell in a WeakHandle in order
+     * to find out which TreeItems currently are visible to the user.
      *
-     * @param proofFileName
-     *            The file name of the proof file to load.
-     * @return The loaded proof.
+     * @param t
+     *            the ProofTreeCell to register.
      */
-    private Proof loadProof(final File proofFile) {
-        try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-                    proofFile, null, null, null, true);
-            Proof proof = environment.getLoadedProof();
-            return proof;
-        }
-        catch (ProblemLoaderException e) {
-            e.printStackTrace();
-            return null;
-        }
+    private void registerTreeCell(ProofTreeCell t) {
+        proofTreeCells.put(t,
+                Bindings.createDoubleBinding(() -> t.getHeight(), t.heightProperty()));
     }
 
     /**
-     * Stores all the Labels in the tree and their respective TreeItems.
-     */
-    private List<TreeItem<NUINode>> items;
-
-    public final int getCurrentlySelectedItemsIndex() {
-        return proofTreeView.getSelectionModel().getSelectedIndex();
-    }
-
-    public final int getTreeItemsRow(TreeItem<NUINode> t) {
-        return proofTreeView.getRow(t);
-    }
-
-    /**
+     * Searches the <tt>Label</tt>s of the <tt>TreeItems</tt> in the underlying
+     * <tt>ProofTree</tt> for a given term. Highlights all the matches.<br/>
+     * It is possible to use this for an incremental search, but doing so is
+     * inefficient because the list storing the matches from the last search is
+     * being emptied on every call. <br/>
+     * <br/>
+     * <b><tt>TODO</tt> optimize this for incremental search by buffering the
+     * last search term.</b>
      * 
-     * @return
+     * @param term
+     *            The String to search for.
      */
-    public final List<TreeItem<NUINode>> getItems() {
+    public final void search(String term) {
+        // remove old matches
+        searchMatches.clear();
+        // exit if no search term specified
+        if (term.isEmpty())
+            return;
 
+        // iterate over all the TreeItems and add them to searchMatches if they match the search
+        for (TreeItem<NUINode> t : getTreeItems()) {
+            if (t.getValue().getLabel().toLowerCase().contains(term.toLowerCase())) {
+                searchMatches.add(t);
+        }
+        }
+    }
+
+    /**
+     * Selects the next item in searchMatches. Scrolls the ProofTreeView if that
+     * item is not visible to the user. Expands the ProofTreeView as needed.
+     * Only to be used together with <tt>TreeViewController.search()</tt>.
+     */
+    public void selectAndIfNeededScrollToNextSearchResult() {
+        // catch bad calls
+        if (searchMatches.isEmpty() || searchMatches == null)
+            return;
+
+        TreeItem<NUINode> currentlySelectedItem = proofTreeView.getSelectionModel()
+                .getSelectedItem();
+        TreeItem<NUINode> itemToSelect;
+        
+        /* start from the top if
+         * a) no item is selected
+         * b) an item is selected that is not a search result
+         * c) the selected item is the last search result
+         */                        
+        if (currentlySelectedItem == null || !searchMatches.contains(currentlySelectedItem)
+                || searchMatches.size() == searchMatches.indexOf(currentlySelectedItem) + 1) {
+            itemToSelect = searchMatches.get(0);
+        }
+        else {
+            itemToSelect = searchMatches.get(searchMatches.indexOf(currentlySelectedItem) + 1);
+        }
+        // if the treeItem is not in an expanded branch of the tree, the tree
+        // must be expanded accordingly
+        if (proofTreeView.getRow(itemToSelect) == -1) {
+            for (TreeItem<NUINode> t = itemToSelect; t.getParent() != null
+                    && !t.getParent().isExpanded(); t = t.getParent()) {
+                t.setExpanded(true);
+            }
+        }
+
+        // select the item
+        proofTreeView.getSelectionModel().select(itemToSelect);
+
+        // if none of the treeCells contain the item we have just selected,
+        // we need to scroll to make it visible
+        if (proofTreeCells.keySet().stream().noneMatch(x -> (x.getTreeItem() == itemToSelect))) {
+            proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex());
+    }
+
+    }
+
+    /**
+     * Displays a proof in the proofTreeView.
+     * 
+     * @param proof
+     *            The proof file which should be displayed
+     */
+    private void displayProof(final Proof proof) {
+        visualizer.loadProofTree(proof);
+        visualizer.visualizeProofTree();
+    }
+
+    /**
+     * Recursively walks through the tree, storing all items in the List being
+     * returned
+     * 
+     * @return a List of all the TreeItems in the underlying ProofTreeView
+     */
+    private List<TreeItem<NUINode>> getTreeItems() {
+        if (treeItems == null) {
         class TreeToListHelper {
             /**
              * Parses a Tree, beginning at <b>t</b>, and adds to list every
@@ -226,19 +306,31 @@ public class TreeViewController implements Initializable {
                 return list;
             }
         }
-
-        if (items == null) {
-            return (new TreeToListHelper()).treeToList(proofTreeView.getRoot(),
+            treeItems = (new TreeToListHelper()).treeToList(proofTreeView.getRoot(),
                     new LinkedList<TreeItem<NUINode>>());
         }
-        else
-            return items;
+
+        return treeItems;
     }
 
-    public void scrollToAndSelect(int nextLargerIdx) {
-        // TODO this is a workaround as I was not able to make this thing scroll
-        // to middle
-        proofTreeView.scrollTo((nextLargerIdx < 5) ? nextLargerIdx : (nextLargerIdx - 5));
-        proofTreeView.getSelectionModel().select(nextLargerIdx);
+    /**
+     * Loads the given proof file. Checks if the proof file exists and the proof
+     * is not null, and fails if the proof could not be loaded.
+     *
+     * @param proofFileName
+     *            The file name of the proof file to load.
+     * @return The loaded proof.
+     */
+    private Proof loadProof(final File proofFile) {
+        try {
+            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+                    proofFile, null, null, null, true);
+            Proof proof = environment.getLoadedProof();
+            return proof;
+        }
+        catch (ProblemLoaderException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
