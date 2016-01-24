@@ -22,7 +22,6 @@ import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -40,8 +39,6 @@ import org.key_project.keyide.ui.handlers.ShowSymbolicExecutionTreeOnlyHandler;
 import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
-import org.key_project.sed.key.core.model.IKeYSENode;
-import org.key_project.sed.ui.visualization.view.ExecutionTreeView;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -134,13 +131,13 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
       }
 	};
 	
-	private ISelectionChangedListener debugViewListener = new ISelectionChangedListener() {
-		
-		@Override
-		public void selectionChanged(SelectionChangedEvent event) {
-			handleDebugViewSelectionChanged(event.getSelection());
-		}
-	};
+//	private ISelectionChangedListener debugViewListener = new ISelectionChangedListener() {
+//		
+//		@Override
+//		public void selectionChanged(SelectionChangedEvent event) {
+//			handleDebugViewSelectionChanged(event.getSelection());
+//		}
+//	};
 
 	/**
 	 * Constructor.
@@ -177,16 +174,16 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	      }
 	}
 	
-	protected void handleDebugViewSelectionChanged(ISelection selection) {
-		Object element = SWTUtil.getFirstElement(selection);
-		if (element != null && element instanceof IKeYSENode<?>) {
-			Node node = ((IKeYSENode<?>) element).getExecutionNode().getProofNode();
-			selectionModel.setSelectedNode(node);
-		} else {
-			System.out.println("No instances of IKeYSENode<?> found: no selection");
-			System.out.println(element.getClass());
-		}
-	}
+//	protected void handleDebugViewSelectionChanged(ISelection selection) {
+//		Object element = SWTUtil.getFirstElement(selection);
+//		if (element != null && element instanceof IKeYSENode<?>) {
+//			Node node = ((IKeYSENode<?>) element).getExecutionNode().getProofNode();
+//			selectionModel.setSelectedNode(node);
+//		} else {
+//			System.out.println("No instances of IKeYSENode<?> found: no selection");
+//			System.out.println(element.getClass());
+//		}
+//	}
 
 	/**
 	 * Handles a change in the state of the showSymbolicExecutionTree outline filter.
@@ -271,11 +268,11 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 				getTreeViewer());
 		
 		//TODO add debug view listener here
-		ExecutionTreeView exeTreeView = (ExecutionTreeView) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(ExecutionTreeView.VIEW_ID);
-      	if (exeTreeView != null) {
-      		exeTreeView.getDebugView().getSite().getSelectionProvider().addSelectionChangedListener(debugViewListener);
-      		handleDebugViewSelectionChanged(exeTreeView.getDebugView().getSite().getSelectionProvider().getSelection());
-      	}
+//		ExecutionTreeView exeTreeView = (ExecutionTreeView) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(ExecutionTreeView.VIEW_ID);
+//      	if (exeTreeView != null) {
+//      		exeTreeView.getDebugView().getSite().getSelectionProvider().addSelectionChangedListener(debugViewListener);
+//      		handleDebugViewSelectionChanged(exeTreeView.getDebugView().getSite().getSelectionProvider().getSelection());
+//      	}
 		// Update selected node
 		updateSelectedNode();
 	}

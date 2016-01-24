@@ -28,6 +28,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.keyide.ui.editor,
+ org.key_project.keyide.ui.editor.input,
  org.key_project.keyide.ui.handlers,
  org.key_project.keyide.ui.perspectives,
  org.key_project.keyide.ui.preference.page,
@@ -36,7 +37,4 @@ Export-Package: org.key_project.keyide.ui.editor,
  org.key_project.keyide.ui.starter,
  org.key_project.keyide.ui.util,
  org.key_project.keyide.ui.views
-Import-Package: org.eclipse.debug.ui,
- org.eclipse.jdt.internal.debug.core.breakpoints,
- org.key_project.sed.key.core.model,
- org.key_project.sed.ui.visualization.view
+Import-Package: org.eclipse.jdt.internal.debug.core.breakpoints
