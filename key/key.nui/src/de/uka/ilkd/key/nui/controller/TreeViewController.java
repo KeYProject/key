@@ -39,6 +39,7 @@ import javafx.scene.input.KeyCode;
  */
 public class TreeViewController implements Initializable {
     public static final String NAME = "treeView";
+    public static final String RESOURCE = "treeView.fxml";
 
     /**
      * The IconFactory used to create icons for the proof tree nodes.
