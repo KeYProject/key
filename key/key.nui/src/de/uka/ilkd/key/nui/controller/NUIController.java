@@ -37,13 +37,6 @@ import javafx.scene.input.KeyEvent;
  */
 public class NUIController implements Initializable {
     /**
-     * Provides an enum for the available places in the main window.
-     */
-    public enum Place {
-        BOTTOM, HIDDEN, LEFT, MIDDLE, RIGHT
-    }
-
-    /**
      * Singleton.
      */
     private static NUIController instance;
@@ -53,7 +46,7 @@ public class NUIController implements Initializable {
      * 
      * @return the single instance of <tt>this</tt>
      */
-    public static NUIController getInstance() {
+    public static synchronized NUIController getInstance() {
         if (instance == null) {
             instance = new NUIController();
             return instance;
@@ -66,13 +59,13 @@ public class NUIController implements Initializable {
     /**
      * Stores the KeyEventHandlers (registered here using registerKeyListener)
      */
-    private Map<KeyCode, SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>> keyEventHandlers = new HashMap<>();
+    private final Map<KeyCode, SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>> keyEventHandlers = new HashMap<>();
 
     /**
      * Stores the position of components added to the SplitPane. Other views can
      * listen to changes in this map and react to changes to their position.
      */
-    private ObservableMap<String, Place> placeComponent = new ObservableMapWrapper<>(
+    private final ObservableMap<String, Place> placeComponent = new ObservableMapWrapper<>(
             new HashMap<>());
 
     // Definition of GUI fields
@@ -98,6 +91,13 @@ public class NUIController implements Initializable {
     private ToggleGroup toggleGroup2;
     @FXML
     private ToggleGroup toggleGroup3;
+
+    /**
+     * Provides an enum for the available places in the main window.
+     */
+    public enum Place {
+        BOTTOM, HIDDEN, LEFT, MIDDLE, RIGHT
+    }
 
     /**
      * Loads the default components of the GUI.
@@ -242,10 +242,7 @@ public class NUIController implements Initializable {
      */
     @FXML
     public final void handleOpenProof(final ActionEvent e) {
-        if (!ComponentFactory.getInstance().hasComponent(TreeViewController.NAME)) {
-            statustext.setText("TreeView not found, opening a tree is not possible");
-        }
-        else {
+        if (ComponentFactory.getInstance().hasComponent(TreeViewController.NAME)) {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(new File("resources/de/uka/ilkd/key/examples"));
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Proof files",
@@ -258,6 +255,9 @@ public class NUIController implements Initializable {
                         .getController(TreeViewController.NAME);
                 t.loadAndDisplayProof(file);
             }
+        }
+        else {
+            statustext.setText("TreeView not found, opening a tree is not possible");
         }
     }
 
@@ -356,7 +356,7 @@ public class NUIController implements Initializable {
      */
     @FXML
     protected void handleAboutWindow(final ActionEvent e) {
-
+        // TODO implement this
     }
 
     /**
