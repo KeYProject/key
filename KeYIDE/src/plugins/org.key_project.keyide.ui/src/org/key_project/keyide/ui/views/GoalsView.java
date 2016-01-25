@@ -1,4 +1,3 @@
-
 package org.key_project.keyide.ui.views;
 
 import org.eclipse.ui.IEditorPart;
@@ -10,20 +9,14 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.PageBookView;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
-
-
-
 /**
  * This {@link PageBookView} shows {@link IGoalPages}s provided by the active
  * {@link IEditorPart} via calling the {@link IEditorPart#getAdapter(Class)}
  * method.
  * 
  * @author Seena Vellaramkalayil
- *
  */
 public class GoalsView extends PageBookView {
-   
-   
    /**
     * The id of this view.
     */
@@ -40,7 +33,6 @@ public class GoalsView extends PageBookView {
       page.setMessage("No Goals available");
       return page;
    }
-
    
    /**
     * {@inheritDoc}
@@ -61,7 +53,6 @@ public class GoalsView extends PageBookView {
       }
       return null;
    }
-
    
    /**
     * {@inheritDoc}
@@ -72,7 +63,6 @@ public class GoalsView extends PageBookView {
       page.dispose();
       pageRecord.dispose();
    }
-
    
    /**
     * {@inheritDoc}
@@ -89,7 +79,4 @@ public class GoalsView extends PageBookView {
    protected boolean isImportant(IWorkbenchPart part) {
       return (part instanceof IEditorPart);
    }
-
-   
-
 }

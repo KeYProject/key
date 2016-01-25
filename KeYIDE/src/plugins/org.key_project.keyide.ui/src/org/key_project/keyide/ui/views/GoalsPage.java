@@ -32,11 +32,8 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
  * {link TableViewer}.
  * 
  * @author Seena Vellaramkalayil
- *
  */
 public class GoalsPage extends Page implements IGoalsPage {
-
- 
    /**
     * the currently loaded proof.
     */
@@ -46,25 +43,21 @@ public class GoalsPage extends Page implements IGoalsPage {
     * the viewer of this page.
     */
    private ListViewer viewer;
-
    
    /**
     * the environment of the proof.
     */
    private KeYEnvironment<?> environment;
-
    
    /**
     * the selection model.
     */
    private KeYSelectionModel selectionModel;
-
    
    /**
     * the content provider for the viewer.
     */
    private ImmutableCollectionContentProvider contentProvider;
-
    
    /**
     * the label provider for the viewer.
@@ -76,7 +69,6 @@ public class GoalsPage extends Page implements IGoalsPage {
     * {@link KeYSelectionModel}.
     */
    private KeYSelectionListener keySelectionListener = new KeYSelectionListener() {
-
       @Override
       public void selectedNodeChanged(KeYSelectionEvent e) {
          handleSelectedNodeChanged(e);
@@ -86,7 +78,6 @@ public class GoalsPage extends Page implements IGoalsPage {
       public void selectedProofChanged(KeYSelectionEvent e) {
          handleSelectedProofChanged(e);
       }
-
    };
 
    /**
@@ -94,52 +85,50 @@ public class GoalsPage extends Page implements IGoalsPage {
     * current {@link Proof}.
     */
    private ProofTreeListener proofTreeListener = new ProofTreeListener() {
-
       @Override
       public void proofExpanded(ProofTreeEvent e) {
-         handleProofChanged();
+         updateProofThreadSafe();
       }
 
       @Override
       public void proofIsBeingPruned(ProofTreeEvent e) {
-         handleProofChanged();
+         updateProofThreadSafe();
       }
 
       @Override
       public void proofPruned(ProofTreeEvent e) {
-         handleProofChanged();
+         updateProofThreadSafe();
       }
 
       @Override
       public void proofStructureChanged(ProofTreeEvent e) {
-         handleProofChanged();
+         updateProofThreadSafe();
       }
 
       @Override
       public void proofClosed(ProofTreeEvent e) {
-         handleProofChanged();
+         updateProofThreadSafe();
       }
 
       @Override
       public void proofGoalRemoved(ProofTreeEvent e) {
-         handleProofChanged();
+         updateProofThreadSafe();
       }
 
       @Override
       public void proofGoalsAdded(ProofTreeEvent e) {
-         handleProofChanged();
+         updateProofThreadSafe();
       }
 
       @Override
       public void proofGoalsChanged(ProofTreeEvent e) {
-         handleProofChanged();
+         updateProofThreadSafe();
       }
 
       @Override
       public void smtDataUpdate(ProofTreeEvent e) {
-         handleProofChanged();
+         updateProofThreadSafe();
       }
-
    };
 
    /**
@@ -147,7 +136,6 @@ public class GoalsPage extends Page implements IGoalsPage {
     * mode.
     */
    private final AutoModeListener autoModeListener = new AutoModeListener() {
-
       @Override
       public void autoModeStarted(ProofEvent e) {
          handleAutoModeStarted();
@@ -157,7 +145,6 @@ public class GoalsPage extends Page implements IGoalsPage {
       public void autoModeStopped(ProofEvent e) {
          handleAutoModeStopped(e);
       }
-
    };
 
    /**
@@ -166,18 +153,15 @@ public class GoalsPage extends Page implements IGoalsPage {
     * selectionModel has to be updated.
     */
    private final ISelectionListener selectionListener = new ISelectionListener() {
-
       @Override
       public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-         if (selection instanceof IStructuredSelection
-               && part instanceof GoalsView) {
+         if (selection instanceof IStructuredSelection && part instanceof GoalsView) {
             Object selectedObj = SWTUtil.getFirstElement(selection);
             if (selectedObj instanceof Goal) {
                selectionModel.setSelectedGoal((Goal) selectedObj);
             }
          }
       }
-
    };
 
    /**
@@ -191,9 +175,7 @@ public class GoalsPage extends Page implements IGoalsPage {
     *           The {@link KeYSelectionModel} to add the keySelectionListener
     *           to.
     */
-   public GoalsPage(Proof proof, KeYEnvironment<?> environment,
-         KeYSelectionModel selectionModel) {
-
+   public GoalsPage(Proof proof, KeYEnvironment<?> environment, KeYSelectionModel selectionModel) {
       this.proof = proof;
       this.environment = environment;
       this.selectionModel = selectionModel;
@@ -202,8 +184,6 @@ public class GoalsPage extends Page implements IGoalsPage {
       this.selectionModel.addKeYSelectionListener(keySelectionListener);
    }
 
-   
-  
    /**
     * Method handles selection changes on the proof.
     * @param e 
@@ -213,7 +193,6 @@ public class GoalsPage extends Page implements IGoalsPage {
          updateSelectionThreadSafe();
       }
    }
-
    
    /**
     * Method handles selection changes on a node.
@@ -222,16 +201,6 @@ public class GoalsPage extends Page implements IGoalsPage {
    protected void handleSelectedNodeChanged(KeYSelectionEvent e) {
       updateSelectionThreadSafe();
    }
-
-   
-   /**
-    * This method sets a new input to the viewer and is called when the proof 
-    * has changed.
-    */
-   protected void handleProofChanged() {
-      viewer.setInput(proof.openGoals());
-   }
-
    
    /**
     * Method handles the page when the auto mode stops.
@@ -243,7 +212,6 @@ public class GoalsPage extends Page implements IGoalsPage {
          updateProofThreadSafe();
       }
    }
-
    
    /**
     * Method handles the page when the auto mode starts.
@@ -252,25 +220,29 @@ public class GoalsPage extends Page implements IGoalsPage {
       proof.removeProofTreeListener(proofTreeListener);
    }
 
-   
-   
    /**
     * Method executes {@link #handleProofChanged()} asynchronously and thread safe.
     */
    protected void updateProofThreadSafe() {
-      if (!getControl().getDisplay().isDisposed()) {
-         getControl().getDisplay().asyncExec(new Runnable() {
+      if (!viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
             @Override
             public void run() {
-               if (!getControl().isDisposed()) {
+               if (!viewer.getControl().isDisposed()) {
                   handleProofChanged();
                }
             }
          });
       }
-
    }
-
+   
+   /**
+    * This method sets a new input to the viewer and is called when the proof 
+    * has changed.
+    */
+   protected void handleProofChanged() {
+      viewer.setInput(proof.openGoals());
+   }
    
    /**
     * Method updates the selection of the viewer when there are changes.
@@ -284,7 +256,6 @@ public class GoalsPage extends Page implements IGoalsPage {
       }
 
    }
-
    
    /**
     * Method returns the selected {@link Node}.
@@ -303,7 +274,6 @@ public class GoalsPage extends Page implements IGoalsPage {
          return null;
       }
    }
-
    
    /**
     * Executes {@link #updateSelectedNode()} asynchronously and thread safe.
@@ -320,7 +290,6 @@ public class GoalsPage extends Page implements IGoalsPage {
          });
       }
    }
-   
 
    /**
     * {@inheritDoc}
@@ -333,11 +302,8 @@ public class GoalsPage extends Page implements IGoalsPage {
       viewer.setContentProvider(contentProvider);
       viewer.setLabelProvider(labelProvider);
       viewer.setInput(proof.openGoals());
-      
-      //allow listening to selection changes of this viewer
-      getSite().setSelectionProvider(viewer);
+      getSite().setSelectionProvider(viewer); //allow listening to selection changes of this viewer
       getSite().getPage().addSelectionListener(selectionListener);
-
       updateSelectedNode();
    }
 
@@ -370,7 +336,7 @@ public class GoalsPage extends Page implements IGoalsPage {
       environment.getProofControl().removeAutoModeListener(autoModeListener);
       proof.removeProofTreeListener(proofTreeListener);
       selectionModel.removeKeYSelectionListener(keySelectionListener);
+      getSite().getPage().removeSelectionListener(selectionListener);
       super.dispose();
    }
-
 }
