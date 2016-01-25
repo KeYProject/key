@@ -90,7 +90,7 @@ public class SecurityLattice {
         /**
          * Returns whether this domain is strictly higher in the hierarchy than the other one.
          */
-        // TODO: do we really want strict super-elemets??
+        // TODO: do we really want strict super-elements??
         public boolean isSuperDomain(SecurityDomain other) {
             if (other == this) return false;
             for (SecurityDomain sub: subDomains) {
