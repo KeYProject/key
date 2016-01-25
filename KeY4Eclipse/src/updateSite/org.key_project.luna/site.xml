@@ -33,6 +33,9 @@
    <feature url="features/org.key_project.removegenerics.feature_1.0.0.qualifier.jar" id="org.key_project.removegenerics.feature" version="1.0.0.qualifier">
       <category name="org.key_project.category.utilities"/>
    </feature>
+   <feature url="features/org.key_project.sed.key.evaluation.feature_1.0.0.qualifier.jar" id="org.key_project.sed.key.evaluation.feature" version="1.0.0.qualifier">
+      <category name="org.key_project.category.evaluation"/>
+   </feature>
    <category-def name="org.key_project.category.verification" label="Verification">
       <description>
          Provides tools for verification.
@@ -56,6 +59,12 @@
    <category-def name="org.key_project.category.editing" label="Editing">
       <description>
          Provides tools for editing source code.
+      </description>
+   </category-def>
+   <category-def name="org.key_project.category.evaluation" label="Evaluation">
+      <description>
+         Allows one to participate in the SED evaluations. 
+The evaluations are a good starting point for new users!
       </description>
    </category-def>
 </site>
