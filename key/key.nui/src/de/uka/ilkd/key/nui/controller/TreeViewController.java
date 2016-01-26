@@ -17,6 +17,7 @@ import de.uka.ilkd.key.nui.prooftree.ProofTreeVisualizer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
@@ -34,6 +35,7 @@ import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 /**
  * Controller for the treeView GUI element to visualize proofs.
@@ -54,9 +56,10 @@ public class TreeViewController implements Initializable {
      * The IconFactory used to create icons for the proof tree nodes.
      */
     private final IconFactory icf;
-    
+
     /**
-     * The VBox containing both the TreeView and the Anchor Pane where the Search elements are
+     * The VBox containing both the TreeView and the Anchor Pane where the
+     * Search elements are
      */
     @FXML
     private VBox mainVBox;
@@ -96,7 +99,7 @@ public class TreeViewController implements Initializable {
     @FXML
     private AnchorPane searchViewAnchorPane;
     /**
-     * A List representation of the all the TreeItems 
+     * A List representation of the all the TreeItems
      */
     private List<TreeItem<NUINode>> treeItems;
 
@@ -351,10 +354,24 @@ public class TreeViewController implements Initializable {
         NUIController.getInstance().registerKeyListener(KeyCode.ENTER, new KeyCode[] {},
                 (event) -> {
                     if (event.isShiftDown()) {
+                        previousButton.arm();
+                        PauseTransition pause = new PauseTransition(Duration.millis(130));
+                        pause.setOnFinished(e -> {
+                            previousButton.disarm();
+                        });
                         previousButton.fire();
+                        pause.play();
+
                     }
                     else {
+                        nextButton.arm();
+                        PauseTransition pause = new PauseTransition(Duration.millis(130));
+                        pause.setOnFinished(e -> {
+                            nextButton.disarm();
+                        });
                         nextButton.fire();
+                        pause.play();
+
                     }
                 });
         mainVBox.getChildren().add(searchViewAnchorPane);
