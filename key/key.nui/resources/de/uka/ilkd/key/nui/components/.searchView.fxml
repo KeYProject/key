@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane fx:controller="de.uka.ilkd.key.nui.controller.SearchViewController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="36.0" prefWidth="279.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="searchViewAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="36.0" prefWidth="244.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Button fx:id="PreviousButton" onAction="#handlePreviousButton" disable="true" layoutX="214.0" layoutY="6.0" mnemonicParsing="false" text="&lt;" textAlignment="CENTER" />
-      <Button fx:id="NextButton" onAction="#handleNextButton" disable="true" layoutX="243.0" layoutY="6.0" mnemonicParsing="false" text="&gt;" textAlignment="CENTER" />
-      <TextField fx:id="SearchTextField" layoutX="6.0" layoutY="6.0" promptText="Search..." />
+      <Button fx:id="previousButton" disable="true" layoutX="181.0" layoutY="6.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="22.0" text="&lt;" textAlignment="CENTER" />
+      <Button fx:id="nextButton" disable="true" layoutX="209.0" layoutY="6.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="23.0" text="&gt;" textAlignment="CENTER" />
+      <TextField fx:id="searchTextField" layoutX="6.0" layoutY="6.0" promptText="Search..." />
    </children>
 </AnchorPane>

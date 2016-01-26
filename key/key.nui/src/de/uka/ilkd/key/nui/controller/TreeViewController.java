@@ -2,6 +2,7 @@ package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -10,7 +11,6 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.ComponentFactory;
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.NUI;
-import de.uka.ilkd.key.nui.controller.NUIController.Place;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeVisualizer;
@@ -21,13 +21,19 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.collections.FXCollections;
-import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 
 /**
  * Controller for the treeView GUI element to visualize proofs.
@@ -41,35 +47,68 @@ public class TreeViewController implements Initializable {
     public static final String NAME = "treeView";
     public static final String RESOURCE = "treeView.fxml";
 
+    @FXML
+    private ToggleButton expandToggleButton;
+
     /**
      * The IconFactory used to create icons for the proof tree nodes.
      */
     private final IconFactory icf;
-
+    
+    /**
+     * The VBox containing both the TreeView and the Anchor Pane where the Search elements are
+     */
+    @FXML
+    private VBox mainVBox;
+    /**
+     * The Button toggling selectNextItem in searching
+     */
+    @FXML
+    private Button nextButton;
+    /**
+     * The Button toggling selectPreviousItem in searching
+     */
+    @FXML
+    private Button previousButton;
     /**
      * A <tt>WeakHashMap</tt> storing the <tt>ProofTreeCells</tt> currently
      * existing.
      */
     private WeakHashMap<ProofTreeCell, DoubleBinding> proofTreeCells = new WeakHashMap<>();
-
     /**
      * The proofTree view of the GUI.
      */
     @FXML
     private TreeView<NUINode> proofTreeView;
-
     /**
      * An ObservableList storing the Items matching a <tt/>search()<tt/>
      */
     private ObservableList<TreeItem<NUINode>> searchMatches = FXCollections
             .observableList(new LinkedList<TreeItem<NUINode>>());
-
+    /**
+     * The TextField where search terms are entered
+     */
+    @FXML
+    private TextField searchTextField;
+    /**
+     * The Anchor Pane holding the Search Field and its buttons
+     */
+    @FXML
+    private AnchorPane searchViewAnchorPane;
+    /**
+     * A List representation of the all the TreeItems 
+     */
     private List<TreeItem<NUINode>> treeItems;
 
     /**
      * The visualizer for displaying a proof tree.
      */
     private ProofTreeVisualizer visualizer;
+
+    /**
+     * whether the Search AnchorPane is visible, i.e. exists
+     */
+    boolean aSearchViewIsOpened = false;
 
     /**
      * The constructor.
@@ -85,45 +124,19 @@ public class TreeViewController implements Initializable {
     public final void initialize(final URL location, final ResourceBundle resources) {
         Platform.runLater(() -> {
 
-            // Look for changes to TreeViews Place. If changed and searchView is
-            // visible, also change searchView's Place.
-            NUIController.getInstance().getPlaceComponent()
-                    .addListener(new MapChangeListener<String, Place>() {
-                @Override
-                public void onChanged(Change<? extends String, ? extends Place> change) {
-                    if (change.getKey().equals(NAME) && NUIController.getInstance()
-                            .getPlaceComponent().containsKey(SearchViewController.NAME)) {
-                        NUIController.getInstance().createOrMoveOrHideComponent(
-                                SearchViewController.NAME, change.getValueAdded(),
-                                SearchViewController.RESOURCE);
-                    }
-                }
-            });
-
             // Register KeyEvent
             NUIController.getInstance().registerKeyListener(KeyCode.F,
                     new KeyCode[] { KeyCode.CONTROL }, (event) -> {
-                if (NUIController.getInstance().getPlaceComponent().containsKey(NAME)) {
-                    try {
-                        NUIController.getInstance().createOrMoveOrHideComponent(
-                                SearchViewController.NAME,
-                                NUIController.getInstance().getPlaceComponent().get(NAME),
-                                SearchViewController.RESOURCE);
-                    }
-                    catch (IllegalArgumentException ex) {
-                        // SearchView already exists
-                        SearchViewController c = ComponentFactory.getInstance()
-                                .getController(SearchViewController.NAME);
-                        c.performFocusRequest();
-                    }
+                if (aSearchViewIsOpened) {
+                    searchTextField.requestFocus();
+                }
+                else {
+                    displaySearchView();
                 }
             });
 
-            NUIController.getInstance().registerKeyListener(KeyCode.ESCAPE, null, (event) -> {
-                NUIController.getInstance().createOrMoveOrHideComponent(SearchViewController.NAME,
-                        Place.HIDDEN, SearchViewController.RESOURCE);
-                searchMatches.clear();
-            });
+            NUIController.getInstance().registerKeyListener(KeyCode.ESCAPE, null,
+                    (event) -> hideSearchView());
         });
 
         // set cell factory for rendering cells
@@ -176,19 +189,6 @@ public class TreeViewController implements Initializable {
     }
 
     /**
-     * This method should be called every time a new TreeCell is being created.
-     * <tt>this</tt> will reference the ProofTreeCell in a WeakHandle in order
-     * to find out which TreeItems currently are visible to the user.
-     *
-     * @param t
-     *            the ProofTreeCell to register.
-     */
-    private void registerTreeCell(ProofTreeCell t) {
-        proofTreeCells.put(t,
-                Bindings.createDoubleBinding(() -> t.getHeight(), t.heightProperty()));
-    }
-
-    /**
      * Searches the <tt>Label</tt>s of the <tt>TreeItems</tt> in the underlying
      * <tt>ProofTree</tt> for a given term. Highlights all the matches.<br/>
      * It is possible to use this for an incremental search, but doing so is
@@ -224,7 +224,7 @@ public class TreeViewController implements Initializable {
      */
     public void selectAndIfNeededScrollToNextSearchResult() {
         // catch bad calls
-        if (searchMatches.isEmpty() || searchMatches == null)
+        if (searchMatches == null || searchMatches.isEmpty())
             return;
 
         TreeItem<NUINode> currentlySelectedItem = proofTreeView.getSelectionModel()
@@ -262,15 +262,16 @@ public class TreeViewController implements Initializable {
         }
 
     }
-    
+
     /**
-     * Selects the previous item in searchMatches. Scrolls the ProofTreeView if that
-     * item is not visible to the user. Expands the ProofTreeView as needed.
-     * Only to be used together with <tt>TreeViewController.search()</tt>.
+     * Selects the previous item in searchMatches. Scrolls the ProofTreeView if
+     * that item is not visible to the user. Expands the ProofTreeView as
+     * needed. Only to be used together with
+     * <tt>TreeViewController.search()</tt>.
      */
-    public void selectAndIfNeededScrollToPreviousSearchResult(){
+    public void selectAndIfNeededScrollToPreviousSearchResult() {
         // catch bad calls
-        if (searchMatches.isEmpty() || searchMatches == null)
+        if (searchMatches == null || searchMatches.isEmpty())
             return;
 
         TreeItem<NUINode> currentlySelectedItem = proofTreeView.getSelectionModel()
@@ -278,16 +279,16 @@ public class TreeViewController implements Initializable {
         TreeItem<NUINode> itemToSelect;
 
         /*
-         * start from the bottom if a) no item is selected b) an item is selected
-         * that is not a search result c) the selected item is the first search
-         * result
+         * start from the bottom if a) no item is selected b) an item is
+         * selected that is not a search result c) the selected item is the
+         * first search result
          */
         if (currentlySelectedItem == null || !searchMatches.contains(currentlySelectedItem)
                 || currentlySelectedItem == searchMatches.get(0)) {
-            itemToSelect = searchMatches.get(searchMatches.size()-1);
+            itemToSelect = searchMatches.get(searchMatches.size() - 1);
         }
         else {
-            itemToSelect = searchMatches.get(searchMatches.indexOf(currentlySelectedItem) -1);
+            itemToSelect = searchMatches.get(searchMatches.indexOf(currentlySelectedItem) - 1);
         }
         // if the treeItem is not in an expanded branch of the tree, the tree
         // must be expanded accordingly
@@ -304,7 +305,8 @@ public class TreeViewController implements Initializable {
         // if none of the treeCells contain the item we have just selected,
         // we need to scroll to make it visible
         if (proofTreeCells.keySet().stream().noneMatch(x -> (x.getTreeItem() == itemToSelect))) {
-            proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex() - ((int)(proofTreeCells.size() /2)));
+            proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex()
+                    - ((int) (proofTreeCells.size() / 2)));
         }
     }
 
@@ -317,6 +319,45 @@ public class TreeViewController implements Initializable {
     private void displayProof(final Proof proof) {
         visualizer.loadProofTree(proof);
         visualizer.visualizeProofTree();
+    }
+
+    private void displaySearchView() {
+        aSearchViewIsOpened = true;
+        searchViewAnchorPane = (AnchorPane) (new ComponentFactory("components/"))
+                .createComponent(".searchView", ".searchView.fxml");
+        for (Node n : searchViewAnchorPane.getChildren()) {
+            if (n.getId().equals("previousButton")) {
+                previousButton = (Button) n;
+                previousButton
+                        .setOnAction((event) -> selectAndIfNeededScrollToPreviousSearchResult());
+            }
+            else if (n.getId().equals("nextButton")) {
+                nextButton = (Button) n;
+                nextButton.setOnAction((event) -> selectAndIfNeededScrollToNextSearchResult());
+            }
+            else if (n.getId().equals("searchTextField")) {
+                searchTextField = (TextField) n;
+                searchTextField.textProperty().addListener((obs, oldText, newText) -> {
+                    nextButton.setDisable(newText.isEmpty());
+                    previousButton.setDisable(newText.isEmpty());
+                    search(newText);
+                });
+                Platform.runLater(() -> searchTextField.requestFocus());
+            }
+            else if (n.getId().equals("expandToggleButton")) {
+                expandToggleButton = (ToggleButton) n;
+            }
+        }
+        NUIController.getInstance().registerKeyListener(KeyCode.ENTER, new KeyCode[] {},
+                (event) -> {
+                    if (event.isShiftDown()) {
+                        previousButton.fire();
+                    }
+                    else {
+                        nextButton.fire();
+                    }
+                });
+        mainVBox.getChildren().add(searchViewAnchorPane);
     }
 
     /**
@@ -361,6 +402,24 @@ public class TreeViewController implements Initializable {
         return treeItems;
     }
 
+    private void hideSearchView() {
+        for (Iterator<Node> i = mainVBox.getChildren().iterator(); i.hasNext();) {
+            Node node = i.next();
+            System.out.println("searchViewAnchorPane= " + searchViewAnchorPane);
+            System.out.println("node= " + node);
+            if (node == searchViewAnchorPane) {
+                i.remove();
+                break;
+            }
+        }
+        NUIController.getInstance().unregisterKeyListener(KeyCode.ENTER);
+        aSearchViewIsOpened = false;
+        searchTextField = null;
+        nextButton = null;
+        previousButton = null;
+        searchViewAnchorPane = null;
+    }
+
     /**
      * Loads the given proof file. Checks if the proof file exists and the proof
      * is not null, and fails if the proof could not be loaded.
@@ -380,5 +439,18 @@ public class TreeViewController implements Initializable {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * This method should be called every time a new TreeCell is being created.
+     * <tt>this</tt> will reference the ProofTreeCell in a WeakHandle in order
+     * to find out which TreeItems currently are visible to the user.
+     *
+     * @param t
+     *            the ProofTreeCell to register.
+     */
+    private void registerTreeCell(ProofTreeCell t) {
+        proofTreeCells.put(t,
+                Bindings.createDoubleBinding(() -> t.getHeight(), t.heightProperty()));
     }
 }

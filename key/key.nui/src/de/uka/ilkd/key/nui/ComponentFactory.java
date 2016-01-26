@@ -42,11 +42,16 @@ public final class ComponentFactory {
 		return instance;
 	}
 
-	/**
-	 * Singleton constructor.
-	 */
-	private ComponentFactory() {
+	@SuppressWarnings("static-access")
+    public ComponentFactory(String resourceDir) {
+	    this.resourceDir = resourceDir;
+	}
 
+    /**
+     * Singleton constructor.
+     */
+	private ComponentFactory(){
+	    
 	}
 	
 	/**

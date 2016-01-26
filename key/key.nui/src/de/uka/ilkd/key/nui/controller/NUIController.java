@@ -242,7 +242,11 @@ public class NUIController implements Initializable {
      */
     @FXML
     public final void handleOpenProof(final ActionEvent e) {
-        if (!ComponentFactory.getInstance().hasComponent(TreeViewController.NAME)) {
+
+        if (placeComponent.keySet().stream()
+                .map((key) -> getPane(placeComponent.get(key)).getChildren().stream()
+                        .noneMatch((node) -> node.getId().equals(TreeViewController.NAME)))
+                .filter((bool) -> bool.booleanValue()).count() == 0) {
             statustext.setText("TreeView not found, opening a tree is not possible");
         }
         else {

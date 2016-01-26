@@ -3,10 +3,14 @@
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.VBox?>
 
-<TreeView xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="de.uka.ilkd.key.nui.controller.TreeViewController"
-	fx:id="proofTreeView" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+   fx:controller="de.uka.ilkd.key.nui.controller.TreeViewController" fx:id="mainVBox" VBox.vgrow="ALWAYS">
+   <children>
+<TreeView fx:id="proofTreeView" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"
 	minHeight="0" minWidth="0" AnchorPane.bottomAnchor="0.0"
 	AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
 	AnchorPane.topAnchor="0.0" />
+ </children>
+ </VBox>
