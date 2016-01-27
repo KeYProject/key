@@ -55,6 +55,7 @@ public class CompleteAndApplyTacletMatchWizard extends Wizard {
     */
    @Override
    public boolean performFinish() {
+      completePage.finish();
       return true;
    }
    
