@@ -131,14 +131,6 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
       }
 	};
 	
-//	private ISelectionChangedListener debugViewListener = new ISelectionChangedListener() {
-//		
-//		@Override
-//		public void selectionChanged(SelectionChangedEvent event) {
-//			handleDebugViewSelectionChanged(event.getSelection());
-//		}
-//	};
-
 	/**
 	 * Constructor.
 	 * 
@@ -174,17 +166,6 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	      }
 	}
 	
-//	protected void handleDebugViewSelectionChanged(ISelection selection) {
-//		Object element = SWTUtil.getFirstElement(selection);
-//		if (element != null && element instanceof IKeYSENode<?>) {
-//			Node node = ((IKeYSENode<?>) element).getExecutionNode().getProofNode();
-//			selectionModel.setSelectedNode(node);
-//		} else {
-//			System.out.println("No instances of IKeYSENode<?> found: no selection");
-//			System.out.println(element.getClass());
-//		}
-//	}
-
 	/**
 	 * Handles a change in the state of the showSymbolicExecutionTree outline filter.
 	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
@@ -267,13 +248,6 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 				"org.key_project.keyide.ui.view.outline.popup", menuManager,
 				getTreeViewer());
 		
-		//TODO add debug view listener here
-//		ExecutionTreeView exeTreeView = (ExecutionTreeView) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(ExecutionTreeView.VIEW_ID);
-//      	if (exeTreeView != null) {
-//      		exeTreeView.getDebugView().getSite().getSelectionProvider().addSelectionChangedListener(debugViewListener);
-//      		handleDebugViewSelectionChanged(exeTreeView.getDebugView().getSite().getSelectionProvider().getSelection());
-//      	}
-		// Update selected node
 		updateSelectedNode();
 	}
 
