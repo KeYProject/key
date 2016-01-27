@@ -35,25 +35,19 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
  * The {@link LabelProvider} used to label a proof tree consiting of 
@@ -81,6 +75,9 @@ public class ProofTreeLabelProvider extends LabelProvider {
     */
    private final Map<Node, BranchFolder> nodeToBranchMapping = new HashMap<Node, BranchFolder>();
    
+   /**
+    * The {@link SymbolicExecutionTreeBuilder} used for matching icons with the corresponding nodes.
+    */
    private SymbolicExecutionTreeBuilder symExeTreeBuilder;
    
    /**
@@ -234,8 +231,8 @@ public class ProofTreeLabelProvider extends LabelProvider {
     */
    @Override
    public Image getImage(Object element) {
-      if (element instanceof Node){
-         Node node = (Node)element;
+      if (element instanceof Node) {
+         Node node = (Node) element;
          IExecutionNode<?> exeNode;
          if (node.isClosed()) {
             return KeYImages.getImage(KeYImages.NODE_PROVED);
@@ -317,21 +314,17 @@ public class ProofTreeLabelProvider extends LabelProvider {
          } else {
             if (node.getNodeInfo().getInteractiveRuleApplication()) {
                return KeYImages.getImage(KeYImages.NODE_INTERACTIVE);
-            }
-            else {
+            } else {
                return KeYImages.getImage(KeYImages.NODE);
             }
          }
-      }
-      else if (element instanceof BranchFolder){
-         if (((BranchFolder)element).isClosed()){
+      } else if (element instanceof BranchFolder) {
+         if (((BranchFolder) element).isClosed()) {
             return KeYImages.getImage(KeYImages.FOLDER_PROVED);
-         }
-         else {
+         } else {
             return KeYImages.getImage(KeYImages.FOLDER);
          }
-      }
-      else {
+      } else {
          return super.getImage(element); // Unknown element
       }
    }
