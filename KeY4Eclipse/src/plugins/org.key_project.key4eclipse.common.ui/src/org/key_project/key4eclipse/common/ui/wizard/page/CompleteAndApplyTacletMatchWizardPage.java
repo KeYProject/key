@@ -1,15 +1,8 @@
 package org.key_project.key4eclipse.common.ui.wizard.page;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Vector;
-
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.border.TitledBorder;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -20,25 +13,22 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.key_project.key4eclipse.common.ui.util.KeYImages;
-import org.key_project.key4eclipse.common.ui.wizard.CompleteAndApplyTacletMatchWizard;
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.control.InstantiationFileHandler;
 import de.uka.ilkd.key.control.instantiation_model.TacletAssumesModel;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -48,11 +38,9 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ModelChangeListener;
-import de.uka.ilkd.key.proof.ModelEvent;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.pp.StringBackend;
@@ -72,28 +60,46 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
     */
    private final Goal goal;
    
+   /**
+    * the root Composite of this page.
+    */
    private Composite root;
 
+   /**
+    * The spec selector combo.
+    */
    private Combo specSelector;
 
+   /**
+    * A Composite with Stack Layout for spec switching.
+    */
    private Composite specSwitchComposite;
 
+   /**
+    * The stack layout in use by specSwitchComposite.
+    */
    private StackLayout stackLayout;
 
+   /**
+    * The validationView's Text field.
+    */
    private Label validationText;
 
+   /**
+    * the ID of the spec currently selected.
+    */
    private int currentID = 0;
    
    /**
     * Constructor.
     * @param pageName The name of this {@link WizardPage}.
-    * @param models The partial models with all different possible instantiations found automatically.
-    * @param goal The Goal where to apply.
+    * @param modelsP The partial models with all different possible instantiations found automatically.
+    * @param goalP The Goal where to apply.
     */
-   public CompleteAndApplyTacletMatchWizardPage(String pageName, TacletInstantiationModel[] models, Goal goal) {
+   public CompleteAndApplyTacletMatchWizardPage(String pageName, TacletInstantiationModel[] modelsP, Goal goalP) {
       super(pageName);
-      this.models = models;
-      this.goal = goal;
+      this.models = modelsP;
+      this.goal = goalP;
       setTitle("Choose Taclet Instantiation");
       setDescription("Define instantiations required to apply the taclet.");
       setImageDescriptor(KeYImages.getImageDescriptor(KeYImages.INTERACTIVE_WIZARD));
@@ -140,7 +146,11 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       validationViewUpdate();
    }
    
-   private void mkTacletView(Composite parent){
+   /**
+    * creates the taclet view.
+    * @param parent the composite to attach to
+    */
+   private void mkTacletView(Composite parent) {
       Taclet taclet = models[0].taclet();
       
       //TODO: Horrible mess beyond this point. Cleanup needed. Are all these calls to various String make thingies really needed?
@@ -173,7 +183,11 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       tacletText.setText(tacletSB.toString());
    }
    
-   private void mkVariableInstantiationView(Composite parent){
+   /**
+    * creates the variable instantiation view.
+    * @param parent the composite to attach to
+    */
+   private void mkVariableInstantiationView(Composite parent) {
       Group programVariablesView = new Group(parent, SWT.NONE);
       programVariablesView.setLayoutData(new GridData(GridData.FILL_BOTH));
       programVariablesView.setLayout(new GridLayout(1, false));
@@ -197,7 +211,11 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       }
    }
    
-   private void mkProgramVariablesView(Composite parent){
+   /**
+    * creates the program variables view.
+    * @param parent the composite to attach to
+    */
+   private void mkProgramVariablesView(Composite parent) {
       //implementation pretty much completed.
       Group statusGrp = new Group(parent, SWT.NONE);
       statusGrp.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -209,18 +227,21 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       if (vars.size() > 0) {
          text = vars.toString();
          text = "";
-         for(Named n : vars) {
+         for (Named n : vars) {
             text += n.name();
             text += "\n";
          }
-      }
-      else {
+      } else {
          text = "none";
       }
       status.setText(text);
    }
    
-   private void mkValidationView(Composite parent){
+   /**
+    * creates the validation view.
+    * @param parent the composite to attach to
+    */
+   private void mkValidationView(Composite parent) {
       Group statusGrp = new Group(parent, SWT.NONE);
       statusGrp.setLayoutData(new GridData(GridData.FILL_BOTH));
       statusGrp.setLayout(new GridLayout(1, false));
@@ -229,6 +250,8 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
    }
    
    //Not getting called yet, because I'm unsure where.
+   //Part of assumes-extension
+   @SuppressWarnings("unused")//TODO: remove this tag once onsolete.
    private void mkIfSelectionView(Composite parent, TacletInstantiationModel model){
       //Completely untested
       
@@ -239,34 +262,44 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       Group ifSelectionViewGrp = new Group(parent, SWT.NONE);
       ifSelectionViewGrp.setText("Assumption instantiation");
       ifSelectionViewGrp.setLayout(new GridLayout(2, false));
-      for(int i = 0; i < model.ifChoiceModelCount(); i++) {
+      for (int i = 0; i < model.ifChoiceModelCount(); i++) {
          String text = ProofSaver.printAnything(model.ifFma(i), model.proof().getServices());
          Text assumption = new Text(ifSelectionViewGrp, SWT.READ_ONLY);
          assumption.setText(text);
          TacletAssumesModel tam = model.ifChoiceModel(i);
          Combo c = new Combo(ifSelectionViewGrp, SWT.DROP_DOWN);
          Services svc = model.proof().getServices();
-         for(int j = 0 ; j < tam.getSize(); j++){
+         for (int j = 0 ; j < tam.getSize(); j++) {
             c.add(tam.getElementAt(j).toString(svc));
          }
          //selection listener for the Combo?
       }
    }
    
-   private void specSwitchTo(int id){
+   /**
+    * Switches to a different spec.
+    * @param id The ID of the spec in models
+    */
+   private void specSwitchTo(int id) {
       stackLayout.topControl = (Composite) specSwitchComposite.getChildren()[id];
       specSwitchComposite.layout();
       validationViewUpdate();
    }
    
-   private TacletInstantiationModel getCurrentModel(){
+   /**
+    * @return The model currently selected.
+    */
+   private TacletInstantiationModel getCurrentModel() {
       return models[currentID ];
    }
    
-   private void validationViewUpdate(){
+   /**
+    * updates the validation View.
+    */
+   private void validationViewUpdate() {
       String status = getCurrentModel().getStatusString();
       validationText.setText(status);
-      if (status.equals("Instantiation is OK.")){
+      if (status.equals("Instantiation is OK.")) {
          setErrorMessage(null);
          setPageComplete(true);
       } else {
@@ -275,26 +308,32 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       }
    }
    
-   private void mkSpecification(String name, final int id){
+   /**
+    * creates a new specification.
+    * @param name The alias in the DropDown Combo
+    * @param id The ID in models
+    */
+   private void mkSpecification(String name, final int id) {
       specSelector.add(name);
       TacletInstantiationModel model = models[id];
       Composite specComposite = new Composite(specSwitchComposite, SWT.NONE);
       specComposite.setLayout(new GridLayout(1, false));
       specComposite.setLayout(new FillLayout());
-      final Table table = new Table (specComposite, SWT.BORDER | SWT.FULL_SELECTION);
+      final Table table = new Table(specComposite, SWT.BORDER | SWT.FULL_SELECTION);
       TableColumn varnames = new TableColumn(table, SWT.NONE);
       TableColumn varspecs = new TableColumn(table, SWT.NONE);
-      TableItem item;
+      TableItem item = new TableItem(table, SWT.NONE);
+      item.setText(new String[] {"terms", "specs"}); //TODO: What to put here?
       final Vector<TableItem> editableItems = new Vector<TableItem>();
       final Vector<Integer> editableItemOriginalRowID = new Vector<Integer>();
-      for(int i = 0; i < model.tableModel().getRowCount(); i++){
+      for (int i = 0; i < model.tableModel().getRowCount(); i++) {
          item = new TableItem(table, SWT.NONE);
          String left = model.tableModel().getValueAt(i, 0).toString();
          Object rightSideSpec = model.tableModel().getValueAt(i, 1);
          String right;
          if (rightSideSpec == null) {
-            right = "";
-         }else{
+            right = "enter specification here";
+         } else {
             right = rightSideSpec.toString();
          }
          item.setText(new String[] {left, right});
@@ -316,8 +355,6 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       editor.horizontalAlignment = SWT.LEFT;
       editor.grabHorizontal = true;
       editor.minimumWidth = 50;
-      // editing the second column
-      final int EDITABLECOLUMN = 1;
 
       table.addSelectionListener(new SelectionAdapter() {
          public void widgetSelected(SelectionEvent e) {
@@ -334,7 +371,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
             }
             
             //check if row is editable.
-            if (!editableItems.contains(item)){
+            if (!editableItems.contains(item)) {
                return;
             }
             
@@ -343,11 +380,11 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
             // The control that will be the editor must be a child of the
             // Table
             Text newEditor = new Text(table, SWT.NONE);
-            newEditor.setText(item.getText(EDITABLECOLUMN));
+            newEditor.setText(item.getText(1));
             newEditor.addModifyListener(new ModifyListener() {
                public void modifyText(ModifyEvent me) {
                   Text text = (Text) editor.getEditor();
-                  editor.getItem().setText(EDITABLECOLUMN, text.getText());
+                  editor.getItem().setText(1, text.getText());
                   //we know, by the above if()s, that we're in column ID 1.
                   //column 0 is not editable.
                   models[id].tableModel().setValueAt(text.getText(), row, 1);
@@ -356,8 +393,39 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
             });
             newEditor.selectAll();
             newEditor.setFocus();
-            editor.setEditor(newEditor, item, EDITABLECOLUMN);
+            editor.setEditor(newEditor, item, 1);
          }
       });
+      table.setLinesVisible(true);
+   }
+   
+   /**
+    * Stores the information and applies a freshly created taclet application.
+    */
+   public void finish() {
+      //TODO error handling
+      try {
+         validationViewUpdate();
+         TacletApp app = getCurrentModel().createTacletApp();
+         if (app == null) {
+             /*Error message TODO:
+             "Could not apply rule",
+             "Rule Application Failure",
+             */ 
+             return;
+         }
+         //goal.node().getNodeInfo().setInteractiveRuleApplication(true);//Maybe?
+         goal.apply(app);
+      }  catch (Exception exc) {
+//          if (exc instanceof SVInstantiationExceptionWithPosition) {
+//                        errorPositionKnown(exc.getMessage(),
+//                                ((SVInstantiationExceptionWithPosition) exc).getRow(),
+//                                ((SVInstantiationExceptionWithPosition) exc).getColumn(),
+//                                ((SVInstantiationExceptionWithPosition) exc).inIfSequent());
+//          }
+          //ExceptionDialog.showDialog(TacletMatchCompletionDialog.this, exc);
+          return;
+      } 
+      InstantiationFileHandler.saveListFor(getCurrentModel());
    }
 }

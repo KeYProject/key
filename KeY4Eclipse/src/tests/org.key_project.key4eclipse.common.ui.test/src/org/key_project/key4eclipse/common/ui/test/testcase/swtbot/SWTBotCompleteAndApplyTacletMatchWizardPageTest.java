@@ -1,18 +1,28 @@
 package org.key_project.key4eclipse.common.ui.test.testcase.swtbot;
 
-import static org.junit.Assert.*;
+import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.junit.Test;
 import org.key_project.key4eclipse.common.ui.test.Activator;
 import org.key_project.key4eclipse.common.ui.util.EclipseUserInterfaceCustomization;
@@ -28,23 +38,98 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 
+/**
+ * Tests for CompleteAndApplyTacletMatchWizardPage.
+ * @author Viktor Pfanschilling
+ *
+ */
 public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
-
-   private SWTWorkbenchBot bot;
-   private SWTBotShell dialogShell;
-   private SWTBotEditor editor;
-   private SWTBotPerspective previousperspective;
-   private String prevProofStarter;
-   private boolean prevDontAsk;
-   private Proof proof;
-   private KeYEnvironment<DefaultUserInterfaceControl> environment;
+   /**
+    * The workbench bot this test uses.
+    */
+   private SWTWorkbenchBot bot = null;
+   /**
+    * The shell of the LoopInvariant dialog under Test.
+    */
+   private SWTBotShell dialogShell = null;
+   /**
+    * The editor used to open the above dialog.
+    */
+   private SWTBotEditor editor = null;
+   /**
+    * The previous Eclipse perspective, stored to restore.
+    */
+   private SWTBotPerspective previousperspective = null;
+   /**
+    * The previous proofStarter, stored to restore.
+    */
+   private String prevProofStarter = null;
+   /**
+    * The previous dontAsk setting, stored to restore.
+    */
+   private boolean prevDontAsk = false;
+   /**
+    * The Proof used for the test.
+    */
+   private Proof proof = null;
+   /**
+    * The KeY Environment.
+    */
+   private KeYEnvironment<DefaultUserInterfaceControl> environment = null;
 
    @Test
-   public void initialTest() throws Exception {
-      try{
+   public void testFinish() throws Exception {
+      try {
+         //load a proof file:
          setupTest("allLeft.proof");
-         openLIDialog("orall", "allLeft");
-      } finally{
+         openLIDialog("ellForm", "cut");
+         
+         //edit the table
+         SWTBotTable t = dialogShell.bot().table();
+         SWTBotTableItem ti = t.getTableItem(1);
+         ti.click();
+         Text wdgt = bot.widget(widgetOfType(Text.class), t.widget);
+         SWTBotText txt = new SWTBotText(wdgt, null);
+         txt.setText("1!=3");
+         txt.pressShortcut(KeyStroke.getInstance(SWT.CR));
+         
+         //finish the dialog
+         dialogShell.bot().button("Finish").click();
+         final SWTBotStyledText styledText = editor.bot().styledText();
+         //assert that the expected change happened.
+         assertTrue(styledText.getText().contains("!1 = 3"));
+      } finally {
+         restore();
+      }
+   }
+   
+   @Test
+   public void testCancel() throws Exception {
+      try {
+         //load a proof file
+         setupTest("allLeft.proof");
+         openLIDialog("ellForm", "cut");
+         
+         //edit the spec to unlock the finish button.
+         String oldEditorText = editor.bot().styledText().getText();
+         SWTBotTable t = dialogShell.bot().table();
+         SWTBotTableItem ti = t.getTableItem(1);
+         ti.click();
+         Text wdgt = bot.widget(widgetOfType(Text.class), t.widget);
+         SWTBotText txt = new SWTBotText(wdgt, null);
+         txt.setText("1!=3");
+         txt.pressShortcut(KeyStroke.getInstance(SWT.CR));
+         //cancel
+         dialogShell.bot().button("Cancel").click();
+         
+         //assert that nothing has changed.
+         final SWTBotStyledText styledText = editor.bot().styledText();
+         assertFalse(styledText.getText().contains("!1 = 3"));
+
+         String newEditorText = editor.bot().styledText().getText();
+         assertTrue(oldEditorText.equals(newEditorText));
+         
+      } finally {
          restore();
       }
    }
@@ -110,7 +195,8 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
    }
    
    /**
-    * opens a taclet Dialog.
+    * opens a Taclet Dialog.
+    * @param location The text snippet where to look for the rule
     * @param rule The name of the rule to be applied
     */
    private void openLIDialog(String location, String rule) {
