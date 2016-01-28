@@ -216,65 +216,65 @@ public final class KeYImages {
           path = "icons/interactiveAppLogo16.png";
        }
        else if (METHOD_CALL.equals(key)) {
-           path = "icons/SEDIcons/method_call.gif";
-        }
-        else if (METHOD_RETURN.equals(key)) {
-           path = "icons/SEDIcons/method_return.gif";
-        }
-        else if (EXCEPTIONAL_METHOD_RETURN.equals(key)) {
-           path = "icons/SEDIcons/exceptional_method_return.gif";
-        }
-        else if (TERMINATION.equals(key)) {
-           path = "icons/SEDIcons/termination.gif";
-        }
-        else if (TERMINATION_NOT_VERIFIED.equals(key)) {
-           path = "icons/SEDIcons/termination_not_verified.gif";
-        }
-        else if (BRANCH_STATEMENT.equals(key)) {
-           path = "icons/SEDIcons/branch_statement.gif";
-        }
-        else if (BRANCH_CONDITION.equals(key)) {
-           path = "icons/SEDIcons/branch_condition.gif";
-        }
-        else if (EXCEPTIONAL_TERMINATION.equals(key)) {
-           path = "icons/SEDIcons/exceptional_termination.gif";
-        }
-        else if (EXCEPTIONAL_TERMINATION_NOT_VERIFIED.equals(key)) {
-           path = "icons/SEDIcons/exceptional_termination_not_verified.gif";
-        }
-        else if (LOOP_STATEMENT.equals(key)) {
-           path = "icons/SEDIcons/loop_statement.gif";
-        }
-        else if (LOOP_CONDITION.equals(key)) {
-           path = "icons/SEDIcons/loop_condition.gif";
-        }
-        else if (METHOD_CONTRACT.equals(key)) {
-           path = "icons/SEDIcons/method_contract.gif";
-        }
-        else if (METHOD_CONTRACT_NOT_PRE.equals(key)) {
-           path = "icons/SEDIcons/method_contract_not_pre.gif";
-        }
-        else if (METHOD_CONTRACT_NOT_NPC.equals(key)) {
-           path = "icons/SEDIcons/method_contract_not_npc.gif";
-        }
-        else if (METHOD_CONTRACT_NOT_PRE_NOT_NPC.equals(key)) {
-           path = "icons/SEDIcons/method_contract_not_pre_not_npc.gif";
-        }
-        else if (LOOP_INVARIANT.equals(key)) {
-           path = "icons/SEDIcons/loop_invariant.gif";
-        }
-        else if (LOOP_INVARIANT_INITIALLY_INVALID.equals(key)) {
-           path = "icons/SEDIcons/loop_invariant _initially_invalid.gif";
-        }
-        else if (LOOP_BODY_TERMINATION.equals(key)) {
-           path = "icons/SEDIcons/loop_body_termination.gif";
-        }
-        else if (LOOP_BODY_TERMINATION_NOT_VERIFIED.equals(key)) {
-           path = "icons/SEDIcons/exceptional_termination_not_verified.gif";
-        }
-        else if (STATEMENT.equals(key)) {
-        	path = "icons/SEDIcons/statement.gif";
-        }
+          path = "icons/SEDIcons/method_call.gif";
+       }
+       else if (METHOD_RETURN.equals(key)) {
+          path = "icons/SEDIcons/method_return.gif";
+       }
+       else if (EXCEPTIONAL_METHOD_RETURN.equals(key)) {
+          path = "icons/SEDIcons/exceptional_method_return.gif";
+       }
+       else if (TERMINATION.equals(key)) {
+          path = "icons/SEDIcons/termination.gif";
+       }
+       else if (TERMINATION_NOT_VERIFIED.equals(key)) {
+          path = "icons/SEDIcons/termination_not_verified.gif";
+       }
+       else if (BRANCH_STATEMENT.equals(key)) {
+          path = "icons/SEDIcons/branch_statement.gif";
+       }
+       else if (BRANCH_CONDITION.equals(key)) {
+          path = "icons/SEDIcons/branch_condition.gif";
+       }
+       else if (EXCEPTIONAL_TERMINATION.equals(key)) {
+          path = "icons/SEDIcons/exceptional_termination.gif";
+       }
+       else if (EXCEPTIONAL_TERMINATION_NOT_VERIFIED.equals(key)) {
+          path = "icons/SEDIcons/exceptional_termination_not_verified.gif";
+       }
+       else if (LOOP_STATEMENT.equals(key)) {
+          path = "icons/SEDIcons/loop_statement.gif";
+       }
+       else if (LOOP_CONDITION.equals(key)) {
+          path = "icons/SEDIcons/loop_condition.gif";
+       }
+       else if (METHOD_CONTRACT.equals(key)) {
+          path = "icons/SEDIcons/method_contract.gif";
+       }
+       else if (METHOD_CONTRACT_NOT_PRE.equals(key)) {
+          path = "icons/SEDIcons/method_contract_not_pre.gif";
+       }
+       else if (METHOD_CONTRACT_NOT_NPC.equals(key)) {
+          path = "icons/SEDIcons/method_contract_not_npc.gif";
+       }
+       else if (METHOD_CONTRACT_NOT_PRE_NOT_NPC.equals(key)) {
+          path = "icons/SEDIcons/method_contract_not_pre_not_npc.gif";
+       }
+       else if (LOOP_INVARIANT.equals(key)) {
+          path = "icons/SEDIcons/loop_invariant.gif";
+       }
+       else if (LOOP_INVARIANT_INITIALLY_INVALID.equals(key)) {
+          path = "icons/SEDIcons/loop_invariant _initially_invalid.gif";
+       }
+       else if (LOOP_BODY_TERMINATION.equals(key)) {
+          path = "icons/SEDIcons/loop_body_termination.gif";
+       }
+       else if (LOOP_BODY_TERMINATION_NOT_VERIFIED.equals(key)) {
+          path = "icons/SEDIcons/exceptional_termination_not_verified.gif";
+       }
+       else if (STATEMENT.equals(key)) {
+       	path = "icons/SEDIcons/statement.gif";
+       }
        // Load image if possible
        if (path != null) {
           InputStream in = null;

@@ -14,6 +14,7 @@
 package org.key_project.sed.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.key_project.sed.ui.management.SEDSelectionManager;
 import org.key_project.sed.ui.util.LaunchViewManager;
 import org.osgi.framework.BundleContext;
 
@@ -42,6 +43,7 @@ public class Activator extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		LaunchViewManager.getInstance().start();
+		SEDSelectionManager.getInstance().start();
 	}
 
 	/*
@@ -50,6 +52,7 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
         LaunchViewManager.getInstance().stop();
+        SEDSelectionManager.getInstance().stop();
 		plugin = null;
 		super.stop(context);
 	}
