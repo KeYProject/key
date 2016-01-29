@@ -37,6 +37,13 @@ import javafx.scene.input.KeyEvent;
  */
 public class NUIController implements Initializable {
     /**
+     * Provides an enum for the available places in the main window.
+     */
+    public enum Place {
+        BOTTOM, HIDDEN, LEFT, MIDDLE, RIGHT
+    }
+
+    /**
      * Singleton.
      */
     private static NUIController instance;
@@ -56,27 +63,26 @@ public class NUIController implements Initializable {
         }
     }
 
+    // Definition of GUI fields
+    @FXML
+    private HBox bottom;
+
+    @FXML
+    private ContextMenu contextMenu;
     /**
      * Stores the KeyEventHandlers (registered here using registerKeyListener)
      */
     private final Map<KeyCode, SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>> keyEventHandlers = new HashMap<>();
-
+    @FXML
+    private VBox left;
+    @FXML
+    private VBox middle;
     /**
      * Stores the position of components added to the SplitPane. Other views can
      * listen to changes in this map and react to changes to their position.
      */
     private final ObservableMap<String, Place> placeComponent = new ObservableMapWrapper<>(
             new HashMap<>());
-
-    // Definition of GUI fields
-    @FXML
-    private HBox bottom;
-    @FXML
-    private ContextMenu contextMenu;
-    @FXML
-    private VBox left;
-    @FXML
-    private VBox middle;
     @FXML
     private VBox right;
     @FXML
@@ -89,39 +95,9 @@ public class NUIController implements Initializable {
     private ToggleGroup toggleGroup1;
     @FXML
     private ToggleGroup toggleGroup2;
+
     @FXML
     private ToggleGroup toggleGroup3;
-
-    /**
-     * Provides an enum for the available places in the main window.
-     */
-    public enum Place {
-        BOTTOM, HIDDEN, LEFT, MIDDLE, RIGHT
-    }
-
-    /**
-     * Loads the default components of the GUI.
-     */
-    @Override
-    public final void initialize(final URL location, final ResourceBundle resources) {
-        // Load default components
-        createOrMoveOrHideComponent(TreeViewController.NAME, Place.LEFT,
-                TreeViewController.RESOURCE);
-        createOrMoveOrHideComponent("proofView", Place.RIGHT, "proofView.fxml");
-        Platform.runLater(() -> {
-            TreeViewController t = ComponentFactory.getInstance()
-                    .getController(TreeViewController.NAME);
-            t.loadExampleProof();
-        });
-
-        // Select appropriate menu item entries
-        final int POSITION_TREEVIEW = 3; // 3: left view
-        final int POSITION_PROOFVIEW = 2; // 2: right view
-        toggleGroup2.selectToggle(toggleGroup2.getToggles().get(POSITION_TREEVIEW));
-        toggleGroup3.selectToggle(toggleGroup3.getToggles().get(POSITION_PROOFVIEW));
-
-        instance = this; // TODO this is ugly
-    }
 
     /**
      * This is the primary function used by everyone to create, move or hide
@@ -263,6 +239,30 @@ public class NUIController implements Initializable {
                 t.loadAndDisplayProof(file);
             }
         }
+    }
+
+    /**
+     * Loads the default components of the GUI.
+     */
+    @Override
+    public final void initialize(final URL location, final ResourceBundle resources) {
+        // Load default components
+        createOrMoveOrHideComponent(TreeViewController.NAME, Place.LEFT,
+                TreeViewController.RESOURCE);
+        createOrMoveOrHideComponent("proofView", Place.RIGHT, "proofView.fxml");
+        Platform.runLater(() -> {
+            TreeViewController t = ComponentFactory.getInstance()
+                    .getController(TreeViewController.NAME);
+            t.loadExampleProof();
+        });
+
+        // Select appropriate menu item entries
+        final int POSITION_TREEVIEW = 3; // 3: left view
+        final int POSITION_PROOFVIEW = 2; // 2: right view
+        toggleGroup2.selectToggle(toggleGroup2.getToggles().get(POSITION_TREEVIEW));
+        toggleGroup3.selectToggle(toggleGroup3.getToggles().get(POSITION_PROOFVIEW));
+
+        instance = this; // TODO this is ugly
     }
 
     /**
