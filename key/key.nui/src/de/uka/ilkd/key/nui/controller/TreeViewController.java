@@ -23,7 +23,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -86,8 +85,8 @@ public class TreeViewController implements Initializable {
     /**
      * An ObservableList storing the Items matching a <tt/>search()<tt/>
      */
-    private ObservableList<TreeItem<NUINode>> searchMatches = FXCollections
-            .observableList(new LinkedList<TreeItem<NUINode>>());
+    private ObservableList<NUINode> searchMatches = FXCollections
+            .observableList(new LinkedList<>());
     /**
      * The TextField where search terms are entered
      */
@@ -173,7 +172,8 @@ public class TreeViewController implements Initializable {
      *            The proof file to load.
      */
     public final void loadAndDisplayProof(File file) {
-        displayProof(loadProof(file));
+        visualizer.loadProofTree(loadProof(file));
+        visualizer.visualizeProofTree();
         searchMatches.clear();
     }
 
@@ -204,95 +204,70 @@ public class TreeViewController implements Initializable {
      * @param term
      *            The String to search for.
      */
-    public final void search(String term) {
+    private final void search(String term) {
         // remove old matches
         searchMatches.clear();
         // exit if no search term specified
-        if (term.isEmpty())
-            return;
+        if (!term.isEmpty()) {
 
-        // iterate over all the TreeItems and add them to searchMatches if they
-        // match the search
-        for (TreeItem<NUINode> t : getTreeItems()) {
-            if (t.getValue().getLabel().toLowerCase().contains(term.toLowerCase())) {
-                searchMatches.add(t);
+            // iterate over all the TreeItems and add them to searchMatches if
+            // they
+            // match the search
+            for (NUINode n : proofTreeView.getRoot().getValue().search(term)) {
+                if (n.getLabel().toLowerCase().contains(term.toLowerCase())) {
+                    searchMatches.add(n);
+                }
             }
         }
     }
 
     /**
-     * Selects the next item in searchMatches. Scrolls the ProofTreeView if that
-     * item is not visible to the user. Expands the ProofTreeView as needed.
-     * Only to be used together with <tt>TreeViewController.search()</tt>.
-     */
-    public void selectAndIfNeededScrollToNextSearchResult() {
-        // catch bad calls
-        if (searchMatches == null || searchMatches.isEmpty())
-            return;
-
-        TreeItem<NUINode> currentlySelectedItem = proofTreeView.getSelectionModel()
-                .getSelectedItem();
-        TreeItem<NUINode> itemToSelect;
-
-        /*
-         * start from the top if a) no item is selected b) an item is selected
-         * that is not a search result c) the selected item is the last search
-         * result
-         */
-        if (currentlySelectedItem == null || !searchMatches.contains(currentlySelectedItem)
-                || searchMatches.size() == searchMatches.indexOf(currentlySelectedItem) + 1) {
-            itemToSelect = searchMatches.get(0);
-        }
-        else {
-            itemToSelect = searchMatches.get(searchMatches.indexOf(currentlySelectedItem) + 1);
-        }
-        // if the treeItem is not in an expanded branch of the tree, the tree
-        // must be expanded accordingly
-        if (proofTreeView.getRow(itemToSelect) == -1) {
-            for (TreeItem<NUINode> t = itemToSelect; t.getParent() != null
-                    && !t.getParent().isExpanded(); t = t.getParent()) {
-                t.setExpanded(true);
-            }
-        }
-
-        // select the item
-        proofTreeView.getSelectionModel().select(itemToSelect);
-
-        // if none of the treeCells contain the item we have just selected,
-        // we need to scroll to make it visible
-        if (proofTreeCells.keySet().stream().noneMatch(x -> (x.getTreeItem() == itemToSelect))) {
-            proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex());
-        }
-
-    }
-
-    /**
-     * Selects the previous item in searchMatches. Scrolls the ProofTreeView if
-     * that item is not visible to the user. Expands the ProofTreeView as
-     * needed. Only to be used together with
+     * Selects the next/previous item in searchMatches. Scrolls the
+     * ProofTreeView if that item is not visible to the user. Expands the
+     * ProofTreeView as needed. Only to be used together with
      * <tt>TreeViewController.search()</tt>.
+     * 
+     * @param moveDownwards
+     *            whether the selection is to be moved up- or downwards
      */
-    public void selectAndIfNeededScrollToPreviousSearchResult() {
+    private void moveSelectionAndScrollIfNeeded(boolean moveDownwards) {
+        List<TreeItem<NUINode>> treeItems = getTreeItems("");
         // catch bad calls
         if (searchMatches == null || searchMatches.isEmpty())
             return;
 
-        TreeItem<NUINode> currentlySelectedItem = proofTreeView.getSelectionModel()
+        final TreeItem<NUINode> currentlySelectedItem = proofTreeView.getSelectionModel()
                 .getSelectedItem();
-        TreeItem<NUINode> itemToSelect;
 
-        /*
-         * start from the bottom if a) no item is selected b) an item is
-         * selected that is not a search result c) the selected item is the
-         * first search result
-         */
-        if (currentlySelectedItem == null || !searchMatches.contains(currentlySelectedItem)
-                || currentlySelectedItem == searchMatches.get(0)) {
-            itemToSelect = searchMatches.get(searchMatches.size() - 1);
+        TreeItem<NUINode> itemToSelect = null;
+
+        // Basically does: itemToSelect = currentlySelectedItem + 1
+        if (currentlySelectedItem == null
+                || moveDownwards
+                        && (treeItems.indexOf(currentlySelectedItem) == treeItems.size() - 1)
+                || (!moveDownwards) && (treeItems.indexOf(currentlySelectedItem) == 0)) {
+            itemToSelect = moveDownwards ? treeItems.get(0) : treeItems.get(treeItems.size() - 1);
         }
         else {
-            itemToSelect = searchMatches.get(searchMatches.indexOf(currentlySelectedItem) - 1);
+            itemToSelect = moveDownwards
+                    ? treeItems.get(treeItems.indexOf(currentlySelectedItem) + 1)
+                    : treeItems.get(treeItems.indexOf(currentlySelectedItem) - 1);
         }
+
+        // Basically does: while(!searchMatches.contains(itemToSelect))
+        // itemToSelect++;
+        while (!searchMatches.contains(itemToSelect.getValue())) {
+            if ((moveDownwards && (treeItems.indexOf(itemToSelect) == treeItems.size() - 1))
+                    || (!moveDownwards && (treeItems.indexOf(itemToSelect) == 0))) {
+                itemToSelect = moveDownwards ? treeItems.get(0)
+                        : treeItems.get(treeItems.size() - 1);
+            }
+            else {
+                itemToSelect = moveDownwards ? treeItems.get(treeItems.indexOf(itemToSelect) + 1)
+                        : treeItems.get(treeItems.indexOf(itemToSelect) - 1);
+            }
+        }
+
         // if the treeItem is not in an expanded branch of the tree, the tree
         // must be expanded accordingly
         if (proofTreeView.getRow(itemToSelect) == -1) {
@@ -307,23 +282,26 @@ public class TreeViewController implements Initializable {
 
         // if none of the treeCells contain the item we have just selected,
         // we need to scroll to make it visible
-        if (proofTreeCells.keySet().stream().noneMatch(x -> (x.getTreeItem() == itemToSelect))) {
-            proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex()
-                    - ((int) (proofTreeCells.size() / 2)));
+        boolean performScroll = true;
+        for (ProofTreeCell c : proofTreeCells.keySet()) {
+            if (c.getTreeItem() == itemToSelect) {
+                performScroll = false;
+                break;
+            }
         }
-    }
 
+        if (performScroll)
+            // if we are to scroll downwards, we have to subtract an offset to
+            // make
+            // the selected item appear in middle.
+            proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex()
+                    - (moveDownwards ? 0 : (int) (proofTreeCells.size() / 2)));
+
+    }
+    
     /**
-     * Displays a proof in the proofTreeView.
-     * 
-     * @param proof
-     *            The proof file which should be displayed
+     * Displays a search view.
      */
-    private void displayProof(final Proof proof) {
-        visualizer.loadProofTree(proof);
-        visualizer.visualizeProofTree();
-    }
-
     private void displaySearchView() {
         aSearchViewIsOpened = true;
         searchViewAnchorPane = (AnchorPane) (new ComponentFactory("components/"))
@@ -331,12 +309,11 @@ public class TreeViewController implements Initializable {
         for (Node n : searchViewAnchorPane.getChildren()) {
             if (n.getId().equals("previousButton")) {
                 previousButton = (Button) n;
-                previousButton
-                        .setOnAction((event) -> selectAndIfNeededScrollToPreviousSearchResult());
+                previousButton.setOnAction((event) -> moveSelectionAndScrollIfNeeded(false));
             }
             else if (n.getId().equals("nextButton")) {
                 nextButton = (Button) n;
-                nextButton.setOnAction((event) -> selectAndIfNeededScrollToNextSearchResult());
+                nextButton.setOnAction((event) -> moveSelectionAndScrollIfNeeded(true));
             }
             else if (n.getId().equals("searchTextField")) {
                 searchTextField = (TextField) n;
@@ -383,7 +360,8 @@ public class TreeViewController implements Initializable {
      * 
      * @return a List of all the TreeItems in the underlying ProofTreeView
      */
-    private List<TreeItem<NUINode>> getTreeItems() {
+    private List<TreeItem<NUINode>> getTreeItems(String term) {
+
         if (treeItems == null) {
             class TreeToListHelper {
                 /**
@@ -393,11 +371,14 @@ public class TreeViewController implements Initializable {
                  * 
                  * @param root
                  *            Where to start parsing
+                 * 
                  * @param list
                  *            Where all the TreeItems are added to
+                 * 
                  * @return <b>list</b>, but with all the TreeItems appended to
                  *         it
                  */
+
                 private List<TreeItem<NUINode>> treeToList(final TreeItem<NUINode> root,
                         final List<TreeItem<NUINode>> list) {
                     if (root == null || list == null) {

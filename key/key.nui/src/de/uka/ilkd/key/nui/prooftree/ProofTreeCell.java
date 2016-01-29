@@ -6,7 +6,6 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeCell;
-import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
@@ -51,11 +50,11 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      * @param icf
      *            the icon factory used to display node icons
      */
-    public ProofTreeCell(final IconFactory icf, ObservableList<TreeItem<NUINode>> searchMatches) {
+    public ProofTreeCell(final IconFactory icf, ObservableList<NUINode> searchMatches) {
         super();
         this.icf = icf;
 
-        matchesSearch = Bindings.createBooleanBinding(() -> searchMatches.contains(getTreeItem()),
+        matchesSearch = Bindings.createBooleanBinding(() -> {if(getTreeItem() != null) { return searchMatches.contains(getTreeItem().getValue()); } else return false;},
                 treeItemProperty(), searchMatches);
 
         matchesSearch.addListener((obs, didMatchSearch, nowMatchesSearch) -> {

@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Represents a leaf node. Is used to create a graphical representation of
  * a proof tree consisting of {@link de.uka.ilkd.key.proof.Node} objects.
@@ -9,6 +12,15 @@ package de.uka.ilkd.key.nui.prooftree;
  *
  */
 public class NUILeafNode extends NUINode {
+    
+    @Override
+    public List<NUINode> search(final String term){
+        List<NUINode> l = new LinkedList<>();
+        if(getLabel().toLowerCase().contains(term.toLowerCase())){
+                    l.add(this);
+        }
+        return l;
+    }
 
     /**
      * The related proof node of the leaf node.

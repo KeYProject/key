@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.nui.prooftree;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,78 +13,90 @@ import java.util.List;
  */
 public class NUIBranchNode extends NUINode {
 
-	/**
-	 * The parent node of the branch node.
-	 */
-	private de.uka.ilkd.key.proof.Node proofParentNode;
+    public List<NUINode> search(final String term) {
+        List<NUINode> l = new LinkedList<>();
+        if (this.getLabel().toLowerCase().equals(term.toLowerCase())) {
+            l.add(this);
+        }
+        for (NUINode n : children) {
+            l.addAll(n.search(term));
+        }
 
-	/**
-	 * A list of children of the branch node.
-	 */
-	private final List<NUINode> children;
+        return l;
+    }
 
-	/**
-	 * Creates a new branch node.
-	 * 
-	 * @param proofParentNode
-	 *            The related parent node of the branch node.
-	 */
-	public NUIBranchNode(final de.uka.ilkd.key.proof.Node proofParentNode) {
-		super();
+    /**
+     * The parent node of the branch node.
+     */
+    private de.uka.ilkd.key.proof.Node proofParentNode;
 
-		this.proofParentNode = proofParentNode;
-		children = new LinkedList<NUINode>();
-	}
+    /**
+     * A list of children of the branch node.
+     */
+    private final List<NUINode> children;
 
-	/**
-	 * Returns the parent node of the branch node.
-	 * 
-	 * @return parent The parent node of the branch node.
-	 */
-	public final de.uka.ilkd.key.proof.Node getProofParentNode() {
-		return proofParentNode;
-	}
+    /**
+     * Creates a new branch node.
+     * 
+     * @param proofParentNode
+     *            The related parent node of the branch node.
+     */
+    public NUIBranchNode(final de.uka.ilkd.key.proof.Node proofParentNode) {
+        super();
 
-	/**
-	 * Sets the parent node of the branch node.
-	 * 
-	 * @param parent
-	 *            The node to set as parent node of the branch node.
-	 */
-	public final void setProofParentNode(final de.uka.ilkd.key.proof.Node parent) {
-		this.proofParentNode = parent;
-	}
+        this.proofParentNode = proofParentNode;
+        children = new LinkedList<NUINode>();
+    }
 
-	/**
-	 * Returns a list of children of the branch node.
-	 * 
-	 * @return children A LinkedList of the branch node's children.
-	 */
-	public final List<NUINode> getChildren() {
-		return children;
-	}
+    /**
+     * Returns the parent node of the branch node.
+     * 
+     * @return parent The parent node of the branch node.
+     */
+    public final de.uka.ilkd.key.proof.Node getProofParentNode() {
+        return proofParentNode;
+    }
 
-	/**
-	 * Adds a new child to the list of children.
-	 * 
-	 * @param child
-	 *            The child to add.
-	 */
-	public final void addChild(final NUINode child) {
-		this.children.add(child);
-	}
+    /**
+     * Sets the parent node of the branch node.
+     * 
+     * @param parent
+     *            The node to set as parent node of the branch node.
+     */
+    public final void setProofParentNode(final de.uka.ilkd.key.proof.Node parent) {
+        this.proofParentNode = parent;
+    }
 
-	/**
-	 * Checks if all branch node children are marked as linked.
-	 * 
-	 * @return true iff all branch node children are linked
-	 */
-	public final boolean hasOnlyLinkedBranchChildren() {
-		for (NUINode child : children) {
-			if (child instanceof NUIBranchNode && !child.isLinked()) {
-				return false; 
-			}
-		}
-		return true;
-	}
+    /**
+     * Returns a list of children of the branch node.
+     * 
+     * @return children A LinkedList of the branch node's children.
+     */
+    public final List<NUINode> getChildren() {
+        return children;
+    }
+
+    /**
+     * Adds a new child to the list of children.
+     * 
+     * @param child
+     *            The child to add.
+     */
+    public final void addChild(final NUINode child) {
+        this.children.add(child);
+    }
+
+    /**
+     * Checks if all branch node children are marked as linked.
+     * 
+     * @return true iff all branch node children are linked
+     */
+    public final boolean hasOnlyLinkedBranchChildren() {
+        for (NUINode child : children) {
+            if (child instanceof NUIBranchNode && !child.isLinked()) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

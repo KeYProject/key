@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+import java.util.List;
+
 /**
  * Abstract class for representing a NUINode, which can be:
  * <ul>
@@ -268,4 +270,11 @@ public abstract class NUINode {
 	public String toString(){
 	    return getLabel();
 	}
+	
+	/**
+	 * Searches the subtree beneath this NUINode for all occurrences of the term and returns a List of all of them
+	 * @param term the term to search for
+	 * @return a List of Search Results
+	 */
+	public abstract List<NUINode> search(final String term);
 }
