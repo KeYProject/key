@@ -55,11 +55,11 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         this.icf = icf;
 
         matchesSearch = Bindings.createBooleanBinding(() -> {
-            if (getTreeItem() != null) {
-                return searchMatches.contains(getTreeItem().getValue());
+            if (getTreeItem() == null) {
+                return false;
             }
             else
-                return false;
+                return searchMatches.contains(getTreeItem().getValue());
         } , treeItemProperty(), searchMatches);
 
         matchesSearch.addListener((obs, didMatchSearch, nowMatchesSearch) -> {
