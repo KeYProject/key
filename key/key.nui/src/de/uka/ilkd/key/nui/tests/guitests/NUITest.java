@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nui.guitests;
+package de.uka.ilkd.key.nui.tests.guitests;
 
 import static org.junit.Assert.assertTrue;
 
@@ -12,7 +12,8 @@ import de.uka.ilkd.key.nui.ComponentFactory;
 import javafx.scene.Parent;
 
 /**
- * Tests for User Story 1
+ * Tests for User Story
+ * (001) Oberflaeche: Grundaufbau #14297
  * 
  * GUI test for main application window
  *
@@ -70,7 +71,13 @@ public class NUITest extends GuiTest {
 		// FILE
 		// Testing 'Close' is not possible (see
 		// https://github.com/TestFX/TestFX/issues/50)
+	    
+	    // FILE
+	    // Test open file dialog
 		clickOn(MENUBAR_FILE).clickOn("Open Proof...");
+		// close open file dialog directly
+		// Load file tests in LoadProofTest
+		this.closeCurrentWindow();
 
 		// EDIT
 		clickOn(MENUBAR_EDIT);
