@@ -12,7 +12,7 @@ import javafx.scene.layout.HBox;
 /**
  * This class is responsible for rendering of a tree cell.
  * 
- * @author  Matthias Schultheis
+ * @author Matthias Schultheis
  * @version 1.0
  */
 public class ProofTreeCell extends TreeCell<NUINode> {
@@ -42,7 +42,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      */
     private ImageView icon;
 
-    private BooleanBinding matchesSearch;
+    private final BooleanBinding matchesSearch;
 
     /**
      * The constructor of the ProofTreeCell.
@@ -54,8 +54,13 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         super();
         this.icf = icf;
 
-        matchesSearch = Bindings.createBooleanBinding(() -> {if(getTreeItem() != null) { return searchMatches.contains(getTreeItem().getValue()); } else return false;},
-                treeItemProperty(), searchMatches);
+        matchesSearch = Bindings.createBooleanBinding(() -> {
+            if (getTreeItem() != null) {
+                return searchMatches.contains(getTreeItem().getValue());
+            }
+            else
+                return false;
+        } , treeItemProperty(), searchMatches);
 
         matchesSearch.addListener((obs, didMatchSearch, nowMatchesSearch) -> {
             ObservableList<String> l = getStyleClass();
@@ -96,7 +101,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 
         // reset label and icon
         label = new Label(item.getLabel() + " ");
-        icon  = null;
+        icon = null;
 
         // set decoration (style, icon)
         if (item instanceof NUIInnerNode) {
@@ -105,14 +110,14 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         else if (item instanceof NUIBranchNode) {
             decorateAsBranchNode();
         }
-        
 
         // workaround to display an icon next to a label
         setText(null);
-    
+
         if (icon == null) {
             setGraphic(label);
-        } else {
+        }
+        else {
             final HBox hbox = new HBox();
             hbox.setSpacing(ICON_SPACING);
 
@@ -143,9 +148,11 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         if (getItem().isClosed()) {
             label.getStyleClass().add(ProofTreeStyle.CSS_NODE_CLOSED);
             setIcon(icf.getImage(IconFactory.BRANCH_CLOSED));
-        } else if (getItem().isLinked()) {
+        }
+        else if (getItem().isLinked()) {
             setIcon(icf.getImage(IconFactory.BRANCH_LINKED));
-        } else {
+        }
+        else {
             setIcon(icf.getImage(IconFactory.BRANCH_OPEN));
         }
     }
