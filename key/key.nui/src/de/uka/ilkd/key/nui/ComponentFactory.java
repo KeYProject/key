@@ -21,48 +21,6 @@ import javafx.scene.Parent;
 public final class ComponentFactory {
 
 	/**
-	 * Directory for FXML files.
-	 */
-	private static String resourceDir;
-
-	/**
-	 * Singleton.
-	 */
-	private static ComponentFactory instance;
-
-	/**
-	 * Returns the singleton instance of the ComponentFactory.
-	 * 
-	 * @return the single instance of <tt>this</tt>
-	 */
-	public static ComponentFactory getInstance() {
-		if (instance == null) {
-			instance = new ComponentFactory();
-		}
-		return instance;
-	}
-
-	@SuppressWarnings("static-access")
-    public ComponentFactory(String resourceDir) {
-	    this.resourceDir = resourceDir;
-	}
-
-    /**
-     * Singleton constructor.
-     */
-	private ComponentFactory(){
-	    
-	}
-	
-	/**
-	 * A HashMap storing the components created by <tt>this</tt>, or to be more
-	 * precise, it stores the Parent to provide references to the actual
-	 * components and the FXMLLoader to provide references to the respective
-	 * Controllers.
-	 */
-	private final Map<String, ComponentMapEntry> componentMap = new HashMap<>();
-	
-	/**
 	 * This class encapsulates a
 	 * <tt>java.util.AbstractMap.SimpleImmutableEntry<FXMLLoader, Parent></tt>
 	 * to make the ComponentFactory more readable.
@@ -89,15 +47,6 @@ public final class ComponentFactory {
 		}
 
 		/**
-		 * Returns the controller corresponding to the FXMLLoader.
-		 * 
-		 * @return the controller.
-		 */
-		public <T> T getController() {
-			return entry.getKey().getController();
-		}
-
-		/**
 		 * Returns the component corresponding to the controller.
 		 * 
 		 * @return the corresponding component.
@@ -105,6 +54,71 @@ public final class ComponentFactory {
 		public Parent getComponent() {
 			return entry.getValue();
 		}
+
+		/**
+		 * Returns the controller corresponding to the FXMLLoader.
+		 * 
+		 * @return the controller.
+		 */
+		public <T> T getController() {
+			return entry.getKey().getController();
+		}
+	}
+
+	/**
+	 * Singleton.
+	 */
+	private static ComponentFactory instance;
+
+	/**
+	 * Directory for FXML files.
+	 */
+	private static String resourceDir;
+
+	/**
+	 * Returns the singleton instance of the ComponentFactory.
+	 * 
+	 * @return the single instance of <tt>this</tt>
+	 */
+	public static ComponentFactory getInstance() {
+		if (instance == null) {
+			instance = new ComponentFactory();
+		}
+		return instance;
+	}
+
+    /**
+	 * Set the resource directory containing the FXML files, e.g. "components/".
+	 * 
+	 * @param resourceDir
+	 * 			The relative path to the resource directory with the FXML files.
+	 */
+	public static void setResourceDirectory(final String resourceDir) {
+		if ((resourceDir.endsWith(File.separator))) {
+			ComponentFactory.resourceDir = resourceDir;
+		} else {
+			ComponentFactory.resourceDir = resourceDir + File.separator;
+		}
+	}
+	
+	/**
+	 * A HashMap storing the components created by <tt>this</tt>, or to be more
+	 * precise, it stores the Parent to provide references to the actual
+	 * components and the FXMLLoader to provide references to the respective
+	 * Controllers.
+	 */
+	private final Map<String, ComponentMapEntry> componentMap = new HashMap<>();
+	
+	@SuppressWarnings("static-access")
+    public ComponentFactory(String resourceDir) {
+	    this.resourceDir = resourceDir;
+	}
+
+	/**
+     * Singleton constructor.
+     */
+	private ComponentFactory(){
+	    
 	}
 
 	/**
@@ -132,6 +146,26 @@ public final class ComponentFactory {
 	}
 
 	/**
+	 * Creates and returns the JavaFX scenegraph for the application window.
+	 * 
+	 * @return returns the JavaFX scenegraph for the application window
+	 */
+	public Parent createNUISceneGraph() {
+		ResourceBundle bundle = null;
+		Parent root = null;
+		try {
+			// Load the default bundle
+			bundle = new PropertyResourceBundle(getClass().getResourceAsStream("bundle_en_EN.properties"));
+			// Load FXML from main window
+			final FXMLLoader loader = new FXMLLoader(getClass().getResource("NUIdefault.fxml"), bundle);
+			root = loader.load();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return root;
+	}
+
+	/**
 	 * Deletes all references to a certain component stored by <tt>this</tt>.
 	 * 
 	 * @param id
@@ -140,20 +174,6 @@ public final class ComponentFactory {
 	 */
 	public void deleteComponent(final String id) {
 		componentMap.remove(id);
-	}
-
-	/**
-	 * Checks whether a certain component is currently being stored.
-	 * 
-	 * @param id
-	 *            The Components FXID or another identifier specified at
-	 *            construction.
-	 * @return boolean
-	 * 				True iff the component is already stored.
-	 * 
-	 */
-	public boolean hasComponent(final String id) {
-		return componentMap.containsKey(id);
 	}
 
 	/**
@@ -184,38 +204,18 @@ public final class ComponentFactory {
 		}
 		return null;
 	}
-
-	/**
-	 * Creates and returns the JavaFX scenegraph for the application window.
-	 * 
-	 * @return returns the JavaFX scenegraph for the application window
-	 */
-	public Parent createNUISceneGraph() {
-		ResourceBundle bundle = null;
-		Parent root = null;
-		try {
-			// Load the default bundle
-			bundle = new PropertyResourceBundle(getClass().getResourceAsStream("bundle_en_EN.properties"));
-			// Load FXML from main window
-			final FXMLLoader loader = new FXMLLoader(getClass().getResource("NUIdefault.fxml"), bundle);
-			root = loader.load();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return root;
-	}
 	
 	/**
-	 * Set the resource directory containing the FXML files, e.g. "components/".
+	 * Checks whether a certain component is currently being stored.
 	 * 
-	 * @param resourceDir
-	 * 			The relative path to the resource directory with the FXML files.
+	 * @param id
+	 *            The Components FXID or another identifier specified at
+	 *            construction.
+	 * @return boolean
+	 * 				True iff the component is already stored.
+	 * 
 	 */
-	public static void setResourceDirectory(final String resourceDir) {
-		if (!(resourceDir.endsWith(File.separator))) {
-			ComponentFactory.resourceDir = resourceDir + File.separator;
-		} else {
-			ComponentFactory.resourceDir = resourceDir;
-		}
+	public boolean hasComponent(final String id) {
+		return componentMap.containsKey(id);
 	}
 }

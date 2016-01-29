@@ -13,15 +13,6 @@ import java.util.List;
  */
 public class NUILeafNode extends NUINode {
     
-    @Override
-    public List<NUINode> search(final String term){
-        List<NUINode> l = new LinkedList<>();
-        if(getLabel().toLowerCase().contains(term.toLowerCase())){
-                    l.add(this);
-        }
-        return l;
-    }
-
     /**
      * The related proof node of the leaf node.
      */
@@ -46,5 +37,14 @@ public class NUILeafNode extends NUINode {
      */
     public final de.uka.ilkd.key.proof.Node getProofNode() {
         return proofNode;
+    }
+
+    @Override
+    public List<NUINode> search(final String term){
+        List<NUINode> l = new LinkedList<>();
+        if(getLabel().toLowerCase().contains(term.toLowerCase())){
+                    l.add(this);
+        }
+        return l;
     }
 }

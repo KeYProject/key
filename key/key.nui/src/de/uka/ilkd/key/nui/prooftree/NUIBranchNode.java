@@ -13,27 +13,15 @@ import java.util.List;
  */
 public class NUIBranchNode extends NUINode {
 
-    public List<NUINode> search(final String term) {
-        List<NUINode> l = new LinkedList<>();
-        if (this.getLabel().toLowerCase().equals(term.toLowerCase())) {
-            l.add(this);
-        }
-        for (NUINode n : children) {
-            l.addAll(n.search(term));
-        }
-
-        return l;
-    }
+    /**
+     * A list of children of the branch node.
+     */
+    private final List<NUINode> children;
 
     /**
      * The parent node of the branch node.
      */
     private de.uka.ilkd.key.proof.Node proofParentNode;
-
-    /**
-     * A list of children of the branch node.
-     */
-    private final List<NUINode> children;
 
     /**
      * Creates a new branch node.
@@ -49,22 +37,13 @@ public class NUIBranchNode extends NUINode {
     }
 
     /**
-     * Returns the parent node of the branch node.
+     * Adds a new child to the list of children.
      * 
-     * @return parent The parent node of the branch node.
+     * @param child
+     *            The child to add.
      */
-    public final de.uka.ilkd.key.proof.Node getProofParentNode() {
-        return proofParentNode;
-    }
-
-    /**
-     * Sets the parent node of the branch node.
-     * 
-     * @param parent
-     *            The node to set as parent node of the branch node.
-     */
-    public final void setProofParentNode(final de.uka.ilkd.key.proof.Node parent) {
-        this.proofParentNode = parent;
+    public final void addChild(final NUINode child) {
+        this.children.add(child);
     }
 
     /**
@@ -77,13 +56,12 @@ public class NUIBranchNode extends NUINode {
     }
 
     /**
-     * Adds a new child to the list of children.
+     * Returns the parent node of the branch node.
      * 
-     * @param child
-     *            The child to add.
+     * @return parent The parent node of the branch node.
      */
-    public final void addChild(final NUINode child) {
-        this.children.add(child);
+    public final de.uka.ilkd.key.proof.Node getProofParentNode() {
+        return proofParentNode;
     }
 
     /**
@@ -98,5 +76,27 @@ public class NUIBranchNode extends NUINode {
             }
         }
         return true;
+    }
+
+    public List<NUINode> search(final String term) {
+        List<NUINode> l = new LinkedList<>();
+        if (this.getLabel().toLowerCase().equals(term.toLowerCase())) {
+            l.add(this);
+        }
+        for (NUINode n : children) {
+            l.addAll(n.search(term));
+        }
+
+        return l;
+    }
+
+    /**
+     * Sets the parent node of the branch node.
+     * 
+     * @param parent
+     *            The node to set as parent node of the branch node.
+     */
+    public final void setProofParentNode(final de.uka.ilkd.key.proof.Node parent) {
+        this.proofParentNode = parent;
     }
 }
