@@ -21,7 +21,7 @@ public class ProofTreeVisualizer {
     /**
      * The label used for the root.
      */
-    private final String rootLabel = "Proof Tree";
+    private static final String LBL_ROOT = "Proof Tree";
 	
 	/**
 	 * The fx tree view for displaying the NUI tree.
@@ -92,7 +92,7 @@ public class ProofTreeVisualizer {
 		// assign the appropriate label
 		nuiRoot = new NUIBranchNode(pRoot);
 		assignNUIFields(pRoot, pRoot.proof(), nuiRoot);
-		String label = rootLabel;
+		String label = LBL_ROOT;
 		nuiRoot.setLabel(label);
 		
 		// reset linked leafs
@@ -277,7 +277,7 @@ public class ProofTreeVisualizer {
 	 * 
 	 * @return the NUIBranchNode (root) of the tree.
 	 */
-	public NUIBranchNode getRootNode() {
+	public final NUIBranchNode getRootNode() {
 	    return this.nuiRoot;
 	}
 }
