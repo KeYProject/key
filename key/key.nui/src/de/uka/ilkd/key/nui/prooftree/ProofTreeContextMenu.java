@@ -37,11 +37,11 @@ public class ProofTreeContextMenu extends ContextMenu {
      */
     private final IconFactory icf;
     
-    private final String lblExpandAll = "Expand All";
-    private final String lblExpandBelow = "Expand Below";
-    private final String lblCollapseAll = "Collapse All";
-    private final String lblCollapseBelow = "Collapse Below";
-    private final String lblSearch = "Search";
+    private static final String lblExpandAll = "Expand All";
+    private static final String lblExpandBelow = "Expand Below";
+    private static final String lblCollapseAll = "Collapse All";
+    private static final String lblCollapseBelow = "Collapse Below";
+    private static final String lblSearch = "Search";
 
     /**
      * The constructor.
