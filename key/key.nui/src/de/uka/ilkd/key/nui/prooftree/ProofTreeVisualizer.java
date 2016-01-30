@@ -92,8 +92,7 @@ public class ProofTreeVisualizer {
 		// assign the appropriate label
 		nuiRoot = new NUIBranchNode(pRoot);
 		assignNUIFields(pRoot, pRoot.proof(), nuiRoot);
-		String label = LBL_ROOT;
-		nuiRoot.setLabel(label);
+		nuiRoot.setLabel(LBL_ROOT);
 		
 		// reset linked leafs
 		linkedLeafs = new LinkedList<NUINode>();
@@ -102,7 +101,7 @@ public class ProofTreeVisualizer {
 		addProofTreeToNUITree(pRoot, nuiRoot);
 		
 		// set linked leafs
-		for(NUINode linkedLeaf : linkedLeafs) {
+		for (final NUINode linkedLeaf : linkedLeafs) {
 		    setNUINodeLinkedTrue(linkedLeaf);
 		}
 	}
@@ -228,13 +227,13 @@ public class ProofTreeVisualizer {
 		
 		// propagate linked information to parent
 		final NUINode parent = newNode.getParent();
-		if (parent != null && parent instanceof NUIBranchNode) {
-		    final NUIBranchNode parentBranch = (NUIBranchNode) parent;
-		    if (parentBranch.hasOnlyLinkedBranchChildren()) {
-		        // if parent has only linked branch children, mark as linked.
-		        setNUINodeLinkedTrue(parentBranch);
-		    }
-		}
+        if (parent != null && parent instanceof NUIBranchNode) {
+            final NUIBranchNode parentBranch = (NUIBranchNode) parent;
+            if (parentBranch.hasOnlyLinkedBranchChildren()) {
+                // if parent has only linked branch children, mark as linked.
+                setNUINodeLinkedTrue(parentBranch);
+            }
+        }
 	}
 
 	/**

@@ -83,15 +83,16 @@ public final class ProofTreeActions {
      * Opens the search view.
      */
     public static void openSearchView() {
-        Place p = NUIController.getInstance().getPlaceComponent().
+        Place place = NUIController.getInstance().getPlaceComponent().
                 get("treeView");
-        
+
         try {
             NUIController.getInstance().createOrMoveOrHideComponent(
-                    ".searchView", p, ".searchView.fxml");
-        } catch (IllegalArgumentException e) {
+                    ".searchView", place, ".searchView.fxml");
+        }
+        catch (IllegalArgumentException e) {
             NUIController.getInstance().createOrMoveOrHideComponent(
-                    ".searchView", NUIController.Place.HIDDEN, 
+                    ".searchView", NUIController.Place.HIDDEN,
                     ".searchView.fxml");
         }
     }

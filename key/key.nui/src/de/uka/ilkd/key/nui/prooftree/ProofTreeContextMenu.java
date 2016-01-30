@@ -17,12 +17,6 @@ import javafx.scene.control.TreeView;
 public class ProofTreeContextMenu extends ContextMenu {
 
     /**
-     * The tree node the context menu is for.
-     */
-    @SuppressWarnings("unused")
-	private final NUINode node;
-
-    /**
      * The treeItem of node.
      */
     private final TreeItem<NUINode> treeItem;
@@ -76,7 +70,6 @@ public class ProofTreeContextMenu extends ContextMenu {
     	super();
     	
     	this.treeItem = treeItem;
-        this.node = treeItem.getValue();
         this.treeView = treeView;
         
         this.icf = icf;
@@ -123,7 +116,7 @@ public class ProofTreeContextMenu extends ContextMenu {
         final MenuItem miExpandAll = new MenuItem(LBL_EXPAND_ALL);
         miExpandAll.setGraphic(icf.getImage(IconFactory.EXPAND));
         getItems().add(miExpandAll);
-        miExpandAll.setOnAction(t -> ProofTreeActions.expandAll(
+        miExpandAll.setOnAction(aEvt -> ProofTreeActions.expandAll(
                 treeView.getRoot()));
     }
     
@@ -133,7 +126,7 @@ public class ProofTreeContextMenu extends ContextMenu {
     private void addMenuItemExpandBelow() {
         final MenuItem miExpand = new MenuItem(LBL_EXPAND_BELOW);
         getItems().add(miExpand);
-        miExpand.setOnAction(t -> ProofTreeActions.expandBelow(treeItem));
+        miExpand.setOnAction(aEvt -> ProofTreeActions.expandBelow(treeItem));
     }
     
     /**
@@ -143,7 +136,7 @@ public class ProofTreeContextMenu extends ContextMenu {
         final MenuItem miCollapseAll = new MenuItem(LBL_COLLAPSE_ALL);
         miCollapseAll.setGraphic(icf.getImage(IconFactory.COLLAPSE));
         getItems().add(miCollapseAll);
-        miCollapseAll.setOnAction(t -> ProofTreeActions.collapseAll(
+        miCollapseAll.setOnAction(aEvt -> ProofTreeActions.collapseAll(
                 treeView.getRoot()));
     }
 
@@ -153,7 +146,7 @@ public class ProofTreeContextMenu extends ContextMenu {
     private void addMenuItemCollapseBelow() {
         final MenuItem miCollapse = new MenuItem(LBL_COLLAPSE_BELOW);
         getItems().add(miCollapse);
-        miCollapse.setOnAction(t -> ProofTreeActions.collapseBelow(treeItem));
+        miCollapse.setOnAction(aEvt -> ProofTreeActions.collapseBelow(treeItem));
     }
 
     /**
@@ -163,7 +156,8 @@ public class ProofTreeContextMenu extends ContextMenu {
     	final MenuItem mISearch = new MenuItem(LBL_SEARCH);
     	getItems().add(mISearch);
     	mISearch.setGraphic(icf.getImage(IconFactory.SEARCH));
-    	mISearch.setOnAction(t -> ProofTreeActions.openSearchView());
+    	mISearch.setOnAction(aEvt -> ProofTreeActions.openSearchView());
+    	
     }
 
 }

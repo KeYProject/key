@@ -49,7 +49,7 @@ public abstract class NUINode {
 	/**
 	 * Marks if notes for this node exist.
 	 */
-	private boolean hasNotes;
+	private boolean notes;
 
 	/**
 	 * The serial number of the proof node.
@@ -193,7 +193,7 @@ public abstract class NUINode {
 	 * @return hasNotes is TRUE if the node has notes, else FALSE.
 	 */
 	public final boolean hasNotes() {
-		return hasNotes;
+		return notes;
 	}
 
 	/**
@@ -204,7 +204,7 @@ public abstract class NUINode {
 	 *            should be set to TRUE if the node has notes, else to FALSE.
 	 */
 	public final void setHasNotes(final boolean hasNotes) {
-		this.hasNotes = hasNotes;
+		this.notes = hasNotes;
 	}
 
 	/**
