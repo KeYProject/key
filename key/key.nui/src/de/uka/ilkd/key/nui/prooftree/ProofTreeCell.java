@@ -54,23 +54,27 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         super();
         this.icf = icf;
 
+        //TODO comments what is done here?
         matchesSearch = Bindings.createBooleanBinding(() -> {
             if (getTreeItem() == null) {
                 return false;
             }
-            else
+            else {
                 return searchMatches.contains(getTreeItem().getValue());
-        } , treeItemProperty(), searchMatches);
+            }
+        }, treeItemProperty(), searchMatches);
 
+        //TODO comment
         matchesSearch.addListener((obs, didMatchSearch, nowMatchesSearch) -> {
-            ObservableList<String> l = getStyleClass();
-            String s = ProofTreeStyle.CSS_NODE_HIGHLIGHT;
+            final ObservableList<String> styles = getStyleClass();
+            final String cssClassHighlight = ProofTreeStyle.CSS_NODE_HIGHLIGHT;
             if (nowMatchesSearch) {
-                if (!l.contains(s))
-                    l.add(s);
+                if (!styles.contains(cssClassHighlight)) {
+                    styles.add(cssClassHighlight);
+                }
             }
             else {
-                l.remove(s);
+                styles.remove(cssClassHighlight);
             }
         });
     }
@@ -104,11 +108,14 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         icon = null;
 
         // set decoration (style, icon)
-        if (item instanceof NUIInnerNode) {
-            decorateAsInnerNode();
+        if (item instanceof NUILeafNode) {
+            decorateAsLeafNode();
         }
         else if (item instanceof NUIBranchNode) {
             decorateAsBranchNode();
+        }
+        else {
+            decorateAsInnerNode();
         }
 
         // workaround to display an icon next to a label
@@ -150,10 +157,39 @@ public class ProofTreeCell extends TreeCell<NUINode> {
             setIcon(icf.getImage(IconFactory.BRANCH_CLOSED));
         }
         else if (getItem().isLinked()) {
+            label.getStyleClass().add(ProofTreeStyle.CSS_NODE_LINKED);
             setIcon(icf.getImage(IconFactory.BRANCH_LINKED));
         }
         else {
+            label.getStyleClass().add(ProofTreeStyle.CSS_NODE_OPEN);
             setIcon(icf.getImage(IconFactory.BRANCH_OPEN));
+        }
+    }
+    
+    /**
+     * Decorates the cell as LeafNode by modifying label and icon
+     * Assigns CSS style classes and icon images.
+     */
+    private void decorateAsLeafNode() {
+        label.getStyleClass().add(ProofTreeStyle.CSS_NODE_LEAF);
+        // leaf node is a closed goal
+        if (getItem().isClosed()) {
+            setIcon(icf.getImage(IconFactory.LEAF_CLOSED));
+            label.getStyleClass().add(ProofTreeStyle.CSS_NODE_CLOSED);
+        }
+        else if (getItem().isLinked()) {
+            setIcon(icf.getImage(IconFactory.LEAF_LINKED));
+            label.getStyleClass().add(ProofTreeStyle.CSS_NODE_LINKED);
+        }
+        // leaf node is an interactive node
+        else if (getItem().isInteractive()) {
+            setIcon(icf.getImage(IconFactory.LEAF_INTERACTIVE));
+            label.getStyleClass().add(ProofTreeStyle.CSS_NODE_INTERACTIVE);
+        }
+        // else: leaf node must be an open goal
+        else {
+            setIcon(icf.getImage(IconFactory.LEAF_OPEN));
+            label.getStyleClass().add(ProofTreeStyle.CSS_NODE_OPEN);
         }
     }
 }

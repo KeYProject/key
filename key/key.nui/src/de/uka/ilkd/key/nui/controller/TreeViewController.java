@@ -12,6 +12,7 @@ import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.NUI;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeStyle;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeVisualizer;
 import de.uka.ilkd.key.nui.prooftree.SearchHelper;
 import de.uka.ilkd.key.proof.Proof;
@@ -35,6 +36,7 @@ import javafx.scene.layout.VBox;
  * @version 1.1
  */
 public class TreeViewController implements Initializable {
+    
     public static final String NAME = "treeView";
     public static final String RESOURCE = "treeView.fxml";
 
@@ -42,12 +44,14 @@ public class TreeViewController implements Initializable {
      * The IconFactory used to create icons for the proof tree nodes.
      */
     private final IconFactory icf;
+    
     /**
      * The VBox containing both the TreeView and the Anchor Pane where the
      * Search elements are
      */
     @FXML
     private VBox mainVBox;
+    
     private final Set<ProofTreeCell> proofTreeCells = Collections.newSetFromMap(new WeakHashMap<>());
 
     /**
@@ -55,9 +59,11 @@ public class TreeViewController implements Initializable {
      */
     @FXML
     private TreeView<NUINode> proofTreeView;
+    
     private SearchHelper searchHelper = null;
+    
     /**
-     * An ObservableList storing the Items matching a <tt/>search()<tt/>
+     * An ObservableList storing the Items matching a <tt/>search()<tt/>.
      */
     private final ObservableList<NUINode> searchMatches = FXCollections
             .observableList(new LinkedList<>());
@@ -93,7 +99,8 @@ public class TreeViewController implements Initializable {
                     searchHelper.performFocusRequest();
                 }
                 else {
-                    searchHelper = new SearchHelper(proofTreeView, proofTreeCells, mainVBox, searchMatches);
+                    searchHelper = new SearchHelper(proofTreeView,
+                            proofTreeCells, mainVBox, searchMatches);
                 }
             });
 
@@ -102,6 +109,8 @@ public class TreeViewController implements Initializable {
                 searchHelper = null;
             });
         });
+        
+        proofTreeView.getStyleClass().add(ProofTreeStyle.CSS_PROOF_TREE);
 
         // set cell factory for rendering cells
         proofTreeView.setCellFactory((treeItem) -> {
@@ -117,7 +126,9 @@ public class TreeViewController implements Initializable {
         visualizer = new ProofTreeVisualizer(proofTreeView);
 
         // add CSS file to view
-        String cssPath = this.getClass().getResource("../components/treeView.css").toExternalForm();
+        final String cssPath = this.getClass()
+                .getResource("../components/" + ProofTreeStyle.CSS_FILE)
+                .toExternalForm();
         visualizer.addStylesheet(cssPath);
 
         if (NUI.getInitialProofFile() != null) {
@@ -133,7 +144,7 @@ public class TreeViewController implements Initializable {
      * @param file
      *            The proof file to load.
      */
-    public final void loadAndDisplayProof(File file) {
+    public final void loadAndDisplayProof(final File file) {
         visualizer.loadProofTree(loadProof(file));
         visualizer.visualizeProofTree();
         searchMatches.clear();
@@ -163,9 +174,9 @@ public class TreeViewController implements Initializable {
      */
     private Proof loadProof(final File proofFile) {
         try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+            KeYEnvironment< ? > environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
                     proofFile, null, null, null, true);
-            Proof proof = environment.getLoadedProof();
+            final Proof proof = environment.getLoadedProof();
             return proof;
         }
         catch (ProblemLoaderException e) {
@@ -179,10 +190,10 @@ public class TreeViewController implements Initializable {
      * <tt>this</tt> will reference the ProofTreeCell in a WeakHandle in order
      * to find out which TreeItems currently are visible to the user.
      *
-     * @param t
+     * @param treeCell
      *            the ProofTreeCell to register.
      */
-    private void registerTreeCell(ProofTreeCell t) {
-        proofTreeCells.add(t);
+    private void registerTreeCell(final ProofTreeCell treeCell) {
+        proofTreeCells.add(treeCell);
     }
 }
