@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
 import de.uka.ilkd.key.nui.ComponentFactory;
 import de.uka.ilkd.key.nui.controller.NUIController;
 import javafx.animation.PauseTransition;
@@ -66,18 +65,31 @@ public class SearchHelper {
 
     /**
      * Displays a search view.
-     * @param the proofTreeView to search in
-     * @param the ProofTreeCells to highlight the results in (use weak references!)
-     * @param the VBox to draw the interface in
-     * @param the 
+     * 
+     * @param proofTreeView
+     *            the proofTreeView to search in
+     * @param proofTreeCells
+     *            the ProofTreeCells to highlight the results in (use weak
+     *            references!)
+     * @param mainVBox
+     *            the VBox to draw the interface in
+     * @param searchMatches
+     *            the searchMatches List this is supposed to update
      * 
      */
-    public SearchHelper(TreeView<NUINode> proofTreeView, Set<ProofTreeCell> proofTreeCells, VBox mainVBox, ObservableList<NUINode> searchMatches) {
-        this.mainVBox = mainVBox; this.searchMatches = searchMatches;
+    public SearchHelper(TreeView<NUINode> proofTreeView, Set<ProofTreeCell> proofTreeCells,
+            VBox mainVBox, ObservableList<NUINode> searchMatches) {
+        this.mainVBox = mainVBox;
+        this.searchMatches = searchMatches;
         this.proofTreeView = proofTreeView;
         this.proofTreeCells = proofTreeCells;
+
+        // Loads the components from the .searchView fxml file
         searchViewAnchorPane = (AnchorPane) (new ComponentFactory("components/"))
                 .createComponent(".searchView", ".searchView.fxml");
+
+        // iterates over the previously loaded components and adds EventHandlers
+        // to each of them
         for (Node n : searchViewAnchorPane.getChildren()) {
             if (n.getId().equals("previousButton")) {
                 previousButton = (Button) n;
@@ -97,6 +109,9 @@ public class SearchHelper {
                 Platform.runLater(() -> searchTextField.requestFocus());
             }
         }
+
+        // Register a Key Event Handler so that ENTER will trigger the
+        // "Next"-Button and Shift-ENTER will trigger the "Previous"-Button
         NUIController.getInstance().registerKeyListener(KeyCode.ENTER, new KeyCode[] {},
                 (event) -> {
                     if (event.isShiftDown()) {
@@ -123,11 +138,13 @@ public class SearchHelper {
         mainVBox.getChildren().add(searchViewAnchorPane);
     }
 
+    /**
+     * This routine <i>must</i> be called in order to actually remove the search
+     * View from the interface (without any memory leaks).
+     */
     public void destructor() {
         for (Iterator<Node> i = mainVBox.getChildren().iterator(); i.hasNext();) {
             Node node = i.next();
-            System.out.println("searchViewAnchorPane= " + searchViewAnchorPane);
-            System.out.println("node= " + node);
             if (node == searchViewAnchorPane) {
                 i.remove();
                 break;
@@ -150,7 +167,7 @@ public class SearchHelper {
      * 
      * @return a List of all the TreeItems in the underlying ProofTreeView
      */
-    private List<TreeItem<NUINode>> getTreeItems(String term) {
+    private List<TreeItem<NUINode>> getTreeItems() {
 
         if (treeItems == null) {
             class TreeToListHelper {
@@ -169,15 +186,15 @@ public class SearchHelper {
                  *         it
                  */
 
-                private List<TreeItem<NUINode>> treeToList(final TreeItem<NUINode> root,
-                        final List<TreeItem<NUINode>> list) {
+                private <T> List<TreeItem<T>> treeToList(final TreeItem<T> root,
+                        final List<TreeItem<T>> list) {
                     if (root == null || list == null) {
                         throw new IllegalArgumentException();
                     }
                     list.add(root);
                     if (!root.getChildren().isEmpty()) {
-                        for (TreeItem<NUINode> ti : root.getChildren()) {
-                            list.addAll(treeToList(ti, new LinkedList<TreeItem<NUINode>>()));
+                        for (TreeItem<T> ti : root.getChildren()) {
+                            list.addAll(treeToList(ti, new LinkedList<TreeItem<T>>()));
                         }
                     }
                     return list;
@@ -200,7 +217,7 @@ public class SearchHelper {
      *            whether the selection is to be moved up- or downwards
      */
     private void moveSelectionAndScrollIfNeeded(boolean moveDownwards) {
-        List<TreeItem<NUINode>> treeItems = getTreeItems("");
+        List<TreeItem<NUINode>> treeItems = getTreeItems();
         // catch bad calls
         if (searchMatches == null || searchMatches.isEmpty())
             return;
@@ -297,5 +314,4 @@ public class SearchHelper {
             }
         }
     }
-
 }
