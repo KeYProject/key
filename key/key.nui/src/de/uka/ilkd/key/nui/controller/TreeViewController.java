@@ -74,11 +74,6 @@ public class TreeViewController implements Initializable {
     private ProofTreeVisualizer visualizer;
 
     /**
-     * whether the Search AnchorPane is visible, i.e. exists
-     */
-    boolean aSearchViewIsOpened = false;
-
-    /**
      * The constructor.
      */
     public TreeViewController() {
