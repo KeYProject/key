@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.nui.prooftree;
 
 import java.util.List;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 
 /**
  * Abstract class for representing a NUINode, which can be:
@@ -20,261 +23,347 @@ import java.util.List;
  *
  */
 public abstract class NUINode {
+    /**
+     * Marks if the node has the active property.
+     */
+    private SimpleBooleanProperty active;
+    /**
+     * Marks if the node has the closed property.
+     */
+    private SimpleBooleanProperty closed;
 
-	/**
-	 * The node text label.
-	 */
-	private String label;
+    /**
+     * Marks if the node has the interactive property.
+     */
+    private SimpleBooleanProperty interactive;
 
-	/**
-	 * Marks if the node has the closed property.
-	 */
-	private boolean closed;
+    /**
+     * Marks whether this node is a result of a currently active search
+     */
+    private SimpleBooleanProperty isSearchResult = new SimpleBooleanProperty(false);
 
-	/**
-	 * Marks if the node has the linked property.
-	 */
-	private boolean linked;
+    /**
+     * Marks if the node is currently visible in the treeView.
+     */
+    private SimpleBooleanProperty isVisible = new SimpleBooleanProperty(true);
 
-	/**
-	 * Marks if the node has the interactive property.
-	 */
-	private boolean interactive;
+    /**
+     * The node text label.
+     */
+    private SimpleStringProperty label;
 
-	/**
-	 * Marks if the node has the active property.
-	 */
-	private boolean active;
+    /**
+     * Marks if the node has the linked property.
+     */
+    private SimpleBooleanProperty linked;
 
-	/**
-	 * Marks if notes for this node exist.
-	 */
-	private boolean notes;
+    /**
+     * Marks if notes for this node exist.
+     */
+    private SimpleBooleanProperty notes;
 
-	/**
-	 * The serial number of the proof node.
-	 */
-	private String serialNumber;
+    /**
+     * the parent node of this node.
+     */
+    private SimpleObjectProperty<NUINode> parent;
 
-	/**
-	 * the parent node of this node.
-	 */
-	private NUINode parent;
+    /**
+     * The serial number of the proof node.
+     */
+    private SimpleStringProperty serialNumber;
 
-	/**
-	 * Marks if the node is currently visible in the treeView.
-	 */
-	private boolean isVisible = true;
+    /**
+     * Retrieves the label (name) of the node. <br>
+     * See {@link de.uka.ilkd.key.proof.Node#serialNr()}.
+     * 
+     * @return label The name of the node as String.
+     */
+    public final String getLabel() {
+        if(label == null) label = new SimpleStringProperty();
+        return label.get();
+    }
 
-	/**
-	 * Returns the serial number of the node.
-	 * <p>
-	 * See {@link #setSerialNumber(String)} for more details.
-	 * 
-	 * @return serialNumber The serial number of the node.
-	 */
-	public final String getSerialNumber() {
-		return serialNumber;
-	}
+    /**
+     * Returns the parent node of the current node.
+     * 
+     * @return the parent NUINode
+     */
+    public final NUINode getParent() {
+        if(parent == null) parent = new SimpleObjectProperty<NUINode>();
+        return parent.get();
+    }
 
-	/**
-	 * Sets the serial number of the node.
-	 * <ul>
-	 * <li>If the node is an inner node or an leaf node, use
-	 * node.serialNumber(), <br>
-	 * see {@link de.uka.ilkd.key.proof.Node#serialNr()}</li>
-	 * <li>If the node is a branch node, use
-	 * node.getNodeInfo().getBranchLabel().replace(" ","_"), <br>
-	 * see {@link de.uka.ilkd.key.proof.NodeInfo#getBranchLabel()}.</li>
-	 * </ul>
-	 * 
-	 * @param serial
-	 *            The serial number to set.
-	 */
-	public final void setSerialNumber(final String serial) {
-		this.serialNumber = serial;
-	}
+    /**
+     * Returns the serial number of the node.
+     * <p>
+     * See {@link #setSerialNumber(String)} for more details.
+     * 
+     * @return serialNumber The serial number of the node.
+     */
+    public final String getSerialNumber() {
+        if(serialNumber == null) serialNumber = new SimpleStringProperty();
+        return serialNumber.get();
+    }
 
-	/**
-	 * Indicates whether the goal corresponding to the node is open or closed.
-	 * <br>
-	 * See {@link de.uka.ilkd.key.proof.Node#isClosed()}.
-	 * 
-	 * @return closed is TRUE when the goal is closed, else FALSE.
-	 */
-	public final boolean isClosed() {
-		return closed;
-	}
+    /**
+     * Indicates whether the node has notes. <br>
+     * See {@link de.uka.ilkd.key.proof.NodeInfo#getNotes()}.
+     * 
+     * @return hasNotes is TRUE if the node has notes, else FALSE.
+     */
+    public final boolean hasNotes() {
+        if(notes == null) notes = new SimpleBooleanProperty();
+        return notes.get();
+    }
 
-	/**
-	 * Defines whether the goal corresponding to the node is open or closed. See
-	 * {@link de.uka.ilkd.key.proof.Node#isClosed()}.
-	 * 
-	 * @param isClosed
-	 *            sets the status of the goal, can be open (T) or closed (F)
-	 */
-	public final void setClosed(final boolean isClosed) {
-		this.closed = isClosed;
-	}
+    /**
+     * Indicates if the node has an active statement. <br>
+     * See {@link de.uka.ilkd.key.proof.NodeInfo#getActiveStatement()}.
+     * 
+     * @return active is TRUE when the node has an active statement, else to
+     *         FALSE.
+     */
+    public final boolean isActive() {
+        if(active == null) active = new SimpleBooleanProperty();
+        return active.get();
+    }
 
-	/**
-	 * Indicates whether the node is linked. <br>
-	 * See {@link de.uka.ilkd.key.proof.Goal#isLinked()}.
-	 * 
-	 * @return isLinked is TRUE when the node is a linked node, else FALSE.
-	 */
-	public final boolean isLinked() {
-		return linked;
-	}
+    /**
+     * Indicates whether the goal corresponding to the node is open or closed.
+     * <br>
+     * See {@link de.uka.ilkd.key.proof.Node#isClosed()}.
+     * 
+     * @return closed is TRUE when the goal is closed, else FALSE.
+     */
+    public final boolean isClosed() {
+        if(closed == null) closed = new SimpleBooleanProperty();
+        return closed.getValue();
+    }
 
-	/**
-	 * Defines if the node is a linked node. <br>
-	 * See {@link de.uka.ilkd.key.proof.Goal#isLinked()}.
-	 * 
-	 * @param isLinked
-	 *            should be TRUE if the node is a linked node, else FALSE.
-	 */
-	public final void setLinked(final boolean isLinked) {
-		this.linked = isLinked;
-	}
+    /**
+     * Indicates if the node is an interactive node. <br>
+     * See {@link de.uka.ilkd.key.proof.Goal#isAutomatic()}. If the node is not
+     * automatic, it is interactive.
+     * 
+     * @return interactive is TRUE when the node is an interactive node, else
+     *         FALSE.
+     */
+    public final boolean isInteractive() {
+        if(interactive == null) interactive = new SimpleBooleanProperty();
+        return interactive.get();
+    }
 
-	/**
-	 * Indicates if the node is an interactive node. <br>
-	 * See {@link de.uka.ilkd.key.proof.Goal#isAutomatic()}. If the node is not
-	 * automatic, it is interactive.
-	 * 
-	 * @return interactive is TRUE when the node is an interactive node, else
-	 *         FALSE.
-	 */
-	public final boolean isInteractive() {
-		return interactive;
-	}
+    /**
+     * Indicates whether the node is linked. <br>
+     * See {@link de.uka.ilkd.key.proof.Goal#isLinked()}.
+     * 
+     * @return isLinked is TRUE when the node is a linked node, else FALSE.
+     */
+    public final boolean isLinked() {
+        if(linked == null) linked = new SimpleBooleanProperty();
+        return linked.get();
+    }
 
-	/**
-	 * Defines whether the node has an active statement. <br>
-	 * See {@link de.uka.ilkd.key.proof.Goal#isAutomatic()}. If the node is not
-	 * automatic, it is interactive.
-	 * 
-	 * @param interactive
-	 *            should be set to TRUE if the node has an active statement,
-	 *            else to FALSE.
-	 */
-	public final void setInteractive(final boolean interactive) {
-		this.interactive = interactive;
-	}
+    /**
+     * Get the value of the property isSearchResult.
+     * 
+     * @return true if this is a search Result, else false
+     */
+    public boolean isSearchResult() {
+        if(isSearchResult == null) isSearchResult = new SimpleBooleanProperty();
+        return isSearchResult.get();
+    }
 
-	/**
-	 * Indicates if the node has an active statement. <br>
-	 * See {@link de.uka.ilkd.key.proof.NodeInfo#getActiveStatement()}.
-	 * 
-	 * @return active is TRUE when the node has an active statement, else to
-	 *         FALSE.
-	 */
-	public final boolean isActive() {
-		return active;
-	}
+    /**
+     * Indicates if the node is visible.
+     * 
+     * @return true if the node is visible, else false
+     */
+    public final boolean isVisible() {
+        if(isVisible == null) isVisible = new SimpleBooleanProperty();
+        return isVisible.get();
+    }
 
-	/**
-	 * Sets the active statement status of the node. <br>
-	 * See {@link de.uka.ilkd.key.proof.NodeInfo#getActiveStatement()}.
-	 * 
-	 * @param active
-	 *            Should be set on TRUE if the node has an active statement,
-	 *            else to FALSE.
-	 */
-	public final void setActive(final boolean active) {
-		this.active = active;
-	}
+    /**
+     * Searches the subtree beneath this NUINode for all occurrences of the term
+     * and returns a List of all of them
+     * 
+     * @param term
+     *            the term to search for
+     * @return a List of Search Results
+     */
+    public abstract List<NUINode> search(final String term);
 
-	/**
-	 * Indicates whether the node has notes. <br>
-	 * See {@link de.uka.ilkd.key.proof.NodeInfo#getNotes()}.
-	 * 
-	 * @return hasNotes is TRUE if the node has notes, else FALSE.
-	 */
-	public final boolean hasNotes() {
-		return notes;
-	}
+    /**
+     * Sets the active statement status of the node. <br>
+     * See {@link de.uka.ilkd.key.proof.NodeInfo#getActiveStatement()}.
+     * 
+     * @param active
+     *            Should be set on TRUE if the node has an active statement,
+     *            else to FALSE.
+     */
+    public final void setActive(final boolean active) {
+        if (this.active == null) {
+            this.active = new SimpleBooleanProperty(active);
+        }
+        else {
+            this.active.set(active);
+        }
+    }
 
-	/**
-	 * Defines if the node has notes. <br>
-	 * See {@link de.uka.ilkd.key.proof.NodeInfo#getNotes()}.
-	 * 
-	 * @param hasNotes
-	 *            should be set to TRUE if the node has notes, else to FALSE.
-	 */
-	public final void setHasNotes(final boolean hasNotes) {
-		this.notes = hasNotes;
-	}
+    /**
+     * Defines whether the goal corresponding to the node is open or closed. See
+     * {@link de.uka.ilkd.key.proof.Node#isClosed()}.
+     * 
+     * @param isClosed
+     *            sets the status of the goal, can be open (T) or closed (F)
+     */
+    public final void setClosed(final boolean isClosed) {
+        if (this.closed == null) {
+            this.closed = new SimpleBooleanProperty(isClosed);
+        }
+        else {
+            this.closed.set(isClosed);
+        }
+    }
 
-	/**
-	 * Retrieves the label (name) of the node. <br>
-	 * See {@link de.uka.ilkd.key.proof.Node#serialNr()}.
-	 * 
-	 * @return label The name of the node as String.
-	 */
-	public final String getLabel() {
-		return label;
-	}
+    /**
+     * Defines if the node has notes. <br>
+     * See {@link de.uka.ilkd.key.proof.NodeInfo#getNotes()}.
+     * 
+     * @param hasNotes
+     *            should be set to TRUE if the node has notes, else to FALSE.
+     */
+    public final void setHasNotes(final boolean hasNotes) {
+        if (this.notes == null) {
+            this.notes = new SimpleBooleanProperty(hasNotes);
+        }
+        else {
+            this.notes.set(hasNotes);
+        }
+    }
 
-	/**
-	 * Sets the label (name) of the node. <br>
-	 * See {@link de.uka.ilkd.key.proof.Node#serialNr()}.
-	 * 
-	 * @param label
-	 *            The name as String.
-	 */
-	public final void setLabel(final String label) {
-		this.label = label;
-	}
+    /**
+     * Defines whether the node has an active statement. <br>
+     * See {@link de.uka.ilkd.key.proof.Goal#isAutomatic()}. If the node is not
+     * automatic, it is interactive.
+     * 
+     * @param interactive
+     *            should be set to TRUE if the node has an active statement,
+     *            else to FALSE.
+     */
+    public final void setInteractive(final boolean interactive) {
+        if (this.interactive == null) {
+            this.interactive = new SimpleBooleanProperty(interactive);
+        }
+        else {
+            this.interactive.set(interactive);
+        }
+    }
 
-	/**
-	 * Returns the parent node of the current node.
-	 * 
-	 * @return the parent NUINode
-	 */
-	public final NUINode getParent() {
-		return parent;
-	}
+    /**
+     * Sets the label (name) of the node. <br>
+     * See {@link de.uka.ilkd.key.proof.Node#serialNr()}.
+     * 
+     * @param label
+     *            The name as String.
+     */
+    public final void setLabel(final String label) {
+        if (this.label == null) {
+            this.label = new SimpleStringProperty(label);
+        }
+        else {
+            this.label.set(label);
+        }
+    }
 
-	/**
-	 * Sets the parent node of the current node.
-	 * 
-	 * @param parent
-	 *            the parent NUINode
-	 */
-	public final void setParent(final NUINode parent) {
-		this.parent = parent;
-	}
+    /**
+     * Defines if the node is a linked node. <br>
+     * See {@link de.uka.ilkd.key.proof.Goal#isLinked()}.
+     * 
+     * @param isLinked
+     *            should be TRUE if the node is a linked node, else FALSE.
+     */
+    public final void setLinked(final boolean isLinked) {
+        if (this.linked == null) {
+            this.linked = new SimpleBooleanProperty(isLinked);
+        }
+        else {
+            this.linked.set(isLinked);
+        }
+    }
 
-	/**
-	 * Sets the visibility of the node.
-	 * 
-	 * @param isVisible
-	 *            the state of visibility
-	 */
-	public final void setVisibility(final boolean isVisible) {
-		this.isVisible = isVisible;
-	}
+    /**
+     * Sets the parent node of the current node.
+     * 
+     * @param parent
+     *            the parent NUINode
+     */
+    public final void setParent(final NUINode parent) {
+        if (this.parent == null) {
+            this.parent = new SimpleObjectProperty<NUINode>(parent);
+        }
+        else {
+            this.parent.set(parent);
+        }
+    }
 
-	/**
-	 * Indicates if the node is visible.
-	 * 
-	 * @return true if the node is visible, else false
-	 */
-	public final boolean isVisible() {
-		return isVisible;
-	}
-	
-	@Override
-	public String toString(){
-	    return getLabel();
-	}
-	
-	/**
-	 * Searches the subtree beneath this NUINode for all occurrences of the term and returns a List of all of them
-	 * @param term the term to search for
-	 * @return a List of Search Results
-	 */
-	public abstract List<NUINode> search(final String term);
+    /**
+     * Set the value of the property isSearchResult.
+     * 
+     * @param isSearchResult
+     *            true if this instance is to behave as a search result, else
+     *            false
+     */
+    public void setSearchResult(boolean isSearchResult) {
+        if (this.isSearchResult == null) {
+            this.isSearchResult = new SimpleBooleanProperty(isSearchResult);
+        }
+        else {
+            this.isSearchResult.set(isSearchResult);
+        }
+    }
+
+    /**
+     * Sets the serial number of the node.
+     * <ul>
+     * <li>If the node is an inner node or an leaf node, use
+     * node.serialNumber(), <br>
+     * see {@link de.uka.ilkd.key.proof.Node#serialNr()}</li>
+     * <li>If the node is a branch node, use
+     * node.getNodeInfo().getBranchLabel().replace(" ","_"), <br>
+     * see {@link de.uka.ilkd.key.proof.NodeInfo#getBranchLabel()}.</li>
+     * </ul>
+     * 
+     * @param serial
+     *            The serial number to set.
+     */
+    public final void setSerialNumber(final String serial) {
+        if (this.serialNumber == null) {
+            this.serialNumber = new SimpleStringProperty(serial);
+        }
+        else {
+            this.serialNumber.set(serial);
+        }
+    }
+
+    /**
+     * Sets the visibility of the node.
+     * 
+     * @param isVisible
+     *            the state of visibility
+     */
+    public final void setVisibility(final boolean isVisible) {
+        if (this.isVisible == null) {
+            this.isVisible = new SimpleBooleanProperty(isVisible);
+        }
+        else {
+            this.isVisible.set(isVisible);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return getLabel();
+    }
 }

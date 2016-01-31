@@ -36,7 +36,7 @@ import javafx.scene.layout.VBox;
  * @version 1.1
  */
 public class TreeViewController implements Initializable {
-    
+
     public static final String NAME = "treeView";
     public static final String RESOURCE = "treeView.fxml";
 
@@ -44,24 +44,25 @@ public class TreeViewController implements Initializable {
      * The IconFactory used to create icons for the proof tree nodes.
      */
     private final IconFactory icf;
-    
+
     /**
      * The VBox containing both the TreeView and the Anchor Pane where the
      * Search elements are
      */
     @FXML
     private VBox mainVBox;
-    
-    private final Set<ProofTreeCell> proofTreeCells = Collections.newSetFromMap(new WeakHashMap<>());
+
+    private final Set<ProofTreeCell> proofTreeCells = Collections
+            .newSetFromMap(new WeakHashMap<>());
 
     /**
      * The proofTree view of the GUI.
      */
     @FXML
     private TreeView<NUINode> proofTreeView;
-    
+
     private SearchHelper searchHelper = null;
-    
+
     /**
      * An ObservableList storing the Items matching a <tt/>search()<tt/>.
      */
@@ -94,8 +95,8 @@ public class TreeViewController implements Initializable {
                     searchHelper.performFocusRequest();
                 }
                 else {
-                    searchHelper = new SearchHelper(proofTreeView,
-                            proofTreeCells, mainVBox, searchMatches);
+                    searchHelper = new SearchHelper(proofTreeView, proofTreeCells, mainVBox,
+                            searchMatches);
                 }
             });
 
@@ -104,7 +105,7 @@ public class TreeViewController implements Initializable {
                 searchHelper = null;
             });
         });
-        
+
         proofTreeView.getStyleClass().add(ProofTreeStyle.CSS_PROOF_TREE);
 
         // set cell factory for rendering cells
@@ -122,8 +123,7 @@ public class TreeViewController implements Initializable {
 
         // add CSS file to view
         final String cssPath = this.getClass()
-                .getResource("../components/" + ProofTreeStyle.CSS_FILE)
-                .toExternalForm();
+                .getResource("../components/" + ProofTreeStyle.CSS_FILE).toExternalForm();
         visualizer.addStylesheet(cssPath);
 
         if (NUI.getInitialProofFile() != null) {
@@ -142,6 +142,10 @@ public class TreeViewController implements Initializable {
     public final void loadAndDisplayProof(final File file) {
         visualizer.loadProofTree(loadProof(file));
         visualizer.visualizeProofTree();
+        if (searchHelper != null) {
+            searchHelper.destructor();
+            searchHelper = null;
+        }
         searchMatches.clear();
     }
 
@@ -169,7 +173,7 @@ public class TreeViewController implements Initializable {
      */
     private Proof loadProof(final File proofFile) {
         try {
-            KeYEnvironment< ? > environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
                     proofFile, null, null, null, true);
             final Proof proof = environment.getLoadedProof();
             return proof;

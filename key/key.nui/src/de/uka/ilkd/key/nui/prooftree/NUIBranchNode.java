@@ -16,7 +16,7 @@ public class NUIBranchNode extends NUINode {
     /**
      * A list of children of the branch node.
      */
-    private final List<NUINode> children;
+    private final List<NUINode> children = new LinkedList<>();
 
     /**
      * The parent node of the branch node.
@@ -31,9 +31,8 @@ public class NUIBranchNode extends NUINode {
      */
     public NUIBranchNode(final de.uka.ilkd.key.proof.Node proofParentNode) {
         super();
-
         this.proofParentNode = proofParentNode;
-        children = new LinkedList<NUINode>();
+
     }
 
     /**

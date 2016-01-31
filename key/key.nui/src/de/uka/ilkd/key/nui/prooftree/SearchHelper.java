@@ -151,6 +151,7 @@ public class SearchHelper {
             }
         }
         NUIController.getInstance().unregisterKeyListener(KeyCode.ENTER);
+        searchMatches.clear();
         searchTextField = null;
         nextButton = null;
         previousButton = null;
