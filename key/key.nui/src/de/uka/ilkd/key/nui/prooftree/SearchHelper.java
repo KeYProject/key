@@ -29,13 +29,14 @@ import javafx.util.Duration;
 
 public class SearchHelper {
 
+    private boolean anythingIsHighlighted = false; //NOPMD
+
     /**
      * The VBox containing both the TreeView and the Anchor Pane where the
      * Search elements are
      */
     @FXML
-    private VBox mainVBox;
-
+    private final VBox mainVBox;
     /**
      * The Button toggling selectNextItem in searching
      */
@@ -46,50 +47,18 @@ public class SearchHelper {
      */
     @FXML
     private Button previousButton;
+    
     /**
      * Weak-referenced Set of ProofTreeCells
      */
-    private Set<ProofTreeCell> proofTreeCells;
+    private final Set<ProofTreeCell> proofTreeCells;
     
-    /**
-     * TODO Bitte nicht löschen, in Code Reviews bitte ignorieren
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    private Set<ProofTreeCell> getProofTreeCells() {
-        try {
-            Field f = VirtualContainerBase.class.getDeclaredField("flow");
-            f.setAccessible(true);
-            Field g = VirtualFlow.class.getDeclaredField("cells");
-            g.setAccessible(true);
-            Set<ProofTreeCell> s = new HashSet<>();
-            s.addAll((ArrayLinkedList<ProofTreeCell>) g.get(((VirtualFlow<ProofTreeCell>) f
-                    .get(((TreeViewSkin<NUINode>) proofTreeView.skinProperty().get())))));
-            return s;
-        }
-        catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-        catch (SecurityException e) {
-            e.printStackTrace();
-        }
-        catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-        catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-    
-    /**
-     * An ObservableList storing the Items matching a <tt/>search()<tt/>
-     */
-    // private ObservableList<NUINode> searchMatches;
+    private TreeView<NUINode> proofTreeView;
     /**
      * The TextField where search terms are entered
      */
     private TextField searchTextField;
+
     /**
      * The Anchor Pane holding the Search Field and its buttons
      */
@@ -99,10 +68,6 @@ public class SearchHelper {
      * A List representation of the all the TreeItems
      */
     private List<TreeItem<NUINode>> treeItems;
-
-    private TreeView<NUINode> proofTreeView;
-
-    private boolean anythingIsHighlighted = false;
 
     /**
      * Displays a search view.
@@ -190,7 +155,7 @@ public class SearchHelper {
     public void destructor() {
         for (Iterator<Node> i = mainVBox.getChildren().iterator(); i.hasNext();) {
             Node node = i.next();
-            if (node == searchViewAnchorPane) {
+            if (node == searchViewAnchorPane) { //NOPMD
                 i.remove();
                 break;
             }
@@ -206,6 +171,37 @@ public class SearchHelper {
 
     public void performFocusRequest() {
         searchTextField.requestFocus();
+    }
+
+    /**
+     * TODO Bitte nicht löschen, in Code Reviews bitte ignorieren
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private Set<ProofTreeCell> getProofTreeCells() {
+        try {
+            Field f = VirtualContainerBase.class.getDeclaredField("flow");
+            f.setAccessible(true);
+            Field g = VirtualFlow.class.getDeclaredField("cells");
+            g.setAccessible(true);
+            Set<ProofTreeCell> s = new HashSet<>();
+            s.addAll((ArrayLinkedList<ProofTreeCell>) g.get(((VirtualFlow<ProofTreeCell>) f
+                    .get(((TreeViewSkin<NUINode>) proofTreeView.skinProperty().get())))));
+            return s;
+        }
+        catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        catch (SecurityException e) {
+            e.printStackTrace();
+        }
+        catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
