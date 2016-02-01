@@ -44,6 +44,14 @@ public class NUIBranchNode extends NUINode {
     public final void addChild(final NUINode child) {
         this.children.add(child);
     }
+    
+    @Override
+    public List<NUINode> asList(){
+        List<NUINode> l = new LinkedList<>();
+        l.add(this);
+        children.forEach((child) -> l.addAll(child.asList()));
+        return l;
+    }
 
     /**
      * Returns a list of children of the branch node.

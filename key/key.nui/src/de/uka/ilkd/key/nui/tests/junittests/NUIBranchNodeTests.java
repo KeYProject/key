@@ -36,6 +36,11 @@ public class NUIBranchNodeTests {
         Proof proof = environment.getLoadedProof();
         ptVisualizer.loadProofTree(proof);
     }
+
+    @Test
+    public void testAsList(){
+        assertEquals(669 + 29, ptVisualizer.getRootNode().asList().stream().count());
+    }
     
     /**
      * Test for standard search terms.

@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+import java.util.LinkedList;
+import java.util.List;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -77,6 +79,12 @@ public abstract class NUINode {
             isSearchResult = new SimpleBooleanProperty();
         isSearchResult.addListener(listener);
          
+    }
+    
+    public List<NUINode> asList(){
+        List<NUINode> l = new LinkedList<>();
+        l.add(this);
+        return l;
     }
 
     /**
