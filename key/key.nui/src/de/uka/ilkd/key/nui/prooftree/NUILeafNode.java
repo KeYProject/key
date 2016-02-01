@@ -41,6 +41,7 @@ public class NUILeafNode extends NUINode {
 
     @Override
     public boolean search(String term) {
+        if(term.isEmpty()) return false;
    //     System.out.println(this + ", a LeafNode was searched for '" + term + "' and highlighted? " + getLabel().toLowerCase().contains(term.toLowerCase()));
         return setSearchResult(getLabel().toLowerCase().contains(term.toLowerCase()));
     }

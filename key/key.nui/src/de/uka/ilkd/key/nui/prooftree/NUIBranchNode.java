@@ -92,6 +92,8 @@ public class NUIBranchNode extends NUINode {
 
     @Override
     public boolean search(String term) {
+        if(term.isEmpty()) return false;
+        
         if (getLabel().toLowerCase().contains(term.toLowerCase())) {
             setSearchResult(true);
             children.forEach((child) -> child.search(term));
