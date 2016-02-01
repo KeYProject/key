@@ -168,7 +168,7 @@ public class SymbolicExecutionTreeBuilder {
     */
    private ExecutionStart startNode;
    
-   /**
+   /** 
     * <p>
     * Maps a {@link Node} of KeY's proof tree to his execution tree model representation
     * if it is available.
@@ -473,12 +473,56 @@ public class SymbolicExecutionTreeBuilder {
       AnalyzerProofVisitor visitor = new AnalyzerProofVisitor(completions);
       NodePreorderIterator iter = new NodePreorderIterator(proof.root());
       while (iter.hasNext()) {
-         visitor.visit(proof, iter.next()); // This visitor pattern must be used because a recursive iteration causes StackOverflowErrors if the proof tree in KeY is to deep (e.g. simple list with 2000 elements during computation of fibonacci(7)
+         Node node = iter.next();
+         visitor.visit(proof, node); // This visitor pattern must be used because a recursive iteration causes StackOverflowErrors if the proof tree in KeY is to deep (e.g. simple list with 2000 elements during computation of fibonacci(7)
       }
       visitor.completeTree();
       return completions;
    }
-   
+   /**
+    * Prunes the symbolic execution tree at the first father of the given {@link Node} who is a 
+    * {@link AbstractExecutionNode} or at the given {@link Node} itself if it's an {@link AbstractExecutionNode}.
+    * @param node Node to be pruned.
+    * @author Anna Filighera
+    */
+   public void prune(Node node) {
+      // search for the first node in the parent hierarchy (including the node itself) who is an AbstractExecutionNode
+      while (keyNodeMapping.get(node) == null) {
+         node = node.parent();
+      }
+      Iterator<Node> subtree = node.subtreeIterator();
+      subtree.next();
+      while (subtree.hasNext()) {
+         Node sub = subtree.next();
+         AbstractExecutionNode<?> exSub = keyNodeMapping.get(sub);
+         if (exSub != null) {
+            exSub.removeAllChildren();
+            exSub.setParent(null);
+         }      
+         keyNodeMapping.remove(sub);
+         keyNodeLoopConditionMapping.remove(sub);
+         keyNodeBranchConditionMapping.remove(sub);
+         SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(sub.getAppliedRuleApp());
+         if (label != null) {
+            methodCallStackMap.remove(label);
+            afterBlockMap.remove(label);
+            methodReturnsToIgnoreMap.remove(label);
+         }      
+      }
+      keyNodeMapping.get(node).removeAllChildren();
+
+      ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(getStartNode());
+       while (iter.hasNext()) {
+         IExecutionNode next = iter.next();
+         try {
+         System.out.println(next.getName());
+         }
+         catch (Exception e){
+            
+         }
+       }
+       System.out.println("----------------------");
+   }
    /**
     * Instances of this class are returned by {@link SymbolicExecutionTreeBuilder#analyse()}
     * to inform about newly completed blocks and returned methods.

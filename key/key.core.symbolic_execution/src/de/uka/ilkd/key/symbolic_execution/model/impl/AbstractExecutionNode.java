@@ -474,4 +474,11 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
          return null;
       }
    }
+   
+   /**
+    * Removes all children.
+    */
+   public void removeAllChildren() {
+      children.clear();
+   }
 }

@@ -60,7 +60,7 @@ public class OpenProofHandler extends AbstractHandler {
                                                   keyTarget.getMethod(),
                                                   false,
                                                   false,
-                                                  false,
+                                                  true,
                                                   false);
                   }
                }

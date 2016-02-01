@@ -92,20 +92,20 @@ public final class KeYModelUtil {
     * Creates new {@link IKeYSENode}s for new {@link IExecutionNode}s
     * which are added after the existing {@link IKeYSENode}s.
     * </p>
-    * <p>
-    * The assumption is that new children are only added in the end and
-    * that existing children are never replaced or removed.
-    * </p>
     * @param parent The parent {@link IKeYSENode} in the debug model.
     * @param oldChildren The existing {@link IKeYSENode}s to keep.
     * @param executionChildren The {@link IExecutionNode}s of the execution tree to create debug model representations for.
     * @return The created debug model representations.
     * @throws DebugException Occurred Exception.
     */
-   public static IKeYSENode<?>[] updateChildren(IKeYSENode<?> parent, 
-                                                      IKeYSENode<?>[] oldChildren, 
-                                                      IExecutionNode<?>[] executionChildren) throws DebugException {
-      if (executionChildren != null) {
+   public static IKeYSENode<?>[] updateChildren(IKeYSENode<?> parent,
+         IKeYSENode<?>[] oldChildren, IExecutionNode<?>[] executionChildren)
+         throws DebugException {
+      assert (executionChildren != null);
+      if (executionChildren.length == 0) {
+         return new IKeYSENode<?>[0];
+      }
+      else {
          IKeYSENode<?>[] result = new IKeYSENode<?>[executionChildren.length];
          // Add old children
          System.arraycopy(oldChildren, 0, result, 0, oldChildren.length);
@@ -114,9 +114,6 @@ public final class KeYModelUtil {
             result[i] = createChild(parent, executionChildren[i]);
          }
          return result;
-      }
-      else {
-         return new IKeYSENode<?>[0];
       }
    }
    
