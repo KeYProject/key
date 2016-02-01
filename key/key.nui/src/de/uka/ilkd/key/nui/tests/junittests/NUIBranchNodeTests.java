@@ -79,24 +79,31 @@ public class NUIBranchNodeTests {
      */
     @Test
     public void testSearchNoMatches() {
+        String SEARCH_TERM_01 = "NO_SUCH";
+        
+        assertTrue(searchAndCompareSize(SEARCH_TERM_01, 0));
+        
+        // TODO this could be extended
         
     }
     
     /**
-     * Tests for search terms containing special characters,
-     * like spaces, &, $, etc.
+     * Tests for search terms containing special characters, like spaces, &, $,
+     * etc.
      */
     @Test
     public void testSearchSpecialTerms() {
+        String SEARCH_TERM_01 = "";
         
+        assertTrue(searchAndCompareSize(SEARCH_TERM_01, 0));
+        
+        // TODO this could be extended
     }
     
     private boolean searchAndCompareSize(String searchTerm, int expectedSize) {
-        /*
-         * int NoOfFindings = ptVisualizer.getRootNode().search(searchTerm).size();
-         * return (NoOfFindings == expectedSize);         
-         */
-        return false;
+        ptVisualizer.getRootNode().search(searchTerm);
+        return expectedSize == ptVisualizer.getRootNode().asList().stream()
+                .filter((node) -> node.isSearchResult()).count();
     }
 
 }
