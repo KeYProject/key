@@ -48,12 +48,12 @@ public class ProofTreeCell extends TreeCell<NUINode> {
                 Boolean nowMatchesSearch) {
             final ObservableList<String> styles = getStyleClass();
             final String cssClassHighlight = ProofTreeStyle.CSS_NODE_HIGHLIGHT;
-            if (nowMatchesSearch == true) {
-                if (!styles.contains(cssClassHighlight)) {
-                    styles.add(cssClassHighlight);
-                }
+            if (nowMatchesSearch && !styles.contains(cssClassHighlight)) {
+
+                styles.add(cssClassHighlight);
+
             }
-            if (nowMatchesSearch == false) {
+            if (nowMatchesSearch) {
                 styles.remove(cssClassHighlight);
             }
         }
@@ -147,18 +147,20 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 
         super.updateItem(item, empty);
 
-        if (item != null) {
+        if (item == null) {
+            getStyleClass().remove(ProofTreeStyle.CSS_NODE_HIGHLIGHT);
+
+        }
+        else {
             item.addSearchResultListener(searchResultListener);
             if (item.isSearchResult()) {
-                if(!getStyleClass().contains(ProofTreeStyle.CSS_NODE_HIGHLIGHT))
-                 { getStyleClass().add(ProofTreeStyle.CSS_NODE_HIGHLIGHT); }
+                if (!getStyleClass().contains(ProofTreeStyle.CSS_NODE_HIGHLIGHT)) {
+                    getStyleClass().add(ProofTreeStyle.CSS_NODE_HIGHLIGHT);
+                }
             }
             else {
                 getStyleClass().remove(ProofTreeStyle.CSS_NODE_HIGHLIGHT);
             }
-        }
-        else {
-            getStyleClass().remove(ProofTreeStyle.CSS_NODE_HIGHLIGHT);
         }
 
         // if null node, display nothing
