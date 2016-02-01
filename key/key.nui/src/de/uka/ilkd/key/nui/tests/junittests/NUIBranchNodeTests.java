@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nui.tests;
+package de.uka.ilkd.key.nui.tests.junittests;
 
 import static org.junit.Assert.*;
 
@@ -87,8 +87,11 @@ public class NUIBranchNodeTests {
     }
     
     private boolean searchAndCompareSize(String searchTerm, int expectedSize) {
-        int NoOfFindings = ptVisualizer.getRootNode().search(searchTerm).size();
-        return (NoOfFindings == expectedSize);        
+        /*
+         * int NoOfFindings = ptVisualizer.getRootNode().search(searchTerm).size();
+         * return (NoOfFindings == expectedSize);         
+         */
+        return false;
     }
 
 }
