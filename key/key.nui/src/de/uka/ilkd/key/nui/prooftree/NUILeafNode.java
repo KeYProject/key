@@ -1,18 +1,15 @@
 package de.uka.ilkd.key.nui.prooftree;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
- * Represents a leaf node. Is used to create a graphical representation of
- * a proof tree consisting of {@link de.uka.ilkd.key.proof.Node} objects.
+ * Represents a leaf node. Is used to create a graphical representation of a
+ * proof tree consisting of {@link de.uka.ilkd.key.proof.Node} objects.
  * 
  * @author Matthias Schultheis
  * @author Patrick Jattke
  *
  */
 public class NUILeafNode extends NUINode {
-    
+
     /**
      * The related proof node of the leaf node.
      */
@@ -22,29 +19,29 @@ public class NUILeafNode extends NUINode {
      * Creates a new leaf node.
      * 
      * @param proofNode
-     * 		   The related proof node of the leaf node.
+     *            The related proof node of the leaf node.
      */
     public NUILeafNode(final de.uka.ilkd.key.proof.Node proofNode) {
-    	super();
+        super();
         this.proofNode = proofNode;
     }
 
     /**
      * Returns the corresponding proof node of the leaf node.
      * 
-     * @return proofNode
-     * 			The proof node of the leaf node.
+     * @return proofNode The proof node of the leaf node.
      */
     public final de.uka.ilkd.key.proof.Node getProofNode() {
         return proofNode;
     }
 
+    public void resetSearch() {
+        setSearchResult(false);
+    }
+
     @Override
-    public List<NUINode> search(final String term){
-        List<NUINode> l = new LinkedList<>();
-        if(getLabel().toLowerCase().contains(term.toLowerCase())){
-                    l.add(this);
-        }
-        return l;
+    public boolean search(String term) {
+   //     System.out.println(this + ", a LeafNode was searched for '" + term + "' and highlighted? " + getLabel().toLowerCase().contains(term.toLowerCase()));
+        return setSearchResult(getLabel().toLowerCase().contains(term.toLowerCase()));
     }
 }

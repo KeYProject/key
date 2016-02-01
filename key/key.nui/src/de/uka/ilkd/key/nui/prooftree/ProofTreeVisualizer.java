@@ -40,7 +40,7 @@ public class ProofTreeVisualizer {
 
 	/**
 	 * Creates a new TreeConverter object.
-	 * 
+	 *
 	 * @param proofTreeView
 	 * 			The reference to the TreeView<NUINode> object on the GUI
 	 */
@@ -50,7 +50,7 @@ public class ProofTreeVisualizer {
 
 	/**
 	 * Adds a CSS stylesheet given by its path to the tree.
-	 * 
+	 *
 	 * @param path
 	 * 			The path of the stylesheet to add
 	 */
@@ -82,7 +82,7 @@ public class ProofTreeVisualizer {
 	 * loads a proof tree by converting it to a NUITree which 
 	 * is used as an intermediate representation 
 	 * (decorated abstract tree).
-	 * 
+	 *
 	 * @param proof The proof tree to load
 	 */
 	public final void loadProofTree(final Proof proof) {

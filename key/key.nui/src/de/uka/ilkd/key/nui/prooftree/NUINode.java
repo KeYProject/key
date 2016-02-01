@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.nui.prooftree;
 
-import java.util.List;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
 
 /**
  * Abstract class for representing a NUINode, which can be:
@@ -72,6 +72,13 @@ public abstract class NUINode {
      */
     private SimpleStringProperty serialNumber;
 
+    public void addSearchResultListener(ChangeListener<Boolean> listener) {
+       if (isSearchResult == null)
+            isSearchResult = new SimpleBooleanProperty();
+        isSearchResult.addListener(listener);
+         
+    }
+
     /**
      * Retrieves the label (name) of the node. <br>
      * See {@link de.uka.ilkd.key.proof.Node#serialNr()}.
@@ -79,7 +86,8 @@ public abstract class NUINode {
      * @return label The name of the node as String.
      */
     public final String getLabel() {
-        if(label == null) label = new SimpleStringProperty();
+        if (label == null)
+            label = new SimpleStringProperty();
         return label.get();
     }
 
@@ -89,7 +97,8 @@ public abstract class NUINode {
      * @return the parent NUINode
      */
     public final NUINode getParent() {
-        if(parent == null) parent = new SimpleObjectProperty<NUINode>();
+        if (parent == null)
+            parent = new SimpleObjectProperty<NUINode>();
         return parent.get();
     }
 
@@ -101,7 +110,8 @@ public abstract class NUINode {
      * @return serialNumber The serial number of the node.
      */
     public final String getSerialNumber() {
-        if(serialNumber == null) serialNumber = new SimpleStringProperty();
+        if (serialNumber == null)
+            serialNumber = new SimpleStringProperty();
         return serialNumber.get();
     }
 
@@ -112,7 +122,8 @@ public abstract class NUINode {
      * @return hasNotes is TRUE if the node has notes, else FALSE.
      */
     public final boolean hasNotes() {
-        if(notes == null) notes = new SimpleBooleanProperty();
+        if (notes == null)
+            notes = new SimpleBooleanProperty();
         return notes.get();
     }
 
@@ -124,7 +135,8 @@ public abstract class NUINode {
      *         FALSE.
      */
     public final boolean isActive() {
-        if(active == null) active = new SimpleBooleanProperty();
+        if (active == null)
+            active = new SimpleBooleanProperty();
         return active.get();
     }
 
@@ -136,7 +148,8 @@ public abstract class NUINode {
      * @return closed is TRUE when the goal is closed, else FALSE.
      */
     public final boolean isClosed() {
-        if(closed == null) closed = new SimpleBooleanProperty();
+        if (closed == null)
+            closed = new SimpleBooleanProperty();
         return closed.getValue();
     }
 
@@ -149,7 +162,8 @@ public abstract class NUINode {
      *         FALSE.
      */
     public final boolean isInteractive() {
-        if(interactive == null) interactive = new SimpleBooleanProperty();
+        if (interactive == null)
+            interactive = new SimpleBooleanProperty();
         return interactive.get();
     }
 
@@ -160,7 +174,8 @@ public abstract class NUINode {
      * @return isLinked is TRUE when the node is a linked node, else FALSE.
      */
     public final boolean isLinked() {
-        if(linked == null) linked = new SimpleBooleanProperty();
+        if (linked == null)
+            linked = new SimpleBooleanProperty();
         return linked.get();
     }
 
@@ -170,7 +185,8 @@ public abstract class NUINode {
      * @return true if this is a search Result, else false
      */
     public boolean isSearchResult() {
-        if(isSearchResult == null) isSearchResult = new SimpleBooleanProperty();
+        if (isSearchResult == null)
+            isSearchResult = new SimpleBooleanProperty();
         return isSearchResult.get();
     }
 
@@ -180,19 +196,30 @@ public abstract class NUINode {
      * @return true if the node is visible, else false
      */
     public final boolean isVisible() {
-        if(isVisible == null) isVisible = new SimpleBooleanProperty();
+        if (isVisible == null)
+            isVisible = new SimpleBooleanProperty();
         return isVisible.get();
     }
 
+    public void removeSearchResultListener(ChangeListener<Boolean> listener) {
+       if (isSearchResult != null) {
+            isSearchResult.removeListener(listener);
+        }
+    }
+    
+    /**
+     * Marks all nodes in the subtree beneath this node as non-search-Results.
+     */
+    public abstract void resetSearch();
+    
     /**
      * Searches the subtree beneath this NUINode for all occurrences of the term
-     * and returns a List of all of them
+     * and marks each of them as SearchResults. Returns true if there are any search results.
      * 
-     * @param term
-     *            the term to search for
-     * @return a List of Search Results
+     * @param term  the term to search for
+     * @return whether there are any search results
      */
-    public abstract List<NUINode> search(final String term);
+    public abstract boolean search(String term);
 
     /**
      * Sets the active statement status of the node. <br>
@@ -315,13 +342,14 @@ public abstract class NUINode {
      *            true if this instance is to behave as a search result, else
      *            false
      */
-    public void setSearchResult(boolean isSearchResult) {
+    public boolean setSearchResult(boolean isSearchResult) {
         if (this.isSearchResult == null) {
             this.isSearchResult = new SimpleBooleanProperty(isSearchResult);
         }
         else {
             this.isSearchResult.set(isSearchResult);
         }
+        return isSearchResult;
     }
 
     /**

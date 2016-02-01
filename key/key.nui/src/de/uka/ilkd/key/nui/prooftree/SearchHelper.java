@@ -1,14 +1,21 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import com.sun.javafx.scene.control.skin.TreeViewSkin;
+import com.sun.javafx.scene.control.skin.VirtualContainerBase;
+import com.sun.javafx.scene.control.skin.VirtualFlow;
+import com.sun.javafx.scene.control.skin.VirtualFlow.ArrayLinkedList;
+
 import de.uka.ilkd.key.nui.ComponentFactory;
 import de.uka.ilkd.key.nui.controller.NUIController;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -43,10 +50,42 @@ public class SearchHelper {
      * Weak-referenced Set of ProofTreeCells
      */
     private Set<ProofTreeCell> proofTreeCells;
+    
+    /**
+     * TODO Bitte nicht löschen, in Code Reviews bitte ignorieren
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private Set<ProofTreeCell> getProofTreeCells() {
+        try {
+            Field f = VirtualContainerBase.class.getDeclaredField("flow");
+            f.setAccessible(true);
+            Field g = VirtualFlow.class.getDeclaredField("cells");
+            g.setAccessible(true);
+            Set<ProofTreeCell> s = new HashSet<>();
+            s.addAll((ArrayLinkedList<ProofTreeCell>) g.get(((VirtualFlow<ProofTreeCell>) f
+                    .get(((TreeViewSkin<NUINode>) proofTreeView.skinProperty().get())))));
+            return s;
+        }
+        catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        catch (SecurityException e) {
+            e.printStackTrace();
+        }
+        catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
     /**
      * An ObservableList storing the Items matching a <tt/>search()<tt/>
      */
-    private ObservableList<NUINode> searchMatches;
+    // private ObservableList<NUINode> searchMatches;
     /**
      * The TextField where search terms are entered
      */
@@ -61,7 +100,9 @@ public class SearchHelper {
      */
     private List<TreeItem<NUINode>> treeItems;
 
-    TreeView<NUINode> proofTreeView;
+    private TreeView<NUINode> proofTreeView;
+
+    private boolean anythingIsHighlighted = false;
 
     /**
      * Displays a search view.
@@ -77,10 +118,9 @@ public class SearchHelper {
      *            the searchMatches List this is supposed to update
      * 
      */
-    public SearchHelper(TreeView<NUINode> proofTreeView, Set<ProofTreeCell> proofTreeCells,
-            VBox mainVBox, ObservableList<NUINode> searchMatches) {
+    public SearchHelper(TreeView<NUINode> proofTreeView, Set<ProofTreeCell> proofTreeCells, VBox mainVBox) {
         this.mainVBox = mainVBox;
-        this.searchMatches = searchMatches;
+        // this.searchMatches = searchMatches;
         this.proofTreeView = proofTreeView;
         this.proofTreeCells = proofTreeCells;
 
@@ -104,7 +144,12 @@ public class SearchHelper {
                 searchTextField.textProperty().addListener((obs, oldText, newText) -> {
                     nextButton.setDisable(newText.isEmpty());
                     previousButton.setDisable(newText.isEmpty());
-                    search(newText);
+                    if (newText.isEmpty()) {
+                        proofTreeView.getRoot().getValue().resetSearch();
+                    }
+                    else {
+                        anythingIsHighlighted = proofTreeView.getRoot().getValue().search(newText);
+                    }
                 });
                 Platform.runLater(() -> searchTextField.requestFocus());
             }
@@ -151,7 +196,8 @@ public class SearchHelper {
             }
         }
         NUIController.getInstance().unregisterKeyListener(KeyCode.ENTER);
-        searchMatches.clear();
+        // searchMatches.clear();
+        this.proofTreeView.getRoot().getValue().resetSearch();
         searchTextField = null;
         nextButton = null;
         previousButton = null;
@@ -218,10 +264,14 @@ public class SearchHelper {
      *            whether the selection is to be moved up- or downwards
      */
     private void moveSelectionAndScrollIfNeeded(boolean moveDownwards) {
+        if (!anythingIsHighlighted) {
+            return;
+        }
+
         List<TreeItem<NUINode>> treeItems = getTreeItems();
         // catch bad calls
-        if (searchMatches == null || searchMatches.isEmpty())
-            return;
+        // if (searchMatches == null || searchMatches.isEmpty())
+        // return;
 
         final TreeItem<NUINode> currentlySelectedItem = proofTreeView.getSelectionModel()
                 .getSelectedItem();
@@ -233,17 +283,25 @@ public class SearchHelper {
                 || moveDownwards
                         && (treeItems.indexOf(currentlySelectedItem) == treeItems.size() - 1)
                 || (!moveDownwards) && (treeItems.indexOf(currentlySelectedItem) == 0)) {
-            itemToSelect = moveDownwards ? treeItems.get(0) : treeItems.get(treeItems.size() - 1);
+            if (moveDownwards) {
+                itemToSelect = treeItems.get(0);
+            }
+            else {
+                itemToSelect = treeItems.get(treeItems.size() - 1);
+            }
         }
         else {
-            itemToSelect = moveDownwards
-                    ? treeItems.get(treeItems.indexOf(currentlySelectedItem) + 1)
-                    : treeItems.get(treeItems.indexOf(currentlySelectedItem) - 1);
+            if (moveDownwards) {
+                itemToSelect = treeItems.get(treeItems.indexOf(currentlySelectedItem) + 1);
+            }
+            else {
+                itemToSelect = treeItems.get(treeItems.indexOf(currentlySelectedItem) - 1);
+            }
         }
 
         // Basically does: while(!searchMatches.contains(itemToSelect))
         // itemToSelect++;
-        while (!searchMatches.contains(itemToSelect.getValue())) {
+        while (!itemToSelect.getValue().isSearchResult()) {
             if ((moveDownwards && (treeItems.indexOf(itemToSelect) == treeItems.size() - 1))
                     || (!moveDownwards && (treeItems.indexOf(itemToSelect) == 0))) {
                 itemToSelect = moveDownwards ? treeItems.get(0)
@@ -283,36 +341,5 @@ public class SearchHelper {
             // the selected item appear in middle.
             proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex()
                     - (moveDownwards ? 0 : (int) (proofTreeCells.size() / 2)));
-
-    }
-
-    /**
-     * Searches the <tt>Label</tt>s of the <tt>TreeItems</tt> in the underlying
-     * <tt>ProofTree</tt> for a given term. Highlights all the matches.<br/>
-     * It is possible to use this for an incremental search, but doing so is
-     * inefficient because the list storing the matches from the last search is
-     * being emptied on every call. <br/>
-     * <br/>
-     * <b><tt>TODO</tt> optimize this for incremental search by buffering the
-     * last search term.</b>
-     * 
-     * @param term
-     *            The String to search for.
-     */
-    private final void search(String term) {
-        // remove old matches
-        searchMatches.clear();
-        // exit if no search term specified
-        if (!term.isEmpty()) {
-
-            // iterate over all the TreeItems and add them to searchMatches if
-            // they
-            // match the search
-            for (NUINode n : proofTreeView.getRoot().getValue().search(term)) {
-                if (n.getLabel().toLowerCase().contains(term.toLowerCase())) {
-                    searchMatches.add(n);
-                }
-            }
-        }
     }
 }

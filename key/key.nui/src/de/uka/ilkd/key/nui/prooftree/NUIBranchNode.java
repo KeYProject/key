@@ -77,16 +77,28 @@ public class NUIBranchNode extends NUINode {
         return true;
     }
 
-    public List<NUINode> search(final String term) {
-        List<NUINode> l = new LinkedList<>();
-        if (this.getLabel().toLowerCase().equals(term.toLowerCase())) {
-            l.add(this);
-        }
-        for (NUINode n : children) {
-            l.addAll(n.search(term));
-        }
+    public void resetSearch() {
+        setSearchResult(false);
+        children.forEach((child) -> child.resetSearch());
+    }
 
-        return l;
+    @Override
+    public boolean search(String term) {
+        if (getLabel().toLowerCase().contains(term.toLowerCase())) {
+            setSearchResult(true);
+            children.forEach((child) -> child.search(term));
+         //   System.out.println(this + " was searched for " + term + "and highlighted? " + true);
+            return true;
+        }
+        else {
+            setSearchResult(false);
+            boolean returnvalue = false;
+            for(NUINode n : children){
+                if(n.search(term)) { returnvalue = true; }
+            }
+           // System.out.println(this + ", a BranchNode was searched for '" + term + "' and highlighted? " + returnvalue);
+            return returnvalue;
+        }
     }
 
     /**

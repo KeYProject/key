@@ -1,12 +1,14 @@
 package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
+
 import java.net.URL;
 import java.util.Collections;
-import java.util.LinkedList;
+
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.WeakHashMap;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.NUI;
@@ -19,8 +21,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TreeView;
@@ -64,12 +65,6 @@ public class TreeViewController implements Initializable {
     private SearchHelper searchHelper = null;
 
     /**
-     * An ObservableList storing the Items matching a <tt/>search()<tt/>.
-     */
-    private final ObservableList<NUINode> searchMatches = FXCollections
-            .observableList(new LinkedList<>());
-
-    /**
      * The visualizer for displaying a proof tree.
      */
     private ProofTreeVisualizer visualizer;
@@ -95,8 +90,7 @@ public class TreeViewController implements Initializable {
                     searchHelper.performFocusRequest();
                 }
                 else {
-                    searchHelper = new SearchHelper(proofTreeView, proofTreeCells, mainVBox,
-                            searchMatches);
+                    searchHelper = new SearchHelper(proofTreeView, proofTreeCells, mainVBox);
                 }
             });
 
@@ -110,7 +104,7 @@ public class TreeViewController implements Initializable {
 
         // set cell factory for rendering cells
         proofTreeView.setCellFactory((treeItem) -> {
-            ProofTreeCell c = new ProofTreeCell(icf, searchMatches);
+            ProofTreeCell c = new ProofTreeCell(icf);
             Platform.runLater(() -> registerTreeCell(c));
             return c;
         });
@@ -146,7 +140,6 @@ public class TreeViewController implements Initializable {
             searchHelper.destructor();
             searchHelper = null;
         }
-        searchMatches.clear();
     }
 
     /**
@@ -158,9 +151,12 @@ public class TreeViewController implements Initializable {
      * @return The loaded proof.
      */
     public final void loadExampleProof() {
+        if (searchHelper != null) {
+            searchHelper.destructor();
+            searchHelper = null;
+        }
         File proofFile = new File("resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof");
         loadAndDisplayProof(proofFile);
-        searchMatches.clear();
     }
 
     /**
@@ -187,7 +183,8 @@ public class TreeViewController implements Initializable {
     /**
      * This method should be called every time a new TreeCell is being created.
      * <tt>this</tt> will reference the ProofTreeCell in a WeakHandle in order
-     * to find out which TreeItems currently are visible to the user.
+     * to find out which TreeItems currently are visible to the user. This is
+     * needed because TreeView does not provide something like getTreeCells
      *
      * @param treeCell
      *            the ProofTreeCell to register.
