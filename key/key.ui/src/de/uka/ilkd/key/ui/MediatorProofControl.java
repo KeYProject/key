@@ -9,12 +9,16 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.ProofMacroWorker;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProverTaskListener;
@@ -194,5 +198,18 @@ public class MediatorProofControl extends AbstractProofControl {
            return applyStrategy.start(proof, goals, ui.getMediator().getMaxAutomaticSteps(),
                  ui.getMediator().getAutomaticApplicationTimeout(), stopMode);
        }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc) {
+      KeYMediator mediator = ui.getMediator();
+      final ProofMacroWorker worker = new ProofMacroWorker(node, macro, mediator, posInOcc);
+      mediator.stopInterface(true);
+      mediator.setInteractive(false);
+      mediator.addInterruptedListener(worker);
+      worker.execute();
    }
 }

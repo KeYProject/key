@@ -21,7 +21,6 @@ import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
-import de.uka.ilkd.key.gui.ProofMacroWorker;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -58,11 +57,7 @@ public class MacroKeyBinding extends AbstractAction {
         }
 
         PosInOccurrence posInOcc = mousePos.getPosInOccurrence();
-        final ProofMacroWorker worker = new ProofMacroWorker(macro, mediator, posInOcc);
-        mediator.stopInterface(true);
-        mediator.setInteractive(false);
-        mediator.addInterruptedListener(worker);
-        worker.execute();
+        mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, posInOcc);
     }
 
     public static void registerMacroKeyBindings(KeYMediator mediator, SequentView sequentView, JComponent comp) {

@@ -167,11 +167,7 @@ public class ProofMacroMenu extends JMenu {
                 if (mediator.isInAutoMode()) {
                     return;
                 }
-                final ProofMacroWorker worker = new ProofMacroWorker(macro, mediator, posInOcc);
-                mediator.stopInterface(true);
-                mediator.setInteractive(false);
-                mediator.addInterruptedListener(worker);
-                worker.execute();
+                mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, posInOcc);
             }
         });
 

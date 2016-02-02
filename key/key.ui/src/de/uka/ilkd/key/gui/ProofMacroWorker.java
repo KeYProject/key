@@ -46,6 +46,11 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
             Boolean.parseBoolean(System.getProperty("key.macro.selectGoalAfter", "true"));
 
     /**
+     * The {@link Node} to start macro at.
+     */
+    private final Node node;
+    
+    /**
      * The macro which is to be executed
      */
     private final ProofMacro macro;
@@ -63,13 +68,15 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
     /**
      * Instantiates a new proof macro worker.
      *
+     * @param node the {@link Node} to start macro at.
      * @param macro the macro, not null
      * @param mediator the mediator, not null
      * @param posInOcc the position, possibly null
      */
-    public ProofMacroWorker(ProofMacro macro, KeYMediator mediator, PosInOccurrence posInOcc) {
+    public ProofMacroWorker(Node node, ProofMacro macro, KeYMediator mediator, PosInOccurrence posInOcc) {
         assert macro != null;
         assert mediator != null;
+        this.node = node;
         this.macro = macro;
         this.mediator = mediator;
         this.posInOcc = posInOcc;
@@ -78,14 +85,13 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
     @Override
     protected Void doInBackground() throws Exception {
         final ProverTaskListener ptl = mediator.getUI();
-        Node selectedNode = mediator.getSelectedNode();
-        Proof selectedProof = selectedNode.proof();
+        Proof selectedProof = node.proof();
         TaskFinishedInfo info =
                 ProofMacroFinishedInfo.getDefaultInfo(macro, selectedProof);
         ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
         try {
             synchronized(macro) {
-                info = macro.applyTo(mediator.getUI(), selectedNode, posInOcc, ptl);
+                info = macro.applyTo(mediator.getUI(), node, posInOcc, ptl);
             }
         } catch (final InterruptedException exception) {
             Debug.out("Proof macro has been interrupted:");
