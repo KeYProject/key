@@ -24,13 +24,13 @@ public class NUIBranchNodeTests {
         try {
             environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null,
                     null, null, true);
+            Proof proof = environment.getLoadedProof();
+            ptVisualizer.loadProofTree(proof);
         }
         catch (ProblemLoaderException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        Proof proof = environment.getLoadedProof();
-        ptVisualizer.loadProofTree(proof);
     }
 
     @Test
