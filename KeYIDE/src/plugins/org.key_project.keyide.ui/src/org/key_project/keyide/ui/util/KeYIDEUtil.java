@@ -65,6 +65,8 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
 /**
  * Provides utility method for the KeYIDE.
@@ -96,7 +98,7 @@ public final class KeYIDEUtil {
                        try {
                           SWTUtil.checkCanceled(monitor);
                           monitor.beginTask("Loading Proof Environment", IProgressMonitor.UNKNOWN);
-                          final KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, classPaths, bootClassPath, includes, EclipseUserInterfaceCustomization.getInstance());
+                          final KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(false), location, classPaths, bootClassPath, includes, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), EclipseUserInterfaceCustomization.getInstance(), true);
                           if (environment.getInitConfig() != null) {
                              // Get method to proof in KeY
                              final IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getJavaInfo());
