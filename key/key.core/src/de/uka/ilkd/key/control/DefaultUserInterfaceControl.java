@@ -41,7 +41,7 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
     * Constructor.
     */
    public DefaultUserInterfaceControl() {
-      proofControl = new DefaultProofControl(this);
+      proofControl = new DefaultProofControl(this, this);
    }
 
    /**
@@ -49,7 +49,7 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
     * @param customization An optional {@link RuleCompletionHandler}.
     */
    public DefaultUserInterfaceControl(RuleCompletionHandler customization) {
-      proofControl = new DefaultProofControl(this, customization);
+      proofControl = new DefaultProofControl(this, this, customization);
    }
    
    /**
