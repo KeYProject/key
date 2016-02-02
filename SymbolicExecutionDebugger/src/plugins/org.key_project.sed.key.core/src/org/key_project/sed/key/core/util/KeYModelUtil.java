@@ -13,6 +13,7 @@
 
 package org.key_project.sed.key.core.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -102,19 +103,19 @@ public final class KeYModelUtil {
          IKeYSENode<?>[] oldChildren, IExecutionNode<?>[] executionChildren)
          throws DebugException {
       assert (executionChildren != null);
-      if (executionChildren.length == 0) {
-         return new IKeYSENode<?>[0];
-      }
-      else {
-         IKeYSENode<?>[] result = new IKeYSENode<?>[executionChildren.length];
-         // Add old children
-         System.arraycopy(oldChildren, 0, result, 0, oldChildren.length);
-         // Create new children
-         for (int i = oldChildren.length; i < executionChildren.length; i++) {
+      IKeYSENode<?>[] result = new IKeYSENode<?>[executionChildren.length];
+      for (int i = 0; i < executionChildren.length; i++) {
+         for (int old = 0; old < oldChildren.length; old ++) {
+            if (executionChildren[i].equals(oldChildren[old])) { // maybe == instead of equals
+               result[i] = oldChildren[old];
+               break;
+            }
+         }
+         if (result[i] == null) {
             result[i] = createChild(parent, executionChildren[i]);
          }
-         return result;
       }
+      return result;
    }
    
    /**

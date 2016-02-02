@@ -474,7 +474,13 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
          return null;
       }
    }
-   
+   /**
+    * Removes the given child.
+    * @param child The child to be removed.
+    */
+   public void removeChild(IExecutionNode<?> child) {
+      children.remove(child);
+   }
    /**
     * Removes all children.
     */
