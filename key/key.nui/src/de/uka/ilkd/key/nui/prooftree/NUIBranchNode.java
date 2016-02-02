@@ -16,7 +16,7 @@ public class NUIBranchNode extends NUINode {
     /**
      * A list of children of the branch node.
      */
-    private final List<NUINode> children;
+    private final List<NUINode> children = new LinkedList<>();
 
     /**
      * The parent node of the branch node.
@@ -31,9 +31,8 @@ public class NUIBranchNode extends NUINode {
      */
     public NUIBranchNode(final de.uka.ilkd.key.proof.Node proofParentNode) {
         super();
-
         this.proofParentNode = proofParentNode;
-        children = new LinkedList<NUINode>();
+
     }
 
     /**
@@ -44,6 +43,14 @@ public class NUIBranchNode extends NUINode {
      */
     public final void addChild(final NUINode child) {
         this.children.add(child);
+    }
+    
+    @Override
+    public List<NUINode> asList(){
+        List<NUINode> l = new LinkedList<>();
+        l.add(this);
+        children.forEach((child) -> l.addAll(child.asList()));
+        return l;
     }
 
     /**
@@ -78,16 +85,30 @@ public class NUIBranchNode extends NUINode {
         return true;
     }
 
-    public List<NUINode> search(final String term) {
-        List<NUINode> l = new LinkedList<>();
-        if (this.getLabel().toLowerCase().equals(term.toLowerCase())) {
-            l.add(this);
-        }
-        for (NUINode n : children) {
-            l.addAll(n.search(term));
-        }
+    public void resetSearch() {
+        setSearchResult(false);
+        children.forEach((child) -> child.resetSearch());
+    }
 
-        return l;
+    @Override
+    public boolean search(String term) {
+        if(term.isEmpty()) return false;
+        
+        if (getLabel().toLowerCase().contains(term.toLowerCase())) {
+            setSearchResult(true);
+            children.forEach((child) -> child.search(term));
+         //   System.out.println(this + " was searched for " + term + "and highlighted? " + true);
+            return true;
+        }
+        else {
+            setSearchResult(false);
+            boolean returnvalue = false;
+            for(NUINode n : children){
+                if(n.search(term)) { returnvalue = true; }
+            }
+           // System.out.println(this + ", a BranchNode was searched for '" + term + "' and highlighted? " + returnvalue);
+            return returnvalue;
+        }
     }
 
     /**

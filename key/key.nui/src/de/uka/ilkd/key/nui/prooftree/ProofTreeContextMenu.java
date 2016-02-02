@@ -17,12 +17,6 @@ import javafx.scene.control.TreeView;
 public class ProofTreeContextMenu extends ContextMenu {
 
     /**
-     * The tree node the context menu is for.
-     */
-    @SuppressWarnings("unused")
-	private final NUINode node;
-
-    /**
      * The treeItem of node.
      */
     private final TreeItem<NUINode> treeItem;
@@ -37,11 +31,30 @@ public class ProofTreeContextMenu extends ContextMenu {
      */
     private final IconFactory icf;
     
-    private static final String lblExpandAll = "Expand All";
-    private static final String lblExpandBelow = "Expand Below";
-    private static final String lblCollapseAll = "Collapse All";
-    private static final String lblCollapseBelow = "Collapse Below";
-    private static final String lblSearch = "Search";
+    /**
+     * The label of the context menu "expand all" label.
+     */
+    private static final String LBL_EXPAND_ALL = "Expand All";
+    
+    /**
+     * The label of the context menu "expand below" label.
+     */
+    private static final String LBL_EXPAND_BELOW = "Expand Below";
+    
+    /**
+     * The label of the context menu "collapse all" label.
+     */
+    private static final String LBL_COLLAPSE_ALL = "Collapse All";
+    
+    /**
+     * The label of the context menu "collapse below" label.
+     */
+    private static final String LBL_COLLAPSE_BELOW = "Collapse Below";
+    
+    /**
+     * The label of the context menu "search" label.
+     */
+    private static final String LBL_SEARCH = "Search";
 
     /**
      * The constructor.
@@ -57,7 +70,6 @@ public class ProofTreeContextMenu extends ContextMenu {
     	super();
     	
     	this.treeItem = treeItem;
-        this.node = treeItem.getValue();
         this.treeView = treeView;
         
         this.icf = icf;
@@ -101,10 +113,10 @@ public class ProofTreeContextMenu extends ContextMenu {
      * Adds the entry ExpandAll to the context menu.
      */
     private void addMenuItemExpandAll() {
-        final MenuItem miExpandAll = new MenuItem(lblExpandAll);
+        final MenuItem miExpandAll = new MenuItem(LBL_EXPAND_ALL);
         miExpandAll.setGraphic(icf.getImage(IconFactory.EXPAND));
         getItems().add(miExpandAll);
-        miExpandAll.setOnAction(t -> ProofTreeActions.expandAll(
+        miExpandAll.setOnAction(aEvt -> ProofTreeActions.expandAll(
                 treeView.getRoot()));
     }
     
@@ -112,19 +124,19 @@ public class ProofTreeContextMenu extends ContextMenu {
      * Adds the entry ExpandAll to the context menu.
      */
     private void addMenuItemExpandBelow() {
-        final MenuItem miExpand = new MenuItem(lblExpandBelow);
+        final MenuItem miExpand = new MenuItem(LBL_EXPAND_BELOW);
         getItems().add(miExpand);
-        miExpand.setOnAction(t -> ProofTreeActions.expandBelow(treeItem));
+        miExpand.setOnAction(aEvt -> ProofTreeActions.expandBelow(treeItem));
     }
     
     /**
      * Adds the entry ExpandAll to the context menu.
      */
     private void addMenuItemCollapseAll() {
-        final MenuItem miCollapseAll = new MenuItem(lblCollapseAll);
+        final MenuItem miCollapseAll = new MenuItem(LBL_COLLAPSE_ALL);
         miCollapseAll.setGraphic(icf.getImage(IconFactory.COLLAPSE));
         getItems().add(miCollapseAll);
-        miCollapseAll.setOnAction(t -> ProofTreeActions.collapseAll(
+        miCollapseAll.setOnAction(aEvt -> ProofTreeActions.collapseAll(
                 treeView.getRoot()));
     }
 
@@ -132,19 +144,20 @@ public class ProofTreeContextMenu extends ContextMenu {
      * Adds the entry ExpandAll to the context menu.
      */
     private void addMenuItemCollapseBelow() {
-        final MenuItem miCollapse = new MenuItem(lblCollapseBelow);
+        final MenuItem miCollapse = new MenuItem(LBL_COLLAPSE_BELOW);
         getItems().add(miCollapse);
-        miCollapse.setOnAction(t -> ProofTreeActions.collapseBelow(treeItem));
+        miCollapse.setOnAction(aEvt -> ProofTreeActions.collapseBelow(treeItem));
     }
 
     /**
      * Adds the entry Search to the context menu.
      */
     private void addMenuItemSearch() {
-    	final MenuItem mISearch = new MenuItem(lblSearch);
+    	final MenuItem mISearch = new MenuItem(LBL_SEARCH);
     	getItems().add(mISearch);
     	mISearch.setGraphic(icf.getImage(IconFactory.SEARCH));
-    	mISearch.setOnAction(t -> ProofTreeActions.openSearchView());
+    	mISearch.setOnAction(aEvt -> ProofTreeActions.openSearchView());
+    	
     }
 
 }

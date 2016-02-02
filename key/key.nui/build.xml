@@ -20,7 +20,7 @@
 		<pathelement location="${basedir}/ant-lib/junit/junit-4.12.jar" />
 		<pathelement location="${basedir}/testfx-4/testfx-core-4.0.2-SNAPSHOT.jar"/>
 		<pathelement location="${basedir}/testfx-4/testfx-legacy-4.0.2-SNAPSHOT.jar"/>
-		<pathelement location="${basedir}/testfx-4/testfx-junit-4.0.2-SNAPSHOT.jar"/>
+		<pathelement location="${basedir}/testfx-4/testfx-junit-4.0.2-SNAPSHOT.jar"/> 
 		<pathelement location="${basedir}/testfx-4/guava-18.0.jar"/>
 		<pathelement location="${basedir}/ant-lib/junit/hamcrest-core-1.3.jar"/>
 	</path>
@@ -105,19 +105,27 @@
 
 	<!-- Definition of target FINDBUGS -->
 	<target name="findbugs" description="Generates FindBugs Report.">
-		<findbugs home="${basedir}/ant-lib/findbugs" output="xml" outputFile="${basedir}/reports/findBugs_${time.stamp}.xml">
+		<findbugs home="${basedir}/ant-lib/findbugs" output="xml" outputFile="${basedir}/reports/findBugs.xml">
 			<class location="${basedir}/bin" />
 			<auxClasspath path="${basedir}/testfx-4/" />
 			<auxClasspath path="${basedir}/ant-lib/" />
 		</findbugs>
+      <xslt in="${basedir}/reports/findBugs.xml"
+             style="${basedir}/reports-templates/findbugs/plain.xsl"
+             out="${basedir}/reports/findBugs.html"
+       />
 	</target>
 
 	<!-- Definition of target CHECKSTYLE -->
 	<target name="checkstyle" description="Generates Checkstyle Report.">
 		<checkstyle config="${basedir}/config/checkstyle/bp_checks.xml" classpath="${basedir}/ant-lib/checkstyle/checkstyle-6.14.1-all.jar">
 			<fileset dir="${basedir}/src" includes="**/*.java" />
-			<formatter type="xml" tofile="${basedir}/reports/checkstyle_${time.stamp}.xml" />
+			<formatter type="xml" tofile="${basedir}/reports/checkstyle.xml" />
 		</checkstyle>
+	   <xslt in="${basedir}/reports/checkstyle.xml"
+	               out="${basedir}/reports/checkstyle.html"
+	               style="${basedir}/reports-templates/checkstyle/checkstyle-noframes.xsl"
+	        />
 	</target>
 
 	<!-- Definition of target PMD -->
@@ -126,13 +134,17 @@
 			<sourceLanguage name="java" version="1.8" />
 			<ruleset>rulesets/java/design.xml</ruleset>
 			<ruleset>java-basic</ruleset>
-			<formatter type="xml" toFile="${basedir}/reports/pmd_${time.stamp}.xml" toConsole="true">
+			<formatter type="xml" toFile="${basedir}/reports/pmd.xml" toConsole="true">
 				<param name="linkPrefix" value="http://pmd.sourceforge.net/xref/" />
 			</formatter>
 			<fileset dir="${basedir}/src/">
 				<include name="**/*.java" />
 			</fileset>
 		</pmd>
+	   <xslt in="${basedir}/reports/pmd.xml"
+	              style="${basedir}/reports-templates/pmd/pmd-report-per-class.xslt"
+	              out="${basedir}/reports/pmd.html"
+	        />
 	</target>
 	
 	<!-- Definition of target JUnit -->

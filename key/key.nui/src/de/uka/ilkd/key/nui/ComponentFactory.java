@@ -80,7 +80,7 @@ public final class ComponentFactory {
 	 * 
 	 * @return the single instance of <tt>this</tt>
 	 */
-	public static ComponentFactory getInstance() {
+	public static synchronized ComponentFactory getInstance() {
 		if (instance == null) {
 			instance = new ComponentFactory();
 		}

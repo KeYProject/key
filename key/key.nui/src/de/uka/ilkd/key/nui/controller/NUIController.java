@@ -48,27 +48,13 @@ public class NUIController implements Initializable {
      */
     private static NUIController instance;
 
-    /**
-     * Implements the Singleton pattern.
-     * 
-     * @return the single instance of <tt>this</tt>
-     */
-    public static synchronized NUIController getInstance() {
-        if (instance == null) {
-            instance = new NUIController();
-            return instance;
-        }
-        else {
-            return instance;
-        }
-    }
-
     // Definition of GUI fields
     @FXML
     private HBox bottom;
 
     @FXML
     private ContextMenu contextMenu;
+
     /**
      * Stores the KeyEventHandlers (registered here using registerKeyListener)
      */
@@ -95,9 +81,23 @@ public class NUIController implements Initializable {
     private ToggleGroup toggleGroup1;
     @FXML
     private ToggleGroup toggleGroup2;
-
     @FXML
     private ToggleGroup toggleGroup3;
+
+    /**
+     * Implements the Singleton pattern.
+     * 
+     * @return the single instance of <tt>this</tt>
+     */
+    public static synchronized NUIController getInstance() {
+        if (instance == null) {
+            instance = new NUIController();
+            return instance;
+        }
+        else {
+            return instance;
+        }
+    }
 
     /**
      * This is the primary function used by everyone to create, move or hide

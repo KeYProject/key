@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.nui.prooftree;
 
 import de.uka.ilkd.key.nui.IconFactory;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeCell;
@@ -33,16 +33,31 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     private final IconFactory icf;
 
     /**
-     * The label that will be displayed.
-     */
-    private Label label;
-
-    /**
      * The icon that will be displayed left next to the label.
      */
     private ImageView icon;
 
-    private final BooleanBinding matchesSearch;
+    /**
+     * The label that will be displayed.
+     */
+    private Label label;
+
+    private final ChangeListener<Boolean> searchResultListener = new ChangeListener<Boolean>() {
+        @Override
+        public void changed(ObservableValue<? extends Boolean> observable, Boolean didMatchSearch,
+                Boolean nowMatchesSearch) {
+            final ObservableList<String> styles = getStyleClass();
+            final String cssClassHighlight = ProofTreeStyle.CSS_NODE_HIGHLIGHT;
+            if (nowMatchesSearch && !styles.contains(cssClassHighlight)) {
+
+                styles.add(cssClassHighlight);
+
+            }
+            if (nowMatchesSearch) {
+                styles.remove(cssClassHighlight);
+            }
+        }
+    };
 
     /**
      * The constructor of the ProofTreeCell.
@@ -50,29 +65,66 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      * @param icf
      *            the icon factory used to display node icons
      */
-    public ProofTreeCell(final IconFactory icf, ObservableList<NUINode> searchMatches) {
+    public ProofTreeCell(final IconFactory icf) {
         super();
         this.icf = icf;
+    }
 
-        matchesSearch = Bindings.createBooleanBinding(() -> {
-            if (getTreeItem() == null) {
-                return false;
-            }
-            else
-                return searchMatches.contains(getTreeItem().getValue());
-        } , treeItemProperty(), searchMatches);
+    /**
+     * Decorates the cell as BranchNode by modifying label and icon Assigns CSS
+     * style classes and icon images.
+     */
+    private void decorateAsBranchNode() {
+        label.getStyleClass().add(ProofTreeStyle.CSS_NODE_BRANCH);
+        if (getItem().isClosed()) {
+            label.getStyleClass().add(ProofTreeStyle.CSS_NODE_CLOSED);
+            setIcon(icf.getImage(IconFactory.BRANCH_CLOSED));
+        }
+        else if (getItem().isLinked()) {
+            label.getStyleClass().add(ProofTreeStyle.CSS_NODE_LINKED);
+            setIcon(icf.getImage(IconFactory.BRANCH_LINKED));
+        }
+        else {
+            label.getStyleClass().add(ProofTreeStyle.CSS_NODE_OPEN);
+            setIcon(icf.getImage(IconFactory.BRANCH_OPEN));
+        }
+    }
 
-        matchesSearch.addListener((obs, didMatchSearch, nowMatchesSearch) -> {
-            ObservableList<String> l = getStyleClass();
-            String s = ProofTreeStyle.CSS_NODE_HIGHLIGHT;
-            if (nowMatchesSearch) {
-                if (!l.contains(s))
-                    l.add(s);
-            }
-            else {
-                l.remove(s);
-            }
-        });
+    /**
+     * Decorates the cell as InnerNode by modifying label and icon Assigns CSS
+     * style classes and icon images.
+     */
+    private void decorateAsInnerNode() {
+        if (getItem().isInteractive()) {
+            setIcon(icf.getImage(IconFactory.INODE_INTERACTIVE));
+        }
+    }
+
+    /**
+     * Decorates the cell as LeafNode by modifying label and icon Assigns CSS
+     * style classes and icon images.
+     */
+    private void decorateAsLeafNode() {
+        label.getStyleClass().add(ProofTreeStyle.CSS_NODE_LEAF);
+        // leaf node is a closed goal
+        if (getItem().isClosed()) {
+            setIcon(icf.getImage(IconFactory.LEAF_CLOSED));
+            label.getStyleClass().add(ProofTreeStyle.CSS_NODE_CLOSED);
+        }
+        else if (getItem().isLinked()) {
+            setIcon(icf.getImage(IconFactory.LEAF_LINKED));
+            label.getStyleClass().add(ProofTreeStyle.CSS_NODE_LINKED);
+        }
+        // leaf node is an interactive node
+        else if (getItem().isInteractive()) {
+            setIcon(icf.getImage(IconFactory.LEAF_INTERACTIVE));
+            label.getStyleClass().add(ProofTreeStyle.CSS_NODE_INTERACTIVE);
+        }
+        // else: leaf node must be an open goal
+        else {
+            setIcon(icf.getImage(IconFactory.LEAF_OPEN));
+            label.getStyleClass().add(ProofTreeStyle.CSS_NODE_OPEN);
+        }
     }
 
     /**
@@ -88,7 +140,28 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      */
     @Override
     protected final void updateItem(final NUINode item, final boolean empty) {
+
+        if (getItem() != null) {
+            getItem().removeSearchResultListener(searchResultListener);
+        }
+
         super.updateItem(item, empty);
+
+        if (item == null) {
+            getStyleClass().remove(ProofTreeStyle.CSS_NODE_HIGHLIGHT);
+
+        }
+        else {
+            item.addSearchResultListener(searchResultListener);
+            if (item.isSearchResult()) {
+                if (!getStyleClass().contains(ProofTreeStyle.CSS_NODE_HIGHLIGHT)) {
+                    getStyleClass().add(ProofTreeStyle.CSS_NODE_HIGHLIGHT);
+                }
+            }
+            else {
+                getStyleClass().remove(ProofTreeStyle.CSS_NODE_HIGHLIGHT);
+            }
+        }
 
         // if null node, display nothing
         if (empty || item == null) {
@@ -104,11 +177,14 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         icon = null;
 
         // set decoration (style, icon)
-        if (item instanceof NUIInnerNode) {
-            decorateAsInnerNode();
+        if (item instanceof NUILeafNode) {
+            decorateAsLeafNode();
         }
         else if (item instanceof NUIBranchNode) {
             decorateAsBranchNode();
+        }
+        else {
+            decorateAsInnerNode();
         }
 
         // workaround to display an icon next to a label
@@ -126,34 +202,6 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 
             hbox.getChildren().addAll(iconLabel, label);
             setGraphic(hbox);
-        }
-    }
-
-    /**
-     * Decorates the cell as InnerNode by modifying label and icon Assigns CSS
-     * style classes and icon images.
-     */
-    private void decorateAsInnerNode() {
-        if (getItem().isInteractive()) {
-            setIcon(icf.getImage(IconFactory.INODE_INTERACTIVE));
-        }
-    }
-
-    /**
-     * Decorates the cell as BranchNode by modifying label and icon Assigns CSS
-     * style classes and icon images.
-     */
-    private void decorateAsBranchNode() {
-        label.getStyleClass().add(ProofTreeStyle.CSS_NODE_BRANCH);
-        if (getItem().isClosed()) {
-            label.getStyleClass().add(ProofTreeStyle.CSS_NODE_CLOSED);
-            setIcon(icf.getImage(IconFactory.BRANCH_CLOSED));
-        }
-        else if (getItem().isLinked()) {
-            setIcon(icf.getImage(IconFactory.BRANCH_LINKED));
-        }
-        else {
-            setIcon(icf.getImage(IconFactory.BRANCH_OPEN));
         }
     }
 }

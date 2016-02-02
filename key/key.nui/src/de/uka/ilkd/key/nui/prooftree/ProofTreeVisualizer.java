@@ -21,7 +21,7 @@ public class ProofTreeVisualizer {
     /**
      * The label used for the root.
      */
-    private final String rootLabel = "Proof Tree";
+    private static final String LBL_ROOT = "Proof Tree";
 	
 	/**
 	 * The fx tree view for displaying the NUI tree.
@@ -40,7 +40,7 @@ public class ProofTreeVisualizer {
 
 	/**
 	 * Creates a new TreeConverter object.
-	 * 
+	 *
 	 * @param proofTreeView
 	 * 			The reference to the TreeView<NUINode> object on the GUI
 	 */
@@ -50,7 +50,7 @@ public class ProofTreeVisualizer {
 
 	/**
 	 * Adds a CSS stylesheet given by its path to the tree.
-	 * 
+	 *
 	 * @param path
 	 * 			The path of the stylesheet to add
 	 */
@@ -82,7 +82,7 @@ public class ProofTreeVisualizer {
 	 * loads a proof tree by converting it to a NUITree which 
 	 * is used as an intermediate representation 
 	 * (decorated abstract tree).
-	 * 
+	 *
 	 * @param proof The proof tree to load
 	 */
 	public final void loadProofTree(final Proof proof) {
@@ -92,8 +92,7 @@ public class ProofTreeVisualizer {
 		// assign the appropriate label
 		nuiRoot = new NUIBranchNode(pRoot);
 		assignNUIFields(pRoot, pRoot.proof(), nuiRoot);
-		String label = rootLabel;
-		nuiRoot.setLabel(label);
+		nuiRoot.setLabel(LBL_ROOT);
 		
 		// reset linked leafs
 		linkedLeafs = new LinkedList<NUINode>();
@@ -102,7 +101,7 @@ public class ProofTreeVisualizer {
 		addProofTreeToNUITree(pRoot, nuiRoot);
 		
 		// set linked leafs
-		for(NUINode linkedLeaf : linkedLeafs) {
+		for (final NUINode linkedLeaf : linkedLeafs) {
 		    setNUINodeLinkedTrue(linkedLeaf);
 		}
 	}
@@ -228,13 +227,13 @@ public class ProofTreeVisualizer {
 		
 		// propagate linked information to parent
 		final NUINode parent = newNode.getParent();
-		if (parent != null && parent instanceof NUIBranchNode) {
-		    final NUIBranchNode parentBranch = (NUIBranchNode) parent;
-		    if (parentBranch.hasOnlyLinkedBranchChildren()) {
-		        // if parent has only linked branch children, mark as linked.
-		        setNUINodeLinkedTrue(parentBranch);
-		    }
-		}
+        if (parent != null && parent instanceof NUIBranchNode) {
+            final NUIBranchNode parentBranch = (NUIBranchNode) parent;
+            if (parentBranch.hasOnlyLinkedBranchChildren()) {
+                // if parent has only linked branch children, mark as linked.
+                setNUINodeLinkedTrue(parentBranch);
+            }
+        }
 	}
 
 	/**
@@ -277,7 +276,7 @@ public class ProofTreeVisualizer {
 	 * 
 	 * @return the NUIBranchNode (root) of the tree.
 	 */
-	public NUIBranchNode getRootNode() {
+	public final NUIBranchNode getRootNode() {
 	    return this.nuiRoot;
 	}
 }
