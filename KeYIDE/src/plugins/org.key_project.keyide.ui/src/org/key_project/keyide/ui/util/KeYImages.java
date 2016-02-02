@@ -162,6 +162,11 @@ public final class KeYImages {
    public static final String STATEMENT = "org.key_project.keyide.ui.images.statement";
    
    /**
+    * The key for the image that is used for threads.
+    */
+   public static final String THREAD = "org.key_project.keyide.ui.images.thread";
+   
+   /**
     * Forbid instances.
     */
    private KeYImages(){
@@ -273,7 +278,10 @@ public final class KeYImages {
           path = "icons/SEDIcons/exceptional_termination_not_verified.gif";
        }
        else if (STATEMENT.equals(key)) {
-       	path = "icons/SEDIcons/statement.gif";
+       	  path = "icons/SEDIcons/statement.gif";
+       }
+       else if (THREAD.equals(key)) {
+    	  path = "icons/SEDIcons/thread.gif";
        }
        // Load image if possible
        if (path != null) {

@@ -234,11 +234,9 @@ public class ProofTreeLabelProvider extends LabelProvider {
       if (element instanceof Node) {
          Node node = (Node) element;
          IExecutionNode<?> exeNode;
-         if (node.isClosed()) {
-            return KeYImages.getImage(KeYImages.NODE_PROVED);
-         } else if ((exeNode = symExeTreeBuilder.getExecutionNode(node)) != null) {
+         if ((exeNode = symExeTreeBuilder.getExecutionNode(node)) != null) {
         	 if (exeNode instanceof IExecutionStart) {
-        		 return KeYImages.getImage(KeYImages.NODE);
+        		 return KeYImages.getImage(KeYImages.THREAD);
         	 } else if (exeNode instanceof IExecutionStatement) {
         		 return KeYImages.getImage(KeYImages.STATEMENT);
         		 
@@ -311,6 +309,8 @@ public class ProofTreeLabelProvider extends LabelProvider {
         		 return KeYImages.getImage(KeYImages.NODE);
         	 }
         	 
+         } else if (node.isClosed()) {
+        	 return KeYImages.getImage(KeYImages.NODE_PROVED);
          } else {
             if (node.getNodeInfo().getInteractiveRuleApplication()) {
                return KeYImages.getImage(KeYImages.NODE_INTERACTIVE);
