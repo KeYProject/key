@@ -95,6 +95,7 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ProofUserManager;
@@ -405,14 +406,14 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
                File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(eclipseFile.getProject());
                List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(eclipseFile.getProject());
                List<File> includes = KeYResourceProperties.getKeYIncludes(eclipseFile.getProject());
-               this.environment = KeYEnvironment.load(null, 
+               this.environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(false), 
                                                       file, 
                                                       classPaths, 
                                                       bootClassPath, 
                                                       includes, 
                                                       SymbolicExecutionTreeBuilder.createPoPropertiesToForce(),
                                                       EclipseUserInterfaceCustomization.getInstance(),
-                                                      false);
+                                                      true);
                Assert.isTrue(getEnvironment().getLoadedProof() != null, "No proof loaded.");
                this.currentProof = getEnvironment().getLoadedProof();
             }

@@ -15,6 +15,7 @@ import org.key_project.sed.key.evaluation.server.random.ReviewingCodeRandomFormO
 import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemptsRandomFormOrderComputer;
 import org.key_project.sed.key.evaluation.server.report.HTMLReportEngine;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IOUtil;
 
 /**
  * The server which runs forever and listens for client connections.
@@ -87,7 +88,7 @@ public class SEDServer {
    public static void createReports() throws Exception {
       System.out.println("Creating reports...");
       for (AbstractEvaluation evaluation: AbstractEvaluation.getEvaluations()) {
-         File target = new File(FileStorage.FORM_STORAGE_LOCATION, evaluation.getName() + ".html");
+         File target = new File(FileStorage.FORM_STORAGE_LOCATION, IOUtil.validateOSIndependentFileName(evaluation.getName()) + ".html");
          HTMLReportEngine engine = new HTMLReportEngine(FileStorage.FORM_STORAGE_LOCATION);
          if (engine.saveReport(evaluation, target)) {
             System.out.println("Report created: " + target.getAbsolutePath());

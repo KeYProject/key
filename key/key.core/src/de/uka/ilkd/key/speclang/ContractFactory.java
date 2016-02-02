@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -492,12 +493,17 @@ public class ContractFactory {
                     Term m2 = other.getMod(h, t.originalSelfVar,
                             t.originalParamVars,
                             services);
+                    Function emptyMod = services.getTypeConverter().getLocSetLDT().getEmpty();
                     if (m1 != null || m2 != null) {
                         Term nm;
                         if (m1 == null) {
                             nm = m2;
                         } else if (m2 == null) {
                             nm = m1;
+                        } else if (m1.op().equals(emptyMod) && m2.op().equals(emptyMod)) {
+                        	// special case for both contracts being (weakly) pure
+                        	// fixes bug #1557
+                        	nm = m1;
                         } else {
                             Term ownPre = pres.get(h) != null ? pres.get(h) : tb.tt();
                             nm = tb.intersect(tb.ife(ownPre, m1, tb.allLocs()),

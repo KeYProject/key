@@ -65,7 +65,7 @@ public class Node  {
     private boolean              closed              = false;
 
     /** contains non-logical content, used for user feedback */
-    private final NodeInfo             nodeInfo;
+    private NodeInfo             nodeInfo;
 
     private final int                  serialNr;
 
@@ -150,6 +150,10 @@ public class Node  {
 
     public void clearNameCache() {
         cachedName = null;
+    }
+
+    void clearNodeInfo() {
+        this.nodeInfo = new NodeInfo(this);
     }
 
     public NameRecorder getNameRecorder() {

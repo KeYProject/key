@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
@@ -56,8 +55,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.impl.AbstractSEDebugTarget;
 import org.key_project.sed.core.slicing.ISESlicer;
 import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
@@ -77,8 +76,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -149,45 +146,6 @@ public class KeYDebugTarget extends AbstractSEDebugTarget {
          handleProofDisposed(e);
       }
    };
-   private final ProofTreeListener proofChangedListener = new ProofTreeListener() {
-      @Override
-      public void proofExpanded(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void proofIsBeingPruned(ProofTreeEvent e) { 
-      }
-
-      @Override
-      public void proofPruned(ProofTreeEvent e) {
-        handleProofPruned(e);  
-      }
-
-      @Override
-      public void proofStructureChanged(ProofTreeEvent e) {  
-      }
-
-      @Override
-      public void proofClosed(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void proofGoalRemoved(ProofTreeEvent e) {  
-      }
-
-      @Override
-      public void proofGoalsAdded(ProofTreeEvent e) {  
-      }
-
-      @Override
-      public void proofGoalsChanged(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void smtDataUpdate(ProofTreeEvent e) {  
-      }
-      
-   };
    
    /**
     * Constructor.
@@ -211,7 +169,6 @@ public class KeYDebugTarget extends AbstractSEDebugTarget {
       this.environment = environment;
       Proof proof = environment.getProof();
       proof.addProofDisposedListener(proofDisposedListener);
-      proof.addProofTreeListener(proofChangedListener);
       ProofUserManager.getInstance().addUser(proof, environment, this);
       // Update initial model
       setModelIdentifier(MODEL_IDENTIFIER);
@@ -663,16 +620,6 @@ public class KeYDebugTarget extends AbstractSEDebugTarget {
          }
       };
       Display.getDefault().asyncExec(run);
-   }
-   
-   /**
-    * When the proof was pruned.
-    * @param e The event.
-    */
-   protected void handleProofPruned(ProofTreeEvent e) {
-      getEnvironment().getBuilder().prune(e.getNode());
-      fireChangeEvent(DebugEvent.SUSPEND);
-      fireChangeEvent(DebugEvent.CONTENT);
    }
    
    /**

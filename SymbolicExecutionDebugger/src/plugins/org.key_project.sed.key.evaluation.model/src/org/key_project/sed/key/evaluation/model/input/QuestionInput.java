@@ -1,5 +1,7 @@
 package org.key_project.sed.key.evaluation.model.input;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -328,8 +330,10 @@ public class QuestionInput extends Bean {
                boolean correct = true;
                int i = 0;
                while (correct && i < selectedChoices.length) {
-                  if (!remainingCorrectChoices.remove(selectedChoices[i])) {
-                     correct = false;
+                  if (choiceQuestion.isChoiceCorrectnessRelevant(selectedChoices[i])) { // Skip for instance the gave up choice in the understanding proof attempts evaluation.
+                     if (!remainingCorrectChoices.remove(selectedChoices[i])) {
+                        correct = false;
+                     }
                   }
                   i++;
                }
@@ -348,7 +352,24 @@ public class QuestionInput extends Bean {
       }
    }
    
-   public Integer computeCorrectnessScore() {
+   public BigDecimal computeCorrectnessScore() {
+      Integer difference = computeCorrectWrongDifference();
+      if (difference != null) {
+         if (difference.intValue() > 0) {
+            Integer correctCount = countCorrectAnswers();
+            return new BigDecimal(difference).divide(new BigDecimal(correctCount), 2, RoundingMode.HALF_EVEN);
+         }
+         else {
+            Integer wrongCount = countWrongAnswers();
+            return new BigDecimal(difference).divide(new BigDecimal(wrongCount), 2, RoundingMode.HALF_EVEN);
+         }
+      }
+      else {
+         return null;
+      }
+   }
+   
+   public Integer computeCorrectWrongDifference() {
       if (question.isEditable()) {
          if (question instanceof TextQuestion) {
             return null; // Correctness not supported
@@ -360,11 +381,13 @@ public class QuestionInput extends Bean {
                Choice[] selectedChoices = getSelectedChoices();
                int correctCount = 0;
                for (Choice choice : selectedChoices) {
-                  if (correctChoices.contains(choice)) {
-                     correctCount++;
-                  }
-                  else {
-                     correctCount--;
+                  if (choiceQuestion.isChoiceCorrectnessRelevant(choice)) { // Skip for instance the gave up choice in the understanding proof attempts evaluation.
+                     if (correctChoices.contains(choice)) {
+                        correctCount++;
+                     }
+                     else {
+                        correctCount--;
+                     }
                   }
                }
                return correctCount;
@@ -376,6 +399,49 @@ public class QuestionInput extends Bean {
          else {
             throw new IllegalStateException("Unsupported question: " + question);
          }
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Returns the number of correct answers.
+    * @return The number of correct answers or {@code null} if not available.
+    */
+   public Integer countCorrectAnswers() {
+      if (question instanceof AbstractChoicesQuestion) {
+         AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) question;
+         Set<Choice> correctChoices = choiceQuestion.getCorrectChoices();
+         if (!CollectionUtil.isEmpty(correctChoices)) {
+            return correctChoices.size();
+         }
+         else {
+            return 0;
+         }
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Returns the number of wrong answers.
+    * @return The number of wrong answers or {@code null} if not available.
+    */
+   public Integer countWrongAnswers() {
+      if (question instanceof AbstractChoicesQuestion) {
+         AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) question;
+         Set<Choice> correctChoices = choiceQuestion.getCorrectChoices();
+         int wrongCount = 0;
+         for (Choice choice : choiceQuestion.getChoices()) {
+            if (choiceQuestion.isChoiceCorrectnessRelevant(choice)) { // Skip for instance the gave up choice in the understanding proof attempts evaluation.
+               if (!correctChoices.contains(choice)) {
+                  wrongCount++;
+               }
+            }
+         }
+         return wrongCount;
       }
       else {
          return null;
@@ -395,42 +461,52 @@ public class QuestionInput extends Bean {
    public Integer computeTrustScore() {
       if (trust != null) {
          Boolean correct = checkCorrectness();
-         if (correct != null) {
-            if (Trust.SURE.equals(trust)) {
-               return correct.booleanValue() ? 2 : -2;
-            }
-            else if (Trust.EDUCATED_GUESS.equals(trust)) {
-               return correct.booleanValue() ? 1 : -1;
-            }
-            else if (Trust.UNSURE.equals(trust)) {
-               return correct.booleanValue() ? -1 : 1;
-            }
-            else {
-               throw new IllegalStateException("Unsupported trust: " + trust);
-            }
+         return doTrustScoreComputation(correct);
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Utility method of {@link #computeTrustScore()}.
+    * @param correct The achieved correctness.
+    * @return The computed trust score or {@code null} if not available.
+    */
+   private Integer doTrustScoreComputation(Boolean correct) {
+      if (correct != null) {
+         if (Trust.SURE.equals(trust)) {
+            return correct.booleanValue() ? 2 : -2;
+         }
+         else if (Trust.EDUCATED_GUESS.equals(trust)) {
+            return correct.booleanValue() ? 1 : -1;
+         }
+         else if (Trust.UNSURE.equals(trust)) {
+            return correct.booleanValue() ? -1 : 1;
          }
          else {
-            return null;
+            throw new IllegalStateException("Unsupported trust: " + trust);
          }
       }
       else {
          return null;
       }
    }
-
+   
    /**
-    * Normalizes the trust score to ensure positive values.
-    * @param trustScore The trust score to normalize.
-    * @return The normalized trust score.
+    * Computes the achieved partial trust score which is
+    * {@link #computeCorrectnessScore()} * trust score.
+    * @return The computed trust score or {@code null} if no result is available.
     */
-   public static int normalizeTrust(int trustScore) {
-      switch (trustScore) {
-         case -2 : return 0;
-         case -1 : return 1;
-         case  0 : return 2;
-         case  1 : return 3;
-         case  2 : return 4;
-         default : throw new IllegalArgumentException("Unsupported trust score: " + trustScore);
+   public BigDecimal computePartialTrustScore() {
+      if (trust != null) {
+         Integer correctnessScore = computeCorrectWrongDifference();
+         Boolean correct = correctnessScore != null ? correctnessScore.intValue() > 0 : null;
+         Integer trustScore = doTrustScoreComputation(correct);
+         return trustScore != null ? computeCorrectnessScore().multiply(new BigDecimal(trustScore)) : null;
+      }
+      else {
+         return null;
       }
    }
 }

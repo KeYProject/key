@@ -100,7 +100,7 @@ public final class ProofManagementDialog extends JDialog {
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
-    private ProofManagementDialog(MainWindow mainWindow, InitConfig initConfig) {
+    private ProofManagementDialog(MainWindow mainWindow, final InitConfig initConfig) {
         super(mainWindow, "Proof Management", true);
         this.mediator = mainWindow.getMediator();
         this.initConfig = initConfig;
@@ -108,6 +108,24 @@ public final class ProofManagementDialog extends JDialog {
         //create class tree
         targetIcons = new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, Icon>();
         classTree = new ClassTree(true, true, initConfig.getServices(), targetIcons);
+        classTree.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    final ClassTree.Entry entry = classTree.getSelectedEntry();
+                    if (entry.kjt != null && entry.target != null) {
+                        final ImmutableSet<Contract> contracts =
+                                initConfig.getServices().getSpecificationRepository()
+                                            .getContracts(entry.kjt, entry.target);
+                        final Contract c = contracts.iterator().next();
+                        if (contracts.size() == 1
+                                && c == contractPanelByMethod.getContract()) {
+                            startButton.doClick();
+                        }
+                    }
+                }
+            }
+        });
         classTree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent e) {

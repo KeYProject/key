@@ -353,13 +353,18 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     private String getHTMLFor(Iterable<Term> originalTerms,
                               Services services) {
-        String result = "";
-        Iterator<Term> it = originalTerms.iterator();
+        String result;
+        final Iterator<Term> it = originalTerms.iterator();
+        if (!it.hasNext()) {
+            result = LogicPrinter.quickPrintTerm(services.getTermBuilder().empty(), services);
+        } else {
+            result = "";
+        }
         while (it.hasNext()) {
             Term term = it.next();
             final String quickPrint =
                     LogicPrinter.quickPrintTerm(term, services);
-            result += " " + LogicPrinter.escapeHTML(quickPrint, false);
+            result += LogicPrinter.escapeHTML(quickPrint, false);
             if (it.hasNext()) {
                 result += ", ";
             }
@@ -367,18 +372,26 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         return result;
     }
 
-    
+
     private String getHTMLFor(ImmutableList<InfFlowSpec> originalInfFlowSpecs,
                               String htmlName,
                               Services services) {
         String infFlowSpecString = "";
         if (hasInfFlowSpec()) {
             infFlowSpecString = "<br><b>" + htmlName + "</b> ";
-            for (InfFlowSpec infFlowSpec : originalInfFlowSpecs) {
-                infFlowSpecString += "(" + getHTMLFor(infFlowSpec.preExpressions, services) + ")";
-                infFlowSpecString += " by (" + getHTMLFor(infFlowSpec.postExpressions, services) + ")";
+            Iterator<InfFlowSpec> it = originalInfFlowSpecs.iterator();
+            while (it.hasNext()) {
+                final InfFlowSpec infFlowSpec = it.next();
+                infFlowSpecString += getHTMLFor(infFlowSpec.postExpressions, services);
+                infFlowSpecString += " <b>by</b> " + getHTMLFor(infFlowSpec.preExpressions, services);
                 if (!infFlowSpec.newObjects.isEmpty()) {
-                    infFlowSpecString += ", new objects (" + getHTMLFor(infFlowSpec.newObjects, services) + ")";
+                    infFlowSpecString += ", <b>new objects</b> " + getHTMLFor(infFlowSpec.newObjects, services);
+                }
+                if (it.hasNext()) {
+                    infFlowSpecString += "<br>"
+                            + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                            + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                            + "<b>and</b> ";
                 }
             }
         }

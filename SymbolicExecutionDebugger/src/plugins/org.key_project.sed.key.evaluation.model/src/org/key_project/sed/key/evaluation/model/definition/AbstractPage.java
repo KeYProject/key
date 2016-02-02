@@ -6,6 +6,8 @@ public abstract class AbstractPage {
    
    private final String title;
    
+   private final String latexTitle;
+   
    private final String message;
    
    private AbstractForm form;
@@ -16,9 +18,25 @@ public abstract class AbstractPage {
    
    private final boolean enabled;
    
-   public AbstractPage(String name, String title, String message, boolean wrapLayout, boolean toolBased, boolean enabled) {
+   public AbstractPage(String name, 
+                       String title, 
+                       String message, 
+                       boolean wrapLayout, 
+                       boolean toolBased, 
+                       boolean enabled) {
+      this(name, title, title, message, wrapLayout, toolBased, enabled);
+   }
+   
+   public AbstractPage(String name, 
+                       String title, 
+                       String latexTitle,
+                       String message, 
+                       boolean wrapLayout, 
+                       boolean toolBased, 
+                       boolean enabled) {
       assert name != null;
       this.name = name;
+      this.latexTitle = latexTitle;
       this.title = title;
       this.message = message;
       this.wrapLayout = wrapLayout;
@@ -36,6 +54,10 @@ public abstract class AbstractPage {
 
    public String getName() {
       return name;
+   }
+
+   public String getLatexTitle() {
+      return latexTitle;
    }
 
    public String getTitle() {

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 
 public class TabbedQuestion extends AbstractQuestion implements IQuestionWithCildren {
    private final List<TabQuestion> childQuestions;
@@ -39,6 +41,16 @@ public class TabbedQuestion extends AbstractQuestion implements IQuestionWithCil
    @Override
    public int countChildQuestions() {
       return childQuestions.size();
+   }
+
+   @Override
+   public TabQuestion getChildQuestion(final String name) {
+      return CollectionUtil.search(childQuestions, new IFilter<TabQuestion>() {
+         @Override
+         public boolean select(TabQuestion element) {
+            return ObjectUtil.equals(element.getName(), name);
+         }
+      });
    }
 
    @Override

@@ -44,6 +44,4 @@ public class SimpleRIFLExceptionHandler extends KeYRecoderExcHandler {
             reportException(e.getCause());
         }
     }
-
-
 }

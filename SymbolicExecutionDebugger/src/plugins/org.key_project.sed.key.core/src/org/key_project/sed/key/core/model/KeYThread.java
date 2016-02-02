@@ -40,6 +40,8 @@ import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpointconditions;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -111,6 +113,48 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    };
    
    /**
+    * Listens for proof changes
+    */
+   private final ProofTreeListener proofChangedListener = new ProofTreeListener() {
+      @Override
+      public void proofExpanded(ProofTreeEvent e) {
+      }
+
+      @Override
+      public void proofIsBeingPruned(ProofTreeEvent e) { 
+      }
+
+      @Override
+      public void proofPruned(ProofTreeEvent e) {
+        handleProofPruned(e);  
+      }
+
+      @Override
+      public void proofStructureChanged(ProofTreeEvent e) {  
+      }
+
+      @Override
+      public void proofClosed(ProofTreeEvent e) {
+      }
+
+      @Override
+      public void proofGoalRemoved(ProofTreeEvent e) {  
+      }
+
+      @Override
+      public void proofGoalsAdded(ProofTreeEvent e) {  
+      }
+
+      @Override
+      public void proofGoalsChanged(ProofTreeEvent e) {
+      }
+
+      @Override
+      public void smtDataUpdate(ProofTreeEvent e) {  
+      }
+   };
+   
+   /**
     * The up to know discovered {@link ISETermination} nodes.
     */
    private final Map<IExecutionTermination, ISETermination> knownTerminations = new HashMap<IExecutionTermination, ISETermination>();
@@ -130,6 +174,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
       getProofControl().addAutoModeListener(autoModeListener);
+      getProof().addProofTreeListener(proofChangedListener);
       target.registerDebugNode(this);
       initializeAnnotations();
    }
@@ -249,6 +294,20 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    public KeYBreakpointManager getBreakpointManager() {
       return getDebugTarget().getBreakpointManager();
    }
+   
+   /**
+    * When the proof was pruned.
+    * @param e The event.
+    */
+   protected void handleProofPruned(ProofTreeEvent e) {
+      getBuilder().prune(e.getNode());
+      try {
+         super.suspend();
+      }
+      catch (DebugException exception) {
+         LogUtil.getLogger().logError(exception);
+      }
+   }
 
    /**
     * When the auto mode is started.
@@ -257,6 +316,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    protected void handleAutoModeStarted(ProofEvent e) {
       if (e.getSource() == getProof() && getProofControl().isInAutoMode()) { // Sadly auto mode started events are misused and do not really indicate that a auto mode is running
          try {
+            getProof().removeProofTreeListener(proofChangedListener);
             // Inform UI that the process is resumed
             super.resume();
          }
@@ -281,6 +341,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
          }
          finally {
             try {
+               getProof().addProofTreeListener(proofChangedListener);
                super.suspend();
             }
             catch (DebugException e1) {
@@ -339,6 +400,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
     */
    public void disconnect() throws DebugException {
       getProofControl().removeAutoModeListener(autoModeListener);
+      getProof().removeProofTreeListener(proofChangedListener);
    }
    
    /**
@@ -347,6 +409,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    @Override
    public void terminate() throws DebugException {
       getProofControl().removeAutoModeListener(autoModeListener);
+      getProof().removeProofTreeListener(proofChangedListener);
       super.terminate();
    }
    

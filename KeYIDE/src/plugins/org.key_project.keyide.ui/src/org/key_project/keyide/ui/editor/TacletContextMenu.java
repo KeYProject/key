@@ -50,7 +50,7 @@ public class TacletContextMenu extends ExtensionContributionFactory {
          if (goal != null) {
             PosInSequent pos = keyEditor.getSelectedPosInSequent();
             // Add taclet rules
-            ImmutableList<TacletApp> appList = KeYIDEUtil.findTaclets(keyEditor.getUI(), goal, pos.getPosInOccurrence());
+            ImmutableList<TacletApp> appList = KeYIDEUtil.findTaclets(keyEditor.getUI(), goal, pos);
             if (appList != null) {
                Iterator<TacletApp> it = appList.iterator();
                while (it.hasNext()) {

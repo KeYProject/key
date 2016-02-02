@@ -134,6 +134,7 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "intersectAllFieldsFreshLocs",
         "disjointWithSingleton1",
         "disjointWithSingleton2",
+        "sortsDisjointModuloNull",
         
         "createdInHeapWithSingleton",
         "createdInHeapWithAllFields",
