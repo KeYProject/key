@@ -5,9 +5,9 @@
     This configuration file was written by the eclipse-cs plugin configuration editor
 -->
 <!--
-    Checkstyle-Configuration: bp_checks
+    Checkstyle-Configuration: BP-KeY new
     Description: 
-Checkstyle configuration for the Bachelorpraktikum
+Slightly modified version of Sun Checks that better matches the default code formatter setting of Eclipse.
 -->
 <module name="Checker">
   <property name="severity" value="warning"/>
@@ -33,7 +33,8 @@ Checkstyle configuration for the Bachelorpraktikum
     <module name="RedundantImport"/>
     <module name="UnusedImports"/>
     <module name="LineLength">
-      <property name="max" value="120"/>
+      <property name="max" value="100"/>
+      <property name="tabWidth" value="4"/>
     </module>
     <module name="MethodLength"/>
     <module name="ParameterNumber"/>
@@ -57,7 +58,10 @@ Checkstyle configuration for the Bachelorpraktikum
     <module name="EmptyBlock"/>
     <module name="LeftCurly"/>
     <module name="NeedBraces"/>
-    <module name="RightCurly"/>
+    <module name="RightCurly">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
     <module name="AvoidInlineConditionals"/>
     <module name="EmptyStatement"/>
     <module name="EqualsHashCode"/>
@@ -71,7 +75,10 @@ Checkstyle configuration for the Bachelorpraktikum
     <module name="MissingSwitchDefault"/>
     <module name="SimplifyBooleanExpression"/>
     <module name="SimplifyBooleanReturn"/>
-    <module name="DesignForExtension"/>
+    <module name="DesignForExtension">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
     <module name="FinalClass"/>
     <module name="HideUtilityClassConstructor"/>
     <module name="InterfaceIsType"/>
@@ -83,6 +90,7 @@ Checkstyle configuration for the Bachelorpraktikum
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="UpperEll"/>
+    <module name="FinalLocalVariable"/>
   </module>
   <module name="JavadocPackage"/>
   <module name="NewlineAtEndOfFile">
