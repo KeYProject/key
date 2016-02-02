@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.nui.tests.guitests;
 
-import java.io.File;
-
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 
