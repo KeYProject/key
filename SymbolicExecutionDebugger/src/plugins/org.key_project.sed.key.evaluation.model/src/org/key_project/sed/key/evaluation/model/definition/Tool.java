@@ -7,6 +7,8 @@ import org.eclipse.swt.graphics.Image;
 public class Tool {
    private final String name;
    
+   private final String latexName;
+   
    private final URL descriptionURL;
    
    private final URL wizardDescriptionURL;
@@ -14,7 +16,12 @@ public class Tool {
    private final Image image;
 
    public Tool(String name, URL descriptionURL, URL wizardDescriptionURL, Image image) {
+      this(name, name, descriptionURL, wizardDescriptionURL, image);
+   }
+
+   public Tool(String name, String latexName, URL descriptionURL, URL wizardDescriptionURL, Image image) {
       this.name = name;
+      this.latexName = latexName;
       this.descriptionURL = descriptionURL;
       this.wizardDescriptionURL = wizardDescriptionURL;
       this.image = image;
@@ -22,6 +29,10 @@ public class Tool {
 
    public String getName() {
       return name;
+   }
+
+   public String getLatexName() {
+      return latexName;
    }
 
    public URL getDescriptionURL() {

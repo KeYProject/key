@@ -14,6 +14,8 @@ public abstract class AbstractChoicesQuestion extends AbstractQuestion {
    public static final String VALUE_SEPARATOR = ",";
    
    private final List<Choice> choices;
+   
+   private final Set<String> notCorrectnessRelevantChoiceValues;
 
    public AbstractChoicesQuestion(String name, String label, String description, String defaultChoice, IValueValidator validator, boolean askForTrust, Choice... choices) {
       this(name, label, description, defaultChoice, validator, askForTrust, null, CollectionUtil.toList(choices));
@@ -32,8 +34,17 @@ public abstract class AbstractChoicesQuestion extends AbstractQuestion {
    }
 
    public AbstractChoicesQuestion(String name, String label, String description, String defaultChoice, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, boolean enabled, List<Choice> choices) {
-      super(name, label, description, defaultChoice, validator, askForTrust, relatedTools, enabled);
+      this(name, label, description, defaultChoice, validator, askForTrust, relatedTools, enabled, choices, null);
+   }
+
+   public AbstractChoicesQuestion(String name, String label, String description, String defaultChoice, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, boolean enabled, List<Choice> choices, Set<String> notCorrectnessRelevantChoiceValues) {
+      this(name, label, label, description, defaultChoice, validator, askForTrust, relatedTools, enabled, choices, notCorrectnessRelevantChoiceValues);
+   }
+
+   public AbstractChoicesQuestion(String name, String label, String latexLabel, String description, String defaultChoice, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, boolean enabled, List<Choice> choices, Set<String> notCorrectnessRelevantChoiceValues) {
+      super(name, label, latexLabel, description, defaultChoice, validator, askForTrust, relatedTools, enabled);
       this.choices = choices;
+      this.notCorrectnessRelevantChoiceValues = notCorrectnessRelevantChoiceValues;
       validateChocies(choices);
    }
    
@@ -95,5 +106,14 @@ public abstract class AbstractChoicesQuestion extends AbstractQuestion {
             return element.countChildQuestions() >= 1;
          }
       }) != null;
+   }
+   
+   public boolean isChoiceCorrectnessRelevant(Choice choice) {
+      if (!CollectionUtil.isEmpty(notCorrectnessRelevantChoiceValues)) {
+         return !notCorrectnessRelevantChoiceValues.contains(choice.getValue());
+      }
+      else {
+         return true;
+      }
    }
 }

@@ -24,6 +24,8 @@ import java.util.Arrays;
  */
 public abstract class SpecificationEntity {
 
+    static enum Type { SOURCE, SINK }
+
     public static final class Field extends SpecificationEntity {
 
         public final String name;
@@ -34,30 +36,28 @@ public abstract class SpecificationEntity {
          * @param p package name of the class where the field is declared
          * @param c name of the class where the field is declared
          */
-        Field(String n, String p, String c) {
-            super(p, c);
+        Field(String n, String p, String c, Type t) {
+            super(p, c, t);
             name = n.intern();
         }
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof Field) {
-                return (inPackage.equals(((Field) o).inPackage)
-                        && inClass.equals(((Field) o).inClass) && name
-                            .equals(((Field) o).name));
-            } else
-                return false;
+            if (super.equals(o) && o instanceof Field) {
+                return name.equals(((Field) o).name);
+            } else { return false; }
         }
 
         @Override
         public int hashCode() {
-            return 3977 * (inPackage + inClass).hashCode() + name.hashCode();
+            return 3977 * (inPackage + inClass).hashCode()
+                    + 13 * type.hashCode()
+                    + name.hashCode();
         }
 
         @Override
         public String qualifiedName() {
-            return (inPackage == "" ? "" : inPackage + ".") + inClass + "#"
-                    + name;
+            return (inPackage == "" ? "" : inPackage + ".") + inClass + "#" + name;
         }
     }
 
@@ -74,8 +74,8 @@ public abstract class SpecificationEntity {
          * @param p package name of the class where the method is declared
          * @param c name of the class where the method is declared
          */
-        Parameter(int pos, String m, String p, String c) {
-            super(p, c);
+        Parameter(int pos, String m, String p, String c, Type t) {
+            super(p, c, t);
             final int i = m.indexOf('(');
             methodName = m.substring(0, i).intern();
             paramTypes = m.substring(i + 1, m.lastIndexOf(')')).split(",");
@@ -90,8 +90,8 @@ public abstract class SpecificationEntity {
          * @param p package name of the class where the method is declared
          * @param c name of the class where the method is declared
          */
-        Parameter(int pos, String m, String[] pt, String p, String c) {
-            super(p, c);
+        Parameter(int pos, String m, String[] pt, String p, String c, Type t) {
+            super(p, c, t);
             position = pos;
             methodName = m;
             paramTypes = pt;
@@ -99,10 +99,8 @@ public abstract class SpecificationEntity {
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof Parameter) {
-                return (inPackage.equals(((Parameter) o).inPackage)
-                        && inClass.equals(((Parameter) o).inClass)
-                        && methodName.equals(((Parameter) o).methodName)
+            if (super.equals(o) && o instanceof Parameter) {
+                return (methodName.equals(((Parameter) o).methodName)
                         && Arrays.equals(((Parameter) o).paramTypes, paramTypes)
                         && position == ((Parameter) o).position);
             }
@@ -111,8 +109,10 @@ public abstract class SpecificationEntity {
 
         @Override
         public int hashCode() {
-            return 3661 * (inPackage + inClass).hashCode() + 37
-                    * (methodName.hashCode() + Arrays.hashCode(paramTypes))
+            return 3661 * (inPackage + inClass).hashCode()
+                    + 37 * (methodName.hashCode()
+                    + 13 * type.hashCode()
+                    + Arrays.hashCode(paramTypes))
                     + position;
         }
 
@@ -148,8 +148,8 @@ public abstract class SpecificationEntity {
          * @param p package name of the class where the method is declared
          * @param c name of the class where the method is declared
          */
-        ReturnValue(String m, String p, String c) {
-            super(p, c);
+        ReturnValue(String m, String p, String c, Type t) {
+            super(p, c, t);
             final int i = m.indexOf('(');
             methodName = m.substring(0, i).intern();
             paramTypes = m.substring(i + 1, m.lastIndexOf(')')).split(",");
@@ -162,27 +162,26 @@ public abstract class SpecificationEntity {
          * @param p package name of the class where the method is declared
          * @param c name of the class where the method is declared
          */
-        ReturnValue(String m, String[] pt, String p, String c) {
-            super(p, c);
+        ReturnValue(String m, String[] pt, String p, String c, Type t) {
+            super(p, c, t);
             methodName = m;
             paramTypes = pt;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof ReturnValue) {
-                return (inPackage.equals(((ReturnValue) o).inPackage)
-                        && inClass.equals(((ReturnValue) o).inClass)
-                        && methodName.equals(((ReturnValue) o).methodName)
+            if (super.equals(o) && o instanceof ReturnValue) {
+                return (methodName.equals(((ReturnValue) o).methodName)
                         && Arrays.equals(paramTypes, ((ReturnValue) o).paramTypes));
-            } else
-                return false;
+            } else { return false; }
         }
 
         @Override
         public int hashCode() {
-            return 3721 * (inPackage + inClass).hashCode() + 79
-                    * methodName.hashCode() + Arrays.hashCode(paramTypes);
+            return 3721 * (inPackage + inClass).hashCode()
+                    + 79 * methodName.hashCode()
+                    + 13 * type.hashCode()
+                    + Arrays.hashCode(paramTypes);
         }
 
         @Override
@@ -205,13 +204,22 @@ public abstract class SpecificationEntity {
 
     public final String inClass;
 
-    private SpecificationEntity(String p, String c) {
+    public final Type type;
+
+    private SpecificationEntity(String p, String c, Type t) {
         inPackage = (p == null) ? "" : p.intern();
         inClass = c.intern();
+        type = t;
     }
 
     @Override
-    public abstract boolean equals(Object o);
+    public boolean equals(Object o) {
+        if (o instanceof SpecificationEntity) {
+            return (inPackage.equals(((SpecificationEntity) o).inPackage)
+                    && inClass.equals(((SpecificationEntity) o).inClass)
+                    && (type == ((SpecificationEntity) o).type));
+        } else { return false; }
+    }
 
     // //////////////////////////////////////////////////
     // implementations
@@ -226,5 +234,4 @@ public abstract class SpecificationEntity {
     public String toString() {
         return qualifiedName();
     }
-
 }

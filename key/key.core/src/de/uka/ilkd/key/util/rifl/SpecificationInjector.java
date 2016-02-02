@@ -13,11 +13,14 @@
 
 package de.uka.ilkd.key.util.rifl;
 
-import java.util.ArrayList;
+import java.util.AbstractMap;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
+import de.uka.ilkd.key.util.rifl.SpecificationEntity.Type;
 import recoder.abstraction.ClassType;
 import recoder.java.*;
 import recoder.java.declaration.*;
@@ -34,6 +37,10 @@ import recoder.service.SourceInfo;
  */
 public class SpecificationInjector extends SourceVisitor {
 
+    private static final String LINE_BREAK = "\n";
+    private static final String DEFAULT_SPEC_COMMENT =
+            LINE_BREAK + "// JML* comment created by KeY RIFL Transformer." + LINE_BREAK;
+
     /**
      * Produces JML* respects clauses. Clauses are internally labeled with keys
      * (resulting from security domains in RIFL), which are discarded in the
@@ -47,16 +54,22 @@ public class SpecificationInjector extends SourceVisitor {
         private static final String DEFAULT_KEY = "low";
         private static final String RESULT = "\\result";
         private static final String DETERMINES = "determines";
-        private static final String JML_END = "@*/\n";
-        private static final String JML_START = "\n"+DEFAULT_INDENTATION+"/*@ ";
+        private static final String BY = " \\by";
+        private static final String JML_LINE_START = "@ ";
+        private static final String JML_END = "@*/" + LINE_BREAK;
+        private static final String JML_CLAUSE_END = ";";
+        private static final String JML_START = LINE_BREAK + DEFAULT_INDENTATION + "/*@ ";
 
         private final String indentation;
-        private final Map<String, List<String>> respects = new HashMap<String, List<String>>();
-
-        JMLFactory() {
+        private final Map<String, Set<Entry<String, Type>>> respects =
+                new HashMap<String, Set<Entry<String, Type>>>();
+        private SpecificationContainer sc;
+        JMLFactory(SpecificationContainer sc) {
             indentation = DEFAULT_INDENTATION;
+            this.sc = sc;
         }
 
+        @SuppressWarnings("unused")
         JMLFactory(int indent) {
             final StringBuffer sb = new StringBuffer();
             for (int i = 0; i < indent; i++)
@@ -64,46 +77,113 @@ public class SpecificationInjector extends SourceVisitor {
             indentation = sb.toString();
         }
 
-        void addResultToDetermines() {
-            put(DEFAULT_KEY, RESULT);
+        @SuppressWarnings("unused")
+        void addResultToDetermines(Type t) {
+            put(DEFAULT_KEY, t, RESULT);
         }
 
         // TODO allow more respects clauses
 
         /** Adds \result to a determines clause labeled by key. */
-        void addResultToDetermines(String key) {
-            put(key, RESULT);
+        void addResultToDetermines(String key, Type t) {
+            put(key, t, RESULT);
         }
 
-        void addToDetermines(String name) {
-            put(DEFAULT_KEY, name);
+        @SuppressWarnings("unused")
+        void addToDetermines(String name, Type t) {
+            put(DEFAULT_KEY, t, name);
         }
 
-        void addToDetermines(String name, String key) {
-            put(key, name);
+        void addToDetermines(String name, Type t, String key) {
+            put(key, t, name);
+        }
+
+        String getRespects(String domain, final Type t) {
+            return getRespects(respects.get(domain), t);
+        }
+
+        String getRespects(Set<String> oneRespect) {
+            String result = "";
+            if (oneRespect != null && 0 < oneRespect.size()) {
+                for (final String elem : oneRespect) {
+                    result += " "+elem+",";
+                }
+                result = result.substring(0,result.length()-1);
+            } else {
+                result = " \\nothing";
+            }
+            return result;
+        }
+
+        String getRespects(Set<Entry<String, Type>> oneRespect, final Type t) {
+            String result = "";
+            boolean found = false;
+            if (oneRespect != null && 0 < oneRespect.size()) {
+                for (final Entry<String, Type> elem : oneRespect) {
+                    if (t == elem.getValue()) {
+                        result += " "+elem.getKey()+",";
+                        found = true;
+                    }
+                }
+                if (found) {
+                    result = result.substring(0,result.length()-1);
+                } else {
+                    result = " \\nothing";
+                }
+            }
+            return result;
         }
 
         /** Gets a formatted JML comment. */
         String getSpecification() {
             // start JML
             final StringBuffer sb = new StringBuffer(indentation);
-            sb.append(JML_START + "\n");
+            sb.append(JML_START + LINE_BREAK);
+            // debug
+            //System.out.println("Respects: "+respects);
 
             // respects clauses
-            for (final List<String> oneRespect : respects.values()) {
-                sb.append(indentation);
-                sb.append(DEFAULT_INDENTATION);
-                sb.append("@ ");
-                sb.append(DETERMINES);
-                for (final String elem : oneRespect) {
-                    sb.append(" ");
-                    sb.append(elem);
-                    sb.append(",");
-                }
-                sb.deleteCharAt(sb.length() - 1);
-                sb.append(" \\by \\itself;\n");
-            }
+            for (final Entry<String, Set<Entry<String,Type>>> oneRespect : respects.entrySet()) {
+                final String domain = oneRespect.getKey();
+                final Set<String> flowsFromDomain = sc.flows(domain);
+                // debug
+                // System.out.println("flows to "+domain+" "+flowsFromDomain);
 
+            	Set<String> oneRespects = new LinkedHashSet<String>();
+                for (final String flowsFrom : flowsFromDomain) {
+                    final Set<Entry<String, Type>> es = respects.get(flowsFrom);
+                    if (es != null) { // sources
+                        for (final Entry<String, Type> e: es) {
+                            if (e.getValue() == Type.SOURCE) {
+                                oneRespects.add(e.getKey());
+                            }
+                        }
+                    }
+            	}
+                final Set<Entry<String, Type>> es = respects.get(domain);
+                if (es != null) { // sources
+                    for (final Entry<String, Type> reflFlow : es) {
+                        if (reflFlow.getValue() == Type.SOURCE) {
+                            oneRespects.add(reflFlow.getKey());
+                        }
+                    }
+                }
+
+            	sb.append(indentation);
+                sb.append(DEFAULT_INDENTATION);
+                sb.append(JML_LINE_START);
+                sb.append(DETERMINES);
+                sb.append(getRespects(domain, Type.SINK)); // sinks
+                sb.append(BY);
+                sb.append(getRespects(oneRespects));
+                // debug
+                // final Set<String> set = new LinkedHashSet<String>();
+                // set.addAll(flowsFromDomain);
+                // set.add(domain);
+                sb.append(JML_CLAUSE_END);
+                // sb.append(" // "+ domain + " -> " + set);
+                sb.append(LINE_BREAK);
+            }
             // close JML
             sb.append(indentation);
             sb.append(DEFAULT_INDENTATION);
@@ -111,15 +191,19 @@ public class SpecificationInjector extends SourceVisitor {
             return sb.toString();
         }
 
-        private void put(String key, String value) {
+        private void put(String key, Entry<String, Type> value) {
             if (key == null)
                 return;
-            List<String> target = respects.get(key);
+            Set<Entry<String, Type>> target = respects.get(key);
             if (target == null) {
-                target = new ArrayList<String>();
+                target = new LinkedHashSet<Entry<String, Type>>();
             }
             target.add(value);
             respects.put(key, target);
+        }
+
+        private void put(String key, Type t, String value) {
+            put(key, new AbstractMap.SimpleEntry<String, Type>(value, t));
         }
     } // private class end
 
@@ -168,7 +252,7 @@ public class SpecificationInjector extends SourceVisitor {
     public void visitClassDeclaration(ClassDeclaration cd) {
         cd.setProgramModelInfo(si);
         accessChildren(cd);
-        addComment(cd, "\n// JML* comment created by KeY RIFL Transformer.\n");
+        addComment(cd, DEFAULT_SPEC_COMMENT);
     }
 
 
@@ -181,27 +265,34 @@ public class SpecificationInjector extends SourceVisitor {
     public void visitInterfaceDeclaration(InterfaceDeclaration id) {
         id.setProgramModelInfo(si);
         accessChildren(id);
-        addComment(id, "\n// JML* comment created by KeY RIFL Transformer.\n");
+        addComment(id, DEFAULT_SPEC_COMMENT);
     }
 
     @Override
     public void visitMethodDeclaration(MethodDeclaration md) {
         md.setProgramModelInfo(si);
-        final JMLFactory factory = new JMLFactory();
+        final JMLFactory factory = new JMLFactory(sc);
 
         // add return value
-        final String returnDomain = sc.returnValue(md);
+        final String returnDomainSrc = sc.returnValue(md, Type.SOURCE);
         // debug
         // System.out.println(".... return domain: "+returnDomain);
-        factory.addResultToDetermines(returnDomain);
+        factory.addResultToDetermines(returnDomainSrc, Type.SOURCE);
+        final String returnDomainSnk = sc.returnValue(md, Type.SINK);
+        // debug
+        // System.out.println(".... return domain: "+returnDomain);
+        factory.addResultToDetermines(returnDomainSnk, Type.SINK);
 
         // add parameters
         for (int i = 0; i < md.getParameterDeclarationCount(); i++) {
             final ParameterDeclaration pd = md.getParameterDeclarationAt(i);
+            final String paraName = pd.getVariableSpecification().getName();
+            final String paramSrc = sc.parameter(md, i+1, Type.SOURCE);
+            final String paramSnk = sc.parameter(md, i+1, Type.SINK);
             // debug
             // System.out.println(".... "+ pd.getVariableSpecification().getName() +" domain: " + sc.parameter(md, i+1));
-            factory.addToDetermines(pd.getVariableSpecification().getName(),
-                    sc.parameter(md, i+1));
+            factory.addToDetermines(paraName, Type.SOURCE, paramSrc);
+            factory.addToDetermines(paraName, Type.SINK, paramSnk);
         }
 
         // add fields
@@ -212,12 +303,15 @@ public class SpecificationInjector extends SourceVisitor {
             final JavaProgramElement fd = (JavaProgramElement) md.getASTParent().getChildAt(i);
             if (fd instanceof FieldDeclaration) {
                 final String field = ((FieldDeclaration) fd).getVariables().get(0).getName();
+                final String fName = cls + "." + field;
+                final String fieldSrc = sc.field(pkg, cls, field, Type.SOURCE);
+                final String fieldSnk = sc.field(pkg, cls, field, Type.SINK);
                 // debug
                 // System.out.println(".... "+ field +" domain: " + sc.field(pkg, cls, field));
-                factory.addToDetermines(field, sc.field(pkg, cls, field));
+                factory.addToDetermines(fName, Type.SOURCE, fieldSrc);
+                factory.addToDetermines(fName, Type.SINK, fieldSnk);
             }
         }
         addComment(md, factory.getSpecification());
     }
-
 }

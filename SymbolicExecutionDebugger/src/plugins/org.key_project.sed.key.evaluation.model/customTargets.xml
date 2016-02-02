@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- see: http://help.eclipse.org/mars/topic/org.eclipse.pde.doc.user/reference/pde_feature_generating_build.htm -->
+<!-- see: http://help.eclipse.org/mars/topic/org.eclipse.pde.doc.user/tasks/pde_custom_callbacks.htm -->
+<project name="org.key_project.sed.key.evaluation.model" basedir=".">
+   <target name="pre.build.jars" description="Called before targets are compiled.">
+      <antcall target="testUPAVideos" />
+      <antcall target="testRCVideos" />
+   </target>
+
+   <target name="testUPAVideos" description="Ensures that the videos of the Understanding Proof Attempts Evaluation are available.">
+      <property name="upa.EvaluationIntroduction.mp4" value="${basedir}/data/understandingProofAttempts/instructions/EvaluationIntroduction/videos/EvaluationIntroduction.mp4"/>
+      <property name="upa.EvaluationIntroduction.ogv" value="${basedir}/data/understandingProofAttempts/instructions/EvaluationIntroduction/videos/EvaluationIntroduction.ogv"/>
+      <property name="upa.EvaluationIntroduction.webm" value="${basedir}/data/understandingProofAttempts/instructions/EvaluationIntroduction/videos/EvaluationIntroduction.webm"/>
+      <property name="upa.KeYScreencast.mp4" value="${basedir}/data/understandingProofAttempts/instructions/KeY/videos/KeYScreencast.mp4"/>
+      <property name="upa.KeYScreencast.ogv" value="${basedir}/data/understandingProofAttempts/instructions/KeY/videos/KeYScreencast.ogv"/>
+      <property name="upa.KeYScreencast.webm" value="${basedir}/data/understandingProofAttempts/instructions/KeY/videos/KeYScreencast.webm"/>
+      <property name="upa.SEDScreencast.mp4" value="${basedir}/data/understandingProofAttempts/instructions/SED/videos/SEDScreencast.mp4"/>
+      <property name="upa.SEDScreencast.ogv" value="${basedir}/data/understandingProofAttempts/instructions/SED/videos/SEDScreencast.ogv"/>
+      <property name="upa.SEDScreencast.webm" value="${basedir}/data/understandingProofAttempts/instructions/SED/videos/SEDScreencast.webm"/>
+      <fail message="Video ${upa.EvaluationIntroduction.mp4} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${upa.EvaluationIntroduction.mp4}" />
+            </not>
+         </condition>
+      </fail>
+      <fail message="Video ${upa.EvaluationIntroduction.ogv} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${upa.EvaluationIntroduction.ogv}" />
+            </not>
+         </condition>
+      </fail>
+      <fail message="Video ${upa.EvaluationIntroduction.webm} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${upa.EvaluationIntroduction.webm}" />
+            </not>
+         </condition>
+      </fail>
+      <fail message="Video ${upa.KeYScreencast.mp4} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${upa.KeYScreencast.mp4}" />
+            </not>
+         </condition>
+      </fail>
+      <fail message="Video ${upa.KeYScreencast.ogv} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${upa.KeYScreencast.ogv}" />
+            </not>
+         </condition>
+      </fail>
+      <fail message="Video ${upa.KeYScreencast.webm} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${upa.KeYScreencast.webm}" />
+            </not>
+         </condition>
+      </fail>
+      <fail message="Video ${upa.SEDScreencast.mp4} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${upa.SEDScreencast.mp4}" />
+            </not>
+         </condition>
+      </fail>
+      <fail message="Video ${upa.SEDScreencast.ogv} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${upa.SEDScreencast.ogv}" />
+            </not>
+         </condition>
+      </fail>
+      <fail message="Video ${upa.SEDScreencast.webm} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${upa.SEDScreencast.webm}" />
+            </not>
+         </condition>
+      </fail>
+   </target>
+
+   <target name="testRCVideos" description="Ensures that the videos of the Reviewing Code Evaluation are available.">
+      <property name="rc.EvaluationIntroduction.mp4" value="${basedir}/data/reviewingCode/instructions/EvaluationIntroduction/videos/EvaluationIntroduction.mp4"/>
+      <property name="rc.EvaluationIntroduction.ogv" value="${basedir}/data/reviewingCode/instructions/EvaluationIntroduction/videos/EvaluationIntroduction.ogv"/>
+      <property name="rc.EvaluationIntroduction.webm" value="${basedir}/data/reviewingCode/instructions/EvaluationIntroduction/videos/EvaluationIntroduction.webm"/>
+      <property name="rc.KeYScreencast.mp4" value="${basedir}/data/reviewingCode/instructions/NO_TOOL/videos/NO_TOOLScreencast.mp4"/>
+      <property name="rc.KeYScreencast.ogv" value="${basedir}/data/reviewingCode/instructions/NO_TOOL/videos/NO_TOOLScreencast.ogv"/>
+      <property name="rc.KeYScreencast.webm" value="${basedir}/data/reviewingCode/instructions/NO_TOOL/videos/NO_TOOLScreencast.webm"/>
+      <property name="rc.SEDScreencast.mp4" value="${basedir}/data/reviewingCode/instructions/SED/videos/SEDScreencast.mp4"/>
+      <property name="rc.SEDScreencast.ogv" value="${basedir}/data/reviewingCode/instructions/SED/videos/SEDScreencast.ogv"/>
+      <property name="rc.SEDScreencast.webm" value="${basedir}/data/reviewingCode/instructions/SED/videos/SEDScreencast.webm"/>
+      <fail message="Video ${rc.EvaluationIntroduction.mp4} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${rc.EvaluationIntroduction.mp4}" />
+            </not>
+         </condition>
+      </fail>
+      <fail message="Video ${rc.EvaluationIntroduction.ogv} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${rc.EvaluationIntroduction.ogv}" />
+            </not>
+         </condition>
+      </fail>
+      <fail message="Video ${rc.EvaluationIntroduction.webm} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${rc.EvaluationIntroduction.webm}" />
+            </not>
+         </condition>
+      </fail>
+      <fail message="Video ${rc.KeYScreencast.mp4} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${rc.KeYScreencast.mp4}" />
+            </not>
+         </condition>
+      </fail>
+      <fail message="Video ${rc.KeYScreencast.ogv} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${rc.KeYScreencast.ogv}" />
+            </not>
+         </condition>
+      </fail>
+      <fail message="Video ${rc.KeYScreencast.webm} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${rc.KeYScreencast.webm}" />
+            </not>
+         </condition>
+      </fail>
+      <fail message="Video ${rc.SEDScreencast.mp4} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${rc.SEDScreencast.mp4}" />
+            </not>
+         </condition>
+      </fail>
+      <fail message="Video ${rc.SEDScreencast.ogv} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${rc.SEDScreencast.ogv}" />
+            </not>
+         </condition>
+      </fail>
+      <fail message="Video ${rc.SEDScreencast.webm} does not exist. Please follow the instructions of the Readme.txt file.">
+         <condition>
+            <not>
+               <available file="${rc.SEDScreencast.webm}" />
+            </not>
+         </condition>
+      </fail>
+   </target>
+
+   <target name="pre.@dot" description="Called before source files are compiled.">
+   </target>
+
+   <target name="post.compile.@dot" description="Called after source files are compiled but before they are jared.">
+   </target>
+
+   <target name="post.@dot" description="Called after source fiels are compiled.">
+   </target>
+
+   <target name="post.build.jars" description="Called after targets are compiled.">
+   </target>
+
+   <target name="pre.gather.bin.parts" description="Before build results are copied.">
+   </target>
+
+   <target name="post.gather.bin.parts" description="After build results are copied.">
+   </target>
+
+   <target name="pre.gather.logs" description="Before log files are collected.">
+   </target>
+
+   <target name="post.gather.logs" description="After log files are collected.">
+   </target>
+</project>

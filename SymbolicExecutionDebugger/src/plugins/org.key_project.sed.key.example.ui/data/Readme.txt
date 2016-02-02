@@ -19,7 +19,7 @@ Open an example class and follow the instructions in the Javadoc documentation.
 We recommend the following order:
 
 1. example1.Number    - Debug a method and control symbolic execution.
-2. example2.QuickSort - Find the origin of a bug.
+2. example2.Mergesort - Find the origin of a bug.
 3. example3.ArrayUtil - Use JML specifications during symbolic execution.
 4. example4.AVLTree   - Inspect large data structures using memory layouts.
 

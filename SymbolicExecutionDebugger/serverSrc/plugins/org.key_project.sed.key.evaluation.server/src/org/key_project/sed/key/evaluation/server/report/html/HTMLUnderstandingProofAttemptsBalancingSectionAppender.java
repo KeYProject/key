@@ -1,6 +1,7 @@
 package org.key_project.sed.key.evaluation.server.report.html;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Map.Entry;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
@@ -8,6 +9,7 @@ import org.key_project.sed.key.evaluation.server.index.PermutationIndex;
 import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemptsRandomFormOrderComputer;
 import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemptsRandomFormOrderComputer.BalancingEntry;
 import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemptsRandomFormOrderComputer.IndexData;
+import org.key_project.sed.key.evaluation.server.report.AdditionalFile;
 import org.key_project.sed.key.evaluation.server.report.EvaluationResult;
 import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
 import org.key_project.util.java.ArrayUtil;
@@ -21,7 +23,7 @@ public class HTMLUnderstandingProofAttemptsBalancingSectionAppender implements I
     * {@inheritDoc}
     */
    @Override
-   public void appendSection(File storageLocation, AbstractEvaluation evaluation, EvaluationResult result, Statistics statistics, StringBuffer sb) {
+   public Collection<AdditionalFile> appendSection(File storageLocation, AbstractEvaluation evaluation, EvaluationResult result, Statistics statistics, StringBuffer sb) {
       sb.append("<h1><a name=\"choices\">Balancing Distribution</a></h1>");
       UnderstandingProofAttemptsRandomFormOrderComputer computer = new UnderstandingProofAttemptsRandomFormOrderComputer(storageLocation);
       sb.append("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">");
@@ -73,5 +75,6 @@ public class HTMLUnderstandingProofAttemptsBalancingSectionAppender implements I
       }
       sb.append("</tr>");
       sb.append("</table>");
+      return null;
    }
 }

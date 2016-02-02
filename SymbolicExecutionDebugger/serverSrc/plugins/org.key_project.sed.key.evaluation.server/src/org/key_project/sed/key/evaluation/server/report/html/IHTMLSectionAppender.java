@@ -1,8 +1,10 @@
 package org.key_project.sed.key.evaluation.server.report.html;
 
 import java.io.File;
+import java.util.Collection;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
+import org.key_project.sed.key.evaluation.server.report.AdditionalFile;
 import org.key_project.sed.key.evaluation.server.report.EvaluationResult;
 import org.key_project.sed.key.evaluation.server.report.HTMLReportEngine;
 import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
@@ -20,6 +22,7 @@ public interface IHTMLSectionAppender {
     * @param The computed {@link EvaluationResult}.
     * @param statistics The computed {@link Statistics}s.
     * @param sb The {@link StringBuffer} to append to.
+    * @return An optional {@link Collection} of {@link AdditionalFile}s to create.
     */   
-   public void appendSection(File storageLocation, AbstractEvaluation evaluation, EvaluationResult result, Statistics statistics, StringBuffer sb);
+   public Collection<AdditionalFile> appendSection(File storageLocation, AbstractEvaluation evaluation, EvaluationResult result, Statistics statistics, StringBuffer sb);
 }
