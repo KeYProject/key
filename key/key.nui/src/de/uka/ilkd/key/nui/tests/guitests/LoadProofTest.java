@@ -34,11 +34,8 @@ public class LoadProofTest extends GuiTest {
         clickOn("File").clickOn("Open Proof...");
 
         // Enter file name: example01.proof
-        type(KeyCode.E).type(KeyCode.X).type(KeyCode.A).type(KeyCode.M)
-                .type(KeyCode.P).type(KeyCode.L).type(KeyCode.E)
-                .type(KeyCode.DIGIT0).type(KeyCode.DIGIT1).type(KeyCode.PERIOD)
-                .type(KeyCode.P).type(KeyCode.R).type(KeyCode.O).type(KeyCode.O)
-                .type(KeyCode.F);
+        KeyCodeHelper key = new KeyCodeHelper(this);
+        key.typeKeys(key.getKeyCode("EXAMPLE01.PROOF"));
 
         // press enter to load file
         type(KeyCode.ENTER);
@@ -52,11 +49,8 @@ public class LoadProofTest extends GuiTest {
         clickOn("File").clickOn("Open Proof...");
 
         // Enter file name: example01.proof
-        type(KeyCode.E).type(KeyCode.X).type(KeyCode.A).type(KeyCode.M)
-                .type(KeyCode.P).type(KeyCode.L).type(KeyCode.E)
-                .type(KeyCode.DIGIT0).type(KeyCode.DIGIT2).type(KeyCode.PERIOD)
-                .type(KeyCode.P).type(KeyCode.R).type(KeyCode.O).type(KeyCode.O)
-                .type(KeyCode.F);
+        KeyCodeHelper key = new KeyCodeHelper(this);
+        key.typeKeys(key.getKeyCode("EXAMPLE01.PROOF"));
 
         // press enter to load file
         type(KeyCode.ENTER);
