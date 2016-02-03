@@ -216,7 +216,8 @@ public abstract class AbstractExpectedAnswersComparison implements IHTMLSectionA
       sb.append("</tr>");
       sb.append("</table>");
       return CollectionUtil.toList(createLatexFile(evaluation, statistics, recordsCount, pageMap, false, getExperienceHeader()),
-                                   createLatexFile(evaluation, statistics, recordsCount, pageMap, true, getExperienceHeader()));
+                                   createLatexFile(evaluation, statistics, recordsCount, pageMap, true, getExperienceHeader()),
+                                   createHtmlFile(evaluation, statistics, recordsCount, pageMap, getExperienceHeader()));
    }
    
    protected abstract String getExperienceHeader();
@@ -359,7 +360,136 @@ public abstract class AbstractExpectedAnswersComparison implements IHTMLSectionA
                         "_ExpectedAnswersComparison.tex";
       return new AdditionalFile(fileName, latex.toString().getBytes(IOUtil.DEFAULT_CHARSET));
    }
-   
+
+   private AdditionalFile createHtmlFile(AbstractEvaluation evaluation, 
+                                         Statistics statistics, 
+                                         Map<IStatisticsFilter, BigInteger> recordsCount, 
+                                         Map<AbstractPage, PageStatistic> pageMap,
+                                         String experienceHeader) {
+      StringBuffer html = new StringBuffer();
+      html.append("<table border=\"0\" cellpadding=\"3\" cellspacing=\"2\">" + StringUtil.NEW_LINE);
+      html.append("<tr style=\"background-color: #4e9ad6;font-weight: bold;\">" + StringUtil.NEW_LINE);
+      html.append("<td colspan=\"3\" rowspan=\"2\">&nbsp;</td>" + StringUtil.NEW_LINE);
+      html.append("<td colspan=\"8\" align=\"center\">" + experienceHeader + " (%)</td>" + StringUtil.NEW_LINE);
+      html.append("</tr>");
+      html.append("<tr style=\"background-color: #4e9ad6;font-weight: bold;\">" + StringUtil.NEW_LINE);
+      for (IStatisticsFilter filter : statistics.getFilters()) {
+         //html.append("<td colspan=\"2\" align=\"center\">" + filter.getLatexName() + " (" + recordsCount.get(filter) + ")</td>" + StringUtil.NEW_LINE);
+         html.append("<td colspan=\"2\" align=\"center\">" + filter.getLatexName() + "</td>" + StringUtil.NEW_LINE);
+      }
+      html.append("</tr>");
+      html.append("<tr style=\"background-color: #4e9ad6;font-weight: bold;\">" + StringUtil.NEW_LINE);
+      html.append("<td>Example</td>" + StringUtil.NEW_LINE);
+      html.append("<td>Question</td>" + StringUtil.NEW_LINE);
+      html.append("<td>Answer</td>" + StringUtil.NEW_LINE);
+      for (@SuppressWarnings("unused") IStatisticsFilter filter : statistics.getFilters()) {
+         for (Tool tool : evaluation.getTools()) {
+            html.append("<td>" + tool.getLatexName() + "</td>" + StringUtil.NEW_LINE);
+         }
+      }
+      html.append("</tr>");
+      Map<IStatisticsFilter, Map<Tool, BigInteger>> winningMap = new HashMap<IStatisticsFilter, Map<Tool, BigInteger>>();
+      boolean afterFirst = false;
+      for (PageStatistic ps : pageMap.values()) {
+         if (!afterFirst) {
+            afterFirst = true;
+         }
+         Collection<QuestionStatistic> qss = ps.getQuestionStatistics();
+         boolean pagePrinted = false;
+         for (QuestionStatistic qs : qss) {
+            boolean questionPrinted = false;
+            Collection<ChoiceStatistic> css = qs.getChoiceStatistics();
+            for (ChoiceStatistic cs : css) {
+               html.append("<tr style=\"background-color: #b1d3ec;\">" + StringUtil.NEW_LINE);
+               if (!pagePrinted) {
+                  int choicesCount = 0;
+                  for (QuestionStatistic currentQs : qss) {
+                     choicesCount += currentQs.getChoiceStatistics().size();
+                  }
+                  html.append("<td rowspan=\"" + choicesCount + "\">" + ps.getPage().getLatexTitle() + "</td>" + StringUtil.NEW_LINE);
+                  pagePrinted = true;
+               }
+               if (!questionPrinted) {
+                  html.append("<td rowspan=\"" + css.size() + "\">" + qs.getQuestion().getLatexLabel() + "</td>" + StringUtil.NEW_LINE);
+                  questionPrinted = true;
+               }
+               html.append("<td>" + cs.getChoice().getLatexText() + "</td>" + StringUtil.NEW_LINE);
+               for (IStatisticsFilter filter : statistics.getFilters()) {
+                  List<Tool> winningTools = cs.computeWinningTools(filter, evaluation.getTools());
+                  if (winningTools != null && winningTools.size() == 1) {
+                     Map<Tool, BigInteger> filterMap = winningMap.get(filter);
+                     if (filterMap == null) {
+                        filterMap = new HashMap<Tool, BigInteger>();
+                        winningMap.put(filter, filterMap);
+                     }
+                     BigInteger currentValue = filterMap.get(winningTools.get(0));
+                     if (currentValue == null) {
+                        currentValue = BigInteger.ONE;
+                     }
+                     else {
+                        currentValue = currentValue.add(BigInteger.ONE);
+                     }
+                     filterMap.put(winningTools.get(0), currentValue);
+                  }
+                  for (Tool tool : evaluation.getTools()) {
+                     Statistic s = cs.getStatistic(filter, tool);
+                     BigDecimal percentage = s.computePercentage(0);
+                     if (winningTools != null && winningTools.size() == 1 && winningTools.contains(tool)) {
+                        html.append("<td style=\"color: blue;\">" + (percentage != null ? percentage : "&nbsp;") + "</td>" + StringUtil.NEW_LINE);
+                     }
+                     else {
+                        html.append("<td>" + (percentage != null ? percentage : "&nbsp;") + "</td>" + StringUtil.NEW_LINE);
+                     }
+                  }
+               }
+               html.append("</tr>" + StringUtil.NEW_LINE);
+            }
+         }
+      }
+      html.append("<tr style=\"background-color: #b1d3ec; font-weight: bold;\">" + StringUtil.NEW_LINE);
+      html.append("<td colspan=\"3\" align=\"right\">Winning Tool Count</td>" + StringUtil.NEW_LINE);
+      for (IStatisticsFilter filter : statistics.getFilters()) {
+         Map<Tool, BigInteger> filterMap = winningMap.get(filter);
+         List<Tool> winningTools = new LinkedList<Tool>();
+         if (filterMap != null) {
+            BigInteger winningCount = null;
+            for (Tool tool : evaluation.getTools()) {
+               BigInteger current = filterMap.get(tool);
+               if (current == null) {
+                  current = BigInteger.ZERO;
+               }
+               if (winningCount == null) {
+                  winningTools.add(tool);
+                  winningCount = current;
+               }
+               else {
+                  if (winningCount.compareTo(current) == 0) {
+                     winningTools.add(tool);
+                  }
+                  else if (winningCount.compareTo(current) < 0) {
+                     winningTools.clear();
+                     winningTools.add(tool);
+                     winningCount = current;
+                  }
+               }
+            }
+         }
+         for (Tool tool : evaluation.getTools()) {
+            BigInteger value = filterMap != null ? filterMap.get(tool) : null;
+            if (winningTools.size() == 1 && winningTools.contains(tool)) {
+               html.append("<td style=\"color: blue;\">" + (value != null ? value : BigInteger.ZERO) + "</td>" + StringUtil.NEW_LINE);
+            }
+            else {
+               html.append("<td>" + (value != null ? value : BigInteger.ZERO) + "</td>" + StringUtil.NEW_LINE);
+            }
+         }
+      }
+      html.append("</tr>" + StringUtil.NEW_LINE);
+      html.append("</table>" + StringUtil.NEW_LINE);
+      String fileName = "_ExpectedAnswersComparison.html";
+      return new AdditionalFile(fileName, html.toString().getBytes(IOUtil.DEFAULT_CHARSET));
+   }
+
    private static class PageStatistic {
       private final AbstractPage page;
       private final Map<AbstractQuestion, QuestionStatistic> questionMap = new LinkedHashMap<AbstractQuestion, QuestionStatistic>();
