@@ -58,13 +58,14 @@
 	<taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpath="${basedir}/ant-lib/checkstyle/checkstyle-6.14.1-all.jar" />
 
 	<path id="pmd.classpath">
-		<pathelement location="${basedir}" />
-		<fileset dir="${basedir}/ant-lib/pmd">
+		<pathelement location="${build.dir}" />
+		<fileset dir="${basedir}/ant-lib/pmd/">
 			<include name="*.jar" />
 		</fileset>
 	</path>
 
 	<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="pmd.classpath" />
+
 
 	<!-- Definition of target START -->
 	<target name="start" depends="compile" description="Starts KeY.">
@@ -118,7 +119,7 @@
 
 	<!-- Definition of target CHECKSTYLE -->
 	<target name="checkstyle" description="Generates Checkstyle Report.">
-		<checkstyle config="${basedir}/config/checkstyle/bp_checks.xml" classpath="${basedir}/ant-lib/checkstyle/checkstyle-6.14.1-all.jar">
+		<checkstyle config="${basedir}/reports-config/checkstyle/checkstyle_bp_key_160130.xml" classpath="${basedir}/ant-lib/checkstyle/checkstyle-6.14.1-all.jar">
 			<fileset dir="${basedir}/src" includes="**/*.java" />
 			<formatter type="xml" tofile="${basedir}/reports/checkstyle.xml" />
 		</checkstyle>
@@ -130,10 +131,10 @@
 
 	<!-- Definition of target PMD -->
 	<target name="pmd" description="Generates PMD Report.">
-		<pmd shortFilenames="true">
+		<pmd rulesetfiles="${basedir}/reports-config/pmd/pmd_bp_key_163001.xml" shortFilenames="true">
 			<sourceLanguage name="java" version="1.8" />
-			<ruleset>rulesets/java/design.xml</ruleset>
-			<ruleset>java-basic</ruleset>
+			<!-- <ruleset>rulesets/java/design.xml</ruleset>
+			<ruleset>java-basic</ruleset> --> 
 			<formatter type="xml" toFile="${basedir}/reports/pmd.xml" toConsole="true">
 				<param name="linkPrefix" value="http://pmd.sourceforge.net/xref/" />
 			</formatter>
@@ -142,7 +143,7 @@
 			</fileset>
 		</pmd>
 	   <xslt in="${basedir}/reports/pmd.xml"
-	              style="${basedir}/reports-templates/pmd/pmd-report-per-class.xslt"
+	              style="${basedir}/reports-templates/pmd/pmd-nicerhtml.xsl"
 	              out="${basedir}/reports/pmd.html"
 	        />
 	</target>
