@@ -28,6 +28,10 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 public class SearchHelper {
+    
+    private enum Direction {
+        UP, DOWN
+    }
 
     private boolean anythingIsHighlighted = false; //NOPMD
 
@@ -98,11 +102,11 @@ public class SearchHelper {
         for (Node n : searchViewAnchorPane.getChildren()) {
             if (n.getId().equals("previousButton")) {
                 previousButton = (Button) n;
-                previousButton.setOnAction((event) -> moveSelectionAndScrollIfNeeded(false));
+                previousButton.setOnAction((event) -> moveSelectionAndScrollIfNeeded(Direction.DOWN));
             }
             else if (n.getId().equals("nextButton")) {
                 nextButton = (Button) n;
-                nextButton.setOnAction((event) -> moveSelectionAndScrollIfNeeded(true));
+                nextButton.setOnAction((event) -> moveSelectionAndScrollIfNeeded(Direction.UP));
             }
             else if (n.getId().equals("searchTextField")) {
                 searchTextField = (TextField) n;
@@ -259,7 +263,7 @@ public class SearchHelper {
      * @param moveDownwards
      *            whether the selection is to be moved up- or downwards
      */
-    private void moveSelectionAndScrollIfNeeded(boolean moveDownwards) {
+    private void moveSelectionAndScrollIfNeeded(Direction direction) {
         if (!anythingIsHighlighted) {
             return;
         }
@@ -276,10 +280,10 @@ public class SearchHelper {
 
         // Basically does: itemToSelect = currentlySelectedItem + 1
         if (currentlySelectedItem == null
-                || moveDownwards
+                || direction == Direction.UP
                         && (treeItems.indexOf(currentlySelectedItem) == treeItems.size() - 1)
-                || (!moveDownwards) && (treeItems.indexOf(currentlySelectedItem) == 0)) {
-            if (moveDownwards) {
+                || direction == Direction.DOWN && (treeItems.indexOf(currentlySelectedItem) == 0)) {
+            if (direction == Direction.UP) {
                 itemToSelect = treeItems.get(0);
             }
             else {
@@ -287,7 +291,7 @@ public class SearchHelper {
             }
         }
         else {
-            if (moveDownwards) {
+            if (direction == Direction.UP) {
                 itemToSelect = treeItems.get(treeItems.indexOf(currentlySelectedItem) + 1);
             }
             else {
@@ -298,13 +302,13 @@ public class SearchHelper {
         // Basically does: while(!searchMatches.contains(itemToSelect))
         // itemToSelect++;
         while (!itemToSelect.getValue().isSearchResult()) {
-            if ((moveDownwards && (treeItems.indexOf(itemToSelect) == treeItems.size() - 1))
-                    || (!moveDownwards && (treeItems.indexOf(itemToSelect) == 0))) {
-                itemToSelect = moveDownwards ? treeItems.get(0)
+            if ((direction == Direction.UP && (treeItems.indexOf(itemToSelect) == treeItems.size() - 1))
+                    || (direction == Direction.DOWN && (treeItems.indexOf(itemToSelect) == 0))) {
+                itemToSelect = direction == Direction.UP ? treeItems.get(0)
                         : treeItems.get(treeItems.size() - 1);
             }
             else {
-                itemToSelect = moveDownwards ? treeItems.get(treeItems.indexOf(itemToSelect) + 1)
+                itemToSelect = direction == Direction.UP ? treeItems.get(treeItems.indexOf(itemToSelect) + 1)
                         : treeItems.get(treeItems.indexOf(itemToSelect) - 1);
             }
         }
@@ -324,7 +328,7 @@ public class SearchHelper {
         // if none of the treeCells contain the item we have just selected,
         // we need to scroll to make it visible
         boolean performScroll = true;
-        for (ProofTreeCell c : proofTreeCells) {
+        for (ProofTreeCell c : getProofTreeCells()) {
             if (c.getTreeItem() == itemToSelect) {
                 performScroll = false;
                 break;
@@ -336,6 +340,6 @@ public class SearchHelper {
             // make
             // the selected item appear in middle.
             proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex()
-                    - (moveDownwards ? 0 : (int) (proofTreeCells.size() / 2)));
+                    - (direction == Direction.UP ? 0 : (int) (proofTreeCells.size() / 2)));
     }
 }
