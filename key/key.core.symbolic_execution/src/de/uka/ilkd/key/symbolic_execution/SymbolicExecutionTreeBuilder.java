@@ -504,7 +504,7 @@ public class SymbolicExecutionTreeBuilder {
          Node n = proofTree.next();
          proofNodes.add(n);
          AbstractExecutionNode<?> exNode = (AbstractExecutionNode<?>) getExecutionNode(n);
-         if (exNode != null && n != node) { // maybe only first condition
+         if (exNode != null) {
             exNodesToKeep.add(exNode);
          }
       }
