@@ -179,12 +179,11 @@ public class ProofTreeLabelProvider extends LabelProvider {
       this.proofControl = proofControl;
       this.proof = proof;
       if (proof != null) {
+//        this.symExeTreeBuilder = new SymbolicExecutionTreeBuilder(proof, false, false, false, false, false);
+//        symExeTreeBuilder.analyse();
          proof.addProofTreeListener(proofTreeListener);
          proofControl.addAutoModeListener(autoModeListener);
       }
-      
-      this.symExeTreeBuilder = new SymbolicExecutionTreeBuilder(proof, false, false, false, false, false);
-      symExeTreeBuilder.analyse();
    }
 
    /**
@@ -233,83 +232,84 @@ public class ProofTreeLabelProvider extends LabelProvider {
    public Image getImage(Object element) {
       if (element instanceof Node) {
          Node node = (Node) element;
-         IExecutionNode<?> exeNode;
-         if ((exeNode = symExeTreeBuilder.getExecutionNode(node)) != null) {
-        	 if (exeNode instanceof IExecutionStart) {
-        		 return KeYImages.getImage(KeYImages.THREAD);
-        	 } else if (exeNode instanceof IExecutionStatement) {
-        		 return KeYImages.getImage(KeYImages.STATEMENT);
-        		 
-        	 } else if (exeNode instanceof IExecutionBranchStatement) {
-        		 return KeYImages.getImage(KeYImages.BRANCH_STATEMENT);
-        		 
-        	 } else if (exeNode instanceof IExecutionBranchCondition) {
-        		 return KeYImages.getImage(KeYImages.BRANCH_CONDITION);
-        		 
-        	 } else if (exeNode instanceof IExecutionMethodCall) {
-        		 return KeYImages.getImage(KeYImages.METHOD_CALL);
-        		 
-        	 } else if (exeNode instanceof IExecutionMethodReturn) {
-        		 return KeYImages.getImage(KeYImages.METHOD_RETURN);
-        		 
-        	 } else if (exeNode instanceof IExecutionTermination) {
-        		 IExecutionTermination termination = (IExecutionTermination) exeNode;
-        		 if (termination.getTerminationKind() == IExecutionTermination.TerminationKind.NORMAL) {
-        			 if (termination.isBranchVerified()) {
-        				 return KeYImages.getImage(KeYImages.TERMINATION);
-        			 } else {
-        				 return KeYImages.getImage(KeYImages.TERMINATION_NOT_VERIFIED);
-        			 }
-        		 } else if (termination.getTerminationKind() == IExecutionTermination.TerminationKind.EXCEPTIONAL) {
-        			 if (termination.isBranchVerified()) {
-        				 return KeYImages.getImage(KeYImages.EXCEPTIONAL_TERMINATION);
-        			 } else {
-        				 return KeYImages.getImage(KeYImages.EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
-        			 }
-        		 } else {
-        			 if (termination.isBranchVerified()) {
-        				 return KeYImages.getImage(KeYImages.LOOP_BODY_TERMINATION);
-        			 } else {
-        				 return KeYImages.getImage(KeYImages.LOOP_BODY_TERMINATION_NOT_VERIFIED);
-        			 }
-        		 }
-        	 } else if (exeNode instanceof IExecutionExceptionalMethodReturn) {
-        		 return KeYImages.getImage(KeYImages.EXCEPTIONAL_METHOD_RETURN);
-        		 
-        	 } else if (exeNode instanceof IExecutionLoopCondition) {
-        		 return KeYImages.getImage(KeYImages.LOOP_CONDITION);
-        		 
-        	 } else if (exeNode instanceof IExecutionLoopInvariant) {
-        		 IExecutionLoopInvariant loopInvariant = (IExecutionLoopInvariant) exeNode;
-        		 if (loopInvariant.isInitiallyValid()) {
-        			 return KeYImages.getImage(KeYImages.LOOP_INVARIANT);
-        		 } else {
-        			 return KeYImages.getImage(KeYImages.LOOP_INVARIANT_INITIALLY_INVALID);
-        		 }
-        	 } else if (exeNode instanceof IExecutionLoopStatement) {
-        		 return KeYImages.getImage(KeYImages.LOOP_STATEMENT);
-        		 
-        	 } else if (exeNode instanceof IExecutionOperationContract) {
-        		 IExecutionOperationContract operationContract = (IExecutionOperationContract) exeNode;
-        		 if (operationContract.isPreconditionComplied()) {
-        			 if (operationContract.isNotNullCheckComplied()) {
-        				 return KeYImages.getImage(KeYImages.METHOD_CONTRACT);
-        			 } else {
-        				 return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_NPC);
-        			 }
-        		 } else {
-        			 if (operationContract.isNotNullCheckComplied()) {
-        				 return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_PRE);
-        			 } else {
-        				 return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_PRE_NOT_NPC);
-        			 }
-        		 }
-        		 
-        	 } else {
-        		 return KeYImages.getImage(KeYImages.NODE);
-        	 }
-        	 
-         } else if (node.isClosed()) {
+//         IExecutionNode<?> exeNode;
+//         if ((exeNode = symExeTreeBuilder.getExecutionNode(node)) != null) {
+//        	 if (exeNode instanceof IExecutionStart) {
+//        		 return KeYImages.getImage(KeYImages.THREAD);
+//        	 } else if (exeNode instanceof IExecutionStatement) {
+//        		 return KeYImages.getImage(KeYImages.STATEMENT);
+//        		 
+//        	 } else if (exeNode instanceof IExecutionBranchStatement) {
+//        		 return KeYImages.getImage(KeYImages.BRANCH_STATEMENT);
+//        		 
+//        	 } else if (exeNode instanceof IExecutionBranchCondition) {
+//        		 return KeYImages.getImage(KeYImages.BRANCH_CONDITION);
+//        		 
+//        	 } else if (exeNode instanceof IExecutionMethodCall) {
+//        		 return KeYImages.getImage(KeYImages.METHOD_CALL);
+//        		 
+//        	 } else if (exeNode instanceof IExecutionMethodReturn) {
+//        		 return KeYImages.getImage(KeYImages.METHOD_RETURN);
+//        		 
+//        	 } else if (exeNode instanceof IExecutionTermination) {
+//        		 IExecutionTermination termination = (IExecutionTermination) exeNode;
+//        		 if (termination.getTerminationKind() == IExecutionTermination.TerminationKind.NORMAL) {
+//        			 if (termination.isBranchVerified()) {
+//        				 return KeYImages.getImage(KeYImages.TERMINATION);
+//        			 } else {
+//        				 return KeYImages.getImage(KeYImages.TERMINATION_NOT_VERIFIED);
+//        			 }
+//        		 } else if (termination.getTerminationKind() == IExecutionTermination.TerminationKind.EXCEPTIONAL) {
+//        			 if (termination.isBranchVerified()) {
+//        				 return KeYImages.getImage(KeYImages.EXCEPTIONAL_TERMINATION);
+//        			 } else {
+//        				 return KeYImages.getImage(KeYImages.EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
+//        			 }
+//        		 } else {
+//        			 if (termination.isBranchVerified()) {
+//        				 return KeYImages.getImage(KeYImages.LOOP_BODY_TERMINATION);
+//        			 } else {
+//        				 return KeYImages.getImage(KeYImages.LOOP_BODY_TERMINATION_NOT_VERIFIED);
+//        			 }
+//        		 }
+//        	 } else if (exeNode instanceof IExecutionExceptionalMethodReturn) {
+//        		 return KeYImages.getImage(KeYImages.EXCEPTIONAL_METHOD_RETURN);
+//        		 
+//        	 } else if (exeNode instanceof IExecutionLoopCondition) {
+//        		 return KeYImages.getImage(KeYImages.LOOP_CONDITION);
+//        		 
+//        	 } else if (exeNode instanceof IExecutionLoopInvariant) {
+//        		 IExecutionLoopInvariant loopInvariant = (IExecutionLoopInvariant) exeNode;
+//        		 if (loopInvariant.isInitiallyValid()) {
+//        			 return KeYImages.getImage(KeYImages.LOOP_INVARIANT);
+//        		 } else {
+//        			 return KeYImages.getImage(KeYImages.LOOP_INVARIANT_INITIALLY_INVALID);
+//        		 }
+//        	 } else if (exeNode instanceof IExecutionLoopStatement) {
+//        		 return KeYImages.getImage(KeYImages.LOOP_STATEMENT);
+//        		 
+//        	 } else if (exeNode instanceof IExecutionOperationContract) {
+//        		 IExecutionOperationContract operationContract = (IExecutionOperationContract) exeNode;
+//        		 if (operationContract.isPreconditionComplied()) {
+//        			 if (operationContract.isNotNullCheckComplied()) {
+//        				 return KeYImages.getImage(KeYImages.METHOD_CONTRACT);
+//        			 } else {
+//        				 return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_NPC);
+//        			 }
+//        		 } else {
+//        			 if (operationContract.isNotNullCheckComplied()) {
+//        				 return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_PRE);
+//        			 } else {
+//        				 return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_PRE_NOT_NPC);
+//        			 }
+//        		 }
+//        		 
+//        	 } else {
+//        		 return KeYImages.getImage(KeYImages.NODE);
+//        	 }
+//        	 
+//         } else 
+        	 if (node.isClosed()) {
         	 return KeYImages.getImage(KeYImages.NODE_PROVED);
          } else {
             if (node.getNodeInfo().getInteractiveRuleApplication()) {
@@ -334,7 +334,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-	  symExeTreeBuilder.analyse();
+//	  symExeTreeBuilder.analyse();
       proof.addProofTreeListener(proofTreeListener);
       fireAllNodesChanged();
    }
@@ -352,7 +352,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * @param e The event.
     */
    protected void handleProofExpanded(final ProofTreeEvent e) {
-	  symExeTreeBuilder.analyse();
+//	  symExeTreeBuilder.analyse();
       fireNodeChanged(e.getNode());
    }
    
@@ -361,7 +361,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * @param e The event.
     */
    protected void handleProofClosed(ProofTreeEvent e) {
-	  symExeTreeBuilder.analyse();
+//	  symExeTreeBuilder.analyse();
       fireAllNodesChanged();
    }
 
@@ -370,7 +370,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * @param e The event.
     */
    protected void hanldeProofPruned(final ProofTreeEvent e) {
-	  symExeTreeBuilder.analyse();
+//	  symExeTreeBuilder.analyse();
       fireNodeChanged(e.getNode());
    }
 
@@ -379,7 +379,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * @param e The event.
     */
    protected void handleProofGoalRemovedOrAdded(ProofTreeEvent e) {
-	   symExeTreeBuilder.analyse();
+//	   symExeTreeBuilder.analyse();
       if (e.getGoal() != null) {
          fireNodeChanged(e.getGoal().node());
       }
