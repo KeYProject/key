@@ -85,14 +85,7 @@ public class TreeViewController implements Initializable {
 
             // Register KeyEvent
             NUIController.getInstance().registerKeyListener(KeyCode.F,
-                    new KeyCode[] { KeyCode.CONTROL }, (event) -> {
-                if (searchHelper != null) {
-                    searchHelper.performFocusRequest();
-                }
-                else {
-                    searchHelper = new SearchHelper(proofTreeView, proofTreeCells, mainVBox);
-                }
-            });
+                    new KeyCode[] { KeyCode.CONTROL }, (event) -> openSearchView());
 
             NUIController.getInstance().registerKeyListener(KeyCode.ESCAPE, null, (event) -> {
                 searchHelper.destructor();
@@ -157,6 +150,19 @@ public class TreeViewController implements Initializable {
         }
         File proofFile = new File("resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof");
         loadAndDisplayProof(proofFile);
+    }
+
+    /**
+     * Opens the search View or moves the focus to the search views text field
+     * if a search view already exists.
+     */
+    public final void openSearchView() {
+        if (searchHelper != null) {
+            searchHelper.performFocusRequest();
+        }
+        else {
+            searchHelper = new SearchHelper(proofTreeView, proofTreeCells, mainVBox);
+        }
     }
 
     /**

@@ -1,8 +1,11 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+import de.uka.ilkd.key.nui.ComponentFactory;
 import de.uka.ilkd.key.nui.controller.NUIController;
+import de.uka.ilkd.key.nui.controller.TreeViewController;
 import de.uka.ilkd.key.nui.controller.NUIController.Place;
 import javafx.scene.control.TreeItem;
+import javafx.scene.input.KeyEvent;
 
 /**
  * This utility class contains actions for the context menu.
@@ -83,18 +86,8 @@ public final class ProofTreeActions {
      * Opens the search view.
      */
     public static void openSearchView() {
-        Place place = NUIController.getInstance().getPlaceComponent().
-                get("treeView");
-
-        try {
-            NUIController.getInstance().createOrMoveOrHideComponent(
-                    ".searchView", place, ".searchView.fxml");
-        }
-        catch (IllegalArgumentException e) {
-            NUIController.getInstance().createOrMoveOrHideComponent(
-                    ".searchView", NUIController.Place.HIDDEN,
-                    ".searchView.fxml");
-        }
+        TreeViewController t = ComponentFactory.getInstance().getController(TreeViewController.NAME);
+        t.openSearchView();
     }
 	
 	/**
