@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+
 /**
  * Represents an inner node. Is used to create a graphical representation of
  * a proof tree consisting of {@link de.uka.ilkd.key.proof.Node} objects.
@@ -35,15 +36,15 @@ public class NUIInnerNode extends NUINode {
     public final de.uka.ilkd.key.proof.Node getProofNode() {
         return proofNode;
     }
-
     
-    public void resetSearch(){
-        setSearchResult(false);
-    }
-    @Override
-    public boolean search(String term){
-        if(term.isEmpty()) return false;
-     //   System.out.println(this + ", a InnerNode was searched for '" + term + "' and highlighted? " + getLabel().toLowerCase().contains(term.toLowerCase()));
-        return setSearchResult(getLabel().toLowerCase().contains(term.toLowerCase()));
+    /**
+     * {@inheritDoc}
+     */
+    public NUIInnerNode clone() {
+        // create clone
+        final NUIInnerNode cloned = new NUIInnerNode(proofNode);
+        this.copyFields(this, cloned);
+        
+        return cloned;
     }
 }

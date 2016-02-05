@@ -57,6 +57,21 @@ public class ProofTreeVisualizer {
 	public final void addStylesheet(final String path) {
 		proofTreeView.getStylesheets().add(path);
 	}
+	
+	private final void visualizeProofTree(NUIBranchNode root) {
+	    if (root == null) {
+	        throw new IllegalStateException("No proof loaded.");
+	    }
+
+	    // create fx root node
+	    final TreeItem<NUINode> rootNode = new TreeItem<NUINode>(root);
+
+	    // convert the NUITree to a FXTree 
+	    convertNUITreeToFXTree(root, rootNode);
+
+	    // define the root of the tree
+	    proofTreeView.setRoot(rootNode);
+	}
 
 	/**
 	 * Visualizes the loaded proof tree in the proof tree view
@@ -64,19 +79,18 @@ public class ProofTreeVisualizer {
 	 * @throws IllegalStateException in case that no proof was loaded before
 	 */
 	public final void visualizeProofTree() {
-		if (nuiRoot == null) {
-			throw new IllegalStateException("No proof loaded.");
-		}
-		
-		// create fx root node
-		final TreeItem<NUINode> rootNode = new TreeItem<NUINode>(nuiRoot);
-		
-		// convert the NUITree to a FXTree 
-		convertNUITreeToFXTree(nuiRoot, rootNode);
-		
-		// define the root of the tree
-		proofTreeView.setRoot(rootNode);
+		visualizeProofTree(nuiRoot);
 	}
+	
+	/*public void visualizeFilteredProofTree() {
+	    NUINode st = FilteringHandler.getMatchedSubtree(nuiRoot, "LINKED");
+	    if(st != null) {
+	        visualizeProofTree((NUIBranchNode) st);
+	    }
+	    else {
+	        System.out.println("Fehler");
+	    }
+	}*/
 
 	/**
 	 * loads a proof tree by converting it to a NUITree which 

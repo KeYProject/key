@@ -27,7 +27,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
-public class SearchHelper {
+public class SearchHandler {
     
     private enum Direction {
         UP, DOWN
@@ -87,7 +87,7 @@ public class SearchHelper {
      *            the searchMatches List this is supposed to update
      * 
      */
-    public SearchHelper(TreeView<NUINode> proofTreeView, Set<ProofTreeCell> proofTreeCells, VBox mainVBox) {
+    public SearchHandler(TreeView<NUINode> proofTreeView, Set<ProofTreeCell> proofTreeCells, VBox mainVBox) {
         this.mainVBox = mainVBox;
         // this.searchMatches = searchMatches;
         this.proofTreeView = proofTreeView;
@@ -156,9 +156,9 @@ public class SearchHelper {
      * This routine <i>must</i> be called in order to actually remove the search
      * View from the interface (without any memory leaks).
      */
-    public void destructor() {
+    public void destruct() {
         for (Iterator<Node> i = mainVBox.getChildren().iterator(); i.hasNext();) {
-            Node node = i.next();
+            final Node node = i.next();
             if (node == searchViewAnchorPane) { //NOPMD
                 i.remove();
                 break;

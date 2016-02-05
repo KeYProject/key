@@ -16,7 +16,7 @@ import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeStyle;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeVisualizer;
-import de.uka.ilkd.key.nui.prooftree.SearchHelper;
+import de.uka.ilkd.key.nui.prooftree.SearchHandler;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -38,7 +38,14 @@ import javafx.scene.layout.VBox;
  */
 public class TreeViewController implements Initializable {
 
+    /**
+     * The name of the GUI component.
+     */
     public static final String NAME = "treeView";
+    
+    /**
+     * The fxml file name.
+     */
     public static final String RESOURCE = "treeView.fxml";
 
     /**
@@ -48,11 +55,14 @@ public class TreeViewController implements Initializable {
 
     /**
      * The VBox containing both the TreeView and the Anchor Pane where the
-     * Search elements are
+     * Search elements are.
      */
     @FXML
     private VBox mainVBox;
 
+    /**
+     * The tree cells used for displaying tree nodes.
+     */
     private final Set<ProofTreeCell> proofTreeCells = Collections
             .newSetFromMap(new WeakHashMap<>());
 
@@ -62,7 +72,11 @@ public class TreeViewController implements Initializable {
     @FXML
     private TreeView<NUINode> proofTreeView;
 
-    private SearchHelper searchHelper = null;
+    /**
+     * The handler that is responsible for managing searches.
+     * It is only present if a search process is started.
+     */
+    private SearchHandler searchHandler = null;
 
     /**
      * The visualizer for displaying a proof tree.
@@ -81,15 +95,24 @@ public class TreeViewController implements Initializable {
      */
     @Override
     public final void initialize(final URL location, final ResourceBundle resources) {
+        
         Platform.runLater(() -> {
 
-            // Register KeyEvent
+            // Register key listeners
+            final KeyCode[] modStrg = { KeyCode.CONTROL };
+            
+            // listener for opening search view
             NUIController.getInstance().registerKeyListener(KeyCode.F,
-                    new KeyCode[] { KeyCode.CONTROL }, (event) -> openSearchView());
+                    modStrg, (event) -> openSearchView());
 
+            // listener for closing search and filter view
             NUIController.getInstance().registerKeyListener(KeyCode.ESCAPE, null, (event) -> {
-                searchHelper.destructor();
-                searchHelper = null;
+                if (searchHandler != null) {
+                    searchHandler.destruct();
+                    searchHandler = null;
+                }
+                
+                //TODO filtering
             });
         });
 
@@ -97,9 +120,9 @@ public class TreeViewController implements Initializable {
 
         // set cell factory for rendering cells
         proofTreeView.setCellFactory((treeItem) -> {
-            ProofTreeCell c = new ProofTreeCell(icf);
-            Platform.runLater(() -> registerTreeCell(c));
-            return c;
+            final ProofTreeCell cell = new ProofTreeCell(icf);
+            Platform.runLater(() -> registerTreeCell(cell));
+            return cell;
         });
 
         // Create a new tree visualizer instance for processing the conversion
@@ -127,45 +150,22 @@ public class TreeViewController implements Initializable {
      *            The proof file to load.
      */
     public final void loadAndDisplayProof(final File file) {
+        reinit();
+        
         visualizer.loadProofTree(loadProof(file));
         visualizer.visualizeProofTree();
-        if (searchHelper != null) {
-            searchHelper.destructor();
-            searchHelper = null;
-        }
     }
 
     /**
-     * Loads the given proof file. Checks if the proof file exists and the proof
-     * is not null, and fails if the proof could not be loaded.
-     *
-     * @param proofFileName
-     *            The file name of the proof file to load.
-     * @return The loaded proof.
+     * Loads an example proof.
      */
     public final void loadExampleProof() {
-        if (searchHelper != null) {
-            searchHelper.destructor();
-            searchHelper = null;
-        }
-        File proofFile = new File("resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof");
+        final File proofFile = new File(
+                "resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof");
         loadAndDisplayProof(proofFile);
     }
 
     /**
-     * Opens the search View or moves the focus to the search views text field
-     * if a search view already exists.
-     */
-    public final void openSearchView() {
-        if (searchHelper != null) {
-            searchHelper.performFocusRequest();
-        }
-        else {
-            searchHelper = new SearchHelper(proofTreeView, proofTreeCells, mainVBox);
-        }
-    }
-
-    /**
      * Loads the given proof file. Checks if the proof file exists and the proof
      * is not null, and fails if the proof could not be loaded.
      *
@@ -173,10 +173,11 @@ public class TreeViewController implements Initializable {
      *            The file name of the proof file to load.
      * @return The loaded proof.
      */
-    private Proof loadProof(final File proofFile) {
+    private Proof loadProof(final File proofFileName) {
         try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-                    proofFile, null, null, null, true);
+            final KeYEnvironment<?> environment = KeYEnvironment.load(
+                    JavaProfile.getDefaultInstance(), proofFileName, null, null,
+                    null, true);
             final Proof proof = environment.getLoadedProof();
             return proof;
         }
@@ -197,5 +198,29 @@ public class TreeViewController implements Initializable {
      */
     private void registerTreeCell(final ProofTreeCell treeCell) {
         proofTreeCells.add(treeCell);
+    }
+    
+    /**
+     * Opens the search View or moves the focus to the search views text field
+     * if a search view already exists.
+     */
+    public final void openSearchView() {
+        if (searchHandler != null) {
+            searchHandler.performFocusRequest();
+        }
+        else {
+            searchHandler = new SearchHandler(proofTreeView, proofTreeCells, mainVBox);
+        }
+    }
+    
+    /**
+     * Reinitializes the tree view controller.
+     * Should be loaded when displaying a new proof.
+     */
+    private void reinit() {
+        if (searchHandler != null) {
+            searchHandler.destruct();
+            searchHandler = null;
+        }
     }
 }
