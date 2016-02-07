@@ -274,7 +274,8 @@ public class NUIController implements Initializable {
         toggleGroup3.selectToggle(
                 toggleGroup3.getToggles().get(POSITION_PROOFVIEW));
 
-        instance = this; // TODO this is ugly
+        // Assign instance for singleton pattern
+        NUIController.instance = this;
     }
 
     /**

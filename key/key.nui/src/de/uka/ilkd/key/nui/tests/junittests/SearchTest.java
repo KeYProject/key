@@ -11,8 +11,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
- * Test for User Story 
- * (005) Laden von Beweisen #14469
+ * Test for User Story (005) Laden von Beweisen #14469
  * 
  * @author Patrick Jattke
  *
@@ -22,7 +21,7 @@ public class SearchTest {
     /**
      * The proof file used for this test.
      */
-    private static String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
+    private final static String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
 
     /**
      * The ProofTreeVisualizer used to load the test file.
@@ -32,12 +31,12 @@ public class SearchTest {
     @BeforeClass
     public static void setUpBeforeClass() {
         ptVisualizer = new ProofTreeVisualizer(null);
-        File proofFile = new File(TESTFILE_01);
+        final File proofFile = new File(TESTFILE_01);
         KeYEnvironment<?> environment = null;
         try {
             environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
                     proofFile, null, null, null, true);
-            Proof proof = environment.getLoadedProof();
+            final Proof proof = environment.getLoadedProof();
             ptVisualizer.loadProofTree(proof);
         }
         catch (ProblemLoaderException e) {
@@ -57,33 +56,33 @@ public class SearchTest {
     @Test
     public void testSearchNumberOfFindings() {
         // 01_CommonSearch
-        String SEARCH_TERM_01 = "polySimp_pullOutFactor0b";
+        final String SEARCH_TERM_01 = "polySimp_pullOutFactor0b";
         assertTrue(searchAndCompareSize(SEARCH_TERM_01, 6));
 
         // 02_CommonSearch
-        String SEARCH_TERM_02 = "neg_literal";
+        final String SEARCH_TERM_02 = "neg_literal";
         assertTrue(searchAndCompareSize(SEARCH_TERM_02, 9));
         // 02_CommonSearch - test upper case
         assertTrue(searchAndCompareSize(SEARCH_TERM_02.toUpperCase(), 9));
 
         // 03_CommonSearch
-        String SEARCH_TERM_03 = "polySimp_";
+        final String SEARCH_TERM_03 = "polySimp_";
         assertTrue(searchAndCompareSize(SEARCH_TERM_03, 142));
 
         // 04_CommonSearch
-        String SEARCH_TERM_04 = "inEqSimp_contradInEq0";
+        final String SEARCH_TERM_04 = "inEqSimp_contradInEq0";
         assertTrue(searchAndCompareSize(SEARCH_TERM_04, 4));
         // 04_CommonSearch - test upper case
         assertTrue(searchAndCompareSize(SEARCH_TERM_04.toUpperCase(), 4));
 
         // 05_CommonSearch - test if beginning of term is found
-        String SEARCH_TERM_05 = "qeq";
+        final String SEARCH_TERM_05 = "qeq";
         assertTrue(searchAndCompareSize(SEARCH_TERM_05, 49));
         // 05_CommonSearch - test upper case
         assertTrue(searchAndCompareSize(SEARCH_TERM_05.toUpperCase(), 49));
 
         // 06_CommonSearch
-        String SEARCH_TERM_06 = "CUT: a <= -1 | a >= 1 FALSE";
+        final String SEARCH_TERM_06 = "CUT: a <= -1 | a >= 1 FALSE";
         assertTrue(searchAndCompareSize(SEARCH_TERM_06, 2));
     }
 
@@ -93,27 +92,27 @@ public class SearchTest {
     @Test
     public void testSearchNoMatches() {
         // 01_NoMatchSearch
-        String SEARCH_TERM_01 = "NO_SUCH";
+        final String SEARCH_TERM_01 = "NO_SUCH";
         assertTrue(searchAndCompareSize(SEARCH_TERM_01, 0));
 
         // 02_NoMatchSearch
-        String SEARCH_TERM_02 = "polySimp_addAssoc2";
+        final String SEARCH_TERM_02 = "polySimp_addAssoc2";
         assertTrue(searchAndCompareSize(SEARCH_TERM_02, 0));
 
         // 03_NoMatchSearch
-        String SEARCH_TERM_03 = "concrete_impl_2";
+        final String SEARCH_TERM_03 = "concrete_impl_2";
         assertTrue(searchAndCompareSize(SEARCH_TERM_03, 0));
 
         // 04_NoMatchSearch
-        String SEARCH_TERM_04 = "EQU$Simp";
+        final String SEARCH_TERM_04 = "EQU$Simp";
         assertTrue(searchAndCompareSize(SEARCH_TERM_04, 0));
 
         // 05_NoMatchSearch
-        String SEARCH_TERM_05 = "polyS%imp-";
+        final String SEARCH_TERM_05 = "polyS%imp-";
         assertTrue(searchAndCompareSize(SEARCH_TERM_05, 0));
 
         // 06_NoMatchSearch
-        String SEARCH_TERM_06 = "";
+        final String SEARCH_TERM_06 = "";
         assertTrue(searchAndCompareSize(SEARCH_TERM_06, 0));
     }
 
@@ -124,33 +123,32 @@ public class SearchTest {
     @Test
     public void testSearchSpecialTerms() {
         // 01_NoMatchSearch
-        String SEARCH_TERM_01 = "CUT: a >= 1 TRUE";
+        final String SEARCH_TERM_01 = "CUT: a >= 1 TRUE";
         assertTrue(searchAndCompareSize(SEARCH_TERM_01, 1));
 
         // 02_NoMatchSearch
-        String SEARCH_TERM_02 = "CUT: a <= -2 | a >= 2 FALSE";
+        final String SEARCH_TERM_02 = "CUT: a <= -2 | a >= 2 FALSE";
         assertTrue(searchAndCompareSize(SEARCH_TERM_02, 1));
 
         // 03_NoMatchSearch
-        String SEARCH_TERM_03 = "$leq";
+        final String SEARCH_TERM_03 = "$leq";
         assertTrue(searchAndCompareSize(SEARCH_TERM_03, 0));
     }
 
     /**
-     * Searches for the given searchTerm and compares the size of the
-     * results with the given expectedSize.
+     * Searches for the given searchTerm and compares the size of the results
+     * with the given expectedSize.
      * 
      * @param searchTerm
-     *          The term which should be used to search for.
+     *            The term which should be used to search for.
      * @param expectedSize
-     *          The expected size of the list of results.
-     * @return
-     *          True iff the size of the result list equals the expectedSize.
+     *            The expected size of the list of results.
+     * @return True iff the size of the result list equals the expectedSize.
      */
-    private boolean searchAndCompareSize(String searchTerm, int expectedSize) {
+    private boolean searchAndCompareSize(final String searchTerm, final int expectedSize) {
         ptVisualizer.getRootNode().search(searchTerm);
-        return (expectedSize == ptVisualizer.getRootNode().asList().stream()
-                .filter((node) -> node.isSearchResult()).count());
+        return expectedSize == ptVisualizer.getRootNode().asList().stream()
+                .filter((node) -> node.isSearchResult()).count();
     }
 
 }

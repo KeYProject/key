@@ -91,7 +91,9 @@ public class SearchHandler {
         this.proofTreeCells = proofTreeCells;
 
         // Loads the components from the .searchView fxml file
-        searchViewAnchorPane = (AnchorPane) (new ComponentFactory("components/"))
+        ComponentFactory cf = ComponentFactory.getInstance();
+        ComponentFactory.setResourceDirectory("components/");
+        searchViewAnchorPane = (AnchorPane) (cf)
                 .createComponent(".searchView", ".searchView.fxml");
 
         // iterates over the previously loaded components and adds EventHandlers
