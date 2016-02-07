@@ -194,6 +194,8 @@ public final class ComponentFactory {
 	 * @param id
 	 *            The Components FXID or another identifier specified at
 	 *            construction.
+	 * @param <T> 
+	 *             The controller class.
 	 * 
 	 * @return the Controller, or <tt> null </tt>, if no component with this ID is
 	 *         currently stored

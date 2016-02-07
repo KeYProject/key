@@ -57,6 +57,7 @@ public class NUIBranchNode extends NUINode {
     /**
      * Sets the children of the branch node.
      * @param children
+     *          Sets the given list of children as children of the current Branch Node.
      */
     public void setChildren(final List<NUINode> children) {
         this.children = children;
@@ -166,14 +167,14 @@ public class NUIBranchNode extends NUINode {
         return cloned;
     }
     
-    //TODO really necessary???
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    @Deprecated
     public List<NUINode> asList(){
         List<NUINode> l = new LinkedList<>();
         l.add(this);
         children.forEach((child) -> l.addAll(child.asList()));
         return l;
     }
-    
 }

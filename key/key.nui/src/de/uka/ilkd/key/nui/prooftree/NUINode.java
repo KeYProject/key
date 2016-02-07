@@ -453,9 +453,14 @@ public abstract class NUINode implements Cloneable {
         setSearchResult(match);
         return match;
     }
-    
-    //TODO really necessary???
-    @Deprecated
+
+    /**
+     * This method returns the current node and all of its children as List&lt;NUINode&gt;.
+     * This method is used for testing purposes.
+     * 
+     * @return
+     *      The current node and all of its children as List&lt;NUINode&gt;.
+     */
     public List<NUINode> asList() {
         List<NUINode> l = new LinkedList<>();
         l.add(this);

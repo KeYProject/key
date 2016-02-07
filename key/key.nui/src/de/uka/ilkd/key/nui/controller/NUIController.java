@@ -109,20 +109,23 @@ public class NUIController implements Initializable {
      * @param place
      *            – the place where the Component is to be moved to
      * @param componentResource
-     *            – the name of the components resource file, including the file
-     *            extension. The file must be a valid fxml file placed in the
-     *            resources folder.
+     *            – the name of the components resource file, including the
+     *            file extension. The file must be a valid fxml file placed in
+     *            the resources folder.
      * @throws IllegalArgumentException
      *             The Component componentName already exists in the Place
      *             place.
      */
-    public final void createOrMoveOrHideComponent(final String componentName, final Place place,
-            final String componentResource) throws IllegalArgumentException {
+    public final void createOrMoveOrHideComponent(final String componentName,
+            final Place place, final String componentResource)
+                    throws IllegalArgumentException {
         // Does the component already exist?
         // Then the user wants to either change its place or to hide it
         if (placeComponent.containsKey(componentName)) {
-            Node existingcomponent = getPane(placeComponent.get(componentName)).getChildren()
-                    .stream().filter((n) -> n.getId().equals(componentName)).findFirst().get();
+            Node existingcomponent = getPane(placeComponent.get(componentName))
+                    .getChildren().stream()
+                    .filter((n) -> n.getId().equals(componentName)).findFirst()
+                    .get();
             // Add Component to the respective Pane
             // and update its position in the posComponent Map.
             if (place == Place.HIDDEN) {
@@ -133,7 +136,8 @@ public class NUIController implements Initializable {
                  * removed from the Register or the Register should
                  * WeakReferences
                  */
-                getPane(placeComponent.get(componentName)).getChildren().remove(existingcomponent);
+                getPane(placeComponent.get(componentName)).getChildren()
+                        .remove(existingcomponent);
                 placeComponent.remove(componentName);
                 statustext.setText("View " + componentName + " hidden.");
                 ComponentFactory.getInstance().deleteComponent(componentName);
@@ -147,8 +151,8 @@ public class NUIController implements Initializable {
         else if (place != Place.HIDDEN) {
             // Component did not already exist, thus it must be created
             placeComponent.put(componentName, place);
-            Parent newComponent = ComponentFactory.getInstance().createComponent(componentName,
-                    componentResource);
+            Parent newComponent = ComponentFactory.getInstance()
+                    .createComponent(componentName, componentResource);
             getPane(place).getChildren().add(newComponent);
         }
     }
@@ -202,7 +206,8 @@ public class NUIController implements Initializable {
                     break;
                 default:
                     throw new IllegalArgumentException(
-                            "You submitted an illegal modifiers list for the key " + k.getCode());
+                            "You submitted an illegal modifiers list for the key "
+                                    + k.getCode());
                 }
             }
             e.getKey().handle(k);
@@ -219,17 +224,21 @@ public class NUIController implements Initializable {
     @FXML
     public final void handleOpenProof(final ActionEvent e) {
         if (placeComponent.keySet().stream()
-                .map((key) -> getPane(placeComponent.get(key)).getChildren().stream()
-                        .noneMatch((node) -> node.getId().equals(TreeViewController.NAME)))
+                .map((key) -> getPane(placeComponent.get(key)).getChildren()
+                        .stream()
+                        .noneMatch((node) -> node.getId()
+                                .equals(TreeViewController.NAME)))
                 .filter((bool) -> bool.booleanValue()).count() == 0) {
-            statustext.setText("TreeView not found, opening a tree is not possible");
+            statustext.setText(
+                    "TreeView not found, opening a tree is not possible");
         }
         else {
 
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setInitialDirectory(new File("resources/de/uka/ilkd/key/examples"));
-            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Proof files",
-                    "*.proof");
+            fileChooser.setInitialDirectory(
+                    new File("resources/de/uka/ilkd/key/examples"));
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                    "Proof files", "*.proof");
             fileChooser.getExtensionFilters().add(extFilter);
             File file = fileChooser.showOpenDialog(contextMenu);
             // only load proof if any selection was made
@@ -245,7 +254,8 @@ public class NUIController implements Initializable {
      * Loads the default components of the GUI.
      */
     @Override
-    public final void initialize(final URL location, final ResourceBundle resources) {
+    public final void initialize(final URL location,
+            final ResourceBundle resources) {
         // Load default components
         createOrMoveOrHideComponent(TreeViewController.NAME, Place.LEFT,
                 TreeViewController.RESOURCE);
@@ -259,8 +269,10 @@ public class NUIController implements Initializable {
         // Select appropriate menu item entries
         final int POSITION_TREEVIEW = 3; // 3: left view
         final int POSITION_PROOFVIEW = 2; // 2: right view
-        toggleGroup2.selectToggle(toggleGroup2.getToggles().get(POSITION_TREEVIEW));
-        toggleGroup3.selectToggle(toggleGroup3.getToggles().get(POSITION_PROOFVIEW));
+        toggleGroup2
+                .selectToggle(toggleGroup2.getToggles().get(POSITION_TREEVIEW));
+        toggleGroup3.selectToggle(
+                toggleGroup3.getToggles().get(POSITION_PROOFVIEW));
 
         instance = this; // TODO this is ugly
     }
@@ -269,27 +281,27 @@ public class NUIController implements Initializable {
      * This function allows to register key event handlers. After a Handler is
      * registered for a certain key or key combination, all KeyEvents of that
      * key or key combination will be transferred to that handler. <br/>
-     * <b> This functionality is not yet finished and must be used
-     * cautiously.</b>
+     * This functionality is not yet finished and must be used cautiously.
      * 
      * FIXME this does not allow to register the same key with different
      * modifiers, e.g. Enter and Shift-Enter
      * 
      * @param key
-     *            – the KeyCode of the primary to be listened to
+     *            the KeyCode of the primary to be listened to
      * @param modifiers
-     *            – all of the modifiers that should also be pressed to trigger
+     *            all of the modifiers that should also be pressed to trigger
      *            the Handler
      * @param handler
-     *            – the handler that is to be triggered when the key or key
+     *            the handler that is to be triggered when the key or key
      *            combination is recognised
      * 
      * @throws IllegalArgumentException
-     *             – that key is already in use or modifiers does not entirely
+     *             that key is already in use or modifiers does not entirely
      *             consist of modifiers
      */
-    public final void registerKeyListener(final KeyCode key, final KeyCode[] modifiers,
-            final EventHandler<KeyEvent> handler) throws IllegalArgumentException {
+    public final void registerKeyListener(final KeyCode key,
+            final KeyCode[] modifiers, final EventHandler<KeyEvent> handler)
+                    throws IllegalArgumentException {
 
         if (modifiers != null) {
             for (KeyCode c : modifiers) {
@@ -297,7 +309,8 @@ public class NUIController implements Initializable {
                 // cannot make the compiler do this check
                 if (!c.isModifierKey()) {
                     throw new IllegalArgumentException(
-                            "You submitted an illegal modifiers list for the key " + key);
+                            "You submitted an illegal modifiers list for the key "
+                                    + key);
                 }
             }
         }
@@ -311,19 +324,23 @@ public class NUIController implements Initializable {
             // "The key you submitted (" + k + ") was already in use.");
         }
 
-        keyEventHandlers.put(key, new SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>(
-                handler, (modifiers == null) ? new KeyCode[0] : modifiers));
+        keyEventHandlers.put(key,
+                new SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>(
+                        handler,
+                        (modifiers == null) ? new KeyCode[0] : modifiers));
     }
 
     /**
      * Unregister a previously registered key Listener.
      * 
-     * TODO eliminate this by implementing the key register using weak handles.
-     * 
+     * @param k
+     *          the keyCode which should be unregistered.
      * @throws IllegalArgumentException
-     *             – key was never registered
+     *             key was never registered.
      */
-    public final void unregisterKeyListener(final KeyCode k) throws IllegalArgumentException {
+    public final void unregisterKeyListener(final KeyCode k)
+            throws IllegalArgumentException {
+        // TODO eliminate this by implementing the key register using weak handles.
         keyEventHandlers.remove(k);
     }
 
@@ -336,7 +353,8 @@ public class NUIController implements Initializable {
      * @throws IllegalArgumentException
      *             p == HIDDEN
      */
-    protected final Pane getPane(final Place p) throws IllegalArgumentException {
+    protected final Pane getPane(final Place p)
+            throws IllegalArgumentException {
         switch (p) {
         case MIDDLE:
             return middle;
@@ -409,8 +427,8 @@ public class NUIController implements Initializable {
             break;
         }
 
-        String componentResource = (String) clickedItem.getParentMenu().getProperties()
-                .get("componentResource");
+        String componentResource = (String) clickedItem.getParentMenu()
+                .getProperties().get("componentResource");
 
         createOrMoveOrHideComponent(componentName, place, componentResource);
     }

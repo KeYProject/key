@@ -83,9 +83,6 @@ public class SearchHandler {
      *            references!)
      * @param mainVBox
      *            the VBox to draw the interface in
-     * @param searchMatches
-     *            the searchMatches List this is supposed to update
-     * 
      */
     public SearchHandler(TreeView<NUINode> proofTreeView, Set<ProofTreeCell> proofTreeCells, VBox mainVBox) {
         this.mainVBox = mainVBox;

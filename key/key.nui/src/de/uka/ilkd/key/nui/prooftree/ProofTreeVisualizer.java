@@ -42,7 +42,7 @@ public class ProofTreeVisualizer {
 	 * Creates a new TreeConverter object.
 	 *
 	 * @param proofTreeView
-	 * 			The reference to the TreeView<NUINode> object on the GUI
+	 * 			The reference to the TreeView&lt;NUINode&gt; object on the GUI
 	 */
 	public ProofTreeVisualizer(final TreeView<NUINode> proofTreeView) {
 		this.proofTreeView = proofTreeView;
