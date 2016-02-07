@@ -2,6 +2,13 @@ package de.uka.ilkd.key.nui.prooftree;
 
 import java.util.LinkedList;
 
+import de.uka.ilkd.key.nui.ComponentFactory;
+import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TreeView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
+
 /**
  * Performs the filtering.
  * @author Matthias Schultheis
@@ -9,6 +16,30 @@ import java.util.LinkedList;
  *
  */
 public class FilteringHandler {
+    
+    /**
+     * The VBox containing both the TreeView and the Anchor Pane where the
+     * Search elements are
+     */
+    /*@FXML
+    private VBox mainVBox;
+    
+    @FXML
+    private TextField filterTextField;*/
+    
+    //@FXML
+    private AnchorPane filterViewAnchorPane;
+    
+    public FilteringHandler(TreeView<NUINode> proofTreeView, VBox mainVBox) {
+        //this.mainVBox = mainVBox;
+        
+        filterViewAnchorPane = (AnchorPane) (new ComponentFactory("components/"))
+                .createComponent(".filterView", ".filterView.fxml");
+        
+        mainVBox.getChildren().add(filterViewAnchorPane);
+        System.out.println("Hallo");
+    }
+    
     
     /**
      * Returns a subtree consisting of only matching nodes.

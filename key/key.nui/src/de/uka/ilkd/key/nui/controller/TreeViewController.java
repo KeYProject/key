@@ -12,6 +12,7 @@ import java.util.WeakHashMap;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.NUI;
+import de.uka.ilkd.key.nui.prooftree.FilteringHandler;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeStyle;
@@ -114,6 +115,11 @@ public class TreeViewController implements Initializable {
                 
                 //TODO filtering
             });
+            
+            
+            // listener for opening search view
+            NUIController.getInstance().registerKeyListener(KeyCode.G,
+                    modStrg, (event) -> openFilterView());
         });
 
         proofTreeView.getStyleClass().add(ProofTreeStyle.CSS_PROOF_TREE);
@@ -211,6 +217,21 @@ public class TreeViewController implements Initializable {
         else {
             searchHandler = new SearchHandler(proofTreeView, proofTreeCells, mainVBox);
         }
+    }
+    
+    /**
+     * Opens the search View or moves the focus to the search views text field
+     * if a search view already exists.
+     */
+    public final void openFilterView() {
+        System.out.println("hallooo");
+        new FilteringHandler(proofTreeView, mainVBox);
+        /*if (searchHandler != null) {
+            searchHandler.performFocusRequest();
+        }
+        else {
+            searchHandler = new SearchHandler(proofTreeView, proofTreeCells, mainVBox);
+        }*/
     }
     
     /**
