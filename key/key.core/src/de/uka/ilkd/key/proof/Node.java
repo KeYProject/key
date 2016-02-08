@@ -67,7 +67,7 @@ public class Node  {
     /** contains non-logical content, used for user feedback */
     private NodeInfo             nodeInfo;
 
-    private final int                  serialNr;
+    private final int            serialNr;
 
     private int                  siblingNr = -1;
 

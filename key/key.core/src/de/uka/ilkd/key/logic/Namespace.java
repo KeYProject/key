@@ -174,11 +174,11 @@ public class Namespace implements java.io.Serializable {
     }
 
     public Namespace extended(Iterable<? extends Named> ext) {
-	Namespace res=new Namespace(this);
+        Namespace res = new Namespace(this);
         for (Named anExt : ext) {
             res.add(anExt);
         }
-	return res;
+        return res;
     }
 
    /** 
