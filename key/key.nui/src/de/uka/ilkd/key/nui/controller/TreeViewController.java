@@ -114,10 +114,7 @@ public class TreeViewController implements Initializable {
 
             // listener for closing search and filter view
             NUIController.getInstance().registerKeyListener(KeyCode.ESCAPE, null, (event) -> {
-                if (searchHandler != null) {
-                    searchHandler.destruct();
-                    searchHandler = null;
-                }
+                this.closeSearchView();
             });
             
             // listener for opening the filter view
@@ -143,6 +140,7 @@ public class TreeViewController implements Initializable {
         // add CSS file to view
         final String cssPath = this.getClass()
                 .getResource("../components/" + ProofTreeStyle.CSS_FILE).toExternalForm();
+        
         visualizer.addStylesheet(cssPath);
 
         if (NUI.getInitialProofFile() != null) {
@@ -214,11 +212,25 @@ public class TreeViewController implements Initializable {
      * if a search view already exists.
      */
     public final void openSearchView() {
-        if (searchHandler != null) {
+        if (searchHandler != null && searchHandler.isActive()) {
             searchHandler.performFocusRequest();
         }
         else {
-            searchHandler = new SearchHandler(proofTreeView, proofTreeCells, mainVBox);
+            searchHandler = new SearchHandler(proofTreeView, proofTreeCells, mainVBox, icf);
+        }
+    }
+    
+    /**
+     * Opens the search View or moves the focus to the search views text field
+     * if a search view already exists.
+     */
+    public final void closeSearchView() {
+        if (searchHandler == null) {
+            throw new IllegalStateException("Search View is not open.");
+        }
+        else {
+            searchHandler.destruct();
+            searchHandler = null;
         }
     }
     
@@ -228,7 +240,7 @@ public class TreeViewController implements Initializable {
      */
     public final void openFilterView() {
         if (filteringHandler == null) {
-            filteringHandler = new FilteringHandler(visualizer, mainVBox);
+            filteringHandler = new FilteringHandler(visualizer, mainVBox, icf);
         }
         else {
             filteringHandler.openFilteringPane();

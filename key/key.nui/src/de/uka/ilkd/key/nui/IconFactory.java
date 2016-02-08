@@ -74,6 +74,28 @@ public class IconFactory {
 		this.iconSizeWidth = width;
 		this.iconSizeHeight = height;
 	}
+	
+	/**
+     * Returns an custom scaled ImageView (scaled image) based on the given 
+     * imageFilename in the directory folderRoot.
+     * If the image was demanded once before a stored image will be returned.
+     * 
+     * @param imageConstant
+     *            The name of the image, e. g. IconFactory.KEY_INNER_NODE_OPEN
+     * @return ImageView object of JavaFX
+     */
+    public final ImageView getCustomScaledImage(final String imageConstant, int width, int height) {
+        Image img;
+        if (icons.containsKey(imageConstant)) {
+            img = icons.get(imageConstant);
+        } else {
+            final InputStream istream = IconFactory.class.getResourceAsStream(folderRoot
+                    + imageConstant);
+            img = new Image(istream);
+            icons.put(imageConstant, img);
+        }
+        return scaleIcon(img, width, height);
+    }
 
 	/**
 	 * Returns an ImageView (scaled image) based on the given imageFilename in

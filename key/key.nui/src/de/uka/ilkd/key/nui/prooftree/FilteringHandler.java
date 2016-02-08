@@ -4,11 +4,13 @@ import java.util.LinkedList;
 import java.util.Optional;
 
 import de.uka.ilkd.key.nui.ComponentFactory;
+import de.uka.ilkd.key.nui.IconFactory;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 /**
@@ -38,24 +40,24 @@ public class FilteringHandler {
     /**
      * The anchor pane for the filtering view.
      */
-    final private AnchorPane filterViewAnchorPane;
+    private Pane filterViewPane;
     
     /**
      * The text field for entering the filter query.
      */
-    private TextField filterTextField;
+    private TextField tfFilterQuery;
     
     /**
      * The button used to execute filtering.
      */
-    private Button btnExecFiltering;
+    private ToggleButton btnFilteringActive;
     
     /**
      * Initializes the filtering handler.
      * @param ptv the proofTreeVisualizer
      * @param mainVBox the VBox containing the proof tree
      */
-    public FilteringHandler(final ProofTreeVisualizer ptv, final VBox mainVBox) {
+    public FilteringHandler(final ProofTreeVisualizer ptv, final VBox mainVBox, final IconFactory icf) {
 
         this.ptVisualizer = ptv;
         this.mainVBox = mainVBox;
@@ -63,30 +65,42 @@ public class FilteringHandler {
         // Loads the components from the .filterView fxml file
         ComponentFactory cf = ComponentFactory.getInstance();
         ComponentFactory.setResourceDirectory("components/");
-        filterViewAnchorPane = (AnchorPane) (cf)
+        
+        filterViewPane = (Pane) (cf)
                 .createComponent(".filterView", ".filterView.fxml");
                 
               
         // get GUI components and register listeners
-        final Optional<Node> nodeBtnOk = getNodeChildById(filterViewAnchorPane, "btnFilterOK");
+        final Optional<Node> nodeBtnOk = getNodeChildById(filterViewPane, "btnFilterActve");
         if (nodeBtnOk.isPresent()) {
-            btnExecFiltering = (Button) nodeBtnOk.get();
-            btnExecFiltering.setOnAction((event) -> execFiltering());
+            btnFilteringActive = (ToggleButton) nodeBtnOk.get();
+            btnFilteringActive.setOnAction((event) -> execFiltering());
+            btnFilteringActive.setGraphic(icf.getImage("filter.png"));
         }
         else {
             throw new IllegalStateException("Button of filtering view not found!");
         }
         
-        final Optional<Node> nodeTFFiltering = getNodeChildById(filterViewAnchorPane, "filterTextField");
+        final Optional<Node> nodeTFFiltering = getNodeChildById(filterViewPane, "tfFilterQuery");
         if (nodeTFFiltering.isPresent()) {
-            filterTextField = (TextField) nodeTFFiltering.get();
-            btnExecFiltering.setOnAction((event) -> execFiltering());
+            tfFilterQuery = (TextField) nodeTFFiltering.get();
+        }
+        else {
+            throw new IllegalStateException("Text field of filtering view not found!");
+        }
+        
+        final Optional<Node> nodeBtnClose = getNodeChildById(filterViewPane, "btnFilterClose");
+        if (nodeBtnClose.isPresent()) {
+            Button btnClose = (Button) nodeBtnClose.get();
+            btnClose.setOnAction((event) -> hideFilteringPane());
+            btnClose.setGraphic(icf.getImage("cross.png"));
         }
         else {
             throw new IllegalStateException("Text field of filtering view not found!");
         }
         
         openFilteringPane();
+        
     }
     
     /**
@@ -95,11 +109,11 @@ public class FilteringHandler {
      */
     public void openFilteringPane() {
         if (filteringPaneIsVisible) {
-            filterTextField.requestFocus();
+            tfFilterQuery.requestFocus();
         }
         else {
             // add filter view to tree view
-            mainVBox.getChildren().add(filterViewAnchorPane);
+            mainVBox.getChildren().add(filterViewPane);
             filteringPaneIsVisible = true;
         }
     }
@@ -113,7 +127,7 @@ public class FilteringHandler {
         }
         else {
             // remove filter view from tree view
-            mainVBox.getChildren().remove(filterViewAnchorPane);
+            mainVBox.getChildren().remove(filterViewPane);
             filteringPaneIsVisible = false;
         }
     }
@@ -134,7 +148,10 @@ public class FilteringHandler {
      */
     public void execFiltering() {
         
-        final String filterQuery = filterTextField.getText().trim();
+        final String filterQuery = tfFilterQuery.getText().trim();
+        
+        if(filterQuery.isEmpty())
+            return;
         
         final NUINode filteredTree = getMatchedSubtree(ptVisualizer.getRootNode(), filterQuery);
         

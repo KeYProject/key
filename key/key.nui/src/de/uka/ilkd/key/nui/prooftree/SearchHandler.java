@@ -13,6 +13,7 @@ import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualFlow.ArrayLinkedList;
 
 import de.uka.ilkd.key.nui.ComponentFactory;
+import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.controller.NUIController;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -24,6 +25,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
@@ -39,17 +41,16 @@ public class SearchHandler {
      * The VBox containing both the TreeView and the Anchor Pane where the
      * Search elements are
      */
-    @FXML
     private final VBox mainVBox;
+    
     /**
      * The Button toggling selectNextItem in searching
      */
-    @FXML
     private Button nextButton;
+    
     /**
      * The Button toggling selectPreviousItem in searching
      */
-    @FXML
     private Button previousButton;
     
     /**
@@ -64,9 +65,9 @@ public class SearchHandler {
     private TextField searchTextField;
 
     /**
-     * The Anchor Pane holding the Search Field and its buttons
+     * The Pane holding the Search Field and its buttons
      */
-    private AnchorPane searchViewAnchorPane;
+    private Pane searchViewPane;
 
     /**
      * A List representation of the all the TreeItems
@@ -84,30 +85,38 @@ public class SearchHandler {
      * @param mainVBox
      *            the VBox to draw the interface in
      */
-    public SearchHandler(TreeView<NUINode> proofTreeView, Set<ProofTreeCell> proofTreeCells, VBox mainVBox) {
+    public SearchHandler(TreeView<NUINode> proofTreeView, Set<ProofTreeCell> proofTreeCells, VBox mainVBox, IconFactory icf) {
+        
         this.mainVBox = mainVBox;
-        // this.searchMatches = searchMatches;
         this.proofTreeView = proofTreeView;
         this.proofTreeCells = proofTreeCells;
 
-        // Loads the components from the .searchView fxml file
+        // Loads the components from the .filterView fxml file
         ComponentFactory cf = ComponentFactory.getInstance();
         ComponentFactory.setResourceDirectory("components/");
-        searchViewAnchorPane = (AnchorPane) (cf)
+        
+        searchViewPane = (Pane) (cf)
                 .createComponent(".searchView", ".searchView.fxml");
 
         // iterates over the previously loaded components and adds EventHandlers
         // to each of them
-        for (Node n : searchViewAnchorPane.getChildren()) {
-            if (n.getId().equals("previousButton")) {
+        for (Node n : searchViewPane.getChildren()) {
+            if (n.getId().equals("btnSearchPrev")) {
                 previousButton = (Button) n;
                 previousButton.setOnAction((event) -> moveSelectionAndScrollIfNeeded(Direction.DOWN));
+                previousButton.setGraphic(icf.getImage("up.png"));
             }
-            else if (n.getId().equals("nextButton")) {
+            else if (n.getId().equals("btnSearchNext")) {
                 nextButton = (Button) n;
                 nextButton.setOnAction((event) -> moveSelectionAndScrollIfNeeded(Direction.UP));
+                nextButton.setGraphic(icf.getImage("down.png"));
             }
-            else if (n.getId().equals("searchTextField")) {
+            else if (n.getId().equals("btnSearchClose")) {
+                Button closeButton = (Button) n;
+                closeButton.setOnAction((event) -> destruct());
+                closeButton.setGraphic(icf.getImage("cross.png"));
+            }
+            else if (n.getId().equals("tfSearchQuery")) {
                 searchTextField = (TextField) n;
                 searchTextField.textProperty().addListener((obs, oldText, newText) -> {
                     nextButton.setDisable(newText.isEmpty());
@@ -148,7 +157,7 @@ public class SearchHandler {
 
                     }
                 });
-        mainVBox.getChildren().add(searchViewAnchorPane);
+        mainVBox.getChildren().add(searchViewPane);
     }
 
     /**
@@ -156,20 +165,14 @@ public class SearchHandler {
      * View from the interface (without any memory leaks).
      */
     public void destruct() {
-        for (Iterator<Node> i = mainVBox.getChildren().iterator(); i.hasNext();) {
-            final Node node = i.next();
-            if (node == searchViewAnchorPane) { //NOPMD
-                i.remove();
-                break;
-            }
-        }
+        mainVBox.getChildren().remove(searchViewPane);
         NUIController.getInstance().unregisterKeyListener(KeyCode.ENTER);
         // searchMatches.clear();
         this.proofTreeView.getRoot().getValue().resetSearch();
         searchTextField = null;
         nextButton = null;
         previousButton = null;
-        searchViewAnchorPane = null;
+        searchViewPane = null;
     }
 
     public void performFocusRequest() {
@@ -340,5 +343,13 @@ public class SearchHandler {
             // the selected item appear in middle.
             proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex()
                     - (direction == Direction.UP ? 0 : (int) (proofTreeCells.size() / 2)));
+    }
+    
+    /**
+     * @return true iff the search is active
+     */
+    @Deprecated
+    public boolean isActive() {
+        return searchViewPane != null;
     }
 }
