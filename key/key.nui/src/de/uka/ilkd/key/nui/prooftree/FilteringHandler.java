@@ -3,6 +3,7 @@ package de.uka.ilkd.key.nui.prooftree;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.nui.ComponentFactory;
+import de.uka.ilkd.key.nui.controller.TreeViewController;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeView;
@@ -28,16 +29,30 @@ public class FilteringHandler {
     private TextField filterTextField;*/
     
     //@FXML
-    private AnchorPane filterViewAnchorPane;
+    //private AnchorPane filterViewAnchorPane;
     
-    public FilteringHandler(TreeView<NUINode> proofTreeView, VBox mainVBox) {
+    ProofTreeVisualizer ptv;
+    
+    public FilteringHandler(TreeView<NUINode> proofTreeView, ProofTreeVisualizer ptv, VBox mainVBox) {
         //this.mainVBox = mainVBox;
         
-        filterViewAnchorPane = (AnchorPane) (new ComponentFactory("components/"))
+        /*filterViewAnchorPane = (AnchorPane) (new ComponentFactory("components/"))
                 .createComponent(".filterView", ".filterView.fxml");
         
         mainVBox.getChildren().add(filterViewAnchorPane);
-        System.out.println("Hallo");
+        System.out.println("Hallo");*/
+        this.ptv = ptv;
+    }
+    
+    public void showFilteredTree() {
+        NUINode filteredTree = getMatchedSubtree(ptv.getRootNode(), "LINKED");
+        if(filteredTree != null) {
+            //TODO cast okay??
+            //ptv.visualizeProofTree((NUIBranchNode) filteredTree);
+        }
+        else {
+            System.out.println("No matches found.");
+        }
     }
     
     

@@ -29,7 +29,7 @@ public class ProofTreeVisualizer {
 	private final TreeView<NUINode> proofTreeView;
 
 	/**
-	 * The root node of the NUI tree.
+	 * The root node of the original NUI tree.
 	 */
 	private NUIBranchNode nuiRoot;
 	
@@ -58,9 +58,15 @@ public class ProofTreeVisualizer {
 		proofTreeView.getStylesheets().add(path);
 	}
 	
-	private final void visualizeProofTree(NUIBranchNode root) {
+	/**
+	 * Visualizes a custom proof tree. This could be the original one,
+	 * a filtered or modified one, ...
+	 * @param root the root node of the tree to visualize
+	 * @throws IllegalStateException in case that no proof was loaded before
+	 */
+	public final void visualizeProofTree(final NUIBranchNode root) {
 	    if (root == null) {
-	        throw new IllegalStateException("No proof loaded.");
+	        throw new IllegalStateException("VisualizeProofTree: tree is empty");
 	    }
 
 	    // create fx root node
@@ -79,7 +85,12 @@ public class ProofTreeVisualizer {
 	 * @throws IllegalStateException in case that no proof was loaded before
 	 */
 	public final void visualizeProofTree() {
-		visualizeProofTree(nuiRoot);
+	    if (nuiRoot == null) {
+	        throw new IllegalStateException("No proof tree has been loaded.");
+	    }
+	    else {
+	        visualizeProofTree(nuiRoot);
+	    }
 	}
 	
 	/*public void visualizeFilteredProofTree() {

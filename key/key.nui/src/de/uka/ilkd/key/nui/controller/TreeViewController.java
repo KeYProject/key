@@ -112,8 +112,6 @@ public class TreeViewController implements Initializable {
                     searchHandler.destruct();
                     searchHandler = null;
                 }
-                
-                //TODO filtering
             });
             
             
@@ -224,8 +222,10 @@ public class TreeViewController implements Initializable {
      * if a search view already exists.
      */
     public final void openFilterView() {
-        System.out.println("hallooo");
-        new FilteringHandler(proofTreeView, mainVBox);
+        //TODO
+        FilteringHandler fh = new FilteringHandler(proofTreeView, visualizer, mainVBox);
+        
+        fh.showFilteredTree();
         /*if (searchHandler != null) {
             searchHandler.performFocusRequest();
         }
