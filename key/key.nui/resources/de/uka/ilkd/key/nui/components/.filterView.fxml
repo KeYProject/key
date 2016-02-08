@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="filterViewAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+   
+   
+   
+      <TextField fx:id="filterTextField" layoutY="3.0" prefHeight="39.0" prefWidth="222.0" promptText="filter term" />
+      <Button fx:id="btnFilterOK" text="OK" textAlignment="CENTER" AnchorPane.topAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.bottomAnchor="0.0" />
+      
+      
+<!--       <Text text="java-Buddy" AnchorPane.topAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"/> -->
+<!--         <Label text="Who are you?" AnchorPane.topAnchor="25.0" AnchorPane.leftAnchor="0.0"/> -->
+<!--         <TextField id="textfield" fx:id="textfield" AnchorPane.topAnchor="25.0" AnchorPane.rightAnchor="0.0"/> -->
+<!--         <Button id="button"  text="Click Me!" -->
+<!--             onAction="#handleButtonAction" fx:id="button"  -->
+<!--             AnchorPane.topAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"/> -->
+<!--         <Label id="label" fx:id="label" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"/> -->
+      
+      
+      
+   </children>
+</AnchorPane>

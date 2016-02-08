@@ -60,9 +60,12 @@ public class FilteringHandler {
         this.ptVisualizer = ptv;
         this.mainVBox = mainVBox;
         
-        // get filter view pane
-        filterViewAnchorPane = (AnchorPane) (new ComponentFactory("components/"))
+        // Loads the components from the .filterView fxml file
+        ComponentFactory cf = ComponentFactory.getInstance();
+        ComponentFactory.setResourceDirectory("components/");
+        filterViewAnchorPane = (AnchorPane) (cf)
                 .createComponent(".filterView", ".filterView.fxml");
+                
               
         // get GUI components and register listeners
         final Optional<Node> nodeBtnOk = getNodeChildById(filterViewAnchorPane, "btnFilterOK");
