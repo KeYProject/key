@@ -12,6 +12,7 @@ import java.util.WeakHashMap;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.NUI;
+import de.uka.ilkd.key.nui.prooftree.FilteringHandler;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeStyle;
@@ -74,9 +75,15 @@ public class TreeViewController implements Initializable {
 
     /**
      * The handler that is responsible for managing searches.
-     * It is only present if a search process is started.
+     * It is only present if a search process was started.
      */
     private SearchHandler searchHandler = null;
+    
+    /**
+     * The handler that is responsible for filtering the tree.
+     * It is only present if a filtering process was started.
+     */
+    private FilteringHandler filteringHandler = null;
 
     /**
      * The visualizer for displaying a proof tree.
@@ -111,9 +118,11 @@ public class TreeViewController implements Initializable {
                     searchHandler.destruct();
                     searchHandler = null;
                 }
-                
-                //TODO filtering
             });
+            
+            // listener for opening the filter view
+            NUIController.getInstance().registerKeyListener(KeyCode.G,
+                    modStrg, (event) -> openFilterView());
         });
 
         proofTreeView.getStyleClass().add(ProofTreeStyle.CSS_PROOF_TREE);
@@ -210,6 +219,19 @@ public class TreeViewController implements Initializable {
         }
         else {
             searchHandler = new SearchHandler(proofTreeView, proofTreeCells, mainVBox);
+        }
+    }
+    
+    /**
+     * Opens the filter view or moves the focus to the search views text field
+     * if a search view already exists.
+     */
+    public final void openFilterView() {
+        if (filteringHandler == null) {
+            filteringHandler = new FilteringHandler(visualizer, mainVBox);
+        }
+        else {
+            filteringHandler.openFilteringPane();
         }
     }
     

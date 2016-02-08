@@ -62,6 +62,8 @@ public class IconFactory {
 	public static final String COLLAPSE = "collapse.png";
 	/** file name of search icon. */
 	public static final String SEARCH = "search.png";
+	/** file name of filter icon. */
+    public static final String FILTER = "filter.png";
 	
 	/**
 	 * The constructor.

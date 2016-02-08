@@ -72,7 +72,7 @@ public abstract class NUINode implements Cloneable {
     /**
      * Marks whether this node is a result of a currently active search.
      */
-    private SimpleBooleanProperty isSearchResult = new SimpleBooleanProperty(false);
+    private SimpleBooleanProperty searchResult = new SimpleBooleanProperty(false);
 
     /**
      * Retrieves the label (name) of the node. <br>
@@ -356,17 +356,17 @@ public abstract class NUINode implements Cloneable {
     
     /**
      * Copies the fields of a NUINode to another.
-     * @param source  the source of the field values
-     * @param target  the target where the fields have to be set.
+     * @param target  the source of the field values
+     * @param source  the target where the fields have to be set.
      */
     protected void copyFields(final NUINode source, final NUINode target) {
-        source.setActive(target.isActive());
-        source.setClosed(target.isClosed());
-        source.setHasNotes(target.hasNotes());
-        source.setInteractive(target.isInteractive());
-        source.setLabel(target.getLabel());
-        source.setLinked(target.isLinked());
-        source.setSerialNumber(target.getSerialNumber());
+        target.setActive(source.isActive());
+        target.setClosed(source.isClosed());
+        target.setHasNotes(source.hasNotes());
+        target.setInteractive(source.isInteractive());
+        target.setLabel(source.getLabel());
+        target.setLinked(source.isLinked());
+        target.setSerialNumber(source.getSerialNumber());
     }
 
     /**
@@ -386,10 +386,10 @@ public abstract class NUINode implements Cloneable {
      * @return true if this is a search Result, otherwise false
      */
     public boolean isSearchResult() {
-        if (isSearchResult == null) {
-            isSearchResult = new SimpleBooleanProperty();
+        if (searchResult == null) {
+            searchResult = new SimpleBooleanProperty();
         }
-        return isSearchResult.get();
+        return searchResult.get();
     }
     
     /**
@@ -398,11 +398,11 @@ public abstract class NUINode implements Cloneable {
      * @param isSearchResult true iff the NUINode is part of a searchResult
      */
     public void setSearchResult(final boolean isSearchResult) {
-        if (this.isSearchResult == null) {
-            this.isSearchResult = new SimpleBooleanProperty(isSearchResult);
+        if (this.searchResult == null) {
+            this.searchResult = new SimpleBooleanProperty(isSearchResult);
         }
         else {
-            this.isSearchResult.set(isSearchResult);
+            this.searchResult.set(isSearchResult);
         }
     }
     
@@ -414,10 +414,10 @@ public abstract class NUINode implements Cloneable {
      *            the changeListener to add.
      */
     public void addSearchResultListener(final ChangeListener<Boolean> listener) {
-       if (isSearchResult == null) {
-           isSearchResult = new SimpleBooleanProperty();
+       if (searchResult == null) {
+           searchResult = new SimpleBooleanProperty();
        }
-        isSearchResult.addListener(listener);
+        searchResult.addListener(listener);
     }
 
     /**
@@ -425,8 +425,8 @@ public abstract class NUINode implements Cloneable {
      * @param listener the changeListener to remove
      */
     public void removeSearchResultListener(final ChangeListener<Boolean> listener) {
-       if (isSearchResult != null) {
-            isSearchResult.removeListener(listener);
+       if (searchResult != null) {
+            searchResult.removeListener(listener);
         }
     }
     
@@ -449,7 +449,7 @@ public abstract class NUINode implements Cloneable {
             return false;
         }
         
-        boolean match = getLabel().toLowerCase().contains(term.toLowerCase());
+        final boolean match = getLabel().toLowerCase().contains(term.toLowerCase());
         setSearchResult(match);
         return match;
     }
