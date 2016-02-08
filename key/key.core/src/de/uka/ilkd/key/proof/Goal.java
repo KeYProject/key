@@ -94,7 +94,6 @@ public final class Goal  {
      */
     private final Properties strategyInfos;
 
-
     /** creates a new goal referencing the given node */
     private Goal(Node node,
                  RuleAppIndex ruleAppIndex,
