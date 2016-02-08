@@ -55,6 +55,11 @@ public class ProofTreeContextMenu extends ContextMenu {
      * The label of the context menu "search" label.
      */
     private static final String LBL_SEARCH = "Search";
+    
+    /**
+     * The label of the context menu "filter" label.
+     */
+    private static final String LBL_FILTER = "Filter";
 
     /**
      * The constructor.
@@ -100,6 +105,7 @@ public class ProofTreeContextMenu extends ContextMenu {
         addSeparator();
         
         addMenuItemSearch();
+        addMenuItemFilter();
     }
     
     /**
@@ -150,14 +156,24 @@ public class ProofTreeContextMenu extends ContextMenu {
     }
 
     /**
-     * Adds the entry Search to the context menu.
+     * Adds the entry 'Search' to the context menu.
      */
     private void addMenuItemSearch() {
     	final MenuItem mISearch = new MenuItem(LBL_SEARCH);
     	getItems().add(mISearch);
     	mISearch.setGraphic(icf.getImage(IconFactory.SEARCH));
     	mISearch.setOnAction(aEvt -> ProofTreeActions.openSearchView());
-    	
+    }
+    
+
+    /**
+     * Adds the entry 'Filter' to the context menu.
+     */
+    private void addMenuItemFilter() {
+        final MenuItem miFilter = new MenuItem(LBL_FILTER);
+        getItems().add(miFilter);
+        miFilter.setGraphic(icf.getImage(IconFactory.FILTER));
+        miFilter.setOnAction(aEvt -> ProofTreeActions.openFilterView());
     }
 
 }

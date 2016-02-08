@@ -1,11 +1,8 @@
 package de.uka.ilkd.key.nui.prooftree;
 
 import de.uka.ilkd.key.nui.ComponentFactory;
-import de.uka.ilkd.key.nui.controller.NUIController;
 import de.uka.ilkd.key.nui.controller.TreeViewController;
-import de.uka.ilkd.key.nui.controller.NUIController.Place;
 import javafx.scene.control.TreeItem;
-import javafx.scene.input.KeyEvent;
 
 /**
  * This utility class contains actions for the context menu.
@@ -86,9 +83,19 @@ public final class ProofTreeActions {
      * Opens the search view.
      */
     public static void openSearchView() {
-        TreeViewController t = ComponentFactory.getInstance().getController(TreeViewController.NAME);
-        t.openSearchView();
+        final TreeViewController controller = ComponentFactory.getInstance()
+                .getController(TreeViewController.NAME);
+        controller.openSearchView();
     }
+    
+    /**
+    * Opens the filter view.
+    */
+   public static void openFilterView() {
+       final TreeViewController controller = ComponentFactory.getInstance()
+               .getController(TreeViewController.NAME);
+       controller.openFilterView();
+   }
 	
 	/**
 	 * Repaints a tree item in its treeView.

@@ -28,7 +28,7 @@ public class ProofTreeVisualizer {
 	 */
 	private final TreeView<NUINode> proofTreeView;
 
-	/**
+    /**
 	 * The root node of the original NUI tree.
 	 */
 	private NUIBranchNode nuiRoot;
@@ -304,4 +304,11 @@ public class ProofTreeVisualizer {
 	public final NUIBranchNode getRootNode() {
 	    return this.nuiRoot;
 	}
+	
+    /**
+     * @return the proofTreeView
+     */
+    public TreeView<NUINode> getProofTreeView() {
+        return proofTreeView;
+    }
 }

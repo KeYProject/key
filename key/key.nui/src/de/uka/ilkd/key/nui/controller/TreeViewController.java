@@ -75,9 +75,15 @@ public class TreeViewController implements Initializable {
 
     /**
      * The handler that is responsible for managing searches.
-     * It is only present if a search process is started.
+     * It is only present if a search process was started.
      */
     private SearchHandler searchHandler = null;
+    
+    /**
+     * The handler that is responsible for filtering the tree.
+     * It is only present if a filtering process was started.
+     */
+    private FilteringHandler filteringHandler = null;
 
     /**
      * The visualizer for displaying a proof tree.
@@ -114,8 +120,7 @@ public class TreeViewController implements Initializable {
                 }
             });
             
-            
-            // listener for opening search view
+            // listener for opening the filter view
             NUIController.getInstance().registerKeyListener(KeyCode.G,
                     modStrg, (event) -> openFilterView());
         });
@@ -218,20 +223,16 @@ public class TreeViewController implements Initializable {
     }
     
     /**
-     * Opens the search View or moves the focus to the search views text field
+     * Opens the filter view or moves the focus to the search views text field
      * if a search view already exists.
      */
     public final void openFilterView() {
-        //TODO
-        FilteringHandler fh = new FilteringHandler(proofTreeView, visualizer, mainVBox);
-        
-        fh.showFilteredTree();
-        /*if (searchHandler != null) {
-            searchHandler.performFocusRequest();
+        if (filteringHandler == null) {
+            filteringHandler = new FilteringHandler(visualizer, mainVBox);
         }
         else {
-            searchHandler = new SearchHandler(proofTreeView, proofTreeCells, mainVBox);
-        }*/
+            filteringHandler.openFilteringPane();
+        }
     }
     
     /**
