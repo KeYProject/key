@@ -230,22 +230,7 @@ public final class Goal  {
 	}
     }
 
-    /**
-     * adds the global program variables to a new created variable namespace
-     * that contains all the elements of the given namespace.
-     */
-    public Namespace getVariableNamespace(Namespace exNS) {
-	Namespace newNS = exNS;
-	final Iterator<ProgramVariable> it=getGlobalProgVars().iterator();
-	if (it.hasNext()) {
-	    newNS=newNS.extended(it.next());
-	}
-	while (it.hasNext()) {
-	    newNS.add(it.next());
-	}
-	return newNS;
-    }
-
+  
     public void setGlobalProgVars(ImmutableSet<ProgramVariable> s) {
         assert node.proof().getNamespaces().contains(names(s)) :
                     "\""+names(s)+ "\" not found in namespace.";

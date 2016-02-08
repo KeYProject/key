@@ -902,12 +902,12 @@ public class IntermediateProofReplayer {
             Namespace varNS = p.getNamespaces().variables();
             varNS = app.extendVarNamespaceForSV(varNS, sv);
             Term instance = parseTerm(value, p, varNS,
-                    targetGoal.getVariableNamespace(varNS));
+                   varNS.extended(targetGoal.getGlobalProgVars()));
             result = app.addCheckedInstantiation(sv, instance, services, true);
         }
         return result;
     }
-
+    
     /**
      * Signals an error during construction of a taclet app.
      */
