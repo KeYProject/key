@@ -10,7 +10,7 @@ FILES=*.htm*
 PREFIX="$BUILD_NUMBER" + "_"
 
 cd ../key.nui/reports/
-
+mkdir -p "$STATISTICS_DIR"
 for file in $FILES
 do
 	cp $file "$STATISTICS_DIR/$BUILD_NUMBER/$PREFIX${f%%.*}.${f##*.}"
