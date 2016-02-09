@@ -7,7 +7,7 @@ export STATISTICS_DIR="$JENKINS_HOME/userContent/reports-$JOB_NAME"
 unset DISPLAY
 
 FILES=*.htm*
-PREFIX="$BUILD_NUMBER" + "_"
+PREFIX="${BUILD_NUMBER}_"
 
 cd ../key.nui/reports/
 mkdir -p "$STATISTICS_DIR"
