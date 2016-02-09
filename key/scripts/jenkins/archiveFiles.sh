@@ -6,9 +6,10 @@ export PATH=$PATH:/home/hudson/key/bin/
 export STATISTICS_DIR="$JENKINS_HOME/userContent/reports-$JOB_NAME"
 unset DISPLAY
 
-FILES=../key.nui/reports/*.htm*
+FILES="../../key.nui/reports/*.htm*"
 
 mkdir -p "$STATISTICS_DIR/$BUILD_NUMBER"
+
 for file in $FILES
 do
 	FILENAME=$(basename $file)
