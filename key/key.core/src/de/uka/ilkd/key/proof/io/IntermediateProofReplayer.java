@@ -195,6 +195,10 @@ public class IntermediateProofReplayer {
                                     .getChildren();
     
                             addChildren(children, intermChildren);
+                            
+                            // Children are no longer needed, set them to null
+                            // to free memory.
+                            currInterm.setChildren(null);
                         }
                         catch (Exception e) {
                             reportError(ERROR_LOADING_PROOF_LINE + "Line "
