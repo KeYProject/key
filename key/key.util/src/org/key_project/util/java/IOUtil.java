@@ -743,8 +743,16 @@ public final class IOUtil {
    }
 
    public static File toFile(URL url) {
-      URI uri = toURI(url);
-      return uri != null ? new File(uri) : null;
+       // The general approach to use an URI is not used for the file protocol,
+       // because a '+' is converted into a space ' ' according to the URI
+       // standard.
+       if ("file".equals(url.getProtocol())) {
+           return new File(url.getPath());
+       }
+       else {
+           URI uri = toURI(url);
+           return uri != null ? new File(uri) : null;
+       }
    }
    
    public static String toFileString(URL url) {
