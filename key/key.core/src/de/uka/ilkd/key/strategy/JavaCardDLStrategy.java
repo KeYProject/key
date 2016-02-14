@@ -1776,6 +1776,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "polySimp_applyEqRigid",
                 add(eq_monomial_feature, longConst(2)));
 
+        // 
+        bindRuleSet(d, "defOps_expandModulo", add(longConst(-600), new IsInRangeProvable()));
+
+        
         // category "saturate"
 
         bindRuleSet(
