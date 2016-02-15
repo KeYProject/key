@@ -27,27 +27,16 @@ import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * The {@link LabelProvider} used to label a proof tree consiting of 
@@ -74,11 +63,6 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * A mapping from {@link Node}s to {@link BranchFolder}s.
     */
    private final Map<Node, BranchFolder> nodeToBranchMapping = new HashMap<Node, BranchFolder>();
-   
-   /**
-    * The {@link SymbolicExecutionTreeBuilder} used for matching icons with the corresponding nodes.
-    */
-   private SymbolicExecutionTreeBuilder symExeTreeBuilder;
    
    /**
     * The ProofTreeListener
@@ -179,8 +163,6 @@ public class ProofTreeLabelProvider extends LabelProvider {
       this.proofControl = proofControl;
       this.proof = proof;
       if (proof != null) {
-//        this.symExeTreeBuilder = new SymbolicExecutionTreeBuilder(proof, false, false, false, false, false);
-//        symExeTreeBuilder.analyse();
          proof.addProofTreeListener(proofTreeListener);
          proofControl.addAutoModeListener(autoModeListener);
       }
@@ -225,116 +207,117 @@ public class ProofTreeLabelProvider extends LabelProvider {
       }
    }
    
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public Image getImage(Object element) {
-      if (element instanceof Node) {
-         Node node = (Node) element;
-//         IExecutionNode<?> exeNode;
-//         if ((exeNode = symExeTreeBuilder.getExecutionNode(node)) != null) {
-//        	 if (exeNode instanceof IExecutionStart) {
-//        		 return KeYImages.getImage(KeYImages.THREAD);
-//        	 } else if (exeNode instanceof IExecutionStatement) {
-//        		 return KeYImages.getImage(KeYImages.STATEMENT);
-//        		 
-//        	 } else if (exeNode instanceof IExecutionBranchStatement) {
-//        		 return KeYImages.getImage(KeYImages.BRANCH_STATEMENT);
-//        		 
-//        	 } else if (exeNode instanceof IExecutionBranchCondition) {
-//        		 return KeYImages.getImage(KeYImages.BRANCH_CONDITION);
-//        		 
-//        	 } else if (exeNode instanceof IExecutionMethodCall) {
-//        		 return KeYImages.getImage(KeYImages.METHOD_CALL);
-//        		 
-//        	 } else if (exeNode instanceof IExecutionMethodReturn) {
-//        		 return KeYImages.getImage(KeYImages.METHOD_RETURN);
-//        		 
-//        	 } else if (exeNode instanceof IExecutionTermination) {
-//        		 IExecutionTermination termination = (IExecutionTermination) exeNode;
-//        		 if (termination.getTerminationKind() == IExecutionTermination.TerminationKind.NORMAL) {
-//        			 if (termination.isBranchVerified()) {
-//        				 return KeYImages.getImage(KeYImages.TERMINATION);
-//        			 } else {
-//        				 return KeYImages.getImage(KeYImages.TERMINATION_NOT_VERIFIED);
-//        			 }
-//        		 } else if (termination.getTerminationKind() == IExecutionTermination.TerminationKind.EXCEPTIONAL) {
-//        			 if (termination.isBranchVerified()) {
-//        				 return KeYImages.getImage(KeYImages.EXCEPTIONAL_TERMINATION);
-//        			 } else {
-//        				 return KeYImages.getImage(KeYImages.EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
-//        			 }
-//        		 } else {
-//        			 if (termination.isBranchVerified()) {
-//        				 return KeYImages.getImage(KeYImages.LOOP_BODY_TERMINATION);
-//        			 } else {
-//        				 return KeYImages.getImage(KeYImages.LOOP_BODY_TERMINATION_NOT_VERIFIED);
-//        			 }
-//        		 }
-//        	 } else if (exeNode instanceof IExecutionExceptionalMethodReturn) {
-//        		 return KeYImages.getImage(KeYImages.EXCEPTIONAL_METHOD_RETURN);
-//        		 
-//        	 } else if (exeNode instanceof IExecutionLoopCondition) {
-//        		 return KeYImages.getImage(KeYImages.LOOP_CONDITION);
-//        		 
-//        	 } else if (exeNode instanceof IExecutionLoopInvariant) {
-//        		 IExecutionLoopInvariant loopInvariant = (IExecutionLoopInvariant) exeNode;
-//        		 if (loopInvariant.isInitiallyValid()) {
-//        			 return KeYImages.getImage(KeYImages.LOOP_INVARIANT);
-//        		 } else {
-//        			 return KeYImages.getImage(KeYImages.LOOP_INVARIANT_INITIALLY_INVALID);
-//        		 }
-//        	 } else if (exeNode instanceof IExecutionLoopStatement) {
-//        		 return KeYImages.getImage(KeYImages.LOOP_STATEMENT);
-//        		 
-//        	 } else if (exeNode instanceof IExecutionOperationContract) {
-//        		 IExecutionOperationContract operationContract = (IExecutionOperationContract) exeNode;
-//        		 if (operationContract.isPreconditionComplied()) {
-//        			 if (operationContract.isNotNullCheckComplied()) {
-//        				 return KeYImages.getImage(KeYImages.METHOD_CONTRACT);
-//        			 } else {
-//        				 return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_NPC);
-//        			 }
-//        		 } else {
-//        			 if (operationContract.isNotNullCheckComplied()) {
-//        				 return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_PRE);
-//        			 } else {
-//        				 return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_PRE_NOT_NPC);
-//        			 }
-//        		 }
-//        		 
-//        	 } else {
-//        		 return KeYImages.getImage(KeYImages.NODE);
-//        	 }
-//        	 
-//         } else 
-        	 if (node.isClosed()) {
-        	 return KeYImages.getImage(KeYImages.NODE_PROVED);
-         } else {
-            if (node.getNodeInfo().getInteractiveRuleApplication()) {
-               return KeYImages.getImage(KeYImages.NODE_INTERACTIVE);
-            } else {
-               return KeYImages.getImage(KeYImages.NODE);
-            }
-         }
-      } else if (element instanceof BranchFolder) {
-         if (((BranchFolder) element).isClosed()) {
-            return KeYImages.getImage(KeYImages.FOLDER_PROVED);
-         } else {
-            return KeYImages.getImage(KeYImages.FOLDER);
-         }
-      } else {
-         return super.getImage(element); // Unknown element
-      }
-   }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Image getImage(Object element) {
+		if (element instanceof Node) {
+			Node node = (Node) element;
+			NodeInfo info = node.getNodeInfo();
+			SourceElement statement = info.getActiveStatement();
+			
+			if (node.isClosed()) {
+				return KeYImages.getImage(KeYImages.NODE_PROVED);
+				
+			} else if (node.root()) {
+				return KeYImages.getImage(KeYImages.THREAD);
+				
+			} else if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, node.getAppliedRuleApp())) {
+				if (SymbolicExecutionUtil.hasSymbolicExecutionLabel(node.getAppliedRuleApp()) && statement != null && !SymbolicExecutionUtil.isRuleAppToIgnore(node.getAppliedRuleApp())) {
+					// Get position information
+					PositionInfo posInfo = statement.getPositionInfo();
+					//TODO add case for branch condition node
+					if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement)) {
+						return KeYImages.getImage(KeYImages.METHOD_CALL);
+
+					} else if (SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp())) {
+						return KeYImages.getImage(KeYImages.METHOD_RETURN);
+
+					} else if (SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, node.getAppliedRuleApp())) {
+						return KeYImages.getImage(KeYImages.EXCEPTIONAL_METHOD_RETURN);
+
+					} else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
+						if (!SymbolicExecutionUtil.hasLoopBodyLabel(node.getAppliedRuleApp())) {
+							// TODO check if branch is verified
+							return KeYImages.getImage(KeYImages.TERMINATION);
+						} else {
+							// TODO add icons for all termination kinds
+							return KeYImages.getImage(KeYImages.NODE);
+						}
+					} else if (SymbolicExecutionUtil.isBranchStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
+						return KeYImages.getImage(KeYImages.BRANCH_STATEMENT);
+
+					} else if (SymbolicExecutionUtil.isLoopStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
+						return KeYImages.getImage(KeYImages.LOOP_STATEMENT);
+
+					} else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
+						return KeYImages.getImage(KeYImages.STATEMENT);
+
+					} else if (SymbolicExecutionUtil.isOperationContract(node, node.getAppliedRuleApp())) {
+						
+						// is precondition compiled
+						if (node.childrenCount() >= 3 && node.child(2).isClosed()) {
+							
+							// is not null check compiled
+							if (node.childrenCount() >= 4 && node.child(3).isClosed()) {
+								return KeYImages.getImage(KeYImages.METHOD_CONTRACT);
+							} else {
+								return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_NPC);
+							}
+						} else {
+							
+							// is not null check compiled
+							if (node.childrenCount() >= 4 && node.child(3).isClosed()) {
+								return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_PRE);
+							} else {
+								return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_PRE_NOT_NPC);
+							}
+						}
+					} else if (SymbolicExecutionUtil.hasLoopCondition(node, node.getAppliedRuleApp(), statement)) {
+						return KeYImages.getImage(KeYImages.LOOP_CONDITION);
+
+					} else if (SymbolicExecutionUtil.isLoopInvariant(node, node.getAppliedRuleApp())) {
+						
+						// is initially valid
+						if (node.childrenCount() >= 1 && node.child(0).isClosed()) {
+							return KeYImages.getImage(KeYImages.LOOP_INVARIANT);
+						} else {
+							return KeYImages.getImage(KeYImages.LOOP_INVARIANT_INITIALLY_INVALID);
+						}
+					} else {
+						return KeYImages.getImage(KeYImages.NODE);
+					}
+				} else if (SymbolicExecutionUtil.isLoopBodyTermination(node, node.getAppliedRuleApp())) {
+					// TODO check if branch is verified
+					return KeYImages.getImage(KeYImages.LOOP_BODY_TERMINATION);
+					
+				} else {
+					return KeYImages.getImage(KeYImages.NODE);
+				}
+			} else {
+				if (node.getNodeInfo().getInteractiveRuleApplication()) {
+					return KeYImages.getImage(KeYImages.NODE_INTERACTIVE);
+				} else {
+					return KeYImages.getImage(KeYImages.NODE);
+				}
+			}
+		} else if (element instanceof BranchFolder) {
+			if (((BranchFolder) element).isClosed()) {
+				return KeYImages.getImage(KeYImages.FOLDER_PROVED);
+			} else {
+				return KeYImages.getImage(KeYImages.FOLDER);
+			}
+		} else {
+			return super.getImage(element); // Unknown element
+		}
+	}
 
    /**
     * When the auto mode is started.
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-//	  symExeTreeBuilder.analyse();
       proof.addProofTreeListener(proofTreeListener);
       fireAllNodesChanged();
    }
@@ -352,7 +335,6 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * @param e The event.
     */
    protected void handleProofExpanded(final ProofTreeEvent e) {
-//	  symExeTreeBuilder.analyse();
       fireNodeChanged(e.getNode());
    }
    
@@ -361,7 +343,6 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * @param e The event.
     */
    protected void handleProofClosed(ProofTreeEvent e) {
-//	  symExeTreeBuilder.analyse();
       fireAllNodesChanged();
    }
 
@@ -370,7 +351,6 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * @param e The event.
     */
    protected void hanldeProofPruned(final ProofTreeEvent e) {
-//	  symExeTreeBuilder.analyse();
       fireNodeChanged(e.getNode());
    }
 
@@ -379,7 +359,6 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * @param e The event.
     */
    protected void handleProofGoalRemovedOrAdded(ProofTreeEvent e) {
-//	   symExeTreeBuilder.analyse();
       if (e.getGoal() != null) {
          fireNodeChanged(e.getGoal().node());
       }
