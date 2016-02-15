@@ -1061,9 +1061,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                         ifZero(ff.quantifiedFor,
                                                 longTermConst(-10)))),
                         // prefer top level splits
-                        FindDepthFeature.INSTANCE,
+                        ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 2),
                         ScaleFeature.createScaled(
-                                countOccurrences(splitCondition), -2),
+                                countOccurrences(splitCondition), -1),
                         ifZero(applyTF(FocusProjection.INSTANCE,
                                 ContainsExecutableCodeTermFeature.PROGRAMS),
                                 longConst(-100), longConst(5))));
