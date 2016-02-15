@@ -1217,7 +1217,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                         SequentFormulasGenerator.sequent(),
                         sum(sub,
                                 SubtermGenerator
-                                        .leftTraverse(cutFormula, any()), // instead
+                                        .leftTraverse(sf, any()), // instead
                                                                           // of
                                                                           // any
                                                                           // a
