@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -74,7 +75,14 @@ public class SMTProblem {
                 name = "Goal " + goal.node().serialNr();
                 term = goalToTerm(goal);
         }
-        
+
+        public SMTProblem(Sequent s, Services services){
+            this.goal = null;
+            this.sequent = s;
+            name = "Sequent "+s.toString();
+            this.term = sequentToTerm(s, services);
+        }
+
         public SMTProblem(Term t){
         	this.goal = null;
         	name = "Term "+t.toString();
@@ -138,6 +146,27 @@ public class SMTProblem {
         void addSolver(SMTSolver solver) {
                 solvers.add(solver);
         }
+        
+        private static Term sequentToTerm(Sequent s, Services services) {
+
+            ImmutableList<Term> ante = ImmutableSLList.nil();
+
+            final TermBuilder tb = services.getTermBuilder();
+            ante = ante.append(tb.tt());
+            for (SequentFormula f : s.antecedent()) {
+                    ante = ante.append(f.formula());
+            }
+
+            ImmutableList<Term> succ = ImmutableSLList.nil();
+            succ = succ.append(tb.ff());
+            for (SequentFormula f : s.succedent()) {
+                    succ = succ.append(f.formula());
+            }
+
+            return tb.imp(tb.and(ante), tb.or(succ));
+
+        }
+
 
         private Term sequentToTerm(Sequent s) {
 

@@ -1,86 +1,141 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashSet;
-import java.util.Set;
 
-import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.PredictCostProver;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
+import de.uka.ilkd.key.util.ProofStarter;
 
 public class IsInRangeProvable implements Feature {
 
-    public IsInRangeProvable() {
-        
+    public static final IsInRangeProvable INSTANCE = new IsInRangeProvable(250, 5000);    
+    
+    private final int timeoutInMillis;
+    private final int maxRuleApps;
+    
+    private IsInRangeProvable(int timeoutInMillis, int maxRuleApps) {
+        this.timeoutInMillis = timeoutInMillis;
+        this.maxRuleApps = maxRuleApps;
     }
     
     
-    private ImmutableSet<Term> collectEquationsAndInEquations(Sequent seq, Services services) {
+    private ImmutableSet<Term> collectEquationsAndInEquations(Sequent seq, PosInOccurrence ignore, Services services) {
         ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+
+        // collect the operators used to identify the formulas of interest in the sequent
         final HashSet<Operator> ops = new HashSet<>();
-        ops.add(services.getTypeConverter().getIntegerLDT().getLessOrEquals());
-        ops.add(services.getTypeConverter().getIntegerLDT().getLessThan());
-        ops.add(services.getTypeConverter().getIntegerLDT().getGreaterThan());
-        ops.add(services.getTypeConverter().getIntegerLDT().getGreaterOrEquals());
-        for (SequentFormula sf : seq.antecedent()) {
-            final Operator op = sf.formula().op();
-            if (op == Equality.EQUALS || ops.contains(op)) {
-                result.add(sf.formula());
-            }
-        }
-        for (SequentFormula sf : seq.succedent()) {
-            final Operator op = sf.formula().op();
-            if (op == Equality.EQUALS || ops.contains(op)) {
-                result = result.add(services.getTermBuilder().not(sf.formula()));
-            }
-        }        
+        ops.add(integerLDT.getLessOrEquals());
+        ops.add(integerLDT.getLessThan());
+        ops.add(integerLDT.getGreaterThan());
+        ops.add(integerLDT.getGreaterOrEquals());
+        
+        // when extracting we want to ignore the formula on which the rule is applied
+        final SequentFormula formulaToIgnore = ignore.constrainedFormula();
+        
+        // extract formulas with equality (on integer terms) or one of the operators in <code>ops</code> as top level operator
+        result = extractAssumptionsFrom(seq.antecedent(), false, result, ops, formulaToIgnore, services);
+        result = extractAssumptionsFrom(seq.succedent(), true, result, ops, formulaToIgnore, services);
         
         return result;
     }
+
+
+    private ImmutableSet<Term> extractAssumptionsFrom(
+            final Semisequent semisequent, boolean negated, ImmutableSet<Term> assumptions,
+            final HashSet<Operator> ops, final SequentFormula formulaToIgnore, Services services) {
+        
+        final TermBuilder tb = services.getTermBuilder();
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        
+        for (final SequentFormula sf : semisequent) {
+            if (formulaToIgnore != sf) {
+                final Term formula = sf.formula();
+                if (filterSequent(ops, integerLDT, formula)) {
+                    assumptions = assumptions.add(negated ? tb.not(formula) : formula);
+                }
+            }
+        }
+        return assumptions;
+    }
+
+
+    private boolean filterSequent(final HashSet<Operator> ops,
+            final IntegerLDT integerLDT, final Term formula) {
+        return (formula.op() == Equality.EQUALS && 
+                formula.sub(0).sort().extendsTrans(integerLDT.targetSort())) || ops.contains(formula.op());
+    }
     
     
+    protected boolean isProvable(Sequent seq, Services services) {
+        final ProofStarter ps = new ProofStarter(false);
+        try {
+            ps.init(seq, services.getProof().getEnv(), "Strategy Oracle");
+        } catch (ProofInputException pie) {
+            pie.printStackTrace();
+            return false;
+        }
+        
+        final StrategyProperties sp = setupStrategy();
+        
+        ps.setStrategyProperties(sp);
+        ps.setMaxRuleApplications(maxRuleApps);
+        ps.setTimeout(timeoutInMillis);  
+        final ApplyStrategyInfo info = ps.start();
+        
+        return info.getProof().closed();
+    }
+
+
+    protected StrategyProperties setupStrategy() {
+        final StrategyProperties sp = new StrategyProperties();
+        sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_OFF);
+        sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+        sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NONE);
+        sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_NORMAL);
+        return sp;
+    }
+
+
     @Override
     public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
-        TacletApp tapp = (TacletApp) app;
-        
         final Services services = goal.proof().getServices();
         final TermBuilder tb = services.getTermBuilder();
-        final ImmutableSet<Term> axioms = collectEquationsAndInEquations(goal.sequent(), services);
+        final ImmutableSet<Term> axioms = collectEquationsAndInEquations(goal.sequent(), pos, services);
                 
         final Term termToCheck = pos.subTerm().sub(0);
-        Term toProveGEQ = tb.gt(termToCheck,tb.zTerm(Integer.MAX_VALUE));
-                
-        long geqCost = PredictCostProver.computerInstanceCost(new Substitution(DefaultImmutableMap.<QuantifiableVariable, Term>nilMap()), 
-                toProveGEQ, axioms, services);
-        if (geqCost == -1) {
-            return TopRuleAppCost.INSTANCE;
-        }
-        Term toProveLEQ = tb.lt(termToCheck,tb.zTerm(Integer.MIN_VALUE));              
-        long leqCost = PredictCostProver.computerInstanceCost(new Substitution(DefaultImmutableMap.<QuantifiableVariable, Term>nilMap()), 
-                toProveLEQ, axioms, services);
-        if (leqCost == -1) {
-            return TopRuleAppCost.INSTANCE;
-        }
+        Term toProve = tb.and(tb.geq(termToCheck, tb.zTerm(Integer.MIN_VALUE)), 
+                tb.leq(termToCheck, tb.zTerm(Integer.MAX_VALUE)));              
         
-        if (leqCost == 0 && geqCost == 0) {
+        if (isProvable(toSequent(axioms, toProve), services)) {
             return NumberRuleAppCost.getZeroCost();
         }
+                    
         return TopRuleAppCost.INSTANCE;
     }
 
+
+    private Sequent toSequent(ImmutableSet<Term> axioms, Term toProve) {
+        Sequent result = Sequent.EMPTY_SEQUENT;        
+        for (final Term axiom : axioms) {
+            result = result.addFormula(new SequentFormula(axiom), true, true).sequent();
+        }        
+        return result.addFormula(new SequentFormula(toProve), false, true).sequent();
+    }
 }
