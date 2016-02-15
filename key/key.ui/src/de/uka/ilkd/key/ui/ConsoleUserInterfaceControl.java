@@ -110,8 +110,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                final Statistics stat = info.getProof().getStatistics();
                System.out.println("Proof steps: "+stat.nodes);
                System.out.println("Branches: "+stat.branches);
-               System.out.println("Automode Time: "+(stat.autoModeTimeInNano/1000000)+"ms");
-               System.out.println("Time per step: "+(stat.timePerStepInNano/1000000)+"ms");
+               System.out.println("Automode Time: " + stat.autoModeTimeInMillis + "ms");
+               System.out.println("Time per step: " + stat.timePerStepInMillis + "ms");
            }
            System.out.println("Number of goals remaining open: " + openGoals);
            System.out.flush();
