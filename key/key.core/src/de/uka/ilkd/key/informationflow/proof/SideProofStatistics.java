@@ -37,7 +37,7 @@ public final class SideProofStatistics extends Statistics {
                                        stat.dependencyContractApps,
                                        stat.operationContractApps,
                                        stat.loopInvApps,
-                                       stat.autoModeTimeInNano);
+                                       stat.autoModeTimeInMillis);
     }
 
     static SideProofStatistics create(Statistics stat) {
@@ -52,7 +52,7 @@ public final class SideProofStatistics extends Statistics {
                                        stat.dependencyContractApps,
                                        stat.operationContractApps,
                                        stat.loopInvApps,
-                                       stat.autoModeTimeInNano);
+                                       stat.autoModeTimeInMillis);
     }
 
     SideProofStatistics add(SideProofStatistics stat) {
@@ -68,7 +68,7 @@ public final class SideProofStatistics extends Statistics {
                                            this.dependencyContractApps + stat.dependencyContractApps,
                                            this.operationContractApps + stat.operationContractApps,
                                            this.loopInvApps + stat.loopInvApps,
-                                           this.autoModeTimeInNano + stat.autoModeTimeInNano);
+                                           this.autoModeTimeInMillis + stat.autoModeTimeInMillis);
     }
 
     public SideProofStatistics add(Statistics stat) {
@@ -83,7 +83,7 @@ public final class SideProofStatistics extends Statistics {
                                            this.dependencyContractApps + stat.dependencyContractApps,
                                            this.operationContractApps + stat.operationContractApps,
                                            this.loopInvApps + stat.loopInvApps,
-                                           this.autoModeTimeInNano + stat.autoModeTimeInNano);
+                                           this.autoModeTimeInMillis + stat.autoModeTimeInMillis);
     }
 
     public SideProofStatistics setAutoModeTime(long autoTime) {
