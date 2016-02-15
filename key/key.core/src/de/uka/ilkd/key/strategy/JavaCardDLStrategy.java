@@ -1152,6 +1152,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return countOccurrencesInSeq;
     }
 
+    
     private void setupSplittingApproval(RuleSetDispatchFeature d) {
         bindRuleSet(d, "beta", allowSplitting(FocusFormulaProjection.INSTANCE));
 
@@ -1168,10 +1169,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                         compareCutAllowed);
 
         bindRuleSet(d, "hide", 
-                    not(add(applyTF(FocusFormulaProjection.INSTANCE, op(tf.eq)),
+                        add(applyTF(FocusFormulaProjection.INSTANCE, op(tf.eq)),
                             applyTF(sub(FocusFormulaProjection.INSTANCE, 0), tf.constant),
                             leq(countOccurrences(sub(FocusFormulaProjection.INSTANCE, 0)), 
-                                    longConst(1)))));
+                                    longConst(1))));
         
         bindRuleSet(
                 d,
