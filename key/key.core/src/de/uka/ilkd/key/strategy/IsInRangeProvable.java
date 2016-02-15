@@ -36,7 +36,6 @@ public class IsInRangeProvable implements Feature {
     
     
     private ImmutableSet<Term> collectEquationsAndInEquations(Sequent seq, PosInOccurrence ignore, Services services) {
-        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
 
         // collect the operators used to identify the formulas of interest in the sequent
@@ -50,10 +49,10 @@ public class IsInRangeProvable implements Feature {
         final SequentFormula formulaToIgnore = ignore.constrainedFormula();
         
         // extract formulas with equality (on integer terms) or one of the operators in <code>ops</code> as top level operator
-        result = extractAssumptionsFrom(seq.antecedent(), false, result, ops, formulaToIgnore, services);
-        result = extractAssumptionsFrom(seq.succedent(), true, result, ops, formulaToIgnore, services);
+        final ImmutableSet<Term> result = 
+                extractAssumptionsFrom(seq.antecedent(), false, DefaultImmutableSet.<Term>nil(), ops, formulaToIgnore, services);
         
-        return result;
+        return extractAssumptionsFrom(seq.succedent(), true, result, ops, formulaToIgnore, services);
     }
 
 
@@ -106,9 +105,12 @@ public class IsInRangeProvable implements Feature {
     protected StrategyProperties setupStrategy() {
         final StrategyProperties sp = new StrategyProperties();
         sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_OFF);
+        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_OFF);
         sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
         sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NONE);
         sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_NORMAL);
+        sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
+        sp.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY, StrategyProperties.CLASS_AXIOM_OFF);
         return sp;
     }
 
@@ -117,6 +119,7 @@ public class IsInRangeProvable implements Feature {
     public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Services services = goal.proof().getServices();
         final TermBuilder tb = services.getTermBuilder();
+        
         final ImmutableSet<Term> axioms = collectEquationsAndInEquations(goal.sequent(), pos, services);
                 
         final Term termToCheck = pos.subTerm().sub(0);
