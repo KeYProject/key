@@ -123,12 +123,37 @@ public class IsInRangeProvable implements Feature {
     public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Services services = goal.proof().getServices();
         final TermBuilder tb = services.getTermBuilder();
+        final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
         
         final ImmutableSet<Term> axioms = collectEquationsAndInEquations(goal.sequent(), pos, services);
                 
         final Term termToCheck = pos.subTerm().sub(0);
-        Term toProve = tb.and(tb.geq(termToCheck, tb.zTerm(Integer.MIN_VALUE)), 
-                tb.leq(termToCheck, tb.zTerm(Integer.MAX_VALUE)));              
+        
+        long upperBound;
+        long lowerBound;
+        
+        if (pos.subTerm().op() == intLDT.getArithModuloLong()) {
+            upperBound = Long.MAX_VALUE;
+            lowerBound = Long.MIN_VALUE;
+        } else if (pos.subTerm().op() == intLDT.getArithModuloInt()) {
+            upperBound = Integer.MAX_VALUE;
+            lowerBound = Integer.MIN_VALUE;
+        } else if (pos.subTerm().op() == intLDT.getArithModuloShort()) {
+            upperBound = Short.MAX_VALUE;
+            lowerBound = Short.MIN_VALUE;
+        } else if (pos.subTerm().op() == intLDT.getArithModuloByte()) {
+            upperBound = Byte.MAX_VALUE;
+            lowerBound = Byte.MIN_VALUE;
+        } else if (pos.subTerm().op() == intLDT.getArithModuloChar()) {
+            upperBound = Character.MAX_VALUE;
+            lowerBound = Character.MIN_VALUE;
+        } else {
+            assert false :  "Unknown modulo operation";
+            return TopRuleAppCost.INSTANCE;
+        }
+        
+        Term toProve = tb.and(tb.geq(termToCheck, tb.zTerm(lowerBound)), 
+                tb.leq(termToCheck, tb.zTerm(upperBound)));              
         
         if (isProvable(toSequent(axioms, toProve), services)) {
             return NumberRuleAppCost.getZeroCost();

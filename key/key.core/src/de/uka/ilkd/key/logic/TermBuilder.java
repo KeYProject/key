@@ -1279,7 +1279,7 @@ public class TermBuilder {
      * @param number an integer
      * @return Term in Z-Notation representing the given number
      */
-    public Term zTerm(int number) {
+    public Term zTerm(long number) {
         return zTerm(""+number);
     }
 
