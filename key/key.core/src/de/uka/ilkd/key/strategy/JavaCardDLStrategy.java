@@ -16,7 +16,6 @@ package de.uka.ilkd.key.strategy;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.axiom_abstraction.signanalysis.Zero;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -1071,7 +1070,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         ProjectionToTerm cutFormula = instOf("cutFormula");
 
         Feature countOccurrencesInSeq =
-                ScaleFeature.createAffine(countOccurrences(cutFormula), -20, 20);
+                ScaleFeature.createScaled(countOccurrences(cutFormula), -20);
 
         bindRuleSet(
                 d,
@@ -1171,6 +1170,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "hide", 
                         add(applyTF(FocusFormulaProjection.INSTANCE, op(tf.eq)), // we only hide equations automatically
                             applyTF(sub(FocusFormulaProjection.INSTANCE, 0), tf.constant), // we only hide equations if the left hand side is a constant
+                            applyTF(sub(FocusFormulaProjection.INSTANCE, 0), not(TermLabelTermFeature.HAS_ANY_LABEL)), // do not hide symbols with lables (might have special meaning)
                             applyTF(sub(FocusFormulaProjection.INSTANCE, 0), ff.noQueryConstant), // hack: do not hide constants introduced by QueryExpand
                             leq(countOccurrences(sub(FocusFormulaProjection.INSTANCE, 0)), longConst(1)))); // and that constant occurs at most once in the sequent (namely on the lhs)
         
