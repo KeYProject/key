@@ -4,7 +4,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 
-/** Termfeature which checks if a term has a specific label or any label at all */
+/**
+ *  A termfeature that can be used to check whether a term has a specific label {@link #create(TermLabel)} 
+ *  or any label {{@link #HAS_ANY_LABEL} at all.  
+ */
 public class TermLabelTermFeature extends BinaryTermFeature {
     
     public static final TermFeature HAS_ANY_LABEL = new TermLabelTermFeature(null);

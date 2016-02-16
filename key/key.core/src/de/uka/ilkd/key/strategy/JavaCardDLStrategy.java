@@ -1167,12 +1167,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 sum(subFor, AllowedCutPositionsGenerator.INSTANCE,
                         compareCutAllowed);
 
+        final ProjectionToTerm lhsOfEquation = sub(FocusFormulaProjection.INSTANCE, 0);
         bindRuleSet(d, "hide", 
                         add(applyTF(FocusFormulaProjection.INSTANCE, op(tf.eq)), // we only hide equations automatically
-                            applyTF(sub(FocusFormulaProjection.INSTANCE, 0), tf.constant), // we only hide equations if the left hand side is a constant
-                            applyTF(sub(FocusFormulaProjection.INSTANCE, 0), not(TermLabelTermFeature.HAS_ANY_LABEL)), // do not hide symbols with lables (might have special meaning)
-                            applyTF(sub(FocusFormulaProjection.INSTANCE, 0), ff.noQueryConstant), // hack: do not hide constants introduced by QueryExpand
-                            leq(countOccurrences(sub(FocusFormulaProjection.INSTANCE, 0)), longConst(1)))); // and that constant occurs at most once in the sequent (namely on the lhs)
+                            applyTF(lhsOfEquation, tf.constant), // we only hide equations if the left hand side is a constant
+                            applyTF(lhsOfEquation, not(TermLabelTermFeature.HAS_ANY_LABEL)), // do not hide symbols with labels (might have special meaning), it might actually suffic to check just for ParameterlessTermLAbel.SELECT_SKOLEM_LABEL
+                            applyTF(lhsOfEquation, not(ff.queryConstant)), // hack: do not hide constants introduced by QueryExpand
+                            leq(countOccurrences(lhsOfEquation), longConst(1)))); // and that constant occurs at most once in the sequent (namely on the lhs)
         
         bindRuleSet(
                 d,
@@ -3536,7 +3537,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private class FormulaTermFeatures {
 
-        public TermFeature noQueryConstant;
+        public TermFeature queryConstant;
         public FormulaTermFeatures() {
             forF = extendsTrans(Sort.FORMULA);
 
@@ -3547,13 +3548,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             ifThenElse = OperatorClassTF.create(IfThenElse.class);
 
             
-            noQueryConstant = new TermFeature() {
-                // hack to distinguish constants introduced by rule QueryExpand
+            queryConstant = new BinaryTermFeature() {                               
                 @Override
-                public RuleAppCost compute(Term term, Services services) {
-                    return (term.op() instanceof Function && term.arity() == 0 && term.op().name().toString().startsWith("res_")) ? TopRuleAppCost.INSTANCE : NumberRuleAppCost.getZeroCost();
+                protected boolean filter(Term term, Services services) {
+                    return term.op() instanceof Function && term.arity() == 0 && 
+                            term.op().name().toString().startsWith("res_");
                 }
-                
             };
                     
             atom = AtomTermFeature.INSTANCE;
