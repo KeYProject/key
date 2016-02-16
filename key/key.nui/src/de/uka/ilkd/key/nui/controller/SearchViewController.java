@@ -1,8 +1,7 @@
-package de.uka.ilkd.key.nui.prooftree;
+package de.uka.ilkd.key.nui.controller;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -12,35 +11,27 @@ import com.sun.javafx.scene.control.skin.VirtualContainerBase;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualFlow.ArrayLinkedList;
 
-import de.uka.ilkd.key.nui.ComponentFactory;
-import de.uka.ilkd.key.nui.controller.NUIController;
+import de.uka.ilkd.key.nui.prooftree.NUINode;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
-public class SearchHandler {
-    
+public class SearchViewController extends NUIController {
+
     private enum Direction {
         UP, DOWN
     }
 
-    private boolean anythingIsHighlighted = false; //NOPMD
+    private boolean anythingIsHighlighted = false; // NOPMD
 
-    /**
-     * The VBox containing both the TreeView and the Anchor Pane where the
-     * Search elements are
-     */
-    @FXML
-    private final VBox mainVBox;
     /**
      * The Button toggling selectNextItem in searching
      */
@@ -51,22 +42,32 @@ public class SearchHandler {
      */
     @FXML
     private Button previousButton;
-    
-    /**
-     * Weak-referenced Set of ProofTreeCells
-     */
-    private final Set<ProofTreeCell> proofTreeCells;
-    
-    private TreeView<NUINode> proofTreeView;
+
     /**
      * The TextField where search terms are entered
      */
+    @FXML
     private TextField searchTextField;
+
+    /**
+     * Weak-referenced Set of ProofTreeCells
+     */
+    private Set<ProofTreeCell> proofTreeCells;
+
+    /**
+     * Reference of TreeView
+     */
+    private TreeView<NUINode> proofTreeView;
+    /**
+     * Reference of Parent Connection between TreeView and SearchView
+     */
+    private Pane treeViewPane;
 
     /**
      * The Anchor Pane holding the Search Field and its buttons
      */
-    private AnchorPane searchViewAnchorPane;
+    @FXML
+    private Pane searchViewPane;
 
     /**
      * A List representation of the all the TreeItems
@@ -74,103 +75,23 @@ public class SearchHandler {
     private List<TreeItem<NUINode>> treeItems;
 
     /**
-     * Displays a search view.
+     * Set TreeView used for the search
      * 
      * @param proofTreeView
-     *            the proofTreeView to search in
+     *            reference to treeView
      * @param proofTreeCells
-     *            the ProofTreeCells to highlight the results in (use weak
-     *            references!)
-     * @param mainVBox
-     *            the VBox to draw the interface in
-     * @param searchMatches
-     *            the searchMatches List this is supposed to update
-     * 
+     *            reference to cells of treeView
+     * @param treeViewPane
+     *            reference to treeViewPane(Parent of searchView)
      */
-    public SearchHandler(TreeView<NUINode> proofTreeView, Set<ProofTreeCell> proofTreeCells, VBox mainVBox) {
-        this.mainVBox = mainVBox;
-        // this.searchMatches = searchMatches;
+    public void initSearch(TreeView<NUINode> proofTreeView,
+            Set<ProofTreeCell> proofTreeCells, Pane treeViewPane) {
+
         this.proofTreeView = proofTreeView;
         this.proofTreeCells = proofTreeCells;
+        this.treeViewPane = treeViewPane;
 
-        // Loads the components from the .searchView fxml file
-        searchViewAnchorPane = (AnchorPane) (new ComponentFactory("components/"))
-                .createComponent(".searchView", ".searchView.fxml");
-
-        // iterates over the previously loaded components and adds EventHandlers
-        // to each of them
-        for (Node n : searchViewAnchorPane.getChildren()) {
-            if (n.getId().equals("previousButton")) {
-                previousButton = (Button) n;
-                previousButton.setOnAction((event) -> moveSelectionAndScrollIfNeeded(Direction.DOWN));
-            }
-            else if (n.getId().equals("nextButton")) {
-                nextButton = (Button) n;
-                nextButton.setOnAction((event) -> moveSelectionAndScrollIfNeeded(Direction.UP));
-            }
-            else if (n.getId().equals("searchTextField")) {
-                searchTextField = (TextField) n;
-                searchTextField.textProperty().addListener((obs, oldText, newText) -> {
-                    nextButton.setDisable(newText.isEmpty());
-                    previousButton.setDisable(newText.isEmpty());
-                    if (newText.isEmpty()) {
-                        proofTreeView.getRoot().getValue().resetSearch();
-                    }
-                    else {
-                        anythingIsHighlighted = proofTreeView.getRoot().getValue().search(newText);
-                    }
-                });
-                Platform.runLater(() -> searchTextField.requestFocus());
-            }
-        }
-
-        // Register a Key Event Handler so that ENTER will trigger the
-        // "Next"-Button and Shift-ENTER will trigger the "Previous"-Button
-        NUIController.getInstance().registerKeyListener(KeyCode.ENTER, new KeyCode[] {},
-                (event) -> {
-                    if (event.isShiftDown()) {
-                        previousButton.arm();
-                        PauseTransition pause = new PauseTransition(Duration.millis(130));
-                        pause.setOnFinished(e -> {
-                            previousButton.disarm();
-                        });
-                        previousButton.fire();
-                        pause.play();
-
-                    }
-                    else {
-                        nextButton.arm();
-                        PauseTransition pause = new PauseTransition(Duration.millis(130));
-                        pause.setOnFinished(e -> {
-                            nextButton.disarm();
-                        });
-                        nextButton.fire();
-                        pause.play();
-
-                    }
-                });
-        mainVBox.getChildren().add(searchViewAnchorPane);
-    }
-
-    /**
-     * This routine <i>must</i> be called in order to actually remove the search
-     * View from the interface (without any memory leaks).
-     */
-    public void destruct() {
-        for (Iterator<Node> i = mainVBox.getChildren().iterator(); i.hasNext();) {
-            final Node node = i.next();
-            if (node == searchViewAnchorPane) { //NOPMD
-                i.remove();
-                break;
-            }
-        }
-        NUIController.getInstance().unregisterKeyListener(KeyCode.ENTER);
-        // searchMatches.clear();
-        this.proofTreeView.getRoot().getValue().resetSearch();
-        searchTextField = null;
-        nextButton = null;
-        previousButton = null;
-        searchViewAnchorPane = null;
+        Platform.runLater(() -> searchTextField.requestFocus());
     }
 
     public void performFocusRequest() {
@@ -179,6 +100,7 @@ public class SearchHandler {
 
     /**
      * TODO Bitte nicht löschen, in Code Reviews bitte ignorieren
+     * 
      * @return
      */
     @SuppressWarnings("unchecked")
@@ -189,21 +111,23 @@ public class SearchHandler {
             Field g = VirtualFlow.class.getDeclaredField("cells");
             g.setAccessible(true);
             Set<ProofTreeCell> s = new HashSet<>();
-            s.addAll((ArrayLinkedList<ProofTreeCell>) g.get(((VirtualFlow<ProofTreeCell>) f
-                    .get(((TreeViewSkin<NUINode>) proofTreeView.skinProperty().get())))));
+            s.addAll((ArrayLinkedList<ProofTreeCell>) g
+                    .get(((VirtualFlow<ProofTreeCell>) f
+                            .get(((TreeViewSkin<NUINode>) proofTreeView
+                                    .skinProperty().get())))));
             return s;
         }
         catch (NoSuchFieldException e) {
-            e.printStackTrace();
+            e.printStackTrace();//TODO
         }
         catch (SecurityException e) {
-            e.printStackTrace();
+            e.printStackTrace();//TODO
         }
         catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            e.printStackTrace();//TODO
         }
         catch (IllegalAccessException e) {
-            e.printStackTrace();
+            e.printStackTrace();//TODO
         }
         return null;
     }
@@ -241,13 +165,15 @@ public class SearchHandler {
                     list.add(root);
                     if (!root.getChildren().isEmpty()) {
                         for (TreeItem<T> ti : root.getChildren()) {
-                            list.addAll(treeToList(ti, new LinkedList<TreeItem<T>>()));
+                            list.addAll(treeToList(ti,
+                                    new LinkedList<TreeItem<T>>()));
                         }
                     }
                     return list;
                 }
             }
-            treeItems = (new TreeToListHelper()).treeToList(proofTreeView.getRoot(),
+            treeItems = (new TreeToListHelper()).treeToList(
+                    proofTreeView.getRoot(),
                     new LinkedList<TreeItem<NUINode>>());
         }
 
@@ -273,16 +199,17 @@ public class SearchHandler {
         // if (searchMatches == null || searchMatches.isEmpty())
         // return;
 
-        final TreeItem<NUINode> currentlySelectedItem = proofTreeView.getSelectionModel()
-                .getSelectedItem();
+        final TreeItem<NUINode> currentlySelectedItem = proofTreeView
+                .getSelectionModel().getSelectedItem();
 
         TreeItem<NUINode> itemToSelect = null;
 
         // Basically does: itemToSelect = currentlySelectedItem + 1
         if (currentlySelectedItem == null
-                || direction == Direction.UP
-                        && (treeItems.indexOf(currentlySelectedItem) == treeItems.size() - 1)
-                || direction == Direction.DOWN && (treeItems.indexOf(currentlySelectedItem) == 0)) {
+                || direction == Direction.UP && (treeItems
+                        .indexOf(currentlySelectedItem) == treeItems.size() - 1)
+                || direction == Direction.DOWN
+                        && (treeItems.indexOf(currentlySelectedItem) == 0)) {
             if (direction == Direction.UP) {
                 itemToSelect = treeItems.get(0);
             }
@@ -292,23 +219,28 @@ public class SearchHandler {
         }
         else {
             if (direction == Direction.UP) {
-                itemToSelect = treeItems.get(treeItems.indexOf(currentlySelectedItem) + 1);
+                itemToSelect = treeItems
+                        .get(treeItems.indexOf(currentlySelectedItem) + 1);
             }
             else {
-                itemToSelect = treeItems.get(treeItems.indexOf(currentlySelectedItem) - 1);
+                itemToSelect = treeItems
+                        .get(treeItems.indexOf(currentlySelectedItem) - 1);
             }
         }
 
         // Basically does: while(!searchMatches.contains(itemToSelect))
         // itemToSelect++;
         while (!itemToSelect.getValue().isSearchResult()) {
-            if ((direction == Direction.UP && (treeItems.indexOf(itemToSelect) == treeItems.size() - 1))
-                    || (direction == Direction.DOWN && (treeItems.indexOf(itemToSelect) == 0))) {
+            if ((direction == Direction.UP && (treeItems
+                    .indexOf(itemToSelect) == treeItems.size() - 1))
+                    || (direction == Direction.DOWN
+                            && (treeItems.indexOf(itemToSelect) == 0))) {
                 itemToSelect = direction == Direction.UP ? treeItems.get(0)
                         : treeItems.get(treeItems.size() - 1);
             }
             else {
-                itemToSelect = direction == Direction.UP ? treeItems.get(treeItems.indexOf(itemToSelect) + 1)
+                itemToSelect = direction == Direction.UP
+                        ? treeItems.get(treeItems.indexOf(itemToSelect) + 1)
                         : treeItems.get(treeItems.indexOf(itemToSelect) - 1);
             }
         }
@@ -339,7 +271,52 @@ public class SearchHandler {
             // if we are to scroll downwards, we have to subtract an offset to
             // make
             // the selected item appear in middle.
-            proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex()
-                    - (direction == Direction.UP ? 0 : (int) (proofTreeCells.size() / 2)));
+            proofTreeView.scrollTo(
+                    proofTreeView.getSelectionModel().getSelectedIndex()
+                            - (direction == Direction.UP ? 0
+                                    : (int) (proofTreeCells.size() / 2)));
+    }
+
+    @Override
+    protected void init() {
+        previousButton.setOnAction(
+                (event) -> moveSelectionAndScrollIfNeeded(Direction.DOWN));
+        nextButton.setOnAction(
+                (event) -> moveSelectionAndScrollIfNeeded(Direction.UP));
+        searchTextField.textProperty().addListener((obs, oldText, newText) -> {
+            nextButton.setDisable(newText.isEmpty());
+            previousButton.setDisable(newText.isEmpty());
+            if (newText.isEmpty()) {
+                proofTreeView.getRoot().getValue().resetSearch();
+            }
+            else {
+                anythingIsHighlighted = proofTreeView.getRoot().getValue()
+                        .search(newText);
+            }
+        });
+
+        searchViewPane.setOnKeyPressed((e) -> {
+            if (KeyCode.ESCAPE == e.getCode()) {
+
+                // delete searchView component form treeViewPane
+                treeViewPane.getChildren().remove(searchViewPane);
+                // reset proofTreeView
+                proofTreeView.getRoot().getValue().resetSearch();
+
+                searchTextField.setText("");
+            }
+            else if (KeyCode.ENTER == e.getCode()) {
+                PauseTransition pause = new PauseTransition(
+                        Duration.millis(130));
+                Button button;
+                button = e.isShiftDown() ? previousButton : nextButton;
+                button.arm();
+                pause.setOnFinished(event -> {
+                    button.disarm();
+                });
+                button.fire();
+                pause.play();
+            }
+        });
     }
 }

@@ -3,14 +3,15 @@ package de.uka.ilkd.key.nui.tests.guitests;
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 
-import de.uka.ilkd.key.nui.ComponentFactory;
+import de.uka.ilkd.key.nui.NUI;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeStyle;
+import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.input.KeyCode;
+import javafx.stage.Stage;
 
 /**
- * Test for User Stroy
- * (010) Laden von Beweisen #14664
+ * Test for User Stroy (010) Laden von Beweisen #14664
  * 
  * @author Florian Breitfelder
  *
@@ -18,14 +19,14 @@ import javafx.scene.input.KeyCode;
 public class LoadProofTest extends GuiTest {
 
     // the root of the scene graph
-    private Parent root = null;
+    //private Parent root = null;
 
+    private NUI nui = null;
+    
     @Override
     protected Parent getRootNode() {
-        ComponentFactory factory = ComponentFactory.getInstance();
-        ComponentFactory.setResourceDirectory("components/");
-        root = factory.createNUISceneGraph();
-        return root;
+        nui = new NUI();
+        return nui.getRoot();
     }
 
     @Test
@@ -39,8 +40,12 @@ public class LoadProofTest extends GuiTest {
 
         // press enter to load file
         type(KeyCode.ENTER);
-        
-        doubleClickOn("." + ProofTreeStyle.CSS_NODE_BRANCH);
+
+        // navigate through example01 proof tree
+        doubleClickOn("." + ProofTreeStyle.CSS_NODE_BRANCH)
+                .clickOn("0: andRight ").clickOn("Case 1 ").clickOn("Case 2 ")
+                .doubleClickOn("Case 2 ").clickOn("2: equiv_right ")
+                .rightClickOn().clickOn("Collapse All");
     }
 
     @Test
@@ -50,10 +55,17 @@ public class LoadProofTest extends GuiTest {
 
         // Enter file name: example01.proof
         KeyCodeHelper key = new KeyCodeHelper(this);
-        key.typeKeys(key.getKeyCode("EXAMPLE01.PROOF"));
+        key.typeKeys(key.getKeyCode("EXAMPLE02.PROOF"));
 
         // press enter to load file
         type(KeyCode.ENTER);
+
+        // navigate through example02 proof tree
+        doubleClickOn("." + ProofTreeStyle.CSS_NODE_BRANCH).clickOn("0: {} ")
+                .clickOn("a TRUE ").clickOn("a FALSE ").doubleClickOn("a TRUE ")
+                .clickOn("1: OPEN GOAL ").doubleClickOn("a FALSE ")
+                .clickOn("2: notRight ").clickOn("3: OPEN GOAL ").rightClickOn()
+                .clickOn("Collapse All");
     }
 
 }

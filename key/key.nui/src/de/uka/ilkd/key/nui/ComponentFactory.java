@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.layout.BorderPane;
 
 /**
  * Factory for creating GUI components.
@@ -150,14 +151,14 @@ public final class ComponentFactory {
 	 * 
 	 * @return returns the JavaFX scenegraph for the application window
 	 */
-	public Parent createNUISceneGraph() {
+	public BorderPane createNUISceneGraph() {
 		ResourceBundle bundle = null;
-		Parent root = null;
+		BorderPane root = null;
 		try {
 			// Load the default bundle
 			bundle = new PropertyResourceBundle(getClass().getResourceAsStream("bundle_en_EN.properties"));
 			// Load FXML from main window
-			final FXMLLoader loader = new FXMLLoader(getClass().getResource("NUIdefault.fxml"), bundle);
+			final FXMLLoader loader = new FXMLLoader(getClass().getResource("MainView.fxml"), bundle);
 			root = loader.load();
 		} catch (IOException e) {
 			e.printStackTrace();

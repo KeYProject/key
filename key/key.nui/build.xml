@@ -157,7 +157,7 @@
 	         </classpath>		    
 	         <formatter type="xml"/>
 			   <formatter type="plain"/>
-	         <test name="de.uka.ilkd.key.nui.tests.junittests.JUnitExampleTest" todir="${basedir}/reports" />
+	         <test name="de.uka.ilkd.key.nui.tests.junittests.JUnitTestSuite" todir="${basedir}/reports" />
 		</junit>
 	</target>
 

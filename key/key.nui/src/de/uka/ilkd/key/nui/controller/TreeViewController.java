@@ -1,31 +1,27 @@
 package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
-
-import java.net.URL;
 import java.util.Collections;
-
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.NUI;
+import de.uka.ilkd.key.nui.exceptions.ComponentNotFoundException;
+import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeStyle;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeVisualizer;
-import de.uka.ilkd.key.nui.prooftree.SearchHandler;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.application.Platform;
-
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 /**
@@ -34,15 +30,16 @@ import javafx.scene.layout.VBox;
  * @author Patrick Jattke
  * @author Matthias Schultheis
  * @author Stefan Pilot
+ * @author Florian Breitfelder
  * @version 1.1
  */
-public class TreeViewController implements Initializable {
+public class TreeViewController extends NUIController {
 
     /**
      * The name of the GUI component.
      */
     public static final String NAME = "treeView";
-    
+
     /**
      * The fxml file name.
      */
@@ -51,14 +48,14 @@ public class TreeViewController implements Initializable {
     /**
      * The IconFactory used to create icons for the proof tree nodes.
      */
-    private final IconFactory icf;
+    private IconFactory icf;
 
     /**
      * The VBox containing both the TreeView and the Anchor Pane where the
      * Search elements are.
      */
     @FXML
-    private VBox mainVBox;
+    private VBox treeViewPane;
 
     /**
      * The tree cells used for displaying tree nodes.
@@ -73,73 +70,9 @@ public class TreeViewController implements Initializable {
     private TreeView<NUINode> proofTreeView;
 
     /**
-     * The handler that is responsible for managing searches.
-     * It is only present if a search process is started.
-     */
-    private SearchHandler searchHandler = null;
-
-    /**
      * The visualizer for displaying a proof tree.
      */
     private ProofTreeVisualizer visualizer;
-
-    /**
-     * The constructor.
-     */
-    public TreeViewController() {
-        icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
-    }
-
-    /**
-     * Initialization method for scene; loads the default proof.
-     */
-    @Override
-    public final void initialize(final URL location, final ResourceBundle resources) {
-        
-        Platform.runLater(() -> {
-
-            // Register key listeners
-            final KeyCode[] modStrg = { KeyCode.CONTROL };
-            
-            // listener for opening search view
-            NUIController.getInstance().registerKeyListener(KeyCode.F,
-                    modStrg, (event) -> openSearchView());
-
-            // listener for closing search and filter view
-            NUIController.getInstance().registerKeyListener(KeyCode.ESCAPE, null, (event) -> {
-                if (searchHandler != null) {
-                    searchHandler.destruct();
-                    searchHandler = null;
-                }
-                
-                //TODO filtering
-            });
-        });
-
-        proofTreeView.getStyleClass().add(ProofTreeStyle.CSS_PROOF_TREE);
-
-        // set cell factory for rendering cells
-        proofTreeView.setCellFactory((treeItem) -> {
-            final ProofTreeCell cell = new ProofTreeCell(icf);
-            Platform.runLater(() -> registerTreeCell(cell));
-            return cell;
-        });
-
-        // Create a new tree visualizer instance for processing the conversion
-        // de.uka.ilkd.key.proof.Node -->
-        // de.uka.ilkd.key.nui.NUI.prooftree.NUINode
-        // --> TreeItem<NUINode> (JavaFX)
-        visualizer = new ProofTreeVisualizer(proofTreeView);
-
-        // add CSS file to view
-        final String cssPath = this.getClass()
-                .getResource("../components/" + ProofTreeStyle.CSS_FILE).toExternalForm();
-        visualizer.addStylesheet(cssPath);
-
-        if (NUI.getInitialProofFile() != null) {
-            loadAndDisplayProof(NUI.getInitialProofFile());
-        }
-    }
 
     /**
      * Loads and displays a file containing a KeY proof. May fail and/or throw
@@ -150,19 +83,8 @@ public class TreeViewController implements Initializable {
      *            The proof file to load.
      */
     public final void loadAndDisplayProof(final File file) {
-        reinit();
-        
         visualizer.loadProofTree(loadProof(file));
         visualizer.visualizeProofTree();
-    }
-
-    /**
-     * Loads an example proof.
-     */
-    public final void loadExampleProof() {
-        final File proofFile = new File(
-                "resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof");
-        loadAndDisplayProof(proofFile);
     }
 
     /**
@@ -182,6 +104,7 @@ public class TreeViewController implements Initializable {
             return proof;
         }
         catch (ProblemLoaderException e) {
+            // TODO exception handling
             e.printStackTrace();
             return null;
         }
@@ -199,28 +122,91 @@ public class TreeViewController implements Initializable {
     private void registerTreeCell(final ProofTreeCell treeCell) {
         proofTreeCells.add(treeCell);
     }
-    
+
     /**
      * Opens the search View or moves the focus to the search views text field
      * if a search view already exists.
      */
     public final void openSearchView() {
-        if (searchHandler != null) {
-            searchHandler.performFocusRequest();
+
+        try {
+            ((SearchViewController) nui.getController("searchView"))
+                    .initSearch(proofTreeView, proofTreeCells, treeViewPane);
         }
-        else {
-            searchHandler = new SearchHandler(proofTreeView, proofTreeCells, mainVBox);
+        catch (ControllerNotFoundException exception) {
+            exception.showMessage();
         }
+
+        try {
+            Pane searchView = nui.getComponent("searchView");
+            if (!treeViewPane.getChildren().contains(searchView))
+                treeViewPane.getChildren().add(searchView);
+        }
+        catch (ComponentNotFoundException exception) {
+            exception.showMessage();
+        }
+
     }
-    
+
     /**
-     * Reinitializes the tree view controller.
-     * Should be loaded when displaying a new proof.
+     * init() is called by the NUIController constructor
      */
-    private void reinit() {
-        if (searchHandler != null) {
-            searchHandler.destruct();
-            searchHandler = null;
-        }
+    @Override
+    protected void init() {
+        icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
+
+        Platform.runLater(() -> {
+
+            // Register key listeners
+            final KeyCode[] modStrg = { KeyCode.CONTROL };
+
+            // listener for opening search view
+            // MainViewController.getInstance().registerKeyListener(KeyCode.F,
+            // modStrg, (event) -> openSearchView());
+            try {
+                ((MainViewController) nui.getController("MainView"))
+                        .registerKeyListener(KeyCode.F, modStrg,
+                                (event) -> openSearchView());
+            }
+            catch (ControllerNotFoundException exception) {
+                exception.showMessage();
+            }
+
+            // listener for closing search and filter view
+            /*
+             * MainViewController.getInstance().registerKeyListener(KeyCode.
+             * ESCAPE, null, (event) -> { if (searchHandler != null) {
+             * searchHandler.destruct(); searchHandler = null; }
+             * 
+             * //TODO filtering });
+             */
+
+            proofTreeView.getStyleClass().add(ProofTreeStyle.CSS_PROOF_TREE);
+
+            // set cell factory for rendering cells
+            proofTreeView.setCellFactory((treeItem) -> {
+                final ProofTreeCell cell = new ProofTreeCell(icf);
+                Platform.runLater(() -> registerTreeCell(cell));
+                return cell;
+            });
+
+            // Create a new tree visualizer instance for processing the
+            // conversion
+            // de.uka.ilkd.key.proof.Node -->
+            // de.uka.ilkd.key.nui.NUI.prooftree.NUINode
+            // --> TreeItem<NUINode> (JavaFX)
+            visualizer = new ProofTreeVisualizer(proofTreeView);
+
+            // add CSS file to view
+            final String cssPath = this.getClass()
+                    .getResource("../components/" + ProofTreeStyle.CSS_FILE)
+                    .toExternalForm();
+            visualizer.addStylesheet(cssPath);
+
+            if (NUI.getInitialProofFile() != null) {
+                loadAndDisplayProof(NUI.getInitialProofFile());
+            }
+
+        });
     }
 }

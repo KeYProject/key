@@ -4,10 +4,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ 
-    NUITest.class, 
-    TreeViewTest.class, 
-    LoadProofTest.class })
+@Suite.SuiteClasses({ NUITest.class, TreeViewTest.class, LoadProofTest.class,
+        SearchViewTest.class })
 
 public class NUITestSuite {
 }

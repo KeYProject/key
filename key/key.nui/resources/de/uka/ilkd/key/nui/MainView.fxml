@@ -11,7 +11,7 @@
 <BorderPane fx:id="root"
    prefHeight="600.0" prefWidth="800.0"
 	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="de.uka.ilkd.key.nui.controller.NUIController"
+	fx:controller="de.uka.ilkd.key.nui.controller.MainViewController"
 	onKeyPressed="#handleKeyPressed">
 	<top>
 		<MenuBar BorderPane.alignment="CENTER">
@@ -25,7 +25,7 @@
 				</Menu>
 				<Menu mnemonicParsing="false" text="Edit">
 				</Menu>
-				<Menu mnemonicParsing="false" text="View">
+				<Menu fx:id ="viewMenu" mnemonicParsing="false" text="View">
 					<items>
 						<Menu fx:id="configViews" text="%configViews">
 							<items>
