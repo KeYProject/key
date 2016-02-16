@@ -21,8 +21,8 @@ import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
 /**
- * Feature used to check if the value of a given term with <code>moduloXXX</code> (with <code>XXX</code> being Long, Int, etc.)
- * is in the range of Long, Integer etc.
+ * Feature used to check if the value of a given term with <code>moduloXXX</code> 
+ * (with <code>XXX</code> being Long, Int, etc.) is in the range of Long, Integer etc.
  */
 public class IsInRangeProvable implements Feature {
 

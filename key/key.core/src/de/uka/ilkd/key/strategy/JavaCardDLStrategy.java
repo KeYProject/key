@@ -1062,15 +1062,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                 longTermConst(-10)))),
                         // prefer top level splits
                         FindDepthFeature.INSTANCE,
-                        ScaleFeature.createAffine(countOccurrences(splitCondition), -2, 2),
+                        ScaleFeature.createScaled(countOccurrences(splitCondition), -25),
                         ifZero(applyTF(FocusProjection.INSTANCE,
                                 ContainsExecutableCodeTermFeature.PROGRAMS),
-                                longConst(-100), longConst(5))));
+                                longConst(-100), longConst(75))));
 
         ProjectionToTerm cutFormula = instOf("cutFormula");
 
         Feature countOccurrencesInSeq =
-                ScaleFeature.createScaled(countOccurrences(cutFormula), -20);
+                ScaleFeature.createScaled(countOccurrences(cutFormula), -25);
 
         bindRuleSet(
                 d,
@@ -3582,6 +3582,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             quantifiedPureLitConjDisj =
                     rec(quantifiedFor, or(quantifiedFor, pureLitConjDisj));
 
+            elemUpdate = OperatorClassTF.create(ElementaryUpdate.class);
             update = OperatorClassTF.create(UpdateApplication.class);
             program = OperatorClassTF.create(Modality.class);
             modalOperator = or(update, program);
@@ -3635,6 +3636,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermFeature pureLitConjDisj;
         final TermFeature quantifiedPureLitConjDisj;
 
+        final TermFeature elemUpdate;
         final TermFeature update;
         final TermFeature program;
         final TermFeature modalOperator;
