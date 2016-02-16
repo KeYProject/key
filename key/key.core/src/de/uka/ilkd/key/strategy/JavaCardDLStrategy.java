@@ -16,6 +16,7 @@ package de.uka.ilkd.key.strategy;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.axiom_abstraction.signanalysis.Zero;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -24,6 +25,7 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -1061,8 +1063,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                 longTermConst(-10)))),
                         // prefer top level splits
                         FindDepthFeature.INSTANCE,
-                        ScaleFeature.createScaled(
-                                countOccurrences(splitCondition), -30),
+                        ScaleFeature.createScaled(countOccurrences(splitCondition), -30),
                         ifZero(applyTF(FocusProjection.INSTANCE,
                                 ContainsExecutableCodeTermFeature.PROGRAMS),
                                 longConst(-100), longConst(5))));
@@ -1168,10 +1169,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                         compareCutAllowed);
 
         bindRuleSet(d, "hide", 
-                        add(applyTF(FocusFormulaProjection.INSTANCE, op(tf.eq)),
-                            applyTF(sub(FocusFormulaProjection.INSTANCE, 0), tf.constant),
-                            leq(countOccurrences(sub(FocusFormulaProjection.INSTANCE, 0)), 
-                                    longConst(1))));
+                        add(applyTF(FocusFormulaProjection.INSTANCE, op(tf.eq)), // we only hide equations automatically
+                            applyTF(sub(FocusFormulaProjection.INSTANCE, 0), tf.constant), // we only hide equations if the left hand side is a constant
+                            applyTF(sub(FocusFormulaProjection.INSTANCE, 0), ff.noQueryConstant), // hack: do not hide constants introduced by QueryExpand
+                            leq(countOccurrences(sub(FocusFormulaProjection.INSTANCE, 0)), longConst(1)))); // and that constant occurs at most once in the sequent (namely on the lhs)
         
         bindRuleSet(
                 d,
@@ -2731,8 +2732,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         setupSplittingApproval(d);
 
-        setupHideApproval(d);
-        
         bindRuleSet(
                 d,
                 "apply_select_eq",
@@ -2760,11 +2759,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                 instOf("t1")))));
 
         return d;
-    }
-
-    private void setupHideApproval(RuleSetDispatchFeature d) {
-        // TODO Auto-generated method stub
-        
     }
 
     private void setupClassAxiomApproval(final RuleSetDispatchFeature d) {
@@ -3542,6 +3536,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private class FormulaTermFeatures {
 
+        public TermFeature noQueryConstant;
         public FormulaTermFeatures() {
             forF = extendsTrans(Sort.FORMULA);
 
@@ -3552,7 +3547,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             ifThenElse = OperatorClassTF.create(IfThenElse.class);
 
             
-            
+            noQueryConstant = new TermFeature() {
+                // hack to distinguish constants introduced by rule QueryExpand
+                @Override
+                public RuleAppCost compute(Term term, Services services) {
+                    return (term.op() instanceof Function && term.arity() == 0 && term.op().name().toString().startsWith("res_")) ? TopRuleAppCost.INSTANCE : NumberRuleAppCost.getZeroCost();
+                }
+                
+            };
+                    
             atom = AtomTermFeature.INSTANCE;
             propJunctor =
                     or(OperatorClassTF.create(Junctor.class), op(Equality.EQV));
