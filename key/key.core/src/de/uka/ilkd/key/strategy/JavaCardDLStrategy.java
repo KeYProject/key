@@ -1044,8 +1044,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 ScaleFeature.createScaled(CountMaxDPathFeature.INSTANCE, 10.0),
                 longConst(20)));
 
-        final ProjectionToTerm splitCondition =
-                sub(FocusProjection.INSTANCE, 0);
+        final ProjectionToTerm splitCondition = sub(FocusProjection.INSTANCE, 0);
         bindRuleSet(
                 d,
                 "split_cond",
@@ -1061,9 +1060,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                         ifZero(ff.quantifiedFor,
                                                 longTermConst(-10)))),
                         // prefer top level splits
-                        ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 2),
+                        FindDepthFeature.INSTANCE,
                         ScaleFeature.createScaled(
-                                countOccurrences(splitCondition), -1),
+                                countOccurrences(splitCondition), -30),
                         ifZero(applyTF(FocusProjection.INSTANCE,
                                 ContainsExecutableCodeTermFeature.PROGRAMS),
                                 longConst(-100), longConst(5))));
@@ -1071,7 +1070,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         ProjectionToTerm cutFormula = instOf("cutFormula");
 
         Feature countOccurrencesInSeq =
-                ScaleFeature.createScaled(countOccurrences(cutFormula), -1);
+                ScaleFeature.createScaled(countOccurrences(cutFormula), -30);
 
         bindRuleSet(
                 d,
