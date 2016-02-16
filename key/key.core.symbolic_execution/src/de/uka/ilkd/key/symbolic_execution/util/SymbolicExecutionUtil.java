@@ -111,6 +111,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -3873,4 +3874,90 @@ public final class SymbolicExecutionUtil {
       }
       return notationInfo;
    }
+   
+   /**
+    * Checks if this branch would be closed without the uninterpreted predicate
+    * and thus be treated as valid/closed in a regular proof.
+    * @return {@code true} verified/closed, {@code false} not verified/still open
+    */
+   public static boolean lazyComputeIsBranchVerified(Node node) {
+	      if (!node.proof().isDisposed()) {
+	         // Find uninterpreted predicate
+	         Term predicate = AbstractOperationPO.getUninterpretedPredicate(node.proof());
+	         // Check if node can be treated as verified/closed
+	         if (predicate != null) {
+	            boolean verified = true;
+	            Iterator<Node> leafsIter = node.leavesIterator();
+	            while (verified && leafsIter.hasNext()) {
+	               Node leaf = leafsIter.next();
+	               if (!leaf.isClosed()) {
+	                  final Term toSearch = predicate;
+	                  SequentFormula topLevelPredicate = CollectionUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
+	                     @Override
+	                     public boolean select(SequentFormula element) {
+	                        return toSearch.op() == element.formula().op();
+	                     }
+	                  });
+	                  if (topLevelPredicate == null) {
+	                     verified = false;
+	                  }
+	               }
+	            }
+	            return verified;
+	         }
+	         else {
+	            return node.isClosed();
+	         }
+	      }
+	      else {
+	         return false;
+	      }
+	   }
+   
+   /**
+    * Checks if is an exceptional termination.
+    * @return {@code true} exceptional termination, {@code false} normal termination.
+    */
+   public static boolean lazyComputeIsExceptionalTermination(Node node, IProgramVariable exceptionVariable) {
+	      Sort result = null;
+	      if (exceptionVariable != null) {
+	         // Search final value of the exceptional variable which is used to check if the verified program terminates normally
+	         ImmutableArray<Term> value = null;
+	         for (SequentFormula f : node.sequent().succedent()) {
+	            Pair<ImmutableList<Term>,Term> updates = TermBuilder.goBelowUpdates2(f.formula());
+	            Iterator<Term> iter = updates.first.iterator();
+	            while (value == null && iter.hasNext()) {
+	               value = extractValueFromUpdate(iter.next(), exceptionVariable);
+	            }
+	         }
+	         // An exceptional termination is found if the exceptional variable is not null
+	         if (value != null && value.size() == 1) {
+	            result = value.get(0).sort();
+	         }
+	      }
+	      return result != null && !(result instanceof NullSort);
+	   }
+   
+   /**
+    * Utility method to extract the value of the {@link IProgramVariable}
+    * from the given update term.
+    * @param term The given update term.
+    * @param variable The {@link IProgramVariable} for that the value is needed.
+    * @return The found value or {@code null} if it is not defined in the given update term.
+    */
+	protected static ImmutableArray<Term> extractValueFromUpdate(Term term, IProgramVariable variable) {
+		ImmutableArray<Term> result = null;
+		if (term.op() instanceof ElementaryUpdate) {
+			ElementaryUpdate update = (ElementaryUpdate) term.op();
+			if (ObjectUtil.equals(variable, update.lhs())) {
+				result = term.subs();
+			}
+		} else if (term.op() instanceof UpdateJunctor) {
+			Iterator<Term> iter = term.subs().iterator();
+			while (result == null && iter.hasNext()) {
+				result = extractValueFromUpdate(iter.next(), variable);
+			}
+		}
+		return result;
+	}
 }

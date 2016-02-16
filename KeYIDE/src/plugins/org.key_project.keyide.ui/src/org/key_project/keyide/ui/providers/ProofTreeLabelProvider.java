@@ -216,82 +216,85 @@ public class ProofTreeLabelProvider extends LabelProvider {
 			Node node = (Node) element;
 			NodeInfo info = node.getNodeInfo();
 			SourceElement statement = info.getActiveStatement();
-			
+
 			if (node.isClosed()) {
 				return KeYImages.getImage(KeYImages.NODE_PROVED);
-				
+
 			} else if (node.root()) {
 				return KeYImages.getImage(KeYImages.THREAD);
-				
+
+			} else if (node.parent().childrenCount() > 1) {
+				return KeYImages.getImage(KeYImages.BRANCH_CONDITION);
+
 			} else if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, node.getAppliedRuleApp())) {
-				if (SymbolicExecutionUtil.hasSymbolicExecutionLabel(node.getAppliedRuleApp()) && statement != null && !SymbolicExecutionUtil.isRuleAppToIgnore(node.getAppliedRuleApp())) {
-					// Get position information
-					PositionInfo posInfo = statement.getPositionInfo();
-					//TODO add case for branch condition node
-					if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement)) {
-						return KeYImages.getImage(KeYImages.METHOD_CALL);
+				// Get position information
+				PositionInfo posInfo = statement.getPositionInfo();
 
-					} else if (SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp())) {
-						return KeYImages.getImage(KeYImages.METHOD_RETURN);
+				if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement)) {
+					return KeYImages.getImage(KeYImages.METHOD_CALL);
 
-					} else if (SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, node.getAppliedRuleApp())) {
-						return KeYImages.getImage(KeYImages.EXCEPTIONAL_METHOD_RETURN);
+				} else if (SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp())) {
+					return KeYImages.getImage(KeYImages.METHOD_RETURN);
 
-					} else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
-						if (!SymbolicExecutionUtil.hasLoopBodyLabel(node.getAppliedRuleApp())) {
-							// TODO check if branch is verified
-							return KeYImages.getImage(KeYImages.TERMINATION);
+				} else if (SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, node.getAppliedRuleApp())) {
+					return KeYImages.getImage(KeYImages.EXCEPTIONAL_METHOD_RETURN);
+
+				} else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
+					if (SymbolicExecutionUtil.isLoopBodyTermination(node, node.getAppliedRuleApp())) {
+						if (SymbolicExecutionUtil.lazyComputeIsBranchVerified(node)) {
+							return KeYImages.getImage(KeYImages.LOOP_BODY_TERMINATION);
 						} else {
-							// TODO add icons for all termination kinds
-							return KeYImages.getImage(KeYImages.NODE);
+							return KeYImages.getImage(KeYImages.LOOP_BODY_TERMINATION_NOT_VERIFIED);
 						}
-					} else if (SymbolicExecutionUtil.isBranchStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
-						return KeYImages.getImage(KeYImages.BRANCH_STATEMENT);
-
-					} else if (SymbolicExecutionUtil.isLoopStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
-						return KeYImages.getImage(KeYImages.LOOP_STATEMENT);
-
-					} else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
-						return KeYImages.getImage(KeYImages.STATEMENT);
-
-					} else if (SymbolicExecutionUtil.isOperationContract(node, node.getAppliedRuleApp())) {
-						
-						// is precondition compiled
-						if (node.childrenCount() >= 3 && node.child(2).isClosed()) {
-							
-							// is not null check compiled
-							if (node.childrenCount() >= 4 && node.child(3).isClosed()) {
-								return KeYImages.getImage(KeYImages.METHOD_CONTRACT);
-							} else {
-								return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_NPC);
-							}
+					} else if (SymbolicExecutionUtil.lazyComputeIsExceptionalTermination(node, SymbolicExecutionUtil.extractExceptionVariable(node.proof()))) {
+						if (SymbolicExecutionUtil.lazyComputeIsBranchVerified(node)) {
+							return KeYImages.getImage(KeYImages.EXCEPTIONAL_TERMINATION);
 						} else {
-							
-							// is not null check compiled
-							if (node.childrenCount() >= 4 && node.child(3).isClosed()) {
-								return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_PRE);
-							} else {
-								return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_PRE_NOT_NPC);
-							}
-						}
-					} else if (SymbolicExecutionUtil.hasLoopCondition(node, node.getAppliedRuleApp(), statement)) {
-						return KeYImages.getImage(KeYImages.LOOP_CONDITION);
-
-					} else if (SymbolicExecutionUtil.isLoopInvariant(node, node.getAppliedRuleApp())) {
-						
-						// is initially valid
-						if (node.childrenCount() >= 1 && node.child(0).isClosed()) {
-							return KeYImages.getImage(KeYImages.LOOP_INVARIANT);
-						} else {
-							return KeYImages.getImage(KeYImages.LOOP_INVARIANT_INITIALLY_INVALID);
+							return KeYImages.getImage(KeYImages.EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
 						}
 					} else {
-						return KeYImages.getImage(KeYImages.NODE);
+						if (SymbolicExecutionUtil.lazyComputeIsBranchVerified(node)) {
+							return KeYImages.getImage(KeYImages.TERMINATION);
+						} else {
+							return KeYImages.getImage(KeYImages.TERMINATION_NOT_VERIFIED);
+						}
 					}
-				} else if (SymbolicExecutionUtil.isLoopBodyTermination(node, node.getAppliedRuleApp())) {
-					// TODO check if branch is verified
-					return KeYImages.getImage(KeYImages.LOOP_BODY_TERMINATION);
-					
+				} else if (SymbolicExecutionUtil.isBranchStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
+					return KeYImages.getImage(KeYImages.BRANCH_STATEMENT);
+
+				} else if (SymbolicExecutionUtil.isLoopStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
+					return KeYImages.getImage(KeYImages.LOOP_STATEMENT);
+
+				} else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
+					return KeYImages.getImage(KeYImages.STATEMENT);
+
+				} else if (SymbolicExecutionUtil.isOperationContract(node, node.getAppliedRuleApp())) {
+					// is precondition compiled
+					if (node.childrenCount() >= 3 && node.child(2).isClosed()) {
+						// is not null check compiled
+						if (node.childrenCount() >= 4 && node.child(3).isClosed()) {
+							return KeYImages.getImage(KeYImages.METHOD_CONTRACT);
+						} else {
+							return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_NPC);
+						}
+					} else {
+						// is not null check compiled
+						if (node.childrenCount() >= 4 && node.child(3).isClosed()) {
+							return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_PRE);
+						} else {
+							return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_PRE_NOT_NPC);
+						}
+					}
+				} else if (SymbolicExecutionUtil.hasLoopCondition(node, node.getAppliedRuleApp(), statement)) {
+					return KeYImages.getImage(KeYImages.LOOP_CONDITION);
+
+				} else if (SymbolicExecutionUtil.isLoopInvariant(node, node.getAppliedRuleApp())) {
+					// is initially valid
+					if (node.childrenCount() >= 1 && node.child(0).isClosed()) {
+						return KeYImages.getImage(KeYImages.LOOP_INVARIANT);
+					} else {
+						return KeYImages.getImage(KeYImages.LOOP_INVARIANT_INITIALLY_INVALID);
+					}
 				} else {
 					return KeYImages.getImage(KeYImages.NODE);
 				}
