@@ -6,10 +6,15 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+
 import com.sun.javafx.collections.ObservableMapWrapper;
+
 import de.uka.ilkd.key.nui.ComponentFactory;
+import de.uka.ilkd.key.nui.wrapper.StrategyWrapper;
+import de.uka.ilkd.key.proof.Proof;
 import javafx.application.Platform;
 import javafx.collections.ObservableMap;
+import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -18,14 +23,15 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
+import javafx.scene.control.Menu;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 
 /**
  * Controller for the main GUI which is displayed when the program was started.
@@ -83,6 +89,10 @@ public class NUIController implements Initializable {
     private ToggleGroup toggleGroup2;
     @FXML
     private ToggleGroup toggleGroup3;
+    @FXML
+    private Menu configViews;
+
+    StrategyWrapper wrapper;
 
     /**
      * Implements the Singleton pattern.
@@ -246,6 +256,7 @@ public class NUIController implements Initializable {
                 TreeViewController t = ComponentFactory.getInstance()
                         .getController(TreeViewController.NAME);
                 t.loadAndDisplayProof(file);
+
             }
         }
     }
@@ -259,7 +270,8 @@ public class NUIController implements Initializable {
         // Load default components
         createOrMoveOrHideComponent(TreeViewController.NAME, Place.LEFT,
                 TreeViewController.RESOURCE);
-        createOrMoveOrHideComponent("proofView", Place.RIGHT, "proofView.fxml");
+        createOrMoveOrHideComponent("proofView", Place.BOTTOM,
+                "proofView.fxml");
         Platform.runLater(() -> {
             TreeViewController t = ComponentFactory.getInstance()
                     .getController(TreeViewController.NAME);
@@ -267,12 +279,38 @@ public class NUIController implements Initializable {
         });
 
         // Select appropriate menu item entries
-        final int POSITION_TREEVIEW = 3; // 3: left view
-        final int POSITION_PROOFVIEW = 2; // 2: right view
+        final int POSITION_TREEVIEW = 1; // 3: left view
+        final int POSITION_PROOFVIEW = 4; // 2: right view
         toggleGroup2
                 .selectToggle(toggleGroup2.getToggles().get(POSITION_TREEVIEW));
         toggleGroup3.selectToggle(
                 toggleGroup3.getToggles().get(POSITION_PROOFVIEW));
+
+        // Add Swing Component 'StrategySelectionView' to Panel
+
+        // -- Create wrapper and get SwingNode
+        wrapper = new StrategyWrapper();
+        SwingNode node = wrapper.createStrategyComponent();
+
+        // -- Add menu item entry in ConfigViews...
+        Menu strategyEntry = new Menu("StrategyComponent");
+        ToggleGroup tg = new ToggleGroup();
+
+        // --- ..for option 'hide'
+        RadioMenuItem hide = new RadioMenuItem(resources.getString("hide"));
+        tg.getToggles().add(hide);
+        hide.setOnAction((e) -> this.right.getChildren().remove(node));
+        hide.setSelected(true);
+        strategyEntry.getItems().add(hide);
+
+        // --- ..for option 'right'
+        RadioMenuItem right = new RadioMenuItem(resources.getString("right"));
+        tg.getToggles().add(right);
+        right.setOnAction((e) -> this.right.getChildren().add(node));
+        strategyEntry.getItems().add(right);
+
+        // -- Add created menu to ConfigViews
+        configViews.getItems().add(strategyEntry);
 
         // Assign instance for singleton pattern
         NUIController.instance = this;
@@ -335,13 +373,14 @@ public class NUIController implements Initializable {
      * Unregister a previously registered key Listener.
      * 
      * @param k
-     *          the keyCode which should be unregistered.
+     *            the keyCode which should be unregistered.
      * @throws IllegalArgumentException
      *             key was never registered.
      */
     public final void unregisterKeyListener(final KeyCode k)
             throws IllegalArgumentException {
-        // TODO eliminate this by implementing the key register using weak handles.
+        // TODO eliminate this by implementing the key register using weak
+        // handles.
         keyEventHandlers.remove(k);
     }
 
@@ -432,5 +471,15 @@ public class NUIController implements Initializable {
                 .getProperties().get("componentResource");
 
         createOrMoveOrHideComponent(componentName, place, componentResource);
+    }
+
+    /**
+     * Updates the StrategyComponent after a new proof file was loaded.
+     * 
+     * @param p
+     *            The proof file just loaded.
+     */
+    public void updateStrategyComponent(Proof p) {
+        wrapper.refreshComponents(p);
     }
 }

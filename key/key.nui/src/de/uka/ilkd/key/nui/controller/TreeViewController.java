@@ -156,10 +156,11 @@ public class TreeViewController implements Initializable {
      * @param file
      *            The proof file to load.
      */
-    public final void loadAndDisplayProof(final File file) {
+    public final void loadAndDisplayProof(File file) {
         reinit();
-        
-        visualizer.loadProofTree(loadProof(file));
+        Proof p = loadProof(file);
+        visualizer.loadProofTree(p);
+        NUIController.getInstance().updateStrategyComponent(p);
         visualizer.visualizeProofTree();
     }
 
@@ -167,9 +168,9 @@ public class TreeViewController implements Initializable {
      * Loads an example proof.
      */
     public final void loadExampleProof() {
-        final File proofFile = new File(
+        final File file = new File(
                 "resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof");
-        loadAndDisplayProof(proofFile);
+        loadAndDisplayProof(file);
     }
 
     /**

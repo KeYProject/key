@@ -40,6 +40,7 @@ public class NUI extends Application {
 	public final void start(final Stage stage) {
 		ComponentFactory.setResourceDirectory("components/");
 		final Parent root = ComponentFactory.getInstance().createNUISceneGraph();
+		
 
 		// Load scene and set preferences
 		final Scene scene = new Scene(root);
