@@ -7,20 +7,17 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.util.ProofStarter;
+import de.uka.ilkd.key.util.SideProofUtil;
 
 public class IsInRangeProvable implements Feature {
 
@@ -83,9 +80,16 @@ public class IsInRangeProvable implements Feature {
     
     
     protected boolean isProvable(Sequent seq, Services services) {
+        // prevent chained calls
+        if (services.getProof().name().toString().startsWith("IsInRange Proof")) {
+            return false;
+        }
+        
         final ProofStarter ps = new ProofStarter(false);
+        final ProofEnvironment env = 
+                SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
         try {
-            ps.init(seq, services.getProof().getEnv(), "Strategy Oracle");
+            ps.init(seq, env, "IsInRange Proof");
         } catch (ProofInputException pie) {
             pie.printStackTrace();
             return false;
