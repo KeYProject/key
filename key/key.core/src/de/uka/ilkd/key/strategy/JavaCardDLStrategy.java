@@ -1168,7 +1168,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                         add(applyTF(FocusFormulaProjection.INSTANCE, op(tf.eq)), // we only hide equations automatically
                             applyTF(lhsOfEquation, tf.constant), // we only hide equations if the left hand side is a constant
                             applyTF(lhsOfEquation, not(TermLabelTermFeature.HAS_ANY_LABEL)), // do not hide symbols with labels (might have special meaning), it might actually suffic to check just for ParameterlessTermLAbel.SELECT_SKOLEM_LABEL
-                            applyTF(lhsOfEquation, not(ff.queryConstant)), // hack: do not hide constants introduced by QueryExpand
+                            applyTF(lhsOfEquation, not(or(ff.queryConstant,ff.currentThreadConstant))), // hack: do not hide constants introduced by QueryExpand
                             leq(countOccurrences(lhsOfEquation), longConst(1)))); // and that constant occurs at most once in the sequent (namely on the lhs)
         
         bindRuleSet(
@@ -3534,6 +3534,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private class FormulaTermFeatures {
 
         public TermFeature queryConstant;
+        public TermFeature currentThreadConstant;
+        
         public FormulaTermFeatures() {
             forF = extendsTrans(Sort.FORMULA);
 
@@ -3548,10 +3550,18 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 @Override
                 protected boolean filter(Term term, Services services) {
                     return term.op() instanceof Function && term.arity() == 0 && 
-                            term.op().name().toString().startsWith("res_");
+                            term.op().name().toString().startsWith("res_"); // %%HACK: use term labels?
                 }
             };
-                    
+
+            currentThreadConstant = new BinaryTermFeature() {                               
+                @Override
+                protected boolean filter(Term term, Services services) {
+                    return term.op() instanceof Function && term.arity() == 0 && 
+                            term.op().name().toString().equals("currentThread"); // %%HACK: use term labels?
+                }
+            };
+
             atom = AtomTermFeature.INSTANCE;
             propJunctor =
                     or(OperatorClassTF.create(Junctor.class), op(Equality.EQV));
