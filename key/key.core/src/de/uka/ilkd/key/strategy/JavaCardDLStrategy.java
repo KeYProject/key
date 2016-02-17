@@ -24,7 +24,6 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -113,7 +112,6 @@ import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ConstantTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsInductionVariable;
@@ -124,7 +122,6 @@ import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
 import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.SimplifiedSelectTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermLabelTermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.HeapGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
@@ -684,15 +681,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "information_flow_contract_appl", longConst(1000000));
         
-        // the approval feature actually decides whether to hide or not
-       if (strategyProperties.contains(StrategyProperties.AUTO_HIDING_ON)) {
-           bindRuleSet(d, "hide", add(applyTF(FocusFormulaProjection.INSTANCE, op(tf.eq)),
-                   applyTF(sub(FocusFormulaProjection.INSTANCE, 0), tf.constant)));
-       } else {
-           bindRuleSet(d, "hide", inftyConst());
-           
-       }
-
         if (strategyProperties.contains(StrategyProperties.AUTO_INDUCTION_ON)
                 || strategyProperties
                         .contains(StrategyProperties.AUTO_INDUCTION_LEMMA_ON)) {
@@ -1259,15 +1247,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 sum(subFor, AllowedCutPositionsGenerator.INSTANCE,
                         compareCutAllowed);
 
-        final ProjectionToTerm lhsOfEquation = sub(FocusFormulaProjection.INSTANCE, 0);
-        bindRuleSet(d, "hide", 
-                        add(applyTF(FocusFormulaProjection.INSTANCE, op(tf.eq)), // we only hide equations automatically
-                            applyTF(lhsOfEquation, tf.constant), // we only hide equations if the left hand side is a constant
-                            applyTF(lhsOfEquation, not(TermLabelTermFeature.HAS_ANY_LABEL)), // do not hide symbols with labels (might have special meaning), it might actually suffic to check just for ParameterlessTermLAbel.SELECT_SKOLEM_LABEL
-                            applyTF(lhsOfEquation, not(or(ff.queryConstant,ff.isPredefinedConstantSymbol))), // prevent predefined symbols from being hidden and hack: do not hide constants introduced by QueryExpand
-                            longConst(-1000),
-                            leq(countOccurrences(lhsOfEquation), longConst(1)))); // and that constant occurs at most once in the sequent (namely on the lhs)
-        
         bindRuleSet(
                 d,
                 "cut_direct",
@@ -3225,18 +3204,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 + "is not applied on Skolemized formulas in order to<br>"
                 + "limit the number of inductive proofs." + "</html>";
 
-        private static final String TOOL_TIP_AUTO_HIDING_ON = "<html>"
-                + "Hides automatically formulas that are determined to be no longer needed<br> "
-                + "e.g., equations with a constant on the left hand side, which does not occur anywhere else.<br>"
-                + "Hidden formulas can be reinserted using the insert_hidden taclets (and/or dialog)."
-                + "Attention: Does not influence the hiding for the heap simplification rules."
-                + "</html>";
-
-        private static final String TOOL_TIP_AUTO_HIDING_OFF = "<html>"
-                + "Switches the automatic hiding of formulas off."
-                + "Attention: Does not influence the hiding for the heap simplification rules."
-                + "</html>";
-
         public static String TOOL_TIP_USER_OFF(int i) {
             return "Taclets of the rule set \"userTaclets" + i
                     + "\" are not applied automatically";
@@ -3440,19 +3407,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 props.add(user);
             }
             
-            OneOfStrategyPropertyDefinition autoHiding =
-                    new OneOfStrategyPropertyDefinition(
-                            StrategyProperties.AUTO_HIDING_OPTIONS_KEY,
-                            "Auto Hiding",
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.AUTO_HIDING_ON,
-                                    "On", TOOL_TIP_AUTO_HIDING_ON),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.AUTO_HIDING_OFF,
-                                    "Off",
-                                    TOOL_TIP_AUTO_HIDING_OFF));
-
-            
             OneOfStrategyPropertyDefinition userOptions =
                     new OneOfStrategyPropertyDefinition(
                             null,
@@ -3472,7 +3426,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     proofSplitting, loopTreatment, blockTreatment,
                     methodTreatment, dependencyContracts, queryTreatment,
                     arithmeticTreatment, quantifierTreatment, classAxiom,
-                    autoInduction, autoHiding, userOptions);
+                    autoInduction, userOptions);
         }
     }
 
@@ -3656,9 +3610,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private class FormulaTermFeatures {
 
-        public TermFeature queryConstant;
-        public TermFeature isPredefinedConstantSymbol;
-        
         public FormulaTermFeatures() {
             forF = extendsTrans(Sort.FORMULA);            
             orF = op(Junctor.OR);
@@ -3667,22 +3618,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             notF = op(Junctor.NOT);
             ifThenElse = OperatorClassTF.create(IfThenElse.class);
             
-            queryConstant = new BinaryTermFeature() {                               
-                @Override
-                protected boolean filter(Term term, Services services) {
-                    return term.op() instanceof Function && term.arity() == 0 && 
-                            term.op().name().toString().startsWith("res_"); // %%HACK: use term labels?
-                }
-            };
-
-            isPredefinedConstantSymbol = new BinaryTermFeature() {                               
-                @Override
-                protected boolean filter(Term term, Services services) {
-                    return term.op() instanceof Function && term.arity() == 0 && 
-                            services.getProof().getEnv().getInitConfigForEnvironment().funcNS().lookup(term.op().name()) != null;
-                }
-            };
-
             atom = AtomTermFeature.INSTANCE;
             propJunctor =
                     or(OperatorClassTF.create(Junctor.class), op(Equality.EQV));
