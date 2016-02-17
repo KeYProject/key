@@ -1062,7 +1062,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                 longTermConst(-10)))),
                         // prefer top level splits
                         FindDepthFeature.INSTANCE,
-                        ScaleFeature.createScaled(countOccurrences(splitCondition), -25),
+                        ScaleFeature.createAffine(countOccurrences(splitCondition), -2, 2),
                         ifZero(applyTF(FocusProjection.INSTANCE,
                                 ContainsExecutableCodeTermFeature.PROGRAMS),
                                 longConst(-100), longConst(75))));
@@ -1070,7 +1070,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         ProjectionToTerm cutFormula = instOf("cutFormula");
 
         Feature countOccurrencesInSeq =
-                ScaleFeature.createScaled(countOccurrences(cutFormula), -25);
+                ScaleFeature.createAffine(countOccurrences(cutFormula), -5, -10);
 
         bindRuleSet(
                 d,
@@ -1090,12 +1090,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                                 not(IsSelectSkolemConstantTermFeature.INSTANCE)))),
                                                 // prefer cuts over
                                                 // "something = null"
-                                                ifZero(add(
-                                                        applyTF(FocusProjection.INSTANCE,
-                                                                tf.eqF),
-                                                        applyTF(sub(
-                                                                FocusProjection.INSTANCE,
-                                                                1), vf.nullTerm)),
+                                                ifZero(applyTF(FocusProjection.INSTANCE,
+                                                                opSub(tf.eq, any(), vf.nullTerm)),
                                                         longConst(-5),
                                                         longConst(0)),
                                                 // punish cuts over formulas
