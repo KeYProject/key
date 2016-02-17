@@ -93,6 +93,21 @@ public final class StrategyProperties extends Properties {
     public final static String AUTO_INDUCTION_RESTRICTED      = "AUTO_INDUCTION_RESTRICTED"; 
     public final static String AUTO_INDUCTION_ON       = "AUTO_INDUCTION_ON"; 
     public final static String AUTO_INDUCTION_LEMMA_ON = "AUTO_INDUCTION_LEMMA_ON";
+    
+    /**
+     * Key used in {@link StrategyProperties} to hide automatic formulas if they are no longer needed
+     */
+    public static final String AUTO_HIDING_OPTIONS_KEY = "AUTO_HIDING_OPTION_KEY";
+    /**
+     * Value of {@link #AUTO_HIDING_OPTIONS_KEY} in {@link StrategyProperties} to switch auto hiding of formulas on
+     */
+    public final static String AUTO_HIDING_OFF = "AUTO_HIDING_OFF";
+    /**
+     * Value of {@link #AUTO_HIDING_OPTIONS_KEY} in {@link StrategyProperties} to switch auto hiding of formulas off
+     */
+    public final static String AUTO_HIDING_ON = "AUTO_HIDING_ON";
+
+
 
     public final static int USER_TACLETS_NUM = 3;
     private final static String USER_TACLETS_OPTIONS_KEY_BASE = "USER_TACLETS_OPTIONS_KEY";
@@ -132,6 +147,8 @@ public final class StrategyProperties extends Properties {
      */
     public static final String SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF = "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF";
     
+    
+    
 
     //String identities.
     private static final String[] stringPool = {
@@ -151,6 +168,7 @@ public final class StrategyProperties extends Properties {
     	AUTO_INDUCTION_OPTIONS_KEY, AUTO_INDUCTION_OFF, AUTO_INDUCTION_RESTRICTED, AUTO_INDUCTION_ON,  AUTO_INDUCTION_LEMMA_ON,
     	USER_TACLETS_OPTIONS_KEY_BASE, USER_TACLETS_OFF, USER_TACLETS_LOW, USER_TACLETS_HIGH, 
     	USER_TACLETS_OPTIONS_KEY(1), USER_TACLETS_OPTIONS_KEY(2), USER_TACLETS_OPTIONS_KEY(3),
+    	AUTO_HIDING_OPTIONS_KEY, AUTO_HIDING_ON, AUTO_HIDING_OFF,
     	SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY, SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER,
     	SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF, SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF};
     
@@ -173,7 +191,8 @@ public final class StrategyProperties extends Properties {
         defaultMap.setProperty(STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT);
         defaultMap.setProperty(VBT_PHASE, VBT_SYM_EX);
         defaultMap.setProperty(CLASS_AXIOM_OPTIONS_KEY, CLASS_AXIOM_FREE);
-        defaultMap.setProperty(AUTO_INDUCTION_OPTIONS_KEY, AUTO_INDUCTION_OFF); //chrisg        
+        defaultMap.setProperty(AUTO_INDUCTION_OPTIONS_KEY, AUTO_INDUCTION_OFF); //chrisg  
+        defaultMap.setProperty(AUTO_HIDING_OPTIONS_KEY, AUTO_HIDING_ON);
         defaultMap.setProperty(SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
         defaultMap.setProperty(SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
     }
@@ -195,6 +214,7 @@ public final class StrategyProperties extends Properties {
         put(VBT_PHASE, defaultMap.getProperty(VBT_PHASE));
         put(CLASS_AXIOM_OPTIONS_KEY, defaultMap.getProperty(CLASS_AXIOM_OPTIONS_KEY));
         put(AUTO_INDUCTION_OPTIONS_KEY, defaultMap.getProperty(AUTO_INDUCTION_OPTIONS_KEY));
+        put(AUTO_HIDING_OPTIONS_KEY, defaultMap.getProperty(AUTO_HIDING_OPTIONS_KEY));
     }
 
     public static String getDefaultProperty(String key) {

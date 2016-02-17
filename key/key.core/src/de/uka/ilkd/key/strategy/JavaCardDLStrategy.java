@@ -25,23 +25,114 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.QueryExpand;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.strategy.definition.AbstractStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
-import de.uka.ilkd.key.strategy.feature.*;
+import de.uka.ilkd.key.strategy.feature.AgeFeature;
+import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
+import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
+import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
+import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
+import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
+import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
+import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
+import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
+import de.uka.ilkd.key.strategy.feature.DependencyContractFeature;
+import de.uka.ilkd.key.strategy.feature.DiffFindAndIfFeature;
+import de.uka.ilkd.key.strategy.feature.DiffFindAndReplacewithFeature;
+import de.uka.ilkd.key.strategy.feature.DirectlyBelowSymbolFeature;
+import de.uka.ilkd.key.strategy.feature.EqNonDuplicateAppFeature;
+import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.FindDepthFeature;
+import de.uka.ilkd.key.strategy.feature.FindRightishFeature;
+import de.uka.ilkd.key.strategy.feature.FocusInAntecFeature;
+import de.uka.ilkd.key.strategy.feature.InEquationMultFeature;
+import de.uka.ilkd.key.strategy.feature.MatchedIfFeature;
+import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.NoSelfApplicationFeature;
+import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
+import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
+import de.uka.ilkd.key.strategy.feature.NotBelowBinderFeature;
+import de.uka.ilkd.key.strategy.feature.NotBelowQuantifierFeature;
+import de.uka.ilkd.key.strategy.feature.NotInScopeOfModalityFeature;
+import de.uka.ilkd.key.strategy.feature.OnlyInScopeOfQuantifiersFeature;
+import de.uka.ilkd.key.strategy.feature.PolynomialValuesCmpFeature;
+import de.uka.ilkd.key.strategy.feature.PurePosDPathFeature;
+import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
+import de.uka.ilkd.key.strategy.feature.ReducibleMonomialsFeature;
+import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
+import de.uka.ilkd.key.strategy.feature.SVNeedsInstantiation;
+import de.uka.ilkd.key.strategy.feature.ScaleFeature;
+import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
+import de.uka.ilkd.key.strategy.feature.SetsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.SumFeature;
+import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.ThrownExceptionFeature;
+import de.uka.ilkd.key.strategy.feature.TopLevelFindFeature;
+import de.uka.ilkd.key.strategy.feature.TrivialMonomialLCRFeature;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
-import de.uka.ilkd.key.strategy.termProjection.*;
-import de.uka.ilkd.key.strategy.termfeature.*;
-import de.uka.ilkd.key.strategy.termgenerator.*;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCost;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCostScalerFeature;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.SplittableQuantifiedFormulaFeature;
+import de.uka.ilkd.key.strategy.termProjection.AssumptionProjection;
+import de.uka.ilkd.key.strategy.termProjection.CoeffGcdProjection;
+import de.uka.ilkd.key.strategy.termProjection.DividePolynomialsProjection;
+import de.uka.ilkd.key.strategy.termProjection.FocusFormulaProjection;
+import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
+import de.uka.ilkd.key.strategy.termProjection.MonomialColumnOp;
+import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
+import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
+import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.ConstantTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.IsInductionVariable;
+import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.IsSelectSkolemConstantTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
+import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
+import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.SimplifiedSelectTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+import de.uka.ilkd.key.strategy.termfeature.TermLabelTermFeature;
+import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.HeapGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.TriggeredInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -594,8 +685,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "information_flow_contract_appl", longConst(1000000));
         
         // the approval feature actually decides whether to hide or not
-        bindRuleSet(d, "hide", add(applyTF(FocusFormulaProjection.INSTANCE, op(tf.eq)),
-                                   applyTF(sub(FocusFormulaProjection.INSTANCE, 0), tf.constant)));
+       if (strategyProperties.contains(StrategyProperties.AUTO_HIDING_ON)) {
+           bindRuleSet(d, "hide", add(applyTF(FocusFormulaProjection.INSTANCE, op(tf.eq)),
+                   applyTF(sub(FocusFormulaProjection.INSTANCE, 0), tf.constant)));
+       } else {
+           bindRuleSet(d, "hide", inftyConst());
+           
+       }
 
         if (strategyProperties.contains(StrategyProperties.AUTO_INDUCTION_ON)
                 || strategyProperties
@@ -1168,7 +1264,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                         add(applyTF(FocusFormulaProjection.INSTANCE, op(tf.eq)), // we only hide equations automatically
                             applyTF(lhsOfEquation, tf.constant), // we only hide equations if the left hand side is a constant
                             applyTF(lhsOfEquation, not(TermLabelTermFeature.HAS_ANY_LABEL)), // do not hide symbols with labels (might have special meaning), it might actually suffic to check just for ParameterlessTermLAbel.SELECT_SKOLEM_LABEL
-                            applyTF(lhsOfEquation, not(or(ff.queryConstant,ff.currentThreadConstant))), // hack: do not hide constants introduced by QueryExpand
+                            applyTF(lhsOfEquation, not(or(ff.queryConstant,ff.isPredefinedConstantSymbol))), // prevent predefined symbols from being hidden and hack: do not hide constants introduced by QueryExpand
+                            longConst(-1000),
                             leq(countOccurrences(lhsOfEquation), longConst(1)))); // and that constant occurs at most once in the sequent (namely on the lhs)
         
         bindRuleSet(
@@ -3128,6 +3225,18 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 + "is not applied on Skolemized formulas in order to<br>"
                 + "limit the number of inductive proofs." + "</html>";
 
+        private static final String TOOL_TIP_AUTO_HIDING_ON = "<html>"
+                + "Hides automatically formulas that are determined to be no longer needed<br> "
+                + "e.g., equations with a constant on the left hand side, which does not occur anywhere else.<br>"
+                + "Hidden formulas can be reinserted using the insert_hidden taclets (and/or dialog)."
+                + "Attention: Does not influence the hiding for the heap simplification rules."
+                + "</html>";
+
+        private static final String TOOL_TIP_AUTO_HIDING_OFF = "<html>"
+                + "Switches the automatic hiding of formulas off."
+                + "Attention: Does not influence the hiding for the heap simplification rules."
+                + "</html>";
+
         public static String TOOL_TIP_USER_OFF(int i) {
             return "Taclets of the rule set \"userTaclets" + i
                     + "\" are not applied automatically";
@@ -3330,6 +3439,20 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                         6, 2));
                 props.add(user);
             }
+            
+            OneOfStrategyPropertyDefinition autoHiding =
+                    new OneOfStrategyPropertyDefinition(
+                            StrategyProperties.AUTO_HIDING_OPTIONS_KEY,
+                            "Auto Hiding",
+                            new StrategyPropertyValueDefinition(
+                                    StrategyProperties.AUTO_HIDING_ON,
+                                    "On", TOOL_TIP_AUTO_HIDING_ON),
+                            new StrategyPropertyValueDefinition(
+                                    StrategyProperties.AUTO_HIDING_OFF,
+                                    "Off",
+                                    TOOL_TIP_AUTO_HIDING_OFF));
+
+            
             OneOfStrategyPropertyDefinition userOptions =
                     new OneOfStrategyPropertyDefinition(
                             null,
@@ -3349,7 +3472,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     proofSplitting, loopTreatment, blockTreatment,
                     methodTreatment, dependencyContracts, queryTreatment,
                     arithmeticTreatment, quantifierTreatment, classAxiom,
-                    autoInduction, userOptions);
+                    autoInduction, autoHiding, userOptions);
         }
     }
 
@@ -3534,17 +3657,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private class FormulaTermFeatures {
 
         public TermFeature queryConstant;
-        public TermFeature currentThreadConstant;
+        public TermFeature isPredefinedConstantSymbol;
         
         public FormulaTermFeatures() {
-            forF = extendsTrans(Sort.FORMULA);
-
+            forF = extendsTrans(Sort.FORMULA);            
             orF = op(Junctor.OR);
             andF = op(Junctor.AND);
             impF = op(Junctor.IMP);
             notF = op(Junctor.NOT);
             ifThenElse = OperatorClassTF.create(IfThenElse.class);
-
             
             queryConstant = new BinaryTermFeature() {                               
                 @Override
@@ -3554,11 +3675,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 }
             };
 
-            currentThreadConstant = new BinaryTermFeature() {                               
+            isPredefinedConstantSymbol = new BinaryTermFeature() {                               
                 @Override
                 protected boolean filter(Term term, Services services) {
                     return term.op() instanceof Function && term.arity() == 0 && 
-                            term.op().name().toString().equals("currentThread"); // %%HACK: use term labels?
+                            services.getProof().getEnv().getInitConfigForEnvironment().funcNS().lookup(term.op().name()) != null;
                 }
             };
 
