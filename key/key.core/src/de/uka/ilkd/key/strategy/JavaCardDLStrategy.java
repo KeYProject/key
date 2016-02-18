@@ -214,7 +214,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         else if (queryProp.equals(StrategyProperties.QUERY_RESTRICTED)) {
             // All tests in the example directory pass with this strategy.
             // Hence, the old query_on strategy is obsolete.
-            queryF = querySpecFeature(new QueryExpandCost(500, 0, 20, true));
+            queryF = querySpecFeature(new QueryExpandCost(500, 0, 1, true));
         }
         else if (queryProp.equals(StrategyProperties.QUERY_OFF)) {
             queryF = querySpecFeature(inftyConst());
@@ -472,7 +472,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(
                 d,
                 "comprehensions",
-                add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(-100)));
+                add(NonDuplicateAppModPositionFeature.INSTANCE, 
+                        longConst(-50)));
 
         bindRuleSet(
                 d,
@@ -1129,6 +1130,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 ScaleFeature.createScaled(CountMaxDPathFeature.INSTANCE, 10.0),
                 longConst(20)));
 
+        TermBuffer superF = new TermBuffer();
         final ProjectionToTerm splitCondition = sub(FocusProjection.INSTANCE, 0);
         bindRuleSet(
                 d,
@@ -1146,15 +1148,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                 longTermConst(-10)))),
                         // prefer top level splits
                         FindDepthFeature.INSTANCE,
-                        ScaleFeature.createAffine(countOccurrences(splitCondition), -2, 2),
+                        ScaleFeature.createAffine(countOccurrences(splitCondition), -10, 10),
+                        sum(superF, SuperTermGenerator.upwards(any(), getServices()), applyTF(superF, not(ff.elemUpdate))),
                         ifZero(applyTF(FocusProjection.INSTANCE,
                                 ContainsExecutableCodeTermFeature.PROGRAMS),
-                                longConst(-100), longConst(75))));
+                                longConst(-100), longConst(25))));
 
         ProjectionToTerm cutFormula = instOf("cutFormula");
 
         Feature countOccurrencesInSeq =
-                ScaleFeature.createAffine(countOccurrences(cutFormula), -5, -10);
+                ScaleFeature.createAffine(countOccurrences(cutFormula), -10, 10);
 
         bindRuleSet(
                 d,
@@ -1235,7 +1238,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private void setupSplittingApproval(RuleSetDispatchFeature d) {
         bindRuleSet(d, "beta", allowSplitting(FocusFormulaProjection.INSTANCE));
 
-        bindRuleSet(d, "split_cond", allowSplitting(FocusProjection.create(0)));
+        bindRuleSet(d, "split_cond", allowSplitting(FocusProjection.INSTANCE));
 
         final TermBuffer subFor = new TermBuffer();
         final Feature compareCutAllowed =

@@ -183,8 +183,8 @@ public class QueryExpandCost implements Feature {
 	        		RuleApp appliedRuleApp = appliedRuleAppIter.next();
 	        		final PosInOccurrence pio = appliedRuleApp.posInOccurrence();
 	        		if(pio!=null){
-		        		Term oldterm = pio.subTerm();
-		        		Term curterm = pos.subTerm();
+		        		final Term oldterm = pio.subTerm();
+		        		final Term curterm = pos.subTerm();
 		        		if(appliedRuleApp.rule().equals(QueryExpand.INSTANCE) && 
 		        				oldterm.equals(curterm)){
 		        			count++;

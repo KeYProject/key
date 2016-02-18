@@ -50,7 +50,7 @@ public class RuleSetDispatchFeature implements Feature {
         for (RuleSet rs : ( (TacletApp)app ).taclet ().getRuleSets ()) {
             final Feature partialF = rulesetToFeature.get ( rs );
             if ( partialF != null ) {
-        	res = res.add ( partialF.compute ( app, pos, goal ) );
+                res = res.add ( partialF.compute ( app, pos, goal ) );
                 if ( res instanceof TopRuleAppCost ) {
                     break;
                 }
