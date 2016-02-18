@@ -15,6 +15,7 @@
 	<path id="key.nui.class.path">
 		<pathelement path="${basedir}/../key.util/bin" />
 		<pathelement path="${basedir}/../key.core/bin" />
+		<pathelement path="${basedir}/../key.ui/bin" />
 		<pathelement location="${basedir}/../key.core/lib/antlr.jar" />
 		<pathelement location="${basedir}/../key.core/lib/recoderKey.jar" />
 		<pathelement location="${basedir}/ant-lib/junit/junit-4.12.jar" />
