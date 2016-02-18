@@ -25,6 +25,7 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.isUpdateNormalForm;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSEPair;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSETriple;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -58,6 +59,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.join.JoinProcedure.ValuesJoinResult;
@@ -257,9 +259,29 @@ public class JoinRule implements BuiltInRule {
         // Delete previous sequents
         clearSemisequent(newGoal, true);
         clearSemisequent(newGoal, false);
+        
+        // We need to remove all partially instantiated no pos taclets from
+        // the new goal that at least one of the join the partners does not
+        // also have. Otherwise, this would be a soundness problem (e.g. in
+        // the case of insert_hidden taclets). However, taclets that are present
+        // in all partner goals may be safely kept.
+        final ArrayList<NoPosTacletApp> partInstNoPosTacletsToRemove =
+                new ArrayList<NoPosTacletApp>();
+        newGoal.indexOfTaclets()
+                .getPartialInstantiatedApps()
+                .forEach(
+                        app -> {
+                            for (final Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
+                                if (!joinPartner.first.indexOfTaclets()
+                                        .getPartialInstantiatedApps()
+                                        .contains(app)) {
+                                    partInstNoPosTacletsToRemove.add(app);
+                                    break;
+                                }
+                            }
+                        });
 
-        newGoal.indexOfTaclets().removeTaclets(
-                newGoal.indexOfTaclets().getPartialInstantiatedApps());
+        newGoal.indexOfTaclets().removeTaclets(partInstNoPosTacletsToRemove);
 
         // Add new antecedent (path condition)
         for (Term antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
