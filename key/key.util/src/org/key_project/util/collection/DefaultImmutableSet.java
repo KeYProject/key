@@ -193,7 +193,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     public ImmutableList<T> toImmutableList() {
         return elementList;
     }
-
+    
     /**
      * Create an immutable set from an immutable list.
      *

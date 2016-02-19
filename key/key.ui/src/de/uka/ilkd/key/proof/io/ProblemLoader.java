@@ -61,7 +61,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
        mediator.stopInterface(true);
        fireTaskStarted();
 
-       final long currentTime = System.nanoTime();
+       final long currentTime = System.currentTimeMillis();
        Throwable message;
        try {
            message = doWork();
@@ -69,7 +69,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
            message = ex;
        }
 
-       long runTime = System.nanoTime() - currentTime;
+       long runTime = System.currentTimeMillis() - currentTime;
        fireTaskFinished(runTime, message);
    }
 
@@ -120,9 +120,9 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
            @Override
            protected Throwable doInBackground() throws Exception {
-               long currentTime = System.nanoTime();
+               long currentTime = System.currentTimeMillis();
                final Throwable message = doWork();
-               runTime = System.nanoTime() - currentTime;
+               runTime = System.currentTimeMillis() - currentTime;
                return message;
            }
 

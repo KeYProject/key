@@ -93,7 +93,7 @@ public final class StrategyProperties extends Properties {
     public final static String AUTO_INDUCTION_RESTRICTED      = "AUTO_INDUCTION_RESTRICTED"; 
     public final static String AUTO_INDUCTION_ON       = "AUTO_INDUCTION_ON"; 
     public final static String AUTO_INDUCTION_LEMMA_ON = "AUTO_INDUCTION_LEMMA_ON";
-
+    
     public final static int USER_TACLETS_NUM = 3;
     private final static String USER_TACLETS_OPTIONS_KEY_BASE = "USER_TACLETS_OPTIONS_KEY";
     public static String USER_TACLETS_OPTIONS_KEY(int i)
@@ -131,6 +131,8 @@ public final class StrategyProperties extends Properties {
      * Value of key {@link #SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY} in {@link StrategyProperties} to avoid branches caused by modalities not part of main execution by using site proofs in a {@code SymbolicExecutionStrategy}.
      */
     public static final String SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF = "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF";
+    
+    
     
 
     //String identities.
@@ -173,7 +175,7 @@ public final class StrategyProperties extends Properties {
         defaultMap.setProperty(STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT);
         defaultMap.setProperty(VBT_PHASE, VBT_SYM_EX);
         defaultMap.setProperty(CLASS_AXIOM_OPTIONS_KEY, CLASS_AXIOM_FREE);
-        defaultMap.setProperty(AUTO_INDUCTION_OPTIONS_KEY, AUTO_INDUCTION_OFF); //chrisg        
+        defaultMap.setProperty(AUTO_INDUCTION_OPTIONS_KEY, AUTO_INDUCTION_OFF); //chrisg  
         defaultMap.setProperty(SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
         defaultMap.setProperty(SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
     }
