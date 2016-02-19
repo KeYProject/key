@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <equivalenceClass representativeTerm="null">
-      <term term="OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y)"/>
+      <term term="x"/>
       <term term="null"/>
    </equivalenceClass>
    <state name="return this.first.value+this.second.value+tempX.value+tempY.value;">
+      <value name="x" programVariable="x" isArrayIndex="false" value="null" type="Null" condition="true"/>
       <value name="exc" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="true"/>
-      <value name="tempY" programVariable="tempY" isArrayIndex="false" value="null" type="Null" condition="true"/>
+      <value name="tempX" programVariable="tempX" isArrayIndex="false" value="null" type="Null" condition="true"/>
       <association name="self" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
-      <association name="x" programVariable="x" isArrayIndex="false" target="o2" condition="true"/>
-      <association name="tempX" programVariable="tempX" isArrayIndex="false" target="o2" condition="true"/>
+      <association name="tempY" programVariable="tempY" isArrayIndex="false" target="o2" condition="true"/>
    </state>
    <object xml:id="o1" name="self" type="OneAssignmentTest">
-      <value name="y" programVariable="y" isArrayIndex="false" value="null" type="Null" condition="true"/>
-      <value name="second" programVariable="second" isArrayIndex="false" value="null" type="Null" condition="true"/>
-      <association name="first" programVariable="first" isArrayIndex="false" target="o2" condition="true"/>
+      <value name="first" programVariable="first" isArrayIndex="false" value="null" type="Null" condition="true"/>
+      <association name="y" programVariable="y" isArrayIndex="false" target="o2" condition="true"/>
+      <association name="second" programVariable="second" isArrayIndex="false" target="o2" condition="true"/>
    </object>
-   <object xml:id="o2" name="x" type="OneAssignmentTestValueWrapper">
+   <object xml:id="o2" name="OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y)" type="OneAssignmentTestValueWrapper">
    </object>
 </model>
