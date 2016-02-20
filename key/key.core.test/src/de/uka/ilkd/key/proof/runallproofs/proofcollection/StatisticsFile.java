@@ -66,14 +66,14 @@ public class StatisticsFile implements Serializable {
 
             @Override
             long getLongValueFromStatistics(Statistics statistics) {
-               return statistics.timeInMillis / 1000000;
+               return statistics.timeInMillis;
             }
 
          }, new LongColumn("Automode time") {
 
             @Override
             long getLongValueFromStatistics(Statistics statistics) {
-               return statistics.autoModeTimeInMillis / 1000000;
+               return statistics.autoModeTimeInMillis;
             }
 
          }, new Column<Integer>("Closed") {
