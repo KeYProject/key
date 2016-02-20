@@ -2,12 +2,16 @@ package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.nui.DataModel;
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.NUI;
+import de.uka.ilkd.key.nui.TreeViewState;
 import de.uka.ilkd.key.nui.exceptions.ComponentNotFoundException;
 import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
@@ -19,6 +23,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
@@ -33,7 +38,7 @@ import javafx.scene.layout.VBox;
  * @author Florian Breitfelder
  * @version 1.1
  */
-public class TreeViewController extends NUIController {
+public class TreeViewController extends NUIController implements Observer {
 
     /**
      * The name of the GUI component.
@@ -64,6 +69,11 @@ public class TreeViewController extends NUIController {
             .newSetFromMap(new WeakHashMap<>());
 
     /**
+     * Stores the last loaded proof. 
+     */
+    private Proof loadedProof = null;
+    
+    /**
      * The proofTree view of the GUI.
      */
     @FXML
@@ -83,8 +93,15 @@ public class TreeViewController extends NUIController {
      *            The proof file to load.
      */
     public final void loadAndDisplayProof(final File file) {
-        visualizer.loadProofTree(loadProof(file));
-        visualizer.visualizeProofTree();
+        loadedProof = loadProof(file);
+        loadedProof.setProofFile(file);
+        
+        visualizer.loadProofTree(loadedProof);
+        TreeItem<NUINode> tree = visualizer.visualizeProofTree();
+
+        // Store state of treeView into data model
+        nui.getDataModel().saveTreeViewState(new TreeViewState(loadedProof, tree),
+                file.getName());
     }
 
     /**
@@ -208,5 +225,23 @@ public class TreeViewController extends NUIController {
             }
 
         });
+
+        // register to the data model
+        nui.getDataModel().addObserver(this);
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        TreeItem<NUINode> treeItem = ((DataModel) o).getTreeViewState((String) arg).getTreeItem();
+        // update the proofTreeView component in the treeView
+        visualizer.displayProofTree(treeItem);
+
+    }
+
+    /**
+     * Returns the last loaded proof.
+     */
+    public Proof getLoadedProof() {
+        return loadedProof;
     }
 }

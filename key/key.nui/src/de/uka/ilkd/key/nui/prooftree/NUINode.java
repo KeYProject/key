@@ -455,7 +455,6 @@ public abstract class NUINode implements Cloneable {
     }
     
     //TODO really necessary???
-    @Deprecated
     public List<NUINode> asList() {
         List<NUINode> l = new LinkedList<>();
         l.add(this);

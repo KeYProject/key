@@ -86,7 +86,7 @@
 	</target>
 
 	<!-- Definition of target COMPILE -->
-	<target name="compile" depends="generate" description="Compile all source files into the build directory.">
+	<target name="compile" description="Compile all source files into the build directory.">
 		<mkdir dir="${build.dir}" />
 		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" source="1.8" target="1.8" deprecation="off" debug="on" depend="${build.depend}" optimize="off">
 			<!-- <exclude name="**/guitests/*.java" /> -->
@@ -159,45 +159,6 @@
 			   <formatter type="plain"/>
 	         <test name="de.uka.ilkd.key.nui.tests.junittests.JUnitTestSuite" todir="${basedir}/reports" />
 		</junit>
-	</target>
-
-	<!-- Author: Stefan Pilot <stef@n-pilot.de>
-	This will add new menu entries for each	GUI component defined as 
-	.fxml-File in the ${components} folder.
-	Possible problem: For n GUI-Components, it will use the fx:ids 
-	'toggleGroup`0`' to 'toggleGroup`n`'.
-	
-	If any questions should occur or you are editing this target,
-	please do not hesitate to write an email to the author.  
-	-->
-	<!-- Definition of target GENERATE -->
-	<target name="generate" depends="copy" description="Generates the Add-View-Menu by parsing the existing fxml files in /components">
-
-		<!-- Add the new GUI components -->
-		<var name="i" value="0" />
-		<for param="file">
-			<path>
-				<!--  For each .fxml-File in the components folder that is not a dotfile-->
-				<fileset dir="${components}">
-					<include name="*.fxml" />
-					<exclude name=".*" />
-				</fileset>
-			</path>
-			<sequential>
-				<var name="filename" unset="true" />
-				<!-- ${filename} = ${file} just without the '.fxml' -->
-				<basename property="filename" file="@{file}" suffix=".fxml" />
-				<!-- Define a new toggle group -->
-				<replaceregexp file="${NUIdefault}" match="(&lt;\!\-\- ANT DEFINE TOGGLE GROUP No [0-9\.]+ HERE \-\-&gt;)" replace="&lt;ToggleGroup fx:id=&quot;toggleGroup${i}&quot;/&gt;&#10;\1" />
-				<!-- and make the 'Menu' -->
-				<replaceregexp file="${NUIdefault}" match="(&lt;\!\-\- ANT DEFINE MENU HERE \-\-&gt;)" replace="&lt;Menu fx:id=&quot;toggle${filename}&quot; text=&quot;%${filename}&quot;&gt;&#10;&lt;properties componentName=&quot;${filename}&quot; componentResource=&quot;${filename}.fxml&quot;/&gt;&#10;&lt;items&gt;&#10;&lt;RadioMenuItem fx:id=&quot;hideTG${i}&quot; text=&quot;%hide&quot; selected=&quot;true&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;RadioMenuItem fx:id=&quot;leftTG${i}&quot; text=&quot;%left&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;RadioMenuItem fx:id=&quot;middleTG${i}&quot; text=&quot;%middle&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;RadioMenuItem fx:id=&quot;rightTG${i}&quot; text=&quot;%right&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;RadioMenuItem fx:id=&quot;bottomTG${i}&quot; text=&quot;%bottom&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;/items&gt;&#10;&lt;/Menu&gt;&#10;\1" />
-				<!-- Increment the toggle group counter.
-   			Possible bug: If at some point there will be more than one group of 
-   			toggle groups defined in this fmxl file, each of them must have a
-   			number greater than the number of Views / GUI Components. -->
-				<math result="i" operand1="${i}" operation="+" operand2="1" datatype="int" />
-			</sequential>
-		</for>
 	</target>
 
 	<!-- Definition of target CLEAN -->

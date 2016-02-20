@@ -166,9 +166,8 @@ public class NUIBranchNode extends NUINode {
         return cloned;
     }
     
-    //TODO really necessary???
+
     @Override
-    @Deprecated
     public List<NUINode> asList(){
         List<NUINode> l = new LinkedList<>();
         l.add(this);

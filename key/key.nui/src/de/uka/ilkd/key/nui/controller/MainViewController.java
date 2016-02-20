@@ -171,7 +171,7 @@ public class MainViewController extends NUIController implements Initializable {
 
         // only load proof if any selection was made
         if (file != null) {
-            statustext.setText("Beweis wird geladen");
+            updateStatusbar("Beweis wird geladen");
             treeViewController.loadAndDisplayProof(file);
         }
 
@@ -389,6 +389,13 @@ public class MainViewController extends NUIController implements Initializable {
     @Override
     protected void init() {
         // TODO Auto-generated method stub
-        
+
+    }
+
+    public void updateStatusbar(String text) {
+        if (text != null) {
+            statustext.setText(text);
+        }
+
     }
 }

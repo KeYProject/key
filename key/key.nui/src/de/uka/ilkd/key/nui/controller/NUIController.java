@@ -12,10 +12,10 @@ public abstract class NUIController {
         this.nui = nuiRef;
         this.componentName = componentName;
         this.filename = filename;
-        
+
         init();
     }
-    
+
     protected abstract void init();
 
 }

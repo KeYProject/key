@@ -57,7 +57,8 @@ public class NUI extends Application {
     private FXMLLoader fxmlLoader = null;
     private MainViewController mainViewController = null;
 
-    private Menu viewPositionMenu = new Menu("view position");
+    private Menu viewPositionMenu = null;
+    private DataModel dataModel = new DataModel();
 
     /**
      * When program is starting method "start" is called.
@@ -67,11 +68,10 @@ public class NUI extends Application {
         // Load Main View
         String filename = "MainView.fxml";
         String name = cutFileExtension(filename);
-        
+
         bundle = new PropertyResourceBundle(
                 getClass().getResourceAsStream("bundle_en_EN.properties"));
-        fxmlLoader = new FXMLLoader(getClass().getResource(filename),
-                bundle);
+        fxmlLoader = new FXMLLoader(getClass().getResource(filename), bundle);
         System.out.println("start launched successfully.");
         root = fxmlLoader.load();
         components.put("MainView", root);
@@ -79,6 +79,9 @@ public class NUI extends Application {
         mainViewController = fxmlLoader.getController();
         mainViewController.constructor(this, name, filename);
         controllers.put("MainView", mainViewController);
+
+        // initialize viewPositionMenu
+        viewPositionMenu = new Menu(bundle.getString("configViews"));
 
         // Load all components
         loadComponents();
@@ -114,7 +117,8 @@ public class NUI extends Application {
                 // you have to call fxmlLoader.load()
                 nuiController = fxmlLoader.getController();
                 if (nuiController != null)
-                    nuiController.constructor(this, componentName, file.getName());
+                    nuiController.constructor(this, componentName,
+                            file.getName());
                 controllers.put(componentName, nuiController);
 
                 // create a view position menu for every component
@@ -129,7 +133,13 @@ public class NUI extends Application {
     private Menu createSubMenu(String componentName, ToggleGroup toggleGroup) {
         Menu menu = new Menu(componentName);
 
-        RadioMenuItem hide = new RadioMenuItem("hide");
+        String hideText = bundle.getString("hide");
+        String leftText = bundle.getString("left");
+        String rightText = bundle.getString("right");
+        String bottomText = bundle.getString("bottom");
+        String middleText = bundle.getString("middle");
+
+        RadioMenuItem hide = new RadioMenuItem(hideText);
         hide.setOnAction(mainViewController.getNewHandleLoadComponent());
         hide.setId("hide");
         hide.getProperties().put("componentResource", componentName + ".fxml");
@@ -139,7 +149,7 @@ public class NUI extends Application {
         hide.setUserData(Place.HIDDEN);
         menu.getItems().add(hide);
 
-        RadioMenuItem left = new RadioMenuItem("left");
+        RadioMenuItem left = new RadioMenuItem(leftText);
         left.setOnAction(mainViewController.getNewHandleLoadComponent());
         left.setId("left");
         left.getProperties().put("componentResource", componentName + ".fxml");
@@ -148,7 +158,7 @@ public class NUI extends Application {
         left.setUserData(Place.LEFT);
         menu.getItems().add(left);
 
-        RadioMenuItem right = new RadioMenuItem("right");
+        RadioMenuItem right = new RadioMenuItem(rightText);
         right.setOnAction(mainViewController.getNewHandleLoadComponent());
         right.setId("right");
         right.getProperties().put("componentResource", componentName + ".fxml");
@@ -157,7 +167,7 @@ public class NUI extends Application {
         right.setUserData(Place.RIGHT);
         menu.getItems().add(right);
 
-        RadioMenuItem bottom = new RadioMenuItem("bottom");
+        RadioMenuItem bottom = new RadioMenuItem(bottomText);
         bottom.setOnAction(mainViewController.getNewHandleLoadComponent());
         bottom.setId("bottom");
         bottom.getProperties().put("componentResource",
@@ -167,7 +177,7 @@ public class NUI extends Application {
         bottom.setUserData(Place.BOTTOM);
         menu.getItems().add(bottom);
 
-        RadioMenuItem middle = new RadioMenuItem("middle");
+        RadioMenuItem middle = new RadioMenuItem(middleText);
         middle.setOnAction(mainViewController.getNewHandleLoadComponent());
         middle.setId("middle");
         middle.getProperties().put("componentResource",
@@ -215,5 +225,9 @@ public class NUI extends Application {
      */
     public static File getInitialProofFile() {
         return initialProofFile;
+    }
+
+    public DataModel getDataModel() {
+        return dataModel;
     }
 }
