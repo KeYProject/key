@@ -193,7 +193,17 @@ public class SWTBotLoopInvariantRuleCompletionTest extends TestCase {
       
       
       // Load source code in KeY and get contract to proof which is the first contract of LogRecord#getBalance().
-      environment = KeYEnvironment.load(new File(proofFolder, filename), null, null, null, EclipseUserInterfaceCustomization.getInstance());
+      environment = KeYEnvironment.load(
+            new File(proofFolder, filename),
+            null, null, null,
+            EclipseUserInterfaceCustomization.getInstance());
+      
+      //Alternative call to Load - breaks test cases that are based on MyClass.proof
+      /*environment = KeYEnvironment.load(
+            SymbolicExecutionJavaProfile.getDefaultInstance(false), 
+            new File(proofFolder, filename),
+            null, null, null, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(),
+            EclipseUserInterfaceCustomization.getInstance(), true);//*/
       
       proof = environment.getLoadedProof();
       assertNotNull(proof);
