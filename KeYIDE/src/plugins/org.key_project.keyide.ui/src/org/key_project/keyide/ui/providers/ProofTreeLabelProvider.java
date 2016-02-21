@@ -228,7 +228,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
 
 			} else if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, node.getAppliedRuleApp())) {
 				// Get position information
-				PositionInfo posInfo = statement.getPositionInfo();
+				PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
 
 				if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement)) {
 					return KeYImages.getImage(KeYImages.METHOD_CALL);
