@@ -493,64 +493,46 @@ public class SymbolicExecutionTreeBuilder {
     * @author Anna Filighera
     */
    public void prune(Node node) { 
-      // determine which nodes (and the corresponding execution nodes) remain after proof has been pruned
-      Iterator<Node> proofTree = proof.root().subtreeIterator(); 
-      int nodeCount = proof.countNodes();
-      HashSet<Node> proofNodes = new HashSet<Node>(nodeCount*2);
-      HashSet<AbstractExecutionNode<?>> exNodesToKeep = new HashSet<AbstractExecutionNode<?>>(nodeCount);
-      LinkedList<Node> removedNodes = new LinkedList<Node>();
-      proofNodes.add(proof.root());
-      while (proofTree.hasNext()) {
-         Node n = proofTree.next();
-         proofNodes.add(n);
-         AbstractExecutionNode<?> exNode = (AbstractExecutionNode<?>) getExecutionNode(n);
-         if (exNode != null) {
-            exNodesToKeep.add(exNode);
-         }
+      // search for the first node in the parent hierarchy (including the node itself) who is an AbstractExecutionNode
+      while (getExecutionNode(node) == null) {
+         node = node.parent();
       }
-      // remove all deleted nodes from all maps
-      for (Node mapNode : keyNodeMapping.keySet()) {
-         if (!proofNodes.contains(mapNode)) {
-            removedNodes.add(mapNode);     
-         }
-      }
-      for (Node mapNode :keyNodeLoopConditionMapping.keySet()) {
-         if (!proofNodes.contains(mapNode)) {
-            removedNodes.add(mapNode);      
-         }
-      }
-      for (Node mapNode : keyNodeBranchConditionMapping.keySet()) {
-         if (!proofNodes.contains(mapNode)) {
-            removedNodes.add(mapNode);    
-         }
-      }
-      for (Node n : removedNodes) {
-         keyNodeMapping.remove(n);
-         keyNodeLoopConditionMapping.remove(n);
-         keyNodeBranchConditionMapping.remove(n);
-         SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(n.getAppliedRuleApp());
+      // determine which nodes should be pruned
+      HashSet<AbstractExecutionNode<?>> exNodesToDelete = new HashSet<AbstractExecutionNode<?>>(proof.countNodes());
+      ExecutionNodePreorderIterator subtreeToBePruned = new ExecutionNodePreorderIterator(getExecutionNode(node));
+      subtreeToBePruned.next();
+      while (subtreeToBePruned.hasNext()) {
+         AbstractExecutionNode<?> exNode = (AbstractExecutionNode<?>) subtreeToBePruned.next();
+         exNodesToDelete.add(exNode);  
+         Node correspondingNode = exNode.getProofNode();
+         keyNodeMapping.remove(correspondingNode);
+         keyNodeLoopConditionMapping.remove(correspondingNode);
+         keyNodeBranchConditionMapping.remove(correspondingNode);
+         SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(correspondingNode.getAppliedRuleApp());
          if (label != null) {
             methodCallStackMap.remove(label);
             afterBlockMap.remove(label);
             methodReturnsToIgnoreMap.remove(label);
          }   
       }
-      // iterate over all remaining execution nodes and remove all references to deleted execution nodes
-      Iterator<AbstractExecutionNode<?>> symIter = exNodesToKeep.iterator();
-      while (symIter.hasNext()) {
-         AbstractExecutionNode<?> exNode = symIter.next();
-         for (AbstractExecutionNode<?> child: exNode.getChildren()) {
-            if (!exNodesToKeep.contains(child)) {
-               child.setParent(null);
-               exNode.removeChild(child);
-            }
-         }
+      // remove all parent-child-references of pruned nodes
+      Iterator<AbstractExecutionNode<?>> prunedExNodes = exNodesToDelete.iterator();
+      while (prunedExNodes.hasNext()) {
+         AbstractExecutionNode<?> exNode = prunedExNodes.next();
+         exNode.getParent().removeChild(exNode);
+         exNode.setParent(null);       
+      } 
+      // remove all other references to deleted nodes
+      ExecutionNodePreorderIterator remainingExNodes = new ExecutionNodePreorderIterator(startNode);
+      while (remainingExNodes.hasNext()) {
+         AbstractExecutionNode<?> exNode = (AbstractExecutionNode<?>) remainingExNodes.next();
+         
          if (exNode instanceof ExecutionMethodCall) {
             Iterator<IExecutionBaseMethodReturn<?>> iter = ((ExecutionMethodCall) exNode).getMethodReturns().iterator();
             LinkedList<IExecutionBaseMethodReturn<?>> removed = new LinkedList<IExecutionBaseMethodReturn<?>>();
             while (iter.hasNext()) {
                IExecutionBaseMethodReturn<?> methodReturn = iter.next();
-               if (!exNodesToKeep.contains(methodReturn)) {
+               if (exNodesToDelete.contains(methodReturn)) {
                   removed.add(methodReturn);
                }
             }
@@ -563,15 +545,14 @@ public class SymbolicExecutionTreeBuilder {
             LinkedList<IExecutionNode<?>> removed = new LinkedList<IExecutionNode<?>>();
             while (iter.hasNext()) {
                IExecutionNode<?> completion = iter.next();
-               if (!exNodesToKeep.contains(completion)) {
+               if (exNodesToDelete.contains(completion)) {
                   removed.add(completion);
                }
             }
             for (IExecutionNode<?> deleted : removed) {
                ((AbstractExecutionBlockStartNode<?>) exNode).removeBlockCompletion(deleted);
             }
-         }
-         
+         }  
       }
    }
    
