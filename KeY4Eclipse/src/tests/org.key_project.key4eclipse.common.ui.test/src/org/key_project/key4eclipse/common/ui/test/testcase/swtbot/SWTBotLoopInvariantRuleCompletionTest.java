@@ -112,9 +112,8 @@ public class SWTBotLoopInvariantRuleCompletionTest extends TestCase {
          openLIDialog("Loop Invariant");
          dialogShell.bot().button("Finish").click();
          dialogShell = null;
-         final SWTBotStyledText styledText = editor.bot().styledText();
-         assertTrue(styledText.getText().contains("i >= 0 & i <= _array.length"));
-         assertFalse(styledText.getText().contains("bogus, this isn't actually in the text."));
+         assertTrue(proof.openGoals().head().toString().contains("i >= 0 & i <= _array.length"));
+         assertFalse(proof.openGoals().head().toString().contains("bogus, this isn't actually in the text."));
       } finally {
          restore();
       }
