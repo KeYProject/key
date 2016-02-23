@@ -77,7 +77,7 @@ public class NUI extends Application {
         components.put("MainView", root);
 
         mainViewController = fxmlLoader.getController();
-        mainViewController.constructor(this, name, filename);
+        mainViewController.constructor(this, dataModel, name, filename);
         controllers.put("MainView", mainViewController);
 
         // initialize viewPositionMenu
@@ -117,7 +117,7 @@ public class NUI extends Application {
                 // you have to call fxmlLoader.load()
                 nuiController = fxmlLoader.getController();
                 if (nuiController != null)
-                    nuiController.constructor(this, componentName,
+                    nuiController.constructor(this, dataModel, componentName,
                             file.getName());
                 controllers.put(componentName, nuiController);
 

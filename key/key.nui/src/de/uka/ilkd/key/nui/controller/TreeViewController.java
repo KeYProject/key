@@ -63,16 +63,21 @@ public class TreeViewController extends NUIController implements Observer {
     private VBox treeViewPane;
 
     /**
+     * Includes the Sub-Window for search
+     */
+    private Pane searchViewPane;
+
+    /**
      * The tree cells used for displaying tree nodes.
      */
     private final Set<ProofTreeCell> proofTreeCells = Collections
             .newSetFromMap(new WeakHashMap<>());
 
     /**
-     * Stores the last loaded proof. 
+     * Stores the last loaded proof.
      */
     private Proof loadedProof = null;
-    
+
     /**
      * The proofTree view of the GUI.
      */
@@ -95,12 +100,12 @@ public class TreeViewController extends NUIController implements Observer {
     public final void loadAndDisplayProof(final File file) {
         loadedProof = loadProof(file);
         loadedProof.setProofFile(file);
-        
+
         visualizer.loadProofTree(loadedProof);
         TreeItem<NUINode> tree = visualizer.visualizeProofTree();
 
         // Store state of treeView into data model
-        nui.getDataModel().saveTreeViewState(new TreeViewState(loadedProof, tree),
+        dataModel.saveTreeViewState(new TreeViewState(loadedProof, tree),
                 file.getName());
     }
 
@@ -227,12 +232,13 @@ public class TreeViewController extends NUIController implements Observer {
         });
 
         // register to the data model
-        nui.getDataModel().addObserver(this);
+        dataModel.addObserver(this);
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        TreeItem<NUINode> treeItem = ((DataModel) o).getTreeViewState((String) arg).getTreeItem();
+        TreeItem<NUINode> treeItem = ((DataModel) o)
+                .getTreeViewState((String) arg).getTreeItem();
         // update the proofTreeView component in the treeView
         visualizer.displayProofTree(treeItem);
 
@@ -243,5 +249,9 @@ public class TreeViewController extends NUIController implements Observer {
      */
     public Proof getLoadedProof() {
         return loadedProof;
+    }
+
+    public void setSearchWindow(Pane searchViewPane) {
+        this.searchViewPane = searchViewPane;
     }
 }
