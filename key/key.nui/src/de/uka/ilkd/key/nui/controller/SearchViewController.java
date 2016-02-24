@@ -36,18 +36,18 @@ public class SearchViewController extends NUIController {
      * The Button toggling selectNextItem in searching
      */
     @FXML
-    private Button nextButton;
+    private Button btnSearchNext;
     /**
      * The Button toggling selectPreviousItem in searching
      */
     @FXML
-    private Button previousButton;
+    private Button btnSearchPrev;
 
     /**
      * The TextField where search terms are entered
      */
     @FXML
-    private TextField searchTextField;
+    private TextField tfSearchQuery;
 
     /**
      * Weak-referenced Set of ProofTreeCells
@@ -91,11 +91,11 @@ public class SearchViewController extends NUIController {
         this.proofTreeCells = proofTreeCells;
         this.treeViewPane = treeViewPane;
 
-        Platform.runLater(() -> searchTextField.requestFocus());
+        Platform.runLater(() -> tfSearchQuery.requestFocus());
     }
 
     public void performFocusRequest() {
-        searchTextField.requestFocus();
+        tfSearchQuery.requestFocus();
     }
 
     /**
@@ -279,13 +279,13 @@ public class SearchViewController extends NUIController {
 
     @Override
     protected void init() {
-        previousButton.setOnAction(
+        btnSearchPrev.setOnAction(
                 (event) -> moveSelectionAndScrollIfNeeded(Direction.DOWN));
-        nextButton.setOnAction(
+        btnSearchNext.setOnAction(
                 (event) -> moveSelectionAndScrollIfNeeded(Direction.UP));
-        searchTextField.textProperty().addListener((obs, oldText, newText) -> {
-            nextButton.setDisable(newText.isEmpty());
-            previousButton.setDisable(newText.isEmpty());
+        tfSearchQuery.textProperty().addListener((obs, oldText, newText) -> {
+            btnSearchNext.setDisable(newText.isEmpty());
+            btnSearchPrev.setDisable(newText.isEmpty());
             if (newText.isEmpty()) {
                 proofTreeView.getRoot().getValue().resetSearch();
             }
@@ -303,13 +303,13 @@ public class SearchViewController extends NUIController {
                 // reset proofTreeView
                 proofTreeView.getRoot().getValue().resetSearch();
 
-                searchTextField.setText("");
+                tfSearchQuery.setText("");
             }
             else if (KeyCode.ENTER == e.getCode()) {
                 PauseTransition pause = new PauseTransition(
                         Duration.millis(130));
                 Button button;
-                button = e.isShiftDown() ? previousButton : nextButton;
+                button = e.isShiftDown() ? btnSearchPrev : btnSearchNext;
                 button.arm();
                 pause.setOnFinished(event -> {
                     button.disarm();
