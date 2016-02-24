@@ -1,7 +1,6 @@
 package org.key_project.key4eclipse.common.ui.wizard.page;
 
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Vector;
 
 import org.eclipse.jface.wizard.WizardPage;
@@ -26,6 +25,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.key_project.key4eclipse.common.ui.util.KeYImages;
+import org.key_project.key4eclipse.common.ui.wizard.CompleteAndApplyTacletMatchWizard;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.InstantiationFileHandler;
@@ -89,6 +89,10 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
     * the ID of the spec currently selected.
     */
    private int currentID = 0;
+
+   private StackLayout assumptionsStackLayout;
+
+   private Group assumptionViewGrp;
    
    /**
     * Constructor.
@@ -112,21 +116,19 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
    public void createControl(Composite parent) {
       // Create root
       root = new SashForm(parent, SWT.HORIZONTAL);
-      int defaultSashWidth = 20;
+      int defaultSashWidth = 10;
       ((SashForm) root).setSashWidth(defaultSashWidth);
       setControl(root);
-      
       //set general layout. Should be easily modifiable.
       SashForm left  = new SashForm(root, SWT.VERTICAL);
       ((SashForm) left).setSashWidth(defaultSashWidth);
       SashForm right = new SashForm(root, SWT.VERTICAL);
       ((SashForm) right).setSashWidth(defaultSashWidth);
       
-      //TODO: Are the sashForms clearly visible?
-      
       mkTacletView(left);
       mkVariableInstantiationView(right);
       mkProgramVariablesView(left);
+      mkAssumptionsView(right);
       mkValidationView(right);
 
       specSelector.select(0);
@@ -134,9 +136,6 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       
       // Set initial page complete state.
       updatePageComplete();
-      
-      //TODO: Investigate: What do different TacletInstModels we can get have in common?
-      //TODO: Validate assumptions: All models share everything *but* tableModel and ifChoiceModel
    }
    
    /**
@@ -147,30 +146,23 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
    }
    
    /**
-    * creates the taclet view.
+    * Creates the taclet view.
     * @param parent the composite to attach to
     */
    private void mkTacletView(Composite parent) {
       Taclet taclet = models[0].taclet();
       
-      //TODO: Horrible mess beyond this point. Cleanup needed. Are all these calls to various String make thingies really needed?
+      //Generate a String that displays the taclet.
       StringBackend backend = new StringBackend(68);
       StringBuilder tacletSB = new StringBuilder();
 
-      Writer w = new StringWriter();
-
       SequentViewLogicPrinter tp = new SequentViewLogicPrinter(
-            new ProgramPrinter(w), new NotationInfo(), backend,
-            models[0].getServices(), true, MainWindow.getInstance()
-                  .getVisibleTermLabels());
+         new ProgramPrinter(new StringWriter()), new NotationInfo(), backend,
+         models[0].getServices(), true, MainWindow.getInstance().getVisibleTermLabels());
       
       tp.printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
-            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                  .getShowWholeTaclet(),
-            // ProofSettings.DEFAULT_SETTINGS.getViewSettings().getShowWholeTaclet(),
-            false);
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(), false);
       tacletSB.append(backend.getString());
-      //End of mess, hopefully.
       
       //Make a border and Text field.
       Group statusGrp = new Group(parent, SWT.NONE);
@@ -184,7 +176,33 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
    }
    
    /**
-    * creates the variable instantiation view.
+    * Creates the program variables view.
+    * @param parent the composite to attach to
+    */
+   private void mkProgramVariablesView(Composite parent) {
+      //implementation pretty much completed.
+      Group statusGrp = new Group(parent, SWT.NONE);
+      statusGrp.setLayoutData(new GridData(GridData.FILL_BOTH));
+      statusGrp.setLayout(new GridLayout(1, false));
+      statusGrp.setText("Sequent program variables");
+      Label status = new Label(statusGrp, SWT.WRAP);
+      ImmutableList<Named> vars = models[0].programVariables().elements();
+      String text;
+      if (vars.size() > 0) {
+         text = vars.toString();
+         text = "";
+         for (Named n : vars) {
+            text += n.name();
+            text += "\n";
+         }
+      } else {
+         text = "none";
+      }
+      status.setText(text);
+   }
+   
+   /**
+    * Creates the variable instantiation view.
     * @param parent the composite to attach to
     */
    private void mkVariableInstantiationView(Composite parent) {
@@ -212,33 +230,26 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
    }
    
    /**
-    * creates the program variables view.
-    * @param parent the composite to attach to
+    * generates a taclet-assumes instantiation view.
+    * @param parent the parent composite
     */
-   private void mkProgramVariablesView(Composite parent) {
-      //implementation pretty much completed.
-      Group statusGrp = new Group(parent, SWT.NONE);
-      statusGrp.setLayoutData(new GridData(GridData.FILL_BOTH));
-      statusGrp.setLayout(new GridLayout(1, false));
-      statusGrp.setText("Sequent program variables");
-      Label status = new Label(statusGrp, SWT.WRAP);
-      ImmutableList<Named> vars = models[0].programVariables().elements();
-      String text;
-      if (vars.size() > 0) {
-         text = vars.toString();
-         text = "";
-         for (Named n : vars) {
-            text += n.name();
-            text += "\n";
-         }
-      } else {
-         text = "none";
+   private void mkAssumptionsView(Composite parent) {
+      if (models[0].application().taclet().ifSequent().isEmpty()) {
+         //No Assumptions to instantiate
+         return;
       }
-      status.setText(text);
+      //Generate a Group that holds the stack of AssumptionSpec Views for each model.
+      assumptionViewGrp = new Group(parent, SWT.NONE);
+      assumptionViewGrp.setText("Assumption instantiation");
+      assumptionsStackLayout = new StackLayout();
+      assumptionViewGrp.setLayout(assumptionsStackLayout);
+      for(int i = 0; i< models.length; i++) {
+         mkAssumptionsSpec(0);
+      }
    }
    
    /**
-    * creates the validation view.
+    * Creates the validation view.
     * @param parent the composite to attach to
     */
    private void mkValidationView(Composite parent) {
@@ -249,33 +260,6 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       validationText = new Label(statusGrp, SWT.WRAP);
    }
    
-   //Not getting called yet, because I'm unsure where.
-   //Part of assumes-extension
-   @SuppressWarnings("unused")//TODO: remove this tag once onsolete.
-   private void mkIfSelectionView(Composite parent, TacletInstantiationModel model){
-      //Completely untested
-      
-      if (model.application().taclet().ifSequent().isEmpty()){
-         //not going to need a view for that at all.
-         return;
-      }
-      Group ifSelectionViewGrp = new Group(parent, SWT.NONE);
-      ifSelectionViewGrp.setText("Assumption instantiation");
-      ifSelectionViewGrp.setLayout(new GridLayout(2, false));
-      for (int i = 0; i < model.ifChoiceModelCount(); i++) {
-         String text = ProofSaver.printAnything(model.ifFma(i), model.proof().getServices());
-         Text assumption = new Text(ifSelectionViewGrp, SWT.READ_ONLY);
-         assumption.setText(text);
-         TacletAssumesModel tam = model.ifChoiceModel(i);
-         Combo c = new Combo(ifSelectionViewGrp, SWT.DROP_DOWN);
-         Services svc = model.proof().getServices();
-         for (int j = 0 ; j < tam.getSize(); j++) {
-            c.add(tam.getElementAt(j).toString(svc));
-         }
-         //selection listener for the Combo?
-      }
-   }
-   
    /**
     * Switches to a different spec.
     * @param id The ID of the spec in models
@@ -283,6 +267,10 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
    private void specSwitchTo(int id) {
       stackLayout.topControl = (Composite) specSwitchComposite.getChildren()[id];
       specSwitchComposite.layout();
+      if(assumptionsStackLayout != null && assumptionViewGrp != null) {
+         assumptionsStackLayout.topControl = (Composite) assumptionViewGrp.getChildren()[id];
+         assumptionViewGrp.layout();
+      }
       validationViewUpdate();
    }
    
@@ -294,10 +282,11 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
    }
    
    /**
-    * updates the validation View.
+    * Updates the validation View.
     */
    private void validationViewUpdate() {
       String status = getCurrentModel().getStatusString();
+
       validationText.setText(status);
       if (status.equals("Instantiation is OK.")) {
          setErrorMessage(null);
@@ -309,7 +298,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
    }
    
    /**
-    * creates a new specification.
+    * Creates a new specification.
     * @param name The alias in the DropDown Combo
     * @param id The ID in models
     */
@@ -323,7 +312,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       TableColumn varnames = new TableColumn(table, SWT.NONE);
       TableColumn varspecs = new TableColumn(table, SWT.NONE);
       TableItem item = new TableItem(table, SWT.NONE);
-      item.setText(new String[] {"terms", "specs"}); //TODO: What to put here?
+      item.setText(new String[] {"formula", "instantiation"});
       final Vector<TableItem> editableItems = new Vector<TableItem>();
       final Vector<Integer> editableItemOriginalRowID = new Vector<Integer>();
       for (int i = 0; i < model.tableModel().getRowCount(); i++) {
@@ -345,16 +334,9 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       varnames.pack();
       varspecs.pack();
       
-      //TODO: validate that the code from this snippet
-      //http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/editthetextofaSWTtableiteminplace.htm
-      //is in line with what we need.
-      
       final TableEditor editor = new TableEditor(table);
-      // The editor must have the same size as the cell and must
-      // not be any smaller than 50 pixels.
-      editor.horizontalAlignment = SWT.LEFT;
+      editor.horizontalAlignment = SWT.RIGHT;
       editor.grabHorizontal = true;
-      editor.minimumWidth = 50;
 
       table.addSelectionListener(new SelectionAdapter() {
          public void widgetSelected(SelectionEvent e) {
@@ -374,11 +356,10 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
             if (!editableItems.contains(item)) {
                return;
             }
-            
+            //get row index
             final int row = editableItemOriginalRowID.get(editableItems.indexOf(item));
             
-            // The control that will be the editor must be a child of the
-            // Table
+            //Add a editor
             Text newEditor = new Text(table, SWT.NONE);
             newEditor.setText(item.getText(1));
             newEditor.addModifyListener(new ModifyListener() {
@@ -399,32 +380,53 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       table.setLinesVisible(true);
    }
    
+   private void mkAssumptionsSpec(int id){
+      final TacletInstantiationModel model = models[id];
+      Composite ifSelectionViewComposite = new Composite(assumptionViewGrp, SWT.NONE);
+      ifSelectionViewComposite.setLayout(new GridLayout(2, false));
+      
+      for (int i = 0; i < model.ifChoiceModelCount(); i++) {
+         String text = ProofSaver.printAnything(model.ifFma(i), model.proof().getServices());
+         Text assumption = new Text(ifSelectionViewComposite, SWT.READ_ONLY);
+         assumption.setText(text);
+         TacletAssumesModel tam = model.ifChoiceModel(i);
+         final Combo c = new Combo(ifSelectionViewComposite, SWT.DROP_DOWN);
+         Services svc = model.proof().getServices();
+         final int ifChoiceModelID = i;
+         for (int j = 0; j < tam.getSize(); j++) {
+            String ifSelection =tam.getElementAt(j).toString(svc);
+            if(! ifSelection.equals("Manual Input")) {
+               c.add(ifSelection);
+            }
+            
+         }
+         c.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent e) {
+               //FIXME: Decide the following: Do we need to call
+               //    c.setItem
+               //or find another way to set the Combo text
+               //
+               //Validate whether setManualInput works as expected.
+               model.setManualInput(ifChoiceModelID, c.getText());
+            }
+         });
+      }
+   }
+   
    /**
     * Stores the information and applies a freshly created taclet application.
     */
    public void finish() {
-      //TODO error handling
       try {
          validationViewUpdate();
          TacletApp app = getCurrentModel().createTacletApp();
          if (app == null) {
-             /*Error message TODO:
-             "Could not apply rule",
-             "Rule Application Failure",
-             */ 
-             return;
+            return;
          }
-         //goal.node().getNodeInfo().setInteractiveRuleApplication(true);//Maybe?
          goal.apply(app);
       }  catch (Exception exc) {
-//          if (exc instanceof SVInstantiationExceptionWithPosition) {
-//                        errorPositionKnown(exc.getMessage(),
-//                                ((SVInstantiationExceptionWithPosition) exc).getRow(),
-//                                ((SVInstantiationExceptionWithPosition) exc).getColumn(),
-//                                ((SVInstantiationExceptionWithPosition) exc).inIfSequent());
-//          }
-          //ExceptionDialog.showDialog(TacletMatchCompletionDialog.this, exc);
-          return;
+         exc.printStackTrace();
+         return;
       } 
       InstantiationFileHandler.saveListFor(getCurrentModel());
    }

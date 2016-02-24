@@ -37,6 +37,8 @@ import org.key_project.util.test.util.TestUtilsUtil;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
 /**
  * Tests for CompleteAndApplyTacletMatchWizardPage.
@@ -82,12 +84,13 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
       try {
          //load a proof file:
          setupTest("allLeft.proof");
-         openLIDialog("ellForm", "cut");
+         openRuleDialog("ellForm", "local_cut", 0);
          
          //edit the table
          SWTBotTable t = dialogShell.bot().table();
-         SWTBotTableItem ti = t.getTableItem(1);
+         SWTBotTableItem ti = t.getTableItem(2);
          ti.click();
+
          Text wdgt = bot.widget(widgetOfType(Text.class), t.widget);
          SWTBotText txt = new SWTBotText(wdgt, null);
          txt.setText("1!=3");
@@ -95,9 +98,8 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
          
          //finish the dialog
          dialogShell.bot().button("Finish").click();
-         final SWTBotStyledText styledText = editor.bot().styledText();
          //assert that the expected change happened.
-         assertTrue(styledText.getText().contains("!1 = 3"));
+         assertTrue(proof.openGoals().head().toString().contains("!1 = 3"));
       } finally {
          restore();
       }
@@ -108,12 +110,13 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
       try {
          //load a proof file
          setupTest("allLeft.proof");
-         openLIDialog("ellForm", "cut");
+         openRuleDialog("ellForm", "local_cut", 0);
+         
+         String oldEditorText = proof.openGoals().head().toString();
          
          //edit the spec to unlock the finish button.
-         String oldEditorText = editor.bot().styledText().getText();
          SWTBotTable t = dialogShell.bot().table();
-         SWTBotTableItem ti = t.getTableItem(1);
+         SWTBotTableItem ti = t.getTableItem(2);
          ti.click();
          Text wdgt = bot.widget(widgetOfType(Text.class), t.widget);
          SWTBotText txt = new SWTBotText(wdgt, null);
@@ -123,12 +126,36 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
          dialogShell.bot().button("Cancel").click();
          
          //assert that nothing has changed.
-         final SWTBotStyledText styledText = editor.bot().styledText();
-         assertFalse(styledText.getText().contains("!1 = 3"));
+         assertFalse(proof.openGoals().head().toString().contains("!1 = 3"));
 
-         String newEditorText = editor.bot().styledText().getText();
+         String newEditorText = proof.openGoals().head().toString();
          assertTrue(oldEditorText.equals(newEditorText));
          
+      } finally {
+         restore();
+      }
+   }
+   
+   @Test
+   public void testAssumptions() throws Exception {
+      try {
+         //load a proof file
+         setupTest("multiSelectsInAssume.proof");
+         openRuleDialog("y", "multiSelectsInAssume", 2);
+
+         //backup the old open goal's text
+         String oldProofText = proof.openGoals().head().toString();
+         
+         //instantiate the two assumptions
+         dialogShell.bot().comboBox("").setSelection("5 >= 0");
+         dialogShell.bot().comboBox("").setText("3 >= 0");// .setSelection("3 >= 0");
+         dialogShell.bot().button("Finish").click();
+         
+         //assert that expected change happened
+         String newProofText = proof.openGoals().head().toString();
+         assertFalse(oldProofText.contains("true"));
+         assertTrue(newProofText.contains("true"));
+         assertFalse(oldProofText.equals(newProofText));
       } finally {
          restore();
       }
@@ -167,7 +194,11 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
       
       
       // Load source code in KeY and get contract to proof which is the first contract of LogRecord#getBalance().
-      environment = KeYEnvironment.load(new File(proofFolder, filename), null, null, null, EclipseUserInterfaceCustomization.getInstance());
+      environment = KeYEnvironment.load(
+            SymbolicExecutionJavaProfile.getDefaultInstance(false), 
+            new File(proofFolder, filename),
+            null, null, null, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(),
+            EclipseUserInterfaceCustomization.getInstance(), true);
       
       proof = environment.getLoadedProof();
       assertNotNull(proof);
@@ -199,11 +230,11 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
     * @param location The text snippet where to look for the rule
     * @param rule The name of the rule to be applied
     */
-   private void openLIDialog(String location, String rule) {
+   private void openRuleDialog(String location, String rule, int offset) {
       //click context menu / text we're looking for: The first { should be the start of the update.
       final SWTBotStyledText styledText = editor.bot().styledText();
       Point point = TestUtilsUtil.selectText(styledText, location);
-      point.x = point.x - 1;
+      point.x = point.x - 1 + offset;
       
       TestUtilsUtil.setCursorLocation(styledText, point.x, point.y);
       TestUtilsUtil.clickContextMenu(styledText, point.x, point.y, rule);
