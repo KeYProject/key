@@ -66,6 +66,7 @@ public class ProofTreeVisualizer {
      *            The root node of the tree to display.
      */
     public final void displayProofTree(TreeItem<NUINode> root) {
+        root.setExpanded(true);
         // define the root of the tree
         proofTreeView.setRoot(root);
     }
