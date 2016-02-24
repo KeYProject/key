@@ -5,10 +5,8 @@ import org.loadui.testfx.GuiTest;
 
 import de.uka.ilkd.key.nui.NUI;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeStyle;
-import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.input.KeyCode;
-import javafx.stage.Stage;
 
 /**
  * Test for User Stroy (010) Laden von Beweisen #14664
