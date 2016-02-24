@@ -31,9 +31,3 @@ Export-Package: org.key_project.sed.ui.action,
  org.key_project.sed.ui.util,
  org.key_project.sed.ui.wizard,
  org.key_project.sed.ui.wizard.page
-Import-Package: de.uka.ilkd.key.core,
- de.uka.ilkd.key.proof,
- de.uka.ilkd.key.symbolic_execution.model,
- org.key_project.key4eclipse.starter.core.util,
- org.key_project.keyide.ui.editor,
- org.key_project.sed.key.core.model
