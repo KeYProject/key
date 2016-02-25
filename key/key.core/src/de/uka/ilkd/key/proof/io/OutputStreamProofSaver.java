@@ -436,7 +436,7 @@ public class OutputStreamProofSaver {
     public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence pos) {
         if (pos == null) return "";
         return " (formula \""+seq.formulaNumberInSequent(pos.isInAntec(),
-                pos.constrainedFormula())+"\")"+
+                pos.sequentFormula())+"\")"+
                 posInTerm2Proof(pos.posInTerm());
     }
 

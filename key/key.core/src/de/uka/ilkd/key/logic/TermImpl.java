@@ -15,20 +15,12 @@ package de.uka.ilkd.key.logic;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -142,10 +134,10 @@ class TermImpl implements Term {
      * TermCreationException is thrown.  
      */
     public Term checked() {
-    	if(op().validTopLevel(this)) {
+    	if (op.validTopLevel(this)) {
 	    return this;
 	} else {
-	    throw new TermCreationException(op(), this);
+	    throw new TermCreationException(op, this);
 	}
     }    
     
@@ -177,16 +169,6 @@ class TermImpl implements Term {
     @Override
     public Term sub(int nr) {
 	return subs.get(nr);
-    }
-    
-    
-    @Override
-    public Term subAt(PosInTerm pos) {
-        Term sub = this;
-        for(int i = 0; i<pos.depth(); i++) {	
-            sub = sub.sub(pos.getIndexAt(i));
-        }
-        return sub;
     }
     
     

@@ -48,7 +48,7 @@ public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
         boolean noSelfApplication = true;
         for (IfFormulaInstantiation ifInst : ifInsts) {
             noSelfApplication = noSelfApplication &&
-                                (ifInst.getConstrainedFormula() != pos.constrainedFormula());
+                                (ifInst.getConstrainedFormula() != pos.sequentFormula());
         }
         return noSelfApplication;
     }

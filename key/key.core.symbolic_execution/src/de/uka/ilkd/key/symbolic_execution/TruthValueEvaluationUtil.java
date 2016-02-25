@@ -400,14 +400,14 @@ public final class TruthValueEvaluationUtil {
          parentPio.subTerm().execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(Term visited) {
-               checkForNewMinorIdsOSS(childPio.constrainedFormula(), visited, termLabelName, parentPio, tb, results);
+               checkForNewMinorIdsOSS(childPio.sequentFormula(), visited, termLabelName, parentPio, tb, results);
             }
          });
          // Check application term parents
          PosInOccurrence currentPio = parentPio;
          while (!currentPio.isTopLevel()) {
             currentPio = currentPio.up();
-            checkForNewMinorIdsOSS(childPio.constrainedFormula(), currentPio.subTerm(), termLabelName, parentPio, tb, results);
+            checkForNewMinorIdsOSS(childPio.sequentFormula(), currentPio.subTerm(), termLabelName, parentPio, tb, results);
          }
       }
    }

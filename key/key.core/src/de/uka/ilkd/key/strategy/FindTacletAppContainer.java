@@ -91,7 +91,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
 	    infoList = infoList.tail ();
 	    
 	    final SequentFormula newFormula = info.getNewFormula();
-        if ( newFormula == applicationPosition.constrainedFormula() )
+        if ( newFormula == applicationPosition.sequentFormula() )
             // then there were no relevant modifications since the creation
             // of the rule app object
             return false;
@@ -181,7 +181,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
 	assert topPos != null;
 	
 	return applicationPosition.replaceConstrainedFormula
-	    ( topPos.constrainedFormula () );
+	    ( topPos.sequentFormula () );
     }
 
 }

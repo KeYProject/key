@@ -534,7 +534,7 @@ public final class SymbolicExecutionUtil {
       // Combine method frame with value formula in a modality.
       Term modalityTerm = services.getTermBuilder().dia(newJavaBlock, newTerm);
       // Get the updates from the return node which includes the value interested in.
-      Term originalModifiedFormula = methodReturnNode.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+      Term originalModifiedFormula = methodReturnNode.getAppliedRuleApp().posInOccurrence().sequentFormula().formula();
       ImmutableList<Term> originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
       // Create Sequent to prove with new succedent.
       Sequent sequentToProve = createSequentToProveWithNewSuccedent(methodCallEmptyNode, null, modalityTerm, originalUpdates, false);
@@ -2265,7 +2265,7 @@ public final class SymbolicExecutionUtil {
                                                  Sequent toApplyOn) {
       if (original != null && pio != null && toApplyOn != null) {
          // Search index of formula in original sequent
-         SequentFormula originalSF = pio.constrainedFormula();
+         SequentFormula originalSF = pio.sequentFormula();
          boolean antecendet = pio.isInAntec();
          int index;
          if (antecendet) {
@@ -2275,9 +2275,9 @@ public final class SymbolicExecutionUtil {
             index = original.succedent().indexOf(originalSF);
          }
          if (index >= 0) {
-            SequentFormula toApplyOnSF =
+            final SequentFormula toApplyOnSF =
                     (antecendet ? toApplyOn.antecedent() : toApplyOn.succedent()).get(index);
-            return toApplyOnSF.formula().subAt(pio.posInTerm());
+            return pio.posInTerm().getSubTerm(toApplyOnSF.formula());
          }
          else {
             return null;
@@ -2705,7 +2705,7 @@ public final class SymbolicExecutionUtil {
             originalUpdates = computeRootElementaryUpdates(node);
          }
          else {
-            Term originalModifiedFormula = pio.constrainedFormula().formula();
+            Term originalModifiedFormula = pio.sequentFormula().formula();
             originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
          }
          // Create new sequent
@@ -2805,7 +2805,7 @@ public final class SymbolicExecutionUtil {
          newSuccedentToProve = newSuccedent;
       }
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
-      Sequent originalSequentWithoutMethodFrame = SymbolicExecutionSideProofUtil.computeGeneralSequentToProve(node.sequent(), pio != null ? pio.constrainedFormula() : null);
+      Sequent originalSequentWithoutMethodFrame = SymbolicExecutionSideProofUtil.computeGeneralSequentToProve(node.sequent(), pio != null ? pio.sequentFormula() : null);
       Set<Term> skolemTerms = newSuccedentToProve != null ? 
                               collectSkolemConstants(originalSequentWithoutMethodFrame, newSuccedentToProve) :
                               collectSkolemConstants(originalSequentWithoutMethodFrame, tb.parallel(updates));

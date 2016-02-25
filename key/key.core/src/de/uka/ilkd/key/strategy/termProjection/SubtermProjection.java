@@ -39,6 +39,6 @@ public class SubtermProjection implements ProjectionToTerm {
     }
 
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return completeTerm.toTerm ( app, pos, goal ).subAt ( pit );
+        return pit.getSubTerm( completeTerm.toTerm ( app, pos, goal ) ) ;
     }
 }

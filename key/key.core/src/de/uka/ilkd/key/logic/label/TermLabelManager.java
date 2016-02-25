@@ -892,8 +892,8 @@ public class TermLabelManager {
                                       Object hint,
                                       Rule rule,
                                       Term tacletTerm) {
-      PosInTerm pos = applicationPosInOccurrence.posInTerm();
-      Term oldTerm = sequentFormula.subAt(pos);
+      final PosInTerm pos = applicationPosInOccurrence.posInTerm();
+      final Term oldTerm = pos.getSubTerm(sequentFormula);
       // Compute active refactorings
       RefactoringsContainer refactorings = computeRefactorings(state, services, applicationPosInOccurrence, oldTerm, rule, goal, hint, tacletTerm);
       // Perform refactoring

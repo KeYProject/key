@@ -84,8 +84,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         	//the formula does not exist anymore, bail out
         	return false;
             } else {
-                return topPos.constrainedFormula()
-                    .equals(applicationPosition.constrainedFormula());
+                return topPos.sequentFormula()
+                    .equals(applicationPosition.sequentFormula());
             }
 	}
     }
@@ -101,7 +101,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
 	assert topPos != null;
 	
 	return applicationPosition.replaceConstrainedFormula
-	    ( topPos.constrainedFormula () );
+	    ( topPos.sequentFormula () );
     }    
     
     

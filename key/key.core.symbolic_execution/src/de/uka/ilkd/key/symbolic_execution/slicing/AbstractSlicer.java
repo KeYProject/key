@@ -79,7 +79,7 @@ public abstract class AbstractSlicer {
    public ImmutableArray<Node> slice(Node seedNode, ReferencePrefix seedLocation) throws ProofInputException {
       // Solve this reference
       PosInOccurrence pio = seedNode.getAppliedRuleApp().posInOccurrence();
-      Term topLevel = pio.constrainedFormula().formula();
+      Term topLevel = pio.sequentFormula().formula();
       Term modalityTerm = TermBuilder.goBelowUpdates(topLevel);
       Services services = seedNode.proof().getServices();
       ExecutionContext ec = JavaTools.getInnermostExecutionContext(modalityTerm.javaBlock(), services);
@@ -202,7 +202,7 @@ public abstract class AbstractSlicer {
     */
    protected SequentInfo analyzeSequent(Node node) {
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
-      Term topLevel = pio.constrainedFormula().formula();
+      Term topLevel = pio.sequentFormula().formula();
       Pair<ImmutableList<Term>,Term> pair = TermBuilder.goBelowUpdates2(topLevel);
       Term modalityTerm = pair.second;
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);

@@ -34,7 +34,7 @@ public class FormulaChangeInfo {
     }
 
     public SequentFormula getOriginalFormula() {
-	return getPositionOfModification ().constrainedFormula ();
+	return getPositionOfModification ().sequentFormula ();
     }
 
     /**

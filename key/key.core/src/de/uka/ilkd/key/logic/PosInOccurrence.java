@@ -30,7 +30,7 @@ public final class PosInOccurrence {
     /**
      * the constrained formula the pos in occurrence describes
      */
-    private final SequentFormula cfma;
+    private final SequentFormula sequentFormula;
 
     // saves 8 bytes (due to alignment issues) per instance if we use a
     // short here instead of an int
@@ -41,7 +41,7 @@ public final class PosInOccurrence {
      */
     private final boolean inAntec;
 
-    /** the position in cfma.formula() */
+    /** the position in sequentFormula.formula() */
     private final PosInTerm posInTerm;
 
     /**
@@ -49,36 +49,23 @@ public final class PosInOccurrence {
      */
     private Term subTermCache = null;
 
-    public PosInOccurrence(SequentFormula cfma,
+    public PosInOccurrence(SequentFormula sequentFormula,
                            PosInTerm posInTerm,
                            boolean inAntec) {
         assert posInTerm != null;
-	this.inAntec=inAntec;
-	this.cfma=cfma;	
-	this.posInTerm=posInTerm;	
-	this.hashCode = (short) computeHash ();
+    assert sequentFormula != null;
+	this.inAntec = inAntec;
+	this.sequentFormula = sequentFormula;	
+	this.posInTerm = posInTerm;	
+	this.hashCode = (short) (sequentFormula.hashCode() * 13 + posInTerm.hashCode());
     }
-       
-    
-    private int computeHash () {
-        if (constrainedFormula() != null && posInTerm() != null) {
-            return constrainedFormula().hashCode() * 13 + posInTerm().hashCode();
-        } else if (constrainedFormula() != null) {
-            return constrainedFormula().hashCode() * 13;
-        } else if (posInTerm() != null) {
-            return posInTerm().hashCode();
-        } else {
-            return 0;
-        }
-    }
-    
-    
+           
     /**
      * returns the SequentFormula that determines the occurrence of
      * this PosInOccurrence 
      */
-    public SequentFormula constrainedFormula() {
-	return cfma;
+    public SequentFormula sequentFormula() {
+	return sequentFormula;
     }
 
     /**
@@ -96,7 +83,7 @@ public final class PosInOccurrence {
      * {@link de.uka.ilkd.key.logic.PosInTerm}.
      */
     public PosInOccurrence down(int i) {
-	return new PosInOccurrence(cfma, posInTerm.down(i), inAntec);
+	return new PosInOccurrence(sequentFormula, posInTerm.down(i), inAntec);
     }
     
     /** 
@@ -109,7 +96,7 @@ public final class PosInOccurrence {
 	}
 	final PosInOccurrence cmp = (PosInOccurrence)obj;
 
-	if ( !constrainedFormula ().equals ( cmp.constrainedFormula () ) ) {
+	if ( !sequentFormula.equals ( cmp.sequentFormula ) ) {
 	    return false;
         }
     
@@ -130,7 +117,7 @@ public final class PosInOccurrence {
 
 	// NB: the class <code>NonDuplicateAppFeature</code> depends on the usage
 	// of <code>!=</code> in this condition
-	if ( constrainedFormula() != cmp.constrainedFormula() ) {
+	if ( sequentFormula() != cmp.sequentFormula() ) {
 	    return false;
 	}
     
@@ -138,8 +125,8 @@ public final class PosInOccurrence {
     }
 
     private boolean equalsHelp (final PosInOccurrence cmp) {
-	if ( isInAntec () == cmp.isInAntec () ) {
-	    return posInTerm ().equals ( cmp.posInTerm () );
+	if ( inAntec == cmp.inAntec ) {
+	    return posInTerm .equals ( cmp.posInTerm );
 	}
         return false;
     }
@@ -231,7 +218,7 @@ public final class PosInOccurrence {
      */
     public Term subTerm () {
 	if ( subTermCache == null ) {
-	    subTermCache = constrainedFormula().formula().subAt(posInTerm);
+	    subTermCache = posInTerm.getSubTerm(sequentFormula.formula());
 	}
 	return subTermCache;
     }
@@ -243,7 +230,7 @@ public final class PosInOccurrence {
         if (isTopLevel()) {
             return this;
         }
-	return new PosInOccurrence(cfma, PosInTerm.getTopLevel(), 
+	return new PosInOccurrence(sequentFormula, PosInTerm.getTopLevel(), 
 				   inAntec);    	
     }
 
@@ -251,7 +238,7 @@ public final class PosInOccurrence {
     /** toString */
     public String toString() {
 	String res = "Term "+
-	    posInTerm()+" of "+ constrainedFormula();
+	    posInTerm()+" of "+ sequentFormula();
 	
 	return res;
 
@@ -265,7 +252,7 @@ public final class PosInOccurrence {
     public PosInOccurrence up() {
 	assert !isTopLevel() : "not possible to go up from top level position";
 
-	return new PosInOccurrence(cfma, posInTerm.up(), 
+	return new PosInOccurrence(sequentFormula, posInTerm.up(), 
 		inAntec);
 
     }
@@ -299,7 +286,7 @@ public final class PosInOccurrence {
 	    // <code>next()</code> faster
 
 	    final PosInOccurrence pio;	   
-	    pio = new PosInOccurrence ( cfma,
+	    pio = new PosInOccurrence ( sequentFormula,
 		    posInTerm.firstN(count - 1),
 		    inAntec );            
 
@@ -329,7 +316,7 @@ public final class PosInOccurrence {
 	    int res;
 
 	    if ( currentSubTerm == null )
-		currentSubTerm = cfma.formula ();
+		currentSubTerm = sequentFormula.formula ();
 	    else
 		currentSubTerm = currentSubTerm.sub ( child );
 

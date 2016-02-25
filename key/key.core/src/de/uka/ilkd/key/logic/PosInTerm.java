@@ -200,6 +200,23 @@ public final class PosInTerm {
     public int getIndex() {
         return size == 0 ? -1 : positions[size - 1];
     }
+    
+    
+    /**
+     * navigate to the subterm described by this position and return it
+     * if the described position does not exist in the term an {@link IndexOutOfBoundsException}
+     * is thrown
+     * @param t the {@link Term} 
+     * @return the sub term of term {@code t} at this position   
+     * @throws an {@link IndexOutOfBoundsException} if no subterm exists at this position
+     */
+    public Term getSubTerm(Term t) {
+        Term sub = t;
+        for (int i = 0; i<size; i++) {  
+            sub = sub.sub(positions[i]);
+        }
+        return sub;
+    }
 
     public int hashCode() {        
         if (hash == (char)-1) {

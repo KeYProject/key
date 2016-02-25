@@ -138,7 +138,7 @@ public class Sequent implements Iterable<SequentFormula> {
             PosInOccurrence p) {
 	final Semisequent seq = getSemisequent(p);
 
-	final SemisequentChangeInfo semiCI = seq.insert(seq.indexOf(p.constrainedFormula()),cf);
+	final SemisequentChangeInfo semiCI = seq.insert(seq.indexOf(p.sequentFormula()),cf);
 	
 	return SequentChangeInfo.createSequentChangeInfo
 	    (p.isInAntec(), semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
@@ -184,7 +184,7 @@ public class Sequent implements Iterable<SequentFormula> {
 	final Semisequent seq = getSemisequent(p);
 
 	final SemisequentChangeInfo semiCI = 
-	    seq.insert(seq.indexOf(p.constrainedFormula()), insertions);
+	    seq.insert(seq.indexOf(p.sequentFormula()), insertions);
 
 	return SequentChangeInfo.createSequentChangeInfo
 	    (p.isInAntec(), semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
@@ -339,7 +339,7 @@ public class Sequent implements Iterable<SequentFormula> {
 	final Semisequent seq = getSemisequent(p);
 
 	final SemisequentChangeInfo semiCI =
-	    seq.remove(seq.indexOf(p.constrainedFormula()));
+	    seq.remove(seq.indexOf(p.sequentFormula()));
 
 	final SequentChangeInfo sci = SequentChangeInfo.createSequentChangeInfo
 	    (p.isInAntec(), semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);

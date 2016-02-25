@@ -141,7 +141,7 @@ public class TestTermLabelManager extends TestCase {
       two = TB.label(two, new ParameterlessTermLabel(new Name("APPLICATION")));
       Sequent sequent = Sequent.EMPTY_SEQUENT;
       sequent = sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
-      sequent = sequent.addFormula(pos.constrainedFormula(), true, false).sequent();
+      sequent = sequent.addFormula(pos.sequentFormula(), true, false).sequent();
       sequent = sequent.addFormula(new SequentFormula(TB.inInt(two)), false, true).sequent();
       // Test supported rule
       Rule rule = new DummyRule("rule");

@@ -54,7 +54,7 @@ public class IsInRangeProvable implements Feature {
         ops.add(integerLDT.getGreaterOrEquals());
         
         // when extracting we want to ignore the formula on which the rule is applied
-        final SequentFormula formulaToIgnore = ignore.constrainedFormula();
+        final SequentFormula formulaToIgnore = ignore.sequentFormula();
         
         // extract formulas with equality (on integer terms) or one of the operators in <code>ops</code> as top level operator
         final ImmutableSet<Term> result = 
