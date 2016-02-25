@@ -46,7 +46,6 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         @Override
         public void changed(ObservableValue<? extends Boolean> observable, Boolean didMatchSearch,
                 Boolean nowMatchesSearch) {
-            System.out.println(this + " searchResultListener fired");
             final ObservableList<String> styles = getStyleClass();
             final String cssClassHighlight = ProofTreeStyle.CSS_NODE_HIGHLIGHT;
             if (nowMatchesSearch && !styles.contains(cssClassHighlight)) {

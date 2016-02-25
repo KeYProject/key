@@ -118,16 +118,16 @@ public class SearchViewController extends NUIController {
             return s;
         }
         catch (NoSuchFieldException e) {
-            e.printStackTrace();//TODO
+            e.printStackTrace();// TODO
         }
         catch (SecurityException e) {
-            e.printStackTrace();//TODO
+            e.printStackTrace();// TODO
         }
         catch (IllegalArgumentException e) {
-            e.printStackTrace();//TODO
+            e.printStackTrace();// TODO
         }
         catch (IllegalAccessException e) {
-            e.printStackTrace();//TODO
+            e.printStackTrace();// TODO
         }
         return null;
     }
@@ -292,6 +292,16 @@ public class SearchViewController extends NUIController {
             else {
                 anythingIsHighlighted = proofTreeView.getRoot().getValue()
                         .search(newText);
+
+                if (!anythingIsHighlighted) {
+                    // adds the style class for no search results
+                    tfSearchQuery.getStyleClass().add("search-noResults");
+                }
+                else {
+                    // removes the style class for no search results
+                    tfSearchQuery.getStyleClass()
+                            .removeIf((e) -> e.equals("search-noResults"));
+                }
             }
         });
 
@@ -318,5 +328,9 @@ public class SearchViewController extends NUIController {
                 pause.play();
             }
         });
+
+        // Assign stylesheet
+        searchViewPane.getStylesheets().add(getClass()
+                .getResource("../components/searchView.css").toExternalForm());
     }
 }
