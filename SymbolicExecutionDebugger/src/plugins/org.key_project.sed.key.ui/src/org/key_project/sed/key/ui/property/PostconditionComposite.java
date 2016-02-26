@@ -56,7 +56,7 @@ public class PostconditionComposite extends AbstractTruthValueComposite {
          term = term.sub(0);
       }
       Term uninterpretedPredicate = AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof());
-      Term sfTerm = keyNode.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+      Term sfTerm = keyNode.getAppliedRuleApp().posInOccurrence().sequentFormula().formula();
       ImmutableList<Term> updates = TermBuilder.goBelowUpdates2(sfTerm).first;
       if (uninterpretedPredicate != null) {
          Term predicate = findUninterpretedPredicateTerm(term, uninterpretedPredicate);
