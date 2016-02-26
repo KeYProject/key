@@ -17,7 +17,7 @@
 			<menus>
 				<Menu mnemonicParsing="false" text="File">
 					<items>
-						<MenuItem mnemonicParsing="false" onAction="#handleOpenProof"
+						<MenuItem fx:id="openProof" mnemonicParsing="false" onAction="#handleOpenProof"
 							text="%openProof" />
 						<MenuItem mnemonicParsing="false" onAction="#handleCloseWindow"
 							text="Close" />

@@ -8,6 +8,7 @@ import java.util.ResourceBundle;
 import de.uka.ilkd.key.nui.controller.MainViewController;
 import de.uka.ilkd.key.nui.controller.MainViewController.Place;
 import de.uka.ilkd.key.nui.controller.NUIController;
+import de.uka.ilkd.key.nui.controller.TreeViewController;
 import de.uka.ilkd.key.nui.exceptions.ComponentNotFoundException;
 import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
 import de.uka.ilkd.key.nui.exceptions.ToggleGroupNotFoundException;
@@ -48,8 +49,19 @@ public class NUI extends Application {
         launch(args);
     }
 
+    /**
+     * 
+     */
     private HashMap<String, NUIController> controllers = new HashMap<String, NUIController>();
+
+    /**
+     * 
+     */
     private HashMap<String, Pane> components = new HashMap<String, Pane>();
+
+    /**
+     * 
+     */
     private HashMap<String, ToggleGroup> toggleGroups = new HashMap<String, ToggleGroup>();
 
     private ResourceBundle bundle = null;
@@ -86,13 +98,21 @@ public class NUI extends Application {
         // Load all components
         loadComponents();
 
+        ((TreeViewController) getController("treeViewPane")).addSearchView(
+                getComponent("searchViewPane"),
+                getController("searchViewPane"));
         // create file menu for MainView
         mainViewController.getViewMenu().getItems().add(viewPositionMenu);
 
         // place component on MainView
-        mainViewController.placeComponent("treeView", Place.LEFT);
-        mainViewController.placeComponent("proofView", Place.RIGHT);
-        mainViewController.placeComponent("openProofsView", Place.MIDDLE);
+        mainViewController.addComponent(getComponent("treeViewPane"),
+                Place.LEFT);
+        mainViewController.addComponent(getComponent("proofViewPane"),
+                Place.MIDDLE);
+        mainViewController.addComponent(getComponent("strategyViewPane"),
+                Place.RIGHT);
+        mainViewController.addComponent(getComponent("openProofsViewPane"),
+                Place.BOTTOM);
 
         // Load scene and set preferences
         final Scene scene = new Scene(root);
@@ -110,22 +130,23 @@ public class NUI extends Application {
                 fxmlLoader = new FXMLLoader(
                         getClass().getResource("components/" + file.getName()));
 
-                String componentName = cutFileExtension(file.getName());
-                components.put(componentName, fxmlLoader.load());
+                // String componentName = cutFileExtension(file.getName());
+                Pane component = fxmlLoader.load();
+                components.put(component.getId(), component);
                 NUIController nuiController;// = new NUIController();
                 // before you can get the controller
                 // you have to call fxmlLoader.load()
                 nuiController = fxmlLoader.getController();
                 if (nuiController != null)
-                    nuiController.constructor(this, dataModel, componentName,
-                            file.getName());
-                controllers.put(componentName, nuiController);
+                    nuiController.constructor(this, dataModel,
+                            component.getId(), file.getName());
+                controllers.put(component.getId(), nuiController);
 
                 // create a view position menu for every component
                 ToggleGroup toggleGroup = new ToggleGroup();
-                toggleGroups.put(componentName, toggleGroup);
+                toggleGroups.put(component.getId(), toggleGroup);
                 viewPositionMenu.getItems()
-                        .add(createSubMenu(componentName, toggleGroup));
+                        .add(createSubMenu(component.getId(), toggleGroup));
             }
         }
     }
@@ -142,7 +163,8 @@ public class NUI extends Application {
         RadioMenuItem hide = new RadioMenuItem(hideText);
         hide.setOnAction(mainViewController.getNewHandleLoadComponent());
         hide.setId("hide");
-        hide.getProperties().put("componentResource", componentName + ".fxml");
+        // hide.getProperties().put("componentResource", componentName +
+        // ".fxml");
         hide.getProperties().put("componentName", componentName);
         hide.setToggleGroup(toggleGroup);
         hide.setSelected(true);
@@ -152,7 +174,8 @@ public class NUI extends Application {
         RadioMenuItem left = new RadioMenuItem(leftText);
         left.setOnAction(mainViewController.getNewHandleLoadComponent());
         left.setId("left");
-        left.getProperties().put("componentResource", componentName + ".fxml");
+        // left.getProperties().put("componentResource", componentName +
+        // ".fxml");
         left.getProperties().put("componentName", componentName);
         left.setToggleGroup(toggleGroup);
         left.setUserData(Place.LEFT);
@@ -161,7 +184,8 @@ public class NUI extends Application {
         RadioMenuItem right = new RadioMenuItem(rightText);
         right.setOnAction(mainViewController.getNewHandleLoadComponent());
         right.setId("right");
-        right.getProperties().put("componentResource", componentName + ".fxml");
+        // right.getProperties().put("componentResource", componentName +
+        // ".fxml");
         right.getProperties().put("componentName", componentName);
         right.setToggleGroup(toggleGroup);
         right.setUserData(Place.RIGHT);
@@ -170,8 +194,8 @@ public class NUI extends Application {
         RadioMenuItem bottom = new RadioMenuItem(bottomText);
         bottom.setOnAction(mainViewController.getNewHandleLoadComponent());
         bottom.setId("bottom");
-        bottom.getProperties().put("componentResource",
-                componentName + ".fxml");
+        // bottom.getProperties().put("componentResource",
+        // componentName + ".fxml");
         bottom.getProperties().put("componentName", componentName);
         bottom.setToggleGroup(toggleGroup);
         bottom.setUserData(Place.BOTTOM);
@@ -180,8 +204,8 @@ public class NUI extends Application {
         RadioMenuItem middle = new RadioMenuItem(middleText);
         middle.setOnAction(mainViewController.getNewHandleLoadComponent());
         middle.setId("middle");
-        middle.getProperties().put("componentResource",
-                componentName + ".fxml");
+        // middle.getProperties().put("componentResource",
+        // componentName + ".fxml");
         middle.getProperties().put("componentName", componentName);
         middle.setToggleGroup(toggleGroup);
         middle.setUserData(Place.MIDDLE);

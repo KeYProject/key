@@ -8,9 +8,11 @@
 <?import javafx.scene.layout.BorderPane?>
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8"
-	VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
-	<TextArea text="Hier steht ein Beweis q. e. d." minHeight="0"
-		minWidth="0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-		AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+	fx:controller="de.uka.ilkd.key.nui.controller.ProofViewController"
+	fx:id="proofViewPane" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+	<TextArea fx:id="textAreaProof" text=""
+		minHeight="0" minWidth="0" AnchorPane.bottomAnchor="0.0"
+		AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+		AnchorPane.topAnchor="0.0">
 	</TextArea>
 </AnchorPane>

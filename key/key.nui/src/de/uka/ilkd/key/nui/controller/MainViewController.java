@@ -1,31 +1,36 @@
 package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
-import java.net.URL;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import com.sun.javafx.collections.ObservableMapWrapper;
 
-import de.uka.ilkd.key.nui.exceptions.ComponentNotFoundException;
-import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
+import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.nui.TreeViewState;
 import de.uka.ilkd.key.nui.exceptions.ToggleGroupNotFoundException;
+import de.uka.ilkd.key.nui.prooftree.NUINode;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeVisualizer;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.application.Platform;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Toggle;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -41,7 +46,7 @@ import javafx.stage.FileChooser;
  * @author Stefan Pilot
  *
  */
-public class MainViewController extends NUIController implements Initializable {
+public class MainViewController extends NUIController {
     /**
      * Provides an enum for the available places in the main window.
      */
@@ -66,6 +71,14 @@ public class MainViewController extends NUIController implements Initializable {
     private Label statustext;
     @FXML
     private Menu viewMenu;
+
+    @FXML
+    private MenuItem openProof;
+
+    /**
+     * Includes the components which were added to the main Window
+     */
+    private HashMap<String, Pane> components = new HashMap<String, Pane>();
 
     /**
      * Stores the position of components added to the SplitPane. Other views can
@@ -149,40 +162,39 @@ public class MainViewController extends NUIController implements Initializable {
      */
     @FXML
     public final void handleOpenProof(final ActionEvent e) {
-        TreeViewController treeViewController = null;
-
-        try {
-            treeViewController = (TreeViewController) nui
-                    .getController("treeView");
-        }
-        catch (ControllerNotFoundException exception) {
-            exception.showMessage();
-            return;
-        }
-
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(
                 new File("resources/de/uka/ilkd/key/examples"));
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+        FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter(
                 "Proof files", "*.proof");
-        fileChooser.getExtensionFilters().add(extFilter);
+        FileChooser.ExtensionFilter extFilterKey = new FileChooser.ExtensionFilter(
+                "Proof files", "*.key");
+        fileChooser.getExtensionFilters().add(extFilterProof);
+        fileChooser.getExtensionFilters().add(extFilterKey);
 
         File file = fileChooser.showOpenDialog(contextMenu);
 
         // only load proof if any selection was made
         if (file != null) {
-            updateStatusbar("Beweis wird geladen");
-            treeViewController.loadAndDisplayProof(file);
+            // TODO Matthias will fix it!
+            // Create a new tree visualizer instance for processing the
+            // conversion
+            // de.uka.ilkd.key.proof.Node -->
+            // de.uka.ilkd.key.nui.NUI.prooftree.NUINode
+            // --> TreeItem<NUINode> (JavaFX)
+            Proof loadedProof = loadProof(file);
+            loadedProof.setProofFile(file);
+
+            TreeView<NUINode> proofTreeView = new TreeView<NUINode>();
+            ProofTreeVisualizer proofTreeVisulizer = new ProofTreeVisualizer(
+                    proofTreeView);
+            proofTreeVisulizer.loadProofTree(loadedProof);
+            TreeItem<NUINode> tree = proofTreeVisulizer.visualizeProofTree();
+
+            // Store state of treeView into data model
+            dataModel.saveTreeViewState(new TreeViewState(loadedProof, tree),
+                    file.getName());
         }
-
-    }
-
-    /**
-     * Loads the default components of the GUI.
-     */
-    @Override
-    public final void initialize(final URL location,
-            final ResourceBundle resources) {
     }
 
     /**
@@ -310,26 +322,23 @@ public class MainViewController extends NUIController implements Initializable {
      * @param component
      * @param place
      */
-    public void placeComponent(String componentName, Place place) {
-        Parent component = null;
-        try {
-            component = nui.getComponent(componentName);
-            selectToggle(componentName, place);
-            if (place == Place.HIDDEN) {
-                component.setVisible(false);
-                nui.getRoot().getChildren().remove(component);
-            }
-            else {
-                component.setVisible(true);
-                if (!getPane(place).getChildren().contains(component))
-                    getPane(place).getChildren().add(component);
-            }
-        }
-        catch (ComponentNotFoundException e) {
-            e.showMessage();
-            selectToggle(componentName, Place.HIDDEN);
-        }
+    public void moveComponentTo(Pane component, Place place) {
 
+        selectToggle(component.getId(), place);
+        if (place == Place.HIDDEN) {
+            component.setVisible(false);
+            nui.getRoot().getChildren().remove(component);
+        }
+        else {
+            component.setVisible(true);
+            if (!getPane(place).getChildren().contains(component))
+                getPane(place).getChildren().add(component);
+        }
+    }
+
+    public void addComponent(Pane component, Place place) {
+        components.put(component.getId(), component);
+        moveComponentTo(component, place);
     }
 
     private void selectToggle(String componentName, Place place) {
@@ -381,14 +390,13 @@ public class MainViewController extends NUIController implements Initializable {
                     place = Place.HIDDEN;
                     break;
                 }
-                placeComponent(componentName, place);
+                moveComponentTo(components.get(componentName), place);
             }
         };
     }
 
     @Override
     protected void init() {
-        // TODO Auto-generated method stub
 
     }
 
@@ -398,4 +406,28 @@ public class MainViewController extends NUIController implements Initializable {
         }
 
     }
+
+    /**
+     * Loads the given proof file. Checks if the proof file exists and the proof
+     * is not null, and fails if the proof could not be loaded.
+     *
+     * @param proofFileName
+     *            The file name of the proof file to load.
+     * @return The loaded proof.
+     */
+    private Proof loadProof(final File proofFileName) {
+        try {
+            final KeYEnvironment<?> environment = KeYEnvironment.load(
+                    JavaProfile.getDefaultInstance(), proofFileName, null, null,
+                    null, true);
+            final Proof proof = environment.getLoadedProof();
+            return proof;
+        }
+        catch (ProblemLoaderException e) {
+            // TODO exception handling
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }
