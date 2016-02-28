@@ -11,7 +11,8 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.TreeViewState;
 import de.uka.ilkd.key.nui.exceptions.ToggleGroupNotFoundException;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
-import de.uka.ilkd.key.nui.prooftree.ProofTreeVisualizer;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -29,7 +30,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Toggle;
-import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -172,27 +172,25 @@ public class MainViewController extends NUIController {
         fileChooser.getExtensionFilters().add(extFilterProof);
         fileChooser.getExtensionFilters().add(extFilterKey);
 
-        File file = fileChooser.showOpenDialog(contextMenu);
+        final File file = fileChooser.showOpenDialog(contextMenu);
 
         // only load proof if any selection was made
         if (file != null) {
-            // TODO Matthias will fix it!
             // Create a new tree visualizer instance for processing the
             // conversion
             // de.uka.ilkd.key.proof.Node -->
             // de.uka.ilkd.key.nui.NUI.prooftree.NUINode
-            // --> TreeItem<NUINode> (JavaFX)
-            Proof loadedProof = loadProof(file);
-            loadedProof.setProofFile(file);
+            // --> ProofTreeItem (JavaFX)
+            final Proof proof = loadProof(file);
+            proof.setProofFile(file);
 
-            TreeView<NUINode> proofTreeView = new TreeView<NUINode>();
-            ProofTreeVisualizer proofTreeVisulizer = new ProofTreeVisualizer(
-                    proofTreeView);
-            proofTreeVisulizer.loadProofTree(loadedProof);
-            TreeItem<NUINode> tree = proofTreeVisulizer.visualizeProofTree();
+            final TreeView<NUINode> proofTreeView = new TreeView<NUINode>();
+            
+            
+            final ProofTreeItem fxtree = new ProofTreeConverter(proof).createFXProofTree();
 
             // Store state of treeView into data model
-            dataModel.saveTreeViewState(new TreeViewState(loadedProof, tree),
+            dataModel.saveTreeViewState(new TreeViewState(proof, fxtree),
                     file.getName());
         }
     }
@@ -297,7 +295,7 @@ public class MainViewController extends NUIController {
      */
     @FXML
     protected void handleAboutWindow(final ActionEvent e) {
-        Alert alert = new Alert(AlertType.INFORMATION);
+        final Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("KeY");
         alert.setHeaderText("KeY");
         alert.setContentText("Version: Bachelor Praktikum Gruppe 10");

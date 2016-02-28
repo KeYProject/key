@@ -18,7 +18,6 @@ import de.uka.ilkd.key.nui.prooftree.ProofTreeStyle;
 import de.uka.ilkd.key.proof.Proof;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
@@ -121,7 +120,7 @@ public class TreeViewController extends NUIController implements Observer {
     @Override
     protected void init() {
         icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
-        fh = new FilteringHandler();
+        fh = new FilteringHandler(dataModel);
 
         Platform.runLater(() -> {
 
@@ -160,13 +159,10 @@ public class TreeViewController extends NUIController implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        TreeItem<NUINode> treeItem = ((DataModel) o)
+        ProofTreeItem treeItem = ((DataModel) o)
                 .getTreeViewState((String) arg).getTreeItem();
         // update the proofTreeView component in the treeView
         proofTreeView.setRoot(treeItem);
-        
-        ProofTreeItem pti = (ProofTreeItem) treeItem;
-        fh.setTree(pti);
     }
 
     /**

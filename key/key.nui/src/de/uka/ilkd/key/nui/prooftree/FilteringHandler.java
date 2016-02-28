@@ -4,7 +4,11 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+
 import de.uka.ilkd.key.nui.prooftree.filter.FilterShowAll;
+import de.uka.ilkd.key.nui.DataModel;
 import de.uka.ilkd.key.nui.prooftree.filter.FilterCombineAND;
 import de.uka.ilkd.key.nui.prooftree.filter.FilterHideClosed;
 import de.uka.ilkd.key.nui.prooftree.filter.FilterHideIntermediate;
@@ -22,17 +26,43 @@ public class FilteringHandler {
      * A map storing filters with their resp. activation flag.
      */
     private Map<ProofTreeFilter, Boolean> filtersMap = new LinkedHashMap<>();
+
+    /**
+     * The data model.
+     */
+    private DataModel dm;
     
-    //TODO replace
-    ProofTreeItem root;
+    //TODO
+    private String currentTree;
     
     /**
      * Constructor.
+     * @param dm The DataModel.
      */
-    public FilteringHandler() {
+    public FilteringHandler(DataModel dm) {
+        this.dm = dm;
         
         final List<ProofTreeFilter> filters = searchFilterClasses();
         filters.forEach((filter) -> filtersMap.put(filter, false));
+        
+        dm.addObserver(new Observer() {
+            @Override
+            public void update(Observable o, Object arg) {
+                currentTree = (String) arg;
+                reinit();
+            }
+        });
+    }
+    
+    /**
+     * Resets all active filters
+     */
+    public void reinit() {
+        filtersMap.forEach((filter, active) -> {
+            if (active) {
+                filtersMap.put(filter, false);
+            }
+        });
     }
     
     /**
@@ -81,7 +111,7 @@ public class FilteringHandler {
                     return new FilterCombineAND(f1, f2);
                 });
 
-        //TODO perform filtering to current visible tree
+        ProofTreeItem root = dm.getTreeViewState(currentTree).getTreeItem();
         root.filter(redFilter);
     }
 
@@ -110,12 +140,6 @@ public class FilteringHandler {
         filtersMap.put(filter, newState);
         
         applyFilters();
-    }
-    
-    //TODO replace
-    @Deprecated
-    public void setTree(ProofTreeItem r) {
-        root = r;
     }
     
 }
