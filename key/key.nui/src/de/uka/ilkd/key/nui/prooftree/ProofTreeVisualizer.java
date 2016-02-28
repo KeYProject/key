@@ -65,7 +65,7 @@ public class ProofTreeVisualizer {
      * @param root
      *            The root node of the tree to display.
      */
-    public final void displayProofTree(TreeItem<NUINode> root) {
+    public final void displayProofTree(ProofTreeItem root) {
         root.setExpanded(true);
         // define the root of the tree
         proofTreeView.setRoot(root);
@@ -78,13 +78,13 @@ public class ProofTreeVisualizer {
      * @throws IllegalStateException
      *             in case that no proof was loaded before
      */
-    public final TreeItem<NUINode> visualizeProofTree() {
+    public final ProofTreeItem visualizeProofTree() {
         if (nuiRoot == null) {
             throw new IllegalStateException("No proof loaded.");
         }
 
         // create fx root node
-        final TreeItem<NUINode> rootNode = new TreeItem<NUINode>(nuiRoot);
+        final ProofTreeItem rootNode = new ProofTreeItem(nuiRoot);
 
         // convert the NUITree to a FXTree
         convertNUITreeToFXTree(nuiRoot, rootNode);
@@ -276,13 +276,13 @@ public class ProofTreeVisualizer {
      * 
      */
     private void convertNUITreeToFXTree(final NUIBranchNode nuiNode,
-            final TreeItem<NUINode> fxTreeNode) {
+            final ProofTreeItem fxTreeNode) {
 
         // Convert child nodes recursively into TreeItem<Label> objects
         for (final NUINode child : nuiNode.getChildren()) {
 
-            final TreeItem<NUINode> fxNode = new TreeItem<NUINode>(child);
-            fxTreeNode.getChildren().add(fxNode);
+            final ProofTreeItem fxNode = new ProofTreeItem(child);
+            fxTreeNode.addChild(fxNode);
 
             // if child is of type branch node -> add children recursively
             if (child instanceof NUIBranchNode) {

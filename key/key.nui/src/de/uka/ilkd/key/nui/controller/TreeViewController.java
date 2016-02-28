@@ -14,8 +14,10 @@ import de.uka.ilkd.key.nui.NUI;
 import de.uka.ilkd.key.nui.TreeViewState;
 import de.uka.ilkd.key.nui.exceptions.ComponentNotFoundException;
 import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
+import de.uka.ilkd.key.nui.prooftree.FilteringHandler;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeStyle;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeVisualizer;
 import de.uka.ilkd.key.proof.Proof;
@@ -88,6 +90,8 @@ public class TreeViewController extends NUIController implements Observer {
      * The visualizer for displaying a proof tree.
      */
     private ProofTreeVisualizer visualizer;
+    
+    private FilteringHandler fh;
 
     /**
      * Loads and displays a file containing a KeY proof. May fail and/or throw
@@ -176,7 +180,8 @@ public class TreeViewController extends NUIController implements Observer {
     @Override
     protected void init() {
         icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
-
+        fh = new FilteringHandler();
+        
         Platform.runLater(() -> {
 
             // Register key listeners
@@ -207,7 +212,7 @@ public class TreeViewController extends NUIController implements Observer {
 
             // set cell factory for rendering cells
             proofTreeView.setCellFactory((treeItem) -> {
-                final ProofTreeCell cell = new ProofTreeCell(icf);
+                final ProofTreeCell cell = new ProofTreeCell(icf, fh);
                 Platform.runLater(() -> registerTreeCell(cell));
                 return cell;
             });
@@ -240,8 +245,8 @@ public class TreeViewController extends NUIController implements Observer {
         TreeItem<NUINode> treeItem = ((DataModel) o)
                 .getTreeViewState((String) arg).getTreeItem();
         // update the proofTreeView component in the treeView
-        visualizer.displayProofTree(treeItem);
-
+        visualizer.displayProofTree((ProofTreeItem) treeItem);
+        fh.setTree((ProofTreeItem) treeItem);
     }
 
     /**
