@@ -36,36 +36,21 @@ public class ProofTreeItem extends TreeItem<NUINode> {
     private FilteredList<ProofTreeItem> filteredChildren;
     
     /**
-     * Contains the fact if the item is supposed to be hidden.
+     * Contains the fact if the item is supposed to be visible.
      */
-    public boolean hidden = false;
+    private boolean visible = false;
 
     /**
-     * {@inheritDoc}
+     * Constructor.
+     * @param value The NUINode encapsulated in the tree item.
      */
-    public ProofTreeItem(NUINode value) {
+    public ProofTreeItem(final NUINode value) {
         super(value);
         
         internalChildren = FXCollections.observableArrayList();
         filteredChildren = new FilteredList<ProofTreeItem>(internalChildren);
-        applyHiddenTag();
         
         setAllChildren(filteredChildren);
-    }
-    
-    /**
-     * Applies the hidden status stores in the 'hidden' variable.
-     */
-    private void applyHiddenTag() {
-        
-        // define new predicate for the filtered children list
-        Predicate<ProofTreeItem> pred = new Predicate<ProofTreeItem>() {
-            @Override
-            public boolean test(ProofTreeItem t) {
-                return t.hidden;
-            }
-        };
-        filteredChildren.setPredicate(pred);
     }
     
     /**
@@ -73,7 +58,7 @@ public class ProofTreeItem extends TreeItem<NUINode> {
      * @param filter The filter to apply.
      * @return true iff the item is supposed to be displayed after filtering
      */
-    public boolean filter(ProofTreeFilter filter) {
+    public boolean filter(final ProofTreeFilter filter) {
         
         // test this item itself
         boolean testResult = filter.test(this.getValue());
@@ -84,9 +69,9 @@ public class ProofTreeItem extends TreeItem<NUINode> {
             // all children are hidden
             boolean allChildrenHidden = true;
             for (ProofTreeItem child : internalChildren) {
-                boolean childTestResult = child.filter(filter);
+                final boolean childTestResult = child.filter(filter);
                 
-                if(childTestResult) {
+                if (childTestResult) {
                     allChildrenHidden = false;
                 }
             }
@@ -95,10 +80,10 @@ public class ProofTreeItem extends TreeItem<NUINode> {
         }
         
         // store result in hidden field and apply
-        hidden = testResult;
-        applyHiddenTag();
+        setVisible(testResult);
+        applyVisibilitiyOfChildren();
         
-        return hidden;
+        return testResult;
     }
     
     /**
@@ -106,13 +91,13 @@ public class ProofTreeItem extends TreeItem<NUINode> {
      * This works by reflection.
      * @param list The children list to set.
      */
-    protected void setAllChildren(ObservableList<ProofTreeItem> list) {
+    protected void setAllChildren(final ObservableList<ProofTreeItem> list) {
         try {
-            Field childrenField = TreeItem.class.getDeclaredField("children");
+            final Field childrenField = TreeItem.class.getDeclaredField("children");
             childrenField.setAccessible(true);
             childrenField.set(this, list);
 
-            Field declaredField = TreeItem.class
+            final Field declaredField = TreeItem.class
                     .getDeclaredField("childrenListener");
             declaredField.setAccessible(true);
             
@@ -129,7 +114,42 @@ public class ProofTreeItem extends TreeItem<NUINode> {
      * Adds a child to the treeItem.
      * @param child the child to add
      */
-    public void addChild(ProofTreeItem child) {
+    public void addChild(final ProofTreeItem child) {
         internalChildren.add(child);
+    }
+    
+
+    /**
+     * @return true iff the node is visible
+     */
+    public boolean isVisible() {
+        return visible;
+    }
+
+    /**
+     * Sets the visibility of the node.
+     * To apply visibility changese the method 
+     * 'applyVisibiltiyToChildren' of the parent has 
+     * to be called afterwards.
+     * @param visible the visibility of the node.
+     */
+    public void setVisible(final boolean visible) {
+        this.visible = visible;
+    }
+    
+    /**
+     * Applies the visibility information of children
+     * that was stored with 'setVisible'.
+     */
+    public void applyVisibilitiyOfChildren() {
+        
+        // define new predicate for the filtered children list
+        final Predicate<ProofTreeItem> pred = new Predicate<ProofTreeItem>() {
+            @Override
+            public boolean test(final ProofTreeItem pti) {
+                return pti.isVisible();
+            }
+        };
+        filteredChildren.setPredicate(pred);
     }
 }
