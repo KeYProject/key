@@ -1,11 +1,8 @@
 package de.uka.ilkd.key.nui.prooftree;
 
 import de.uka.ilkd.key.nui.ComponentFactory;
-import de.uka.ilkd.key.nui.controller.MainViewController;
 import de.uka.ilkd.key.nui.controller.TreeViewController;
-import de.uka.ilkd.key.nui.controller.MainViewController.Place;
 import javafx.scene.control.TreeItem;
-import javafx.scene.input.KeyEvent;
 
 /**
  * This utility class contains actions for the context menu.

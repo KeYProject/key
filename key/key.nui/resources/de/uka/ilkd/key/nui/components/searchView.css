@@ -1,0 +1,7 @@
+/* Used if search returns to results */
+.search-noResults {
+	/* -fx-border-width: 2.0px; */
+    -fx-background-color: red, -fx-text-box-border, -fx-control-inner-background;
+    -fx-background-insets: -0.4, 1.0, 2.0;
+    -fx-background-radius: 3.4, 2.0, 2.0;
+}

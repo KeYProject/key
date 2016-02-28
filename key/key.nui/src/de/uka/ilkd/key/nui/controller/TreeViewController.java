@@ -10,8 +10,10 @@ import de.uka.ilkd.key.nui.DataModel;
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
 import de.uka.ilkd.key.nui.exceptions.NoSearchViewAddedException;
+import de.uka.ilkd.key.nui.prooftree.FilteringHandler;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeStyle;
 import de.uka.ilkd.key.proof.Proof;
 import javafx.application.Platform;
@@ -77,6 +79,11 @@ public class TreeViewController extends NUIController implements Observer {
      */
     @FXML
     private TreeView<NUINode> proofTreeView;
+    
+    /**
+     * The filtering handler.
+     */
+    private FilteringHandler fh;
 
     /**
      * This method should be called every time a new TreeCell is being created.
@@ -114,6 +121,7 @@ public class TreeViewController extends NUIController implements Observer {
     @Override
     protected void init() {
         icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
+        fh = new FilteringHandler();
 
         Platform.runLater(() -> {
 
@@ -134,7 +142,7 @@ public class TreeViewController extends NUIController implements Observer {
 
             // set cell factory for rendering cells
             proofTreeView.setCellFactory((treeItem) -> {
-                final ProofTreeCell cell = new ProofTreeCell(icf);
+                final ProofTreeCell cell = new ProofTreeCell(icf,fh);
                 Platform.runLater(() -> registerTreeCell(cell));
                 return cell;
             });
@@ -156,6 +164,9 @@ public class TreeViewController extends NUIController implements Observer {
                 .getTreeViewState((String) arg).getTreeItem();
         // update the proofTreeView component in the treeView
         proofTreeView.setRoot(treeItem);
+        
+        ProofTreeItem pti = (ProofTreeItem) treeItem;
+        fh.setTree(pti);
     }
 
     /**

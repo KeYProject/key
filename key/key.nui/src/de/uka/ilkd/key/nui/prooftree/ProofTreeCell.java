@@ -36,6 +36,8 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      * The icon that will be displayed left next to the label.
      */
     private ImageView icon;
+    
+    private FilteringHandler fh;
 
     /**
      * The label that will be displayed.
@@ -46,7 +48,6 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         @Override
         public void changed(ObservableValue<? extends Boolean> observable, Boolean didMatchSearch,
                 Boolean nowMatchesSearch) {
-            System.out.println(this + " searchResultListener fired");
             final ObservableList<String> styles = getStyleClass();
             final String cssClassHighlight = ProofTreeStyle.CSS_NODE_HIGHLIGHT;
             if (nowMatchesSearch && !styles.contains(cssClassHighlight)) {
@@ -65,8 +66,9 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      * @param icf
      *            the icon factory used to display node icons
      */
-    public ProofTreeCell(final IconFactory icf) {
+    public ProofTreeCell(final IconFactory icf, final FilteringHandler fh) {
         super();
+        this.fh = fh;
         this.icf = icf;
     }
 
@@ -170,7 +172,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
             return;
         }
 
-        setContextMenu(new ProofTreeContextMenu(getTreeItem(), getTreeView(), icf));
+        setContextMenu(new ProofTreeContextMenu(getTreeItem(), getTreeView(), icf, fh));
 
         // reset label and icon
         label = new Label(item.getLabel() + " ");
