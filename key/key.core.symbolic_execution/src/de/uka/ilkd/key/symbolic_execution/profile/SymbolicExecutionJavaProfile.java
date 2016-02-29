@@ -273,7 +273,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     * @param proof The {@link Proof} to check.
     * @return {@code true} truth value evaluation is enabled, {@code false} truth value evaluation is disabled.
     */
-   public static boolean isTruthValueEvaluationEnabled(Proof proof) {
+   public static boolean isTruthValueTracingEnabled(Proof proof) {
       if (proof != null && !proof.isDisposed()) {
          return isTruthValueEvaluationEnabled(proof.getInitConfig());
       }

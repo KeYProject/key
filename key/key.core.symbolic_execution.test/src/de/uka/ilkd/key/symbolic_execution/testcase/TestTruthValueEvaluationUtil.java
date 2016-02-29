@@ -11,11 +11,11 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.BranchResult;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.MultiEvaluationResult;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValue;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValueEvaluationResult;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.BranchResult;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.MultiEvaluationResult;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValueTracingResult;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
@@ -23,7 +23,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 
 /**
- * Tests for {@link TruthValueEvaluationUtil}.
+ * Tests for {@link TruthValueTracingUtil}.
  * @author Martin Hentschel
  */
 public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestCase {
@@ -621,7 +621,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Performs an {@link TruthValueEvaluationUtil} test.
+    * Performs an {@link TruthValueTracingUtil} test.
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param baseContractName The name of the contract.
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
@@ -667,7 +667,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Performs an {@link TruthValueEvaluationUtil} test.
+    * Performs an {@link TruthValueTracingUtil} test.
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param baseContractName The name of the contract.
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
@@ -715,7 +715,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Performs an {@link TruthValueEvaluationUtil} test.
+    * Performs an {@link TruthValueTracingUtil} test.
     * @param env The {@link SymbolicExecutionEnvironment} to use.
     * @param expectedResults The expected results.
     * @throws Exception Occurred Exception.
@@ -723,7 +723,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    protected void doTruthValueEvaluationTest(SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env, 
                                              ExpectedTruthValueEvaluationResult... expectedResults) throws Exception {
       // Compute current results
-      List<TruthValueEvaluationResult> currentResults = new LinkedList<TruthValueEvaluationResult>();
+      List<TruthValueTracingResult> currentResults = new LinkedList<TruthValueTracingResult>();
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(env.getBuilder().getStartNode());
       while (iter.hasNext()) {
          IExecutionNode<?> next = iter.next();
@@ -741,7 +741,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
             nodeToEvaluate = null;
          }
          if (nodeToEvaluate != null) {
-            TruthValueEvaluationResult result = TruthValueEvaluationUtil.evaluate(nodeToEvaluate, FormulaTermLabel.NAME, false, false);
+            TruthValueTracingResult result = TruthValueTracingUtil.evaluate(nodeToEvaluate, FormulaTermLabel.NAME, false, false);
             currentResults.add(result);
             if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
                System.out.println("\nFound Result:");
@@ -758,10 +758,10 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * @param expected The expected results.
     * @param current The current results.
     */
-   protected void assertResults(ExpectedTruthValueEvaluationResult[] expected, List<TruthValueEvaluationResult> current) {
+   protected void assertResults(ExpectedTruthValueEvaluationResult[] expected, List<TruthValueTracingResult> current) {
       assertEquals(expected.length, current.size());
       int i = 0;
-      Iterator<TruthValueEvaluationResult> currentIter = current.iterator();
+      Iterator<TruthValueTracingResult> currentIter = current.iterator();
       while (i < expected.length && currentIter.hasNext()) {
          assertTruthValueResults(expected[i], currentIter.next());
          i++;
@@ -775,7 +775,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * @param expected The expected results.
     * @param current The current results.
     */
-   protected void assertTruthValueResults(ExpectedTruthValueEvaluationResult expected, TruthValueEvaluationResult current) {
+   protected void assertTruthValueResults(ExpectedTruthValueEvaluationResult expected, TruthValueTracingResult current) {
       BranchResult[] currentResults = current.getBranchResults();
       assertEquals(expected.branchResults.length, currentResults.length);
       for (int i = 0; i < currentResults.length; i++) {

@@ -76,9 +76,9 @@ public class KeYSEDPreferences {
    public static final String VARIABLES_ARE_COMPUTED_FROM_UPDATES = "org.key_project.sed.key.core.preference.variablesAreOnlyComputedFromUpdates";
 
    /**
-    * Preference key to enable truth value evaluation.
+    * Preference key to enable truth value tracing.
     */
-   public static final String TRUTH_VALUE_EVALUATION_ENABLED = "org.key_project.sed.key.core.preference.truthValueEvaluationEnabled";
+   public static final String TRUTH_VALUE_TRACING_ENABLED = "org.key_project.sed.key.core.preference.truthValueTracingEnabled";
 
    /**
     * Preference key to enable or disable highlighting of reached source code.
@@ -407,35 +407,35 @@ public class KeYSEDPreferences {
    }
    
    /**
-    * Checks if truth value evaluation is enabled.
-    * @return Is truth value evaluation enabled?
+    * Checks if truth value tracing is enabled.
+    * @return Is truth value tracing enabled?
     */
-   public static boolean isTruthValueEvaluationEnabled() {
-      return getStore().getBoolean(TRUTH_VALUE_EVALUATION_ENABLED);
+   public static boolean isTruthValueTracingEnabled() {
+      return getStore().getBoolean(TRUTH_VALUE_TRACING_ENABLED);
    }
    
    /**
-    * Checks if truth value evaluation is enabled by default.
-    * @return Is truth value evaluation enabled?
+    * Checks if truth value tracing is enabled by default.
+    * @return Is truth value tracing enabled?
     */
-   public static boolean isDefaultTruthValueEvaluationEnabled() {
-      return getStore().getDefaultBoolean(TRUTH_VALUE_EVALUATION_ENABLED);
+   public static boolean isDefaultTruthValueTracingEnabled() {
+      return getStore().getDefaultBoolean(TRUTH_VALUE_TRACING_ENABLED);
    }
    
    /**
-    * Sets if truth value evaluation is enabled.
-    * @param value Enable truth value evaluation?
+    * Sets if truth value tracing is enabled.
+    * @param value Enable truth value tracing?
     */
-   public static void setTruthValueEvaluationEnabled(boolean value) {
-      getStore().setValue(TRUTH_VALUE_EVALUATION_ENABLED, value);
+   public static void setTruthValueTracingEnabled(boolean value) {
+      getStore().setValue(TRUTH_VALUE_TRACING_ENABLED, value);
    }
    
    /**
-    * Sets if truth value evaluation is enabled by default.
-    * @param defaultValue Enable truth value evaluation?
+    * Sets if truth value tracing is enabled by default.
+    * @param defaultValue Enable truth value tracing?
     */
-   public static void setDefaultTruthValueEvaluationEnabled(boolean defaultValue) {
-      getStore().setDefault(TRUTH_VALUE_EVALUATION_ENABLED, defaultValue);
+   public static void setDefaultTruthValueTracingEnabled(boolean defaultValue) {
+      getStore().setDefault(TRUTH_VALUE_TRACING_ENABLED, defaultValue);
    }
    
    /**
@@ -455,7 +455,7 @@ public class KeYSEDPreferences {
    }
    
    /**
-    * Sets if truth value evaluation is enabled.
+    * Sets if reached source code should be highlighted
     * @param value Enable source code highlighting.
     */
    public static void setHighlightReachedSourceCode(boolean value) {

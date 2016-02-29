@@ -77,9 +77,9 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
    private CCombo variablesAreOnlyComputedFromUpdatesCombo;
    
    /**
-    * Defines if truth value evaluation is enabled or not.
+    * Defines if truth value tracing is enabled or not.
     */
-   private Button truthValueEvaluationEnabledButton;
+   private Button truthValueTracingEnabledButton;
    
    /**
     * Defines if reached source code is highlighted or not.
@@ -160,9 +160,9 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
             updateLaunchConfigurationDialog();
          }
       });
-      truthValueEvaluationEnabledButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)", SWT.CHECK);
-      truthValueEvaluationEnabledButton.setEnabled(isEditable());
-      truthValueEvaluationEnabledButton.addSelectionListener(new SelectionAdapter() {
+      truthValueTracingEnabledButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "Truth value tracing enabled (EXPERIMENTAL, not all rules are correctly supported)", SWT.CHECK);
+      truthValueTracingEnabledButton.setEnabled(isEditable());
+      truthValueTracingEnabledButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
             updateLaunchConfigurationDialog();
@@ -274,7 +274,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
          usePrettyPrintingButton.setSelection(KeySEDUtil.isUsePrettyPrinting(configuration));
          showSignatureOnMethodReturnNodes.setSelection(KeySEDUtil.isShowSignatureOnMethodReturnNodes(configuration));
          variablesAreOnlyComputedFromUpdatesCombo.setText(KeySEDUtil.isVariablesAreOnlyComputedFromUpdates(configuration) ? "Based on sequent" : "Based on visible type structure");
-         truthValueEvaluationEnabledButton.setSelection(KeySEDUtil.isTruthValueEvaluationEnabled(configuration));
+         truthValueTracingEnabledButton.setSelection(KeySEDUtil.isTruthValueTracingEnabled(configuration));
          highlightReachedSourceCodeButton.setSelection(KeySEDUtil.isHighlightReachedSourceCode(configuration));
          groupingEnabledButton.setSelection(KeySEDUtil.isGroupingEnabled(configuration));
          simplifyConditionsButton.setSelection(KeySEDUtil.isSimplifyConditions(configuration));
@@ -299,7 +299,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       usePrettyPrintingButton.setSelection(launchSettings.isUsePrettyPrinting());
       showSignatureOnMethodReturnNodes.setSelection(launchSettings.isShowSignatureOnMethodReturnNodes());
       variablesAreOnlyComputedFromUpdatesCombo.setText(launchSettings.isVariablesAreOnlyComputedFromUpdates() ? "Based on sequent" : "Based on visible type structure");
-      truthValueEvaluationEnabledButton.setSelection(launchSettings.isTruthValueEvaluationEnabled());
+      truthValueTracingEnabledButton.setSelection(launchSettings.isTruthValueTracingEnabled());
       highlightReachedSourceCodeButton.setSelection(launchSettings.isHighlightReachedSourceCode());
       groupingEnabledButton.setSelection(launchSettings.isGroupingEnabled());
       simplifyConditionsButton.setSelection(launchSettings.isSimplifyConditions());
@@ -320,7 +320,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrintingButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, showSignatureOnMethodReturnNodes.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_VARIABLES_ARE_COMPUTED_FROM_UPDATES, "Based on sequent".equals(variablesAreOnlyComputedFromUpdatesCombo.getText()));
-      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, truthValueEvaluationEnabledButton.getSelection());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_TRACING_ENABLED, truthValueTracingEnabledButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, highlightReachedSourceCodeButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_GROUPING_ENABLED, groupingEnabledButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SIMPLIFY_CONDITIONS, simplifyConditionsButton.getSelection());

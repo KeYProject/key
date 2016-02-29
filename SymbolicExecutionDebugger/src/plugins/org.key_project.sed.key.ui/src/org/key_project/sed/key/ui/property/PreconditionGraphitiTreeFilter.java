@@ -36,7 +36,7 @@ public class PreconditionGraphitiTreeFilter extends AbstractPropertySectionFilte
          PreconditionGraphitiPropertySection section = new PreconditionGraphitiPropertySection();
          section.setInput(part, null);
          KeYMethodContract node = section.getDebugNode(pe);
-         return node != null && node.isTruthValueEvaluationEnabled();
+         return node != null && node.isTruthValueTracingEnabled();
       }
       else {
          return false;

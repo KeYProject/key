@@ -297,7 +297,7 @@ public class KeYLoopBodyTermination extends AbstractSELoopBodyTermination implem
     * {@inheritDoc}
     */
    @Override
-   public boolean isTruthValueEvaluationEnabled() {
-      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
+   public boolean isTruthValueTracingEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueTracingEnabled(getExecutionNode().getProof());
    }
 }

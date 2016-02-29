@@ -73,8 +73,8 @@ public class KeYLaunchSymbolicDebugPreferencePage extends FieldEditorPreferenceP
       });
       BooleanFieldEditor sigEdit = new BooleanFieldEditor(KeYSEDPreferences.SHOW_SIGNATURE_ON_METHOD_RETURN_NODES, "Show signature instead of only the name on method &return nodes", SWT.NONE, spacer);
       addField(sigEdit);
-      BooleanFieldEditor truthEvaluationEdit = new BooleanFieldEditor(KeYSEDPreferences.TRUTH_VALUE_EVALUATION_ENABLED, "Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)", SWT.NONE, spacer);
-      addField(truthEvaluationEdit);
+      BooleanFieldEditor truthTracingEdit = new BooleanFieldEditor(KeYSEDPreferences.TRUTH_VALUE_TRACING_ENABLED, "Truth value tracing enabled (EXPERIMENTAL, not all rules are correctly supported)", SWT.NONE, spacer);
+      addField(truthTracingEdit);
       BooleanFieldEditor groupingEdit = new BooleanFieldEditor(KeYSEDPreferences.GROUPING_ENABLED, "Group nodes", SWT.NONE, spacer);
       addField(groupingEdit);
 

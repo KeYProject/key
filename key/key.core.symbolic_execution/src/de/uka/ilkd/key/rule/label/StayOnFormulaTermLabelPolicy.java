@@ -23,7 +23,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
 /**
  * This {@link TermLabelPolicy} maintains a {@link FormulaTermLabel} on predicates.
@@ -49,8 +49,8 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
                               ImmutableArray<TermLabel> newTermOriginalLabels,
                               TermLabel label) {
       // Maintain label if new Term is a predicate
-      if (TruthValueEvaluationUtil.isPredicate(newTermOp) || 
-          TruthValueEvaluationUtil.isLogicOperator(newTermOp, newTermSubs)) {
+      if (TruthValueTracingUtil.isPredicate(newTermOp) || 
+          TruthValueTracingUtil.isLogicOperator(newTermOp, newTermSubs)) {
          assert label instanceof FormulaTermLabel;
          FormulaTermLabel formulaLabel = (FormulaTermLabel) label;
          FormulaTermLabel originalLabel = searchFormulaTermLabel(newTermOriginalLabels);
@@ -73,13 +73,13 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
                }
             }
             if (tacletHint.getSequentFormula() != null) {
-               if (!TruthValueEvaluationUtil.isPredicate(tacletHint.getSequentFormula())) {
+               if (!TruthValueTracingUtil.isPredicate(tacletHint.getSequentFormula())) {
                   newLabelIdRequired = true;
                }
             }
             else if (tacletHint.getTerm() != null) {
                boolean topLevel = isTopLevel(tacletHint, tacletTerm);
-               if (!topLevel && !TruthValueEvaluationUtil.isPredicate(tacletHint.getTerm())) {
+               if (!topLevel && !TruthValueTracingUtil.isPredicate(tacletHint.getTerm())) {
                   newLabelIdRequired = true;
                }
             }

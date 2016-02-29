@@ -28,6 +28,6 @@ public class PreconditionTreeFilter implements IFilter {
    @Override
    public boolean select(Object toTest) {
       KeYMethodContract node = PreconditionPropertySection.getDebugNode(toTest);
-      return node != null && node.isTruthValueEvaluationEnabled();
+      return node != null && node.isTruthValueTracingEnabled();
    }
 }

@@ -170,9 +170,9 @@ public final class KeySEDUtil {
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_VARIABLES_ARE_COMPUTED_FROM_UPDATES = "org.key_project.sed.key.core.launch.sed.key.attribute.variablesAreOnlyComputedFromUpdates";
 
     /**
-     * The key of the attribute to store if truth value evaluation is enabled or not.
+     * The key of the attribute to store if truth value tracing is enabled or not.
      */
-    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED = "org.key_project.sed.key.core.launch.sed.key.attribute.truthValueEvaluationEnabled";
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_TRACING_ENABLED = "org.key_project.sed.key.core.launch.sed.key.attribute.truthValueTracingEnabled";
 
     /**
      * The key of the attribute to store if reached source code is highlighted or not.
@@ -387,13 +387,13 @@ public final class KeySEDUtil {
     }
 
     /**
-     * Checks if truth value evaluation is enabled or not.
+     * Checks if truth value tracing is enabled or not.
      * @param configuration The {@link ILaunchConfiguration} to read from.
-     * @return {@code true} truth value evaluation enabled, {@code false} truth value evaluation disabled.
+     * @return {@code true} truth value tracing enabled, {@code false} truth value tracing disabled.
      * @throws CoreException Occurred Exception.
      */
-    public static boolean isTruthValueEvaluationEnabled(ILaunchConfiguration configuration) throws CoreException {
-       return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, KeYSEDPreferences.isTruthValueEvaluationEnabled()) : KeYSEDPreferences.isTruthValueEvaluationEnabled();
+    public static boolean isTruthValueTracingEnabled(ILaunchConfiguration configuration) throws CoreException {
+       return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_TRACING_ENABLED, KeYSEDPreferences.isTruthValueTracingEnabled()) : KeYSEDPreferences.isTruthValueTracingEnabled();
     }
 
     /**
@@ -781,7 +781,7 @@ public final class KeySEDUtil {
     * @param usePrettyPrinting The new value to set.
     * @param showSignatureOnMethodReturnNodes The new value to set.
     * @param higlightReachedSourceCode The new value to set.
-    * @param truthValueEvaluationEnabled The new value to set.
+    * @param truthValueTracingEnabled The new value to set.
     * @param variablesAreComputedFromUpdates The new value to set.
     * @return The updated {@link ILaunchConfiguration}.
     * @throws CoreException Occurred Exception.
@@ -797,7 +797,7 @@ public final class KeySEDUtil {
                                                                 Boolean usePrettyPrinting,
                                                                 Boolean showSignatureOnMethodReturnNodes,
                                                                 Boolean higlightReachedSourceCode,
-                                                                Boolean truthValueEvaluationEnabled,
+                                                                Boolean truthValueTracingEnabled,
                                                                 Boolean variablesAreComputedFromUpdates) throws CoreException {
       ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
       if (useExistingContract != null) {
@@ -840,8 +840,8 @@ public final class KeySEDUtil {
       if (higlightReachedSourceCode != null) {
          wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, higlightReachedSourceCode);
       }
-      if (truthValueEvaluationEnabled != null) {
-         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, truthValueEvaluationEnabled);
+      if (truthValueTracingEnabled != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_TRACING_ENABLED, truthValueTracingEnabled);
       }
       if (variablesAreComputedFromUpdates != null) {
          wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_VARIABLES_ARE_COMPUTED_FROM_UPDATES, variablesAreComputedFromUpdates);

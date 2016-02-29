@@ -45,11 +45,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * (predicates and junctors).
  * @author Martin Hentschel
  */
-public final class TruthValueEvaluationUtil {
+public final class TruthValueTracingUtil {
    /**
     * Forbid instances.
     */
-   private TruthValueEvaluationUtil() {
+   private TruthValueTracingUtil() {
    }
    
    /**
@@ -176,11 +176,11 @@ public final class TruthValueEvaluationUtil {
     * @return The result.
     * @throws ProofInputException Occurred Exception
     */
-   public static TruthValueEvaluationResult evaluate(Node node, 
+   public static TruthValueTracingResult evaluate(Node node, 
                                                     Name termLabelName,
                                                     boolean useUnicode,
                                                     boolean usePrettyPrinting) throws ProofInputException {
-      TruthValueEvaluationResult result = new TruthValueEvaluationResult();
+      TruthValueTracingResult result = new TruthValueTracingResult();
       Deque<Map<String, MultiEvaluationResult>> evaluationStack = new LinkedList<Map<String, MultiEvaluationResult>>();
       evaluationStack.addFirst(new HashMap<String, MultiEvaluationResult>());
       evaluateNode(node, useUnicode, usePrettyPrinting, node, termLabelName, evaluationStack, result, node.proof().getServices());
@@ -194,7 +194,7 @@ public final class TruthValueEvaluationUtil {
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
     * @param evaluationStack The not empty stack with evaluation results.
-    * @param result The {@link TruthValueEvaluationResult} to fill with leaf nodes.
+    * @param result The {@link TruthValueTracingResult} to fill with leaf nodes.
     * @param services The {@link Services} to use.
     * @throws ProofInputException Occurred Exception
     */
@@ -204,7 +204,7 @@ public final class TruthValueEvaluationUtil {
                                       final Node node, 
                                       final Name termLabelName, 
                                       final Deque<Map<String, MultiEvaluationResult>> evaluationStack, 
-                                      final TruthValueEvaluationResult result,
+                                      final TruthValueTracingResult result,
                                       final Services services) throws ProofInputException {
       // Create new stack entry
       final Map<String, MultiEvaluationResult> currentResults = evaluationStack.getFirst();
@@ -886,7 +886,7 @@ public final class TruthValueEvaluationUtil {
     * {@link TruthValueEvaluationUtil#evaluate(Node, Name, boolean, boolean).
     * @author Martin Hentschel
     */
-   public static class TruthValueEvaluationResult {
+   public static class TruthValueTracingResult {
       /**
        * The {@link BranchResult}s.
        */

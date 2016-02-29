@@ -42,7 +42,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
-import org.key_project.key4eclipse.common.ui.decorator.TruthValueEvaluationViewerDecorator;
+import org.key_project.key4eclipse.common.ui.decorator.TruthValueTracingViewerDecorator;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
@@ -63,10 +63,10 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.BranchResult;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValue;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValueEvaluationResult;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.BranchResult;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValueTracingResult;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -104,9 +104,9 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    private final List<Control> controls = new LinkedList<Control>();
    
    /**
-    * The used {@link TruthValueEvaluationViewerDecorator}s.
+    * The used {@link TruthValueTracingViewerDecorator}s.
     */
-   private final List<TruthValueEvaluationViewerDecorator> decorators = new LinkedList<TruthValueEvaluationViewerDecorator>();
+   private final List<TruthValueTracingViewerDecorator> decorators = new LinkedList<TruthValueTracingViewerDecorator>();
 
    /**
     * The {@link Color} to highlight {@link TruthValue#TRUE}.
@@ -271,7 +271,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
             final Pair<Term, Term> pair = computeTermToShow(node, executionNode, keyNode);
             // Compute result
             ITreeSettings settings = node.getExecutionNode().getSettings();
-            final TruthValueEvaluationResult result = TruthValueEvaluationUtil.evaluate(keyNode, 
+            final TruthValueTracingResult result = TruthValueTracingUtil.evaluate(keyNode, 
                                                                                         FormulaTermLabel.NAME,
                                                                                         settings.isUseUnicode(),
                                                                                         settings.isUsePrettyPrinting());
@@ -340,12 +340,12 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
 
    /**
     * Shows the given content.
-    * @param result The {@link TruthValueEvaluationResult} to consider.
+    * @param result The {@link TruthValueTracingResult} to consider.
     * @param succedent The {@link Term} to show as succedent.
     * @param uninterpretedPredicate The optional {@link Term} with the uninterpreted predicate offering the {@link FormulaTermLabel}.
     * @param node The {@link IKeYSENode} which provides the new content.
     */
-   protected void addNewContent(TruthValueEvaluationResult result,
+   protected void addNewContent(TruthValueTracingResult result,
                                 Term succedent,
                                 Term uninterpretedPredicate,
                                 IExecutionNode<?> executionNode) {
@@ -379,7 +379,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
             SourceViewer viewer = new SourceViewer(viewerGroup, null, SWT.MULTI | SWT.FULL_SELECTION);
             viewer.setEditable(false);
             notConsideredColor = viewer.getTextWidget().getForeground();
-            TruthValueEvaluationViewerDecorator viewerDecorator = new TruthValueEvaluationViewerDecorator(viewer, trueColor.getRGB(), falseColor.getRGB(), unknownColor.getRGB());
+            TruthValueTracingViewerDecorator viewerDecorator = new TruthValueTracingViewerDecorator(viewer, trueColor.getRGB(), falseColor.getRGB(), unknownColor.getRGB());
             decorators.add(viewerDecorator);
             // Show term and results
             Sequent sequent = createSequentToShow(branchResult.getCondition(), succedent);
@@ -574,7 +574,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
       unknownLabel.setMenu(manager.createContextMenu(unknownLabel));
       Label notConsideredLabel = factory.createLabel(legendComposite, "not considered");
       notConsideredLabel.setForeground(notConsideredColor);
-      notConsideredLabel.setToolTipText("The term is not part of the truth value evaluation.");
+      notConsideredLabel.setToolTipText("The term is not part of the truth value tracing.");
       notConsideredLabel.setMenu(manager.createContextMenu(notConsideredLabel));
    }
    

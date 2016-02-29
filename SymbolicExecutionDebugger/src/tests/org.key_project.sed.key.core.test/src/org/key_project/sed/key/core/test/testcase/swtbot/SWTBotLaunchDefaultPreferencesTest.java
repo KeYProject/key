@@ -220,44 +220,44 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
    }
    
    /**
-    * Tests the launch where truth value evaluation is enabled.
+    * Tests the launch where truth value tracing is enabled.
     */
    @Test
-   public void testTruthValueEvaluationEnabled() throws Exception {
-      doTruthValueEvaluationTest("SWTBotLaunchDefaultPreferencesTest_testTruthValueEvaluationEnabled", true);
+   public void testTruthValueTracingEnabled() throws Exception {
+      doTruthValueTracingTest("SWTBotLaunchDefaultPreferencesTest_testTruthValueTracingEnabled", true);
    }
 
    /**
-    * Tests the launch where truth value evaluation is disabled.
+    * Tests the launch where truth value tracing is disabled.
     */
    @Test
-   public void testTruthValueEvaluationDisabled() throws Exception {
-      doTruthValueEvaluationTest("SWTBotLaunchDefaultPreferencesTest_testTruthValueEvaluationDisabled", false);
+   public void testTruthValueTracingDisabled() throws Exception {
+      doTruthValueTracingTest("SWTBotLaunchDefaultPreferencesTest_testTruthValueTracingDisabled", false);
    }
    
    /**
-    * Does the test steps of {@link #testTruthValueEvaluationEnabled()}
-    * and {@link #testTruthValueEvaluationDisabled()}.
+    * Does the test steps of {@link #testTruthValueTracingEnabled()}
+    * and {@link #testTruthValueTracingDisabled()}.
     * @param projectName The project name to use.
-    * @param truthValueEvaluationEnabled Is truth value evaluation enabled?
+    * @param truthValueTracingEnabled Is truth value tracing enabled?
     * @throws Exception Occurred Exception
     */
-   protected void doTruthValueEvaluationTest(String projectName, 
-                                             final boolean truthValueEvaluationEnabled) throws Exception {
-      boolean originalTruthValueEvaluationEnabled = KeYSEDPreferences.isTruthValueEvaluationEnabled();
+   protected void doTruthValueTracingTest(String projectName, 
+                                          final boolean truthValueTracingEnabled) throws Exception {
+      boolean originalTruthValueTracingEnabled = KeYSEDPreferences.isTruthValueTracingEnabled();
       try {
          KeYSEDPreferences.setUsePrettyPrinting(true);
          // Set preference
          SWTWorkbenchBot bot = new SWTWorkbenchBot();
          SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
-         if (truthValueEvaluationEnabled) {
-            preferenceShell.bot().checkBox("Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)").select();
+         if (truthValueTracingEnabled) {
+            preferenceShell.bot().checkBox("Truth value tracing enabled (EXPERIMENTAL, not all rules are correctly supported)").select();
          }
          else {
-            preferenceShell.bot().checkBox("Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)").deselect();
+            preferenceShell.bot().checkBox("Truth value tracing enabled (EXPERIMENTAL, not all rules are correctly supported)").deselect();
          }
          preferenceShell.bot().button("OK").click();
-         assertEquals(truthValueEvaluationEnabled, KeYSEDPreferences.isTruthValueEvaluationEnabled());
+         assertEquals(truthValueTracingEnabled, KeYSEDPreferences.isTruthValueTracingEnabled());
          // Launch something
          IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
@@ -267,7 +267,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Check launch
                Object threadObject = TestUtilsUtil.getTreeItemData(item);
                assertTrue(threadObject instanceof IKeYSENode);
-               assertEquals(truthValueEvaluationEnabled, ((IKeYSENode<?>) threadObject).isTruthValueEvaluationEnabled());
+               assertEquals(truthValueTracingEnabled, ((IKeYSENode<?>) threadObject).isTruthValueTracingEnabled());
             }
          };
          doKeYDebugTargetTest(projectName,
@@ -292,8 +292,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
       }
       finally {
          // Restore original value
-         KeYSEDPreferences.setTruthValueEvaluationEnabled(originalTruthValueEvaluationEnabled);
-         assertEquals(originalTruthValueEvaluationEnabled, KeYSEDPreferences.isTruthValueEvaluationEnabled());
+         KeYSEDPreferences.setTruthValueTracingEnabled(originalTruthValueTracingEnabled);
+         assertEquals(originalTruthValueTracingEnabled, KeYSEDPreferences.isTruthValueTracingEnabled());
       }
    }
    

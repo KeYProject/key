@@ -148,9 +148,9 @@ public class KeYLaunchSettings {
    private final boolean variablesAreOnlyComputedFromUpdates;
    
    /**
-    * Is truth value evaluation enabled?
+    * Is truth value tracing enabled?
     */
-   private final boolean truthValueEvaluationEnabled;
+   private final boolean truthValueTracingEnabled;
    
    /**
     * Is reached source code highlighted?
@@ -189,7 +189,7 @@ public class KeYLaunchSettings {
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
-    * @param truthValueEvaluationEnabled Is truth value evaluation enabled?
+    * @param truthValueTracingEnabled Is truth value tracing enabled?
     * @param highlightReachedSourceCode Is reached source code highlighted?
     * @param groupingEnabled Is grouping enabled?
     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
@@ -216,7 +216,7 @@ public class KeYLaunchSettings {
                             boolean usePrettyPrinting,
                             boolean showSignatureOnMethodReturnNodes,
                             boolean variablesAreOnlyComputedFromUpdates,
-                            boolean truthValueEvaluationEnabled,
+                            boolean truthValueTracingEnabled,
                             boolean highlightReachedSourceCode,
                             boolean groupingEnabled,
                             boolean simplifyConditions) throws JavaModelException {
@@ -242,7 +242,7 @@ public class KeYLaunchSettings {
       this.usePrettyPrinting = usePrettyPrinting;
       this.showSignatureOnMethodReturnNodes = showSignatureOnMethodReturnNodes;
       this.variablesAreOnlyComputedFromUpdates = variablesAreOnlyComputedFromUpdates;
-      this.truthValueEvaluationEnabled = truthValueEvaluationEnabled;
+      this.truthValueTracingEnabled = truthValueTracingEnabled;
       this.highlightReachedSourceCode = highlightReachedSourceCode;
       this.groupingEnabled = groupingEnabled;
       this.simplifyConditions = simplifyConditions;
@@ -425,11 +425,11 @@ public class KeYLaunchSettings {
    }
 
    /**
-    * Checks if truth value evaluation is enabled.
+    * Checks if truth value tracing is enabled.
     * @return {@code true} enabled, {@code false} disabled
     */
-   public boolean isTruthValueEvaluationEnabled() {
-      return truthValueEvaluationEnabled;
+   public boolean isTruthValueTracingEnabled() {
+      return truthValueTracingEnabled;
    }
 
    /**

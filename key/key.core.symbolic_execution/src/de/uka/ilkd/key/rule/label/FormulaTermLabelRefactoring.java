@@ -26,7 +26,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
 /**
  * The {@link TermLabelRefactoring} used to label predicates with a
@@ -209,7 +209,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
                                                    Goal goal,
                                                    Services services, 
                                                    List<TermLabel> labels) {
-      if (TruthValueEvaluationUtil.isPredicate(term)) {
+      if (TruthValueTracingUtil.isPredicate(term)) {
          TermLabel existingLabel = term.getLabel(FormulaTermLabel.NAME);
          if (existingLabel == null) {
             int labelID = services.getCounter(FormulaTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
