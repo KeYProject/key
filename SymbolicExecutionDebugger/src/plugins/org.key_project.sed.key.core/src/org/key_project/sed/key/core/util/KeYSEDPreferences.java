@@ -109,6 +109,11 @@ public class KeYSEDPreferences {
     * Preference key for the color of unknown in the truth value tracing.
     */
    public static final String TRUTH_VALUE_TRACING_UNKNOWN = "org.key_project.sed.key.core.preference.truthValueTracing.unknown";
+
+   /**
+    * Preference key for the hiding of full branch conditions in case of alternative labels.
+    */
+   public static final String HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS = "org.key_project.sed.key.core.preference.hideFullBranchConditionIfAdditionalLabelIsAvailable";
    
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -628,5 +633,37 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultTruthValueTracingUnknown(RGB defaultValue) {
       PreferenceConverter.setDefault(getStore(), TRUTH_VALUE_TRACING_UNKNOWN, defaultValue);
+   }
+   
+   /**
+    * Checks if full branch conditions might be hidden in case of alternative labels.
+    * @return Hide conditions?
+    */
+   public static boolean isHideFullBranchConditionIfAdditionalLabelIsAvailable() {
+      return getStore().getBoolean(HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS);
+   }
+   
+   /**
+    * Checks if full branch conditions might be hidden in case of alternative labels by default.
+    * @return Hide conditions?
+    */
+   public static boolean isDefaultHideFullBranchConditionIfAdditionalLabelIsAvailable() {
+      return getStore().getDefaultBoolean(HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS);
+   }
+   
+   /**
+    * Sets if full branch conditions might be hidden in case of alternative labels.
+    * @param value Hide conditions?
+    */
+   public static void setHideFullBranchConditionIfAdditionalLabelIsAvailable(boolean value) {
+      getStore().setValue(HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS, value);
+   }
+   
+   /**
+    * Sets if full branch conditions might be hidden in case of alternative labels by default.
+    * @param defaultValue Hide conditions?
+    */
+   public static void setDefaultHideFullBranchConditionIfAdditionalLabelIsAvailable(boolean defaultValue) {
+      getStore().setDefault(HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS, defaultValue);
    }
 }

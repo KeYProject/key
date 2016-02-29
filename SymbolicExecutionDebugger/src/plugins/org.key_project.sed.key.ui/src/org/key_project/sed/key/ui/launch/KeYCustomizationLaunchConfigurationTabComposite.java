@@ -97,6 +97,11 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
    private Button simplifyConditionsButton;
    
    /**
+    * Defines if full branch conditions are hidden if an alternative label is available.
+    */
+   private Button hideFullBranchConditionIfAdditionalLabelIsAvailableButton;
+   
+   /**
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param style The style.
@@ -171,6 +176,14 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       groupingEnabledButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "Group nodes", SWT.CHECK);
       groupingEnabledButton.setEnabled(isEditable());
       groupingEnabledButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateLaunchConfigurationDialog();
+         }
+      });
+      hideFullBranchConditionIfAdditionalLabelIsAvailableButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "Hide full branch conditions when an alternative label is available", SWT.CHECK);
+      hideFullBranchConditionIfAdditionalLabelIsAvailableButton.setEnabled(isEditable());
+      hideFullBranchConditionIfAdditionalLabelIsAvailableButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
             updateLaunchConfigurationDialog();
@@ -278,6 +291,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
          highlightReachedSourceCodeButton.setSelection(KeySEDUtil.isHighlightReachedSourceCode(configuration));
          groupingEnabledButton.setSelection(KeySEDUtil.isGroupingEnabled(configuration));
          simplifyConditionsButton.setSelection(KeySEDUtil.isSimplifyConditions(configuration));
+         hideFullBranchConditionIfAdditionalLabelIsAvailableButton.setSelection(KeySEDUtil.isHideFullBranchConditionIfAdditionalLabelIsAvailable(configuration));
          updatePrettyPrintingDependingEnabledStates();
          updateShowVariablesEnabledState();
       } 
@@ -303,6 +317,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       highlightReachedSourceCodeButton.setSelection(launchSettings.isHighlightReachedSourceCode());
       groupingEnabledButton.setSelection(launchSettings.isGroupingEnabled());
       simplifyConditionsButton.setSelection(launchSettings.isSimplifyConditions());
+      hideFullBranchConditionIfAdditionalLabelIsAvailableButton.setSelection(launchSettings.isHideFullBranchConditionIfAdditionalLabelIsAvailable());
       updatePrettyPrintingDependingEnabledStates();
       updateShowVariablesEnabledState();
    }
@@ -324,5 +339,6 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, highlightReachedSourceCodeButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_GROUPING_ENABLED, groupingEnabledButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SIMPLIFY_CONDITIONS, simplifyConditionsButton.getSelection());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS, hideFullBranchConditionIfAdditionalLabelIsAvailableButton.getSelection());
    }
 }

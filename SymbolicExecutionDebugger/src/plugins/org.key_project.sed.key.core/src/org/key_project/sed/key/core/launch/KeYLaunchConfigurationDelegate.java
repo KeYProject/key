@@ -101,6 +101,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           boolean highlightReachedSourceCode = KeySEDUtil.isHighlightReachedSourceCode(configuration);
           boolean groupingEnabled = KeySEDUtil.isGroupingEnabled(configuration);
           boolean simplifyConditions = KeySEDUtil.isSimplifyConditions(configuration);
+          boolean hideFullBranchConditionIfAdditionalLabelIsAvailable = KeySEDUtil.isHideFullBranchConditionIfAdditionalLabelIsAvailable(configuration);
           // Determine location and class path entries
           File location = null;
           List<File> classPaths = null;
@@ -155,7 +156,8 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                              truthValueTracingEnabled,
                                                              highlightReachedSourceCode,
                                                              groupingEnabled,
-                                                             simplifyConditions); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
+                                                             simplifyConditions,
+                                                             hideFullBranchConditionIfAdditionalLabelIsAvailable); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
           // Validate proof settings
           if (newDebugSession) {
              if (method == null) {

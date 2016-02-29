@@ -77,6 +77,8 @@ public class KeYLaunchSymbolicDebugPreferencePage extends FieldEditorPreferenceP
       addField(truthTracingEdit);
       BooleanFieldEditor groupingEdit = new BooleanFieldEditor(KeYSEDPreferences.GROUPING_ENABLED, "Group nodes", SWT.NONE, spacer);
       addField(groupingEdit);
+      BooleanFieldEditor hideFullConditions = new BooleanFieldEditor(KeYSEDPreferences.HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS, "Hide full branch conditions when an alternative label is available", SWT.NONE, spacer);
+      addField(hideFullConditions);
 
       group = SWTFactory.createGroup(getFieldEditorParent(), "Variables", 1, 1, GridData.FILL_HORIZONTAL);
       final Composite variablesSpacer = SWTFactory.createComposite(group, 2, 1, GridData.FILL_HORIZONTAL);

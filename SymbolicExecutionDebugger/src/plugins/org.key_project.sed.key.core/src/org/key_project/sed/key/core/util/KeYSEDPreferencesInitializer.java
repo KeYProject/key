@@ -47,5 +47,6 @@ public class KeYSEDPreferencesInitializer extends AbstractPreferenceInitializer 
       KeYSEDPreferences.setDefaultTruthValueTracingTrue(new RGB(0, 117, 0));
       KeYSEDPreferences.setDefaultTruthValueTracingFalse(new RGB(170, 0, 0));
       KeYSEDPreferences.setDefaultTruthValueTracingUnknown(new RGB(217, 108, 0));
+      KeYSEDPreferences.setDefaultHideFullBranchConditionIfAdditionalLabelIsAvailable(false);
    }
 }

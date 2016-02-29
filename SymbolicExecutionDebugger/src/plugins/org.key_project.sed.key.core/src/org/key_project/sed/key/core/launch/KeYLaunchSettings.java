@@ -168,6 +168,11 @@ public class KeYLaunchSettings {
    private final boolean simplifyConditions;
    
    /**
+    * {@code true} full branch condition is hidden in case an additional label is available, {@code false} full branch condition is always shown.
+    */
+   private final boolean hideFullBranchConditionIfAdditionalLabelIsAvailable;
+   
+   /**
     * Constructor.
     * @param newDebugSession {@code true} new debug session, {@code false} continue existing *.proof file.
     * @param proofFileToContinue The path to the proof file to continue.
@@ -193,6 +198,7 @@ public class KeYLaunchSettings {
     * @param highlightReachedSourceCode Is reached source code highlighted?
     * @param groupingEnabled Is grouping enabled?
     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
+    * @param hideFullBranchConditionIfAdditionalLabelIsAvailable {@code true} full branch condition is hidden in case an additional label is available, {@code false} full branch condition is always shown.
     * @throws JavaModelException Occurred Exception.
     */
    public KeYLaunchSettings(boolean newDebugSession,
@@ -219,7 +225,8 @@ public class KeYLaunchSettings {
                             boolean truthValueTracingEnabled,
                             boolean highlightReachedSourceCode,
                             boolean groupingEnabled,
-                            boolean simplifyConditions) throws JavaModelException {
+                            boolean simplifyConditions,
+                            boolean hideFullBranchConditionIfAdditionalLabelIsAvailable) throws JavaModelException {
       this.newDebugSession = newDebugSession;
       this.proofFileToContinue = proofFileToContinue;
       this.method = method;
@@ -246,6 +253,7 @@ public class KeYLaunchSettings {
       this.highlightReachedSourceCode = highlightReachedSourceCode;
       this.groupingEnabled = groupingEnabled;
       this.simplifyConditions = simplifyConditions;
+      this.hideFullBranchConditionIfAdditionalLabelIsAvailable = hideFullBranchConditionIfAdditionalLabelIsAvailable;
    }
 
    /**
@@ -454,5 +462,13 @@ public class KeYLaunchSettings {
     */
    public boolean isSimplifyConditions() {
       return simplifyConditions;
+   }
+
+   /**
+    * Checks if branch conditions should be hidden in case of alternative labels.
+    * @return {@code true} full branch condition is hidden in case an additional label is available, {@code false} full branch condition is always shown.
+    */
+   public boolean isHideFullBranchConditionIfAdditionalLabelIsAvailable() {
+      return hideFullBranchConditionIfAdditionalLabelIsAvailable;
    }
 }

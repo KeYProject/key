@@ -188,6 +188,11 @@ public final class KeySEDUtil {
      * The key of the attribute to store if conditions are simplified or not.
      */
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SIMPLIFY_CONDITIONS = "org.key_project.sed.key.core.launch.sed.key.attribute.simplifyConditions";
+
+    /**
+     * The key of the attribute to store if full branch conditions are hidden or not.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS = "org.key_project.sed.key.core.launch.sed.key.attribute.hideFullBranchConditionIfAdditionalLabelIsAvailable";
     
     /**
      * The launch mode supported by the Symbolic Execution Debugger based on KeY.
@@ -424,6 +429,16 @@ public final class KeySEDUtil {
      */
     public static boolean isSimplifyConditions(ILaunchConfiguration configuration) throws CoreException {
        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SIMPLIFY_CONDITIONS, KeYSEDPreferences.isSimplifyConditions()) : KeYSEDPreferences.isSimplifyConditions();
+    }
+
+    /**
+     * Checks if full branch conditions might be hidden in case of alternative labels.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} full branch condition is hidden in case an additional label is available, {@code false} full branch condition is always shown.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isHideFullBranchConditionIfAdditionalLabelIsAvailable(ILaunchConfiguration configuration) throws CoreException {
+       return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS, KeYSEDPreferences.isHideFullBranchConditionIfAdditionalLabelIsAvailable()) : KeYSEDPreferences.isHideFullBranchConditionIfAdditionalLabelIsAvailable();
     }
     
     /**
