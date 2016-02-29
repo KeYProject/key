@@ -23,7 +23,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
@@ -41,6 +45,8 @@ import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorato
 import org.key_project.key4eclipse.common.ui.decorator.TruthValueEvaluationViewerDecorator;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.sed.key.core.model.IKeYSENode;
+import org.key_project.sed.key.core.util.KeYSEDPreferences;
+import org.key_project.sed.key.ui.preference.page.KeYColorsPreferencePage;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.java.ObjectUtil;
@@ -105,22 +111,32 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    /**
     * The {@link Color} to highlight {@link TruthValue#TRUE}.
     */
-   private final Color trueColor;
+   private Color trueColor;
 
    /**
     * The {@link Color} to highlight {@link TruthValue#FALSE}.
     */
-   private final Color falseColor;
+   private Color falseColor;
 
    /**
     * The {@link Color} to highlight {@link TruthValue#UNKNOWN} or {@code null}.
     */
-   private final Color unknownColor;
+   private Color unknownColor;
    
    /**
     * The currently shown {@link IKeYSENode}.
     */
    private IKeYSENode<?> currentNode;
+   
+   /**
+    * Listens for color changes
+    */
+   private final IPropertyChangeListener colorPropertyListener = new IPropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent event) {
+         handleColorPropertyChange(event);
+      }
+   };
    
    /**
     * Constructor.
@@ -133,9 +149,35 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
       this.layoutListener = layoutListener;
       root = factory.createFlatFormComposite(parent);
       root.setLayout(new GridLayout(1, false));
-      trueColor = new Color(parent.getDisplay(), TruthValueEvaluationViewerDecorator.trueRGB);
-      falseColor = new Color(parent.getDisplay(), TruthValueEvaluationViewerDecorator.falseRGB);
-      unknownColor = new Color(parent.getDisplay(), TruthValueEvaluationViewerDecorator.unknownRGB);
+      updateColors();
+      KeYSEDPreferences.getStore().addPropertyChangeListener(colorPropertyListener);
+   }
+
+   protected void handleColorPropertyChange(PropertyChangeEvent event) {
+      if (KeYSEDPreferences.TRUTH_VALUE_TRACING_TRUE.equals(event.getProperty())
+          || KeYSEDPreferences.TRUTH_VALUE_TRACING_FALSE.equals(event.getProperty())
+          || KeYSEDPreferences.TRUTH_VALUE_TRACING_UNKNOWN.equals(event.getProperty())) {
+         updateColors();
+         recreateContent();
+      }
+   }
+   
+   /**
+    * Updates the used colors.
+    */
+   protected void updateColors() {
+      if (trueColor != null) {
+         trueColor.dispose();
+      }
+      trueColor = new Color(root.getDisplay(), KeYSEDPreferences.getTruthValueTracingTrue());
+      if (falseColor != null) {
+         falseColor.dispose();
+      }
+      falseColor = new Color(root.getDisplay(), KeYSEDPreferences.getTruthValueTracingFalse());
+      if (unknownColor != null) {
+         unknownColor.dispose();
+      }
+      unknownColor = new Color(root.getDisplay(), KeYSEDPreferences.getTruthValueTracingUnknown());
    }
 
    /**
@@ -143,6 +185,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     */
    @Override
    public void dispose() {
+      KeYSEDPreferences.getStore().removePropertyChangeListener(colorPropertyListener);
       if (trueColor != null) {
          trueColor.dispose();
       }
@@ -161,26 +204,33 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    public void updateContent(final IKeYSENode<?> node) {
       if (!ObjectUtil.equals(currentNode, node)) {
          currentNode = node;
-         showEvaluatingInformation();
-         AbstractDependingOnObjectsJob.cancelJobs(this);
-         Job job = new AbstractDependingOnObjectsJob("Evaluating postconditions", this, PlatformUI.getWorkbench()) {
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-               try {
-                  computeAndAddNewContent(node);
-                  return Status.OK_STATUS;
-               }
-               catch (OperationCanceledException e) {
-                  return Status.CANCEL_STATUS;
-               }
-               catch (Exception e) {
-                  return LogUtil.getLogger().createErrorStatus(e);
-               }
-            }
-         };
-         job.setSystem(true);
-         job.schedule();
+         recreateContent();
       }
+   }
+   
+   /**
+    * Recreates the shown content.
+    */
+   protected void recreateContent() {
+      showEvaluatingInformation();
+      AbstractDependingOnObjectsJob.cancelJobs(this);
+      Job job = new AbstractDependingOnObjectsJob("Evaluating postconditions", this, PlatformUI.getWorkbench()) {
+         @Override
+         protected IStatus run(IProgressMonitor monitor) {
+            try {
+               computeAndAddNewContent(currentNode);
+               return Status.OK_STATUS;
+            }
+            catch (OperationCanceledException e) {
+               return Status.CANCEL_STATUS;
+            }
+            catch (Exception e) {
+               return LogUtil.getLogger().createErrorStatus(e);
+            }
+         }
+      };
+      job.setSystem(true);
+      job.schedule();
    }
 
    /**
@@ -329,7 +379,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
             SourceViewer viewer = new SourceViewer(viewerGroup, null, SWT.MULTI | SWT.FULL_SELECTION);
             viewer.setEditable(false);
             notConsideredColor = viewer.getTextWidget().getForeground();
-            TruthValueEvaluationViewerDecorator viewerDecorator = new TruthValueEvaluationViewerDecorator(viewer);
+            TruthValueEvaluationViewerDecorator viewerDecorator = new TruthValueEvaluationViewerDecorator(viewer, trueColor.getRGB(), falseColor.getRGB(), unknownColor.getRGB());
             decorators.add(viewerDecorator);
             // Show term and results
             Sequent sequent = createSequentToShow(branchResult.getCondition(), succedent);
@@ -488,6 +538,15 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * Adds the legend.
     */
    protected void addLegend(Color notConsideredColor) {
+      // Create context menu
+      MenuManager manager = new MenuManager();
+      manager.add(new Action("Change &Colors...") {
+         @Override
+         public void run() {
+            openColorPreferencePage();
+         }
+      });
+      // Create legend
       Composite legendComposite = factory.createFlatFormComposite(root);
       legendComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       GridLayout legendLayout = new GridLayout(5, false);
@@ -499,21 +558,33 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
       legendLayout.verticalSpacing = 0;
       legendComposite.setLayout(legendLayout);
       controls.add(legendComposite);
-      factory.createLabel(legendComposite, "Legend: ");
+      Label legendLabel = factory.createLabel(legendComposite, "Legend: ");
+      legendLabel.setMenu(manager.createContextMenu(legendLabel));
       Label trueLabel = factory.createLabel(legendComposite, "true");
       trueLabel.setForeground(trueColor);
       trueLabel.setToolTipText("The term evaluates to true.");
+      trueLabel.setMenu(manager.createContextMenu(trueLabel));
       Label falseLabel = factory.createLabel(legendComposite, "false");
       falseLabel.setForeground(falseColor);
       falseLabel.setToolTipText("The term evaluates to false.");
+      falseLabel.setMenu(manager.createContextMenu(falseLabel));
       Label unknownLabel = factory.createLabel(legendComposite, "unknown");
       unknownLabel.setForeground(unknownColor);
       unknownLabel.setToolTipText("The term is not (yet) completely evaluated into true or false.");
+      unknownLabel.setMenu(manager.createContextMenu(unknownLabel));
       Label notConsideredLabel = factory.createLabel(legendComposite, "not considered");
       notConsideredLabel.setForeground(notConsideredColor);
       notConsideredLabel.setToolTipText("The term is not part of the truth value evaluation.");
+      notConsideredLabel.setMenu(manager.createContextMenu(notConsideredLabel));
    }
    
+   /**
+    * Opens the preference page to change the colors.
+    */
+   protected void openColorPreferencePage() {
+      KeYColorsPreferencePage.openPreferencePage(root.getShell());
+   }
+
    public static interface ILayoutListener {
       public void layoutUpdated();
    }

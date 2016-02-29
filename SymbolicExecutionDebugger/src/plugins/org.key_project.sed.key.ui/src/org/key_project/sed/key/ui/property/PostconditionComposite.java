@@ -16,7 +16,6 @@ package org.key_project.sed.key.ui.property;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.key.core.model.IKeYSENode;
-import org.key_project.sed.key.ui.property.AbstractTruthValueComposite.ILayoutListener;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.Term;
@@ -24,7 +23,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
-import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.util.Pair;
 

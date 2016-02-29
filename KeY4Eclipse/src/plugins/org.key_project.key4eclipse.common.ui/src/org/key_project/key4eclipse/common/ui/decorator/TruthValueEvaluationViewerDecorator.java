@@ -46,21 +46,6 @@ import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValue;
  */
 public class TruthValueEvaluationViewerDecorator extends ProofSourceViewerDecorator {
    /**
-    * The {@link RGB} specifying the {@link Color} to highlight {@link TruthValue#TRUE}.
-    */
-   public static final RGB trueRGB = new RGB(0, 117, 0);
-
-   /**
-    * The {@link RGB} specifying the {@link Color} to highlight {@link TruthValue#FALSE}.
-    */
-   public static final RGB falseRGB = new RGB(170, 0, 0);
-
-   /**
-    * The {@link RGB} specifying the {@link Color} to highlight {@link TruthValue#UNKNOWN} or {@code null}.
-    */
-   public static final RGB unknownRGB = new RGB(217, 108, 0);
-   
-   /**
     * The {@link Color} to highlight {@link TruthValue#TRUE}.
     */
    private final Color trueColor;
@@ -78,8 +63,11 @@ public class TruthValueEvaluationViewerDecorator extends ProofSourceViewerDecora
    /**
     * Constructor.
     * @param viewer The {@link ISourceViewer} to decorate.
+    * @param trueRGB The {@link RGB} to highlight true.
+    * @param falseRGB The {@link RGB} to highlight false.
+    * @param unknownRGB The {@link RGB} to highlight unknown.
     */
-   public TruthValueEvaluationViewerDecorator(ISourceViewer viewer) {
+   public TruthValueEvaluationViewerDecorator(ISourceViewer viewer, RGB trueRGB, RGB falseRGB, RGB unknownRGB) {
       super(viewer);
       trueColor = new Color(getViewerText().getDisplay(), trueRGB);
       falseColor = new Color(getViewerText().getDisplay(), falseRGB);

@@ -208,7 +208,7 @@
                   <or>
                      <and>
                         <instanceof
-                              value="org.key_project.sed.key.core.model.IKeYSEDDebugNode">
+                              value="org.key_project.sed.key.core.model.IKeYSENode">
                         </instanceof>
                         <test
                               forcePluginActivation="true"
@@ -303,6 +303,12 @@
                class="org.key_project.sed.key.ui.preference.page.KeYLaunchSymbolicDebugPreferencePage"
                id="org.key_project.sed.key.ui.preference.page.key_launch_defaults"
                name="KeY Launch Defaults">
+         </page>
+         <page
+               category="org.key_project.sed.key.ui.preference.page.key_symbolic_debug"
+               class="org.key_project.sed.key.ui.preference.page.KeYColorsPreferencePage"
+               id="org.key_project.sed.ui.preference.page.colors"
+               name="Colors">
          </page>
       </extension>
       <extension
@@ -467,7 +473,7 @@
                      <or>
                         <and>
                            <instanceof
-                                 value="org.key_project.sed.key.core.model.IKeYSEDDebugNode">
+                                 value="org.key_project.sed.key.core.model.IKeYSENode">
                            </instanceof>
                            <test
                                  forcePluginActivation="true"

@@ -14,6 +14,8 @@
 package org.key_project.sed.key.core.util;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.swt.graphics.RGB;
 import org.key_project.sed.core.model.ISEGroupable;
 import org.key_project.sed.key.core.Activator;
 
@@ -92,6 +94,21 @@ public class KeYSEDPreferences {
     * Preference key to enable or disable simplification of conditions.
     */
    public static final String SIMPLIFY_CONDITIONS = "org.key_project.sed.key.core.preference.simplifyConditions";
+
+   /**
+    * Preference key for the color of true in the truth value tracing.
+    */
+   public static final String TRUTH_VALUE_TRACING_TRUE = "org.key_project.sed.key.core.preference.truthValueTracing.true";
+
+   /**
+    * Preference key for the color of false in the truth value tracing.
+    */
+   public static final String TRUTH_VALUE_TRACING_FALSE = "org.key_project.sed.key.core.preference.truthValueTracing.false";
+
+   /**
+    * Preference key for the color of unknown in the truth value tracing.
+    */
+   public static final String TRUTH_VALUE_TRACING_UNKNOWN = "org.key_project.sed.key.core.preference.truthValueTracing.unknown";
    
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -515,5 +532,101 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultSimplifyConditions(boolean defaultValue) {
       getStore().setDefault(SIMPLIFY_CONDITIONS, defaultValue);
+   }
+   
+   /**
+    * Returns the color of true in the truth value tracing.
+    * @return The color.
+    */
+   public static RGB getTruthValueTracingTrue() {
+      return PreferenceConverter.getColor(getStore(), TRUTH_VALUE_TRACING_TRUE);
+   }
+   
+   /**
+    * Returns the default color of true in the truth value tracing.
+    * @return The color.
+    */
+   public static RGB getDefaultTruthValueTracingTrue() {
+      return PreferenceConverter.getDefaultColor(getStore(), TRUTH_VALUE_TRACING_TRUE);
+   }
+   
+   /**
+    * Sets the color of true in the truth value tracing.
+    * @param value The color.
+    */
+   public static void setTruthValueTracingTrue(RGB value) {
+      PreferenceConverter.setValue(getStore(), TRUTH_VALUE_TRACING_TRUE, value);
+   }
+   
+   /**
+    * Sets the default color of true in the truth value tracing.
+    * @param defaultValue The color.
+    */
+   public static void setDefaultTruthValueTracingTrue(RGB defaultValue) {
+      PreferenceConverter.setDefault(getStore(), TRUTH_VALUE_TRACING_TRUE, defaultValue);
+   }
+   
+   /**
+    * Returns the color of false in the truth value tracing.
+    * @return The color.
+    */
+   public static RGB getTruthValueTracingFalse() {
+      return PreferenceConverter.getColor(getStore(), TRUTH_VALUE_TRACING_FALSE);
+   }
+   
+   /**
+    * Returns the default color of false in the truth value tracing.
+    * @return The color.
+    */
+   public static RGB getDefaultTruthValueTracingFalse() {
+      return PreferenceConverter.getDefaultColor(getStore(), TRUTH_VALUE_TRACING_FALSE);
+   }
+   
+   /**
+    * Sets the color of false in the truth value tracing.
+    * @param value The color.
+    */
+   public static void setTruthValueTracingFalse(RGB value) {
+      PreferenceConverter.setValue(getStore(), TRUTH_VALUE_TRACING_FALSE, value);
+   }
+   
+   /**
+    * Sets the default color of false in the truth value tracing.
+    * @param defaultValue The color.
+    */
+   public static void setDefaultTruthValueTracingFalse(RGB defaultValue) {
+      PreferenceConverter.setDefault(getStore(), TRUTH_VALUE_TRACING_FALSE, defaultValue);
+   }
+   
+   /**
+    * Returns the color of unknown in the truth value tracing.
+    * @return The color.
+    */
+   public static RGB getTruthValueTracingUnknown() {
+      return PreferenceConverter.getColor(getStore(), TRUTH_VALUE_TRACING_UNKNOWN);
+   }
+   
+   /**
+    * Returns the default color of unknown in the truth value tracing.
+    * @return The color.
+    */
+   public static RGB getDefaultTruthValueTracingUnknown() {
+      return PreferenceConverter.getDefaultColor(getStore(), TRUTH_VALUE_TRACING_UNKNOWN);
+   }
+   
+   /**
+    * Sets the color of unknown in the truth value tracing.
+    * @param value The color.
+    */
+   public static void setTruthValueTracingUnknown(RGB value) {
+      PreferenceConverter.setValue(getStore(), TRUTH_VALUE_TRACING_UNKNOWN, value);
+   }
+   
+   /**
+    * Sets the default color of unknown in the truth value tracing.
+    * @param defaultValue The color.
+    */
+   public static void setDefaultTruthValueTracingUnknown(RGB defaultValue) {
+      PreferenceConverter.setDefault(getStore(), TRUTH_VALUE_TRACING_UNKNOWN, defaultValue);
    }
 }
