@@ -19,8 +19,13 @@
 					<items>
 						<MenuItem mnemonicParsing="false" onAction="#handleOpenProof"
 							text="%openProof" />
+						<MenuItem fx:id="saveProof" mnemonicParsing="false"
+							visible="false" onAction="#handleSaveProof" text="%saveProof" />
+						<MenuItem fx:id="saveProofAs" visible="false"
+							mnemonicParsing="false" onAction="#handleSaveProofAs" text="%saveProofAs"
+							userData="" />
 						<MenuItem mnemonicParsing="false" onAction="#handleCloseWindow"
-							text="Close" />
+							text="%close" />
 					</items>
 				</Menu>
 				<Menu mnemonicParsing="false" text="Edit">
@@ -93,7 +98,7 @@
 		<ToolBar prefHeight="21.0" prefWidth="200.0"
 			BorderPane.alignment="CENTER">
 			<items>
-				<Label fx:id="statustext" prefHeight="17.0" prefWidth="334.0"
+				<Label fx:id="statustext" prefHeight="17.0" prefWidth="700.0"
 					text="%status" />
 			</items>
 		</ToolBar>

@@ -227,7 +227,15 @@ public class NUI extends Application {
         return initialProofFile;
     }
 
-    public DataModel getDataModel() {
-        return dataModel;
+    /**
+     * Returns the text from the current loaded bundle corresponding to the
+     * provided String key.
+     * 
+     * @param key
+     *            the String used to identify the string in the bundle file
+     * @return the String of the corresponding key
+     */
+    public String getStringFromBundle(String key) {
+        return bundle.getString(key);
     }
 }

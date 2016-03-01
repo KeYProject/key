@@ -1,17 +1,22 @@
 package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.ResourceBundle;
 
 import com.sun.javafx.collections.ObservableMapWrapper;
 
+import de.uka.ilkd.key.nui.TreeViewState;
 import de.uka.ilkd.key.nui.exceptions.ComponentNotFoundException;
 import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
 import de.uka.ilkd.key.nui.exceptions.ToggleGroupNotFoundException;
+import de.uka.ilkd.key.proof.Proof;
 import javafx.application.Platform;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
@@ -24,6 +29,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Toggle;
 import javafx.scene.input.KeyCode;
@@ -41,7 +47,8 @@ import javafx.stage.FileChooser;
  * @author Stefan Pilot
  *
  */
-public class MainViewController extends NUIController implements Initializable {
+public class MainViewController extends NUIController
+        implements Initializable, Observer {
     /**
      * Provides an enum for the available places in the main window.
      */
@@ -66,6 +73,10 @@ public class MainViewController extends NUIController implements Initializable {
     private Label statustext;
     @FXML
     private Menu viewMenu;
+    @FXML
+    private MenuItem saveProofAs;
+    @FXML
+    private MenuItem saveProof;
 
     /**
      * Stores the position of components added to the SplitPane. Other views can
@@ -161,8 +172,23 @@ public class MainViewController extends NUIController implements Initializable {
         }
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(
-                new File("resources/de/uka/ilkd/key/examples"));
+        TreeViewState loadedTVS = dataModel.getLoadedTreeViewState();
+        // set default directory to location where currently loaded proof is
+        // located
+        File parentDirectory = null;
+        if (dataModel.getLoadedTreeViewState() != null) {
+            parentDirectory = loadedTVS.getProof().getProofFile()
+                    .getParentFile();
+        }
+        if (parentDirectory != null) {
+            fileChooser.setInitialDirectory(parentDirectory);
+        }
+        // if no proof is loaded, use the example directory (default)
+        else {
+            fileChooser.setInitialDirectory(
+                    new File("resources/de/uka/ilkd/key/examples"));
+        }
+
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "Proof files", "*.proof");
         fileChooser.getExtensionFilters().add(extFilter);
@@ -305,6 +331,88 @@ public class MainViewController extends NUIController implements Initializable {
     }
 
     /**
+     * Handles saving of a proof file if no destination path is specified. Uses
+     * the location where the proof was saved to the last time.
+     * 
+     * @param e
+     *            the ActionEvent raised by clicking on the MenuItem.
+     */
+    @FXML
+    protected final void handleSaveProof(final ActionEvent e) {
+        // retrieve last saved location from proof file
+        Proof loadedProof = dataModel.getLoadedTreeViewState().getProof();
+
+        if (loadedProof != null && loadedProof.getProofFile() != null) {
+            // call saveProof with proof file
+            saveProof(loadedProof, loadedProof.getProofFile());
+        }
+        else {
+            // open dialog with file chooser
+            handleSaveProof(e);
+        }
+    }
+
+    /**
+     * Handles saving of a proof file if the destination path should be
+     * specified. Opens a file chooser dialog where the path can be chosen.
+     * 
+     * @param e
+     *            the ActionEvent raised by clicking on the MenuItem.
+     */
+    @FXML
+    protected final void handleSaveProofAs(final ActionEvent e) {
+
+        // Get loaded proof
+        Proof loadedProof = dataModel.getLoadedTreeViewState().getProof();
+
+        // Open file picker window
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(nui.getStringFromBundle("fileChooserSaveTitle"));
+        // set initial directory to last saved location (if available)
+        if (loadedProof.getProofFile() != null) {
+            // if file has a parent directory, set initial directory
+            File parentDir = loadedProof.getProofFile().getParentFile();
+            if (parentDir != null) {
+                fileChooser.setInitialDirectory(parentDir);
+            }
+        }
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                "Proof files", "*.proof");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File selectedFile = fileChooser.showSaveDialog(contextMenu);
+
+        // abort save action if no selection was made in file chooser
+        if (selectedFile == null) {
+            return;
+        }
+
+        // save proof file
+        saveProof(loadedProof, selectedFile);
+
+    }
+
+    /**
+     * Saves the proof file proof to the given File destinationFile.
+     * 
+     * @param proof
+     *            the {@link Proof} file to be saved.
+     * @param destinationFile
+     *            the destination {@link File} where the proof is saved to.
+     */
+    protected final void saveProof(Proof proof, File destinationFile) {
+        try {
+            proof.saveToFile(destinationFile);
+            proof.setProofFile(destinationFile);
+            updateStatusbar(nui.getStringFromBundle("savedSuccessfully") + " "
+                    + destinationFile.getAbsolutePath());
+        }
+        catch (IOException e) {
+            updateStatusbar(e.getMessage());
+        }
+    }
+
+    /**
      * NEW
      * 
      * @param component
@@ -388,14 +496,39 @@ public class MainViewController extends NUIController implements Initializable {
 
     @Override
     protected void init() {
-        // TODO Auto-generated method stub
-
+        dataModel.addObserver(this);
     }
 
+    /**
+     * Updates the status bar on the mainView by the given text. Keeps the text
+     * on the status bar till the next update is performed.
+     * 
+     * @param text
+     *            String to be set to the status bar.
+     */
     public void updateStatusbar(String text) {
         if (text != null) {
             statustext.setText(text);
         }
 
     }
+
+    /**
+     * Updates the MainView if any change in the dataModel occurred.
+     * 
+     * @param o
+     *            The observable, here the dataModel
+     * @param arg
+     *            An argument (not used)
+     */
+    @Override
+    public void update(Observable o, Object arg) {
+        // If first proof file is loaded, enable MenuItems for store action
+        saveProof.setVisible(true);
+        saveProofAs.setVisible(true);
+        // Remove observer, because we do not need it anymore (-> proof files
+        // cannot be closed)
+        dataModel.deleteObserver(this);
+    }
+
 }

@@ -68,7 +68,7 @@
 
 
 	<!-- Definition of target START -->
-	<target name="start" depends="compile" description="Starts KeY.">
+	<target name="start" depends="compile" description="Starts the KeY NUI.">
 		<java classname="de.uka.ilkd.key.nui.NUI" classpathref="key.nui.run.class.path" fork="true">
 			<jvmarg value="-Xmx2048m" />
 			<jvmarg value="-XX:MaxPermSize=256m" />

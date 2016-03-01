@@ -19,6 +19,12 @@ public class DataModel extends Observable {
     private HashMap<String, TreeViewState> treeViewStates = new HashMap<String, TreeViewState>();
 
     /**
+     * Represents the lastly stored TreeViewState, therefore it is displayed
+     * currently in the TreeView
+     */
+    private TreeViewState loadedTreeViewState;
+
+    /**
      * Returns the {@link TreeViewState} associated to the given filename name.
      * 
      * @param name
@@ -41,8 +47,13 @@ public class DataModel extends Observable {
      */
     public void saveTreeViewState(TreeViewState treeViewState, String name) {
         treeViewStates.put(name, treeViewState);
+        loadedTreeViewState = treeViewState;
         this.setChanged();
         this.notifyObservers(name);
+    }
+
+    public TreeViewState getLoadedTreeViewState() {
+        return loadedTreeViewState;
     }
 
 }

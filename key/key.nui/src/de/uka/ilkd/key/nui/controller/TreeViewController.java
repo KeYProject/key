@@ -74,11 +74,6 @@ public class TreeViewController extends NUIController implements Observer {
             .newSetFromMap(new WeakHashMap<>());
 
     /**
-     * Stores the last loaded proof.
-     */
-    private Proof loadedProof = null;
-
-    /**
      * The proofTree view of the GUI.
      */
     @FXML
@@ -98,7 +93,7 @@ public class TreeViewController extends NUIController implements Observer {
      *            The proof file to load.
      */
     public final void loadAndDisplayProof(final File file) {
-        loadedProof = loadProof(file);
+        Proof loadedProof = loadProof(file);
         loadedProof.setProofFile(file);
 
         visualizer.loadProofTree(loadedProof);
@@ -242,13 +237,6 @@ public class TreeViewController extends NUIController implements Observer {
         // update the proofTreeView component in the treeView
         visualizer.displayProofTree(treeItem);
 
-    }
-
-    /**
-     * Returns the last loaded proof.
-     */
-    public Proof getLoadedProof() {
-        return loadedProof;
     }
 
     public void setSearchWindow(Pane searchViewPane) {

@@ -27,8 +27,8 @@ public class StrategyViewController extends NUIController {
         String filename;
 
         try {
-            filename = ((TreeViewController) nui.getController("treeView"))
-                    .getLoadedProof().getProofFile().getName();
+            filename = dataModel.getLoadedTreeViewState().getProof()
+                    .getProofFile().getName();
         }
         catch (NullPointerException e2) {
             ((MainViewController) nui.getController("MainView"))
@@ -37,8 +37,7 @@ public class StrategyViewController extends NUIController {
         }
 
         // retrieve proof file and init proofStarter
-        TreeViewState treeViewState = nui.getDataModel()
-                .getTreeViewState(filename);
+        TreeViewState treeViewState = dataModel.getTreeViewState(filename);
         Proof p = treeViewState.getProof();
         proofStarter.init(p);
 
@@ -52,7 +51,7 @@ public class StrategyViewController extends NUIController {
         // save changed proof into data model
         TreeViewState newTreeViewState = new TreeViewState(
                 proofStarter.getProof(), treeViewState.getTreeItem());
-        nui.getDataModel().saveTreeViewState(newTreeViewState, filename);
+        dataModel.saveTreeViewState(newTreeViewState, filename);
     }
 
 }
