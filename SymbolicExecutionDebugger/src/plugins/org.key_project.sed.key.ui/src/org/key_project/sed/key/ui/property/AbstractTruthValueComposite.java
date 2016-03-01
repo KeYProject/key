@@ -25,11 +25,15 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -49,6 +53,7 @@ import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.ui.preference.page.KeYColorsPreferencePage;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
+import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.logic.Sequent;
@@ -139,6 +144,16 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    };
    
    /**
+    * Listens for editor changes.
+    */
+   private IPropertyChangeListener editorsListener = new IPropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent event) {
+         handleEditorPropertyChange(event);
+      }
+   };
+   
+   /**
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param factory The {@link TabbedPropertySheetWidgetFactory} to use.
@@ -151,6 +166,8 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
       root.setLayout(new GridLayout(1, false));
       updateColors();
       KeYSEDPreferences.getStore().addPropertyChangeListener(colorPropertyListener);
+      SWTUtil.getEditorsPreferenceStore().addPropertyChangeListener(editorsListener);
+      JFaceResources.getFontRegistry().addListener(editorsListener);
    }
 
    protected void handleColorPropertyChange(PropertyChangeEvent event) {
@@ -186,6 +203,8 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    @Override
    public void dispose() {
       KeYSEDPreferences.getStore().removePropertyChangeListener(colorPropertyListener);
+      SWTUtil.getEditorsPreferenceStore().removePropertyChangeListener(editorsListener);
+      JFaceResources.getFontRegistry().removeListener(editorsListener);
       if (trueColor != null) {
          trueColor.dispose();
       }
@@ -194,6 +213,12 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
       }
       if (unknownColor != null) {
          unknownColor.dispose();
+      }
+   }
+
+   protected void handleEditorPropertyChange(PropertyChangeEvent event) {
+      if (event.getProperty().equals(SWTUtil.getEditorsTextFontPropertiesKey())) {
+         recreateContent();
       }
    }
    
@@ -378,6 +403,15 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
             // Create viewer
             SourceViewer viewer = new SourceViewer(viewerGroup, null, SWT.MULTI | SWT.FULL_SELECTION);
             viewer.setEditable(false);
+            final Font font = SWTUtil.initializeViewerFont(viewer);
+            viewer.getTextWidget().addDisposeListener(new DisposeListener() {
+               @Override
+               public void widgetDisposed(DisposeEvent e) {
+                  if (font != null) {
+                     font.dispose();
+                  }
+               }
+            });
             notConsideredColor = viewer.getTextWidget().getForeground();
             TruthValueTracingViewerDecorator viewerDecorator = new TruthValueTracingViewerDecorator(viewer, trueColor.getRGB(), falseColor.getRGB(), unknownColor.getRGB());
             decorators.add(viewerDecorator);

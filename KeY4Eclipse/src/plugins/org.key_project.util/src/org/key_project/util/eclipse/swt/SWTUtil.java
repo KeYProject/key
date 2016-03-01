@@ -23,7 +23,12 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.viewers.AbstractTableViewer;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -37,7 +42,10 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -55,6 +63,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
@@ -63,6 +72,7 @@ import org.key_project.util.java.thread.IRunnableWithResult;
  * Provides utility methods for SWT.
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public final class SWTUtil {
     /**
      * Separator between CSV values.
@@ -700,5 +710,74 @@ public final class SWTUtil {
          }
       };
       return dialog.open();
+   }
+   
+   /**
+    * Sets the user defined text {@link Font} on the given {@link ISourceViewer}
+    * @param viewer The {@link ISourceViewer} to modify.
+    * @return The {@link Font} to dispose or {@code null} if no {@link Font} needs to be disposed manually.
+    */
+   public static Font initializeViewerFont(ISourceViewer viewer) {
+      assert viewer != null;
+      return initializeViewerFont(viewer.getTextWidget());
+   }
+   
+   /**
+    * Sets the user defined text {@link Font} on the given {@link ISourceViewer}
+    * <p>
+    * The functionality is a slightly adapted version of 
+    * {@link org.eclipse.ui.texteditor.AbstractTextEditor#initializeViewerFont(ISourceViewer)}.
+    * @param text The {@link StyledText} to modify.
+    * @return The {@link Font} to dispose or {@code null} if no {@link Font} needs to be disposed manually.
+    */
+   public static Font initializeViewerFont(StyledText text) {
+      assert text != null;
+      IPreferenceStore fPreferenceStore = getEditorsPreferenceStore();
+
+      boolean isSharedFont= true;
+      Font font= null;
+      String symbolicFontName= getEditorsTextFontPropertiesKey();
+
+      if (symbolicFontName != null)
+         font= JFaceResources.getFont(symbolicFontName);
+      else if (fPreferenceStore != null) {
+         // Backward compatibility
+         if (fPreferenceStore.contains(JFaceResources.TEXT_FONT) && !fPreferenceStore.isDefault(JFaceResources.TEXT_FONT)) {
+            FontData data= PreferenceConverter.getFontData(fPreferenceStore, JFaceResources.TEXT_FONT);
+
+            if (data != null) {
+               isSharedFont= false;
+               font= new Font(text.getDisplay(), data);
+            }
+         }
+      }
+      if (font == null)
+         font= JFaceResources.getTextFont();
+
+      if (!font.equals(text.getFont())) {
+         text.setFont(font);
+
+         if (!isSharedFont)
+            return font;
+      } else if (!isSharedFont) {
+         font.dispose();
+      }
+      return null;
+   }
+   
+   /**
+    * Returns the preference key of the text font.
+    * @return The preference key of the text font.
+    */
+   public static String getEditorsTextFontPropertiesKey() {
+      return PreferenceConstants.EDITOR_TEXT_FONT;
+   }
+   
+   /**
+    * Returns the {@link IPreferenceStore} of the {@link EditorsPlugin}.
+    * @return The {@link IPreferenceStore} of the {@link EditorsPlugin}.
+    */
+   public static IPreferenceStore getEditorsPreferenceStore() {
+      return EditorsPlugin.getDefault().getPreferenceStore();
    }
 }

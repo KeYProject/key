@@ -13,9 +13,13 @@
 
 package org.key_project.sed.key.ui.property;
 
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -56,6 +60,21 @@ public class KeYTabComposite extends Composite {
    private ProofSourceViewerDecorator sequentViewerDecorator;
    
    /**
+    * The {@link Font} of {@link #sequentViewer} which needs to be disposed manually.
+    */
+   private Font viewerFont;
+   
+   /**
+    * Listens for editor changes.
+    */
+   private IPropertyChangeListener editorsListener = new IPropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent event) {
+         handleEditorPropertyChange(event);
+      }
+   };
+   
+   /**
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param style The style to use.
@@ -84,6 +103,7 @@ public class KeYTabComposite extends Composite {
 
       sequentViewer = new SourceViewer(composite, null, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
       sequentViewer.setEditable(false);
+      updateSequentViewerFont();
       data = new FormData();
       data.left = new FormAttachment(0, AbstractPropertySection.STANDARD_LABEL_WIDTH);
       data.right = new FormAttachment(100, 0);
@@ -97,8 +117,31 @@ public class KeYTabComposite extends Composite {
       data.right = new FormAttachment(sequentViewer.getControl(), -ITabbedPropertyConstants.HSPACE);
       data.top = new FormAttachment(sequentViewer.getControl(), 0, SWT.TOP);
       sequentLabel.setLayoutData(data);
+
+      SWTUtil.getEditorsPreferenceStore().addPropertyChangeListener(editorsListener);
+      JFaceResources.getFontRegistry().addListener(editorsListener);
    }
-   
+
+   /**
+    * When a property of the text editor has changed.
+    * @param event The {@link PropertyChangeEvent}.
+    */
+   protected void handleEditorPropertyChange(PropertyChangeEvent event) {
+      if (event.getProperty().equals(SWTUtil.getEditorsTextFontPropertiesKey())) {
+         updateSequentViewerFont();
+      }
+   }
+
+   /**
+    * Updates the font of {@link #sequentViewer}.
+    */
+   protected void updateSequentViewerFont() {
+      if (viewerFont != null) {
+         viewerFont.dispose();
+      }
+      viewerFont = SWTUtil.initializeViewerFont(sequentViewer);
+   }
+
    /**
     * Updates the shown content.
     * @param node The {@link IKeYSENode} which provides the new content.
@@ -119,5 +162,18 @@ public class KeYTabComposite extends Composite {
       else {
          sequentViewerDecorator.showNode(null, notationInfo);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      JFaceResources.getFontRegistry().removeListener(editorsListener);
+      SWTUtil.getEditorsPreferenceStore().removePropertyChangeListener(editorsListener);
+      if (viewerFont != null) {
+         viewerFont.dispose();
+      }
+      super.dispose();
    }
 }
