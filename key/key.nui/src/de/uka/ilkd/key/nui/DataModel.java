@@ -3,6 +3,8 @@ package de.uka.ilkd.key.nui;
 import java.util.HashMap;
 import java.util.Observable;
 
+import de.uka.ilkd.key.proof.Proof;
+
 /**
  * Class representing the data associated with the GUI.
  * 
@@ -36,8 +38,10 @@ public class DataModel extends Observable {
     }
 
     /**
-     * Stores a new TreeViewState into the list of TreeViewStates. Overwrites
-     * the last state if the key is already present.
+     * Stores a <b>new</b> TreeViewState into the list of TreeViewStates.
+     * Overwrites the an existing state if the key is already present. Do NOT
+     * use this method to save changes of a proof file, use instead
+     * {@link #updateProofFile}.
      * 
      * @param treeViewState
      *            The new treeViewState to store.
@@ -52,6 +56,29 @@ public class DataModel extends Observable {
         this.notifyObservers(name);
     }
 
+    /**
+     * Updates the proof file of an already existing (loaded) TreeViewState.
+     * 
+     * @param key
+     *            the key (filename) of the {@link Proof} file.
+     * @param proof
+     *            the proof file to be set to the TreeViewState, identified by
+     *            the provided key
+     * 
+     */
+    public void updateProofFile(String key, Proof proof) {
+        TreeViewState treeViewState = treeViewStates.get(key);
+        if (treeViewState != null) {
+            treeViewState.setProof(proof);
+            treeViewState.setModified(true);
+            this.setChanged();
+            this.notifyObservers(key);
+        }
+    }
+
+    /**
+     * @return
+     */
     public TreeViewState getLoadedTreeViewState() {
         return loadedTreeViewState;
     }

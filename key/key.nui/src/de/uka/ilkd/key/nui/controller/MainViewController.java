@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import com.sun.javafx.collections.ObservableMapWrapper;
@@ -20,12 +21,14 @@ import de.uka.ilkd.key.proof.Proof;
 import javafx.application.Platform;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -38,6 +41,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.WindowEvent;
 
 /**
  * Controller for the main GUI which is displayed when the program was started.
@@ -326,8 +331,42 @@ public class MainViewController extends NUIController
      *            The ActionEvent
      */
     @FXML
-    protected final void handleCloseWindow(final ActionEvent e) {
-        Platform.exit();
+    public final void handleCloseWindow(final Event e) {
+
+        // If no proof file was loaded OR file was not changed: close
+        // application immediately
+        if (dataModel.getLoadedTreeViewState() == null
+                || !(dataModel.getLoadedTreeViewState().isModified())) {
+            Platform.exit();
+            return;
+        }
+
+        // File was changed: ask user if he wants to save changes
+        // create alert window
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle(nui.getStringFromBundle("dialogTitle"));
+        alert.setHeaderText(nui.getStringFromBundle("dialogHeader"));
+        String filename = dataModel.getLoadedTreeViewState().getProof()
+                .getProofFile().getName();
+        alert.setContentText(nui.getStringFromBundle("dialogQuestion") + " '"
+                + filename + "' ?");
+        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO,
+                ButtonType.CANCEL);
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.get() == ButtonType.YES || result.get() == ButtonType.NO) {
+            // If YES was selected: save changes made to file
+            if (result.get() == ButtonType.YES) {
+                Proof proof = dataModel.getLoadedTreeViewState().getProof();
+                saveProof(proof, proof.getProofFile());
+            }
+            // Close application without saving
+            Platform.exit();
+        }
+
+        // If CANCEL was selected (or in any other case): do not close KeY
+        alert.close();
+        e.consume();
     }
 
     /**

@@ -49,9 +49,7 @@ public class StrategyViewController extends NUIController {
                 .updateStatusbar(strategyInfo.reason());
 
         // save changed proof into data model
-        TreeViewState newTreeViewState = new TreeViewState(
-                proofStarter.getProof(), treeViewState.getTreeItem());
-        dataModel.saveTreeViewState(newTreeViewState, filename);
+        dataModel.updateProofFile(filename, proofStarter.getProof());
     }
 
 }

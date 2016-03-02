@@ -24,6 +24,12 @@ public class TreeViewState {
     private TreeItem<NUINode> treeItem = null;
 
     /**
+     * Indicates whether the proof was modified after loading it into the
+     * treeView.
+     */
+    private boolean isModified = false;
+
+    /**
      * Creates a new TreeViewState.
      * 
      * @param proof
@@ -53,6 +59,41 @@ public class TreeViewState {
      */
     public TreeItem<NUINode> getTreeItem() {
         return treeItem;
+    }
+
+    /**
+     * Indicates whether the proof of the TreeViewState was changed after
+     * loading it initially. This information is used to show the confirmation
+     * dialog before closing KeY, if the loaded proof was modified during the
+     * session.
+     * 
+     * @param bool
+     *            Sets the status of the proof file to bool, where TRUE marks
+     *            the file as changed and FALSE as unchanged.
+     */
+    protected void setModified(boolean bool) {
+        this.isModified = bool;
+    }
+
+    /**
+     * Returns TRUE if the proof of the TreeViewState was modified after loading
+     * it, else returns FALSE.
+     * 
+     * @return the status of the changes at the proof file.
+     */
+    public boolean isModified() {
+        return this.isModified;
+    }
+
+    /**
+     * Sets a new proof file to the TreeViewState. Overwrites the existing proof
+     * file.
+     * 
+     * @param proof
+     *            the proof to be added to the TreeViewState.
+     */
+    protected void setProof(Proof proof) {
+        this.proof = proof;
     }
 
 }

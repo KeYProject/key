@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
+import com.sun.glass.events.WindowEvent;
+
 import de.uka.ilkd.key.nui.controller.MainViewController;
 import de.uka.ilkd.key.nui.controller.MainViewController.Place;
 import de.uka.ilkd.key.nui.controller.NUIController;
@@ -94,6 +96,18 @@ public class NUI extends Application {
         mainViewController.placeComponent("proofView", Place.RIGHT);
         mainViewController.placeComponent("openProofsView", Place.MIDDLE);
 
+        // Assign event when stage closing event is elevated
+        stage.setOnCloseRequest((e) -> {
+            try {
+                ((MainViewController)getController("MainView")).handleCloseWindow(e);
+            }
+            catch (Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        });
+        
+      
         // Load scene and set preferences
         final Scene scene = new Scene(root);
         stage.setTitle("KeY");
