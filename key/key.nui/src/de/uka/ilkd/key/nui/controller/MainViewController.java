@@ -79,7 +79,15 @@ public class MainViewController extends NUIController {
     @FXML
     private MenuItem openProof;
     
-    private AtomicBoolean isLoadingProof = new AtomicBoolean(false);
+    /**
+     * An atomic boolean to indicate if loading is in progress
+     * While this is set to true, the loading task can be cancelled.
+     */
+    final private AtomicBoolean isLoadingProof = new AtomicBoolean(false);
+    
+    /**
+     * The thread that is used for the loading task.
+     */
     private Thread loadingThread;
 
     /**
@@ -402,14 +410,22 @@ public class MainViewController extends NUIController {
         };
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void init() {
+        // register key listener for cancel the proof loading task.
+        //TODO is key is not registered if focus is on proof tree.
         registerKeyListener(KeyCode.ESCAPE, new KeyCode[] {}, new EventHandler<KeyEvent>() {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
-            public void handle(KeyEvent event) {
+            public void handle(final KeyEvent event) {
                 cancelLoadProof();
-            }});
+            } });
     }
 
     public void updateStatusbar(String text) {
@@ -436,10 +452,10 @@ public class MainViewController extends NUIController {
             try {
                 
                 try {
-                    java.lang.reflect.Method m = Thread.class.getDeclaredMethod(
-                            "stop0", new Class[] { Object.class });
-                    m.setAccessible(true);
-                    m.invoke(loadingThread, new ThreadDeath());
+                    final java.lang.reflect.Method tsm = Thread.class.getDeclaredMethod("stop0",
+                                    new Class[] { Object.class });
+                    tsm.setAccessible(true);
+                    tsm.invoke(loadingThread, new ThreadDeath());
                 }
                 catch (java.lang.ThreadDeath e) {
                    System.out.println("ThreadDeath to ignore?"); //TODO
@@ -447,6 +463,9 @@ public class MainViewController extends NUIController {
                 
                 // reset loading state
                 Platform.runLater(new Runnable() {
+                    /**
+                     * {@inheritDoc}
+                     */
                     @Override
                     public void run() {
                         statustext.setText("Loading has been cancelled.");
@@ -485,12 +504,12 @@ public class MainViewController extends NUIController {
      */
     private void loadProof(final File proofFileName) {
 
-        statustext.setText("Loading " + proofFileName.getName() + "...");
+        statustext.setText("Loading " + proofFileName.getName() + ".");
         root.setCursor(Cursor.WAIT);
         openProof.setDisable(true);
 
         // define a task for proof loading to do it asynchronously
-        Task<Void> task = new Task<Void>() {
+        final Task<Void> task = new Task<Void>() {
 
             @Override
             public Void call() throws InterruptedException {
@@ -511,11 +530,8 @@ public class MainViewController extends NUIController {
                     final ProofTreeItem fxtree = new ProofTreeConverter(proof)
                             .createFXProofTree();
                     
-                    // put proof into treeView
-                    final TreeView<NUINode> proofTreeView = new TreeView<NUINode>();
-                    
                     // set Loading = false as you can no longer cancel
-                    boolean hasNotBeenCanceled = isLoadingProof.compareAndSet(true, false);
+                    final boolean hasNotBeenCanceled = isLoadingProof.compareAndSet(true, false);
 
                     if (hasNotBeenCanceled) {
                         // reset set gui waiting state
