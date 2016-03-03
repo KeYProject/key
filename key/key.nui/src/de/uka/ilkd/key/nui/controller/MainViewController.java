@@ -1,9 +1,11 @@
 package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.sun.javafx.collections.ObservableMapWrapper;
 
@@ -21,6 +23,7 @@ import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -37,6 +40,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.concurrent.Task;
 
 /**
  * Controller for the main GUI which is displayed when the program was started.
@@ -74,6 +78,9 @@ public class MainViewController extends NUIController {
 
     @FXML
     private MenuItem openProof;
+    
+    private AtomicBoolean isLoadingProof = new AtomicBoolean(false);
+    private Thread loadingThread;
 
     /**
      * Includes the components which were added to the main Window
@@ -181,8 +188,10 @@ public class MainViewController extends NUIController {
             // de.uka.ilkd.key.proof.Node -->
             // de.uka.ilkd.key.nui.NUI.prooftree.NUINode
             // --> ProofTreeItem (JavaFX)
-            final Proof proof = loadProof(file);
-            proof.setProofFile(file);
+            
+            loadProof(file);
+            //final Proof proof = loadProof(file);
+            /*proof.setProofFile(file);
 
             final TreeView<NUINode> proofTreeView = new TreeView<NUINode>();
             
@@ -191,7 +200,7 @@ public class MainViewController extends NUIController {
 
             // Store state of treeView into data model
             dataModel.saveTreeViewState(new TreeViewState(proof, fxtree),
-                    file.getName());
+                    file.getName());*/
         }
     }
 
@@ -395,7 +404,12 @@ public class MainViewController extends NUIController {
 
     @Override
     protected void init() {
+        registerKeyListener(KeyCode.ESCAPE, new KeyCode[] {}, new EventHandler<KeyEvent>() {
 
+            @Override
+            public void handle(KeyEvent event) {
+                cancelLoadProof();
+            }});
     }
 
     public void updateStatusbar(String text) {
@@ -404,6 +418,63 @@ public class MainViewController extends NUIController {
         }
 
     }
+    
+    /**
+     * Invokes canceling of proof loading process.
+     * If no proof is loaded at the moment, nothing is done.
+     */
+    private void cancelLoadProof() {
+
+        // try to set loading status atomically
+        final boolean hasBeenCanceled = isLoadingProof.compareAndSet(true, false);
+
+        if (hasBeenCanceled) {
+            
+            // TODO not a very kind way to stop a thread
+            // However the method KeYEnvironment.load doesn't support
+            // interrupting.
+            try {
+                
+                try {
+                    java.lang.reflect.Method m = Thread.class.getDeclaredMethod(
+                            "stop0", new Class[] { Object.class });
+                    m.setAccessible(true);
+                    m.invoke(loadingThread, new ThreadDeath());
+                }
+                catch (java.lang.ThreadDeath e) {
+                   System.out.println("ThreadDeath to ignore?"); //TODO
+                }
+                
+                // reset loading state
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        statustext.setText("Loading has been cancelled.");
+                        root.setCursor(Cursor.DEFAULT);
+                        openProof.setDisable(false);
+                    }
+                });
+            }
+            catch (NoSuchMethodException e1) {
+                e1.printStackTrace();
+            }
+            catch (SecurityException e1) {
+                e1.printStackTrace();
+            }
+            catch (IllegalAccessException e1) {
+                e1.printStackTrace();
+            }
+            catch (IllegalArgumentException e1) {
+                e1.printStackTrace();
+            }
+            catch (InvocationTargetException e1) {
+                e1.printStackTrace();
+            }
+            catch (java.lang.ThreadDeath e) {
+                System.out.println("Unexpected ThreadDeath in cancelLoadProof."); //TODO
+            }
+        }
+    }
 
     /**
      * Loads the given proof file. Checks if the proof file exists and the proof
@@ -411,21 +482,77 @@ public class MainViewController extends NUIController {
      *
      * @param proofFileName
      *            The file name of the proof file to load.
-     * @return The loaded proof.
      */
-    private Proof loadProof(final File proofFileName) {
-        try {
-            final KeYEnvironment<?> environment = KeYEnvironment.load(
-                    JavaProfile.getDefaultInstance(), proofFileName, null, null,
-                    null, true);
-            final Proof proof = environment.getLoadedProof();
-            return proof;
-        }
-        catch (ProblemLoaderException e) {
-            // TODO exception handling
-            e.printStackTrace();
-            return null;
-        }
+    private void loadProof(final File proofFileName) {
+
+        statustext.setText("Loading " + proofFileName.getName() + "...");
+        root.setCursor(Cursor.WAIT);
+        openProof.setDisable(true);
+
+        // define a task for proof loading to do it asynchronously
+        Task<Void> task = new Task<Void>() {
+
+            @Override
+            public Void call() throws InterruptedException {
+
+                try {
+                    // set Loading = false to enable canceling
+                    isLoadingProof.set(true);
+                    
+                    // load proof
+                    final KeYEnvironment<?> environment = KeYEnvironment.load(
+                            JavaProfile.getDefaultInstance(), proofFileName,
+                            null, null, null, true);
+                    final Proof proof = environment.getLoadedProof();
+
+                    proof.setProofFile(proofFileName);
+
+                    // convert proof to fx tree
+                    final ProofTreeItem fxtree = new ProofTreeConverter(proof)
+                            .createFXProofTree();
+                    
+                    // put proof into treeView
+                    final TreeView<NUINode> proofTreeView = new TreeView<NUINode>();
+                    
+                    // set Loading = false as you can no longer cancel
+                    boolean hasNotBeenCanceled = isLoadingProof.compareAndSet(true, false);
+
+                    if (hasNotBeenCanceled) {
+                        // reset set gui waiting state
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Store state of treeView into data model.
+                                dataModel.saveTreeViewState(
+                                        new TreeViewState(proof, fxtree),
+                                        proofFileName.getName());
+                                
+                                statustext.setText("Ready.");
+                                root.setCursor(Cursor.DEFAULT);
+                                openProof.setDisable(false);
+                            }
+                        });
+                    }
+                    
+                }
+                catch (ProblemLoaderException e) {
+                    // This Exception is thrown if the thread has been killed.
+                    System.out.println("ProblemLoaderException: normal if loading thread killed.");
+                    //e.printStackTrace();
+                }
+                catch (java.lang.ThreadDeath e) {
+                    System.out.println("Unexpected Thread Death in call.");
+                }
+                
+                return null;
+            }
+
+        };
+
+        // execute loading in a new thread
+        loadingThread = new Thread(task);
+        loadingThread.setDaemon(true);
+        loadingThread.start();
     }
 
 }
