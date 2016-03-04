@@ -15,6 +15,7 @@ package org.key_project.keyide.ui.editor;
 
 import java.util.Iterator;
 
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
@@ -71,6 +72,9 @@ public class TacletContextMenu extends ExtensionContributionFactory {
                item.setVisible(true);
                additions.addContributionItem(item, null);
             }
+            MenuManager macroMenu = new MenuManager("Strategy macros");
+            
+            additions.addContributionItem(macroMenu, null); 
          }
       }
    }

@@ -264,7 +264,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                false, 
                false, 
                true);
-         env.getProof().pruneProof(env.getProof().root().child(0).child(0), true);
+         env.getBuilder().prune(env.getProof().root().child(0).child(0));
          assertSetTreeAfterStep(env.getBuilder(), "/set/complexIf/oracle/PrunedIf.xml", testCaseDirectory);
       }
       finally {
@@ -314,7 +314,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
             }
          }
          assertTrue("They prooftree does not contain nodes it should.", node.childrenCount() == 2);
-         env.getProof().pruneProof(node.child(0), true);
+         env.getBuilder().prune(node.child(0));
          assertSetTreeAfterStep(env.getBuilder(), "/set/complexIf/oracle/BranchPrunedIf.xml", testCaseDirectory);
       }
       finally {
@@ -369,9 +369,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
             }
          }
          assertTrue("They prooftree does not contain nodes it should.", node.childrenCount() == 2);
-         env.getProof().pruneProof(node.child(0), true);
+         env.getBuilder().prune(node.child(0));
          assertSetTreeAfterStep(env.getBuilder(), "/set/complexIf/oracle/Branch0InBranchPrunedIf.xml", testCaseDirectory);
-         env.getProof().pruneProof(node.child(1), true);
+         env.getBuilder().prune(node.child(1));
          assertSetTreeAfterStep(env.getBuilder(), "/set/complexIf/oracle/Branch1InBranchPrunedIf.xml", testCaseDirectory);
       }
       finally {
