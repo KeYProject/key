@@ -15,6 +15,7 @@ package org.key_project.key4eclipse.common.ui.test.suite.swtbot;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotCompleteAndApplyTacletMatchWizardPageTest;
 import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotExportProjectFileWizardTest;
 import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotKeYExampleNewWizardTest;
 import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotKeYIncludesPropertyPageTest;
@@ -41,7 +42,8 @@ import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotTacletOp
    SWTBotProofGenerateTestsJobTest.class,
    SWTBotStarterTest.class,
    SWTBotTacletOptionsPreferencePageTest.class,
-   SWTBotLoopInvariantRuleCompletionTest.class
+   SWTBotLoopInvariantRuleCompletionTest.class,
+   SWTBotCompleteAndApplyTacletMatchWizardPageTest.class
 })
 public class SWTBotAllCommonUiTests {
 }
