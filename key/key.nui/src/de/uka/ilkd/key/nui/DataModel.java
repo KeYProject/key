@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.nui;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Observable;
 
@@ -25,6 +27,21 @@ public class DataModel extends Observable {
      * currently in the TreeView
      */
     private TreeViewState loadedTreeViewState;
+
+    /**
+     * An instance representing the associated NUI.
+     */
+    private NUI nui;
+
+    /**
+     * Creates a new data model for the GUI instance.
+     * 
+     * @param nui
+     *            The {@link NUI} instance associated to the data model.
+     */
+    public DataModel(NUI nui) {
+        this.nui = nui;
+    }
 
     /**
      * Returns the {@link TreeViewState} associated to the given filename name.
@@ -81,6 +98,28 @@ public class DataModel extends Observable {
      */
     public TreeViewState getLoadedTreeViewState() {
         return loadedTreeViewState;
+    }
+
+    /**
+     * Saves the proof file proof to the given File destinationFile.
+     * 
+     * @param proof
+     *            the {@link Proof} file to be saved.
+     * @param destinationFile
+     *            the destination {@link File} where the proof is saved to.
+     */
+    public final void saveProof(Proof proof, File destinationFile) {
+        try {
+            proof.saveToFile(destinationFile);
+            proof.setProofFile(destinationFile);
+            nui.updateStatusbar(nui.getStringFromBundle("savedSuccessfully")
+                    + " " + destinationFile.getAbsolutePath());
+            // If proof is successfully saved, unset isModified flag
+            getLoadedTreeViewState().setModified(false);
+        }
+        catch (IOException e) {
+            nui.updateStatusbar(e.getMessage());
+        }
     }
 
 }

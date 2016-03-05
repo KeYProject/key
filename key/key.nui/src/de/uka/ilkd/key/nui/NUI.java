@@ -60,7 +60,7 @@ public class NUI extends Application {
     private MainViewController mainViewController = null;
 
     private Menu viewPositionMenu = null;
-    private DataModel dataModel = new DataModel();
+    private DataModel dataModel = new DataModel(this);
 
     /**
      * When program is starting method "start" is called.
@@ -99,15 +99,15 @@ public class NUI extends Application {
         // Assign event when stage closing event is elevated
         stage.setOnCloseRequest((e) -> {
             try {
-                ((MainViewController)getController("MainView")).handleCloseWindow(e);
+                ((MainViewController) getController("MainView"))
+                        .handleCloseWindow(e);
             }
             catch (Exception e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
         });
-        
-      
+
         // Load scene and set preferences
         final Scene scene = new Scene(root);
         stage.setTitle("KeY");
@@ -252,4 +252,23 @@ public class NUI extends Application {
     public String getStringFromBundle(String key) {
         return bundle.getString(key);
     }
+
+    /**
+     * Updates the status bar on the mainView by the given text. Keeps the text
+     * on the status bar till the next update is performed.
+     * 
+     * @param text
+     *            String to be set to the status bar.
+     */
+    public void updateStatusbar(String text) {
+        try {
+            ((MainViewController) getController("MainView"))
+                    .updateStatusbar(text);
+        }
+        catch (ControllerNotFoundException e) {
+            e.showMessage();
+            e.printStackTrace();
+        }
+    }
+
 }

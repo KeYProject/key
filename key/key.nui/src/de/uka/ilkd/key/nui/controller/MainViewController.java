@@ -333,6 +333,13 @@ public class MainViewController extends NUIController
     @FXML
     public final void handleCloseWindow(final Event e) {
 
+        // enforces to show the confirmation dialog always before closing KeY
+        // TODO remove this line after 2nd round of user study
+        // TODO set visibility of setModified to private
+        if (dataModel.getLoadedTreeViewState() != null) {
+            dataModel.getLoadedTreeViewState().setModified(true);
+        }
+
         // If no proof file was loaded OR file was not changed: close
         // application immediately
         if (dataModel.getLoadedTreeViewState() == null
@@ -358,7 +365,7 @@ public class MainViewController extends NUIController
             // If YES was selected: save changes made to file
             if (result.get() == ButtonType.YES) {
                 Proof proof = dataModel.getLoadedTreeViewState().getProof();
-                saveProof(proof, proof.getProofFile());
+                dataModel.saveProof(proof, proof.getProofFile());
             }
             // Close application without saving
             Platform.exit();
@@ -383,7 +390,7 @@ public class MainViewController extends NUIController
 
         if (loadedProof != null && loadedProof.getProofFile() != null) {
             // call saveProof with proof file
-            saveProof(loadedProof, loadedProof.getProofFile());
+            dataModel.saveProof(loadedProof, loadedProof.getProofFile());
         }
         else {
             // open dialog with file chooser
@@ -427,28 +434,8 @@ public class MainViewController extends NUIController
         }
 
         // save proof file
-        saveProof(loadedProof, selectedFile);
+        dataModel.saveProof(loadedProof, selectedFile);
 
-    }
-
-    /**
-     * Saves the proof file proof to the given File destinationFile.
-     * 
-     * @param proof
-     *            the {@link Proof} file to be saved.
-     * @param destinationFile
-     *            the destination {@link File} where the proof is saved to.
-     */
-    protected final void saveProof(Proof proof, File destinationFile) {
-        try {
-            proof.saveToFile(destinationFile);
-            proof.setProofFile(destinationFile);
-            updateStatusbar(nui.getStringFromBundle("savedSuccessfully") + " "
-                    + destinationFile.getAbsolutePath());
-        }
-        catch (IOException e) {
-            updateStatusbar(e.getMessage());
-        }
     }
 
     /**
@@ -549,7 +536,6 @@ public class MainViewController extends NUIController
         if (text != null) {
             statustext.setText(text);
         }
-
     }
 
     /**
@@ -566,7 +552,7 @@ public class MainViewController extends NUIController
         saveProof.setVisible(true);
         saveProofAs.setVisible(true);
         // Remove observer, because we do not need it anymore (-> proof files
-        // cannot be closed)
+        // cannot be closed without closing the application)
         dataModel.deleteObserver(this);
     }
 
