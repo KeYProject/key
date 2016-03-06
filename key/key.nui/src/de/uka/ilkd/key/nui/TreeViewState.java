@@ -1,8 +1,7 @@
 package de.uka.ilkd.key.nui;
 
-import de.uka.ilkd.key.nui.prooftree.NUINode;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import de.uka.ilkd.key.proof.Proof;
-import javafx.scene.control.TreeItem;
 
 /**
  * Class representing a state of the TreeView.
@@ -21,7 +20,7 @@ public class TreeViewState {
     /**
      * The generated tree, associated with the proof.
      */
-    private TreeItem<NUINode> treeItem = null;
+    private ProofTreeItem treeItem = null;
 
     /**
      * Indicates whether the proof was modified after loading it into the
@@ -38,7 +37,7 @@ public class TreeViewState {
      * @param treeItem
      *            The tree associated with the proof.
      */
-    public TreeViewState(Proof proof, TreeItem<NUINode> treeItem) {
+    public TreeViewState(Proof proof, ProofTreeItem treeItem) {
         this.proof = proof;
         this.treeItem = treeItem;
     }
@@ -53,11 +52,11 @@ public class TreeViewState {
     }
 
     /**
-     * Returns the {@link TreeItem} of the TreeViewState.
+     * Returns the {@link ProofTreeItem} of the TreeViewState.
      * 
      * @return TreeItem&lt;NUINode&gt; the root node of the tree.
      */
-    public TreeItem<NUINode> getTreeItem() {
+    public ProofTreeItem getTreeItem() {
         return treeItem;
     }
 

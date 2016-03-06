@@ -31,8 +31,7 @@ public class StrategyViewController extends NUIController {
                     .getProofFile().getName();
         }
         catch (NullPointerException e2) {
-            ((MainViewController) nui.getController("MainView"))
-                    .updateStatusbar("A proof file must be loaded first!");
+            nui.updateStatusbar("A proof file must be loaded first!");
             return;
         }
 
@@ -45,8 +44,7 @@ public class StrategyViewController extends NUIController {
         ApplyStrategyInfo strategyInfo = proofStarter.start();
 
         // update statusbar
-        ((MainViewController) nui.getController("MainView"))
-                .updateStatusbar(strategyInfo.reason());
+        nui.updateStatusbar(strategyInfo.reason());
 
         // save changed proof into data model
         dataModel.updateProofFile(filename, proofStarter.getProof());

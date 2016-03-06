@@ -5,7 +5,7 @@ import java.io.File;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.nui.prooftree.ProofTreeVisualizer;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -27,11 +27,11 @@ public class SearchTest {
     /**
      * The ProofTreeVisualizer used to load the test file.
      */
-    private static ProofTreeVisualizer ptVisualizer;
+    private static ProofTreeConverter ptVisualizer;
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        ptVisualizer = new ProofTreeVisualizer(null);
+        ptVisualizer = new ProofTreeConverter(null);
         File proofFile = new File(TESTFILE_01);
         KeYEnvironment<?> environment = null;
         try {
