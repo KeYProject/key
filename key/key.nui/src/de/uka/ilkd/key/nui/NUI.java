@@ -1,12 +1,9 @@
 package de.uka.ilkd.key.nui;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
-
-import com.sun.glass.events.WindowEvent;
 
 import de.uka.ilkd.key.nui.controller.MainViewController;
 import de.uka.ilkd.key.nui.controller.MainViewController.Place;
@@ -87,7 +84,7 @@ public class NUI extends Application {
         stage.setTitle("KeY");
         stage.setScene(scene);
         stage.show();
-        
+
         // Assign event when stage closing event is elevated
         stage.setOnCloseRequest((e) -> {
             try {
@@ -100,7 +97,7 @@ public class NUI extends Application {
             }
         });
     }
-    
+
     public void initializeNUI() throws Exception {
         // Load Main View
         String filename = "MainView.fxml";
@@ -134,7 +131,8 @@ public class NUI extends Application {
                 Place.LEFT);
         mainViewController.addComponent(getComponent("proofViewPane"),
                 Place.MIDDLE);
-        //mainViewController.addComponent(getComponent("strategyViewPane"),Place.RIGHT); //TODO
+        // mainViewController.addComponent(getComponent("strategyViewPane"),Place.RIGHT);
+        // //TODO
         mainViewController.addComponent(getComponent("openProofsViewPane"),
                 Place.BOTTOM);
     }
@@ -297,6 +295,15 @@ public class NUI extends Application {
             e.showMessage();
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Returns a reference to the DataModel.
+     * 
+     * @return dataModel
+     */
+    public DataModel getDataModel() {
+        return dataModel;
     }
 
 }
