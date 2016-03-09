@@ -36,6 +36,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Toggle;
 import javafx.scene.input.KeyCode;
@@ -90,6 +91,9 @@ public class MainViewController extends NUIController
 
     @FXML
     private MenuItem openProof;
+    
+    @FXML
+    private ProgressIndicator progressIndicator;
     
     /**
      * An atomic boolean to indicate if loading is in progress
@@ -653,6 +657,7 @@ public class MainViewController extends NUIController
         
 
         statustext.setText("Loading " + proofFileName.getName() + ".");
+        progressIndicator.setVisible(true);
         root.setCursor(Cursor.WAIT);
         openProof.setDisable(true);
 
@@ -692,6 +697,7 @@ public class MainViewController extends NUIController
                                         proofFileName.getName());
                                 
                                 statustext.setText("Ready.");
+                                progressIndicator.setVisible(false);
                                 root.setCursor(Cursor.DEFAULT);
                                 openProof.setDisable(false);
                             }
