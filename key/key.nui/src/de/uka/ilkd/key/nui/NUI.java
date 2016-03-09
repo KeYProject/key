@@ -116,6 +116,7 @@ public class NUI extends Application {
 
         // initialize viewPositionMenu
         viewPositionMenu = new Menu(bundle.getString("configViews"));
+        viewPositionMenu.setId("configViews");
 
         // Load all components
         loadComponents();
@@ -131,8 +132,8 @@ public class NUI extends Application {
                 Place.LEFT);
         mainViewController.addComponent(getComponent("proofViewPane"),
                 Place.MIDDLE);
-        // mainViewController.addComponent(getComponent("strategyViewPane"),Place.RIGHT);
-        // //TODO
+        mainViewController.addComponent(getComponent("strategyViewPane"),
+                Place.RIGHT); // TODO
         mainViewController.addComponent(getComponent("openProofsViewPane"),
                 Place.BOTTOM);
     }
@@ -168,7 +169,7 @@ public class NUI extends Application {
     }
 
     private Menu createSubMenu(String componentName, ToggleGroup toggleGroup) {
-        Menu menu = new Menu(componentName);
+        Menu menu = new Menu(bundle.getString(componentName));
 
         String hideText = bundle.getString("hide");
         String leftText = bundle.getString("left");
@@ -306,4 +307,13 @@ public class NUI extends Application {
         return dataModel;
     }
 
+    /**
+     * returns a text from the language file which corresponds to the textId
+     * 
+     * @param textId
+     * @return
+     */
+    public String getText(String textId) {
+        return bundle.getString(textId);
+    }
 }
