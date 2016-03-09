@@ -2,6 +2,8 @@ package de.uka.ilkd.key.nui.controller;
 
 import de.uka.ilkd.key.nui.TreeViewState;
 import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -46,8 +48,19 @@ public class StrategyViewController extends NUIController {
         // update statusbar
         nui.updateStatusbar(strategyInfo.reason());
 
-        // save changed proof into data model
-        dataModel.updateProofFile(filename, proofStarter.getProof());
+        // load updated proof
+        Proof updatedProof = proofStarter.getProof();
+
+        // create new tree from updateProof
+        ProofTreeItem fxtree = new ProofTreeConverter(updatedProof)
+                .createFXProofTree();
+
+        // Create new TreeViewState for updatedProof
+        TreeViewState updatedTreeViewState = new TreeViewState(updatedProof,
+                fxtree);
+
+        // update datamodel
+        dataModel.updateTreeViewState(filename, updatedTreeViewState);
     }
 
 }

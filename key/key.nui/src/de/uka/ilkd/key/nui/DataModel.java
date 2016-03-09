@@ -58,7 +58,7 @@ public class DataModel extends Observable {
      * Stores a <b>new</b> TreeViewState into the list of TreeViewStates.
      * Overwrites the an existing state if the key is already present. Do NOT
      * use this method to save changes of a proof file, use instead
-     * {@link #updateProofFile}.
+     * {@link #updateTreeViewState}.
      * 
      * @param treeViewState
      *            The new treeViewState to store.
@@ -74,23 +74,21 @@ public class DataModel extends Observable {
     }
 
     /**
-     * Updates the proof file of an already existing (loaded) TreeViewState.
+     * Updates the already existing (loaded) TreeViewState.
      * 
      * @param key
      *            the key (filename) of the {@link Proof} file.
-     * @param proof
-     *            the proof file to be set to the TreeViewState, identified by
-     *            the provided key
+     * @param updatedTreeViewState
+     *            updatedTreeViewState e. g. running strategy
      * 
      */
-    public void updateProofFile(String key, Proof proof) {
-        TreeViewState treeViewState = treeViewStates.get(key);
-        if (treeViewState != null) {
-            treeViewState.setProof(proof);
-            treeViewState.setModified(true);
-            this.setChanged();
-            this.notifyObservers(key);
-        }
+    public void updateTreeViewState(String key,
+            TreeViewState updatedTreeViewState) {
+
+        updatedTreeViewState.setModified(true);
+        treeViewStates.put(key, updatedTreeViewState);
+        this.setChanged();
+        this.notifyObservers(key);
     }
 
     /**
