@@ -544,6 +544,7 @@ public class MainViewController extends NUIController
              */
             @Override
             public void handle(final KeyEvent event) {
+                progressIndicator.setVisible(false);
                 cancelLoadProof();
             }
         });

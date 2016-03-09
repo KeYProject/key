@@ -63,7 +63,7 @@ public class NUITest extends GuiTest {
      * @param filename
      *            of proof
      */
-    protected void loadProof(String filename) {
+    protected void loadProof(String filename, boolean cancelLoading) {
         // open load file dialog
         clickOn("File").clickOn("Open Proof...");
 
@@ -74,6 +74,7 @@ public class NUITest extends GuiTest {
         // press enter to load file
         type(KeyCode.ENTER);
 
+        if(!cancelLoading){
         // wait until load file is finished
         waitUntilStatusIs("Ready.");
 
@@ -82,6 +83,19 @@ public class NUITest extends GuiTest {
         assertTrue(treeViewState != null);
         assertTrue(treeViewState.getProof() != null);
         assertTrue(treeViewState.getTreeItem() != null);
+        }
+        else{
+            // cancel loading process
+            /* TODO
+             * Works just if you click
+             * on the the proofView.
+             * 
+             * Otherwise KeyEvent ESCAPE
+             * is not triggered
+             */
+            //clickOn("#proofViewPane");
+            press(KeyCode.ESCAPE);
+        }
     }
 
 }
