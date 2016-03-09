@@ -34,13 +34,6 @@ public class ProofTreeConverter {
     
     /**
      * Constructor.
-     */
-    public ProofTreeConverter() {
-        
-    }
-    
-    /**
-     * Constructor.
      * Loads a proof into the converter.
      * @param proof The proof to load.
      */
@@ -205,12 +198,15 @@ public class ProofTreeConverter {
             newNode.setClosed(proofNode.isClosed());
             newNode.setInteractive(
                     proofNode.getNodeInfo().getInteractiveRuleApplication());
+            
+            
         }
         // Set parameters which exist at all nodes
         final String nodeName = proofNode.serialNr() + ": " + proofNode.name();
         newNode.setLabel(nodeName);
         newNode.setHasNotes(proofNode.getNodeInfo().getNotes() != null);
         newNode.setActive(proofNode.getNodeInfo().getActiveStatement() != null);
+        //newNode.setSymbolicExcecution(proofNode.getNodeInfo().isSymbolicExecution(taclet)); //TODO find taclet
     }
 
     /**
@@ -270,6 +266,9 @@ public class ProofTreeConverter {
         }
     }
 
+    /**
+     * @return the root node of the converted tree.
+     */
     public NUIBranchNode getRootNode() {
         return nuiRoot;
     }

@@ -1,5 +1,8 @@
 Icons taken from flaticon.com
 
+flag icon
+http://www.flaticon.com/free-icon/location-flag_66884
+
 folder sign
 http://www.flaticon.com/free-icon/file-folder_3493
 

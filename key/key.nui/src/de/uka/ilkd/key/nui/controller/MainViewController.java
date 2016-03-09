@@ -599,7 +599,7 @@ public class MainViewController extends NUIController
                     tsm.invoke(loadingThread, new ThreadDeath());
                 }
                 catch (java.lang.ThreadDeath e) {
-                   System.out.println("ThreadDeath to ignore?"); //TODO
+                   System.out.println("ThreadDeath to ignore? Speak with Matthias"); //TODO
                 }
                 
                 // reset loading state
@@ -631,7 +631,7 @@ public class MainViewController extends NUIController
                 e1.printStackTrace();
             }
             catch (java.lang.ThreadDeath e) {
-                System.out.println("Unexpected ThreadDeath in cancelLoadProof."); //TODO
+                System.out.println("Unexpected ThreadDeath in cancelLoadProof. Speak with Matthias."); //TODO
             }
         }
     }
@@ -701,11 +701,18 @@ public class MainViewController extends NUIController
                 }
                 catch (ProblemLoaderException e) {
                     // This Exception is thrown if the thread has been killed.
-                    System.out.println("ProblemLoaderException: normal if loading thread killed.");
-                    //e.printStackTrace();
+                    if (isLoadingProof.get()) {
+                        // error during loading
+                        System.out.println("If this occurs speak with Matthias");
+                        e.printStackTrace();
+                    }
+                    else {
+                        // exception occured by thread killing (canceling)
+                        System.out.println("Usual PLException...");
+                    }
                 }
                 catch (java.lang.ThreadDeath e) {
-                    System.out.println("Unexpected Thread Death in call.");
+                    System.out.println("Unexpected Thread Death in call. Talk to Matthias");
                 }
                 
                 return null;
