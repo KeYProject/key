@@ -31,18 +31,21 @@ public class SearchTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        ptVisualizer = new ProofTreeConverter(null);
-        File proofFile = new File(TESTFILE_01);
+        File proofFileName = new File(TESTFILE_01);
+        // load proof
         KeYEnvironment<?> environment = null;
         try {
-            environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-                    proofFile, null, null, null, true);
-            Proof proof = environment.getLoadedProof();
-            ptVisualizer.loadProofTree(proof);
+            environment = KeYEnvironment.load(
+                    JavaProfile.getDefaultInstance(), proofFileName,
+                    null, null, null, true);
         }
         catch (ProblemLoaderException e) {
-            fail("Could not set up testing environment.");
+            e.printStackTrace();
         }
+        final Proof proof = environment.getLoadedProof();
+        proof.setProofFile(proofFileName);
+        // initalize ProofConverter object used for tests
+        ptVisualizer = new ProofTreeConverter(proof);
     }
 
     @Test
