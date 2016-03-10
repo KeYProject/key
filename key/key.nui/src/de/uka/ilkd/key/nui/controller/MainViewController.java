@@ -537,16 +537,7 @@ public class MainViewController extends NUIController
         
         // register key listener for cancel the proof loading task.
         //TODO is key is not registered if focus is on proof tree.
-        registerKeyListener(KeyCode.ESCAPE, new KeyCode[] {}, new EventHandler<KeyEvent>() {
-            
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void handle(final KeyEvent event) {
-                cancelLoadProof();
-            }
-        });
+        registerKeyListener(KeyCode.ESCAPE, new KeyCode[] {}, (final KeyEvent event) -> cancelLoadProof());
     }
 
     /**
@@ -616,6 +607,7 @@ public class MainViewController extends NUIController
                         statustext.setText("Loading has been cancelled.");
                         root.setCursor(Cursor.DEFAULT);
                         openProof.setDisable(false);
+                        progressIndicator.setVisible(false);
                     }
                 });
             }
