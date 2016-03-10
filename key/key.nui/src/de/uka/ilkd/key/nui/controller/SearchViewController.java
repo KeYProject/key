@@ -288,12 +288,16 @@ public class SearchViewController extends NUIController {
             btnSearchPrev.setDisable(newText.isEmpty());
             if (newText.isEmpty()) {
                 proofTreeView.getRoot().getValue().resetSearch();
+                nui.updateStatusbar("");
             }
             else {
-                anythingIsHighlighted = proofTreeView.getRoot().getValue()
+                int numberOfSearchResults = proofTreeView.getRoot().getValue()
                         .search(newText);
 
-                if (!anythingIsHighlighted) {
+                nui.updateStatusbar("Number of Search Results: " + numberOfSearchResults);
+
+
+                if (numberOfSearchResults == 0) {
                     // adds the style class for no search results
                     tfSearchQuery.getStyleClass().add("search-noResults");
                 }
