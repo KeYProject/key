@@ -2,18 +2,11 @@ package de.uka.ilkd.key.nui.tests.guitests;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
-
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
-import org.loadui.testfx.GuiTest;
-
-import de.uka.ilkd.key.nui.ComponentFactory;
-import javafx.scene.Parent;
 
 /**
- * Tests for User Story
- * (001) Oberflaeche: Grundaufbau #14297
+ * Tests for User Story (001) Oberflaeche: Grundaufbau #14297
  * 
  * GUI test for main application window
  *
@@ -21,174 +14,173 @@ import javafx.scene.Parent;
  * @author Patrick Jattke
  *
  */
-public class MoveViewTest extends GuiTest {
+public class MoveViewTest extends NUITest {
 
-	// IDs of the panes where the views can be placed on
-	private static final String DIRECTION_BOTTOM = "bottom";
-	private static final String DIRECTION_RIGHT = "right";
-	private static final String DIRECTION_LEFT = "left";
+    // IDs of the panes where the views can be placed on
+    private final String DIRECTION_BOTTOM = "bottom";
+    private final String DIRECTION_RIGHT = "right";
+    private final String DIRECTION_LEFT = "left";
+    private final String DIRECTION_MIDDLE = "middle";
 
-	// Text of the items in the menu bar
-	private static final String MENUBAR_ABOUT = "About";
-	private static final String MENUBAR_VIEW = "View";
-	private static final String MENUBAR_EDIT = "Edit";
-	private static final String MENUBAR_FILE = "File";
+    // Text of the items in the menu bar
+    private static final String MENUBAR_ABOUT = "About";
+    private static final String MENUBAR_VIEW = "View";
+    private static final String MENUBAR_EDIT = "Edit";
+    private static final String MENUBAR_FILE = "File";
 
-	// IDs of the views
-	private static final String TREE_VIEW = "#treeView";
-	private static final String PROOF_VIEW = "#proofView";
-	private static final String CONFIG_VIEWS = "#configViews";
-	private static final String OPEN_PROOFS_VIEW = "#openProofsView";
-	private static final String GOAL_VIEW = "#goalView";
+    // IDs of the views
+    private static final String CONFIG_VIEWS = "#configViews";
 
-	// IDs of the toggle groups
-	private static final String TREE_VIEW_TOGGLE = "#toggletreeView";
-	private static final String PROOF_VIEW_TOGGLE = "#toggleproofView";
-	private static final String OPEN_PROOFS_TOGGLE = "#toggleopenProofsView";
-	private static final String GOAL_TOGGLE = "#togglegoalView";
+    private String hide = null;
+    private String left = null;
+    private String middle = null;
+    private String right = null;
+    private String bottom = null;
 
-	// the root of the scene graph
-	private Parent root = null;
+    @Before
+    public void setupTest() throws Throwable {
+        // mapViewsToToggleGroups();
+        hide = nui.getText("hide");
+        left = nui.getText("left");
+        middle = nui.getText("middle");
+        right = nui.getText("right");
+        bottom = nui.getText("bottom");
+    }
 
-	// the map containing the mapping: view ID <-> toggle group ID
-	private static HashMap<String, String> viewMap;
+    @Test
+    public void testFileMenu() {
+        // FILE
+        // Testing 'Close' is not possible (see
+        // https://github.com/TestFX/TestFX/issues/50)
 
-	@BeforeClass
-	public static void setupStage() throws Throwable {
-		mapViewsToToggleGroups();
-	}
+        // FILE
+        // Test open file dialog
+        clickOn(MENUBAR_FILE).clickOn("Open Proof...");
+        // close open file dialog directly
+        // Load file tests in LoadProofTest
+        this.closeCurrentWindow();
 
-	@Override
-	public Parent getRootNode() {
-		ComponentFactory factory = ComponentFactory.getInstance();
-		ComponentFactory.setResourceDirectory("components/");
-		root = factory.createNUISceneGraph();
-		return root;
-	}
+        // EDIT
+        clickOn(MENUBAR_EDIT);
 
-	@Test
-	public void testFileMenu() {
-		// FILE
-		// Testing 'Close' is not possible (see
-		// https://github.com/TestFX/TestFX/issues/50)
-	    
-	    // FILE
-	    // Test open file dialog
-		clickOn(MENUBAR_FILE).clickOn("Open Proof...");
-		// close open file dialog directly
-		// Load file tests in LoadProofTest
-		this.closeCurrentWindow();
+        // VIEW
+        // configViews is tested by testToogleGroupX
+        clickOn(MENUBAR_VIEW);
 
-		// EDIT
-		clickOn(MENUBAR_EDIT);
+        // ABOUT
+        clickOn(MENUBAR_ABOUT).clickOn("About KeY");
+        // close ABOUT window
+        this.closeCurrentWindow();
+        clickOn(MENUBAR_ABOUT).clickOn("License");
+    }
 
-		// VIEW
-		// configViews is tested by testToogleGroupX
-		clickOn(MENUBAR_VIEW);
+    @Test
+    public void testMoveOpenProofsView() {
+        /*
+         * componendId must starts with # hence testfx interprets componedId as
+         * JavaFX fxid
+         */
+        String componendId = "#openProofsViewPane";
+        String subMenuName = nui.getText("openProofsViewPane");
 
-		// ABOUT
-		clickOn(MENUBAR_ABOUT).clickOn("About KeY");
-		clickOn(MENUBAR_ABOUT).clickOn("License");
-	}
+        loadProof("example01.proof", false);
+        moveViewTester(componendId, subMenuName);
+    }
 
-	public static void mapViewsToToggleGroups() {
-		viewMap = new HashMap<>();
-		viewMap.put(GOAL_VIEW, GOAL_TOGGLE);
-		viewMap.put(OPEN_PROOFS_VIEW, OPEN_PROOFS_TOGGLE);
-		viewMap.put(PROOF_VIEW, PROOF_VIEW_TOGGLE);
-		viewMap.put(TREE_VIEW, TREE_VIEW_TOGGLE);
-	}
+    @Test
+    public void testMoveTreeView() {
+        /*
+         * componendId must starts with # hence testfx interprets componedId as
+         * JavaFX fxid
+         */
+        String componendId = "#treeViewPane";
+        String subMenuName = nui.getText("treeViewPane");
+        
+        loadProof("example01.proof", false);
+        moveViewTester(componendId, subMenuName);
+    }
 
-	@Test
-	public void testToggleGroup0() {
-		final String hideTGroup = "#hideTG0";
-		final String leftTGroup = "#leftTG0";
-		final String middleTGroup = "#middleTG0";
-		final String rightTGroup = "#rightTG0";
-		final String bottomTGroup = "#bottomTG0";
+    @Test
+    public void testMoveStrategyView() {
+        /*
+         * componendId must starts with # hence testfx interprets componedId as
+         * JavaFX fxid
+         */
+        String componendId = "#strategyViewPane";
+        String subMenuName = nui.getText("strategyViewPane");
+        
+        loadProof("example01.proof", false);
+        moveViewTester(componendId, subMenuName);
+    }
 
-		toggleGroupTester(hideTGroup, leftTGroup, middleTGroup, rightTGroup, bottomTGroup, GOAL_VIEW);
-	}
+    @Test
+    public void testMoveProofView() {
+        /*
+         * componendId must starts with # hence testfx interprets componedId as
+         * JavaFX fxid
+         */
+        String componendId = "#proofViewPane";
+        String subMenuName = nui.getText("proofViewPane");
+        
+        loadProof("example01.proof", false);
+        moveViewTester(componendId, subMenuName);
+    }
 
-	@Test
-	public void testToggleGroup1() {
-		final String hideTGroup = "#hideTG1";
-		final String leftTGroup = "#leftTG1";
-		final String middleTGroup = "#middleTG1";
-		final String rightTGroup = "#rightTG1";
-		final String bottomTGroup = "#bottomTG1";
+    /**
+     * This method tests if it is possible to move view.
+     * 
+     * @param hide
+     *            text to identify position of the hide submenu
+     * @param left
+     *            text to identify position of the left submenu
+     * @param middle
+     *            text to identify position of the middle submenu
+     * @param right
+     *            text to identify position of the right submenu
+     * @param bottom
+     *            text to identify position of the bottom submenu
+     */
+    private void moveViewTester(final String componendId,
+            final String subMenuName) {
+        // String subMenuName = (String) viewMap.get(componendId);
 
-		toggleGroupTester(hideTGroup, leftTGroup, middleTGroup, rightTGroup, bottomTGroup, OPEN_PROOFS_VIEW);
-	}
+        // place view on HIDE
+        clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
+                .moveTo(hide).clickOn(hide);
+        assertTrue(!find(componendId).isVisible());
 
-	@Test
-	public void testToggleGroup2() {
-		final String hideTGroup = "#hideTG2";
-		final String leftTGroup = "#leftTG2";
-		final String middleTGroup = "#middleTG2";
-		final String rightTGroup = "#rightTG2";
-		final String bottomTGroup = "#bottomTG2";
+        // place view on LEFT pane
+        clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
+                .moveTo(hide).clickOn(left);
+        assertTrue(find(componendId).isVisible());
+        assertTrue(
+                find(componendId).getParent().getId().equals(DIRECTION_LEFT));
+        assertTrue(find(componendId).isResizable());
 
-		toggleGroupTester(hideTGroup, leftTGroup, middleTGroup, rightTGroup, bottomTGroup, PROOF_VIEW);
-	}
+        // place view on MIDDLE pane
+        clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
+                .moveTo(hide).clickOn(middle);
+        assertTrue(find(componendId).isVisible());
+        assertTrue(
+                find(componendId).getParent().getId().equals(DIRECTION_MIDDLE));
 
-	@Test
-	public void testToggleGroup3() {
-		final String hideTGroup = "#hideTG3";
-		final String leftTGroup = "#leftTG3";
-		final String middleTGroup = "#middleTG3";
-		final String rightTGroup = "#rightTG3";
-		final String bottomTGroup = "#bottomTG3";
+        // place view on RIGHT pane
+        clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
+                .moveTo(hide).clickOn(right);
+        assertTrue(find(componendId).isVisible());
+        assertTrue(
+                find(componendId).getParent().getId().equals(DIRECTION_RIGHT));
 
-		toggleGroupTester(hideTGroup, leftTGroup, middleTGroup, rightTGroup, bottomTGroup, TREE_VIEW);
-	}
+        // place view on BOTTOM pane
+        clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
+                .moveTo(hide).clickOn(bottom);
+        assertTrue(find(componendId).isVisible());
+        assertTrue(
+                find(componendId).getParent().getId().equals(DIRECTION_BOTTOM));
 
-	/**
-	 * This method tests the toggle groups in the 'View' menu
-	 * 
-	 * @param hideTG
-	 *            The ID of the toggle for hiding the view
-	 * @param leftTG
-	 *            The ID of the toggle for moving the view to the left
-	 * @param middleTG
-	 *            The ID of the toggle for moving the view to the middle
-	 * @param rightTG
-	 *            The ID of the toggle for moving the view to the right
-	 * @param bottomTG
-	 *            The ID of the toggle for moving the view to the bottom
-	 */
-	private void toggleGroupTester(final String hideTG, final String leftTG, final String middleTG,
-			final String rightTG, final String bottomTG, final String view) {
-		String targetViewID = (String) viewMap.get(view);
-
-		// place view on HIDE
-		clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(targetViewID).moveTo(hideTG).clickOn(hideTG);
-		assertTrue(find(view) == null);
-
-		// place view on LEFT pane
-		clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(targetViewID).moveTo(hideTG).clickOn(leftTG);
-		assertTrue(find(view).isVisible());
-		assertTrue(find(view).getParent().getId().equals(DIRECTION_LEFT));
-		assertTrue(find(view).isResizable());
-
-		// place view on MIDDLE pane
-		clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(targetViewID).moveTo(hideTG).clickOn(middleTG);
-		assertTrue(find(view).isVisible());
-		final String DIRECTION_MIDDLE = "middle";
-		assertTrue(find(view).getParent().getId().equals(DIRECTION_MIDDLE));
-
-		// place view on RIGHT pane
-		clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(targetViewID).moveTo(hideTG).clickOn(rightTG);
-		assertTrue(find(view).isVisible());
-		assertTrue(find(view).getParent().getId().equals(DIRECTION_RIGHT));
-
-		// place view on BOTTOM pane
-		clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(targetViewID).moveTo(hideTG).clickOn(bottomTG);
-		assertTrue(find(view).isVisible());
-		assertTrue(find(view).getParent().getId().equals(DIRECTION_BOTTOM));
-
-		// place view on HIDE pane
-		clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(targetViewID).moveTo(hideTG).clickOn(hideTG);
-		assertTrue(find(view) == null);
-	}
+        // place view on HIDE pane
+        clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
+                .moveTo(hide).clickOn(hide);
+        assertTrue(!find(componendId).isVisible());
+    }
 }
