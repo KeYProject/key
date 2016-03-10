@@ -83,7 +83,7 @@ public class MoveViewTest extends NUITest {
         String componendId = "#openProofsViewPane";
         String subMenuName = nui.getText("openProofsViewPane");
 
-        loadProof("example01.proof");
+        loadProof("example01.proof", false);
         moveViewTester(componendId, subMenuName);
     }
 
@@ -96,7 +96,7 @@ public class MoveViewTest extends NUITest {
         String componendId = "#treeViewPane";
         String subMenuName = nui.getText("treeViewPane");
         
-        loadProof("example01.proof");
+        loadProof("example01.proof", false);
         moveViewTester(componendId, subMenuName);
     }
 
@@ -109,7 +109,7 @@ public class MoveViewTest extends NUITest {
         String componendId = "#strategyViewPane";
         String subMenuName = nui.getText("strategyViewPane");
         
-        loadProof("example01.proof");
+        loadProof("example01.proof", false);
         moveViewTester(componendId, subMenuName);
     }
 
@@ -122,7 +122,7 @@ public class MoveViewTest extends NUITest {
         String componendId = "#proofViewPane";
         String subMenuName = nui.getText("proofViewPane");
         
-        loadProof("example01.proof");
+        loadProof("example01.proof", false);
         moveViewTester(componendId, subMenuName);
     }
 

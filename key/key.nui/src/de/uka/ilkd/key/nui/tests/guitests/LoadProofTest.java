@@ -1,6 +1,11 @@
 package de.uka.ilkd.key.nui.tests.guitests;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
+
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 
 /**
  * Test for User Story (010) Laden von Beweisen #14664
@@ -13,9 +18,9 @@ import org.junit.Test;
 public class LoadProofTest extends NUITest {
 
     @Test
-    public void example01Test() throws InterruptedException {
+    public void example01TestProof() throws InterruptedException {
         // test load proof
-        loadProof("example01.proof");
+        loadProof("example01.proof", false);
 
         /*
          * navigate through example01 proof tree; root node should be opened
@@ -31,9 +36,9 @@ public class LoadProofTest extends NUITest {
     }
 
     @Test
-    public void example02Test() {
+    public void example02TestProof() {
         // test load proof
-        loadProof("example02.proof");
+        loadProof("example02.proof", false);
 
         /*
          * navigate through example01 proof tree; root node should be opened
@@ -47,6 +52,18 @@ public class LoadProofTest extends NUITest {
 
         rightClickOn("Proof Tree ");
         clickOn("Collapse All");
+    }
+
+    @Test
+    public void example01TestKey() {
+        // test load proof
+        loadProof("example01.key", false);
+    }
+
+    @Test(timeout=30000)
+    public void testCancelLoadingProcess() {
+        // test load proof
+        loadProof("gcd.twoJoins.proof", true);        
     }
 
 }
