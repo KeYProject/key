@@ -14,7 +14,7 @@ import de.uka.ilkd.key.nui.prooftree.FilteringHandler;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
-import de.uka.ilkd.key.nui.prooftree.ProofTreeStyle;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeStyleConstants;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeView;
@@ -140,7 +140,7 @@ public class TreeViewController extends NUIController implements Observer {
             
             // add CSS file to view
             final String cssPath = this.getClass()
-                    .getResource("../components/" + ProofTreeStyle.CSS_FILE)
+                    .getResource("../components/" + ProofTreeStyleConstants.CSS_FILE)
                     .toExternalForm();
             proofTreeView.getStylesheets().add(cssPath);
         });
@@ -163,5 +163,9 @@ public class TreeViewController extends NUIController implements Observer {
         this.searchViewPane = searchViewPane;
         if (nuiController instanceof SearchViewController)
             this.searchViewController = (SearchViewController) nuiController;
+    }
+    
+    public Set<ProofTreeCell> getProofTreeCells(){
+        return this.proofTreeCells;
     }
 }

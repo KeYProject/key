@@ -43,17 +43,17 @@ public class IconFactory {
 	/** file name of linked branch node icon. */
 	public static final String BRANCH_LINKED = "linkedBranch.png";
 	/** file name of interactive inner node icon. */
-	public static final String INODE_INTERACTIVE = "interactiveNode.png";
+	public static final String INNER_NODE_INTERACTIVE = "interactiveNode.png";
 
 	// Leafs
 	/** file name of interactive leaf node icon. */
-	public static final String LEAF_INTERACTIVE = "nation.png";//"interactiveGoal.png";
+	public static final String LEAF_INTERACTIVE = "interactiveGoal.png";
 	/** file name of closed leaf node icon. */
     public static final String LEAF_CLOSED = "closedGoalFlag.png";
     /** file name of open leaf node icon. */
     public static final String LEAF_OPEN = "openGoalFlag.png";
     /** file name of linked leaf node icon. */
-	public static final String LEAF_LINKED = "nation.png";//"linkedNode.png";
+	public static final String LEAF_LINKED = "linkedNode.png";
 	
 	// Context Menu
 	/** file name of expand icon. */

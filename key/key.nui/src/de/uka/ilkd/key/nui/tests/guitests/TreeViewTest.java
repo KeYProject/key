@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 
 import de.uka.ilkd.key.nui.ComponentFactory;
-import de.uka.ilkd.key.nui.prooftree.ProofTreeStyle;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeStyleConstants;
 import javafx.scene.Parent;
 import javafx.scene.input.KeyCode;
 
@@ -58,7 +58,7 @@ public class TreeViewTest extends GuiTest {
         // press enter to load file
         type(KeyCode.ENTER);
         
-    	doubleClickOn("." + ProofTreeStyle.CSS_NODE_BRANCH);
+    	doubleClickOn("." + ProofTreeStyleConstants.CSS_NODE_BRANCH);
     	clickOn("0: andRight ");
     	doubleClickOn("Case 1 ");
     	doubleClickOn("Case 2 ");

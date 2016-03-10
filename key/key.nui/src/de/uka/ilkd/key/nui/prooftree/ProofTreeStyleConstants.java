@@ -8,7 +8,7 @@ package de.uka.ilkd.key.nui.prooftree;
  * @author Patrick Jattke
  * @version 1.0
  */
-public final class ProofTreeStyle {
+public final class ProofTreeStyleConstants {
     
     /** CSS filename for the proof tree. */
     public static final String CSS_FILE  = "treeView.css";
@@ -50,6 +50,6 @@ public final class ProofTreeStyle {
 	 * The private constructor is not called as
 	 * it is only a utility class.
 	 */
-	private ProofTreeStyle() {
+	private ProofTreeStyleConstants() {
 	}
 }

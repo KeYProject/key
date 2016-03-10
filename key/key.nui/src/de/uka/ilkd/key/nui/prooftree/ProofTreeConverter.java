@@ -31,11 +31,12 @@ public class ProofTreeConverter {
      * A list of leafs that are marked as linked.
      */
     private List<NUINode> linkedLeafs;
-    
+
     /**
-     * Constructor.
-     * Loads a proof into the converter.
-     * @param proof The proof to load.
+     * Constructor. Loads a proof into the converter.
+     * 
+     * @param proof
+     *            The proof to load.
      */
     public ProofTreeConverter(final Proof proof) {
         loadProofTree(proof);
@@ -76,7 +77,7 @@ public class ProofTreeConverter {
         // Create a new branch node (as root node) and
         // assign the appropriate label
         nuiRoot = new NUIBranchNode(pRoot);
-        assignNUIFields(pRoot, pRoot.proof(), nuiRoot);
+        assignNUIFieldsAndStyle(pRoot, pRoot.proof(), nuiRoot);
         nuiRoot.setLabel(LBL_ROOT);
 
         // reset linked leafs
@@ -112,20 +113,15 @@ public class ProofTreeConverter {
         final Proof proof = proofNode.proof();
         NUINode newNode;
         // Create NUI node -----------------------------------------------------
-        if (proofNode.leaf()) {
-            final NUILeafNode leafNode = new NUILeafNode(proofNode);
-            newNode = leafNode;
-        }
-        else {
-            final NUIInnerNode innerNode = new NUIInnerNode(proofNode);
-            newNode = innerNode;
-        }
+        newNode = proofNode.leaf() ? new NUILeafNode(proofNode)
+                : new NUIInnerNode(proofNode);
+
         // Add created node to parent
         parent.addChild(newNode);
         newNode.setParent(parent);
 
         // Set NUI fields ------------------------------------------------------
-        assignNUIFields(proofNode, proof, newNode);
+        assignNUIFieldsAndStyle(proofNode, proof, newNode);
         newNode.setSerialNumber(String.valueOf(proofNode.serialNr()));
 
         // Add children of current node proofNode to parent --------------------
@@ -151,6 +147,8 @@ public class ProofTreeConverter {
                 branchNode.setSerialNumber(branchLabel.replace(" ", "_"));
                 branchNode.setLabel(branchLabel);
                 branchNode.setClosed(child.isClosed());
+                // Determine style to be applied when ProofTreeCell is rendered
+                branchNode.setStyleConfiguration();
 
                 // add node to parent
                 parent.addChild(branchNode);
@@ -166,7 +164,8 @@ public class ProofTreeConverter {
      * Add the required information to the newNode based on the information
      * given by the proofNode and the proof. The linked field will be not set
      * because it needs the full tree to work properly. Linked leafs will be put
-     * into the field 'linkedLeafs'.
+     * into the field 'linkedLeafs'. Finally, the style to be applied when the
+     * ProofTreeCell is rendered, is assigned to the newNode.
      * 
      * @param proofNode
      *            The proof node used to determine properties of the newNode.
@@ -175,8 +174,8 @@ public class ProofTreeConverter {
      * @param newNode
      *            The NUINode object where the information should be added to.
      */
-    private void assignNUIFields(final Node proofNode, final Proof proof,
-            final NUINode newNode) {
+    private void assignNUIFieldsAndStyle(final Node proofNode,
+            final Proof proof, final NUINode newNode) {
         final Goal goal = proof.getGoal(proofNode);
         if (proofNode.leaf()) {
             if (goal == null) {
@@ -198,15 +197,18 @@ public class ProofTreeConverter {
             newNode.setClosed(proofNode.isClosed());
             newNode.setInteractive(
                     proofNode.getNodeInfo().getInteractiveRuleApplication());
-            
-            
+
         }
         // Set parameters which exist at all nodes
         final String nodeName = proofNode.serialNr() + ": " + proofNode.name();
         newNode.setLabel(nodeName);
         newNode.setHasNotes(proofNode.getNodeInfo().getNotes() != null);
         newNode.setActive(proofNode.getNodeInfo().getActiveStatement() != null);
-        //newNode.setSymbolicExcecution(proofNode.getNodeInfo().isSymbolicExecution(taclet)); //TODO find taclet
+        // newNode.setSymbolicExcecution(proofNode.getNodeInfo().isSymbolicExecution(taclet));
+        // //TODO find taclet
+
+        // Determine style to be applied when ProofTreeCell is rendered
+        newNode.setStyleConfiguration();
     }
 
     /**
