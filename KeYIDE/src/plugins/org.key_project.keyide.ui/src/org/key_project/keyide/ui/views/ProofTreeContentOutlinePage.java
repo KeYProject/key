@@ -151,7 +151,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	         if (hideCmd != null) {
 	            hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
 	            if (hideState != null) {
-	               hideState.addListener(hideStateListener);
+	            	hideState.addListener(hideStateListener);
 	            }
 	         }
 	         
@@ -159,7 +159,6 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	         if (symbolicCmd != null) {
 	            symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
 	            if (symbolicState != null) {
-	            	symbolicState.setValue(false); //TODO remove
 	            	symbolicState.addListener(symbolicStateListener);
 	            }
 	         }
@@ -262,9 +261,6 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		// (Behavior of original KeY UI and solves problem with selection
 		// synchronization with the shown TreeViewer)
 		selectionModel.removeKeYSelectionListener(listener);
-		// deactivate showSymbolicExecutionTree outline filter and remove symbolic state listener
-		symbolicState.removeListener(symbolicStateListener);
-		contentProvider.setSymbolicState(false);
 	}
 
 	/**
@@ -278,22 +274,6 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 			// Listen for mediator selection changes caused by the user to
 			// synchronize them with the shown TreeViewer
 			selectionModel.addKeYSelectionListener(listener);
-			// reactivate showSymbolicExecutionTree outline filter
-			if ((boolean) symbolicState.getValue()) {
-				if (!getControl().getDisplay().isDisposed()) {
-					getControl().getDisplay().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							if (!getControl().isDisposed()) {
-								contentProvider.setSymbolicState(true);
-								getTreeViewer().setInput(proof);
-							}
-						}
-					});
-				}
-			}
-			// add symbolic state listener
-			symbolicState.addListener(symbolicStateListener);
 			// Make sure that correct selected node is shown
 			updateSelectedNodeThreadSafe();
 		}
