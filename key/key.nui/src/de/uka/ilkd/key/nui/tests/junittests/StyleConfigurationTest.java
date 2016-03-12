@@ -31,7 +31,7 @@ public class StyleConfigurationTest {
      * The absolute path to the directory containing the test files.
      */
     //private static String TESTFILES_DIRECTORY = "../../../examples/";
-    private static String TESTFILES_DIRECTORY  = "resources//de/uka//ilkd//key//examples//";
+    private static String TESTFILES_DIRECTORY  = "resources//de//uka//ilkd//key//examples//";
     /**
      * The proof file used for this test.
      */
@@ -42,7 +42,7 @@ public class StyleConfigurationTest {
     /**
      * The ProofTreeVisualizer used to load the test file.
      */
-    private static ProofTreeConverter ptVisualizer;
+    private ProofTreeConverter ptVisualizer;
 
     public NUINode loadVisualizer(String testfileName) {
         File proofFileName = new File(TESTFILES_DIRECTORY + testfileName);
