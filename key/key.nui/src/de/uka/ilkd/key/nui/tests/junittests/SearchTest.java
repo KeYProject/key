@@ -1,12 +1,15 @@
 package de.uka.ilkd.key.nui.tests.junittests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
-import java.net.URL;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
 import de.uka.ilkd.key.proof.Proof;
@@ -23,28 +26,30 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 public class SearchTest {
 
     /**
+     * The proof file used for this test.
+     */
+    private static String TESTFILE_01 = "../../../examples/example01.proof";
+
+    /**
      * The ProofTreeVisualizer used to load the test file.
      */
     private static ProofTreeConverter ptVisualizer;
 
     @Before
     public void setup() {
-        String TESTFILE_01 = "resources//de//uka//ilkd//key//examples//example01.proof";        
-        File proofFileName = new File(TESTFILE_01);
-        // load proof
+        
+        File proofFile = new File(this.getClass().getResource(TESTFILE_01).getFile());
         KeYEnvironment<?> environment = null;
         try {
-            environment = KeYEnvironment.load(
-                    JavaProfile.getDefaultInstance(), proofFileName,
-                    null, null, null, true);
+            environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+                    proofFile, null, null, null, true);
+            Proof proof = environment.getLoadedProof();
+            proof.setProofFile(proofFile);
+            ptVisualizer = new ProofTreeConverter(proof);
         }
         catch (ProblemLoaderException e) {
-            e.printStackTrace();
+            fail("Could not set up testing environment.");
         }
-        final Proof proof = environment.getLoadedProof();
-        proof.setProofFile(proofFileName);
-        // initalize ProofConverter object used for tests
-        ptVisualizer = new ProofTreeConverter(proof);
     }
 
     @Test
