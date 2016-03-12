@@ -2,11 +2,13 @@ package de.uka.ilkd.key.nui.tests.junittests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
+import static org.junit.Assert.fail;
 import java.io.File;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
+
 import org.junit.Test;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -36,19 +38,16 @@ public class SearchTest {
 
     @Before
     public void setup() {
-
         File proofFile = new File(TESTFILE_01);
         KeYEnvironment<?> environment = null;
         try {
             environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
                     proofFile, null, null, null, true);
-            Proof proof = environment.getLoadedProof();
-            proof.setProofFile(proofFile);
-            ptVisualizer = new ProofTreeConverter(proof);
         }
         catch (ProblemLoaderException e) {
             fail("Could not set up testing environment.");
         }
+        ptVisualizer = new ProofTreeConverter(environment.getLoadedProof());
     }
 
     @Test

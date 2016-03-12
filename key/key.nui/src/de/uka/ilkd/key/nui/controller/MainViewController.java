@@ -428,6 +428,7 @@ public class MainViewController extends NUIController implements Observer {
      */
     @Override
     protected void init() {
+
         dataModel.addObserver(this);
     }
 
