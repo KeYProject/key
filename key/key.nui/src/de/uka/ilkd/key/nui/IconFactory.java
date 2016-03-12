@@ -28,7 +28,7 @@ public class IconFactory {
     /**
      * the relative path to the root folder where icons can be found.
      */
-    private static String folderRoot = "components/images/";
+    private static String folderRoot = "components//images//";
 
     /**
      * An HashMap for storing loaded icon images.
