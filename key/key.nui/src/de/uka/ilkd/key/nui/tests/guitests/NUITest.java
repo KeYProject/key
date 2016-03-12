@@ -9,6 +9,7 @@ import de.uka.ilkd.key.nui.NUI;
 import de.uka.ilkd.key.nui.TreeViewState;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.input.KeyCode;
 
 public class NUITest extends GuiTest {
@@ -74,28 +75,35 @@ public class NUITest extends GuiTest {
         // press enter to load file
         type(KeyCode.ENTER);
 
-        if(!cancelLoading){
-        // wait until load file is finished
-        waitUntilStatusIs("Ready.");
+        if (!cancelLoading) {
+            // wait until load file is finished
+            waitUntilStatusIs("Ready.");
 
-        // check if proof was loaded and stored in the datamodel
-        TreeViewState treeViewState = dataModel.getTreeViewState(filename);
-        assertTrue(treeViewState != null);
-        assertTrue(treeViewState.getProof() != null);
-        assertTrue(treeViewState.getTreeItem() != null);
+            // check if proof was loaded and stored in the datamodel
+            TreeViewState treeViewState = dataModel.getTreeViewState(filename);
+            assertTrue(treeViewState != null);
+            assertTrue(treeViewState.getProof() != null);
+            assertTrue(treeViewState.getTreeItem() != null);
         }
-        else{
+        else {
             // cancel loading process
-            /* TODO
-             * Works just if you click
-             * on the the proofView.
+            /*
+             * TODO Works just if you click on the the proofView.
              * 
-             * Otherwise KeyEvent ESCAPE
-             * is not triggered
+             * Otherwise KeyEvent ESCAPE is not triggered
              */
-            //clickOn("#proofViewPane");
+            // clickOn("#proofViewPane");
             press(KeyCode.ESCAPE);
+
+            Label label = ((Label) find("#statustext"));
+            // Loading process was canceled
+            assertTrue(label.getText().equals("Loading has been cancelled."));
         }
+
+        ProgressIndicator progressIndicator = ((ProgressIndicator) find(
+                "#progressIndicator"));
+        // ProgressIndicator is not visible
+        assertTrue(!progressIndicator.isVisible());
     }
 
 }
