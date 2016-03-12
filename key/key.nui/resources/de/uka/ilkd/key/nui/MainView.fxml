@@ -99,9 +99,11 @@
 			BorderPane.alignment="CENTER">
 			<items>
 				<Label fx:id="statustext" prefHeight="17.0" text="%status" />
-				<ProgressIndicator fx:id="progressIndicator"
-					visible="false" prefHeight="20.0" prefWidth="20.0"
-					xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" />
+				<ProgressIndicator prefHeight="20.0" visible="false" fx:id="progressIndicator" />
+				<Button fx:id="cancelButton" mnemonicParsing="false"
+					prefHeight="20.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+					text="%cancelButton" visible="false" onAction="#handleCancelLoadingProcess">
+				</Button>
 			</items>
 		</ToolBar>
 	</bottom>

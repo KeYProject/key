@@ -2,6 +2,7 @@ package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +32,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -46,7 +48,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
-
 /**
  * Controller for the main GUI which is displayed when the program was started.
  * 
@@ -57,9 +58,8 @@ import javafx.stage.FileChooser;
  *
  */
 
-public class MainViewController extends NUIController
-        implements Observer {
-    
+public class MainViewController extends NUIController implements Observer {
+
     /**
      * Provides an enum for the available places in the main window.
      */
@@ -91,16 +91,19 @@ public class MainViewController extends NUIController
 
     @FXML
     private MenuItem openProof;
-    
+
     @FXML
     private ProgressIndicator progressIndicator;
     
+    @FXML
+    private Button cancelButton;
+
     /**
-     * An atomic boolean to indicate if loading is in progress
-     * While this is set to true, the loading task can be cancelled.
+     * An atomic boolean to indicate if loading is in progress While this is set
+     * to true, the loading task can be cancelled.
      */
     final private AtomicBoolean isLoadingProof = new AtomicBoolean(false);
-    
+
     /**
      * The thread that is used for the loading task.
      */
@@ -194,7 +197,7 @@ public class MainViewController extends NUIController
     @FXML
     public final void handleOpenProof(final ActionEvent e) {
         FileChooser fileChooser = new FileChooser();
-        
+
         TreeViewState loadedTVS = dataModel.getLoadedTreeViewState();
         // set default directory to location where currently loaded proof is
         // located
@@ -211,7 +214,7 @@ public class MainViewController extends NUIController
             fileChooser.setInitialDirectory(
                     new File("resources/de/uka/ilkd/key/examples"));
         }
-        
+
         FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter(
                 "Proof files", "*.proof");
         FileChooser.ExtensionFilter extFilterKey = new FileChooser.ExtensionFilter(
@@ -449,6 +452,11 @@ public class MainViewController extends NUIController
 
     }
 
+    @FXML
+    protected final void handleCancelLoadingProcess(final ActionEvent e) {
+        cancelLoadProof();
+    }
+
     /**
      * NEW
      * 
@@ -534,10 +542,6 @@ public class MainViewController extends NUIController
     @Override
     protected void init() {
         dataModel.addObserver(this);
-        
-        // register key listener for cancel the proof loading task.
-        //TODO is key is not registered if focus is on proof tree.
-        registerKeyListener(KeyCode.ESCAPE, new KeyCode[] {}, (final KeyEvent event) -> cancelLoadProof());
     }
 
     /**
@@ -570,33 +574,36 @@ public class MainViewController extends NUIController
         // cannot be closed without closing the application)
         dataModel.deleteObserver(this);
     }
-    
+
     /**
-     * Invokes canceling of proof loading process.
-     * If no proof is loaded at the moment, nothing is done.
+     * Invokes canceling of proof loading process. If no proof is loaded at the
+     * moment, nothing is done.
      */
     private void cancelLoadProof() {
 
         // try to set loading status atomically
-        final boolean hasBeenCanceled = isLoadingProof.compareAndSet(true, false);
+        final boolean hasBeenCanceled = isLoadingProof.compareAndSet(true,
+                false);
 
         if (hasBeenCanceled) {
-            
+
             // TODO not a very kind way to stop a thread
             // However the method KeYEnvironment.load doesn't support
             // interrupting.
             try {
-                
+
                 try {
-                    final java.lang.reflect.Method tsm = Thread.class.getDeclaredMethod("stop0",
+                    final java.lang.reflect.Method tsm = Thread.class
+                            .getDeclaredMethod("stop0",
                                     new Class[] { Object.class });
                     tsm.setAccessible(true);
                     tsm.invoke(loadingThread, new ThreadDeath());
                 }
                 catch (java.lang.ThreadDeath e) {
-                   System.out.println("ThreadDeath to ignore? Speak with Matthias"); //TODO
+                    System.out.println(
+                            "ThreadDeath to ignore? Speak with Matthias"); // TODO
                 }
-                
+
                 // reset loading state
                 Platform.runLater(new Runnable() {
                     /**
@@ -608,6 +615,7 @@ public class MainViewController extends NUIController
                         root.setCursor(Cursor.DEFAULT);
                         openProof.setDisable(false);
                         progressIndicator.setVisible(false);
+                        cancelButton.setVisible(false);
                     }
                 });
             }
@@ -627,7 +635,8 @@ public class MainViewController extends NUIController
                 e1.printStackTrace();
             }
             catch (java.lang.ThreadDeath e) {
-                System.out.println("Unexpected ThreadDeath in cancelLoadProof. Speak with Matthias."); //TODO
+                System.out.println(
+                        "Unexpected ThreadDeath in cancelLoadProof. Speak with Matthias."); // TODO
             }
         }
     }
@@ -640,16 +649,16 @@ public class MainViewController extends NUIController
      *            The file name of the proof file to load.
      */
     private void loadProof(final File proofFileName) {
-        
+
         // Create a new tree visualizer instance for processing the
         // conversion
         // de.uka.ilkd.key.proof.Node -->
         // de.uka.ilkd.key.nui.NUI.prooftree.NUINode
         // --> ProofTreeItem (JavaFX)
-        
 
-        statustext.setText("Loading " + proofFileName.getName() + ".");
+        statustext.setText(MessageFormat.format(bundle.getString("statusLoading"), proofFileName.getName()));
         progressIndicator.setVisible(true);
+        cancelButton.setVisible(true);
         root.setCursor(Cursor.WAIT);
         openProof.setDisable(true);
 
@@ -662,7 +671,7 @@ public class MainViewController extends NUIController
                 try {
                     // set Loading = false to enable canceling
                     isLoadingProof.set(true);
-                    
+
                     // load proof
                     final KeYEnvironment<?> environment = KeYEnvironment.load(
                             JavaProfile.getDefaultInstance(), proofFileName,
@@ -674,9 +683,10 @@ public class MainViewController extends NUIController
                     // convert proof to fx tree
                     final ProofTreeItem fxtree = new ProofTreeConverter(proof)
                             .createFXProofTree();
-                    
+
                     // set Loading = false as you can no longer cancel
-                    final boolean hasNotBeenCanceled = isLoadingProof.compareAndSet(true, false);
+                    final boolean hasNotBeenCanceled = isLoadingProof
+                            .compareAndSet(true, false);
 
                     if (hasNotBeenCanceled) {
                         // reset set gui waiting state
@@ -687,21 +697,23 @@ public class MainViewController extends NUIController
                                 dataModel.saveTreeViewState(
                                         new TreeViewState(proof, fxtree),
                                         proofFileName.getName());
-                                
+
                                 statustext.setText("Ready.");
                                 progressIndicator.setVisible(false);
+                                cancelButton.setVisible(false);
                                 root.setCursor(Cursor.DEFAULT);
                                 openProof.setDisable(false);
                             }
                         });
                     }
-                    
+
                 }
                 catch (ProblemLoaderException e) {
                     // This Exception is thrown if the thread has been killed.
                     if (isLoadingProof.get()) {
                         // error during loading
-                        System.out.println("If this occurs speak with Matthias");
+                        System.out
+                                .println("If this occurs speak with Matthias");
                         e.printStackTrace();
                     }
                     else {
@@ -710,9 +722,10 @@ public class MainViewController extends NUIController
                     }
                 }
                 catch (java.lang.ThreadDeath e) {
-                    System.out.println("Unexpected Thread Death in call. Talk to Matthias");
+                    System.out.println(
+                            "Unexpected Thread Death in call. Talk to Matthias");
                 }
-                
+
                 return null;
             }
 

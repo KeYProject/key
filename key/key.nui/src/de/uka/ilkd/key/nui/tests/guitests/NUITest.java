@@ -8,6 +8,7 @@ import de.uka.ilkd.key.nui.DataModel;
 import de.uka.ilkd.key.nui.NUI;
 import de.uka.ilkd.key.nui.TreeViewState;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.input.KeyCode;
@@ -87,13 +88,7 @@ public class NUITest extends GuiTest {
         }
         else {
             // cancel loading process
-            /*
-             * TODO Works just if you click on the the proofView.
-             * 
-             * Otherwise KeyEvent ESCAPE is not triggered
-             */
-            // clickOn("#proofViewPane");
-            press(KeyCode.ESCAPE);
+            clickOn("#cancelButton");
 
             Label label = ((Label) find("#statustext"));
             // Loading process was canceled
@@ -104,6 +99,9 @@ public class NUITest extends GuiTest {
                 "#progressIndicator"));
         // ProgressIndicator is not visible
         assertTrue(!progressIndicator.isVisible());
+
+        Button cancelButton = ((Button) find("#cancelButton"));
+        assertTrue(!cancelButton.isVisible());
     }
 
 }
