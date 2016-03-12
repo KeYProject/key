@@ -18,6 +18,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -82,6 +83,7 @@ public class NUI extends Application {
         // Load scene and set preferences
         final Scene scene = new Scene(root);
         stage.setTitle("KeY");
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("images/KeY-Mono.png")));
         stage.setScene(scene);
         stage.show();
 
