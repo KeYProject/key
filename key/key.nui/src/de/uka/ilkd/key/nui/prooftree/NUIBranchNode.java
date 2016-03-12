@@ -32,7 +32,6 @@ public class NUIBranchNode extends NUINode {
     public NUIBranchNode(final de.uka.ilkd.key.proof.Node proofParentNode) {
         super();
         this.proofParentNode = proofParentNode;
-
     }
 
     /**

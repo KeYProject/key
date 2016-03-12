@@ -2,6 +2,8 @@ package de.uka.ilkd.key.nui.prooftree;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import de.uka.ilkd.key.nui.prooftree.ProofTreeStyler.StyleConfiguration;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -42,7 +44,8 @@ public abstract class NUINode implements Cloneable {
     /**
      * Marks if the node is currently visible in the treeView.
      */
-    private final SimpleBooleanProperty visible = new SimpleBooleanProperty(true);
+    private final SimpleBooleanProperty visible = new SimpleBooleanProperty(
+            true);
 
     /**
      * The node text label.
@@ -52,12 +55,14 @@ public abstract class NUINode implements Cloneable {
     /**
      * Marks if the node has the linked property.
      */
-    private final SimpleBooleanProperty linked = new SimpleBooleanProperty(false);
+    private final SimpleBooleanProperty linked = new SimpleBooleanProperty(
+            false);
 
     /**
      * Marks if notes for this node exist.
      */
-    private final SimpleBooleanProperty notes = new SimpleBooleanProperty(false);
+    private final SimpleBooleanProperty notes = new SimpleBooleanProperty(
+            false);
 
     /**
      * the parent node of this node.
@@ -68,16 +73,20 @@ public abstract class NUINode implements Cloneable {
      * The serial number of the proof node.
      */
     private final SimpleStringProperty serialNumber = new SimpleStringProperty();
-    
+
     /**
      * Marks whether this node is a result of a currently active search.
      */
-    private final SimpleBooleanProperty searchResult = new SimpleBooleanProperty(false);
-    
+    private final SimpleBooleanProperty searchResult = new SimpleBooleanProperty(
+            false);
+
     /**
      * Marks if the node is a symbolic execution.
      */
-    private final SimpleBooleanProperty symbolicExecution = new SimpleBooleanProperty(false);
+    private final SimpleBooleanProperty symbolicExecution = new SimpleBooleanProperty(
+            false);
+
+    private StyleConfiguration style;
 
     /**
      * Retrieves the label (name) of the node. <br>
@@ -129,7 +138,7 @@ public abstract class NUINode implements Cloneable {
     public final boolean isActive() {
         return active.get();
     }
-    
+
     /**
      * Indicates if the node has is an symbolic execution.
      * 
@@ -180,6 +189,7 @@ public abstract class NUINode implements Cloneable {
     public final boolean isVisible() {
         return visible.get();
     }
+
     /**
      * Sets the active statement status of the node. <br>
      * See {@link de.uka.ilkd.key.proof.NodeInfo#getActiveStatement()}.
@@ -237,7 +247,7 @@ public abstract class NUINode implements Cloneable {
     public final void setLabel(final String label) {
         this.label.set(label);
     }
-    
+
     /**
      * Defines whether the node is a symbolic execution.
      * 
@@ -296,20 +306,23 @@ public abstract class NUINode implements Cloneable {
     public final void setVisibility(final boolean isVisible) {
         this.visible.set(isVisible);
     }
-    
+
     /**
-     * Clones the NUINode.
-     * Attention, normally the parent is not set because the
+     * Clones the NUINode. Attention, normally the parent is not set because the
      * cloned one is not known.
+     * 
      * @return the cloned nuiNode
      */
     @Override
     public abstract NUINode clone();
-    
+
     /**
      * Copies the fields of a NUINode to another.
-     * @param source  the source of the field values
-     * @param target  the target where the fields have to be set.
+     * 
+     * @param source
+     *            the source of the field values
+     * @param target
+     *            the target where the fields have to be set.
      */
     protected void copyFields(final NUINode source, final NUINode target) {
         source.setActive(target.isActive());
@@ -328,10 +341,9 @@ public abstract class NUINode implements Cloneable {
     public String toString() {
         return getLabel();
     }
-    
-    
+
     /* ********** SEARCH METHODS ********** */
-    
+
     /**
      * Returns the value of the property isSearchResult.
      * 
@@ -340,16 +352,17 @@ public abstract class NUINode implements Cloneable {
     public boolean isSearchResult() {
         return searchResult.get();
     }
-    
+
     /**
      * Defines if the node is marked as a search result.
      * 
-     * @param isSearchResult true iff the NUINode is part of a searchResult
+     * @param isSearchResult
+     *            true iff the NUINode is part of a searchResult
      */
     public void setSearchResult(final boolean isSearchResult) {
         this.searchResult.set(isSearchResult);
     }
-    
+
     /**
      * Adds a search result listener that is notified when the node is marked as
      * search result.
@@ -357,46 +370,61 @@ public abstract class NUINode implements Cloneable {
      * @param listener
      *            the changeListener to add.
      */
-    public void addSearchResultListener(final ChangeListener<Boolean> listener) {
+    public void addSearchResultListener(
+            final ChangeListener<Boolean> listener) {
         searchResult.addListener(listener);
     }
 
     /**
      * Removes a search result listener.
-     * @param listener the changeListener to remove
+     * 
+     * @param listener
+     *            the changeListener to remove
      */
-    public void removeSearchResultListener(final ChangeListener<Boolean> listener) {
+    public void removeSearchResultListener(
+            final ChangeListener<Boolean> listener) {
         searchResult.removeListener(listener);
     }
-    
+
     /**
      * Marks all nodes in the subtree beneath this node as non-search-Results.
      */
     public void resetSearch() {
         setSearchResult(false);
     }
-    
+
     /**
      * Searches the subtree beneath this NUINode for all occurrences of the term
      * and marks each of them as SearchResults.
      * 
-     * @param term  the term to search for
-     * @return      true iff there are any search results
+     * @param term
+     *            the term to search for
+     * @return true iff there are any search results
      */
     public boolean search(final String term) {
         if (term.isEmpty()) {
             return false;
         }
-        
-        final boolean match = getLabel().toLowerCase().contains(term.toLowerCase());
+
+        final boolean match = getLabel().toLowerCase()
+                .contains(term.toLowerCase());
         setSearchResult(match);
         return match;
     }
-    
-    //TODO comments, maybe outsource
+
+    // TODO comments, maybe outsource
     public List<NUINode> asList() {
         List<NUINode> l = new LinkedList<>();
         l.add(this);
         return l;
+    }
+
+    protected void setStyleConfiguration() {
+        ProofTreeStyler pts = new ProofTreeStyler();
+        this.style = pts.getStyleConfiguration(this);
+    }
+    
+    public StyleConfiguration getStyleConfiguration() {
+        return this.style;
     }
 }
