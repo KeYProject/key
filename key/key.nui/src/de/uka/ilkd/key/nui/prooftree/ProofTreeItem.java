@@ -98,6 +98,7 @@ public class ProofTreeItem extends TreeItem<NUINode> {
      * @param list
      *            The children list to set.
      */
+    @SuppressWarnings("unchecked")
     protected void setAllChildren(final ObservableList<ProofTreeItem> list) {
         try {
             final Field childrenField = TreeItem.class

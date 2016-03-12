@@ -2,9 +2,8 @@ package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.AbstractMap.SimpleImmutableEntry;
+import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.Map;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -32,6 +31,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -40,7 +40,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Toggle;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -94,6 +93,9 @@ public class MainViewController extends NUIController implements Observer {
     @FXML
     private ProgressIndicator progressIndicator;
 
+    @FXML
+    private Button cancelButton;
+
     /**
      * An atomic boolean to indicate if loading is in progress While this is set
      * to true, the loading task can be cancelled.
@@ -117,11 +119,6 @@ public class MainViewController extends NUIController implements Observer {
     private final ObservableMap<String, Place> placeComponent = new ObservableMapWrapper<>(
             new HashMap<>());
 
-    /**
-     * Stores the KeyEventHandlers (registered here using registerKeyListener)
-     */
-    private final Map<KeyCode, SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>> keyEventHandlers = new HashMap<>();
-
     public Menu getViewMenu() {
         return viewMenu;
     }
@@ -131,56 +128,6 @@ public class MainViewController extends NUIController implements Observer {
      */
     public final ObservableMap<String, Place> getPlaceComponent() {
         return placeComponent;
-    }
-
-    /**
-     * Handles all key combinations. To make this function listedn for a certain
-     * key combination, it must beforehand be registered via
-     * {@link registerKeyListener}. Usually <b> not to be called by
-     * developers.</b>
-     * 
-     * see the FIXME at registerKeyListener
-     * 
-     * @param k
-     *            the KeyEvent
-     */
-    public final void handleKeyPressed(final KeyEvent k) {
-
-        // Registered Key Handlers
-        SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]> e = keyEventHandlers
-                .get(k.getCode());
-
-        if (e != null) {
-            for (KeyCode keyCode : e.getValue()) {
-                switch (keyCode) {
-                case ALT:
-                    if (!k.isAltDown()) {
-                        return;
-                    }
-                    break;
-                case CONTROL:
-                    if (!k.isControlDown()) {
-                        return;
-                    }
-                    break;
-                case META:
-                    if (!k.isMetaDown()) {
-                        return;
-                    }
-                    break;
-                case SHIFT:
-                    if (!k.isShiftDown()) {
-                        return;
-                    }
-                    break;
-                default:
-                    throw new IllegalArgumentException(
-                            "You submitted an illegal modifiers list for the key "
-                                    + k.getCode());
-                }
-            }
-            e.getKey().handle(k);
-        }
     }
 
     /**
@@ -212,7 +159,6 @@ public class MainViewController extends NUIController implements Observer {
         }
 
         FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter(
-
                 "Proof files", "*.proof");
         FileChooser.ExtensionFilter extFilterKey = new FileChooser.ExtensionFilter(
                 "Proof files", "*.key");
@@ -225,73 +171,6 @@ public class MainViewController extends NUIController implements Observer {
         if (file != null) {
             loadProof(file);
         }
-    }
-
-    /**
-     * This function allows to register key event handlers. After a Handler is
-     * registered for a certain key or key combination, all KeyEvents of that
-     * key or key combination will be transferred to that handler. <br/>
-     * <b> This functionality is not yet finished and must be used
-     * cautiously.</b>
-     * 
-     * FIXME this does not allow to register the same key with different
-     * modifiers, e.g. Enter and Shift-Enter
-     * 
-     * @param key
-     *            – the KeyCode of the primary to be listened to
-     * @param modifiers
-     *            – all of the modifiers that should also be pressed to
-     *            trigger the Handler
-     * @param handler
-     *            – the handler that is to be triggered when the key or key
-     *            combination is recognised
-     * 
-     * @throws IllegalArgumentException
-     *             – that key is already in use or modifiers does not entirely
-     *             consist of modifiers
-     */
-    public final void registerKeyListener(final KeyCode key,
-            final KeyCode[] modifiers, final EventHandler<KeyEvent> handler)
-                    throws IllegalArgumentException {
-
-        if (modifiers != null) {
-            for (KeyCode c : modifiers) {
-                // blame the way Java Designers made Enum for the fact that I
-                // cannot make the compiler do this check
-                if (!c.isModifierKey()) {
-                    throw new IllegalArgumentException(
-                            "You submitted an illegal modifiers list for the key "
-                                    + key);
-                }
-            }
-        }
-        if (keyEventHandlers.containsKey(key)) {
-            // TODO this should better be done when the view is going to be
-            // hidden
-            // TODO this should be implemented using WeakHandles
-            // this is just a workaround to make the tests work again
-            unregisterKeyListener(key);
-            // throw new IllegalArgumentException(
-            // "The key you submitted (" + k + ") was already in use.");
-        }
-
-        keyEventHandlers.put(key,
-                new SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>(
-                        handler,
-                        (modifiers == null) ? new KeyCode[0] : modifiers));
-    }
-
-    /**
-     * Unregister a previously registered key Listener.
-     * 
-     * TODO eliminate this by implementing the key register using weak handles.
-     * 
-     * @throws IllegalArgumentException
-     *             – key was never registered
-     */
-    public final void unregisterKeyListener(final KeyCode k)
-            throws IllegalArgumentException {
-        keyEventHandlers.remove(k);
     }
 
     /**
@@ -449,6 +328,11 @@ public class MainViewController extends NUIController implements Observer {
 
     }
 
+    @FXML
+    protected final void handleCancelLoadingProcess(final ActionEvent e) {
+        cancelLoadProof();
+    }
+
     /**
      * NEW
      * 
@@ -529,16 +413,24 @@ public class MainViewController extends NUIController implements Observer {
     }
 
     /**
+     * Executes the given EventHandler e if any key was pressed, therefore the
+     * provided Handler <b>must check by itself</b> if the right KeyCode was
+     * pressed.
+     * 
+     * @param e
+     *            The EventHandler
+     */
+    public void registerKeyListener(EventHandler<KeyEvent> e) {
+        root.addEventHandler(KeyEvent.KEY_PRESSED, e);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     protected void init() {
 
         dataModel.addObserver(this);
-
-        // register key listener for cancel the proof loading task.
-        //TODO is key is not registered if focus is on proof tree.
-        registerKeyListener(KeyCode.ESCAPE, new KeyCode[] {}, (final KeyEvent event) -> cancelLoadProof());
     }
 
     /**
@@ -555,9 +447,7 @@ public class MainViewController extends NUIController implements Observer {
     }
 
     /**
-     * <<<<<<< HEAD Invokes canceling of proof loading process. If no proof is
-     * loaded at the moment, nothing is done. ======= Updates the MainView if
-     * any change in the dataModel occurred.
+     * Updates the MainView if any change in the dataModel occurred.
      * 
      * @param o
      *            The observable, here the dataModel
@@ -576,7 +466,7 @@ public class MainViewController extends NUIController implements Observer {
 
     /**
      * Invokes canceling of proof loading process. If no proof is loaded at the
-     * moment, nothing is done. >>>>>>> e6d2a381dc951ff234958e2f71dc77b7ec3ed759
+     * moment, nothing is done.
      */
     private void cancelLoadProof() {
 
@@ -615,6 +505,7 @@ public class MainViewController extends NUIController implements Observer {
                         root.setCursor(Cursor.DEFAULT);
                         openProof.setDisable(false);
                         progressIndicator.setVisible(false);
+                        cancelButton.setVisible(false);
                     }
                 });
             }
@@ -656,8 +547,10 @@ public class MainViewController extends NUIController implements Observer {
         // de.uka.ilkd.key.nui.NUI.prooftree.NUINode
         // --> ProofTreeItem (JavaFX)
 
-        statustext.setText("Loading " + proofFileName.getName() + ".");
+        statustext.setText(MessageFormat.format(
+                bundle.getString("statusLoading"), proofFileName.getName()));
         progressIndicator.setVisible(true);
+        cancelButton.setVisible(true);
         root.setCursor(Cursor.WAIT);
         openProof.setDisable(true);
 
@@ -699,6 +592,7 @@ public class MainViewController extends NUIController implements Observer {
 
                                 statustext.setText("Ready.");
                                 progressIndicator.setVisible(false);
+                                cancelButton.setVisible(false);
                                 root.setCursor(Cursor.DEFAULT);
                                 openProof.setDisable(false);
                             }

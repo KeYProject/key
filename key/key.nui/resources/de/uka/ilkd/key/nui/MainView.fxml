@@ -10,8 +10,7 @@
 
 <BorderPane fx:id="root" prefHeight="600.0" prefWidth="800.0"
 	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="de.uka.ilkd.key.nui.controller.MainViewController"
-	onKeyPressed="#handleKeyPressed">
+	fx:controller="de.uka.ilkd.key.nui.controller.MainViewController">
 	<top>
 		<MenuBar BorderPane.alignment="CENTER">
 			<menus>
@@ -27,8 +26,6 @@
 						<MenuItem mnemonicParsing="false" onAction="#handleCloseWindow"
 							text="%close" />
 					</items>
-				</Menu>
-				<Menu mnemonicParsing="false" text="Edit">
 				</Menu>
 				<Menu fx:id="viewMenu" mnemonicParsing="false" text="View">
 				</Menu>
@@ -99,9 +96,11 @@
 			BorderPane.alignment="CENTER">
 			<items>
 				<Label fx:id="statustext" prefHeight="17.0" text="%status" />
-				<ProgressIndicator fx:id="progressIndicator"
-					visible="false" prefHeight="20.0" prefWidth="20.0"
-					xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" />
+				<ProgressIndicator prefHeight="20.0" visible="false" fx:id="progressIndicator" />
+				<Button fx:id="cancelButton" mnemonicParsing="false"
+					prefHeight="20.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+					text="%cancelButton" visible="false" onAction="#handleCancelLoadingProcess">
+				</Button>
 			</items>
 		</ToolBar>
 	</bottom>

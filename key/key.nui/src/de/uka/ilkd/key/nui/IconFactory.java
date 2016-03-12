@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.Icon;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

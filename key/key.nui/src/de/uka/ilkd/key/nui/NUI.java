@@ -83,7 +83,8 @@ public class NUI extends Application {
         // Load scene and set preferences
         final Scene scene = new Scene(root);
         stage.setTitle("KeY");
-        stage.getIcons().add(new Image(getClass().getResourceAsStream("images/KeY-Mono.png")));
+        stage.getIcons().add(new Image(
+                getClass().getResourceAsStream("images/KeY-Mono.png")));
         stage.setScene(scene);
         stage.show();
 
@@ -113,7 +114,7 @@ public class NUI extends Application {
         components.put("MainView", root);
 
         mainViewController = fxmlLoader.getController();
-        mainViewController.constructor(this, dataModel, name, filename);
+        mainViewController.constructor(this, dataModel, bundle, name, filename);
         controllers.put("MainView", mainViewController);
 
         // initialize viewPositionMenu
@@ -157,7 +158,7 @@ public class NUI extends Application {
                 // you have to call fxmlLoader.load()
                 nuiController = fxmlLoader.getController();
                 if (nuiController != null)
-                    nuiController.constructor(this, dataModel,
+                    nuiController.constructor(this, dataModel, bundle,
                             component.getId(), file.getName());
                 controllers.put(component.getId(), nuiController);
 

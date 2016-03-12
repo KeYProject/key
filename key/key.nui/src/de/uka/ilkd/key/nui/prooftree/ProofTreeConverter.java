@@ -221,6 +221,7 @@ public class ProofTreeConverter {
      */
     private void setNUINodeLinkedTrue(final NUINode newNode) {
         newNode.setLinked(true);
+        newNode.setStyleConfiguration();
 
         // propagate linked information to parent
         final NUINode parent = newNode.getParent();

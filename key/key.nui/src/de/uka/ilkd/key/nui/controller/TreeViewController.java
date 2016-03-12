@@ -72,10 +72,10 @@ public class TreeViewController extends NUIController implements Observer {
      */
     @FXML
     private TreeView<NUINode> proofTreeView;
-    
-    //TODO comments
+
+    // TODO comments
     private FilteringHandler fh;
-    
+
     /**
      * This method should be called every time a new TreeCell is being created.
      * <tt>this</tt> will reference the ProofTreeCell in a WeakHandle in order
@@ -115,17 +115,15 @@ public class TreeViewController extends NUIController implements Observer {
         fh = new FilteringHandler(dataModel);
 
         Platform.runLater(() -> {
-
-            // Register key listeners
-            final KeyCode[] modStrg = { KeyCode.CONTROL };
-
             // listener for opening search view
-            // MainViewController.getInstance().registerKeyListener(KeyCode.F,
-            // modStrg, (event) -> openSearchView());
             try {
                 ((MainViewController) nui.getController("MainView"))
-                        .registerKeyListener(KeyCode.F, modStrg,
-                                (event) -> openSearchView());
+                        .registerKeyListener((e) -> {
+                    if ((e.getCode().equals(KeyCode.F) && e.isShortcutDown())
+                            && dataModel.getLoadedTreeViewState() != null) {
+                        openSearchView();
+                    }
+                });
             }
             catch (ControllerNotFoundException exception) {
                 exception.showMessage();
@@ -133,14 +131,15 @@ public class TreeViewController extends NUIController implements Observer {
 
             // set cell factory for rendering cells
             proofTreeView.setCellFactory((treeItem) -> {
-                final ProofTreeCell cell = new ProofTreeCell(icf, fh);
+                final ProofTreeCell cell = new ProofTreeCell(icf,fh, this);
                 Platform.runLater(() -> registerTreeCell(cell));
                 return cell;
             });
 
             // add CSS file to view
             final String cssPath = this.getClass()
-                    .getResource("../components/" + ProofTreeStyleConstants.CSS_FILE)
+                    .getResource(
+                            "../components/" + ProofTreeStyleConstants.CSS_FILE)
                     .toExternalForm();
             proofTreeView.getStylesheets().add(cssPath);
         });
@@ -159,12 +158,13 @@ public class TreeViewController extends NUIController implements Observer {
 
     public void addSearchView(Pane searchViewPane,
             NUIController nuiController) {
+
         this.searchViewPane = searchViewPane;
         if (nuiController instanceof SearchViewController)
             this.searchViewController = (SearchViewController) nuiController;
     }
-    
-    public Set<ProofTreeCell> getProofTreeCells(){
+
+    public Set<ProofTreeCell> getProofTreeCells() {
         return this.proofTreeCells;
     }
 }

@@ -1,9 +1,11 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import de.uka.ilkd.key.nui.IconFactory;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 /**
@@ -121,8 +123,7 @@ public final class ProofTreeStyler {
                 if (getIconImage() != null && scfg.getIconImage() != null) {
                     // Then compare the image filename stored in ID field
                     if (!(getIconImage().getId()
-                            .equals(((StyleConfiguration) sc).getIconImage()
-                                    .getId()))) {
+                            .equals(scfg.getIconImage().getId()))) {
                         return false;
                     }
                 }
@@ -178,8 +179,6 @@ public final class ProofTreeStyler {
 
         // initialize default styles for interactive inner nodes
         INNER_NODE_INTERACTIVE = new StyleConfiguration();
-        INNER_NODE_INTERACTIVE
-                .addCssClass(ProofTreeStyleConstants.CSS_NODE_BRANCH);
         INNER_NODE_INTERACTIVE.setIconImage(IconFactory.INNER_NODE_INTERACTIVE);
 
         // initialize default styles for closed leaf nodes
@@ -271,7 +270,7 @@ public final class ProofTreeStyler {
             }
         }
         // if the node is an inner node
-        else if (node instanceof NUIInnerNode) {
+        else {
             if (node.isInteractive()) {
                 return INNER_NODE_INTERACTIVE;
             }
