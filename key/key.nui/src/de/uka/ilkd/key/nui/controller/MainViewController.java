@@ -537,20 +537,8 @@ public class MainViewController extends NUIController implements Observer {
         dataModel.addObserver(this);
 
         // register key listener for cancel the proof loading task.
-        // TODO is key is not registered if focus is on proof tree.
-        registerKeyListener(KeyCode.ESCAPE, new KeyCode[] {},
-                new EventHandler<KeyEvent>() {
-
-                    /**
-                     * {@inheritDoc}
-                     */
-                    @Override
-                    public void handle(final KeyEvent event) {
-                        progressIndicator.setVisible(false);
-                        cancelLoadProof();
-
-                    }
-                });
+        //TODO is key is not registered if focus is on proof tree.
+        registerKeyListener(KeyCode.ESCAPE, new KeyCode[] {}, (final KeyEvent event) -> cancelLoadProof());
     }
 
     /**
@@ -626,6 +614,7 @@ public class MainViewController extends NUIController implements Observer {
                         statustext.setText("Loading has been cancelled.");
                         root.setCursor(Cursor.DEFAULT);
                         openProof.setDisable(false);
+                        progressIndicator.setVisible(false);
                     }
                 });
             }
