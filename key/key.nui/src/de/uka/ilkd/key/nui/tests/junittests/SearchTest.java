@@ -23,20 +23,13 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 public class SearchTest {
 
     /**
-     * The absolute path to the directory containing the test files.
-     */
-    private static String TESTFILES_DIRECTORY_LOCAL = "/de/uka/ilkd/key/examples/";
-    private static String TESTFILES_DIRECTORY_JENKINS = "/key/key.nui/resources/de/uka/ilkd/key/examples/";
-    
-    /**
      * The ProofTreeVisualizer used to load the test file.
      */
     private static ProofTreeConverter ptVisualizer;
 
     @Before
     public void setup() {
-        String TESTFILE_01 = TESTFILES_DIRECTORY_JENKINS + "example01.proof";
-        TESTFILE_01 = this.getClass().getResource(TESTFILE_01).getFile();
+        String TESTFILE_01 = "resources//de//uka//ilkd//key//examples//example01.proof";        
         File proofFileName = new File(TESTFILE_01);
         // load proof
         KeYEnvironment<?> environment = null;
