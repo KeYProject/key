@@ -7,7 +7,6 @@ import static org.junit.Assert.fail;
 import java.io.File;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -17,8 +16,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
- * Test for User Story 
- * (005) Laden von Beweisen #14469
+ * Test for User Story (005) Laden von Beweisen #14469
  * 
  * @author Patrick Jattke
  *
@@ -28,7 +26,8 @@ public class SearchTest {
     /**
      * The proof file used for this test.
      */
-    private static String TESTFILE_01 = "../../../examples/example01.proof";
+    // private static String TESTFILE_01 = "../../../examples/example01.proof";
+    private final String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
 
     /**
      * The ProofTreeVisualizer used to load the test file.
@@ -37,8 +36,8 @@ public class SearchTest {
 
     @Before
     public void setup() {
-        
-        File proofFile = new File(this.getClass().getResource(TESTFILE_01).getFile());
+
+        File proofFile = new File(TESTFILE_01);
         KeYEnvironment<?> environment = null;
         try {
             environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
@@ -144,15 +143,14 @@ public class SearchTest {
     }
 
     /**
-     * Searches for the given searchTerm and compares the size of the
-     * results with the given expectedSize.
+     * Searches for the given searchTerm and compares the size of the results
+     * with the given expectedSize.
      * 
      * @param searchTerm
-     *          The term which should be used to search for.
+     *            The term which should be used to search for.
      * @param expectedSize
-     *          The expected size of the list of results.
-     * @return
-     *          True iff the size of the result list equals the expectedSize.
+     *            The expected size of the list of results.
+     * @return True iff the size of the result list equals the expectedSize.
      */
     private boolean searchAndCompareSize(String searchTerm, int expectedSize) {
         ptVisualizer.getRootNode().search(searchTerm);

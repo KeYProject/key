@@ -30,7 +30,8 @@ public class StyleConfigurationTest {
     /**
      * The absolute path to the directory containing the test files.
      */
-    private static String TESTFILES_DIRECTORY = "../../../examples/";
+    // private static String TESTFILES_DIRECTORY = "../../../examples/";
+    private final String TESTFILES_DIRECTORY = "resources//de/uka//ilkd//key//examples//";
     /**
      * The proof file used for this test.
      */
@@ -44,8 +45,7 @@ public class StyleConfigurationTest {
     private static ProofTreeConverter ptVisualizer;
 
     public NUINode loadVisualizer(String testfileName) {
-        File proofFileName = new File(testfileName);
-
+        File proofFileName = new File(TESTFILES_DIRECTORY + testfileName);
         // load proof
         KeYEnvironment<?> environment = null;
         try {
@@ -55,36 +55,31 @@ public class StyleConfigurationTest {
         catch (ProblemLoaderException e) {
             e.printStackTrace();
         }
-        final Proof proof = environment.getLoadedProof();
+        Proof proof = environment.getLoadedProof();
         proof.setProofFile(proofFileName);
 
-        // initalize ProofConverter object used for tests
+        // initialize ProofConverter object used for tests
         ptVisualizer = new ProofTreeConverter(proof);
 
         // return root node of the created tree
         return ptVisualizer.getRootNode();
     }
 
-    private String loadResource(String testFile) {
-        return this.getClass().getResource(TESTFILES_DIRECTORY + testFile)
-                .getFile();
-    }
-
     @Test
     public void StyleConfigurationTest01() {
-        NUINode node = loadVisualizer(loadResource(TESTFILE_01));
+        NUINode node = loadVisualizer(TESTFILE_01);
         checkTree(node);
     }
 
     @Test
     public void StyleConfigurationTest02() {
-        NUINode node = loadVisualizer(loadResource(TESTFILE_02));
+        NUINode node = loadVisualizer(TESTFILE_02);
         checkTree(node);
     }
 
     @Test
     public void StyleConfigurationTest03() {
-        NUINode node = loadVisualizer(loadResource(TESTFILE_03));
+        NUINode node = loadVisualizer(TESTFILE_03);
         checkTree(node);
     }
 
