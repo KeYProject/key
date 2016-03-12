@@ -28,7 +28,8 @@ public class SearchTest {
     /**
      * The proof file used for this test.
      */
-    private static String TESTFILE_01 = "../../../examples/example01.proof";
+    //private static String TESTFILE_01 = "../../../examples/example01.proof";
+    private static String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
 
     /**
      * The ProofTreeVisualizer used to load the test file.
@@ -38,7 +39,7 @@ public class SearchTest {
     @Before
     public void setup() {
         
-        File proofFile = new File(this.getClass().getResource(TESTFILE_01).getFile());
+        File proofFile = new File(TESTFILE_01);
         KeYEnvironment<?> environment = null;
         try {
             environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
