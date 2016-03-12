@@ -27,8 +27,10 @@ public class StrategyViewController extends NUIController {
         String filename;
 
         try {
+
             filename = dataModel.getLoadedTreeViewState().getProof()
                     .getProofFile().getName();
+
         }
         catch (NullPointerException e2) {
             ((MainViewController) nui.getController("MainView"))
@@ -49,7 +51,10 @@ public class StrategyViewController extends NUIController {
                 .updateStatusbar(strategyInfo.reason());
 
         // save changed proof into data model
-        dataModel.updateProofFile(filename, proofStarter.getProof());
+        TreeViewState newTreeViewState = new TreeViewState(
+                proofStarter.getProof(), treeViewState.getTreeItem());
+        dataModel.saveTreeViewState(newTreeViewState, filename);
+
     }
 
 }

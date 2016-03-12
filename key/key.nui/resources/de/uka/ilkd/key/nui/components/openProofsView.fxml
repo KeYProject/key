@@ -5,10 +5,12 @@
 <?import javafx.scene.layout.*?>
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8"
+   fx:controller="de.uka.ilkd.key.nui.controller.OpenProofsViewController"
+   fx:id="openProofsViewPane"
 	VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
-	<TextArea minHeight="0" minWidth="0" AnchorPane.bottomAnchor="0.0"
+	<TextArea fx:id="textAreaOpenProofs" minHeight="0" minWidth="0" AnchorPane.bottomAnchor="0.0"
 		AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
 		AnchorPane.topAnchor="0.0"
-		text="Hier koennten geoeffnete Beweise hinterlegt sein.">
+		text="">
 	</TextArea>
 </AnchorPane>

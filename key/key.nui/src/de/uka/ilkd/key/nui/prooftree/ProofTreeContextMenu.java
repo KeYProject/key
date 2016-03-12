@@ -1,11 +1,19 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import de.uka.ilkd.key.nui.IconFactory;
+import de.uka.ilkd.key.nui.prooftree.filter.ProofTreeFilter;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.KeyCombination;
 
 /**
  * This class represents a context menu used for proof tree items.
@@ -30,6 +38,8 @@ public class ProofTreeContextMenu extends ContextMenu {
      * The IconFactory used to create the required icons.
      */
     private final IconFactory icf;
+    
+    private final FilteringHandler fh;
     
     /**
      * The label of the context menu "expand all" label.
@@ -66,13 +76,15 @@ public class ProofTreeContextMenu extends ContextMenu {
      * 	          an icon factory for creating icons
      */
     public ProofTreeContextMenu(final TreeItem<NUINode> treeItem, 
-    		final TreeView<NUINode> treeView, final IconFactory icf) {
+    		final TreeView<NUINode> treeView, final IconFactory icf,
+    		final FilteringHandler fh) {
     	super();
     	
     	this.treeItem = treeItem;
         this.treeView = treeView;
         
         this.icf = icf;
+        this.fh = fh;
         
         // Add dummy so that the context menu can be displayed.
         // It is put in in the method "show".
@@ -100,6 +112,7 @@ public class ProofTreeContextMenu extends ContextMenu {
         addSeparator();
         
         addMenuItemSearch();
+        addMenuItemsFilter();
     }
     
     /**
@@ -157,7 +170,32 @@ public class ProofTreeContextMenu extends ContextMenu {
     	getItems().add(mISearch);
     	mISearch.setGraphic(icf.getImage(IconFactory.SEARCH));
     	mISearch.setOnAction(aEvt -> ProofTreeActions.openSearchView());
-    	
+    	mISearch.setAccelerator(KeyCombination.keyCombination("Ctrl+F"));
+    }
+    
+    private void addMenuItemsFilter() {
+        Map<ProofTreeFilter, Boolean> a = fh.getFiltersMap();
+        for (Entry<ProofTreeFilter, Boolean> k : a.entrySet()) {
+            addMenuItemFilter(k.getKey(), k.getValue());
+        }
+    }
+    
+    private void addMenuItemFilter(ProofTreeFilter k, boolean initState) {
+        CheckMenuItem cmi = new CheckMenuItem(k.getContextMenuItemText());
+        cmi.setSelected(initState);
+        
+        cmi.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable,
+                    Boolean oldValue, Boolean newValue) {
+                if (fh.getFilterStatus(k) != newValue) {
+                    fh.toggleFilteringStatus(k);
+                }
+            }
+
+        });
+
+        getItems().add(cmi);
     }
 
 }

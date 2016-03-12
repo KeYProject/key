@@ -1,75 +1,145 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+
+import de.uka.ilkd.key.nui.prooftree.filter.FilterShowAll;
+import de.uka.ilkd.key.nui.DataModel;
+import de.uka.ilkd.key.nui.prooftree.filter.FilterCombineAND;
+import de.uka.ilkd.key.nui.prooftree.filter.FilterHideClosed;
+import de.uka.ilkd.key.nui.prooftree.filter.FilterHideIntermediate;
+import de.uka.ilkd.key.nui.prooftree.filter.FilterHideNonInteractive;
+import de.uka.ilkd.key.nui.prooftree.filter.ProofTreeFilter;
 
 /**
- * Performs the filtering.
+ * Handles the filtering of the proof tree.
  * @author Matthias Schultheis
- * @version 1.0
  *
  */
 public class FilteringHandler {
     
     /**
-     * Returns a subtree consisting of only matching nodes.
-     * @param root    the root node of the source tree
-     * @param search  the query used for filtering
-     * @return        the root node of a filtered tree or null if not found
+     * A map storing filters with their resp. activation flag.
      */
-    public static NUINode getMatchedSubtree(final NUINode root, final String search) {
-        // label matches -> copy subtree
-        if (matchesFilter(root, search)) {
-            //TODO set parent??
-            final NUINode filteredTreeRoot = (NUINode) root.clone();
-            
-            return filteredTreeRoot;
-        }
-        // branch nodes -> look at children
-        else if (root instanceof NUIBranchNode) {
-            
-            final LinkedList<NUINode> matchedChildren = new LinkedList<NUINode>();
-            final NUIBranchNode rootBN = (NUIBranchNode) root;
-            
-            // add matching children
-            for (final NUINode child : rootBN.getChildren()) {
-                final NUINode childMatchedSubTree = getMatchedSubtree(child, search);
-                if (childMatchedSubTree != null) {
-                    matchedChildren.add(childMatchedSubTree);
-                }
+    private Map<ProofTreeFilter, Boolean> filtersMap = new LinkedHashMap<>();
+
+    /**
+     * The data model.
+     */
+    private DataModel dm;
+    
+    //TODO
+    private String currentTree;
+    
+    /**
+     * Constructor.
+     * @param dm The DataModel.
+     */
+    public FilteringHandler(DataModel dm) {
+        this.dm = dm;
+        
+        final List<ProofTreeFilter> filters = searchFilterClasses();
+        filters.forEach((filter) -> filtersMap.put(filter, false));
+        
+        dm.addObserver(new Observer() {
+            @Override
+            public void update(Observable o, Object arg) {
+                currentTree = (String) arg;
+                reinit();
             }
-            
-            // if children match it is also a match
-            if (!matchedChildren.isEmpty()) {
-                
-                final NUIBranchNode filteredRoot = rootBN.cloneWithoutChildren();
-                filteredRoot.setChildren(matchedChildren);
-                
-                // set parent for children
-                matchedChildren.forEach((child) -> child.setParent(filteredRoot));
-                
-                return filteredRoot;
-                
-            }
-            // no children match -> branch doesnt match
-            else {
-                return null;
-            }
-        }
-        // root doesnt match and is no branch node
-        else {
-            return null;
-        }
+        });
     }
     
     /**
-     * Checks if a node matches a filter rule.
-     * @param node    the node to check
-     * @param filter  the filter string
-     * @return        true iff the node matches the filter rule
+     * Resets all active filters
      */
-    private static boolean matchesFilter(final NUINode node, final String filter) {
-        final String lblLC = node.getLabel().toLowerCase();
-        final String filterLC = filter.toLowerCase();
-        return lblLC.contains(filterLC);
+    public void reinit() {
+        filtersMap.forEach((filter, active) -> {
+            if (active) {
+                filtersMap.put(filter, false);
+            }
+        });
     }
+    
+    /**
+     * Searches for applicable filters in the package
+     * de.uka.ilkd.key.nui.prooftree.filter.
+     * @return A list of filters
+     */
+    private List<ProofTreeFilter> searchFilterClasses() {
+        
+        final List<ProofTreeFilter> filters = new LinkedList<ProofTreeFilter>();
+        
+        //TODO search in package
+        filters.add(new FilterHideClosed());
+        filters.add(new FilterHideIntermediate());
+        filters.add(new FilterHideNonInteractive());
+        
+        return filters;
+    }
+    
+    /**
+     * Returns a list of the currently active filters.
+     * @return A list of the currently active filters.
+     */
+    private List<ProofTreeFilter> getActiveFilters() {
+        
+        final List<ProofTreeFilter> filters = new LinkedList<ProofTreeFilter>();
+
+        filtersMap.forEach((filter, active) -> {
+            if (active) {
+                filters.add(filter);
+            }
+        });
+        
+        return filters;
+    }
+    
+    /**
+     * Applies the filters that are currently set to active.
+     */
+    private void applyFilters() {
+        final List<ProofTreeFilter> activeFilters = getActiveFilters();
+
+        // reduces all active filers to one
+        final ProofTreeFilter redFilter = activeFilters.stream().reduce(new FilterShowAll(),
+                (f1, f2) -> {
+                    return new FilterCombineAND(f1, f2);
+                });
+
+        ProofTreeItem root = dm.getTreeViewState(currentTree).getTreeItem();
+        root.filter(redFilter);
+    }
+
+    /**
+     * @return the filtersMap
+     */
+    public Map<ProofTreeFilter, Boolean> getFiltersMap() {
+        return filtersMap;
+    }
+
+    /**
+     * Returns the activation status for a filter.
+     * @param filter The filter to check
+     * @return true iff the filter is activated
+     */
+    public boolean getFilterStatus(final ProofTreeFilter filter) {
+        return filtersMap.get(filter);
+    }
+    
+    /**
+     * Toggles the activation status for a filter.
+     * @param filter The filter to change the status of.
+     */
+    public void toggleFilteringStatus(final ProofTreeFilter filter) {
+        final boolean newState = !filtersMap.get(filter);
+        filtersMap.put(filter, newState);
+        
+        applyFilters();
+    }
+    
 }
