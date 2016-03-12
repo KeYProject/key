@@ -240,7 +240,7 @@ public class MainViewController extends NUIController implements Observer {
         // File was changed: ask user if he wants to save changes
         // create alert window
         Alert alert = new Alert(AlertType.CONFIRMATION);
-        alert.setTitle(nui.getStringFromBundle("dialogTitle"));
+        alert.setTitle(bundle.getString("dialogTitle"));
         alert.setHeaderText(nui.getStringFromBundle("dialogHeader"));
         String filename = dataModel.getLoadedTreeViewState().getProof()
                 .getProofFile().getName();
@@ -302,7 +302,7 @@ public class MainViewController extends NUIController implements Observer {
 
         // Open file picker window
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(nui.getStringFromBundle("fileChooserSaveTitle"));
+        fileChooser.setTitle(bundle.getString("fileChooserSaveTitle"));
         // set initial directory to last saved location (if available)
         if (loadedProof.getProofFile() != null) {
             // if file has a parent directory, set initial directory

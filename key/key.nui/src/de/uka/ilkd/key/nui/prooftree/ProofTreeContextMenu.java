@@ -173,7 +173,6 @@ public class ProofTreeContextMenu extends ContextMenu {
     	final MenuItem mISearch = new MenuItem(LBL_SEARCH);
     	getItems().add(mISearch);
     	mISearch.setGraphic(icf.getImage(IconFactory.SEARCH));
-    	//mISearch.setOnAction(aEvt -> ProofTreeActions.openSearchView());
     	mISearch.setOnAction(aEvt -> treeViewController.openSearchView());
     	mISearch.setAccelerator(KeyCombination.keyCombination("Ctrl+F"));
     }
