@@ -1,11 +1,8 @@
 package de.uka.ilkd.key.nui.tests.guitests;
 
 import org.junit.Test;
-import org.loadui.testfx.GuiTest;
 
-import de.uka.ilkd.key.nui.ComponentFactory;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeStyleConstants;
-import javafx.scene.Parent;
 import javafx.scene.input.KeyCode;
 
 /**
@@ -20,31 +17,7 @@ import javafx.scene.input.KeyCode;
  * @author Florian Breitfelder
  *
  */
-public class TreeViewTest extends GuiTest {
-
-    private Parent root = null;
-
-    @Override
-    /*public Parent getRootNode() {
-    	// Retrieve component factory and create treeView
-    	ComponentFactory factory = ComponentFactory.getInstance();
-    	ComponentFactory.setResourceDirectory("components/");
-    	root = factory.createComponent("treeView", "treeView.fxml");
-    	
-    	// Get controller and load default proof file
-    	TreeViewController tvc = ComponentFactory.getInstance().getController("treeView");
-    	tvc.loadAndDisplayProof(new File("resources//de/uka//ilkd//key//examples//example01.proof"));
-    	
-        return root;
-    }*/
-
-    
-    public Parent getRootNode() {
-        ComponentFactory factory = ComponentFactory.getInstance();
-        ComponentFactory.setResourceDirectory("components/");
-        root = factory.createNUISceneGraph();
-        return root;
-    }
+public class TreeViewTest extends NUITest {
 
     @Test
     public void testTreeNavigation() {
