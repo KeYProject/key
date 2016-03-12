@@ -150,7 +150,7 @@
 	
 	<!-- Definition of target JUnit -->
 	<target name="runTests" description="Run JUnit Tests">
-		<junit printsummary="yes" haltonfailure="yes">
+		<junit printsummary="yes" haltonfailure="no">
 			  <classpath refid="key.nui.class.path"/>
 			  <classpath>
 			      <pathelement location="${build.dir}"/>

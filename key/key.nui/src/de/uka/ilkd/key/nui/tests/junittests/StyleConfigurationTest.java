@@ -1,8 +1,9 @@
 package de.uka.ilkd.key.nui.tests.junittests;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.util.stream.Stream;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,7 +12,6 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeStyler;
-import de.uka.ilkd.key.nui.prooftree.ProofTreeStyler.StyleConfiguration;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -41,7 +41,6 @@ public class StyleConfigurationTest {
     @BeforeClass
     public static void setUpBeforeClass() {
         File proofFileName = new File(TESTFILE_01);
-
         // load proof
         KeYEnvironment<?> environment = null;
         try {
@@ -53,20 +52,16 @@ public class StyleConfigurationTest {
         }
         final Proof proof = environment.getLoadedProof();
         proof.setProofFile(proofFileName);
-
         // initalize ProofConverter object used for tests
         ptVisualizer = new ProofTreeConverter(proof);
     }
 
     @Test
     public void StyleConfigurationTest01() {
-        for (NUINode n : ptVisualizer.getRootNode().asList()) {
-            ProofTreeStyler ptStyler = new ProofTreeStyler(null);
-            StyleConfiguration nodeConfig = n.getStyleConfiguration();
-            StyleConfiguration desiredConfig = ptStyler
-                    .getStyleConfiguration(n);
-            assertTrue("StyleConfiguration of node is not correct!",
-                    nodeConfig.equals(desiredConfig));
-        }
+        ProofTreeStyler ptStyler = new ProofTreeStyler(null);
+        Stream<NUINode> nstream = ptVisualizer.getRootNode().asList().stream()
+                .filter((nd) -> (!(nd.getStyleConfiguration()
+                        .equals(ptStyler.getStyleConfiguration(nd)))));
+        assertEquals(nstream.count(), 0);
     }
 }

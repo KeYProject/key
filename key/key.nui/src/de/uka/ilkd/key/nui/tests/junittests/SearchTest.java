@@ -15,8 +15,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
- * Test for User Story 
- * (005) Laden von Beweisen #14469
+ * Test for User Story (005) Laden von Beweisen #14469
  * 
  * @author Patrick Jattke
  *
@@ -39,9 +38,8 @@ public class SearchTest {
         // load proof
         KeYEnvironment<?> environment = null;
         try {
-            environment = KeYEnvironment.load(
-                    JavaProfile.getDefaultInstance(), proofFileName,
-                    null, null, null, true);
+            environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+                    proofFileName, null, null, null, true);
         }
         catch (ProblemLoaderException e) {
             e.printStackTrace();
@@ -144,15 +142,14 @@ public class SearchTest {
     }
 
     /**
-     * Searches for the given searchTerm and compares the size of the
-     * results with the given expectedSize.
+     * Searches for the given searchTerm and compares the size of the results
+     * with the given expectedSize.
      * 
      * @param searchTerm
-     *          The term which should be used to search for.
+     *            The term which should be used to search for.
      * @param expectedSize
-     *          The expected size of the list of results.
-     * @return
-     *          True iff the size of the result list equals the expectedSize.
+     *            The expected size of the list of results.
+     * @return True iff the size of the result list equals the expectedSize.
      */
     private boolean searchAndCompareSize(String searchTerm, int expectedSize) {
         ptVisualizer.getRootNode().search(searchTerm);
