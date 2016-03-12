@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -27,23 +28,24 @@ public class SearchTest {
     /**
      * The proof file used for this test.
      */
-    private static String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
+    private static String TESTFILE_01 = "../../../examples/example01.proof";
 
     /**
      * The ProofTreeVisualizer used to load the test file.
      */
     private static ProofTreeConverter ptVisualizer;
 
-    @BeforeClass
-    public static void setUpBeforeClass() {
-        ptVisualizer = new ProofTreeConverter(null);
-        File proofFile = new File(TESTFILE_01);
+    @Before
+    public void setup() {
+        
+        File proofFile = new File(this.getClass().getResource(TESTFILE_01).getFile());
         KeYEnvironment<?> environment = null;
         try {
             environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
                     proofFile, null, null, null, true);
             Proof proof = environment.getLoadedProof();
-            ptVisualizer.loadProofTree(proof);
+            proof.setProofFile(proofFile);
+            ptVisualizer = new ProofTreeConverter(proof);
         }
         catch (ProblemLoaderException e) {
             fail("Could not set up testing environment.");

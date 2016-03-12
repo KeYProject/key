@@ -30,9 +30,7 @@ public class StyleConfigurationTest {
     /**
      * The absolute path to the directory containing the test files.
      */
-    private static String TESTFILES_DIRECTORY_LOCAL = "/de/uka/ilkd/key/examples/";
-    private static String TESTFILES_DIRECTORY_JENKINS = "resources/de/uka/ilkd/key/examples/";
-
+    private static String TESTFILES_DIRECTORY = "../../../examples/";
     /**
      * The proof file used for this test.
      */
@@ -68,7 +66,7 @@ public class StyleConfigurationTest {
     }
 
     private String loadResource(String testFile) {
-        return this.getClass().getResource(TESTFILES_DIRECTORY_JENKINS + testFile)
+        return this.getClass().getResource(TESTFILES_DIRECTORY + testFile)
                 .getFile();
     }
 
