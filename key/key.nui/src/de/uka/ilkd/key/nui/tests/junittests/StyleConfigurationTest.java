@@ -32,7 +32,7 @@ public class StyleConfigurationTest {
      */
     private static String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
     private static String TESTFILE_02 = "resources//de/uka//ilkd//key//examples//example02.proof";
-    private static String TESTFILE_03 = "resources//de/uka//ilkd//key//examples//example01.proof";
+    private static String TESTFILE_03 = "resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof";
 
     /**
      * The ProofTreeVisualizer used to load the test file.

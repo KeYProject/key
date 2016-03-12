@@ -22,7 +22,6 @@ public class ProofViewController extends NUIController implements Observer {
     public void update(Observable o, Object arg) {
         TreeViewState treeViewState = dataModel
                 .getTreeViewState(arg.toString());
-        textAreaProof.setText(treeViewState.getProof().toString());
     }
 
 }
