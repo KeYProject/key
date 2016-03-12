@@ -2,9 +2,7 @@ package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
@@ -39,13 +37,11 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Toggle;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-
 
 /**
  * Controller for the main GUI which is displayed when the program was started.
@@ -57,9 +53,8 @@ import javafx.stage.FileChooser;
  *
  */
 
-public class MainViewController extends NUIController
-        implements Observer {
-    
+public class MainViewController extends NUIController implements Observer {
+
     /**
      * Provides an enum for the available places in the main window.
      */
@@ -91,16 +86,16 @@ public class MainViewController extends NUIController
 
     @FXML
     private MenuItem openProof;
-    
+
     @FXML
     private ProgressIndicator progressIndicator;
-    
+
     /**
-     * An atomic boolean to indicate if loading is in progress
-     * While this is set to true, the loading task can be cancelled.
+     * An atomic boolean to indicate if loading is in progress While this is set
+     * to true, the loading task can be cancelled.
      */
     final private AtomicBoolean isLoadingProof = new AtomicBoolean(false);
-    
+
     /**
      * The thread that is used for the loading task.
      */
@@ -118,11 +113,6 @@ public class MainViewController extends NUIController
     private final ObservableMap<String, Place> placeComponent = new ObservableMapWrapper<>(
             new HashMap<>());
 
-    /**
-     * Stores the KeyEventHandlers (registered here using registerKeyListener)
-     */
-    private final Map<KeyCode, SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>> keyEventHandlers = new HashMap<>();
-
     public Menu getViewMenu() {
         return viewMenu;
     }
@@ -135,56 +125,6 @@ public class MainViewController extends NUIController
     }
 
     /**
-     * Handles all key combinations. To make this function listedn for a certain
-     * key combination, it must beforehand be registered via
-     * {@link registerKeyListener}. Usually <b> not to be called by
-     * developers.</b>
-     * 
-     * see the FIXME at registerKeyListener
-     * 
-     * @param k
-     *            the KeyEvent
-     */
-    public final void handleKeyPressed(final KeyEvent k) {
-
-        // Registered Key Handlers
-        SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]> e = keyEventHandlers
-                .get(k.getCode());
-
-        if (e != null) {
-            for (KeyCode keyCode : e.getValue()) {
-                switch (keyCode) {
-                case ALT:
-                    if (!k.isAltDown()) {
-                        return;
-                    }
-                    break;
-                case CONTROL:
-                    if (!k.isControlDown()) {
-                        return;
-                    }
-                    break;
-                case META:
-                    if (!k.isMetaDown()) {
-                        return;
-                    }
-                    break;
-                case SHIFT:
-                    if (!k.isShiftDown()) {
-                        return;
-                    }
-                    break;
-                default:
-                    throw new IllegalArgumentException(
-                            "You submitted an illegal modifiers list for the key "
-                                    + k.getCode());
-                }
-            }
-            e.getKey().handle(k);
-        }
-    }
-
-    /**
      * Handles the ActionEvent resulting in the user clicking "Open Proof..." in
      * the File menu. Usually <b> not to be called by developers. </b>
      * 
@@ -194,7 +134,7 @@ public class MainViewController extends NUIController
     @FXML
     public final void handleOpenProof(final ActionEvent e) {
         FileChooser fileChooser = new FileChooser();
-        
+
         TreeViewState loadedTVS = dataModel.getLoadedTreeViewState();
         // set default directory to location where currently loaded proof is
         // located
@@ -211,7 +151,7 @@ public class MainViewController extends NUIController
             fileChooser.setInitialDirectory(
                     new File("resources/de/uka/ilkd/key/examples"));
         }
-        
+
         FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter(
                 "Proof files", "*.proof");
         FileChooser.ExtensionFilter extFilterKey = new FileChooser.ExtensionFilter(
@@ -225,73 +165,6 @@ public class MainViewController extends NUIController
         if (file != null) {
             loadProof(file);
         }
-    }
-
-    /**
-     * This function allows to register key event handlers. After a Handler is
-     * registered for a certain key or key combination, all KeyEvents of that
-     * key or key combination will be transferred to that handler. <br/>
-     * <b> This functionality is not yet finished and must be used
-     * cautiously.</b>
-     * 
-     * FIXME this does not allow to register the same key with different
-     * modifiers, e.g. Enter and Shift-Enter
-     * 
-     * @param key
-     *            – the KeyCode of the primary to be listened to
-     * @param modifiers
-     *            – all of the modifiers that should also be pressed to
-     *            trigger the Handler
-     * @param handler
-     *            – the handler that is to be triggered when the key or key
-     *            combination is recognised
-     * 
-     * @throws IllegalArgumentException
-     *             – that key is already in use or modifiers does not entirely
-     *             consist of modifiers
-     */
-    public final void registerKeyListener(final KeyCode key,
-            final KeyCode[] modifiers, final EventHandler<KeyEvent> handler)
-                    throws IllegalArgumentException {
-
-        if (modifiers != null) {
-            for (KeyCode c : modifiers) {
-                // blame the way Java Designers made Enum for the fact that I
-                // cannot make the compiler do this check
-                if (!c.isModifierKey()) {
-                    throw new IllegalArgumentException(
-                            "You submitted an illegal modifiers list for the key "
-                                    + key);
-                }
-            }
-        }
-        if (keyEventHandlers.containsKey(key)) {
-            // TODO this should better be done when the view is going to be
-            // hidden
-            // TODO this should be implemented using WeakHandles
-            // this is just a workaround to make the tests work again
-            unregisterKeyListener(key);
-            // throw new IllegalArgumentException(
-            // "The key you submitted (" + k + ") was already in use.");
-        }
-
-        keyEventHandlers.put(key,
-                new SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>(
-                        handler,
-                        (modifiers == null) ? new KeyCode[0] : modifiers));
-    }
-
-    /**
-     * Unregister a previously registered key Listener.
-     * 
-     * TODO eliminate this by implementing the key register using weak handles.
-     * 
-     * @throws IllegalArgumentException
-     *             – key was never registered
-     */
-    public final void unregisterKeyListener(final KeyCode k)
-            throws IllegalArgumentException {
-        keyEventHandlers.remove(k);
     }
 
     /**
@@ -529,15 +402,22 @@ public class MainViewController extends NUIController
     }
 
     /**
+     * Executes the given EventHandler e if any key was pressed, therefore the
+     * provided Handler <b>must check by itself</b> if the right KeyCode was pressed.
+     * 
+     * @param e
+     *          The EventHandler
+     */
+    public void registerKeyListener(EventHandler<KeyEvent> e) {
+        root.addEventHandler(KeyEvent.KEY_PRESSED, e);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     protected void init() {
         dataModel.addObserver(this);
-        
-        // register key listener for cancel the proof loading task.
-        //TODO is key is not registered if focus is on proof tree.
-        registerKeyListener(KeyCode.ESCAPE, new KeyCode[] {}, (final KeyEvent event) -> cancelLoadProof());
     }
 
     /**
@@ -570,33 +450,36 @@ public class MainViewController extends NUIController
         // cannot be closed without closing the application)
         dataModel.deleteObserver(this);
     }
-    
+
     /**
-     * Invokes canceling of proof loading process.
-     * If no proof is loaded at the moment, nothing is done.
+     * Invokes canceling of proof loading process. If no proof is loaded at the
+     * moment, nothing is done.
      */
     private void cancelLoadProof() {
 
         // try to set loading status atomically
-        final boolean hasBeenCanceled = isLoadingProof.compareAndSet(true, false);
+        final boolean hasBeenCanceled = isLoadingProof.compareAndSet(true,
+                false);
 
         if (hasBeenCanceled) {
-            
+
             // TODO not a very kind way to stop a thread
             // However the method KeYEnvironment.load doesn't support
             // interrupting.
             try {
-                
+
                 try {
-                    final java.lang.reflect.Method tsm = Thread.class.getDeclaredMethod("stop0",
+                    final java.lang.reflect.Method tsm = Thread.class
+                            .getDeclaredMethod("stop0",
                                     new Class[] { Object.class });
                     tsm.setAccessible(true);
                     tsm.invoke(loadingThread, new ThreadDeath());
                 }
                 catch (java.lang.ThreadDeath e) {
-                   System.out.println("ThreadDeath to ignore? Speak with Matthias"); //TODO
+                    System.out.println(
+                            "ThreadDeath to ignore? Speak with Matthias"); // TODO
                 }
-                
+
                 // reset loading state
                 Platform.runLater(new Runnable() {
                     /**
@@ -627,7 +510,8 @@ public class MainViewController extends NUIController
                 e1.printStackTrace();
             }
             catch (java.lang.ThreadDeath e) {
-                System.out.println("Unexpected ThreadDeath in cancelLoadProof. Speak with Matthias."); //TODO
+                System.out.println(
+                        "Unexpected ThreadDeath in cancelLoadProof. Speak with Matthias."); // TODO
             }
         }
     }
@@ -640,13 +524,12 @@ public class MainViewController extends NUIController
      *            The file name of the proof file to load.
      */
     private void loadProof(final File proofFileName) {
-        
+
         // Create a new tree visualizer instance for processing the
         // conversion
         // de.uka.ilkd.key.proof.Node -->
         // de.uka.ilkd.key.nui.NUI.prooftree.NUINode
         // --> ProofTreeItem (JavaFX)
-        
 
         statustext.setText("Loading " + proofFileName.getName() + ".");
         progressIndicator.setVisible(true);
@@ -662,7 +545,7 @@ public class MainViewController extends NUIController
                 try {
                     // set Loading = false to enable canceling
                     isLoadingProof.set(true);
-                    
+
                     // load proof
                     final KeYEnvironment<?> environment = KeYEnvironment.load(
                             JavaProfile.getDefaultInstance(), proofFileName,
@@ -674,9 +557,10 @@ public class MainViewController extends NUIController
                     // convert proof to fx tree
                     final ProofTreeItem fxtree = new ProofTreeConverter(proof)
                             .createFXProofTree();
-                    
+
                     // set Loading = false as you can no longer cancel
-                    final boolean hasNotBeenCanceled = isLoadingProof.compareAndSet(true, false);
+                    final boolean hasNotBeenCanceled = isLoadingProof
+                            .compareAndSet(true, false);
 
                     if (hasNotBeenCanceled) {
                         // reset set gui waiting state
@@ -687,7 +571,7 @@ public class MainViewController extends NUIController
                                 dataModel.saveTreeViewState(
                                         new TreeViewState(proof, fxtree),
                                         proofFileName.getName());
-                                
+
                                 statustext.setText("Ready.");
                                 progressIndicator.setVisible(false);
                                 root.setCursor(Cursor.DEFAULT);
@@ -695,13 +579,14 @@ public class MainViewController extends NUIController
                             }
                         });
                     }
-                    
+
                 }
                 catch (ProblemLoaderException e) {
                     // This Exception is thrown if the thread has been killed.
                     if (isLoadingProof.get()) {
                         // error during loading
-                        System.out.println("If this occurs speak with Matthias");
+                        System.out
+                                .println("If this occurs speak with Matthias");
                         e.printStackTrace();
                     }
                     else {
@@ -710,9 +595,10 @@ public class MainViewController extends NUIController
                     }
                 }
                 catch (java.lang.ThreadDeath e) {
-                    System.out.println("Unexpected Thread Death in call. Talk to Matthias");
+                    System.out.println(
+                            "Unexpected Thread Death in call. Talk to Matthias");
                 }
-                
+
                 return null;
             }
 
