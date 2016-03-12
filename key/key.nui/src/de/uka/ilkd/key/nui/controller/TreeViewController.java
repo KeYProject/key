@@ -131,7 +131,7 @@ public class TreeViewController extends NUIController implements Observer {
 
             // set cell factory for rendering cells
             proofTreeView.setCellFactory((treeItem) -> {
-                final ProofTreeCell cell = new ProofTreeCell(icf, fh);
+                final ProofTreeCell cell = new ProofTreeCell(icf,fh, this);
                 Platform.runLater(() -> registerTreeCell(cell));
                 return cell;
             });

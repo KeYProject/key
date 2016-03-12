@@ -2,6 +2,7 @@ package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
@@ -29,6 +30,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -89,6 +91,9 @@ public class MainViewController extends NUIController implements Observer {
 
     @FXML
     private ProgressIndicator progressIndicator;
+
+    @FXML
+    private Button cancelButton;
 
     /**
      * An atomic boolean to indicate if loading is in progress While this is set
@@ -322,6 +327,11 @@ public class MainViewController extends NUIController implements Observer {
 
     }
 
+    @FXML
+    protected final void handleCancelLoadingProcess(final ActionEvent e) {
+        cancelLoadProof();
+    }
+
     /**
      * NEW
      * 
@@ -403,10 +413,11 @@ public class MainViewController extends NUIController implements Observer {
 
     /**
      * Executes the given EventHandler e if any key was pressed, therefore the
-     * provided Handler <b>must check by itself</b> if the right KeyCode was pressed.
+     * provided Handler <b>must check by itself</b> if the right KeyCode was
+     * pressed.
      * 
      * @param e
-     *          The EventHandler
+     *            The EventHandler
      */
     public void registerKeyListener(EventHandler<KeyEvent> e) {
         root.addEventHandler(KeyEvent.KEY_PRESSED, e);
@@ -491,6 +502,7 @@ public class MainViewController extends NUIController implements Observer {
                         root.setCursor(Cursor.DEFAULT);
                         openProof.setDisable(false);
                         progressIndicator.setVisible(false);
+                        cancelButton.setVisible(false);
                     }
                 });
             }
@@ -531,8 +543,10 @@ public class MainViewController extends NUIController implements Observer {
         // de.uka.ilkd.key.nui.NUI.prooftree.NUINode
         // --> ProofTreeItem (JavaFX)
 
-        statustext.setText("Loading " + proofFileName.getName() + ".");
+        statustext.setText(MessageFormat.format(
+                bundle.getString("statusLoading"), proofFileName.getName()));
         progressIndicator.setVisible(true);
+        cancelButton.setVisible(true);
         root.setCursor(Cursor.WAIT);
         openProof.setDisable(true);
 
@@ -574,6 +588,7 @@ public class MainViewController extends NUIController implements Observer {
 
                                 statustext.setText("Ready.");
                                 progressIndicator.setVisible(false);
+                                cancelButton.setVisible(false);
                                 root.setCursor(Cursor.DEFAULT);
                                 openProof.setDisable(false);
                             }

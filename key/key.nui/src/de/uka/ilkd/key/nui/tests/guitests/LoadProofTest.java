@@ -4,9 +4,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
-
 /**
  * Test for User Story (010) Laden von Beweisen #14664
  * 
@@ -60,10 +57,13 @@ public class LoadProofTest extends NUITest {
         loadProof("example01.key", false);
     }
 
-    @Test(timeout=30000)
+    @Test
     public void testCancelLoadingProcess() {
+        String proofFile = "gcd.twoJoins.proof"; 
         // test load proof
-        loadProof("gcd.twoJoins.proof", true);        
+        loadProof(proofFile, true);
+        
+        assertTrue(dataModel.getTreeViewState("proofFile")==null);
     }
 
 }
