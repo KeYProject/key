@@ -28,8 +28,6 @@
 							text="%close" />
 					</items>
 				</Menu>
-				<Menu mnemonicParsing="false" text="Edit">
-				</Menu>
 				<Menu fx:id="viewMenu" mnemonicParsing="false" text="View">
 				</Menu>
 				<Menu mnemonicParsing="false" text="%about">

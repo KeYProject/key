@@ -25,7 +25,6 @@ public class MoveViewTest extends NUITest {
     // Text of the items in the menu bar
     private static final String MENUBAR_ABOUT = "About";
     private static final String MENUBAR_VIEW = "View";
-    private static final String MENUBAR_EDIT = "Edit";
     private static final String MENUBAR_FILE = "File";
 
     // IDs of the views
@@ -60,17 +59,18 @@ public class MoveViewTest extends NUITest {
         // Load file tests in LoadProofTest
         this.closeCurrentWindow();
 
-        // EDIT
-        clickOn(MENUBAR_EDIT);
-
         // VIEW
-        // configViews is tested by testToogleGroupX
+        // open view menu
+        clickOn(MENUBAR_VIEW).moveTo("Configure Views");
+        // close view menu
         clickOn(MENUBAR_VIEW);
 
-        // ABOUT
+        // open about menu and click on About KeY
         clickOn(MENUBAR_ABOUT).clickOn("About KeY");
-        // close ABOUT window
+        // close about window
         this.closeCurrentWindow();
+
+        // open about menu and click on License
         clickOn(MENUBAR_ABOUT).clickOn("License");
     }
 
@@ -95,7 +95,7 @@ public class MoveViewTest extends NUITest {
          */
         String componendId = "#treeViewPane";
         String subMenuName = nui.getText("treeViewPane");
-        
+
         loadProof("example01.proof", false);
         moveViewTester(componendId, subMenuName);
     }
@@ -108,7 +108,7 @@ public class MoveViewTest extends NUITest {
          */
         String componendId = "#strategyViewPane";
         String subMenuName = nui.getText("strategyViewPane");
-        
+
         loadProof("example01.proof", false);
         moveViewTester(componendId, subMenuName);
     }
@@ -121,7 +121,7 @@ public class MoveViewTest extends NUITest {
          */
         String componendId = "#proofViewPane";
         String subMenuName = nui.getText("proofViewPane");
-        
+
         loadProof("example01.proof", false);
         moveViewTester(componendId, subMenuName);
     }
