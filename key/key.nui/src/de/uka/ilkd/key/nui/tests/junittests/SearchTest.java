@@ -7,7 +7,6 @@ import static org.junit.Assert.fail;
 import java.io.File;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
