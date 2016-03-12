@@ -30,8 +30,8 @@ public class StyleConfigurationTest {
     /**
      * The absolute path to the directory containing the test files.
      */
-    //private static String TESTFILES_DIRECTORY = "../../../examples/";
-    private static String TESTFILES_DIRECTORY  = "resources//de//uka//ilkd//key//examples//";
+    // private static String TESTFILES_DIRECTORY = "../../../examples/";
+    private final String TESTFILES_DIRECTORY = "resources//de/uka//ilkd//key//examples//";
     /**
      * The proof file used for this test.
      */
@@ -42,7 +42,7 @@ public class StyleConfigurationTest {
     /**
      * The ProofTreeVisualizer used to load the test file.
      */
-    private ProofTreeConverter ptVisualizer;
+    private static ProofTreeConverter ptVisualizer;
 
     public NUINode loadVisualizer(String testfileName) {
         File proofFileName = new File(TESTFILES_DIRECTORY + testfileName);
@@ -55,10 +55,10 @@ public class StyleConfigurationTest {
         catch (ProblemLoaderException e) {
             e.printStackTrace();
         }
-        final Proof proof = environment.getLoadedProof();
+        Proof proof = environment.getLoadedProof();
         proof.setProofFile(proofFileName);
 
-        // initalize ProofConverter object used for tests
+        // initialize ProofConverter object used for tests
         ptVisualizer = new ProofTreeConverter(proof);
 
         // return root node of the created tree

@@ -5,9 +5,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -20,8 +17,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
- * Test for User Story 
- * (005) Laden von Beweisen #14469
+ * Test for User Story (005) Laden von Beweisen #14469
  * 
  * @author Patrick Jattke
  *
@@ -31,81 +27,29 @@ public class SearchTest {
     /**
      * The proof file used for this test.
      */
-    //private static String TESTFILE_01 = "../../../examples/example01.proof";
-    private static String TESTFILE_01 = "resources//de//uka//ilkd//key//examples//example01.proof";
+    // private static String TESTFILE_01 = "../../../examples/example01.proof";
+    private final String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
 
     /**
      * The ProofTreeVisualizer used to load the test file.
      */
-    private ProofTreeConverter ptVisualizer;
+    private static ProofTreeConverter ptVisualizer;
 
     @Before
     public void setup() {
-        testPath();
-//        File proofFile = new File(TESTFILE_01);
-//        KeYEnvironment<?> environment = null;
-//        try {
-//            environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-//                    proofFile, null, null, null, true);
-//            Proof proof = environment.getLoadedProof();
-//            proof.setProofFile(proofFile);
-//            ptVisualizer = new ProofTreeConverter(proof);
-//        }
-//        catch (ProblemLoaderException e) {
-//            fail("Could not set up testing environment.");
-//        }
-    }
 
-    private void testPath() {
-        String TEST_PATH_01 = "resources//de//uka//ilkd//key//examples//example01.proof";
-        String TEST_PATH_02 = "//resources//de//uka//ilkd//key//examples//example01.proof";
-        String TEST_PATH_03 = "/resources/de/uka/ilkd/key/examples/example01.proof";
-        String TEST_PATH_04 = "resources/de/uka/ilkd/key/examples/example01.proof";
-        String TEST_PATH_05 = "/de/uka/ilkd/key/examples/example01.proof";
-        String TEST_PATH_06 = "//de//uka//ilkd//key//examples//example01.proof";
-        String TEST_PATH_07 = "/home/hudson/jobs/da-bpTeam10 (Minimal)/workspace/key/key.nui/bin/de/uka/ilkd/key/examples/example01.proof";
-        String TEST_PATH_08 = "//home//hudson//jobs//da-bpTeam10 (Minimal)//workspace//key//key.nui//bin//de//uka//ilkd//key//examples//example01.proof";
-        
-        String[] TEST_PATHS = {TEST_PATH_01, TEST_PATH_02, TEST_PATH_03, TEST_PATH_04, TEST_PATH_05, TEST_PATH_06, TEST_PATH_07, TEST_PATH_08};
-        PrintWriter writer = null;
+        File proofFile = new File(TESTFILE_01);
+        KeYEnvironment<?> environment = null;
         try {
-            writer = new PrintWriter("pathTest.txt", "UTF-8");
+            environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+                    proofFile, null, null, null, true);
+            Proof proof = environment.getLoadedProof();
+            proof.setProofFile(proofFile);
+            ptVisualizer = new ProofTreeConverter(proof);
         }
-        catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        catch (ProblemLoaderException e) {
+            fail("Could not set up testing environment.");
         }
-        catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        for (String s : TEST_PATHS) {
-            writer.println(s);
-            File currentFile = new File(s);
-            writer.println(currentFile.exists());
-            if (currentFile.exists()) {
-              KeYEnvironment<?> environment = null;
-              try {
-                  environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-                          currentFile, null, null, null, true);
-                  Proof proof = environment.getLoadedProof();
-                  if (proof != null) {
-                      writer.println("Proof loaded.");
-                  } else {
-                      writer.println("Proof is empty.");
-                  }
-                  proof.setProofFile(currentFile);
-                  ptVisualizer = new ProofTreeConverter(proof);
-              }
-              catch (ProblemLoaderException e) {
-                  writer.println(">> Cannot be loaded.");
-              }
-            }
-            
-            writer.println("----");
-        }
-        writer.close();
-        
     }
 
     @Test
@@ -200,15 +144,14 @@ public class SearchTest {
     }
 
     /**
-     * Searches for the given searchTerm and compares the size of the
-     * results with the given expectedSize.
+     * Searches for the given searchTerm and compares the size of the results
+     * with the given expectedSize.
      * 
      * @param searchTerm
-     *          The term which should be used to search for.
+     *            The term which should be used to search for.
      * @param expectedSize
-     *          The expected size of the list of results.
-     * @return
-     *          True iff the size of the result list equals the expectedSize.
+     *            The expected size of the list of results.
+     * @return True iff the size of the result list equals the expectedSize.
      */
     private boolean searchAndCompareSize(String searchTerm, int expectedSize) {
         ptVisualizer.getRootNode().search(searchTerm);
