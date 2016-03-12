@@ -405,7 +405,7 @@ public class MainViewController extends NUIController implements Observer {
         }
         else {
             // open dialog with file chooser
-            handleSaveProof(e);
+            handleSaveProofAs(e);
         }
     }
 

@@ -97,29 +97,23 @@ public class NUIBranchNode extends NUINode {
      * {@inheritDoc}
      */
     @Override
-    public boolean search(final String term) {
+    public int search(final String term) { // TODO this method seems much to
+                                           // verbose
         if (term.isEmpty()) {
-            return false;
+            return 0;
         }
-        
-        if (getLabel().toLowerCase().contains(term.toLowerCase())) {
-            setSearchResult(true);
-            children.forEach((child) -> child.search(term));
-            
-            return true;
+
+        boolean thisIsASearchResult = getLabel().toLowerCase().contains(term.toLowerCase());
+
+        int numberOfResultsAccumulator = thisIsASearchResult ? 1 : 0;
+
+        setSearchResult(thisIsASearchResult);
+
+        for (NUINode child : children) {
+            numberOfResultsAccumulator += child.search(term);
         }
-        else {
-            setSearchResult(false);
-            
-            boolean childrenMatch = false;
-            for (final NUINode child : children) {
-                if (child.search(term)) {
-                    childrenMatch = true;
-                }
-            }
-            
-            return childrenMatch;
-        }
+
+        return numberOfResultsAccumulator;
     }
 
     /**

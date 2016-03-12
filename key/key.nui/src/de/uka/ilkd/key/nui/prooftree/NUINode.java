@@ -401,15 +401,15 @@ public abstract class NUINode implements Cloneable {
      *            the term to search for
      * @return true iff there are any search results
      */
-    public boolean search(final String term) {
+    public int search(final String term) {
         if (term.isEmpty()) {
-            return false;
+            return 0;
         }
 
         final boolean match = getLabel().toLowerCase()
                 .contains(term.toLowerCase());
         setSearchResult(match);
-        return match;
+        return match ? 1 : 0;
     }
 
     // TODO comments, maybe outsource
