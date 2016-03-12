@@ -87,7 +87,7 @@ public class IconFactory {
 		if (icons.containsKey(imageConstant)) {
 			img = icons.get(imageConstant);
 		} else {
-			final InputStream istream = IconFactory.class.getResourceAsStream(folderRoot
+			final InputStream istream = getClass().getResourceAsStream(folderRoot
 					+ imageConstant);
 			img = new Image(istream);
 			icons.put(imageConstant, img);
