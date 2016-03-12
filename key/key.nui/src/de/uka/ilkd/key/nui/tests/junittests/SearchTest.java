@@ -1,9 +1,13 @@
 package de.uka.ilkd.key.nui.tests.junittests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
 import de.uka.ilkd.key.proof.Proof;
@@ -31,17 +35,21 @@ public class SearchTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        File proofFile = new File(TESTFILE_01);
+        File proofFileName = new File(TESTFILE_01);
+        // load proof
         KeYEnvironment<?> environment = null;
         try {
-            environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-                    proofFile, null, null, null, true);
-            Proof proof = environment.getLoadedProof();
-            ptVisualizer = new ProofTreeConverter(proof);
+            environment = KeYEnvironment.load(
+                    JavaProfile.getDefaultInstance(), proofFileName,
+                    null, null, null, true);
         }
         catch (ProblemLoaderException e) {
-            fail("Could not set up testing environment.");
+            e.printStackTrace();
         }
+        final Proof proof = environment.getLoadedProof();
+        proof.setProofFile(proofFileName);
+        // initalize ProofConverter object used for tests
+        ptVisualizer = new ProofTreeConverter(proof);
     }
 
     @Test

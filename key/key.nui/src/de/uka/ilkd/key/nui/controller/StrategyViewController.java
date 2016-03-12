@@ -2,6 +2,8 @@ package de.uka.ilkd.key.nui.controller;
 
 import de.uka.ilkd.key.nui.TreeViewState;
 import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -27,14 +29,11 @@ public class StrategyViewController extends NUIController {
         String filename;
 
         try {
-
             filename = dataModel.getLoadedTreeViewState().getProof()
                     .getProofFile().getName();
-
         }
         catch (NullPointerException e2) {
-            ((MainViewController) nui.getController("MainView"))
-                    .updateStatusbar("A proof file must be loaded first!");
+            nui.updateStatusbar("A proof file must be loaded first!");
             return;
         }
 
@@ -47,14 +46,21 @@ public class StrategyViewController extends NUIController {
         ApplyStrategyInfo strategyInfo = proofStarter.start();
 
         // update statusbar
-        ((MainViewController) nui.getController("MainView"))
-                .updateStatusbar(strategyInfo.reason());
+        nui.updateStatusbar(strategyInfo.reason());
 
-        // save changed proof into data model
-        TreeViewState newTreeViewState = new TreeViewState(
-                proofStarter.getProof(), treeViewState.getTreeItem());
-        dataModel.saveTreeViewState(newTreeViewState, filename);
+        // load updated proof
+        Proof updatedProof = proofStarter.getProof();
 
+        // create new tree from updateProof
+        ProofTreeItem fxtree = new ProofTreeConverter(updatedProof)
+                .createFXProofTree();
+
+        // Create new TreeViewState for updatedProof
+        TreeViewState updatedTreeViewState = new TreeViewState(updatedProof,
+                fxtree);
+
+        // update datamodel
+        dataModel.updateTreeViewState(filename, updatedTreeViewState);
     }
 
 }

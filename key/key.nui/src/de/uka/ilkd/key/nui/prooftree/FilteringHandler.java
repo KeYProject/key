@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
-import java.util.Observer;
 
 import de.uka.ilkd.key.nui.prooftree.filter.FilterShowAll;
 import de.uka.ilkd.key.nui.DataModel;
@@ -13,6 +13,7 @@ import de.uka.ilkd.key.nui.prooftree.filter.FilterCombineAND;
 import de.uka.ilkd.key.nui.prooftree.filter.FilterHideClosed;
 import de.uka.ilkd.key.nui.prooftree.filter.FilterHideIntermediate;
 import de.uka.ilkd.key.nui.prooftree.filter.FilterHideNonInteractive;
+import de.uka.ilkd.key.nui.prooftree.filter.FilterHideNonSymbolicExecution;
 import de.uka.ilkd.key.nui.prooftree.filter.ProofTreeFilter;
 
 /**
@@ -25,37 +26,35 @@ public class FilteringHandler {
     /**
      * A map storing filters with their resp. activation flag.
      */
-    private Map<ProofTreeFilter, Boolean> filtersMap = new LinkedHashMap<>();
+    final private Map<ProofTreeFilter, Boolean> filtersMap = Collections.synchronizedMap(new LinkedHashMap<>());
 
     /**
      * The data model.
      */
-    private DataModel dm;
+    final private DataModel dm;
     
-    //TODO
+    //TODO stores the current tree. When the model class provides a
+    // funtion to get the current tree this can be deleted.
     private String currentTree;
     
     /**
      * Constructor.
-     * @param dm The DataModel.
+     * @param model The DataModel.
      */
-    public FilteringHandler(DataModel dm) {
-        this.dm = dm;
+    public FilteringHandler(final DataModel model) {
+        this.dm = model;
         
         final List<ProofTreeFilter> filters = searchFilterClasses();
         filters.forEach((filter) -> filtersMap.put(filter, false));
         
-        dm.addObserver(new Observer() {
-            @Override
-            public void update(Observable o, Object arg) {
-                currentTree = (String) arg;
-                reinit();
-            }
+        model.addObserver((final Observable obs, final Object arg) -> {
+            currentTree = (String) arg;
+            reinit();
         });
     }
     
     /**
-     * Resets all active filters
+     * Resets all active filters.
      */
     public void reinit() {
         filtersMap.forEach((filter, active) -> {
@@ -74,10 +73,11 @@ public class FilteringHandler {
         
         final List<ProofTreeFilter> filters = new LinkedList<ProofTreeFilter>();
         
-        //TODO search in package
+        //TODO search in package @florian
         filters.add(new FilterHideClosed());
         filters.add(new FilterHideIntermediate());
         filters.add(new FilterHideNonInteractive());
+        filters.add(new FilterHideNonSymbolicExecution());
         
         return filters;
     }
@@ -111,7 +111,7 @@ public class FilteringHandler {
                     return new FilterCombineAND(f1, f2);
                 });
 
-        ProofTreeItem root = dm.getTreeViewState(currentTree).getTreeItem();
+        final ProofTreeItem root = dm.getTreeViewState(currentTree).getTreeItem();
         root.filter(redFilter);
     }
 

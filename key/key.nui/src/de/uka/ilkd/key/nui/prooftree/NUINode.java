@@ -28,51 +28,56 @@ public abstract class NUINode implements Cloneable {
     /**
      * Marks if the node has the active property.
      */
-    private SimpleBooleanProperty active;
+    private final SimpleBooleanProperty active = new SimpleBooleanProperty();
     /**
      * Marks if the node has the closed property.
      */
-    private SimpleBooleanProperty closed;
+    private final SimpleBooleanProperty closed = new SimpleBooleanProperty();
 
     /**
      * Marks if the node has the interactive property.
      */
-    private SimpleBooleanProperty interactive;
+    private final SimpleBooleanProperty interactive = new SimpleBooleanProperty();
 
     /**
      * Marks if the node is currently visible in the treeView.
      */
-    private SimpleBooleanProperty isVisible = new SimpleBooleanProperty(true);
+    private final SimpleBooleanProperty visible = new SimpleBooleanProperty(true);
 
     /**
      * The node text label.
      */
-    private SimpleStringProperty label;
+    private final SimpleStringProperty label = new SimpleStringProperty();
 
     /**
      * Marks if the node has the linked property.
      */
-    private SimpleBooleanProperty linked;
+    private final SimpleBooleanProperty linked = new SimpleBooleanProperty(false);
 
     /**
      * Marks if notes for this node exist.
      */
-    private SimpleBooleanProperty notes;
+    private final SimpleBooleanProperty notes = new SimpleBooleanProperty(false);
 
     /**
      * the parent node of this node.
      */
-    private SimpleObjectProperty<NUINode> parent;
+    private final SimpleObjectProperty<NUINode> parent = new SimpleObjectProperty<NUINode>();
 
     /**
      * The serial number of the proof node.
      */
-    private SimpleStringProperty serialNumber;
+    private final SimpleStringProperty serialNumber = new SimpleStringProperty();
     
     /**
      * Marks whether this node is a result of a currently active search.
      */
-    private SimpleBooleanProperty isSearchResult = new SimpleBooleanProperty(false);
+    private final SimpleBooleanProperty searchResult = new SimpleBooleanProperty(false);
+    
+    /**
+     * Marks if the node is a symbolic execution.
+     */
+    private final SimpleBooleanProperty symbolicExecution = new SimpleBooleanProperty(false);
 
     /**
      * Retrieves the label (name) of the node. <br>
@@ -81,9 +86,6 @@ public abstract class NUINode implements Cloneable {
      * @return label The name of the node as String.
      */
     public final String getLabel() {
-        if (label == null) {
-            label = new SimpleStringProperty();
-        }
         return label.get();
     }
 
@@ -93,9 +95,6 @@ public abstract class NUINode implements Cloneable {
      * @return the parent NUINode
      */
     public final NUINode getParent() {
-        if (parent == null) {
-            parent = new SimpleObjectProperty<NUINode>();
-        }
         return parent.get();
     }
 
@@ -107,9 +106,6 @@ public abstract class NUINode implements Cloneable {
      * @return serialNumber The serial number of the node.
      */
     public final String getSerialNumber() {
-        if (serialNumber == null) {
-            serialNumber = new SimpleStringProperty();
-        }
         return serialNumber.get();
     }
 
@@ -120,9 +116,6 @@ public abstract class NUINode implements Cloneable {
      * @return hasNotes is TRUE if the node has notes, else FALSE.
      */
     public final boolean hasNotes() {
-        if (notes == null) {
-            notes = new SimpleBooleanProperty();
-        }
         return notes.get();
     }
 
@@ -134,10 +127,16 @@ public abstract class NUINode implements Cloneable {
      *         FALSE.
      */
     public final boolean isActive() {
-        if (active == null) {
-            active = new SimpleBooleanProperty();
-        }
         return active.get();
+    }
+    
+    /**
+     * Indicates if the node has is an symbolic execution.
+     * 
+     * @return true iff the node is an symbolic execution.
+     */
+    public final boolean isSymbolicExecution() {
+        return symbolicExecution.get();
     }
 
     /**
@@ -148,9 +147,6 @@ public abstract class NUINode implements Cloneable {
      * @return closed is TRUE when the goal is closed, else FALSE.
      */
     public final boolean isClosed() {
-        if (closed == null) {
-            closed = new SimpleBooleanProperty();
-        }
         return closed.getValue();
     }
 
@@ -163,9 +159,6 @@ public abstract class NUINode implements Cloneable {
      *         FALSE.
      */
     public final boolean isInteractive() {
-        if (interactive == null) {
-            interactive = new SimpleBooleanProperty();
-        }
         return interactive.get();
     }
 
@@ -176,9 +169,6 @@ public abstract class NUINode implements Cloneable {
      * @return isLinked is TRUE when the node is a linked node, else FALSE.
      */
     public final boolean isLinked() {
-        if (linked == null) {
-            linked = new SimpleBooleanProperty();
-        }
         return linked.get();
     }
 
@@ -188,10 +178,7 @@ public abstract class NUINode implements Cloneable {
      * @return true if the node is visible, otherwise false
      */
     public final boolean isVisible() {
-        if (isVisible == null) {
-            isVisible = new SimpleBooleanProperty();
-        }
-        return isVisible.get();
+        return visible.get();
     }
     /**
      * Sets the active statement status of the node. <br>
@@ -202,12 +189,7 @@ public abstract class NUINode implements Cloneable {
      *            else to FALSE.
      */
     public final void setActive(final boolean active) {
-        if (this.active == null) {
-            this.active = new SimpleBooleanProperty(active);
-        }
-        else {
-            this.active.set(active);
-        }
+        this.active.set(active);
     }
 
     /**
@@ -218,12 +200,7 @@ public abstract class NUINode implements Cloneable {
      *            sets the status of the goal, can be open (T) or closed (F)
      */
     public final void setClosed(final boolean isClosed) {
-        if (this.closed == null) {
-            this.closed = new SimpleBooleanProperty(isClosed);
-        }
-        else {
-            this.closed.set(isClosed);
-        }
+        this.closed.set(isClosed);
     }
 
     /**
@@ -234,12 +211,7 @@ public abstract class NUINode implements Cloneable {
      *            should be set to TRUE if the node has notes, else to FALSE.
      */
     public final void setHasNotes(final boolean hasNotes) {
-        if (this.notes == null) {
-            this.notes = new SimpleBooleanProperty(hasNotes);
-        }
-        else {
-            this.notes.set(hasNotes);
-        }
+        this.notes.set(hasNotes);
     }
 
     /**
@@ -252,12 +224,7 @@ public abstract class NUINode implements Cloneable {
      *            else to FALSE.
      */
     public final void setInteractive(final boolean interactive) {
-        if (this.interactive == null) {
-            this.interactive = new SimpleBooleanProperty(interactive);
-        }
-        else {
-            this.interactive.set(interactive);
-        }
+        this.interactive.set(interactive);
     }
 
     /**
@@ -268,12 +235,17 @@ public abstract class NUINode implements Cloneable {
      *            The name as String.
      */
     public final void setLabel(final String label) {
-        if (this.label == null) {
-            this.label = new SimpleStringProperty(label);
-        }
-        else {
-            this.label.set(label);
-        }
+        this.label.set(label);
+    }
+    
+    /**
+     * Defines whether the node is a symbolic execution.
+     * 
+     * @param state
+     *            has to be TRUE iff the node is a symbolic execution.
+     */
+    public final void setSymbolicExcecution(final boolean state) {
+        this.symbolicExecution.set(state);
     }
 
     /**
@@ -284,12 +256,7 @@ public abstract class NUINode implements Cloneable {
      *            should be TRUE if the node is a linked node, otherwise FALSE.
      */
     public final void setLinked(final boolean isLinked) {
-        if (this.linked == null) {
-            this.linked = new SimpleBooleanProperty(isLinked);
-        }
-        else {
-            this.linked.set(isLinked);
-        }
+        this.linked.set(isLinked);
     }
 
     /**
@@ -299,12 +266,7 @@ public abstract class NUINode implements Cloneable {
      *            the parent NUINode
      */
     public final void setParent(final NUINode parent) {
-        if (this.parent == null) {
-            this.parent = new SimpleObjectProperty<NUINode>(parent);
-        }
-        else {
-            this.parent.set(parent);
-        }
+        this.parent.set(parent);
     }
 
     /**
@@ -322,12 +284,7 @@ public abstract class NUINode implements Cloneable {
      *            The serial number to set.
      */
     public final void setSerialNumber(final String serial) {
-        if (this.serialNumber == null) {
-            this.serialNumber = new SimpleStringProperty(serial);
-        }
-        else {
-            this.serialNumber.set(serial);
-        }
+        this.serialNumber.set(serial);
     }
 
     /**
@@ -337,12 +294,7 @@ public abstract class NUINode implements Cloneable {
      *            the state of visibility
      */
     public final void setVisibility(final boolean isVisible) {
-        if (this.isVisible == null) {
-            this.isVisible = new SimpleBooleanProperty(isVisible);
-        }
-        else {
-            this.isVisible.set(isVisible);
-        }
+        this.visible.set(isVisible);
     }
     
     /**
@@ -386,10 +338,7 @@ public abstract class NUINode implements Cloneable {
      * @return true if this is a search Result, otherwise false
      */
     public boolean isSearchResult() {
-        if (isSearchResult == null) {
-            isSearchResult = new SimpleBooleanProperty();
-        }
-        return isSearchResult.get();
+        return searchResult.get();
     }
     
     /**
@@ -398,12 +347,7 @@ public abstract class NUINode implements Cloneable {
      * @param isSearchResult true iff the NUINode is part of a searchResult
      */
     public void setSearchResult(final boolean isSearchResult) {
-        if (this.isSearchResult == null) {
-            this.isSearchResult = new SimpleBooleanProperty(isSearchResult);
-        }
-        else {
-            this.isSearchResult.set(isSearchResult);
-        }
+        this.searchResult.set(isSearchResult);
     }
     
     /**
@@ -414,10 +358,7 @@ public abstract class NUINode implements Cloneable {
      *            the changeListener to add.
      */
     public void addSearchResultListener(final ChangeListener<Boolean> listener) {
-       if (isSearchResult == null) {
-           isSearchResult = new SimpleBooleanProperty();
-       }
-        isSearchResult.addListener(listener);
+        searchResult.addListener(listener);
     }
 
     /**
@@ -425,9 +366,7 @@ public abstract class NUINode implements Cloneable {
      * @param listener the changeListener to remove
      */
     public void removeSearchResultListener(final ChangeListener<Boolean> listener) {
-       if (isSearchResult != null) {
-            isSearchResult.removeListener(listener);
-        }
+        searchResult.removeListener(listener);
     }
     
     /**
@@ -449,12 +388,12 @@ public abstract class NUINode implements Cloneable {
             return false;
         }
         
-        boolean match = getLabel().toLowerCase().contains(term.toLowerCase());
+        final boolean match = getLabel().toLowerCase().contains(term.toLowerCase());
         setSearchResult(match);
         return match;
     }
     
-    //TODO really necessary???
+    //TODO comments, maybe outsource
     public List<NUINode> asList() {
         List<NUINode> l = new LinkedList<>();
         l.add(this);

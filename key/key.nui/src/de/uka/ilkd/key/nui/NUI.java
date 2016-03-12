@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
-import com.sun.glass.events.WindowEvent;
-
 import de.uka.ilkd.key.nui.controller.MainViewController;
 import de.uka.ilkd.key.nui.controller.MainViewController.Place;
 import de.uka.ilkd.key.nui.controller.NUIController;
@@ -72,13 +70,35 @@ public class NUI extends Application {
     private MainViewController mainViewController = null;
 
     private Menu viewPositionMenu = null;
-    private DataModel dataModel = new DataModel();
+    private DataModel dataModel = new DataModel(this);
 
     /**
      * When program is starting method "start" is called.
      */
     @Override
     public final void start(final Stage stage) throws Exception {
+        initializeNUI();
+
+        // Load scene and set preferences
+        final Scene scene = new Scene(root);
+        stage.setTitle("KeY");
+        stage.setScene(scene);
+        stage.show();
+
+        // Assign event when stage closing event is elevated
+        stage.setOnCloseRequest((e) -> {
+            try {
+                ((MainViewController) getController("MainView"))
+                        .handleCloseWindow(e);
+            }
+            catch (Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        });
+    }
+
+    public void initializeNUI() throws Exception {
         // Load Main View
         String filename = "MainView.fxml";
         String name = cutFileExtension(filename);
@@ -96,6 +116,7 @@ public class NUI extends Application {
 
         // initialize viewPositionMenu
         viewPositionMenu = new Menu(bundle.getString("configViews"));
+        viewPositionMenu.setId("configViews");
 
         // Load all components
         loadComponents();
@@ -112,27 +133,9 @@ public class NUI extends Application {
         mainViewController.addComponent(getComponent("proofViewPane"),
                 Place.MIDDLE);
         mainViewController.addComponent(getComponent("strategyViewPane"),
-                Place.RIGHT);
+                Place.RIGHT); // TODO
         mainViewController.addComponent(getComponent("openProofsViewPane"),
                 Place.BOTTOM);
-
-        // Assign event when stage closing event is elevated
-        stage.setOnCloseRequest((e) -> {
-            try {
-                ((MainViewController)getController("MainView")).handleCloseWindow(e);
-            }
-            catch (Exception e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-        });
-        
-      
-        // Load scene and set preferences
-        final Scene scene = new Scene(root);
-        stage.setTitle("KeY");
-        stage.setScene(scene);
-        stage.show();
     }
 
     private void loadComponents() throws Exception {
@@ -166,7 +169,7 @@ public class NUI extends Application {
     }
 
     private Menu createSubMenu(String componentName, ToggleGroup toggleGroup) {
-        Menu menu = new Menu(componentName);
+        Menu menu = new Menu(bundle.getString(componentName));
 
         String hideText = bundle.getString("hide");
         String leftText = bundle.getString("left");
@@ -275,5 +278,42 @@ public class NUI extends Application {
      */
     public String getStringFromBundle(String key) {
         return bundle.getString(key);
+    }
+
+    /**
+     * Updates the status bar on the mainView by the given text. Keeps the text
+     * on the status bar till the next update is performed.
+     * 
+     * @param text
+     *            String to be set to the status bar.
+     */
+    public void updateStatusbar(String text) {
+        try {
+            ((MainViewController) getController("MainView"))
+                    .updateStatusbar(text);
+        }
+        catch (ControllerNotFoundException e) {
+            e.showMessage();
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Returns a reference to the DataModel.
+     * 
+     * @return dataModel
+     */
+    public DataModel getDataModel() {
+        return dataModel;
+    }
+
+    /**
+     * returns a text from the language file which corresponds to the textId
+     * 
+     * @param textId
+     * @return
+     */
+    public String getText(String textId) {
+        return bundle.getString(textId);
     }
 }

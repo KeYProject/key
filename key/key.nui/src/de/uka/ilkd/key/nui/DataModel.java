@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.nui;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Observable;
 
@@ -27,6 +29,21 @@ public class DataModel extends Observable {
     private TreeViewState loadedTreeViewState;
 
     /**
+     * An instance representing the associated NUI.
+     */
+    private NUI nui;
+
+    /**
+     * Creates a new data model for the GUI instance.
+     * 
+     * @param nui
+     *            The {@link NUI} instance associated to the data model.
+     */
+    public DataModel(NUI nui) {
+        this.nui = nui;
+    }
+
+    /**
      * Returns the {@link TreeViewState} associated to the given filename name.
      * 
      * @param name
@@ -41,7 +58,7 @@ public class DataModel extends Observable {
      * Stores a <b>new</b> TreeViewState into the list of TreeViewStates.
      * Overwrites the an existing state if the key is already present. Do NOT
      * use this method to save changes of a proof file, use instead
-     * {@link #updateProofFile}.
+     * {@link #updateTreeViewState}.
      * 
      * @param treeViewState
      *            The new treeViewState to store.
@@ -57,23 +74,21 @@ public class DataModel extends Observable {
     }
 
     /**
-     * Updates the proof file of an already existing (loaded) TreeViewState.
+     * Updates the already existing (loaded) TreeViewState.
      * 
      * @param key
      *            the key (filename) of the {@link Proof} file.
-     * @param proof
-     *            the proof file to be set to the TreeViewState, identified by
-     *            the provided key
+     * @param updatedTreeViewState
+     *            updatedTreeViewState e. g. running strategy
      * 
      */
-    public void updateProofFile(String key, Proof proof) {
-        TreeViewState treeViewState = treeViewStates.get(key);
-        if (treeViewState != null) {
-            treeViewState.setProof(proof);
-            treeViewState.setModified(true);
-            this.setChanged();
-            this.notifyObservers(key);
-        }
+    public void updateTreeViewState(String key,
+            TreeViewState updatedTreeViewState) {
+
+        updatedTreeViewState.setModified(true);
+        treeViewStates.put(key, updatedTreeViewState);
+        this.setChanged();
+        this.notifyObservers(key);
     }
 
     /**
@@ -81,6 +96,28 @@ public class DataModel extends Observable {
      */
     public TreeViewState getLoadedTreeViewState() {
         return loadedTreeViewState;
+    }
+
+    /**
+     * Saves the proof file proof to the given File destinationFile.
+     * 
+     * @param proof
+     *            the {@link Proof} file to be saved.
+     * @param destinationFile
+     *            the destination {@link File} where the proof is saved to.
+     */
+    public final void saveProof(Proof proof, File destinationFile) {
+        try {
+            proof.saveToFile(destinationFile);
+            proof.setProofFile(destinationFile);
+            nui.updateStatusbar(nui.getStringFromBundle("savedSuccessfully")
+                    + " " + destinationFile.getAbsolutePath());
+            // If proof is successfully saved, unset isModified flag
+            getLoadedTreeViewState().setModified(false);
+        }
+        catch (IOException e) {
+            nui.updateStatusbar(e.getMessage());
+        }
     }
 
 }

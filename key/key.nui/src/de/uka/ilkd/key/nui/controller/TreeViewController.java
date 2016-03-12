@@ -15,7 +15,6 @@ import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeStyle;
-import de.uka.ilkd.key.proof.Proof;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeView;
@@ -73,12 +72,10 @@ public class TreeViewController extends NUIController implements Observer {
      */
     @FXML
     private TreeView<NUINode> proofTreeView;
-
-    /**
-     * The filtering handler.
-     */
+    
+    //TODO comments
     private FilteringHandler fh;
-
+    
     /**
      * This method should be called every time a new TreeCell is being created.
      * <tt>this</tt> will reference the ProofTreeCell in a WeakHandle in order
@@ -162,7 +159,6 @@ public class TreeViewController extends NUIController implements Observer {
 
     public void addSearchView(Pane searchViewPane,
             NUIController nuiController) {
-
         this.searchViewPane = searchViewPane;
         if (nuiController instanceof SearchViewController)
             this.searchViewController = (SearchViewController) nuiController;
