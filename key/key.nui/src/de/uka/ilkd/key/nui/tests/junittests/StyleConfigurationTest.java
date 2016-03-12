@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -31,16 +32,15 @@ public class StyleConfigurationTest {
      * The proof file used for this test.
      */
     private static String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
-    private static String TESTFILE_02 = "resources//de/uka//ilkd//key//examples//example02.proof";
-    private static String TESTFILE_03 = "resources//de/uka//ilkd//key//examples//example01.proof";
 
     /**
      * The ProofTreeVisualizer used to load the test file.
      */
     private static ProofTreeConverter ptVisualizer;
 
-    public NUINode loadVisualizer(String testfileName) {
-        File proofFileName = new File(testfileName);
+    @BeforeClass
+    public static void setUpBeforeClass() {
+        File proofFileName = new File(TESTFILE_01);
 
         // load proof
         KeYEnvironment<?> environment = null;
@@ -56,53 +56,17 @@ public class StyleConfigurationTest {
 
         // initalize ProofConverter object used for tests
         ptVisualizer = new ProofTreeConverter(proof);
-
-        // return root node of the created tree
-        return ptVisualizer.getRootNode();
     }
 
     @Test
     public void StyleConfigurationTest01() {
-        NUINode node = loadVisualizer(TESTFILE_01);
-        checkTree(node);
-    }
-
-    @Test
-    public void StyleConfigurationTest02() {
-        NUINode node = loadVisualizer(TESTFILE_02);
-        checkTree(node);
-    }
-
-    @Test
-    public void StyleConfigurationTest03() {
-        NUINode node = loadVisualizer(TESTFILE_03);
-        checkTree(node);
-    }
-
-    /**
-     * Checks for the whole subtree, rooted by the given {@link NUINode} node,
-     * if every node has the right {@link StyleConfiguration} assigned to.
-     * 
-     * @param node
-     */
-    private void checkTree(NUINode node) {
-        for (NUINode n : node.asList()) {
-            checkStyleConfiguration(n);
+        for (NUINode n : ptVisualizer.getRootNode().asList()) {
+            ProofTreeStyler ptStyler = new ProofTreeStyler(null);
+            StyleConfiguration nodeConfig = n.getStyleConfiguration();
+            StyleConfiguration desiredConfig = ptStyler
+                    .getStyleConfiguration(n);
+            assertTrue("StyleConfiguration of node is not correct!",
+                    nodeConfig.equals(desiredConfig));
         }
     }
-
-    /**
-     * Checks whether the given {@link NUINode} node has the right
-     * {@link StyleConfiguration} assigned to.
-     * 
-     * @param node
-     */
-    private void checkStyleConfiguration(NUINode node) {
-        ProofTreeStyler ptStyler = new ProofTreeStyler(null);
-        StyleConfiguration nodeConfig = node.getStyleConfiguration();
-        StyleConfiguration desiredConfig = ptStyler.getStyleConfiguration(node);
-        assertTrue("StyleConfiguration of node is not correct!",
-                nodeConfig.equals(desiredConfig));
-    }
-
 }
