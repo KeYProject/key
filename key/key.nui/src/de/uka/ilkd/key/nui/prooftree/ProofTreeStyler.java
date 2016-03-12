@@ -1,9 +1,11 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import de.uka.ilkd.key.nui.IconFactory;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 /**

@@ -28,11 +28,16 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 public class StyleConfigurationTest {
 
     /**
+     * The absolute path to the directory containing the test files.
+     */
+    private static String TESTFILES_DIRECTORY = "/de/uka/ilkd/key/examples/";
+
+    /**
      * The proof file used for this test.
      */
-    private static String TESTFILE_01 = "de//uka//ilkd//key//examples//example01.proof";
-    private static String TESTFILE_02 = "de//uka//ilkd//key//examples//example02.proof";
-    private static String TESTFILE_03 = "de//uka//ilkd//key//examples//gcd.twoJoins.proof";
+    private static String TESTFILE_01 = "example01.proof";
+    private static String TESTFILE_02 = "example02.proof";
+    private static String TESTFILE_03 = "gcd.twoJoins.proof";
 
     /**
      * The ProofTreeVisualizer used to load the test file.
@@ -61,21 +66,26 @@ public class StyleConfigurationTest {
         return ptVisualizer.getRootNode();
     }
 
+    private String loadResource(String testFile) {
+        return this.getClass().getResource(TESTFILES_DIRECTORY + testFile)
+                .getFile();
+    }
+
     @Test
     public void StyleConfigurationTest01() {
-        NUINode node = loadVisualizer(TESTFILE_01);
+        NUINode node = loadVisualizer(loadResource(TESTFILE_01));
         checkTree(node);
     }
 
     @Test
     public void StyleConfigurationTest02() {
-        NUINode node = loadVisualizer(TESTFILE_02);
+        NUINode node = loadVisualizer(loadResource(TESTFILE_02));
         checkTree(node);
     }
 
     @Test
     public void StyleConfigurationTest03() {
-        NUINode node = loadVisualizer(TESTFILE_03);
+        NUINode node = loadVisualizer(loadResource(TESTFILE_03));
         checkTree(node);
     }
 
