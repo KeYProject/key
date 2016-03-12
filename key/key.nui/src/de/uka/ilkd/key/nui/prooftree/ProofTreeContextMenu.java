@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.nui.IconFactory;
+import de.uka.ilkd.key.nui.controller.TreeViewController;
 import de.uka.ilkd.key.nui.prooftree.filter.ProofTreeFilter;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -41,6 +42,8 @@ public class ProofTreeContextMenu extends ContextMenu {
     
     private final FilteringHandler fh;
     
+    private TreeViewController treeViewController = null;
+    
     /**
      * The label of the context menu "expand all" label.
      */
@@ -77,7 +80,7 @@ public class ProofTreeContextMenu extends ContextMenu {
      */
     public ProofTreeContextMenu(final TreeItem<NUINode> treeItem, 
     		final TreeView<NUINode> treeView, final IconFactory icf,
-    		final FilteringHandler fh) {
+    		final FilteringHandler fh, TreeViewController tvc) {
     	super();
     	
     	this.treeItem = treeItem;
@@ -85,6 +88,7 @@ public class ProofTreeContextMenu extends ContextMenu {
         
         this.icf = icf;
         this.fh = fh;
+        this.treeViewController = tvc;
         
         // Add dummy so that the context menu can be displayed.
         // It is put in in the method "show".
@@ -169,7 +173,8 @@ public class ProofTreeContextMenu extends ContextMenu {
     	final MenuItem mISearch = new MenuItem(LBL_SEARCH);
     	getItems().add(mISearch);
     	mISearch.setGraphic(icf.getImage(IconFactory.SEARCH));
-    	mISearch.setOnAction(aEvt -> ProofTreeActions.openSearchView());
+    	//mISearch.setOnAction(aEvt -> ProofTreeActions.openSearchView());
+    	mISearch.setOnAction(aEvt -> treeViewController.openSearchView());
     	mISearch.setAccelerator(KeyCombination.keyCombination("Ctrl+F"));
     }
     

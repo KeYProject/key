@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui.prooftree;
 
 import de.uka.ilkd.key.nui.IconFactory;
+import de.uka.ilkd.key.nui.controller.TreeViewController;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -39,6 +40,8 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 
     private FilteringHandler fh;
 
+    private TreeViewController treeViewController = null;
+
     /**
      * The label that will be displayed.
      */
@@ -66,10 +69,12 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      * @param icf
      *            the icon factory used to display node icons
      */
-    public ProofTreeCell(final IconFactory icf, final FilteringHandler fh) {
+    public ProofTreeCell(final IconFactory icf, final FilteringHandler fh,
+            TreeViewController tvc) {
         super();
         this.fh = fh;
         this.icf = icf;
+        this.treeViewController = tvc;
     }
 
     /**
@@ -119,7 +124,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         }
 
         setContextMenu(new ProofTreeContextMenu(getTreeItem(), getTreeView(),
-                icf, fh));
+                icf, fh, treeViewController));
 
         // reset label and icon
         label = new Label(item.getLabel() + " ");
