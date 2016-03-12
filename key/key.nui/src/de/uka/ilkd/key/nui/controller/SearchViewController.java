@@ -30,7 +30,7 @@ public class SearchViewController extends NUIController {
         UP, DOWN
     }
 
-    private boolean anythingIsHighlighted = false; // NOPMD
+    private int numberOfSearchResults = 0;
 
     /**
      * The Button toggling selectNextItem in searching
@@ -42,6 +42,12 @@ public class SearchViewController extends NUIController {
      */
     @FXML
     private Button btnSearchPrev;
+
+    /**
+     * A click on this Button closes the SearchView
+     */
+    @FXML
+    private Button btnCloseSearchView;
 
     /**
      * The TextField where search terms are entered
@@ -190,7 +196,7 @@ public class SearchViewController extends NUIController {
      *            whether the selection is to be moved up- or downwards
      */
     private void moveSelectionAndScrollIfNeeded(Direction direction) {
-        if (!anythingIsHighlighted) {
+        if (numberOfSearchResults<1) {
             return;
         }
 
@@ -283,6 +289,7 @@ public class SearchViewController extends NUIController {
                 (event) -> moveSelectionAndScrollIfNeeded(Direction.DOWN));
         btnSearchNext.setOnAction(
                 (event) -> moveSelectionAndScrollIfNeeded(Direction.UP));
+        btnCloseSearchView.setOnAction((event) -> closeSearchView());
         tfSearchQuery.textProperty().addListener((obs, oldText, newText) -> {
             btnSearchNext.setDisable(newText.isEmpty());
             btnSearchPrev.setDisable(newText.isEmpty());
@@ -291,11 +298,11 @@ public class SearchViewController extends NUIController {
                 nui.updateStatusbar("");
             }
             else {
-                int numberOfSearchResults = proofTreeView.getRoot().getValue()
+                numberOfSearchResults = proofTreeView.getRoot().getValue()
                         .search(newText);
 
-                nui.updateStatusbar("Number of Search Results: " + numberOfSearchResults);
-
+                nui.updateStatusbar(
+                        "Number of Search Results: " + numberOfSearchResults);
 
                 if (numberOfSearchResults == 0) {
                     // adds the style class for no search results
@@ -311,13 +318,7 @@ public class SearchViewController extends NUIController {
 
         searchViewPane.setOnKeyPressed((e) -> {
             if (KeyCode.ESCAPE == e.getCode()) {
-
-                // delete searchView component form treeViewPane
-                treeViewPane.getChildren().remove(searchViewPane);
-                // reset proofTreeView
-                proofTreeView.getRoot().getValue().resetSearch();
-
-                tfSearchQuery.setText("");
+                closeSearchView();
             }
             else if (KeyCode.ENTER == e.getCode()) {
                 PauseTransition pause = new PauseTransition(
@@ -336,5 +337,14 @@ public class SearchViewController extends NUIController {
         // Assign stylesheet
         searchViewPane.getStylesheets().add(getClass()
                 .getResource("../components/searchView.css").toExternalForm());
+    }
+
+    private void closeSearchView() {
+        // delete searchView component form treeViewPane
+        treeViewPane.getChildren().remove(searchViewPane);
+        // reset proofTreeView
+        proofTreeView.getRoot().getValue().resetSearch();
+
+        tfSearchQuery.setText("");
     }
 }
