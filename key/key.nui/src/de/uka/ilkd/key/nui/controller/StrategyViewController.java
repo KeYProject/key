@@ -33,9 +33,10 @@ public class StrategyViewController extends NUIController {
     @FXML
     private Label maxRuleAppLabel;
 
+    private int maxRuleApplications = 0;
+
     @Override
     protected void init() {
-        // TODO Auto-generated method stub
         maxRuleAppSlider.setLabelFormatter(new StringConverter<Double>() {
             @Override
             public String toString(Double n) {
@@ -46,7 +47,6 @@ public class StrategyViewController extends NUIController {
 
             @Override
             public Double fromString(String string) {
-                // TODO Auto-generated method stub
                 return null;
             }
         });
@@ -58,6 +58,8 @@ public class StrategyViewController extends NUIController {
                         maxRuleAppLabel.setText(bundle
                                 .getString("maxRuleAppLabel") + " "
                                 + (int) Math.pow(10, new_val.doubleValue()));
+                        maxRuleApplications = (int) Math.pow(10,
+                                new_val.doubleValue());
                     }
                 });
     }
@@ -73,7 +75,7 @@ public class StrategyViewController extends NUIController {
                     .getProofFile().getName();
         }
         catch (NullPointerException e2) {
-            nui.updateStatusbar("A proof file must be loaded first!");
+            nui.updateStatusbar(bundle.getString("errorProofFileMissing"));
             return;
         }
 
@@ -82,25 +84,36 @@ public class StrategyViewController extends NUIController {
         Proof p = treeViewState.getProof();
         proofStarter.init(p);
 
+        // restrict maximum number of rule applications based on slider value
+        // only set value of slider if slider was moved
+        if (maxRuleApplications > 0) {
+            proofStarter.setMaxRuleApplications(maxRuleApplications);
+        }
+        
         // start automatic proof
         ApplyStrategyInfo strategyInfo = proofStarter.start();
 
         // update statusbar
         nui.updateStatusbar(strategyInfo.reason());
 
-        // load updated proof
-        Proof updatedProof = proofStarter.getProof();
+        // if automatic rule application could not be performed -> no rendering
+        // of proof required
+        if (strategyInfo.getAppliedRuleApps() > 0) {
+            // load updated proof
+            Proof updatedProof = proofStarter.getProof();
 
-        // create new tree from updateProof
-        ProofTreeItem fxtree = new ProofTreeConverter(updatedProof)
-                .createFXProofTree();
+            // create new tree from updateProof
+            ProofTreeItem fxtree = new ProofTreeConverter(updatedProof)
+                    .createFXProofTree();
 
-        // Create new TreeViewState for updatedProof
-        TreeViewState updatedTreeViewState = new TreeViewState(updatedProof,
-                fxtree);
+            // Create new TreeViewState for updatedProof
+            TreeViewState updatedTreeViewState = new TreeViewState(updatedProof,
+                    fxtree);
 
-        // update datamodel
-        dataModel.updateTreeViewState(filename, updatedTreeViewState);
+            // update datamodel
+            dataModel.updateTreeViewState(filename, updatedTreeViewState);
+
+        }
     }
 
 }

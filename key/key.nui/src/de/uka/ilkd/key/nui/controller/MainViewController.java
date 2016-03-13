@@ -158,11 +158,8 @@ public class MainViewController extends NUIController implements Observer {
         }
 
         FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter(
-                "Proof files", "*.proof");
-        FileChooser.ExtensionFilter extFilterKey = new FileChooser.ExtensionFilter(
-                "Proof files", "*.key");
+                "Proof files", "*.proof", "*.key");
         fileChooser.getExtensionFilters().add(extFilterProof);
-        fileChooser.getExtensionFilters().add(extFilterKey);
 
         final File file = fileChooser.showOpenDialog(contextMenu);
 
@@ -222,13 +219,6 @@ public class MainViewController extends NUIController implements Observer {
     @FXML
     public final void handleCloseWindow(final Event e) {
 
-        // enforces to show the confirmation dialog always before closing KeY
-        // TODO remove this line after 2nd round of user study
-        // TODO set visibility of setModified to private
-        if (dataModel.getLoadedTreeViewState() != null) {
-            dataModel.getLoadedTreeViewState().setModified(true);
-        }
-
         // If no proof file was loaded OR file was not changed: close
         // application immediately
         if (dataModel.getLoadedTreeViewState() == null
@@ -241,20 +231,25 @@ public class MainViewController extends NUIController implements Observer {
         // create alert window
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle(bundle.getString("dialogTitle"));
-        alert.setHeaderText(nui.getStringFromBundle("dialogHeader"));
         String filename = dataModel.getLoadedTreeViewState().getProof()
                 .getProofFile().getName();
-        alert.setContentText(nui.getStringFromBundle("dialogQuestion") + " '"
-                + filename + "' ?");
-        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO,
-                ButtonType.CANCEL);
+        alert.setHeaderText(MessageFormat.format(
+                nui.getStringFromBundle("dialogHeader"), "'" + filename + "'"));
+        alert.setContentText(nui.getStringFromBundle("dialogQuestion"));
+
+        ButtonType buttonSaveAs = new ButtonType(
+                bundle.getString("dialogSaveAs"));
+        ButtonType buttonClose = new ButtonType(bundle.getString("dialogExit"));
+        ButtonType buttonAbort = new ButtonType(
+                bundle.getString("dialogAbort"));
+
+        alert.getButtonTypes().setAll(buttonSaveAs, buttonClose, buttonAbort);
         Optional<ButtonType> result = alert.showAndWait();
 
-        if (result.get() == ButtonType.YES || result.get() == ButtonType.NO) {
+        if (result.get() == buttonSaveAs || result.get() == buttonClose) {
             // If YES was selected: save changes made to file
-            if (result.get() == ButtonType.YES) {
-                Proof proof = dataModel.getLoadedTreeViewState().getProof();
-                dataModel.saveProof(proof, proof.getProofFile());
+            if (result.get() == buttonSaveAs) {
+                handleSaveProofAs(null);
             }
             // Close application without saving
             Platform.exit();
@@ -428,7 +423,6 @@ public class MainViewController extends NUIController implements Observer {
      */
     @Override
     protected void init() {
-
         dataModel.addObserver(this);
     }
 
