@@ -33,9 +33,10 @@ public class StrategyViewController extends NUIController {
     @FXML
     private Label maxRuleAppLabel;
 
+    private int currentSliderValue = 10;
+
     @Override
     protected void init() {
-        // TODO Auto-generated method stub
         maxRuleAppSlider.setLabelFormatter(new StringConverter<Double>() {
             @Override
             public String toString(Double n) {
@@ -55,11 +56,14 @@ public class StrategyViewController extends NUIController {
                 .addListener(new ChangeListener<Number>() {
                     public void changed(ObservableValue<? extends Number> ov,
                             Number old_val, Number new_val) {
-                        maxRuleAppLabel.setText(bundle
-                                .getString("maxRuleAppLabel") + " "
-                                + (int) Math.pow(10, new_val.doubleValue()));
+                        calculateCurrentSliderValue(new_val);
+                        maxRuleAppLabel
+                                .setText(bundle.getString("maxRuleAppLabel")
+                                        + " " + currentSliderValue);
                     }
                 });
+        maxRuleAppLabel.setText(
+                bundle.getString("maxRuleAppLabel") + " " + currentSliderValue);
     }
 
     public void handleOnAction(final ActionEvent e)
@@ -101,6 +105,56 @@ public class StrategyViewController extends NUIController {
 
         // update datamodel
         dataModel.updateTreeViewState(filename, updatedTreeViewState);
+    }
+
+    private void calculateCurrentSliderValue(Number new_val) {
+        if (new_val.doubleValue() > 0.0 && new_val.doubleValue() < 1.0) {
+            currentSliderValue = ((int) (new_val.doubleValue() % 9.0 * 10.0))
+                    + 1;
+        }
+        else if (new_val.doubleValue() > 1.0 && new_val.doubleValue() < 2.0) {
+            currentSliderValue = ((int) (((new_val.doubleValue() % 9.0) - 1)
+                    * 10) * 10) + 10;
+        }
+        else if (new_val.doubleValue() > 2.0 && new_val.doubleValue() < 3.0) {
+            currentSliderValue = ((int) (((new_val.doubleValue() % 9.0) - 2)
+                    * 10) * 100) + 100;
+        }
+        else if (new_val.doubleValue() > 3.0 && new_val.doubleValue() < 4.0) {
+            currentSliderValue = ((int) (((new_val.doubleValue() % 9.0) - 3)
+                    * 10) * 1000) + 1000;
+        }
+        else if (new_val.doubleValue() > 4.0 && new_val.doubleValue() < 5.0) {
+            currentSliderValue = ((int) (((new_val.doubleValue() % 9.0) - 4)
+                    * 10) * 10000) + 10000;
+        }
+        else if (new_val.doubleValue() > 5.0 && new_val.doubleValue() < 6.0) {
+            currentSliderValue = ((int) (((new_val.doubleValue() % 9.0) - 5)
+                    * 10) * 100000) + 100000;
+        }
+        else {
+            switch (new_val.intValue()) {
+            case 1:
+                currentSliderValue = 10;
+                break;
+            case 2:
+                currentSliderValue = 100;
+                break;
+            case 3:
+                currentSliderValue = 1000;
+                break;
+            case 4:
+                currentSliderValue = 10000;
+                break;
+            case 5:
+                currentSliderValue = 100000;
+                break;
+            case 6:
+                currentSliderValue = 1000000;
+                break;
+            }
+
+        }
     }
 
 }

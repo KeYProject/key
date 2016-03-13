@@ -5,10 +5,10 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane fx:id="strategyViewPane" prefHeight="178.0" prefWidth="272.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.controller.StrategyViewController">
+<AnchorPane fx:id="strategyViewPane" prefHeight="422.0" prefWidth="394.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.controller.StrategyViewController">
 	<children>
 		<Button fx:id="goButton" alignment="CENTER" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleOnAction" text="Start" BorderPane.alignment="CENTER" />
-      <Slider fx:id="maxRuleAppSlider" blockIncrement="1.0" layoutX="14.0" layoutY="83.0" majorTickUnit="1.0" max="6.0" min="0.0" minorTickCount="1" prefHeight="38.0" prefWidth="234.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+      <Slider fx:id="maxRuleAppSlider" blockIncrement="1.0" layoutX="14.0" layoutY="83.0" majorTickUnit="1.0" max="6.0" min="0.0" minorTickCount="8" prefHeight="75.0" prefWidth="346.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
       <Label fx:id="maxRuleAppLabel" layoutX="14.0" layoutY="57.0" prefHeight="17.0" prefWidth="234.0" text="%maxRuleAppLabel" />
 	</children>
 	<cursor>
