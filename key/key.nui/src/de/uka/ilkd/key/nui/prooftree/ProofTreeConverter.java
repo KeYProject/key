@@ -6,7 +6,12 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 
 /**
  * This class converts a proof tree to an fx tree.
@@ -204,8 +209,19 @@ public class ProofTreeConverter {
         newNode.setLabel(nodeName);
         newNode.setHasNotes(proofNode.getNodeInfo().getNotes() != null);
         newNode.setActive(proofNode.getNodeInfo().getActiveStatement() != null);
-        // newNode.setSymbolicExcecution(proofNode.getNodeInfo().isSymbolicExecution(taclet));
-        // //TODO find taclet
+        
+        // set symbolic execution field
+        boolean symbolicExecution;
+        final RuleApp rule = proofNode.getAppliedRuleApp();
+        if (rule instanceof TacletApp) {
+            symbolicExecution = NodeInfo.isSymbolicExecution(((TacletApp) rule).taclet());
+        }
+        else if (rule instanceof IBuiltInRuleApp) {
+            symbolicExecution = true;
+        } else {
+            symbolicExecution = false;
+        }
+        newNode.setSymbolicExcecution(symbolicExecution);
 
         // Determine style to be applied when ProofTreeCell is rendered
         newNode.setStyleConfiguration();

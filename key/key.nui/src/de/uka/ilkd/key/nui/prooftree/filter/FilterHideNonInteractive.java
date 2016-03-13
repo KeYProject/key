@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui.prooftree.filter;
 
 import de.uka.ilkd.key.nui.prooftree.NUIBranchNode;
+import de.uka.ilkd.key.nui.prooftree.NUILeafNode;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 
 /**
@@ -16,7 +17,7 @@ public class FilterHideNonInteractive implements ProofTreeFilter {
      */
     @Override
     public boolean test(final NUINode node) {
-        if (node instanceof NUIBranchNode) {
+        if (node instanceof NUIBranchNode || node instanceof NUILeafNode) {
             return true;
         }
         else {

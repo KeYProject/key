@@ -18,7 +18,7 @@ public class FilterHideNonSymbolicExecution implements ProofTreeFilter {
      */
     @Override
     public boolean test(final NUINode node) {
-        if (node instanceof NUIBranchNode) {
+        if (node instanceof NUIBranchNode || node instanceof NUILeafNode) {
             return true;
         }
         else {
