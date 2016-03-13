@@ -8,6 +8,7 @@ import de.uka.ilkd.key.nui.prooftree.NUINode;
  * that are non-interactive.
  * @author Matthias Schultheis
  */
+@FilterAnnotation(isFilter=true)
 public class FilterHideNonInteractive implements ProofTreeFilter {
 
     /**

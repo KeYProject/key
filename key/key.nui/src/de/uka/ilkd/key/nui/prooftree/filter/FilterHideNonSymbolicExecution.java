@@ -10,6 +10,7 @@ import de.uka.ilkd.key.nui.prooftree.NUINode;
  * @author Matthias Schultheis
  *
  */
+@FilterAnnotation(isFilter=true)
 public class FilterHideNonSymbolicExecution implements ProofTreeFilter {
     
     /**
