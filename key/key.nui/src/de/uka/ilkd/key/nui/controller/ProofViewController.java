@@ -5,9 +5,14 @@ import java.util.Observer;
 
 import de.uka.ilkd.key.nui.TreeViewState;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 
+/**
+ * 
+ * @author Florian Breitfelder
+ *
+ */
+@ControllerAnnotation(createMenu = true)
 public class ProofViewController extends NUIController implements Observer {
 
     @FXML

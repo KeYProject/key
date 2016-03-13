@@ -1,10 +1,12 @@
 package de.uka.ilkd.key.nui;
 
 import java.io.File;
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
+import de.uka.ilkd.key.nui.controller.ControllerAnnotation;
 import de.uka.ilkd.key.nui.controller.MainViewController;
 import de.uka.ilkd.key.nui.controller.MainViewController.Place;
 import de.uka.ilkd.key.nui.controller.NUIController;
@@ -162,11 +164,26 @@ public class NUI extends Application {
                             component.getId(), file.getName());
                 controllers.put(component.getId(), nuiController);
 
+                Annotation[] annotations = nuiController.getClass()
+                        .getAnnotations();
+
                 // create a view position menu for every component
-                ToggleGroup toggleGroup = new ToggleGroup();
-                toggleGroups.put(component.getId(), toggleGroup);
-                viewPositionMenu.getItems()
-                        .add(createSubMenu(component.getId(), toggleGroup));
+                if (annotations != null) {
+                    for (Annotation annotation : annotations) {
+                        if (annotation instanceof ControllerAnnotation) {
+                            ControllerAnnotation controllerAnnotation = (ControllerAnnotation) annotation;
+                            if (controllerAnnotation.createMenu()) {
+                                ToggleGroup toggleGroup = new ToggleGroup();
+                                toggleGroups.put(component.getId(),
+                                        toggleGroup);
+                                viewPositionMenu.getItems().add(createSubMenu(
+                                        component.getId(), toggleGroup));
+                                break;
+                            }
+                        }
+                    }
+
+                }
             }
         }
     }

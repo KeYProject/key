@@ -7,6 +7,12 @@ import de.uka.ilkd.key.nui.TreeViewState;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 
+/**
+ * 
+ * @author Florian Breitfelder
+ *
+ */
+@ControllerAnnotation(createMenu = true)
 public class OpenProofsViewController extends NUIController
         implements Observer {
 
@@ -22,7 +28,8 @@ public class OpenProofsViewController extends NUIController
     public void update(Observable o, Object arg) {
         TreeViewState treeViewState = dataModel
                 .getTreeViewState(arg.toString());
-        textAreaOpenProofs.setText(treeViewState.getProof().getProofFile().getName());
+        textAreaOpenProofs
+                .setText(treeViewState.getProof().getProofFile().getName());
     }
 
 }

@@ -11,6 +11,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
+/**
+ * 
+ * @author Florian Breitfelder
+ *
+ */
+@ControllerAnnotation(createMenu = true)
 public class StrategyViewController extends NUIController {
 
     @FXML

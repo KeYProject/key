@@ -31,6 +31,7 @@ import javafx.scene.layout.VBox;
  * @author Florian Breitfelder
  * @version 1.1
  */
+@ControllerAnnotation(createMenu = true)
 public class TreeViewController extends NUIController implements Observer {
 
     /**
@@ -131,7 +132,7 @@ public class TreeViewController extends NUIController implements Observer {
 
             // set cell factory for rendering cells
             proofTreeView.setCellFactory((treeItem) -> {
-                final ProofTreeCell cell = new ProofTreeCell(icf,fh, this);
+                final ProofTreeCell cell = new ProofTreeCell(icf, fh, this);
                 Platform.runLater(() -> registerTreeCell(cell));
                 return cell;
             });

@@ -24,6 +24,12 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
+/**
+ * 
+ * @author Florian Breitfelder
+ *
+ */
+@ControllerAnnotation(createMenu=false)
 public class SearchViewController extends NUIController {
 
     private enum Direction {

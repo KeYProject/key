@@ -54,7 +54,7 @@ import javafx.stage.FileChooser;
  * @author Matthias Schultheis
  *
  */
-
+@ControllerAnnotation(createMenu = false)
 public class MainViewController extends NUIController implements Observer {
 
     /**
