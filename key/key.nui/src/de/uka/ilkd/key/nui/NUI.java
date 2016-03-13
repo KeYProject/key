@@ -150,7 +150,8 @@ public class NUI extends Application {
         for (File file : files) {
             if (file.isFile() && file.getName().matches(".*[.fxml]")) {
                 fxmlLoader = new FXMLLoader(
-                        getClass().getResource("components/" + file.getName()));
+                        getClass().getResource("components/" + file.getName()),
+                        bundle);
 
                 // String componentName = cutFileExtension(file.getName());
                 Pane component = fxmlLoader.load();
