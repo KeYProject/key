@@ -84,9 +84,9 @@ public class DataModel extends Observable {
      */
     public void updateTreeViewState(String key,
             TreeViewState updatedTreeViewState) {
-
         updatedTreeViewState.setModified(true);
         treeViewStates.put(key, updatedTreeViewState);
+        loadedTreeViewState = updatedTreeViewState;
         this.setChanged();
         this.notifyObservers(key);
     }

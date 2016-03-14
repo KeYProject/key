@@ -70,7 +70,7 @@ public class TreeViewState {
      *            Sets the status of the proof file to bool, where TRUE marks
      *            the file as changed and FALSE as unchanged.
      */
-    public void setModified(boolean bool) {
+    protected void setModified(boolean bool) {
         this.isModified = bool;
     }
 
