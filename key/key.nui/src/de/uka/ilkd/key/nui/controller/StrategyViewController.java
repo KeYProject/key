@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nui.controller;
 
+import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.TreeViewState;
 import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
@@ -14,6 +15,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.ImageView;
 import javafx.util.StringConverter;
 
 /**
@@ -33,10 +36,61 @@ public class StrategyViewController extends NUIController {
     @FXML
     private Label maxRuleAppLabel;
 
+    @FXML
+    private ImageView goButtonImage;
+
+    @FXML
+    private ToggleGroup stopAt;
+
+    @FXML
+    private ToggleGroup proofSplitting;
+
+    @FXML
+    private ToggleGroup loopTreatment;
+
+    @FXML
+    private ToggleGroup blockTreatment;
+
+    @FXML
+    private ToggleGroup methodTreatment;
+
+    @FXML
+    private ToggleGroup dependencyContracts;
+
+    @FXML
+    private ToggleGroup queryTreatment;
+
+    @FXML
+    private ToggleGroup expandLocalQueries;
+
+    @FXML
+    private ToggleGroup arithmeticTreatment;
+
+    @FXML
+    private ToggleGroup quantifierTreatment;
+
+    @FXML
+    private ToggleGroup classAxiom;
+
+    @FXML
+    private ToggleGroup autoInduction;
+
+    @FXML
+    private ToggleGroup userOptions1;
+
+    @FXML
+    private ToggleGroup userOptions2;
+
+    @FXML
+    private ToggleGroup userOptions3;
+
     private int currentSliderValue = 10;
 
     @Override
     protected void init() {
+        IconFactory iconFactory = new IconFactory(15, 15);
+        goButtonImage.setImage(
+                iconFactory.getImage(IconFactory.GO_BUTTON).getImage());
         maxRuleAppSlider.setLabelFormatter(new StringConverter<Double>() {
             @Override
             public String toString(Double n) {
@@ -55,7 +109,7 @@ public class StrategyViewController extends NUIController {
                 .addListener(new ChangeListener<Number>() {
                     public void changed(ObservableValue<? extends Number> ov,
                             Number old_val, Number new_val) {
-                        
+
                         calculateCurrentSliderValue(new_val);
                         maxRuleAppLabel
                                 .setText(bundle.getString("maxRuleAppLabel")
@@ -68,7 +122,7 @@ public class StrategyViewController extends NUIController {
 
     public void handleOnAction(final ActionEvent e)
             throws ControllerNotFoundException {
-
+        
         ProofStarter proofStarter = new ProofStarter(false);
         String filename;
 
@@ -91,7 +145,7 @@ public class StrategyViewController extends NUIController {
         if (currentSliderValue > 0) {
             proofStarter.setMaxRuleApplications(currentSliderValue);
         }
-        
+
         // start automatic proof
         ApplyStrategyInfo strategyInfo = proofStarter.start();
 

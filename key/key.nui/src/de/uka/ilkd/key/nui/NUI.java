@@ -83,7 +83,7 @@ public class NUI extends Application {
         initializeNUI();
 
         // Load scene and set preferences
-        final Scene scene = new Scene(root);
+        final Scene scene = new Scene(root, 1024, 768);
         stage.setTitle("KeY");
         stage.getIcons().add(new Image(
                 getClass().getResourceAsStream("images/KeY-Mono.png")));

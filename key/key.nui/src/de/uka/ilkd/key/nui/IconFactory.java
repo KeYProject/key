@@ -66,6 +66,9 @@ public class IconFactory {
     /** file name of search icon. */
     public static final String SEARCH = folderRoot + "search.png";
 
+    // StrategyView
+    /** file name of goButton icon */
+    public static final String GO_BUTTON = folderRoot + "goButton.png";
     /**
      * The constructor.
      * 
