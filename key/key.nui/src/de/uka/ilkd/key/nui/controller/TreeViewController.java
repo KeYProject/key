@@ -8,6 +8,7 @@ import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.nui.DataModel;
 import de.uka.ilkd.key.nui.IconFactory;
+import de.uka.ilkd.key.nui.TreeViewState;
 import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
 import de.uka.ilkd.key.nui.exceptions.NoSearchViewAddedException;
 import de.uka.ilkd.key.nui.prooftree.FilteringHandler;
@@ -151,8 +152,16 @@ public class TreeViewController extends NUIController implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        ProofTreeItem treeItem = ((DataModel) o).getTreeViewState((String) arg)
-                .getTreeItem();
+        TreeViewState treeViewState = ((DataModel) o)
+                .getTreeViewState((String) arg);
+        ProofTreeItem treeItem;
+
+        if (treeViewState == null) {
+            treeItem = null;
+        }
+        else {
+            treeItem = treeViewState.getTreeItem();
+        }
         // update the proofTreeView component in the treeView
         proofTreeView.setRoot(treeItem);
     }

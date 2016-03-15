@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Observable;
 
 import de.uka.ilkd.key.proof.Proof;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  * Class representing the data associated with the GUI.
@@ -118,6 +120,30 @@ public class DataModel extends Observable {
         catch (IOException e) {
             nui.updateStatusbar(e.getMessage());
         }
+    }
+
+    public ObservableList<String> getListOfProofs() {
+        ObservableList<String> listOfProofs = FXCollections
+                .observableArrayList();
+        for (String proofName : treeViewStates.keySet()) {
+            listOfProofs.add(proofName);
+        }
+        return listOfProofs;
+    }
+
+    public void loadProofFormMemory(String proofName) {
+        loadedTreeViewState = treeViewStates.get(proofName);
+        this.setChanged();
+        this.notifyObservers(proofName);
+    }
+
+    public void deleteProof(String proofName) {
+        if (loadedTreeViewState.equals(treeViewStates.get(proofName))) {
+            loadedTreeViewState = null;
+        }
+        treeViewStates.remove(proofName);
+        this.setChanged();
+        this.notifyObservers(proofName);
     }
 
 }

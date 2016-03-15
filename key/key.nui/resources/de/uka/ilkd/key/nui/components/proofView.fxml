@@ -7,12 +7,17 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.BorderPane?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8"
-	fx:controller="de.uka.ilkd.key.nui.controller.ProofViewController"
-	fx:id="proofViewPane" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
-	<TextArea fx:id="textAreaProof" text=""
-		minHeight="0" minWidth="0" AnchorPane.bottomAnchor="0.0"
-		AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-		AnchorPane.topAnchor="0.0">
-	</TextArea>
+<AnchorPane fx:id="proofViewPane" HBox.hgrow="ALWAYS"
+	VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="de.uka.ilkd.key.nui.controller.ProofViewController">
+	<children>
+		<TextArea fx:id="textAreaProof" editable="false" minHeight="0"
+			minWidth="0" text="%noProofLoaded" AnchorPane.bottomAnchor="0.0"
+			AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+			AnchorPane.topAnchor="0.0">
+			<font>
+				<Font size="14.0" />
+			</font>
+		</TextArea>
+	</children>
 </AnchorPane>

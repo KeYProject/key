@@ -4,13 +4,13 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8"
-   fx:controller="de.uka.ilkd.key.nui.controller.OpenProofsViewController"
-   fx:id="openProofsViewPane"
-	VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
-	<TextArea fx:id="textAreaOpenProofs" minHeight="0" minWidth="0" AnchorPane.bottomAnchor="0.0"
-		AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-		AnchorPane.topAnchor="0.0"
-		text="">
-	</TextArea>
+<AnchorPane fx:id="openProofsViewPane" HBox.hgrow="ALWAYS"
+	VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="de.uka.ilkd.key.nui.controller.OpenProofsViewController">
+	<children>
+		<ListView HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS"
+			AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+			AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" fx:id="listView"
+			prefHeight="200.0" prefWidth="200.0" />
+	</children>
 </AnchorPane>

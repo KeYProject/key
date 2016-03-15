@@ -8,31 +8,23 @@
 <?import com.sun.javafx.scene.control.skin.ContextMenuContent?>
 <?import javafx.scene.control.RadioMenuItem?>
 
-<BorderPane fx:id="root" prefHeight="600.0" prefWidth="800.0"
-	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="de.uka.ilkd.key.nui.controller.MainViewController">
+<BorderPane fx:id="root" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.controller.MainViewController">
 	<top>
 		<MenuBar BorderPane.alignment="CENTER">
 			<menus>
 				<Menu mnemonicParsing="false" text="File">
 					<items>
-						<MenuItem fx:id="openProof" mnemonicParsing="false"
-							onAction="#handleOpenProof" text="%openProof" />
-						<MenuItem fx:id="saveProof" mnemonicParsing="false"
-							visible="false" onAction="#handleSaveProof" text="%saveProof" />
-						<MenuItem fx:id="saveProofAs" visible="false"
-							mnemonicParsing="false" onAction="#handleSaveProofAs" text="%saveProofAs"
-							userData="" />
-						<MenuItem mnemonicParsing="false" onAction="#handleCloseWindow"
-							text="%close" />
+						<MenuItem fx:id="openProof" mnemonicParsing="false" onAction="#handleOpenProof" text="%openProof" />
+						<MenuItem fx:id="saveProof" mnemonicParsing="false" onAction="#handleSaveProof" text="%saveProof" visible="false" />
+						<MenuItem fx:id="saveProofAs" mnemonicParsing="false" onAction="#handleSaveProofAs" text="%saveProofAs" userData="" visible="false" />
+						<MenuItem mnemonicParsing="false" onAction="#handleCloseWindow" text="%close" />
 					</items>
 				</Menu>
 				<Menu fx:id="viewMenu" mnemonicParsing="false" text="View">
 				</Menu>
 				<Menu mnemonicParsing="false" text="%about">
 					<items>
-						<MenuItem mnemonicParsing="false" onAction="#handleAboutWindow"
-							text="%aboutKey" />
+						<MenuItem mnemonicParsing="false" onAction="#handleAboutWindow" text="%aboutKey" />
 						<MenuItem mnemonicParsing="false" text="%license" />
 					</items>
 				</Menu>
@@ -40,37 +32,26 @@
 		</MenuBar>
 	</top>
 	<center>
-		<SplitPane dividerPositions="0.8168498168498168"
-			orientation="VERTICAL" prefHeight="349.0" prefWidth="800.0">
+		<SplitPane dividerPositions="0.8168498168498168" orientation="VERTICAL" prefHeight="349.0" prefWidth="800.0">
 			<items>
 				<AnchorPane>
 					<children>
-						<SplitPane dividerPositions="0.25, 0.75" prefHeight="160.0"
-							prefWidth="200.0" AnchorPane.bottomAnchor="0.0"
-							AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-							AnchorPane.topAnchor="0.0" BorderPane.alignment="CENTER">
+						<SplitPane dividerPositions="0.3065326633165829, 0.75" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" BorderPane.alignment="CENTER">
 							<items>
 								<AnchorPane prefHeight="552.0" prefWidth="266.0">
 									<children>
-										<VBox fx:id="left" prefHeight="200.0" prefWidth="100.0"
-											AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-											AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+										<VBox fx:id="left" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 										</VBox>
 									</children>
 								</AnchorPane>
-								<AnchorPane minHeight="0.0" minWidth="0.0"
-									prefHeight="160.0" prefWidth="100.0">
+								<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
 									<children>
-										<VBox fx:id="middle" prefHeight="200.0" prefWidth="200.0"
-											AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-											AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+										<VBox fx:id="middle" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 									</children>
 								</AnchorPane>
 								<AnchorPane prefHeight="200.0" prefWidth="200.0">
 									<children>
-										<VBox fx:id="right" prefHeight="200.0" prefWidth="100.0"
-											AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-											AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+										<VBox fx:id="right" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 									</children>
 								</AnchorPane>
 							</items>
@@ -83,23 +64,18 @@
 				</AnchorPane>
 				<AnchorPane prefHeight="148.0" prefWidth="798.0">
 					<children>
-						<HBox fx:id="bottom" prefHeight="100.0" prefWidth="200.0"
-							AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-							AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+						<HBox fx:id="bottom" prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 					</children>
 				</AnchorPane>
 			</items>
 		</SplitPane>
 	</center>
 	<bottom>
-		<ToolBar prefHeight="21.0" prefWidth="200.0"
-			BorderPane.alignment="CENTER">
+		<ToolBar prefHeight="21.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 			<items>
 				<Label fx:id="statustext" prefHeight="17.0" text="%status" />
-				<ProgressIndicator prefHeight="20.0" visible="false" fx:id="progressIndicator" />
-				<Button fx:id="cancelButton" mnemonicParsing="false"
-					prefHeight="20.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-					text="%cancelButton" visible="false" onAction="#handleCancelLoadingProcess">
+				<ProgressIndicator fx:id="progressIndicator" prefHeight="20.0" visible="false" />
+				<Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleCancelLoadingProcess" prefHeight="20.0" text="%cancelButton" visible="false" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
 				</Button>
 			</items>
 		</ToolBar>
