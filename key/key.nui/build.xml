@@ -11,19 +11,20 @@
 		<format property="time.stamp" pattern="yyyyMMdd-HHmmss" />
 	</tstamp>
 
-	<!-- Definition of classpath -->
-	<path id="key.nui.class.path">
-		<pathelement path="${basedir}/../key.util/bin" />
-		<pathelement path="${basedir}/../key.core/bin" />
-		<pathelement location="${basedir}/../key.core/lib/antlr.jar" />
-		<pathelement location="${basedir}/../key.core/lib/recoderKey.jar" />
-		<pathelement location="${basedir}/ant-lib/junit/junit-4.12.jar" />
-		<pathelement location="${basedir}/testfx-4/testfx-core-4.0.2-SNAPSHOT.jar"/>
-		<pathelement location="${basedir}/testfx-4/testfx-legacy-4.0.2-SNAPSHOT.jar"/>
-		<pathelement location="${basedir}/testfx-4/testfx-junit-4.0.2-SNAPSHOT.jar"/> 
-		<pathelement location="${basedir}/testfx-4/guava-18.0.jar"/>
-		<pathelement location="${basedir}/ant-lib/junit/hamcrest-core-1.3.jar"/>
-	</path>
+   <!-- Definition of classpath -->
+   <path id="key.nui.class.path">
+      <pathelement path="${basedir}/../key.util/bin" />
+      <pathelement path="${basedir}/../key.core/bin" />
+      <pathelement path="${basedir}/../key.ui/bin" />
+      <pathelement location="${basedir}/../key.core/lib/antlr.jar" />
+      <pathelement location="${basedir}/../key.core/lib/recoderKey.jar" />
+      <pathelement location="${basedir}/ant-lib/junit/junit-4.12.jar" />
+      <pathelement location="${basedir}/testfx-4/testfx-core-4.0.2-SNAPSHOT.jar"/>
+      <pathelement location="${basedir}/testfx-4/testfx-legacy-4.0.2-SNAPSHOT.jar"/>
+      <pathelement location="${basedir}/testfx-4/testfx-junit-4.0.2-SNAPSHOT.jar"/> 
+      <pathelement location="${basedir}/testfx-4/guava-18.0.jar"/>
+      <pathelement location="${basedir}/ant-lib/junit/hamcrest-core-1.3.jar"/>
+   </path>
 
 	<path id="key.nui.run.class.path">
 		<pathelement path="${basedir}/../key.nui/bin" />

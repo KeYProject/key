@@ -10,20 +10,21 @@
 
 <AnchorPane fx:id="strategyViewPane" prefHeight="540.0" prefWidth="407.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.controller.StrategyViewController">
 	<children>
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="42.0" layoutX="14.0" layoutY="14.0" stroke="TRANSPARENT" strokeType="INSIDE" width="371.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="91.0" layoutX="14.0" layoutY="66.0" stroke="TRANSPARENT" strokeType="INSIDE" width="371.0" />
-		<Button fx:id="goButton" alignment="CENTER" layoutX="21.0" layoutY="20.0" mnemonicParsing="false" onAction="#handleOnAction" text="Start" BorderPane.alignment="CENTER">
+		<Button fx:id="goButton" alignment="CENTER" layoutX="297.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleOnAction" prefHeight="33.0" prefWidth="87.0" text="Start" BorderPane.alignment="CENTER">
+         <font>
+            <Font size="15.0" />
+         </font>
          <graphic>
             <ImageView fx:id="goButtonImage" fitHeight="23.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true" />
          </graphic></Button>
-      <Slider fx:id="maxRuleAppSlider" blockIncrement="1.0" layoutX="14.0" layoutY="89.0" majorTickUnit="1.0" max="6.0" min="0.0" minorTickCount="8" prefHeight="75.0" prefWidth="371.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
-      <Label fx:id="maxRuleAppLabel" layoutX="21.0" layoutY="72.0" prefHeight="17.0" prefWidth="234.0" text="%maxRuleAppLabel" textFill="WHITE">
+      <Slider fx:id="maxRuleAppSlider" blockIncrement="1.0" layoutX="18.0" layoutY="49.0" majorTickUnit="1.0" max="6.0" min="0.0" minorTickCount="8" prefHeight="75.0" prefWidth="371.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
+      <Label fx:id="maxRuleAppLabel" layoutX="14.0" layoutY="14.0" prefHeight="27.0" prefWidth="280.0" text="%maxRuleAppLabel">
          <font>
-            <Font size="14.0" />
+            <Font size="18.0" />
          </font></Label>
-      <ScrollPane layoutX="13.0" layoutY="176.0" prefHeight="350.0" prefViewportHeight="564.0" prefViewportWidth="346.0" prefWidth="371.0">
+      <ScrollPane layoutX="13.0" layoutY="473.0" prefHeight="53.0" prefViewportHeight="564.0" prefViewportWidth="346.0" prefWidth="371.0" visible="false">
          <content>
-            <GridPane layoutX="16.0" layoutY="159.0" prefHeight="564.0" prefWidth="346.0">
+            <GridPane layoutX="16.0" layoutY="159.0" prefHeight="424.0" prefWidth="346.0">
               <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="134.0" minWidth="10.0" prefWidth="122.0" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="151.0" minWidth="10.0" prefWidth="111.0" />
@@ -194,6 +195,10 @@
             </GridPane>
          </content>
       </ScrollPane>
+      <ScrollPane layoutX="18.0" layoutY="115.0" prefHeight="408.0" prefWidth="371.0">
+         <content>
+            <AnchorPane fx:id="proofSearchStrategy" prefHeight="477.0" prefWidth="356.0" />
+         </content></ScrollPane>
 	</children>
 	<cursor>
 		<Cursor fx:constant="HAND" />

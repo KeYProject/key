@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.sun.javafx.collections.ObservableMapWrapper;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.nui.TreeViewState;
 import de.uka.ilkd.key.nui.exceptions.ToggleGroupNotFoundException;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
@@ -555,6 +556,9 @@ public class MainViewController extends NUIController implements Observer {
                     // set Loading = false to enable canceling
                     isLoadingProof.set(true);
 
+                    // important to initialize KeYEnvironment
+                    MainWindow mainWindow = MainWindow.getInstance();
+                    mainWindow.setVisible(false);
                     // load proof
                     final KeYEnvironment<?> environment = KeYEnvironment.load(
                             JavaProfile.getDefaultInstance(), proofFileName,

@@ -29,5 +29,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/key.nui/testfx-4/testfx-legacy-4.0.2-SNAPSHOT-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/key.ui"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,15 +1,25 @@
 package de.uka.ilkd.key.nui.controller;
 
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.SwingUtilities;
+
+import de.uka.ilkd.key.nui.DataModel;
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.TreeViewState;
 import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
+import de.uka.ilkd.key.nui.wrapper.StrategyWrapper;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.ProofStarter;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -17,6 +27,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
 
 /**
@@ -25,7 +36,7 @@ import javafx.util.StringConverter;
  *
  */
 @ControllerAnnotation(createMenu = true)
-public class StrategyViewController extends NUIController {
+public class StrategyViewController extends NUIController implements Observer {
 
     @FXML
     private Button goButton;
@@ -84,10 +95,21 @@ public class StrategyViewController extends NUIController {
     @FXML
     private ToggleGroup userOptions3;
 
+    @FXML
+    private AnchorPane strategyViewPane;
+
+    @FXML
+    private AnchorPane proofSearchStrategy;
+
     private int currentSliderValue = 10;
+
+    private StrategyWrapper strategyWrapper = null;
 
     @Override
     protected void init() {
+        dataModel.addObserver(this);
+        strategyWrapper = new StrategyWrapper();
+        addStrategyViewSwing(null);
         IconFactory iconFactory = new IconFactory(15, 15);
         goButtonImage.setImage(
                 iconFactory.getImage(IconFactory.GO_BUTTON).getImage());
@@ -122,7 +144,7 @@ public class StrategyViewController extends NUIController {
 
     public void handleOnAction(final ActionEvent e)
             throws ControllerNotFoundException {
-        
+
         ProofStarter proofStarter = new ProofStarter(false);
         String filename;
 
@@ -140,6 +162,9 @@ public class StrategyViewController extends NUIController {
         Proof p = treeViewState.getProof();
         proofStarter.init(p);
 
+        // TODO
+        Strategy strategy = strategyWrapper.getStrategy();
+        proofStarter.setStrategy(strategy);
         // restrict maximum number of rule applications based on slider value
         // only set value of slider if slider was moved
         if (currentSliderValue > 0) {
@@ -220,6 +245,30 @@ public class StrategyViewController extends NUIController {
             }
 
         }
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        TreeViewState treeViewState = ((DataModel) o)
+                .getTreeViewState(arg.toString());
+
+        if (treeViewState != null) {
+            addStrategyViewSwing(treeViewState.getProof());
+        }
+
+    }
+
+    private void addStrategyViewSwing(Proof proof) {
+        proofSearchStrategy.getChildren().clear();
+        SwingUtilities.invokeLater(() -> {
+            SwingNode swingNode = strategyWrapper
+                    .createStrategyComponent(proof);
+            ;
+
+            Platform.runLater(
+                    () -> proofSearchStrategy.getChildren().add(swingNode));
+
+        });
     }
 
 }
