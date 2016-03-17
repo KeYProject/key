@@ -46,7 +46,7 @@ import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.XMLUtil;
 
 import de.uka.ilkd.key.control.AutoModeListener;
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -131,9 +131,9 @@ public class StrategySettingsComposite extends Composite {
    private String noProofErrorMessage;
    
    /**
-    * The {@link KeYMediator} in which the current {@link Proof} lives.
+    * The {@link ProofControl} in which the current {@link Proof} lives.
     */
-   private KeYMediator mediator;
+   private ProofControl proofControl;
 
    /**
     * The {@link AutoModeListener} which observes {@link #mediator}.
@@ -198,20 +198,21 @@ public class StrategySettingsComposite extends Composite {
     */
    protected void updateShownForm() {
       Proof oldProof = proof;
-      KeYMediator oldMediator = mediator;
+      ProofControl oldProofControl = proofControl;
+      proofControl = proofProvider != null ? proofProvider.getProofControl() : null;
       proof = proofProvider != null ? proofProvider.getCurrentProof() : null;
       if (oldProof != proof && oldProof != null && !oldProof.isDisposed()) {
          oldProof.getSettings().getStrategySettings().removeSettingsListener(settingsListener);
       }
-      if (oldMediator != mediator && oldMediator != null) {
-         oldMediator.getUI().getProofControl().removeAutoModeListener(autoModeListener);
+      if (oldProofControl != proofControl && oldProofControl != null) {
+         oldProofControl.removeAutoModeListener(autoModeListener);
       }
       if (proof != null && !proof.isDisposed()) {
          if (oldProof != proof) {
             proof.getSettings().getStrategySettings().addSettingsListener(settingsListener);
          }
-         if (oldMediator != mediator && mediator != null) {
-            mediator.getUI().getProofControl().addAutoModeListener(autoModeListener);
+         if (oldProofControl != proofControl && proofControl != null) {
+            proofControl.addAutoModeListener(autoModeListener);
          }
          Name strategyName = proof.getSettings().getStrategySettings().getStrategy();
          Profile profile = proof.getInitConfig().getProfile();
@@ -231,7 +232,7 @@ public class StrategySettingsComposite extends Composite {
             }
             data = (FormData)form.getData();
             updateShownContent();
-            setFormEditable(mediator == null || !mediator.isInAutoMode());
+            setFormEditable(proofControl == null || !proofControl.isInAutoMode());
             layout.topControl = form;
          }
          else {
@@ -472,8 +473,8 @@ public class StrategySettingsComposite extends Composite {
       if (proofProvider != null) {
          proofProvider.removeProofProviderListener(proofProviderListener);
       }
-      if (mediator != null) {
-         mediator.getUI().getProofControl().removeAutoModeListener(autoModeListener);
+      if (proofControl != null) {
+         proofControl.removeAutoModeListener(autoModeListener);
       }
       if (proof != null && !proof.isDisposed()) {
          proof.getSettings().getStrategySettings().removeSettingsListener(settingsListener);
