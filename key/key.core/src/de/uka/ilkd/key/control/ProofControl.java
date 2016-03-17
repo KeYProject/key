@@ -141,6 +141,15 @@ public interface ProofControl {
     * in this user interface and blocks the current thread until it
     * has finished.
     * @param proof The {@link Proof} to start auto mode and to wait for.
+    * @param goals The {@link Goal}s to close.
+    */
+   void startAndWaitForAutoMode(Proof proof, ImmutableList<Goal> goals);
+   
+   /**
+    * Starts the auto mode for the given proof which must be contained
+    * in this user interface and blocks the current thread until it
+    * has finished.
+    * @param proof The {@link Proof} to start auto mode and to wait for.
     */
    void startAndWaitForAutoMode(Proof proof);
    

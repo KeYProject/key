@@ -16,6 +16,7 @@ package org.key_project.key4eclipse.resources.test.suite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.key4eclipse.resources.test.testcase.junit.AutoDeleteTests;
+import org.key_project.key4eclipse.resources.test.testcase.junit.AutoModeStartingSpecificationTest;
 import org.key_project.key4eclipse.resources.test.testcase.junit.BuilderTests;
 import org.key_project.key4eclipse.resources.test.testcase.junit.KeYResourcesUtilTest;
 import org.key_project.key4eclipse.resources.test.testcase.junit.MarkerTests;
@@ -30,6 +31,7 @@ import org.key_project.key4eclipse.resources.test.testcase.junit.ProofMetaFileWr
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
    AutoDeleteTests.class,
+   AutoModeStartingSpecificationTest.class,
    BuilderTests.class,
    KeYResourcesUtilTest.class,
    MarkerTests.class,

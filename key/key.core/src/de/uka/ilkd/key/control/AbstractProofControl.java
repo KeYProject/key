@@ -562,6 +562,15 @@ public abstract class AbstractProofControl implements ProofControl {
      * {@inheritDoc}
      */
     @Override
+    public void startAndWaitForAutoMode(Proof proof, ImmutableList<Goal> goals) {
+       startAutoMode(proof, goals);
+       waitWhileAutoMode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void stopAndWaitAutoMode() {
        stopAutoMode();
        waitWhileAutoMode();
