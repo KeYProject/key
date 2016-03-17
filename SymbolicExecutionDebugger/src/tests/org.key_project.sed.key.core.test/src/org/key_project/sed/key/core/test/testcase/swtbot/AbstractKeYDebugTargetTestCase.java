@@ -847,7 +847,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.LOOP_TREATMENT_INVARIANT));
             }
             else {
-               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.LOOP_TREATMENT_EXPAND, 1));
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.LOOP_TREATMENT_EXPAND, 0));
             }
             if (nonExecutionBranchHidingSideProofs) {
                TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF));

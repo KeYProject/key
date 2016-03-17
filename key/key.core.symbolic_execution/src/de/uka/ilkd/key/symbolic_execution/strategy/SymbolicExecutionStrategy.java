@@ -205,22 +205,22 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
       /**
        * Shown string for method treatment "Expand".
        */
-      public static final String METHOD_TREATMENT_EXPAND = "Expand";
+      public static final String METHOD_TREATMENT_EXPAND = "Inline Methods";
 
       /**
        * Shown string for method treatment "Contract".
        */
-      public static final String METHOD_TREATMENT_CONTRACT = "Contract";
+      public static final String METHOD_TREATMENT_CONTRACT = "Use Contracts";
 
       /**
        * Shown string for loop treatment "Expand".
        */
-      public static final String LOOP_TREATMENT_EXPAND = "Expand";
+      public static final String LOOP_TREATMENT_EXPAND = "Unroll Loops";
 
       /**
        * Shown string for loop treatment "Invariant".
        */
-      public static final String LOOP_TREATMENT_INVARIANT = "Invariant";
+      public static final String LOOP_TREATMENT_INVARIANT = "Use Loop Invariants";
 
       /**
        * Shown string for alias check "Never".
@@ -230,7 +230,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
       /**
        * Shown string for alias check "Immediately".
        */
-      public static final String NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF = "Via Side Proofs";
+      public static final String NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF = "On";
 
       /**
        * Shown string for alias check "Never".

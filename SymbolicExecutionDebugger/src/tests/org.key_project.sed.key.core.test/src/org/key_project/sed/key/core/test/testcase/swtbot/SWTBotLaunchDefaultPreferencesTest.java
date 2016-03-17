@@ -98,7 +98,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
                // Do run
                resume(bot, item, target);
-               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.LOOP_TREATMENT_EXPAND, 1));
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.LOOP_TREATMENT_EXPAND, 0));
                if (hideFullBranchConditions) {
                   assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/useLoopInvariantArraySumWhile/oracle/ArraySumWhileHideFullBranchConditions.xml", false, false, false);
                }
