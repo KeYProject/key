@@ -403,8 +403,8 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
       legendLayout.verticalSpacing = 0;
       legendComposite.setLayout(legendLayout);
       Label legendLabel = new Label(legendComposite, SWT.NONE);
-      legendLabel.setText("Colors: ");
-      legendLabel.setToolTipText("Colors indicate the verification status and parents are colored according to the worst verification stati of their children.");
+      legendLabel.setText("Legend: ");
+      legendLabel.setToolTipText("Colors indicate the verification status and ancestors are colored according to the worst verification stati of their children.");
       cyclicProofsColor = new Color(legendLabel.getDisplay(), COLOR_PROOF_IN_RECURSION_CYCLE);
       Label cylcicProofsLabel = new Label(legendComposite, SWT.NONE);
       cylcicProofsLabel.setForeground(cyclicProofsColor);
@@ -1064,6 +1064,8 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             
             sb.append("<li><i>The used Java compiler is correct.</i></li>" + StringUtil.NEW_LINE);
             sb.append("<li><i>The Java Virtual Machine (JVM) is correct.</i></li>" + StringUtil.NEW_LINE);
+            
+            sb.append("<li><i>This list is complete.</i></li>" + StringUtil.NEW_LINE);
             sb.append("</ol>" + StringUtil.NEW_LINE);
             // Add footer
             sb.append("</body>" + StringUtil.NEW_LINE);

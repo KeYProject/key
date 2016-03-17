@@ -15,6 +15,11 @@ public final class LatexUtil {
    public static final String TEX_FILE_EXTENSION_WITH_DOT = ".tex";
 
    /**
+    * Defines if a preset boxplot should be computed.
+    */
+   public static final boolean COMPUTE_PRESENT_BOXPLOT = false;
+   
+   /**
     * Forbid instances.
     */
    private LatexUtil() {
@@ -49,30 +54,6 @@ public final class LatexUtil {
          }
          yLabels = yLabelsReverse;
       }
-      // Compute data for boxplot
-      double[] median = new double[allData.length]; // The median values
-      double[] lowerQuartiles = new double[allData.length]; // The lower quartiles
-      double[] upperQuartiles = new double[allData.length]; // The upper quartiles
-      double[] lowerWhiskers = new double[allData.length]; // The lower whiskers
-      double[] upperWhiskers = new double[allData.length]; // The upper whiskers
-      for (int i = 0; i < allData.length; i++) {
-         // Create working copy
-         double[] copy = new double[allData[i].length];
-         System.arraycopy(allData[i], 0, copy, 0, allData[i].length);
-         Arrays.sort(copy);
-         // Compute median, quartiles and whiskers
-         median[i] = medianValue(copy, copy.length / 2);
-         int lowerQuartileIndex = copy.length / 4;
-         lowerQuartiles[i] = medianValue(copy, lowerQuartileIndex);
-         int upperQuartileIndex = copy.length - 1 - lowerQuartileIndex;
-         upperQuartiles[i] = medianValue(copy, upperQuartileIndex);
-         double d = upperQuartiles[i] - lowerQuartiles[i];
-         lowerWhiskers[i] = lowerQuartiles[i] - (k * d);
-         upperWhiskers[i] = upperQuartiles[i] + (k * d);
-         // Truncate whiskers to nearest actual value
-         lowerWhiskers[i] = trunkateDecreasing(lowerQuartileIndex, copy, lowerWhiskers[i]);
-         upperWhiskers[i] = trunkateIncreasing(upperQuartileIndex, copy, upperWhiskers[i]);
-      }
       // Create latex file
       StringBuffer sb = new StringBuffer();
       // preamble
@@ -82,44 +63,71 @@ public final class LatexUtil {
       sb.append("%\\usepgfplotslibrary{statistics}" + StringUtil.NEW_LINE);
       sb.append("%\\begin{document}" + StringUtil.NEW_LINE);
       // preset boxplot
-      sb.append("%\\begin{tikzpicture}" + StringUtil.NEW_LINE);
-      sb.append("%\\begin{axis}" + StringUtil.NEW_LINE);
-      sb.append("%[" + StringUtil.NEW_LINE);
-      if (!StringUtil.isEmpty(xLabel)) {
-         sb.append("%xlabel={" + xLabel + "}," + StringUtil.NEW_LINE);
-      }
-      sb.append("%ytick={");
-      for (int i = 0; i < allData.length; i++) {
-         if (i > 0) {
-            sb.append(", ");
+      if (COMPUTE_PRESENT_BOXPLOT) {
+         // Compute data for boxplot
+         double[] median = new double[allData.length]; // The median values
+         double[] lowerQuartiles = new double[allData.length]; // The lower quartiles
+         double[] upperQuartiles = new double[allData.length]; // The upper quartiles
+         double[] lowerWhiskers = new double[allData.length]; // The lower whiskers
+         double[] upperWhiskers = new double[allData.length]; // The upper whiskers
+         for (int i = 0; i < allData.length; i++) {
+            // Create working copy
+            double[] copy = new double[allData[i].length];
+            System.arraycopy(allData[i], 0, copy, 0, allData[i].length);
+            Arrays.sort(copy);
+            // Compute median, quartiles and whiskers
+            median[i] = medianValue(copy, copy.length / 2);
+            int lowerQuartileIndex = copy.length / 4;
+            lowerQuartiles[i] = medianValue(copy, lowerQuartileIndex);
+            int upperQuartileIndex = copy.length - 1 - lowerQuartileIndex;
+            upperQuartiles[i] = medianValue(copy, upperQuartileIndex);
+            double d = upperQuartiles[i] - lowerQuartiles[i];
+            lowerWhiskers[i] = lowerQuartiles[i] - (k * d);
+            upperWhiskers[i] = upperQuartiles[i] + (k * d);
+            // Truncate whiskers to nearest actual value
+            lowerWhiskers[i] = trunkateDecreasing(lowerQuartileIndex, copy, lowerWhiskers[i]);
+            upperWhiskers[i] = trunkateIncreasing(upperQuartileIndex, copy, upperWhiskers[i]);
          }
-         sb.append(i + 1);
-      }
-      sb.append("%}," + StringUtil.NEW_LINE);
-      sb.append("%yticklabels={");
-      for (int i = 0; i < allData.length; i++) {
-         if (i > 0) {
-            sb.append(", ");
+         // Append preset boxplot
+         sb.append("%\\begin{tikzpicture}" + StringUtil.NEW_LINE);
+         sb.append("%\\begin{axis}" + StringUtil.NEW_LINE);
+         sb.append("%[" + StringUtil.NEW_LINE);
+         if (!StringUtil.isEmpty(xLabel)) {
+            sb.append("%xlabel={" + xLabel + "}," + StringUtil.NEW_LINE);
          }
-         sb.append(yLabels[i]);
+         sb.append("%ytick={");
+         for (int i = 0; i < allData.length; i++) {
+            if (i > 0) {
+               sb.append(", ");
+            }
+            sb.append(i + 1);
+         }
+         sb.append("%}," + StringUtil.NEW_LINE);
+         sb.append("%yticklabels={");
+         for (int i = 0; i < allData.length; i++) {
+            if (i > 0) {
+               sb.append(", ");
+            }
+            sb.append(yLabels[i]);
+         }
+         sb.append("%}," + StringUtil.NEW_LINE);
+         sb.append("%y=1cm," + StringUtil.NEW_LINE);
+         sb.append("%xmin=" + xMin + "," + StringUtil.NEW_LINE);
+         sb.append("%xmax=" + xMax + "," + StringUtil.NEW_LINE);
+         sb.append("%]" + StringUtil.NEW_LINE);
+         for (int i = 0; i < allData.length; i++) {
+            sb.append("%\\addplot+[" + StringUtil.NEW_LINE);
+            sb.append("%boxplot prepared={median=" + median[i]
+                      + ", upper quartile=" + upperQuartiles[i]
+                      + ", lower quartile=" + lowerQuartiles[i]
+                      + ", upper whisker=" + upperWhiskers[i]
+                      + ", lower whisker=" + lowerWhiskers[i]
+                      + "}," + StringUtil.NEW_LINE);
+            sb.append("%] coordinates {};" + StringUtil.NEW_LINE);
+         }
+         sb.append("%\\end{axis}" + StringUtil.NEW_LINE);
+         sb.append("%\\end{tikzpicture}" + StringUtil.NEW_LINE);
       }
-      sb.append("%}," + StringUtil.NEW_LINE);
-      sb.append("%y=1cm," + StringUtil.NEW_LINE);
-      sb.append("%xmin=" + xMin + "," + StringUtil.NEW_LINE);
-      sb.append("%xmax=" + xMax + "," + StringUtil.NEW_LINE);
-      sb.append("%]" + StringUtil.NEW_LINE);
-      for (int i = 0; i < allData.length; i++) {
-         sb.append("%\\addplot+[" + StringUtil.NEW_LINE);
-         sb.append("%boxplot prepared={median=" + median[i]
-                   + ", upper quartile=" + upperQuartiles[i]
-                   + ", lower quartile=" + lowerQuartiles[i]
-                   + ", upper whisker=" + upperWhiskers[i]
-                   + ", lower whisker=" + lowerWhiskers[i]
-                   + "}," + StringUtil.NEW_LINE);
-         sb.append("%] coordinates {};" + StringUtil.NEW_LINE);
-      }
-      sb.append("%\\end{axis}" + StringUtil.NEW_LINE);
-      sb.append("%\\end{tikzpicture}" + StringUtil.NEW_LINE);
       // auto computed boxplot
       sb.append(StringUtil.NEW_LINE + StringUtil.NEW_LINE);
       sb.append("\\begin{tikzpicture}" + StringUtil.NEW_LINE);
