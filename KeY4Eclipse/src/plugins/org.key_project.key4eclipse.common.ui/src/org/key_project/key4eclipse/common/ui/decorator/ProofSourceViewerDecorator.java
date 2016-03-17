@@ -243,19 +243,22 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     */
    private void setKeywordHighlights(String str) {
       markedKeywords = new ArrayList<StyleRange>();
-      for (Range keyword : printer.getInitialPositionTable().getKeywordRanges()) {
-         StyleRange mark = new StyleRange();
-         mark.fontStyle = SWT.BOLD;
-         mark.foreground = blueColor;
-         mark.start = keyword.start();
-         mark.length = keyword.length();
-         // mark java keywords as purple
-         for (Range javaBlock : printer.getInitialPositionTable().getJavaBlockRanges()) {
-            if (keyword.start() >= javaBlock.start() && keyword.end() <= javaBlock.end()) {
-               mark.foreground = purpleColor;
+      if (printer != null) {
+         for (Range keyword : printer.getInitialPositionTable().getKeywordRanges()) {
+            StyleRange mark = new StyleRange();
+            mark.fontStyle = SWT.BOLD;
+            mark.foreground = blueColor;
+            mark.start = keyword.start();
+            mark.length = keyword.length();
+            // mark java keywords as purple
+            for (Range javaBlock : printer.getInitialPositionTable().getJavaBlockRanges()) {
+               if (keyword.start() >= javaBlock.start() && keyword.end() <= javaBlock.end()) {
+                  mark.foreground = purpleColor;
+               }
             }
+            
+            markedKeywords.add(mark);
          }
-         markedKeywords.add(mark);
       }
    }
    

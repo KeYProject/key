@@ -140,6 +140,12 @@
             id="org.key_project.sed.key.ui.addWatchpointCommand"
             name="Add Watchpoint">
       </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Applies a Rule"
+            id="org.key_project.sed.key.ui.commands.applyRule"
+            name="Apply a Rule">
+      </command>
    </extension>
       <extension
             point="org.eclipse.ui.commandImages">
@@ -254,6 +260,10 @@
          <handler
                class="org.key_project.sed.key.ui.command.AddWatchpointHandler"
                commandId="org.key_project.sed.key.ui.addWatchpointCommand">
+         </handler>
+         <handler
+               class="org.key_project.keyide.ui.handlers.ApplyRuleHandler"
+               commandId="org.key_project.sed.key.ui.commands.applyRule">
          </handler>
       </extension>
    <extension
@@ -564,6 +574,11 @@
                   style="push">
             </command>
          </menuContribution>
+         <menuContribution
+               allPopups="false"
+               class="org.key_project.sed.key.ui.view.RuleAppContextMenu"
+               locationURI="popup:org.key_project.sed.key.ui.ManualView.popup?before=group.add">
+         </menuContribution>
       </extension>
       <extension
             point="org.eclipse.core.expressions.propertyTesters">
@@ -628,6 +643,13 @@
                icon="icons/logo16.gif"
                id="org.key_project.sed.key.ui.view.SideProofsView"
                name="Side Proofs"
+               restorable="true">
+         </view>
+         <view
+               category="org.key_project.sed.ui.category"
+               class="org.key_project.sed.key.ui.view.ManualView"
+               id="org.key_project.sed.key.ui.view.ManualView"
+               name="Manual Rule Application View"
                restorable="true">
          </view>
       </extension>
