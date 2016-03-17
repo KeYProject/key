@@ -3916,9 +3916,23 @@ public final class SymbolicExecutionUtil {
    
    /**
     * Checks if is an exceptional termination.
+    * @param node the node which is used for computation.
+    * @param exceptionVariable the exception variable which is used to check if the executed program in proof terminates normally.
     * @return {@code true} exceptional termination, {@code false} normal termination.
     */
    public static boolean lazyComputeIsExceptionalTermination(Node node, IProgramVariable exceptionVariable) {
+	   	  Sort result = lazyComputeExceptionSort(node, exceptionVariable);
+	      return result != null && !(result instanceof NullSort);
+	   }
+   
+   /**
+    * Computes the exception {@link Sort} lazily when {@link #getExceptionSort()}
+    * is called the first time. 
+    * @param node the node which is user for computation.
+    * @param exceptionVariable the exception variable which is used to check if the executed program in proof terminates normally.
+    * @return The exception {@link Sort}.
+    */
+   public static Sort lazyComputeExceptionSort(Node node, IProgramVariable exceptionVariable) {
 	      Sort result = null;
 	      if (exceptionVariable != null) {
 	         // Search final value of the exceptional variable which is used to check if the verified program terminates normally
@@ -3935,7 +3949,7 @@ public final class SymbolicExecutionUtil {
 	            result = value.get(0).sort();
 	         }
 	      }
-	      return result != null && !(result instanceof NullSort);
+	      return result;
 	   }
    
    /**
