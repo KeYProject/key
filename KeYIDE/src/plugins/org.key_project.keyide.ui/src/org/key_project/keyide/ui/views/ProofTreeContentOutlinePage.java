@@ -316,7 +316,10 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 			}
 		} else {
 		   // scroll to the selected Node
-		   getTreeViewer().reveal(selectedNode);
+			Object selectedObj = SWTUtil.getFirstElement(getSelection());
+			if (selectedObj != null && !(selectedObj instanceof BranchFolder)) {
+				getTreeViewer().reveal(selectedNode);
+			}
 		}
 	}
 
