@@ -3,6 +3,7 @@
 
 	<!-- Properties definition (global variables for paths) -->
 	<property name="src.dir" value="${basedir}/src" />
+	<property name="key.dir" value="${basedir}/../"/>
 	<property name="build.dir" value="${basedir}/bin" />
 	<property name="dist.dir" value="${basedir}/../deployment" />
 	<property name="NUIdefault" value="${build.dir}/de/uka/ilkd/key/nui/NUIdefault.fxml" />
@@ -85,6 +86,40 @@
 		<mkdir dir="${dist.dir}" />
 		<mkdir dir="${dist.dir}/components" />
 		<jar destfile="${dist.dir}/components/key.nui.jar" basedir="${build.dir}" manifest="${basedir}/META-INF/MANIFEST.MF" />
+	</target>
+
+	<!-- Definition of target DEPLOYALL -->
+	<target name="deployAll">
+		<!-- Create Jar archives -->
+		<ant antfile="${key.dir}/key.util/build.xml" target="deploy" dir="${key.dir}/key.util" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core/build.xml" target="deploy" dir="${key.dir}/key.core" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.testgen/build.xml" target="deploy" dir="${key.dir}/key.core.testgen" inheritall="false"/>
+		<ant antfile="${key.dir}/key.ui/build.xml" target="deploy" dir="${key.dir}/key.ui" inheritall="false"/>
+		<ant antfile="${key.dir}/key.nui/build.xml" target="deploy" dir="${key.dir}/key.nui" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.symbolic_execution/build.xml" target="deploy" dir="${key.dir}/key.core.symbolic_execution" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="deploy" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.example/build.xml" target="deploy" dir="${key.dir}/key.core.example" inheritall="false"/>
+		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="deploy" dir="${key.dir}/key.removegenerics" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="deploy" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
+		<!-- Deploy license -->
+		<copy todir="${key.dir}/deployment">
+			<fileset file="${key.dir}/LICENSE.TXT"/>
+		</copy>
+		<!-- Deploy KeY.jar -->
+		<copy todir="${basedir}/KeY.jar">
+     		<fileset dir="${basedir}/KeY.jar-template"/>			
+     		<fileset dir="${key.dir}/key.util/bin/"/>
+     		<fileset dir="${key.dir}/key.core/bin/"/>
+     		<fileset dir="${key.dir}/key.nui/bin/"/>
+     		<fileset dir="${key.dir}/key.core.symbolic_execution/bin/"/>     
+     		<fileset dir="${key.dir}/key.core.proof_references/bin/" />
+     		<fileset dir="${key.dir}/key.core.example/bin/" />
+			<fileset dir="${key.dir}/key.removegenerics/bin/" />
+			<fileset dir="${key.dir}/key.core.symbolic_execution.example/bin/" />
+   		</copy>
+		<copy todir="${basedir}/KeY.jar" file="${key.dir}/key.ui/resources/de/uka/ilkd/key/gui/images/key-color.gif" />
+		<jar destfile="${key.dir}/deployment/KeY.jar" basedir="${basedir}/KeY.jar" manifest="${basedir}/KeY.jar-template/META-INF/MANIFEST.MF" />	
+		<delete dir="${basedir}/KeY.jar" />
 	</target>
 
 	<!-- Definition of target COMPILE -->
