@@ -646,6 +646,21 @@ public abstract class AbstractUpdateExtractor {
       private final boolean stateMember;
 
       /**
+       * Constructor for cloning purpose.
+       * @param original The original {@link ExtractLocationParameter} to clone.
+       * @param newParent The new parent {@link Term} to be used instead of the original one.
+       */
+      public ExtractLocationParameter(ExtractLocationParameter original, Term newParent) {
+         this.programVariable = original.programVariable;
+         this.arrayIndex = original.arrayIndex;
+         this.parentTerm = newParent;
+         this.parentTermIndexInStatePredicate = original.parentTermIndexInStatePredicate;
+         this.valueTermIndexInStatePredicate = original.valueTermIndexInStatePredicate;
+         this.preVariable = original.preVariable;
+         this.stateMember = original.stateMember;
+      }
+
+      /**
        * Constructor.
        * @param programVariable The {@link ProgramVariable}.
        * @param stateMember Defines if this location should explicitly be shown on the state.
