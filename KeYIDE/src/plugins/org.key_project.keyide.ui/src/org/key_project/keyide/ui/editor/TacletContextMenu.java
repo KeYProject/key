@@ -26,6 +26,8 @@ import org.key_project.keyide.ui.util.KeYIDEUtil;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
+import de.uka.ilkd.key.gui.ProofMacroMenu;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -72,8 +74,18 @@ public class TacletContextMenu extends ExtensionContributionFactory {
                item.setVisible(true);
                additions.addContributionItem(item, null);
             }
+            // Add macros
             MenuManager macroMenu = new MenuManager("Strategy macros");
-            
+            Iterable<ProofMacro> allMacros = ProofMacroMenu.REGISTERED_MACROS;
+            for (ProofMacro macro : allMacros) {
+               if (macro.canApplyTo(goal.node(), pos.getPosInOccurrence())) {
+                  CommandContributionItemParameter p = new CommandContributionItemParameter(serviceLocator, "", "org.key_project.keyide.ui.commands.applyrule", SWT.PUSH);
+                  p.label = macro.getName();
+                  MacroCommandContributionItem item = new MacroCommandContributionItem(p, goal.node(), macro, keyEditor.getUI(), pos);
+                  item.setVisible(true);
+                  macroMenu.add(item);
+               }
+            }
             additions.addContributionItem(macroMenu, null); 
          }
       }
