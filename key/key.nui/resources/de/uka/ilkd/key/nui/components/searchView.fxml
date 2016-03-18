@@ -6,13 +6,24 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<HBox fx:id="searchViewPane" HBox.hgrow="ALWAYS" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.controller.SearchViewController">
+<HBox fx:id="searchViewPane" HBox.hgrow="ALWAYS"
+	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="de.uka.ilkd.key.nui.controller.SearchViewController">
+	<children>
+		<TextField fx:id="tfSearchQuery" layoutY="3.0" minHeight="21.0"
+			minWidth="100.0" prefHeight="30.0" prefWidth="121.0" promptText="Search"
+			AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+			AnchorPane.topAnchor="0.0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" />
+		<Button fx:id="btnSearchPrev" minHeight="30.0" minWidth="30.0"
+			prefHeight="30.0" prefWidth="30.0" text="&lt;" textAlignment="CENTER"
+			AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0"
+			AnchorPane.topAnchor="0.0" />
+		<Button fx:id="btnSearchNext" minHeight="30.0" minWidth="30.0"
+			prefHeight="30.0" prefWidth="30.0" text="&gt;" textAlignment="CENTER"
+			AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0"
+			AnchorPane.topAnchor="0.0" />
+		<Button fx:id="btnCloseSearchView" mnemonicParsing="false"
+			prefHeight="30.0" prefWidth="28.0" text="X" />
+	</children>
 
-   <children>
-      <TextField fx:id="tfSearchQuery" layoutY="3.0" minHeight="21.0" minWidth="100.0" prefHeight="30.0" prefWidth="121.0" promptText="Search" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" />
-      <Button fx:id="btnSearchPrev" minHeight="30.0" minWidth="30.0" prefHeight="30.0" prefWidth="30.0" text="&lt;" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-      <Button fx:id="btnSearchNext" minHeight="30.0" minWidth="30.0" prefHeight="30.0" prefWidth="30.0" text="&gt;" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-      <Button fx:id="btnCloseSearchView" mnemonicParsing="false" prefHeight="30.0" prefWidth="28.0" text="X" />
-   </children>
-   
 </HBox>

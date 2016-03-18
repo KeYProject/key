@@ -8,197 +8,312 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane fx:id="strategyViewPane" prefHeight="540.0" prefWidth="407.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.controller.StrategyViewController">
+<AnchorPane fx:id="strategyViewPane" prefHeight="540.0"
+	prefWidth="407.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="de.uka.ilkd.key.nui.controller.StrategyViewController">
 	<children>
-		<Button fx:id="goButton" alignment="CENTER" layoutX="297.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleOnAction" prefHeight="33.0" prefWidth="87.0" text="Start" BorderPane.alignment="CENTER">
-         <font>
-            <Font size="15.0" />
-         </font>
-         <graphic>
-            <ImageView fx:id="goButtonImage" fitHeight="23.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true" />
-         </graphic></Button>
-      <Slider fx:id="maxRuleAppSlider" blockIncrement="1.0" layoutX="18.0" layoutY="49.0" majorTickUnit="1.0" max="6.0" min="0.0" minorTickCount="8" prefHeight="75.0" prefWidth="371.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
-      <Label fx:id="maxRuleAppLabel" layoutX="14.0" layoutY="14.0" prefHeight="27.0" prefWidth="280.0" text="%maxRuleAppLabel">
-         <font>
-            <Font size="18.0" />
-         </font></Label>
-      <ScrollPane layoutX="13.0" layoutY="473.0" prefHeight="53.0" prefViewportHeight="564.0" prefViewportWidth="346.0" prefWidth="371.0" visible="false">
-         <content>
-            <GridPane layoutX="16.0" layoutY="159.0" prefHeight="424.0" prefWidth="346.0">
-              <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="134.0" minWidth="10.0" prefWidth="122.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="151.0" minWidth="10.0" prefWidth="111.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="10.0" prefWidth="114.0" />
-              </columnConstraints>
-              <rowConstraints>
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-               <children>
-                  <Label text="%stopAt" />
-                  <Label text="%proofSplitting" GridPane.rowIndex="2" />
-                  <Label text="%loopTreatment" GridPane.rowIndex="4" />
-                  <Label text="%blockTreatment" GridPane.rowIndex="6" />
-                  <Label text="%methodTreatment" GridPane.rowIndex="8" />
-                  <Label text="%dependencyContracts" GridPane.rowIndex="10" />
-                  <Label text="%queryTreatment" GridPane.rowIndex="12" />
-                  <Label text="%arithmeticTreatment" GridPane.rowIndex="15" />
-                  <Label text="%quantifierTreatment" GridPane.rowIndex="17" />
-                  <Label text="%classAxiom" GridPane.rowIndex="20" />
-                  <Label text="%autoInduction" GridPane.rowIndex="22" />
-                  <Label text="%userOptions" GridPane.rowIndex="24" />
-                  <RadioButton mnemonicParsing="false" prefHeight="17.0" prefWidth="108.0" text="%default" GridPane.rowIndex="1">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="stopAt" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="%unclosable" toggleGroup="$stopAt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <RadioButton mnemonicParsing="false" text="%free" GridPane.rowIndex="3">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="proofSplitting" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="%delayed" toggleGroup="$proofSplitting" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <RadioButton mnemonicParsing="false" text="%off" toggleGroup="$proofSplitting" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                  <RadioButton mnemonicParsing="false" text="%invariant" GridPane.rowIndex="5">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="loopTreatment" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="%expand" toggleGroup="$loopTreatment" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                  <RadioButton mnemonicParsing="false" text="%none" toggleGroup="$loopTreatment" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                  <RadioButton mnemonicParsing="false" text="%contract" GridPane.rowIndex="7">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="blockTreatment" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="%expand" toggleGroup="$blockTreatment" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                  <RadioButton mnemonicParsing="false" text="%contract" GridPane.rowIndex="9">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="methodTreatment" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="%expand" toggleGroup="$methodTreatment" GridPane.columnIndex="1" GridPane.rowIndex="9" />
-                  <RadioButton mnemonicParsing="false" text="%none" toggleGroup="$methodTreatment" GridPane.columnIndex="2" GridPane.rowIndex="9" />
-                  <RadioButton mnemonicParsing="false" text="%on" GridPane.rowIndex="11">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="dependencyContracts" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="%off" toggleGroup="$dependencyContracts" GridPane.columnIndex="1" GridPane.rowIndex="11" />
-                  <RadioButton mnemonicParsing="false" text="%on" GridPane.rowIndex="13">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="queryTreatment" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="%restricted" toggleGroup="$queryTreatment" GridPane.columnIndex="1" GridPane.rowIndex="13" />
-                  <RadioButton mnemonicParsing="false" text="%off" toggleGroup="$queryTreatment" GridPane.columnIndex="2" GridPane.rowIndex="13" />
-                  <RadioButton mnemonicParsing="false" text="%on" GridPane.columnIndex="1" GridPane.rowIndex="14">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="expandLocalQueries" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="%off" toggleGroup="$expandLocalQueries" GridPane.columnIndex="2" GridPane.rowIndex="14" />
-                  <RadioButton mnemonicParsing="false" text="%basic" GridPane.rowIndex="16">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="arithmeticTreatment" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="%defops" toggleGroup="$arithmeticTreatment" GridPane.columnIndex="1" GridPane.rowIndex="16" />
-                  <RadioButton mnemonicParsing="false" text="%modelSearch" toggleGroup="$arithmeticTreatment" GridPane.columnIndex="2" GridPane.rowIndex="16" />
-                  <RadioButton mnemonicParsing="false" text="%none" GridPane.rowIndex="18">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="quantifierTreatment" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="%noSplits" toggleGroup="$quantifierTreatment" GridPane.columnIndex="1" GridPane.rowIndex="18" />
-                  <RadioButton mnemonicParsing="false" text="%noSplitsWithProgs" toggleGroup="$quantifierTreatment" GridPane.rowIndex="19" />
-                  <RadioButton mnemonicParsing="false" text="%free" toggleGroup="$quantifierTreatment" GridPane.columnIndex="1" GridPane.rowIndex="19" />
-                  <RadioButton mnemonicParsing="false" text="%free" GridPane.rowIndex="21">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="classAxiom" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="%delayed" toggleGroup="$classAxiom" GridPane.columnIndex="1" GridPane.rowIndex="21" />
-                  <RadioButton mnemonicParsing="false" text="%off" toggleGroup="$classAxiom" GridPane.columnIndex="2" GridPane.rowIndex="21" />
-                  <RadioButton mnemonicParsing="false" text="%on" GridPane.rowIndex="23">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="autoInduction" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="%restricted" toggleGroup="$autoInduction" GridPane.columnIndex="1" GridPane.rowIndex="23" />
-                  <RadioButton mnemonicParsing="false" text="%off" toggleGroup="$autoInduction" GridPane.columnIndex="2" GridPane.rowIndex="23" />
-                  <RadioButton mnemonicParsing="false" text="%lowPrior" GridPane.columnIndex="1" GridPane.rowIndex="25">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="userOptions1" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="%highPrior" toggleGroup="$userOptions1" GridPane.columnIndex="2" GridPane.rowIndex="25" />
-                  <RadioButton mnemonicParsing="false" text="%lowPrior" GridPane.columnIndex="1" GridPane.rowIndex="26">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="userOptions2" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="%highPrior" toggleGroup="$userOptions2" GridPane.columnIndex="2" GridPane.rowIndex="26" />
-                  <Label text="%expandLocalQueries" GridPane.rowIndex="14" />
-                  <FlowPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="25">
-                     <children>
-                        <Label text="%one" />
-                        <RadioButton mnemonicParsing="false" text="%off" toggleGroup="$userOptions1" />
-                     </children>
-                  </FlowPane>
-                  <FlowPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="26">
-                     <children>
-                        <Label text="%two" />
-                        <RadioButton mnemonicParsing="false" text="%off" toggleGroup="$userOptions2" />
-                     </children>
-                  </FlowPane>
-                  <FlowPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="27">
-                     <children>
-                        <Label text="%three" />
-                        <RadioButton mnemonicParsing="false" text="%off">
-                           <toggleGroup>
-                              <ToggleGroup fx:id="userOptions3" />
-                           </toggleGroup>
-                        </RadioButton>
-                     </children>
-                  </FlowPane>
-                  <RadioButton mnemonicParsing="false" text="%lowPrior" toggleGroup="$userOptions3" GridPane.columnIndex="1" GridPane.rowIndex="27" />
-                  <RadioButton mnemonicParsing="false" text="%highPrior" toggleGroup="$userOptions3" GridPane.columnIndex="2" GridPane.rowIndex="27" />
-               </children>
-            </GridPane>
-         </content>
-      </ScrollPane>
-      <ScrollPane layoutX="18.0" layoutY="115.0" prefHeight="408.0" prefWidth="371.0">
-         <content>
-            <AnchorPane fx:id="proofSearchStrategy" prefHeight="477.0" prefWidth="356.0" />
-         </content></ScrollPane>
+		<Button fx:id="goButton" alignment="CENTER" layoutX="297.0"
+			layoutY="12.0" mnemonicParsing="false" onAction="#handleOnAction"
+			prefHeight="33.0" prefWidth="87.0" text="Start" BorderPane.alignment="CENTER">
+			<font>
+				<Font size="15.0" />
+			</font>
+			<graphic>
+				<ImageView fx:id="goButtonImage" fitHeight="23.0"
+					fitWidth="29.0" pickOnBounds="true" preserveRatio="true" />
+			</graphic>
+		</Button>
+		<Slider fx:id="maxRuleAppSlider" blockIncrement="1.0" layoutX="18.0"
+			layoutY="49.0" majorTickUnit="1.0" max="6.0" min="0.0"
+			minorTickCount="8" prefHeight="75.0" prefWidth="371.0"
+			showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
+		<Label fx:id="maxRuleAppLabel" layoutX="14.0" layoutY="14.0"
+			prefHeight="27.0" prefWidth="280.0" text="%maxRuleAppLabel">
+			<font>
+				<Font size="18.0" />
+			</font>
+		</Label>
+		<ScrollPane layoutX="13.0" layoutY="473.0" prefHeight="53.0"
+			prefViewportHeight="564.0" prefViewportWidth="346.0" prefWidth="371.0"
+			visible="false">
+			<content>
+				<GridPane layoutX="16.0" layoutY="159.0" prefHeight="424.0"
+					prefWidth="346.0">
+					<columnConstraints>
+						<ColumnConstraints hgrow="SOMETIMES" maxWidth="134.0"
+							minWidth="10.0" prefWidth="122.0" />
+						<ColumnConstraints hgrow="SOMETIMES" maxWidth="151.0"
+							minWidth="10.0" prefWidth="111.0" />
+						<ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0"
+							minWidth="10.0" prefWidth="114.0" />
+					</columnConstraints>
+					<rowConstraints>
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0"
+							vgrow="SOMETIMES" />
+					</rowConstraints>
+					<children>
+						<Label text="%stopAt" />
+						<Label text="%proofSplitting" GridPane.rowIndex="2" />
+						<Label text="%loopTreatment" GridPane.rowIndex="4" />
+						<Label text="%blockTreatment" GridPane.rowIndex="6" />
+						<Label text="%methodTreatment" GridPane.rowIndex="8" />
+						<Label text="%dependencyContracts" GridPane.rowIndex="10" />
+						<Label text="%queryTreatment" GridPane.rowIndex="12" />
+						<Label text="%arithmeticTreatment" GridPane.rowIndex="15" />
+						<Label text="%quantifierTreatment" GridPane.rowIndex="17" />
+						<Label text="%classAxiom" GridPane.rowIndex="20" />
+						<Label text="%autoInduction" GridPane.rowIndex="22" />
+						<Label text="%userOptions" GridPane.rowIndex="24" />
+						<RadioButton mnemonicParsing="false" prefHeight="17.0"
+							prefWidth="108.0" text="%default" GridPane.rowIndex="1">
+							<toggleGroup>
+								<ToggleGroup fx:id="stopAt" />
+							</toggleGroup>
+						</RadioButton>
+						<RadioButton mnemonicParsing="false" text="%unclosable"
+							toggleGroup="$stopAt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+						<RadioButton mnemonicParsing="false" text="%free"
+							GridPane.rowIndex="3">
+							<toggleGroup>
+								<ToggleGroup fx:id="proofSplitting" />
+							</toggleGroup>
+						</RadioButton>
+						<RadioButton mnemonicParsing="false" text="%delayed"
+							toggleGroup="$proofSplitting" GridPane.columnIndex="1"
+							GridPane.rowIndex="3" />
+						<RadioButton mnemonicParsing="false" text="%off"
+							toggleGroup="$proofSplitting" GridPane.columnIndex="2"
+							GridPane.rowIndex="3" />
+						<RadioButton mnemonicParsing="false" text="%invariant"
+							GridPane.rowIndex="5">
+							<toggleGroup>
+								<ToggleGroup fx:id="loopTreatment" />
+							</toggleGroup>
+						</RadioButton>
+						<RadioButton mnemonicParsing="false" text="%expand"
+							toggleGroup="$loopTreatment" GridPane.columnIndex="1"
+							GridPane.rowIndex="5" />
+						<RadioButton mnemonicParsing="false" text="%none"
+							toggleGroup="$loopTreatment" GridPane.columnIndex="2"
+							GridPane.rowIndex="5" />
+						<RadioButton mnemonicParsing="false" text="%contract"
+							GridPane.rowIndex="7">
+							<toggleGroup>
+								<ToggleGroup fx:id="blockTreatment" />
+							</toggleGroup>
+						</RadioButton>
+						<RadioButton mnemonicParsing="false" text="%expand"
+							toggleGroup="$blockTreatment" GridPane.columnIndex="1"
+							GridPane.rowIndex="7" />
+						<RadioButton mnemonicParsing="false" text="%contract"
+							GridPane.rowIndex="9">
+							<toggleGroup>
+								<ToggleGroup fx:id="methodTreatment" />
+							</toggleGroup>
+						</RadioButton>
+						<RadioButton mnemonicParsing="false" text="%expand"
+							toggleGroup="$methodTreatment" GridPane.columnIndex="1"
+							GridPane.rowIndex="9" />
+						<RadioButton mnemonicParsing="false" text="%none"
+							toggleGroup="$methodTreatment" GridPane.columnIndex="2"
+							GridPane.rowIndex="9" />
+						<RadioButton mnemonicParsing="false" text="%on"
+							GridPane.rowIndex="11">
+							<toggleGroup>
+								<ToggleGroup fx:id="dependencyContracts" />
+							</toggleGroup>
+						</RadioButton>
+						<RadioButton mnemonicParsing="false" text="%off"
+							toggleGroup="$dependencyContracts" GridPane.columnIndex="1"
+							GridPane.rowIndex="11" />
+						<RadioButton mnemonicParsing="false" text="%on"
+							GridPane.rowIndex="13">
+							<toggleGroup>
+								<ToggleGroup fx:id="queryTreatment" />
+							</toggleGroup>
+						</RadioButton>
+						<RadioButton mnemonicParsing="false" text="%restricted"
+							toggleGroup="$queryTreatment" GridPane.columnIndex="1"
+							GridPane.rowIndex="13" />
+						<RadioButton mnemonicParsing="false" text="%off"
+							toggleGroup="$queryTreatment" GridPane.columnIndex="2"
+							GridPane.rowIndex="13" />
+						<RadioButton mnemonicParsing="false" text="%on"
+							GridPane.columnIndex="1" GridPane.rowIndex="14">
+							<toggleGroup>
+								<ToggleGroup fx:id="expandLocalQueries" />
+							</toggleGroup>
+						</RadioButton>
+						<RadioButton mnemonicParsing="false" text="%off"
+							toggleGroup="$expandLocalQueries" GridPane.columnIndex="2"
+							GridPane.rowIndex="14" />
+						<RadioButton mnemonicParsing="false" text="%basic"
+							GridPane.rowIndex="16">
+							<toggleGroup>
+								<ToggleGroup fx:id="arithmeticTreatment" />
+							</toggleGroup>
+						</RadioButton>
+						<RadioButton mnemonicParsing="false" text="%defops"
+							toggleGroup="$arithmeticTreatment" GridPane.columnIndex="1"
+							GridPane.rowIndex="16" />
+						<RadioButton mnemonicParsing="false" text="%modelSearch"
+							toggleGroup="$arithmeticTreatment" GridPane.columnIndex="2"
+							GridPane.rowIndex="16" />
+						<RadioButton mnemonicParsing="false" text="%none"
+							GridPane.rowIndex="18">
+							<toggleGroup>
+								<ToggleGroup fx:id="quantifierTreatment" />
+							</toggleGroup>
+						</RadioButton>
+						<RadioButton mnemonicParsing="false" text="%noSplits"
+							toggleGroup="$quantifierTreatment" GridPane.columnIndex="1"
+							GridPane.rowIndex="18" />
+						<RadioButton mnemonicParsing="false" text="%noSplitsWithProgs"
+							toggleGroup="$quantifierTreatment" GridPane.rowIndex="19" />
+						<RadioButton mnemonicParsing="false" text="%free"
+							toggleGroup="$quantifierTreatment" GridPane.columnIndex="1"
+							GridPane.rowIndex="19" />
+						<RadioButton mnemonicParsing="false" text="%free"
+							GridPane.rowIndex="21">
+							<toggleGroup>
+								<ToggleGroup fx:id="classAxiom" />
+							</toggleGroup>
+						</RadioButton>
+						<RadioButton mnemonicParsing="false" text="%delayed"
+							toggleGroup="$classAxiom" GridPane.columnIndex="1"
+							GridPane.rowIndex="21" />
+						<RadioButton mnemonicParsing="false" text="%off"
+							toggleGroup="$classAxiom" GridPane.columnIndex="2"
+							GridPane.rowIndex="21" />
+						<RadioButton mnemonicParsing="false" text="%on"
+							GridPane.rowIndex="23">
+							<toggleGroup>
+								<ToggleGroup fx:id="autoInduction" />
+							</toggleGroup>
+						</RadioButton>
+						<RadioButton mnemonicParsing="false" text="%restricted"
+							toggleGroup="$autoInduction" GridPane.columnIndex="1"
+							GridPane.rowIndex="23" />
+						<RadioButton mnemonicParsing="false" text="%off"
+							toggleGroup="$autoInduction" GridPane.columnIndex="2"
+							GridPane.rowIndex="23" />
+						<RadioButton mnemonicParsing="false" text="%lowPrior"
+							GridPane.columnIndex="1" GridPane.rowIndex="25">
+							<toggleGroup>
+								<ToggleGroup fx:id="userOptions1" />
+							</toggleGroup>
+						</RadioButton>
+						<RadioButton mnemonicParsing="false" text="%highPrior"
+							toggleGroup="$userOptions1" GridPane.columnIndex="2"
+							GridPane.rowIndex="25" />
+						<RadioButton mnemonicParsing="false" text="%lowPrior"
+							GridPane.columnIndex="1" GridPane.rowIndex="26">
+							<toggleGroup>
+								<ToggleGroup fx:id="userOptions2" />
+							</toggleGroup>
+						</RadioButton>
+						<RadioButton mnemonicParsing="false" text="%highPrior"
+							toggleGroup="$userOptions2" GridPane.columnIndex="2"
+							GridPane.rowIndex="26" />
+						<Label text="%expandLocalQueries" GridPane.rowIndex="14" />
+						<FlowPane prefHeight="200.0" prefWidth="200.0"
+							GridPane.rowIndex="25">
+							<children>
+								<Label text="%one" />
+								<RadioButton mnemonicParsing="false" text="%off"
+									toggleGroup="$userOptions1" />
+							</children>
+						</FlowPane>
+						<FlowPane prefHeight="200.0" prefWidth="200.0"
+							GridPane.rowIndex="26">
+							<children>
+								<Label text="%two" />
+								<RadioButton mnemonicParsing="false" text="%off"
+									toggleGroup="$userOptions2" />
+							</children>
+						</FlowPane>
+						<FlowPane prefHeight="200.0" prefWidth="200.0"
+							GridPane.rowIndex="27">
+							<children>
+								<Label text="%three" />
+								<RadioButton mnemonicParsing="false" text="%off">
+									<toggleGroup>
+										<ToggleGroup fx:id="userOptions3" />
+									</toggleGroup>
+								</RadioButton>
+							</children>
+						</FlowPane>
+						<RadioButton mnemonicParsing="false" text="%lowPrior"
+							toggleGroup="$userOptions3" GridPane.columnIndex="1"
+							GridPane.rowIndex="27" />
+						<RadioButton mnemonicParsing="false" text="%highPrior"
+							toggleGroup="$userOptions3" GridPane.columnIndex="2"
+							GridPane.rowIndex="27" />
+					</children>
+				</GridPane>
+			</content>
+		</ScrollPane>
+		<ScrollPane layoutX="18.0" layoutY="115.0" prefHeight="408.0"
+			prefWidth="371.0">
+			<content>
+				<AnchorPane fx:id="proofSearchStrategy" prefHeight="477.0"
+					prefWidth="356.0" />
+			</content>
+		</ScrollPane>
 	</children>
 	<cursor>
 		<Cursor fx:constant="HAND" />

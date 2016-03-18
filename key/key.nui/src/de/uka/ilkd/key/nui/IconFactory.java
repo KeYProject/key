@@ -29,7 +29,7 @@ public class IconFactory {
     /**
      * the relative path to the root folder where icons can be found.
      */
-    private static String folderRoot = "components//images//";
+    private static String folderRoot = "components/images/";
 
     /**
      * An HashMap for storing loaded icon images.
@@ -97,9 +97,11 @@ public class IconFactory {
             img = icons.get(imageConstant);
         }
         else {
-            final InputStream istream = IconFactory.class
+            /*final InputStream istream = IconFactory.class
                     .getResourceAsStream(imageConstant);
-            img = new Image(istream);
+            img = new Image(istream);*/
+            // TODO
+            img = new Image("/de/uka/ilkd/key/nui/"+imageConstant);
             icons.put(imageConstant, img);
         }
         return scaleIcon(img, iconSizeWidth, iconSizeHeight);

@@ -154,8 +154,8 @@ public class MainViewController extends NUIController implements Observer {
         }
         // if no proof is loaded, use the example directory (default)
         else {
-            fileChooser.setInitialDirectory(
-                    new File("resources/de/uka/ilkd/key/examples"));
+           // fileChooser.setInitialDirectory(
+           //         new File("resources/de/uka/ilkd/key/examples"));
         }
 
         FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter(
@@ -560,12 +560,15 @@ public class MainViewController extends NUIController implements Observer {
                     MainWindow mainWindow = MainWindow.getInstance();
                     mainWindow.setVisible(false);
                     // load proof
+                    System.out.println("Start loading proof: "+ proofFileName);
                     final KeYEnvironment<?> environment = KeYEnvironment.load(
                             JavaProfile.getDefaultInstance(), proofFileName,
                             null, null, null, true);
                     final Proof proof = environment.getLoadedProof();
 
                     proof.setProofFile(proofFileName);
+                    
+                    System.out.println("loading finished!");
 
                     // convert proof to fx tree
                     final ProofTreeItem fxtree = new ProofTreeConverter(proof)

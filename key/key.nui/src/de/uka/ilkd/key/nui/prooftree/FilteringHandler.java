@@ -1,17 +1,21 @@
 package de.uka.ilkd.key.nui.prooftree;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import de.uka.ilkd.key.nui.DataModel;
 import de.uka.ilkd.key.nui.prooftree.filter.FilterAnnotation;
@@ -50,6 +54,7 @@ public class FilteringHandler {
      *            The DataModel.
      */
     public FilteringHandler(final DataModel model) {
+        System.out.println("Konstruktor FilteringHandler");
         this.dm = model;
 
         final List<ProofTreeFilter> filters = searchFilterClasses();
@@ -79,27 +84,59 @@ public class FilteringHandler {
      * @return A list of filters
      */
     private List<ProofTreeFilter> searchFilterClasses() {
-
+        System.out.println("Start searchFilterClasses()");
         final List<ProofTreeFilter> filters = new LinkedList<ProofTreeFilter>();
 
         // Path were filter class's are stored
         final String PATH = "filter/";
         // Prefix for binary class names
         final String BINARY_NAME_PREFIX = "de.uka.ilkd.key.nui.prooftree.filter.";
+        // path of the jar file
+        final File jarFile = new File(getClass().getProtectionDomain()
+                .getCodeSource().getLocation().getPath());
 
-        // Look for all class files in PATH and store their urls
-        File[] files = new File(getClass().getResource(PATH).getPath())
-                .listFiles();
         ArrayList<URL> listOfURLs = new ArrayList<URL>();
-        for (File file : files) {
-            if (file.isFile() && file.getName().matches(".*[.class]")) {
-                try {
-                    URL urlClassFile = file.toURI().toURL();
-                    listOfURLs.add(urlClassFile);
+        ArrayList<String> listOfFileNames = new ArrayList<String>();
+
+        if (jarFile.isFile()) { // Run with JAR file
+            System.out.println("Run with JAR file");
+            try (JarFile jar = new JarFile(jarFile)) {
+                final Enumeration<JarEntry> entries = jar.entries();
+                System.out.println("Entrie: "+entries.toString()+" More?= "+ entries.hasMoreElements());
+                while (entries.hasMoreElements()) {
+                    final String fileName = entries.nextElement().getName();
+                    if (fileName.matches(
+                            "(de/uka/ilkd/key/nui/prooftree/filter/).*(.class)")) {
+                        URL url = new File(fileName).toURI().toURL();
+                        System.out.println(url.toString());
+                        listOfURLs.add(url);
+                        listOfFileNames.add(fileName.substring(
+                                fileName.lastIndexOf("/") + 1,
+                                fileName.length()));
+                    }
                 }
-                catch (MalformedURLException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+            }
+            catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        else {// Run with IDE
+              // Look for all class files in PATH and store their urls
+            File[] files = new File(getClass().getResource(PATH).getPath())
+                    .listFiles();
+
+            for (File file : files) {
+                if (file.isFile() && file.getName().matches(".*(.class)")) {
+                    try {
+                        URL urlClassFile = file.toURI().toURL();
+                        listOfURLs.add(urlClassFile);
+                        listOfFileNames.add(file.getName());
+                    }
+                    catch (MalformedURLException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -115,10 +152,10 @@ public class FilteringHandler {
             classLoader = new URLClassLoader(urls);
             String binaryClassName = null;
 
-            for (File file : files) {
+            for (String fileName : listOfFileNames) {
                 // build binaryClassName to load class with classLoader
-                binaryClassName = BINARY_NAME_PREFIX + file.getName()
-                        .substring(0, file.getName().lastIndexOf("."));
+                binaryClassName = BINARY_NAME_PREFIX
+                        + fileName.substring(0, fileName.lastIndexOf("."));
 
                 // Load possible filter class
                 Class<?> c = classLoader.loadClass(binaryClassName);
@@ -140,6 +177,8 @@ public class FilteringHandler {
                              * new instance of it and add it to filters.
                              */
                             if (filterAnnotation.isFilter()) {
+                                System.out.println(
+                                        "Added Filter: " + c.getName());
                                 filters.add((ProofTreeFilter) c.newInstance());
                             }
                         }

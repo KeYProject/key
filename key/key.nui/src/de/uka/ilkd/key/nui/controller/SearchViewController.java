@@ -29,7 +29,7 @@ import javafx.util.Duration;
  * @author Florian Breitfelder
  *
  */
-@ControllerAnnotation(createMenu=false)
+@ControllerAnnotation(createMenu = false)
 public class SearchViewController extends NUIController {
 
     private enum Direction {
@@ -202,7 +202,7 @@ public class SearchViewController extends NUIController {
      *            whether the selection is to be moved up- or downwards
      */
     private void moveSelectionAndScrollIfNeeded(Direction direction) {
-        if (numberOfSearchResults<1) {
+        if (numberOfSearchResults < 1) {
             return;
         }
 
@@ -341,8 +341,13 @@ public class SearchViewController extends NUIController {
         });
 
         // Assign stylesheet
-        searchViewPane.getStylesheets().add(getClass()
-                .getResource("../components/searchView.css").toExternalForm());
+        // TODO check if command is equivalent
+        /*
+         * searchViewPane.getStylesheets().add(getClass()
+         * .getResource("../components/searchView.css").toExternalForm());
+         */
+        searchViewPane.getStylesheets()
+                .add("/de/uka/ilkd/key/nui/components/searchView.css");
     }
 
     private void closeSearchView() {
