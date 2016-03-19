@@ -1,5 +1,12 @@
 package org.key_project.sed.key.ui.view;
 
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.IStateListener;
+import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
@@ -27,7 +34,12 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.RegistryToggleState;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
+import org.key_project.keyide.ui.handlers.HideIntermediateProofstepsHandler;
+import org.key_project.keyide.ui.handlers.ShowSymbolicExecutionTreeOnlyHandler;
 import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
@@ -42,6 +54,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -100,6 +113,16 @@ public class ManualView extends AbstractViewBasedView {
    private ProofSourceViewerDecorator sourceViewerDecorator;
    
    /**
+	 * The {@link State} which indicates hiding or showing of intermediate proofsteps.
+	 */
+	private State hideState;
+	
+	/**
+	 * The {@link State} for the show symbolic execution tree only outline filter.
+	 */
+	private State symbolicState;
+   
+   /**
     * the {@link ISelectionChangedListener} for the {@link IDebugView}.
     */
    private ISelectionChangedListener baseViewListener = new ISelectionChangedListener() {
@@ -141,13 +164,114 @@ public class ManualView extends AbstractViewBasedView {
       }
    };
    
+   /**
+	 * The {@link IStateListener} to sync the hide intermediate proof steps toggleState with the outline page.
+	 */
+	private IStateListener hideStateListener = new IStateListener() {
+
+		@Override
+		public void handleStateChange(State state, Object oldValue) {
+			handleHideStateChanged(state, oldValue);
+		}
+	};
+	
+	/**
+	 * The {@link IStateListener} to sync the show symbolic execution tree only toggleState with the outline page.
+	 */
+	private IStateListener symbolicStateListener = new IStateListener(){
+
+      @Override
+      public void handleStateChange(State state, Object oldValue) {
+    	  handleSymbolicStateChanged(state, oldValue);
+      }
+	};
+	
+	private RuleAppListener ruleAppListener = new RuleAppListener() {
+		
+		@Override
+		public void ruleApplied(ProofEvent e) {
+			handleRuleApplied(e);
+			
+		}
+	};
+
+	private boolean isManualRule;
+	
+	public ManualView() {
+		ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
+	      if (service != null) {
+	         Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
+	         if (hideCmd != null) {
+	            hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
+	            if (hideState != null) {
+	            	hideState.setValue(false); //TODO remove
+	            	hideState.addListener(hideStateListener);
+	            }
+	         }
+	         
+	         Command symbolicCmd = service.getCommand(ShowSymbolicExecutionTreeOnlyHandler.COMMAND_ID);
+	         if (symbolicCmd != null) {
+	            symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
+	            if (symbolicState != null) {
+	            	symbolicState.setValue(false); //TODO remove
+	            	symbolicState.addListener(symbolicStateListener);
+	            }
+	         }
+	      }
+	}
+	
+	protected void handleRuleApplied(ProofEvent e) {
+		if (!getProof().closed() && isManualRule) {
+			Node selectedNode = getSelectedNode();
+			Iterator<Node> iterator = selectedNode.childrenIterator();
+			Node newSelectedNode = selectedNode;
+			while (iterator.hasNext()) {
+				Node child = iterator.next();
+				if (child.leaf()) {
+					newSelectedNode = child;
+				}
+			}
+			selectNode(newSelectedNode);
+			sourceViewerDecorator.showNode(newSelectedNode, SymbolicExecutionUtil.createNotationInfo(newSelectedNode));
+			setManualRule(false);
+		}
+		
+	}
+
+	public void setManualRule(boolean b) {
+		isManualRule = b;
+	}
+
+	/**
+	 * Handles a change in the state of the hideIntermediateProofsteps outline filter.
+	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
+	 * @param oldValue The old value; may be anything.
+	 */
+	protected void handleHideStateChanged(State state, Object oldValue) {
+		Node selectedNode = getSelectedNode();
+		contentProvider.setHideState((boolean) state.getValue());
+		getTreeViewer().setInput(proof);
+		selectNode(selectedNode);
+	}
+	
+	/**
+	 * Handles a change in the state of the showSymbolicExecutionTree outline filter.
+	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
+	 * @param oldValue The old value; may be anything.
+	 */
+	protected void handleSymbolicStateChanged(State state, Object oldValue) {
+		Node selectedNode = getSelectedNode();
+		contentProvider.setSymbolicState((boolean) state.getValue());
+		getTreeViewer().setInput(proof);
+		selectNode(selectedNode);
+	}
+   
 
    /**
     * {@inheritDoc}
     */
    @Override
    public void createPartControl(Composite parent) {
-      //create the tree viewer
       parentComposite = new SashForm(parent, SWT.HORIZONTAL);
       //create tree viewer
       this.treeViewer = new TreeViewer(parentComposite, SWT.SINGLE | SWT.H_SCROLL
@@ -185,12 +309,16 @@ public class ManualView extends AbstractViewBasedView {
             if (target instanceof KeYDebugTarget) {
                KeYDebugTarget keyTarget = (KeYDebugTarget) target;
                if (!keyTarget.isTerminated()) {
+	        	  if (getProof() != null && !getProof().isDisposed()) {
+	        		   getProof().removeRuleAppListener(ruleAppListener);
+	        	  }
                   this.proof = keyTarget.getProof();
                   this.environment = keyTarget.getEnvironment();
                   environment.getProofControl().setMinimizeInteraction(true);
                   if (getTreeViewer() != null && getSourceViewer() != null) {
                      updateViewer();
                   }
+                  getProof().addRuleAppListener(ruleAppListener);
                } else {
                   proof = null;
                   environment = null;
@@ -201,10 +329,8 @@ public class ManualView extends AbstractViewBasedView {
                IKeYSENode<?> seNode = (IKeYSENode<?>) element;
                if (getTreeViewer() != null && getSourceViewer() != null) {
                   Node keyNode = seNode.getExecutionNode().getProofNode();
-                  getTreeViewer().expandToLevel(keyNode, 0);
-                  getTreeViewer().setSelection(SWTUtil.createSelection(keyNode), true);
-                  sourceViewerDecorator.showNode(keyNode,
-                        SymbolicExecutionUtil.createNotationInfo(getProof()));
+                  selectNode(keyNode);
+                  sourceViewerDecorator.showNode(keyNode, SymbolicExecutionUtil.createNotationInfo(getProof()));
                }
             }
          }
@@ -224,17 +350,20 @@ public class ManualView extends AbstractViewBasedView {
       Assert.isNotNull(getSourceViewer());
       Assert.isNotNull(sourceViewerDecorator);
       this.contentProvider = new LazyProofTreeContentProvider();
+      // initialize boolean flags for hideIntermediateProofSteps and showSymbolicExecutionTree outline filter
+      contentProvider.setHideState((boolean) hideState.getValue());
+      contentProvider.setSymbolicState((boolean) symbolicState.getValue());
       getTreeViewer().setContentProvider(contentProvider);
-      this.labelProvider = new ProofTreeLabelProvider(getTreeViewer(),
-            environment.getProofControl(), getProof());
+      
+      this.labelProvider = new ProofTreeLabelProvider(getTreeViewer(), environment.getProofControl(), getProof());
       getTreeViewer().setLabelProvider(labelProvider);
       getTreeViewer().setInput(getProof());
       contentProvider.injectTopLevelElements();
+      
       getTreeViewer().setSelection(SWTUtil.createSelection(getProof().root()), true);
       //TODO: implement pruning and both filters on the getTreeViewer()
       createTreeViewerContextMenu();
-      sourceViewerDecorator.showNode(getProof().root(),
-            SymbolicExecutionUtil.createNotationInfo(getProof()));
+      sourceViewerDecorator.showNode(getProof().root(), SymbolicExecutionUtil.createNotationInfo(getProof()));
       getSourceViewer().getControl().setSize(1000,1000);
       createSourceViewerContextMenu();
    }
@@ -243,13 +372,10 @@ public class ManualView extends AbstractViewBasedView {
     * method to create the context menu shown on this view's tree viewer.
     */
    private void createTreeViewerContextMenu() {
-      MenuManager menuManager = new MenuManager("Outline popup",
-            "org.key_project.keyide.ui.view.outline.popup");
+      MenuManager menuManager = new MenuManager("Outline popup", "org.key_project.keyide.ui.view.outline.popup");
       Menu menu = menuManager.createContextMenu(getTreeViewer().getControl());
       getTreeViewer().getControl().setMenu(menu);
-      getSite().registerContextMenu(
-            "org.key_project.keyide.ui.view.outline.popup", menuManager,
-            getTreeViewer());
+      getSite().registerContextMenu("org.key_project.keyide.ui.view.outline.popup", menuManager, getTreeViewer());
    }
    
    /**
@@ -273,7 +399,7 @@ public class ManualView extends AbstractViewBasedView {
       getSite().getPage().addSelectionListener(selectionListener);
       if (baseView != null) {
          baseView.getSite().getSelectionProvider().addSelectionChangedListener(baseViewListener);
-         }
+     }
    }
 
    /**
@@ -313,6 +439,9 @@ public class ManualView extends AbstractViewBasedView {
       }
       if (baseView != null) {
          baseView.getSite().getSelectionProvider().removeSelectionChangedListener(baseViewListener);
+      }
+      if (getProof() != null) {
+    	  getProof().removeRuleAppListener(ruleAppListener);
       }
       getSite().getPage().removeSelectionListener(selectionListener);
       
@@ -411,6 +540,47 @@ public class ManualView extends AbstractViewBasedView {
       }
    }
    
+   protected void makeSureElementIsLoaded(Node node) {
+	// Collect unknown parents
+			Deque<Object> unknownParents = new LinkedList<Object>();
+			boolean unknown = true;
+			Object current = node;
+			while (unknown && current != null) {
+				if (getTreeViewer().testFindItem(current) == null) {
+					unknownParents.addFirst(current);
+				} else {
+					unknown = false;
+				}
+				current = contentProvider.getParent(current);
+			}
+			// Inject unknown elements
+			for (Object unknownElement : unknownParents) {
+				Object parent = contentProvider.getParent(unknownElement);
+				int viewIndex = contentProvider.getIndexOf(parent, unknownElement);
+				if (contentProvider.getHideState() == false && contentProvider.getSymbolicState() == false) {
+				   Assert.isTrue(viewIndex >= 0, "Content provider returned wrong parents or child index computation is buggy.");
+				   contentProvider.updateChildCount(parent, 0);
+				   contentProvider.updateElement(parent, viewIndex);
+				} else if (viewIndex >= 0){
+					contentProvider.updateChildCount(parent, 0);
+					contentProvider.updateElement(parent, viewIndex);
+				}
+			}
+   }
+   
+   protected void selectNode(Node node) {
+	   makeSureElementIsLoaded(node);
+	   
+	   Object parent = contentProvider.getParent(node);
+	   int viewIndex = contentProvider.getIndexOf(parent, node);
+	   
+	   if (viewIndex >= 0) {
+		   getTreeViewer().setSelection(SWTUtil.createSelection(node), true);
+	   } else {
+		   getTreeViewer().setSelection(SWTUtil.createSelection(parent), true);
+	   }
+   }
+   
    /**
     * returns the currently selected node.
     * @return {@link Node} that is selected on the treeViewer
@@ -421,6 +591,9 @@ public class ManualView extends AbstractViewBasedView {
          if (selection instanceof Node) {
             Node selectedNode = (Node) selection;
             return selectedNode;
+         } else if (selection instanceof BranchFolder) {
+        	 Node selectedNode = ((BranchFolder) selection).getChild();
+        	 return selectedNode;
          }
          return null;
       }

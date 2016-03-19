@@ -62,6 +62,7 @@ public class RuleAppContextMenu extends ExtensionContributionFactory {
                item.setVisible(true);
                additions.addContributionItem(item,  null);
             }
+            view.setManualRule(true);
          }
       }
    }
