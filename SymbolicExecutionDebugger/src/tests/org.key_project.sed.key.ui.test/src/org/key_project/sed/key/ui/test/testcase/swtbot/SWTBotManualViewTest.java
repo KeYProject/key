@@ -56,7 +56,7 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
             Point point0 = TestUtilsUtil.selectText(styledText0, "well");
             TestUtilsUtil.setCursorLocation(styledText0, ((int) (point0.x * 0.3)), point0.y);
             TestUtilsUtil.clickContextMenu(styledText0,  ((int) (point0.x * 0.3)), point0.y, "impRight");
-            assertTrue("count1 not right", (count + 1) == manualView.bot().tree().rowCount());
+            assertTrue((count + 1) == manualView.bot().tree().rowCount());
             //step into and check if the same proof is still loaded on both views
             performStep(debugView, bot, target, 0, 0, 0);
             ManualView view = getManualView(manualView);
@@ -64,12 +64,12 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
             //test if manual rule application is still working correctly
             count = manualView.bot().tree().rowCount();
             manualView.bot().tree().select(count - 1);
-            assertTrue("not null", manualView.bot().tree().getTreeItem("10:OPEN GOAL") != null);
+            assertTrue(manualView.bot().tree().getTreeItem("10:OPEN GOAL") != null);
             final SWTBotStyledText styledText = manualView.bot().styledText();
             Point point = TestUtilsUtil.selectText(styledText, "{exc:=null}");
             TestUtilsUtil.setCursorLocation(styledText, point.x + 1, point.y + 15);
             TestUtilsUtil.clickContextMenu(styledText, point.x + 1, point.y + 15, "ifElseUnfold");
-            assertTrue("count2 not right", (count + 1) == manualView.bot().tree().rowCount());
+            assertTrue((count + 1) == manualView.bot().tree().rowCount());
             //close the bot view
             manualView.close();
             assertFalse(((KeYDebugTarget) target).getProof().isDisposed());

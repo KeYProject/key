@@ -113,6 +113,11 @@ public class ManualView extends AbstractViewBasedView {
    private ProofSourceViewerDecorator sourceViewerDecorator;
    
    /**
+    * indicates whether there is a new prof loaded or not.
+    */
+   private boolean newProof;
+   
+   /**
 	 * The {@link State} which indicates hiding or showing of intermediate proofsteps.
 	 */
 	private State hideState;
@@ -232,7 +237,7 @@ public class ManualView extends AbstractViewBasedView {
 				}
 			}
 			selectNode(newSelectedNode);
-			sourceViewerDecorator.showNode(newSelectedNode, SymbolicExecutionUtil.createNotationInfo(newSelectedNode));
+//			sourceViewerDecorator.showNode(newSelectedNode, SymbolicExecutionUtil.createNotationInfo(newSelectedNode));
 			setManualRule(false);
 		}
 		
@@ -309,16 +314,21 @@ public class ManualView extends AbstractViewBasedView {
             if (target instanceof KeYDebugTarget) {
                KeYDebugTarget keyTarget = (KeYDebugTarget) target;
                if (!keyTarget.isTerminated()) {
-	        	  if (getProof() != null && !getProof().isDisposed()) {
-	        		   getProof().removeRuleAppListener(ruleAppListener);
-	        	  }
-                  this.proof = keyTarget.getProof();
-                  this.environment = keyTarget.getEnvironment();
-                  environment.getProofControl().setMinimizeInteraction(true);
-                  if (getTreeViewer() != null && getSourceViewer() != null) {
-                     updateViewer();
-                  }
-                  getProof().addRuleAppListener(ruleAppListener);
+	        	   if (getProof() != null && !getProof().isDisposed()) {
+	        	      getProof().removeRuleAppListener(ruleAppListener);
+	        	      if (!getProof().equals(keyTarget.getProof())) {
+	        	         newProof = true;
+	        	      }
+	        	   } else {
+	        	      newProof = true;
+	        	   }
+               this.proof = keyTarget.getProof();
+               this.environment = keyTarget.getEnvironment();
+               environment.getProofControl().setMinimizeInteraction(true);
+               if (getTreeViewer() != null && getSourceViewer() != null) {
+                  updateViewer();
+               }
+               getProof().addRuleAppListener(ruleAppListener);
                } else {
                   proof = null;
                   environment = null;
@@ -326,11 +336,13 @@ public class ManualView extends AbstractViewBasedView {
                }
             }
             if (element instanceof IKeYSENode<?>) {
-               IKeYSENode<?> seNode = (IKeYSENode<?>) element;
-               if (getTreeViewer() != null && getSourceViewer() != null) {
-                  Node keyNode = seNode.getExecutionNode().getProofNode();
-                  selectNode(keyNode);
-                  sourceViewerDecorator.showNode(keyNode, SymbolicExecutionUtil.createNotationInfo(getProof()));
+               if (!(boolean) hideState.getValue()) {
+                  IKeYSENode<?> seNode = (IKeYSENode<?>) element;
+                  if (getTreeViewer() != null && getSourceViewer() != null) {
+                     Node keyNode = seNode.getExecutionNode().getProofNode();
+                     selectNode(keyNode);
+                     sourceViewerDecorator.showNode(keyNode, SymbolicExecutionUtil.createNotationInfo(getProof()));
+                  }
                }
             }
          }
@@ -361,9 +373,11 @@ public class ManualView extends AbstractViewBasedView {
       contentProvider.injectTopLevelElements();
       
       getTreeViewer().setSelection(SWTUtil.createSelection(getProof().root()), true);
-      //TODO: implement pruning and both filters on the getTreeViewer()
       createTreeViewerContextMenu();
-      sourceViewerDecorator.showNode(getProof().root(), SymbolicExecutionUtil.createNotationInfo(getProof()));
+      if (!(boolean) hideState.getValue() || newProof) {
+         sourceViewerDecorator.showNode(getProof().root(), SymbolicExecutionUtil.createNotationInfo(getProof()));
+         newProof = false;
+      }
       getSourceViewer().getControl().setSize(1000,1000);
       createSourceViewerContextMenu();
    }
@@ -576,8 +590,14 @@ public class ManualView extends AbstractViewBasedView {
 	   
 	   if (viewIndex >= 0) {
 		   getTreeViewer().setSelection(SWTUtil.createSelection(node), true);
+		   sourceViewerDecorator.showNode(node, SymbolicExecutionUtil.createNotationInfo(proof));
 	   } else {
 		   getTreeViewer().setSelection(SWTUtil.createSelection(parent), true);
+		   if (parent instanceof Node) {
+		      sourceViewerDecorator.showNode((Node) parent, SymbolicExecutionUtil.createNotationInfo(proof));
+		   } else if (parent instanceof BranchFolder) {
+		      sourceViewerDecorator.showNode(((BranchFolder) parent).getChild(), SymbolicExecutionUtil.createNotationInfo(proof));
+		   }
 	   }
    }
    
