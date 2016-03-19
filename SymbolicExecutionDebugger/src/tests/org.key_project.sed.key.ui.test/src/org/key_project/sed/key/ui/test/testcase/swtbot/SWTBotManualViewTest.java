@@ -37,7 +37,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
    
    /**
-    * tests the manual rule application feature of the {@link ManualView}
+    * tests the manual rule application feature of the {@link ManualView}.
     * @throws Exception
     */
    @Test
@@ -51,28 +51,28 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
             //test if manual rule application functions before stepping into the proof
             SWTBotView manualView = getManualBotView(bot);
             int count = manualView.bot().tree().rowCount();
-            manualView.bot().tree().select(count-1);
+            manualView.bot().tree().select(count - 1);
             final SWTBotStyledText styledText0 = manualView.bot().styledText();
             Point point0 = TestUtilsUtil.selectText(styledText0, "well");
-            TestUtilsUtil.setCursorLocation(styledText0, ((int)(point0.x * 0.3)), point0.y);
-            TestUtilsUtil.clickContextMenu(styledText0,  ((int)(point0.x * 0.3)), point0.y, "impRight");
-            assertTrue((count + 1) == manualView.bot().tree().rowCount());
+            TestUtilsUtil.setCursorLocation(styledText0, ((int) (point0.x * 0.3)), point0.y);
+            TestUtilsUtil.clickContextMenu(styledText0,  ((int) (point0.x * 0.3)), point0.y, "impRight");
+            assertTrue("count1 not right", (count + 1) == manualView.bot().tree().rowCount());
             //step into and check if the same proof is still loaded on both views
             performStep(debugView, bot, target, 0, 0, 0);
             ManualView view = getManualView(manualView);
             assertSameProof(target, view);
             //test if manual rule application is still working correctly
             count = manualView.bot().tree().rowCount();
-            manualView.bot().tree().select(count-1);
-            assertTrue(manualView.bot().tree().getTreeItem("10:OPEN GOAL") != null);
+            manualView.bot().tree().select(count - 1);
+            assertTrue("not null", manualView.bot().tree().getTreeItem("10:OPEN GOAL") != null);
             final SWTBotStyledText styledText = manualView.bot().styledText();
             Point point = TestUtilsUtil.selectText(styledText, "{exc:=null}");
             TestUtilsUtil.setCursorLocation(styledText, point.x + 1, point.y + 15);
             TestUtilsUtil.clickContextMenu(styledText, point.x + 1, point.y + 15, "ifElseUnfold");
-            assertTrue((count + 1)==manualView.bot().tree().rowCount());
+            assertTrue("count2 not right", (count + 1) == manualView.bot().tree().rowCount());
             //close the bot view
             manualView.close();
-            assertFalse(((KeYDebugTarget)target).getProof().isDisposed());
+            assertFalse(((KeYDebugTarget) target).getProof().isDisposed());
          }
          
          @Override
@@ -192,7 +192,7 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
             SWTBotView manualView = getManualBotView(bot);
             ManualView view = getManualView(manualView);
             int count = manualView.bot().tree().rowCount();
-            manualView.bot().tree().select(count-1);
+            manualView.bot().tree().select(count - 1);
             assertTrue(manualView.bot().tree().getTreeItem("10:OPEN GOAL") != null);
             assertTrue(manualView.bot().tree().getTreeItem("10:OPEN GOAL").isSelected());
             //get the node that is selected
@@ -243,20 +243,20 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
    
    /**
     * tests of the loaded proof in the {@link ISEDebugTarget} is the same as the one in the {@link ManualView}.
-    * @param target
-    * @param view
+    * @param target the {@link ISEDebugTarget} to check
+    * @param view the {@link ManualView} to check
     */
-   private void assertSameProof(ISEDebugTarget target, ManualView view){
+   private void assertSameProof(ISEDebugTarget target, ManualView view) {
       assertTrue(target instanceof KeYDebugTarget);
       assertEquals(((KeYDebugTarget) target).getProof(), view.getProof());
    }
    
    /**
     * performs a step into the proof tree.
-    * @param debugView
-    * @param bot
-    * @param target
-    * @param indexPathToItem
+    * @param debugView the view to get the item to step into
+    * @param bot the{@link SWTWorkbenchBot} to use
+    * @param target the {@link ISEDebugTarget} to use for the step
+    * @param indexPathToItem the indices of the parents to select in debug tree
     * @return 
     * @throws DebugException
     */
@@ -266,9 +266,9 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
    }
    
    /**
-    * returns the {@link SWTBotView} that belongs to the {@link ManualView}.
-    * @param bot
-    * @return
+    * returns the {@link SWTBotView} of the {@link SWTWorkbenchBot} with ID {@link ManualView#VIEW_ID}.
+    * @param bot the {@link SWTWorkbenchBot} to use
+    * @return the {@link SWTBotView} with {@link ManualView#VIEW_ID}
     */
    private SWTBotView getManualBotView(SWTWorkbenchBot bot) {
       SWTBotView manualView = bot.viewById(ManualView.VIEW_ID);
@@ -276,14 +276,14 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
    }
    /**
     * returns the {link ManualView} applicable to the given {@link SWTBotView}.
-    * @param view
-    * @return
+    * @param view the {@link SWTBotView} to extract the {@link ManualView} from
+    * @return the extracted {@link ManualView}
     */
    private ManualView getManualView(SWTBotView view) {
       assertNotNull(view);
       IViewPart newView = view.getReference().getView(true);
       assertTrue(newView instanceof ManualView);
-      return (ManualView)newView;
+      return (ManualView) newView;
    }
    
 

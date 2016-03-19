@@ -53,7 +53,7 @@ public class RuleAppContextMenu extends ExtensionContributionFactory {
                }
             }
             ImmutableList<BuiltInRule> builtInRules = KeYIDEUtil.findBuiltInRules(view.getEnvironment().getUi(), goal, position);
-            for(BuiltInRule rule: builtInRules) {
+            for (BuiltInRule rule: builtInRules) {
                CommandContributionItemParameter p = new CommandContributionItemParameter(serviceLocator, "", 
                                                                                          "org.key_project.sed.key.ui.commands.applyRule", 
                                                                                          SWT.PUSH);
