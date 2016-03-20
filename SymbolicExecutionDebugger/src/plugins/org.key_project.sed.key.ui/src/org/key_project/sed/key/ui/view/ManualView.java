@@ -453,6 +453,12 @@ public class ManualView extends AbstractViewBasedView {
       if (getProof() != null) {
     	  getProof().removeRuleAppListener(ruleAppListener);
       }
+      if (hideState != null) {
+    	  hideState.removeListener(hideStateListener);
+      }
+      if (symbolicState != null) {
+    	  symbolicState.removeListener(symbolicStateListener);
+      }	
       getSite().getPage().removeSelectionListener(selectionListener);
       
       super.dispose();

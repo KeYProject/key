@@ -5,6 +5,7 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -36,15 +37,27 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  */
 public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
 	
+	/**
+	 * tests the filter features of the {@link ManualView}
+	 * @throws Exception
+	 */
 	@Test
 	public void testFilters() throws Exception {
 		IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
 
 			@Override
 			public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
+				SWTBotView manualView = getManualBotView(bot);
+				// activate show symbolic execution tree filter
+				TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Show Symbolic Execution Tree Only");
 				// step into
 				performStep(debugView, bot, target, 0, 0, 0);
-				SWTBotView manualView = getManualBotView(bot);
+				// check if show symbolic execution tree filter is working
+				assertTrue(manualView.bot().tree().getTreeItem("0:One Step Simplification: 1 rule") != null);
+				assertTrue(manualView.bot().tree().getTreeItem("8:result=self.equals(n)@Number;") != null);
+				assertTrue(manualView.bot().tree().rowCount() == 2);
+				// deactivate show symbolic execution tree filter
+				TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Show Symbolic Execution Tree Only");
 				// activate hide intermediate proof steps filter
 				TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Hide Intermediate Proofsteps");
 				// check if hide intermediate proof steps filter is working
