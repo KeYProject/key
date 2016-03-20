@@ -151,6 +151,9 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
             TestUtilsUtil.setCursorLocation(styledText, point.x + 1, point.y + 15);
             TestUtilsUtil.clickContextMenu(styledText, point.x + 1, point.y + 15, "ifElseUnfold");
             assertTrue((count + 1) == manualView.bot().tree().rowCount());
+            //make sure that new node is loaded in debugView
+            TestSedCoreUtil.waitForDebugTreeInterface();
+            assertNotNull(TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0, 1));
             //close the bot view
             manualView.close();
             assertFalse(((KeYDebugTarget) target).getProof().isDisposed());

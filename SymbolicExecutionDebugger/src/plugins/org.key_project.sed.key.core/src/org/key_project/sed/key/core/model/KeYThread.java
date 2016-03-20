@@ -142,7 +142,8 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
       }
 
       @Override
-      public void proofGoalsAdded(ProofTreeEvent e) {  
+      public void proofGoalsAdded(ProofTreeEvent e) { 
+         handleGoalsAdded(e);
       }
 
       @Override
@@ -306,6 +307,29 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
       }
       catch (DebugException exception) {
          LogUtil.getLogger().logError(exception);
+      }
+   }
+   
+   /**
+    * handles event when goals are added to the prooftree.
+    * @param e The {@link ProofTreeEvent}
+    */
+   protected void handleGoalsAdded(ProofTreeEvent e) {
+      try {
+         updateExecutionTree(getBuilder());
+      }
+      catch (Exception exception) {
+         LogUtil.getLogger().logError(exception);
+         LogUtil.getLogger().openErrorDialog(null, exception);
+      }
+      finally {
+         try {
+            super.suspend();
+         }
+         catch (DebugException e1) {
+            LogUtil.getLogger().logError(e1);
+            LogUtil.getLogger().openErrorDialog(null, e1);
+         }
       }
    }
 
