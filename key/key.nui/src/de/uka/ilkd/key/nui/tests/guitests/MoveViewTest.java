@@ -6,7 +6,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests for User Story (001) Oberflaeche: Grundaufbau #14297
+ * Tests for User Stories. 
+ * (001) Oberflaeche: Grundaufbau #14297
  * 
  * GUI test for main application window
  *
@@ -36,6 +37,9 @@ public class MoveViewTest extends NUITest {
     private String right = null;
     private String bottom = null;
 
+    /**
+     * @throws Throwable
+     */
     @Before
     public void setupTest() throws Throwable {
         // mapViewsToToggleGroups();
@@ -46,6 +50,9 @@ public class MoveViewTest extends NUITest {
         bottom = nui.getText("bottom");
     }
 
+    /**
+     * Test for the menu bar.
+     */
     @Test
     public void testFileMenu() {
         // FILE
@@ -74,6 +81,9 @@ public class MoveViewTest extends NUITest {
         clickOn(MENUBAR_ABOUT).clickOn("License");
     }
 
+    /**
+     * Test for moving the view 'OpenProofs'.
+     */
     @Test
     public void testMoveOpenProofsView() {
         /*
@@ -87,6 +97,9 @@ public class MoveViewTest extends NUITest {
         moveViewTester(componendId, subMenuName);
     }
 
+    /**
+     * Test for moving the view 'TreeView'.
+     */
     @Test
     public void testMoveTreeView() {
         /*
@@ -100,6 +113,9 @@ public class MoveViewTest extends NUITest {
         moveViewTester(componendId, subMenuName);
     }
 
+    /**
+     * Test for moving the view 'StrategyView'.
+     */
     @Test
     public void testMoveStrategyView() {
         /*
@@ -113,6 +129,9 @@ public class MoveViewTest extends NUITest {
         moveViewTester(componendId, subMenuName);
     }
 
+    /**
+     * Test for moving the view 'ProofView'.
+     */
     @Test
     public void testMoveProofView() {
         /*
@@ -129,58 +148,52 @@ public class MoveViewTest extends NUITest {
     /**
      * This method tests if it is possible to move view.
      * 
-     * @param hide
-     *            text to identify position of the hide submenu
-     * @param left
-     *            text to identify position of the left submenu
-     * @param middle
-     *            text to identify position of the middle submenu
-     * @param right
-     *            text to identify position of the right submenu
-     * @param bottom
-     *            text to identify position of the bottom submenu
+     * @param componentId
+     *            The fx:id of the component to be moved.
+     * @param subMenuName
+     *            The name of the sub menu to elevate the moving action.
      */
-    private void moveViewTester(final String componendId,
+    private void moveViewTester(final String componentId,
             final String subMenuName) {
         // String subMenuName = (String) viewMap.get(componendId);
 
         // place view on HIDE
         clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
                 .moveTo(hide).clickOn(hide);
-        assertTrue(!find(componendId).isVisible());
+        assertTrue(!find(componentId).isVisible());
 
         // place view on LEFT pane
         clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
                 .moveTo(hide).clickOn(left);
-        assertTrue(find(componendId).isVisible());
+        assertTrue(find(componentId).isVisible());
         assertTrue(
-                find(componendId).getParent().getId().equals(DIRECTION_LEFT));
-        assertTrue(find(componendId).isResizable());
+                find(componentId).getParent().getId().equals(DIRECTION_LEFT));
+        assertTrue(find(componentId).isResizable());
 
         // place view on MIDDLE pane
         clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
                 .moveTo(hide).clickOn(middle);
-        assertTrue(find(componendId).isVisible());
+        assertTrue(find(componentId).isVisible());
         assertTrue(
-                find(componendId).getParent().getId().equals(DIRECTION_MIDDLE));
+                find(componentId).getParent().getId().equals(DIRECTION_MIDDLE));
 
         // place view on RIGHT pane
         clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
                 .moveTo(hide).clickOn(right);
-        assertTrue(find(componendId).isVisible());
+        assertTrue(find(componentId).isVisible());
         assertTrue(
-                find(componendId).getParent().getId().equals(DIRECTION_RIGHT));
+                find(componentId).getParent().getId().equals(DIRECTION_RIGHT));
 
         // place view on BOTTOM pane
         clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
                 .moveTo(hide).clickOn(bottom);
-        assertTrue(find(componendId).isVisible());
+        assertTrue(find(componentId).isVisible());
         assertTrue(
-                find(componendId).getParent().getId().equals(DIRECTION_BOTTOM));
+                find(componentId).getParent().getId().equals(DIRECTION_BOTTOM));
 
         // place view on HIDE pane
         clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
                 .moveTo(hide).clickOn(hide);
-        assertTrue(!find(componendId).isVisible());
+        assertTrue(!find(componentId).isVisible());
     }
 }

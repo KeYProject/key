@@ -24,9 +24,7 @@ public final class ProofTreeActions {
      */
     public static void expandAll(final TreeItem<NUINode> rootTreeItem) {
         rootTreeItem.setExpanded(true);
-        for (final TreeItem<NUINode> child : rootTreeItem.getChildren()) {
-            expandAll(child);
-        }
+        rootTreeItem.getChildren().forEach((child) -> expandAll(child));
     }
 
     /**
@@ -37,9 +35,7 @@ public final class ProofTreeActions {
      */
     public static void expandBelow(final TreeItem<NUINode> treeItem) {
         treeItem.setExpanded(true);
-        for (final TreeItem<NUINode> child : treeItem.getChildren()) {
-            expandAll(child);
-        }
+        treeItem.getChildren().forEach((child) -> expandAll(child));
 
         // only expand siblings in case of no branch node
         if (!(treeItem.getValue() instanceof NUIBranchNode)) {
@@ -58,9 +54,7 @@ public final class ProofTreeActions {
      */
     public static void collapseAll(final TreeItem<NUINode> rootTreeItem) {
         rootTreeItem.setExpanded(false);
-        for (final TreeItem<NUINode> child : rootTreeItem.getChildren()) {
-            collapseAll(child);
-        }
+        rootTreeItem.getChildren().forEach((child) -> collapseAll(child));
     }
 
     /**
@@ -71,9 +65,7 @@ public final class ProofTreeActions {
      */
     public static void collapseBelow(final TreeItem<NUINode> treeItem) {
         treeItem.setExpanded(false);
-        for (final TreeItem<NUINode> child : treeItem.getChildren()) {
-            collapseAll(child);
-        }
+        treeItem.getChildren().forEach((child) -> collapseAll(child));
 
         // only expand siblings in case of no branch node
         if (!(treeItem.getValue() instanceof NUIBranchNode)) {

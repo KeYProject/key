@@ -5,30 +5,23 @@ import de.uka.ilkd.key.nui.prooftree.NUILeafNode;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 
 /**
- * A proof tree filter that can be used to hide nodes that
- * are no symbolic executions.
+ * A proof tree filter that can be used to hide nodes that are no symbolic
+ * executions.
+ * 
  * @author Matthias Schultheis
  *
  */
-@FilterAnnotation(isFilter=true)
+@FilterAnnotation(isFilter = true)
 public class FilterHideNonSymbolicExecution implements ProofTreeFilter {
-    
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public boolean test(final NUINode node) {
         if (node instanceof NUIBranchNode || node instanceof NUILeafNode) {
             return true;
         }
-        else {
-            return node.isSymbolicExecution();
-        }
+        return node.isSymbolicExecution();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getContextMenuItemText() {
         return "Hide Non-Symbolic-Execution";

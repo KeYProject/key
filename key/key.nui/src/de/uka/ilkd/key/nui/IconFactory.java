@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.nui;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -34,7 +34,7 @@ public class IconFactory {
     /**
      * An HashMap for storing loaded icon images.
      */
-    private final Map<String, Image> icons = new HashMap<String, Image>();
+    private final Map<String, Image> icons = new HashMap<>();
 
     // Inner Nodes
     /** file name of open branch node icon. */
@@ -44,7 +44,7 @@ public class IconFactory {
     /** file name of linked branch node icon. */
     public static final String BRANCH_LINKED = folderRoot + "linkedBranch.png";
     /** file name of interactive inner node icon. */
-    public static final String INNER_NODE_INTERACTIVE = folderRoot
+    public static final String INNER_INTERACTIVE = folderRoot
             + "interactiveNode.png";
 
     // Leafs
@@ -67,8 +67,9 @@ public class IconFactory {
     public static final String SEARCH = folderRoot + "search.png";
 
     // StrategyView
-    /** file name of goButton icon */
+    /** file name of goButton icon. */
     public static final String GO_BUTTON = folderRoot + "goButton.png";
+
     /**
      * The constructor.
      * 
@@ -97,11 +98,14 @@ public class IconFactory {
             img = icons.get(imageConstant);
         }
         else {
-            /*final InputStream istream = IconFactory.class
-                    .getResourceAsStream(imageConstant);
-            img = new Image(istream);*/
-            // TODO
-            img = new Image("/de/uka/ilkd/key/nui/"+imageConstant);
+            final File jarFile = new File(getClass().getProtectionDomain()
+                    .getCodeSource().getLocation().getPath());
+            if (!jarFile.isFile()) {
+                img = new Image(getClass().getResourceAsStream(imageConstant));
+            }
+            else {
+                img = new Image("/de/uka/ilkd/key/nui/" + imageConstant);
+            }
             icons.put(imageConstant, img);
         }
         return scaleIcon(img, iconSizeWidth, iconSizeHeight);
@@ -119,7 +123,7 @@ public class IconFactory {
      *            The desired height
      * @return an ImageView containing the scaled Image
      */
-    private ImageView scaleIcon(final Image image, final int width,
+    private static ImageView scaleIcon(final Image image, final int width,
             final int height) {
         final ImageView view = new ImageView(image);
         view.setFitWidth(width);

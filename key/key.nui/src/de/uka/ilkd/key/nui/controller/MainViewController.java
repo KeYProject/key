@@ -4,13 +4,14 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.sun.javafx.collections.ObservableMapWrapper;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.nui.TreeViewState;
@@ -18,7 +19,9 @@ import de.uka.ilkd.key.nui.exceptions.ToggleGroupNotFoundException;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.application.Platform;
 import javafx.collections.ObservableMap;
@@ -48,7 +51,7 @@ import javafx.stage.FileChooser;
 
 /**
  * Controller for the main GUI which is displayed when the program was started.
- * 
+ *
  * @author Florian Breitfelder
  * @author Patrick Jattke
  * @author Stefan Pilot
@@ -62,7 +65,26 @@ public class MainViewController extends NUIController implements Observer {
      * Provides an enum for the available places in the main window.
      */
     public enum Place {
-        BOTTOM, HIDDEN, LEFT, MIDDLE, RIGHT
+        /**
+         * Indicates that the view is placed in the bottom pane.
+         */
+        BOTTOM,
+        /**
+         * Indicates that the view is not placed in any view and thus is hidden.
+         */
+        HIDDEN,
+        /**
+         * Indicates that the view is placed in the left pane.
+         */
+        LEFT,
+        /**
+         * Indicates that the view is placed in the middle pane.
+         */
+        MIDDLE,
+        /**
+         * Indicates that the view is placed in the right pane.
+         */
+        RIGHT
     }
 
     // Definition of GUI fields
@@ -86,13 +108,10 @@ public class MainViewController extends NUIController implements Observer {
     private MenuItem saveProofAs;
     @FXML
     private MenuItem saveProof;
-
     @FXML
     private MenuItem openProof;
-
     @FXML
     private ProgressIndicator progressIndicator;
-
     @FXML
     private Button cancelButton;
 
@@ -100,7 +119,7 @@ public class MainViewController extends NUIController implements Observer {
      * An atomic boolean to indicate if loading is in progress While this is set
      * to true, the loading task can be cancelled.
      */
-    final private AtomicBoolean isLoadingProof = new AtomicBoolean(false);
+    private final AtomicBoolean isLoadingProof = new AtomicBoolean(false);
 
     /**
      * The thread that is used for the loading task.
@@ -108,9 +127,9 @@ public class MainViewController extends NUIController implements Observer {
     private Thread loadingThread;
 
     /**
-     * Includes the components which were added to the main Window
+     * Includes the components which were added to the main Window.
      */
-    private HashMap<String, Pane> components = new HashMap<String, Pane>();
+    private final Map<String, Pane> components = new HashMap<>();
 
     /**
      * Stores the position of components added to the SplitPane. Other views can
@@ -119,11 +138,22 @@ public class MainViewController extends NUIController implements Observer {
     private final ObservableMap<String, Place> placeComponent = new ObservableMapWrapper<>(
             new HashMap<>());
 
+    private KeYEnvironment<DefaultUserInterfaceControl> keyEnvironment;
+
+    /**
+     * Returns the {@link #viewMenu} which contains the menu items of the menu
+     * bar.
+     * 
+     * @return the viewMenu
+     */
     public Menu getViewMenu() {
         return viewMenu;
     }
 
     /**
+     * Returns the {@link #placeComponent} which contains the assignment from
+     * components to their position.
+     * 
      * @return the placeComponent
      */
     public final ObservableMap<String, Place> getPlaceComponent() {
@@ -133,15 +163,15 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Handles the ActionEvent resulting in the user clicking "Open Proof..." in
      * the File menu. Usually <b> not to be called by developers. </b>
-     * 
+     *
      * @param e
      *            The ActionEvent
      */
     @FXML
     public final void handleOpenProof(final ActionEvent e) {
-        FileChooser fileChooser = new FileChooser();
+        final FileChooser fileChooser = new FileChooser();
 
-        TreeViewState loadedTVS = dataModel.getLoadedTreeViewState();
+        final TreeViewState loadedTVS = dataModel.getLoadedTreeViewState();
         // set default directory to location where currently loaded proof is
         // located
         File parentDirectory = null;
@@ -154,14 +184,18 @@ public class MainViewController extends NUIController implements Observer {
         }
         // if no proof is loaded, use the example directory (default)
         else {
-           // fileChooser.setInitialDirectory(
-           //         new File("resources/de/uka/ilkd/key/examples"));
+            final File jarFile = new File(getClass().getProtectionDomain()
+                    .getCodeSource().getLocation().getPath());
+            if (!jarFile.isFile()) { // one for gui tests, while running
+                                     // application in ide
+                fileChooser.setInitialDirectory(
+                        new File("resources/de/uka/ilkd/key/examples"));
+            }
         }
 
-        FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter(
+        final FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter(
                 "Proof files", "*.proof", "*.key");
         fileChooser.getExtensionFilters().add(extFilterProof);
-
         final File file = fileChooser.showOpenDialog(contextMenu);
 
         // only load proof if any selection was made
@@ -172,12 +206,12 @@ public class MainViewController extends NUIController implements Observer {
 
     /**
      * Returns the Pane where all the Components in the Place p are stored.
-     * 
+     *
      * @param p
      *            a {@link Place}
      * @return the respective Pane
      * @throws IllegalArgumentException
-     *             p == HIDDEN
+     *             if (p == HIDDEN) holds
      */
     public final Pane getPane(final Place p) throws IllegalArgumentException {
         switch (p) {
@@ -197,7 +231,7 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Handles the ActionEvent resulting in the user clicking "About KeY" in the
      * About menu. Usually <b> not to be called by developers. </b>
-     * 
+     *
      * @param e
      *            The ActionEvent
      */
@@ -213,13 +247,12 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Handles the ActionEvent resulting in the user clicking "Close" in the
      * File menu. Usually <b> not to be called by developers. </b>
-     * 
+     *
      * @param e
      *            The ActionEvent
      */
     @FXML
     public final void handleCloseWindow(final Event e) {
-
         // If no proof file was loaded OR file was not changed: close
         // application immediately
         if (dataModel.getLoadedTreeViewState() == null
@@ -230,23 +263,26 @@ public class MainViewController extends NUIController implements Observer {
 
         // File was changed: ask user if he wants to save changes
         // create alert window
-        Alert alert = new Alert(AlertType.CONFIRMATION);
+        final Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle(bundle.getString("dialogTitle"));
-        String filename = dataModel.getLoadedTreeViewState().getProof()
+
+        // --- define text for header and content area
+        final String filename = dataModel.getLoadedTreeViewState().getProof()
                 .getProofFile().getName();
         alert.setHeaderText(MessageFormat.format(
-                nui.getStringFromBundle("dialogHeader"), "'" + filename + "'"));
-        alert.setContentText(nui.getStringFromBundle("dialogQuestion"));
+                bundle.getString("dialogHeader"), "'" + filename + "'"));
+        alert.setContentText(bundle.getString("dialogQuestion"));
 
-        ButtonType buttonSaveAs = new ButtonType(
+        // --- define button types
+        final ButtonType buttonSaveAs = new ButtonType(
                 bundle.getString("dialogSaveAs"));
-        ButtonType buttonClose = new ButtonType(bundle.getString("dialogExit"));
-        ButtonType buttonAbort = new ButtonType(
+        final ButtonType buttonClose = new ButtonType(
+                bundle.getString("dialogExit"));
+        final ButtonType buttonAbort = new ButtonType(
                 bundle.getString("dialogAbort"));
-
         alert.getButtonTypes().setAll(buttonSaveAs, buttonClose, buttonAbort);
-        Optional<ButtonType> result = alert.showAndWait();
 
+        final Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == buttonSaveAs || result.get() == buttonClose) {
             // If YES was selected: save changes made to file
             if (result.get() == buttonSaveAs) {
@@ -264,14 +300,14 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Handles saving of a proof file if no destination path is specified. Uses
      * the location where the proof was saved to the last time.
-     * 
+     *
      * @param e
      *            the ActionEvent raised by clicking on the MenuItem.
      */
     @FXML
     protected final void handleSaveProof(final ActionEvent e) {
         // retrieve last saved location from proof file
-        Proof loadedProof = dataModel.getLoadedTreeViewState().getProof();
+        final Proof loadedProof = dataModel.getLoadedTreeViewState().getProof();
 
         if (loadedProof != null && loadedProof.getProofFile() != null) {
             // call saveProof with proof file
@@ -286,56 +322,66 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Handles saving of a proof file if the destination path should be
      * specified. Opens a file chooser dialog where the path can be chosen.
-     * 
+     *
      * @param e
      *            the ActionEvent raised by clicking on the MenuItem.
      */
     @FXML
     protected final void handleSaveProofAs(final ActionEvent e) {
+        saveProofAsDialog();
+    }
 
+    /**
+     * Shows a save dialog with a file chooser.
+     */
+    public void saveProofAsDialog() {
         // Get loaded proof
-        Proof loadedProof = dataModel.getLoadedTreeViewState().getProof();
+        final Proof loadedProof = dataModel.getLoadedTreeViewState().getProof();
 
         // Open file picker window
-        FileChooser fileChooser = new FileChooser();
+        final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(bundle.getString("fileChooserSaveTitle"));
         // set initial directory to last saved location (if available)
         if (loadedProof.getProofFile() != null) {
             // if file has a parent directory, set initial directory
-            File parentDir = loadedProof.getProofFile().getParentFile();
+            final File parentDir = loadedProof.getProofFile().getParentFile();
             if (parentDir != null) {
                 fileChooser.setInitialDirectory(parentDir);
             }
         }
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+        final FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "Proof files", "*.proof");
         fileChooser.getExtensionFilters().add(extFilter);
 
-        File selectedFile = fileChooser.showSaveDialog(contextMenu);
+        final File selectedFile = fileChooser.showSaveDialog(contextMenu);
 
-        // abort save action if no selection was made in file chooser
-        if (selectedFile == null) {
-            return;
+        // save proof file if any destination was specified
+        if (selectedFile != null) {
+            dataModel.saveProof(loadedProof, selectedFile);
         }
-
-        // save proof file
-        dataModel.saveProof(loadedProof, selectedFile);
-
     }
 
+    /**
+     * Handles canceling the proof loading process.
+     * 
+     * @param e
+     *            the ActionEvent raised by clicking on the cancel loading
+     *            button.
+     */
     @FXML
     protected final void handleCancelLoadingProcess(final ActionEvent e) {
         cancelLoadProof();
     }
 
     /**
-     * NEW
-     * 
+     * Moves the Pane component to the position specified by place.
+     *
      * @param component
+     *            The component to be moved.
      * @param place
+     *            The position where the component should be moved to.
      */
-    public void moveComponentTo(Pane component, Place place) {
-
+    private void moveComponentTo(final Pane component, final Place place) {
         selectToggle(component.getId(), place);
         if (place == Place.HIDDEN) {
             component.setVisible(false);
@@ -348,14 +394,34 @@ public class MainViewController extends NUIController implements Observer {
         }
     }
 
-    public void addComponent(Pane component, Place place) {
+    /**
+     * Moves the Pane component to the position specified by place. Additionally
+     * to {@link #moveComponentTo(Pane, Place)} it stores the added component in
+     * the list of {@link #components}.
+     * 
+     * @param component
+     *            The component to be moved.
+     * @param place
+     *            The position where the component should be moved to.
+     */
+    public void addComponent(final Pane component, final Place place) {
         components.put(component.getId(), component);
         moveComponentTo(component, place);
     }
 
-    private void selectToggle(String componentName, Place place) {
+    /**
+     * Marks the element of the toggle group as selected, according to the given
+     * componentName and the specified place.
+     * 
+     * @param componentName
+     *            The component whose toggle should be updated.
+     * @param place
+     *            The new position of the component.
+     */
+    private void selectToggle(final String componentName, final Place place) {
         try {
-            for (Toggle t : nui.getToggleGroup(componentName).getToggles()) {
+            for (final Toggle t : nui.getToggleGroup(componentName)
+                    .getToggles()) {
                 if (t.getUserData().equals(place)) {
                     t.setSelected(true);
                 }
@@ -371,57 +437,50 @@ public class MainViewController extends NUIController implements Observer {
      * GUI components via the View menu. Usually <b> not to be called by
      * developers. </b>
      * 
-     * @param e
-     *            The ActionEvent
+     * @return EventHandler<ActionEvent> The action event associated with the
+     *         clicked menu entry.
      */
     public EventHandler<ActionEvent> getNewHandleLoadComponent() {
-        return new EventHandler<ActionEvent>() {
+        return ((actionEvent) -> {
+            final RadioMenuItem clickedItem = (RadioMenuItem) actionEvent
+                    .getSource();
+            // e.g. "treeView", "proofView"
+            final String componentName = (String) clickedItem.getProperties()
+                    .get("componentName");
+            final String clickedText = clickedItem.getText();
+            Place place;
 
-            @Override
-            public void handle(ActionEvent e) {
-                RadioMenuItem clickedItem = (RadioMenuItem) e.getSource();
-                String componentName = (String) // e.g. "treeView", "proofView"
-                clickedItem.getProperties().get("componentName");
-
-                Place place;
-
-                switch (clickedItem.getText()) {
-                case "left":
-                    place = Place.LEFT;
-                    break;
-                case "middle":
-                    place = Place.MIDDLE;
-                    break;
-                case "right":
-                    place = Place.RIGHT;
-                    break;
-                case "bottom":
-                    place = Place.BOTTOM;
-                    break;
-                default:
-                    place = Place.HIDDEN;
-                    break;
-                }
-                moveComponentTo(components.get(componentName), place);
+            if (clickedItem.getText().equals(bundle.getString("left"))) {
+                place = Place.LEFT;
             }
-        };
+            else if (clickedText.equals(bundle.getString("middle"))) {
+                place = Place.MIDDLE;
+            }
+            else if (clickedText.equals(bundle.getString("right"))) {
+                place = Place.RIGHT;
+            }
+            else if (clickedText.equals(bundle.getString("bottom"))) {
+                place = Place.BOTTOM;
+            }
+            else {
+                place = Place.HIDDEN;
+            }
+            moveComponentTo(components.get(componentName), place);
+        });
     }
 
     /**
      * Executes the given EventHandler e if any key was pressed, therefore the
      * provided Handler <b>must check by itself</b> if the right KeyCode was
      * pressed.
-     * 
+     *
      * @param e
      *            The EventHandler
      */
-    public void registerKeyListener(EventHandler<KeyEvent> e) {
+    public void registerKeyListener(final EventHandler<KeyEvent> e) {
         root.addEventHandler(KeyEvent.KEY_PRESSED, e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void init() {
         dataModel.addObserver(this);
@@ -430,11 +489,11 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Updates the status bar on the mainView by the given text. Keeps the text
      * on the status bar till the next update is performed.
-     * 
+     *
      * @param text
      *            String to be set to the status bar.
      */
-    public void updateStatusbar(String text) {
+    public void updateStatusbar(final String text) {
         if (text != null) {
             statustext.setText(text);
         }
@@ -442,20 +501,22 @@ public class MainViewController extends NUIController implements Observer {
 
     /**
      * Updates the MainView if any change in the dataModel occurred.
-     * 
+     *
      * @param o
      *            The observable, here the dataModel
      * @param arg
      *            An argument (not used)
      */
     @Override
-    public void update(Observable o, Object arg) {
-        // If first proof file is loaded, enable MenuItems for store action
-        saveProof.setVisible(true);
-        saveProofAs.setVisible(true);
-        // Remove observer, because we do not need it anymore (-> proof files
-        // cannot be closed without closing the application)
-        dataModel.deleteObserver(this);
+    public void update(final Observable o, final Object arg) {
+        if (dataModel.getLoadedTreeViewState() == null) {
+            saveProof.setVisible(false);
+            saveProofAs.setVisible(false);
+        }
+        else {
+            saveProof.setVisible(true);
+            saveProofAs.setVisible(true);
+        }
     }
 
     /**
@@ -467,61 +528,34 @@ public class MainViewController extends NUIController implements Observer {
         // try to set loading status atomically
         final boolean hasBeenCanceled = isLoadingProof.compareAndSet(true,
                 false);
-
         if (hasBeenCanceled) {
-
-            // TODO not a very kind way to stop a thread
-            // However the method KeYEnvironment.load doesn't support
-            // interrupting.
+            /*
+             * Not a very kind way to stop a thread However the method
+             * KeYEnvironment.load doesn't support interrupting
+             */
             try {
+                java.lang.reflect.Method tsm = Thread.class.getDeclaredMethod(
+                        "stop0", new Class[] { Object.class });
+                tsm.setAccessible(true);
+                tsm.invoke(loadingThread, new ThreadDeath());
+            }
+            catch (NoSuchMethodException | SecurityException
+                    | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException e) {
+                // Exception can be ignored, because KeYEnvironment object will
+                // be re-created by next proof loading
+            }
 
-                try {
-                    final java.lang.reflect.Method tsm = Thread.class
-                            .getDeclaredMethod("stop0",
-                                    new Class[] { Object.class });
-                    tsm.setAccessible(true);
-                    tsm.invoke(loadingThread, new ThreadDeath());
-                }
-                catch (java.lang.ThreadDeath e) {
-                    System.out.println(
-                            "ThreadDeath to ignore? Speak with Matthias"); // TODO
-                }
-
-                // reset loading state
-                Platform.runLater(new Runnable() {
-                    /**
-                     * {@inheritDoc}
-                     */
-                    @Override
-                    public void run() {
-                        statustext.setText("Loading has been cancelled.");
-                        root.setCursor(Cursor.DEFAULT);
-                        openProof.setDisable(false);
-                        progressIndicator.setVisible(false);
-                        cancelButton.setVisible(false);
-                    }
-                });
-            }
-            catch (NoSuchMethodException e1) {
-                e1.printStackTrace();
-            }
-            catch (SecurityException e1) {
-                e1.printStackTrace();
-            }
-            catch (IllegalAccessException e1) {
-                e1.printStackTrace();
-            }
-            catch (IllegalArgumentException e1) {
-                e1.printStackTrace();
-            }
-            catch (InvocationTargetException e1) {
-                e1.printStackTrace();
-            }
-            catch (java.lang.ThreadDeath e) {
-                System.out.println(
-                        "Unexpected ThreadDeath in cancelLoadProof. Speak with Matthias."); // TODO
-            }
+            // reset loading state
+            Platform.runLater(() -> {
+                statustext.setText("Loading has been cancelled.");
+                root.setCursor(Cursor.DEFAULT);
+                openProof.setDisable(false);
+                progressIndicator.setVisible(false);
+                cancelButton.setVisible(false);
+            });
         }
+
     }
 
     /**
@@ -557,17 +591,30 @@ public class MainViewController extends NUIController implements Observer {
                     isLoadingProof.set(true);
 
                     // important to initialize KeYEnvironment
-                    MainWindow mainWindow = MainWindow.getInstance();
+                    final MainWindow mainWindow = MainWindow.getInstance();
                     mainWindow.setVisible(false);
                     // load proof
-                    System.out.println("Start loading proof: "+ proofFileName);
-                    final KeYEnvironment<?> environment = KeYEnvironment.load(
-                            JavaProfile.getDefaultInstance(), proofFileName,
-                            null, null, null, true);
-                    final Proof proof = environment.getLoadedProof();
+                    System.out.println("Start loading proof: " + proofFileName);
 
+                    // Load proof
+                    DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(
+                            null);
+                    AbstractProblemLoader loader = ui.load(null, proofFileName,
+                            null, null, null, null, false);
+                    InitConfig initConfig = loader.getInitConfig();
+                    keyEnvironment = new KeYEnvironment<DefaultUserInterfaceControl>(
+                            ui, initConfig, loader.getProof(),
+                            loader.getResult());
+                    /*
+                     * final KeYEnvironment<?> environment =
+                     * KeYEnvironment.load( JavaProfile.getDefaultInstance(),
+                     * proofFileName, null, null, null, true);
+                     * 
+                     * final Proof proof = environment.getLoadedProof();
+                     */
+                    final Proof proof = keyEnvironment.getLoadedProof();
                     proof.setProofFile(proofFileName);
-                    
+
                     System.out.println("loading finished!");
 
                     // convert proof to fx tree
@@ -580,42 +627,25 @@ public class MainViewController extends NUIController implements Observer {
 
                     if (hasNotBeenCanceled) {
                         // reset set gui waiting state
-                        Platform.runLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Store state of treeView into data model.
-                                dataModel.saveTreeViewState(
-                                        new TreeViewState(proof, fxtree),
-                                        proofFileName.getName());
+                        Platform.runLater(() -> {
+                            // Store state of treeView into data model.
+                            dataModel.saveTreeViewState(
+                                    new TreeViewState(proof, fxtree),
+                                    proofFileName.getName());
 
-                                statustext.setText("Ready.");
-                                progressIndicator.setVisible(false);
-                                cancelButton.setVisible(false);
-                                root.setCursor(Cursor.DEFAULT);
-                                openProof.setDisable(false);
-                            }
+                            statustext.setText("Ready.");
+                            progressIndicator.setVisible(false);
+                            cancelButton.setVisible(false);
+                            root.setCursor(Cursor.DEFAULT);
+                            openProof.setDisable(false);
                         });
                     }
 
                 }
-                catch (ProblemLoaderException e) {
-                    // This Exception is thrown if the thread has been killed.
-                    if (isLoadingProof.get()) {
-                        // error during loading
-                        System.out
-                                .println("If this occurs speak with Matthias");
-                        e.printStackTrace();
-                    }
-                    else {
-                        // exception occured by thread killing (canceling)
-                        System.out.println("Usual PLException...");
-                    }
+                catch (ProblemLoaderException | java.lang.ThreadDeath e) {
+                    // This Exception is thrown if the thread has been killed
+                    // and can thus be ignored.
                 }
-                catch (java.lang.ThreadDeath e) {
-                    System.out.println(
-                            "Unexpected Thread Death in call. Talk to Matthias");
-                }
-
                 return null;
             }
 

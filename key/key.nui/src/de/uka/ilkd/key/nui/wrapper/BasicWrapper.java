@@ -21,7 +21,7 @@ public abstract class BasicWrapper {
      *            The component desired to display in JavaFX.
      * @return SwingNode The FX Node containing the swingComponent.
      */
-    protected SwingNode addSwingComponent(JComponent swingComponent) {
+    protected SwingNode addSwingComponent(final JComponent swingComponent) {
         final SwingNode swingNode = new SwingNode();
         SwingUtilities.invokeLater(() -> swingNode.setContent(swingComponent));
         return swingNode;

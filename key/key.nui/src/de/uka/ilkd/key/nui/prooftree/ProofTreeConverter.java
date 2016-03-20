@@ -10,11 +10,10 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
- * This class converts a proof tree to an fx tree.
+ * This class converts a proof tree to a fx tree.
  * 
  * @author Patrick Jattke
  * @author Matthias Schultheis
@@ -70,7 +69,7 @@ public class ProofTreeConverter {
     }
 
     /**
-     * loads a proof tree by converting it to a NUITree which is used as an
+     * Loads a proof tree by converting it to a NUITree which is used as an
      * intermediate representation (decorated abstract tree).
      *
      * @param proof
@@ -86,15 +85,13 @@ public class ProofTreeConverter {
         nuiRoot.setLabel(LBL_ROOT);
 
         // reset linked leafs
-        linkedLeafs = new LinkedList<NUINode>();
+        linkedLeafs = new LinkedList<>();
 
         // Convert recursively the ProofTree to a NUITree
         addProofTreeToNUITree(pRoot, nuiRoot);
 
         // set linked leafs
-        for (final NUINode linkedLeaf : linkedLeafs) {
-            setNUINodeLinkedTrue(linkedLeaf);
-        }
+        linkedLeafs.forEach((linkedLeaf) -> setNUINodeLinkedTrue(linkedLeaf));
     }
 
     /**
@@ -135,6 +132,7 @@ public class ProofTreeConverter {
             addProofTreeToNUITree(proofNode.child(0), parent);
         }
         else if (numChildren > 1) {
+
             // for each child create a branch node and add it to parent
             for (final Iterator<Node> childrenIterator = proofNode
                     .childrenIterator(); childrenIterator.hasNext();) {
@@ -209,16 +207,18 @@ public class ProofTreeConverter {
         newNode.setLabel(nodeName);
         newNode.setHasNotes(proofNode.getNodeInfo().getNotes() != null);
         newNode.setActive(proofNode.getNodeInfo().getActiveStatement() != null);
-        
+
         // set symbolic execution field
         boolean symbolicExecution;
         final RuleApp rule = proofNode.getAppliedRuleApp();
         if (rule instanceof TacletApp) {
-            symbolicExecution = NodeInfo.isSymbolicExecution(((TacletApp) rule).taclet());
+            symbolicExecution = NodeInfo
+                    .isSymbolicExecution(((TacletApp) rule).taclet());
         }
         else if (rule instanceof IBuiltInRuleApp) {
             symbolicExecution = true;
-        } else {
+        }
+        else {
             symbolicExecution = false;
         }
         newNode.setSymbolicExcecution(symbolicExecution);

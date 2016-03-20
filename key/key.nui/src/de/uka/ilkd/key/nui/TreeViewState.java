@@ -15,18 +15,18 @@ public class TreeViewState {
     /**
      * The proof file of the state.
      */
-    private Proof proof = null;
+    private Proof proof;
 
     /**
      * The generated tree, associated with the proof.
      */
-    private ProofTreeItem treeItem = null;
+    private final ProofTreeItem treeItem;
 
     /**
      * Indicates whether the proof was modified after loading it into the
      * treeView.
      */
-    private boolean isModified = false;
+    private boolean isModified;
 
     /**
      * Creates a new TreeViewState.
@@ -37,7 +37,7 @@ public class TreeViewState {
      * @param treeItem
      *            The tree associated with the proof.
      */
-    public TreeViewState(Proof proof, ProofTreeItem treeItem) {
+    public TreeViewState(final Proof proof, final ProofTreeItem treeItem) {
         this.proof = proof;
         this.treeItem = treeItem;
     }
@@ -70,13 +70,13 @@ public class TreeViewState {
      *            Sets the status of the proof file to bool, where TRUE marks
      *            the file as changed and FALSE as unchanged.
      */
-    protected void setModified(boolean bool) {
+    protected void setModified(final boolean bool) {
         this.isModified = bool;
     }
 
     /**
      * Returns TRUE if the proof of the TreeViewState was modified after loading
-     * it, else returns FALSE.
+     * or after last saving it, else returns FALSE.
      * 
      * @return the status of the changes at the proof file.
      */
@@ -91,7 +91,7 @@ public class TreeViewState {
      * @param proof
      *            the proof to be added to the TreeViewState.
      */
-    protected void setProof(Proof proof) {
+    protected void setProof(final Proof proof) {
         this.proof = proof;
     }
 

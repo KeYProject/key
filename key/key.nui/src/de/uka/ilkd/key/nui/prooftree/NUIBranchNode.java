@@ -52,15 +52,17 @@ public class NUIBranchNode extends NUINode {
     public final List<NUINode> getChildren() {
         return children;
     }
-    
+
     /**
      * Sets the children of the branch node.
+     * 
      * @param children
+     *            The children to set for the branch node.
      */
     public void setChildren(final List<NUINode> children) {
         this.children = children;
     }
-    
+
     /**
      * Returns the parent node of the branch node.
      * 
@@ -84,36 +86,26 @@ public class NUIBranchNode extends NUINode {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void resetSearch() {
         setSearchResult(false);
         children.forEach((child) -> child.resetSearch());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public int search(final String term) { // TODO this method seems much to
-                                           // verbose
+    public int search(final String term) {
+        // case: Empty search term given
         if (term.isEmpty()) {
             return 0;
         }
 
-        boolean thisIsASearchResult = getLabel().toLowerCase().contains(term.toLowerCase());
+        // case: Non-Empty search term given
 
-        int numberOfResultsAccumulator = thisIsASearchResult ? 1 : 0;
+        final boolean thisIsASearchResult = getLabel().toLowerCase().contains(term.toLowerCase());
 
         setSearchResult(thisIsASearchResult);
-
-        for (NUINode child : children) {
-            numberOfResultsAccumulator += child.search(term);
-        }
-
-        return numberOfResultsAccumulator;
+        return children.stream()/*.parallel()*/.mapToInt((child) -> child.search(term)).sum()
+                + (thisIsASearchResult ? 1 : 0);
     }
 
     /**
@@ -125,47 +117,46 @@ public class NUIBranchNode extends NUINode {
     public final void setProofParentNode(final de.uka.ilkd.key.proof.Node parent) {
         this.proofParentNode = parent;
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public NUIBranchNode clone() {
+
+    @Override
+    public NUIBranchNode clone() throws CloneNotSupportedException {
         // create clone
         final NUIBranchNode cloned = new NUIBranchNode(proofParentNode);
         this.copyFields(this, cloned);
-        
+
         // set children
-        final LinkedList<NUINode> newChildren = new LinkedList<NUINode>();
+        final LinkedList<NUINode> newChildren = new LinkedList<>();
         for (final NUINode child : this.children) {
             final NUINode clonedChild = child.clone();
             clonedChild.setParent(cloned);
             newChildren.add(clonedChild);
         }
         cloned.setChildren(newChildren);
-        
+
         return cloned;
     }
-    
+
     /**
-     * Clones the branch node without children.
-     * The children list will be empty.
+     * Clones the branch node without children. The children list will be empty.
+     * 
      * @return the cloned branch node
      */
     public NUIBranchNode cloneWithoutChildren() {
         // create clone
         final NUIBranchNode cloned = new NUIBranchNode(proofParentNode);
         this.copyFields(this, cloned);
-        
+
         return cloned;
     }
-    
 
     @Override
-    public List<NUINode> asList(){
-        List<NUINode> l = new LinkedList<>();
-        l.add(this);
-        children.forEach((child) -> l.addAll(child.asList()));
-        return l;
+    public List<NUINode> asList() {
+
+        final List<NUINode> list = new LinkedList<>();
+        list.add(this);
+        children.forEach((child) -> list.addAll(child.asList()));
+        return list;
+
     }
-    
+
 }

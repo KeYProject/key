@@ -3,7 +3,6 @@ package de.uka.ilkd.key.nui.prooftree;
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.controller.TreeViewController;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeCell;
@@ -29,129 +28,82 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     public static final int ICON_SPACING = 5;
 
     /**
+     * The filtering handler used to filter the tree's cells.
+     */
+    private FilteringHandler filteringHandler;
+
+    /**
      * The IconFactory used to create the required icons.
      */
-    private final IconFactory icf;
+    private final IconFactory iconFactory;
 
     /**
      * The icon that will be displayed left next to the label.
      */
     private ImageView icon;
 
-    private FilteringHandler fh;
-
-    private TreeViewController treeViewController = null;
-
     /**
      * The label that will be displayed.
      */
     private Label label;
 
-    private final ChangeListener<Boolean> searchResultListener = new ChangeListener<Boolean>() {
-        @Override
-        public void changed(ObservableValue<? extends Boolean> observable,
-                Boolean didMatchSearch, Boolean nowMatchesSearch) {
-            final ObservableList<String> styles = getStyleClass();
-            final String cssClassHighlight = ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT;
-            if (nowMatchesSearch && !styles.contains(cssClassHighlight)) {
-                styles.add(cssClassHighlight);
-            }
-            if (nowMatchesSearch) {
-                styles.remove(cssClassHighlight);
-            }
-            ProofTreeCell.this.updateItem(ProofTreeCell.this.getItem(), false);
+    /**
+     * The change listener registered to this ProofTreeCell.
+     */
+    private final ChangeListener<Boolean> searchResultListener = (observable,
+            didMatchSearch, nowMatchesSearch) -> {
+        final ObservableList<String> styles = getStyleClass();
+        final String cssClassHighlight = ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT;
+        if (nowMatchesSearch && !styles.contains(cssClassHighlight)) {
+            styles.add(cssClassHighlight);
         }
+        if (nowMatchesSearch) {
+            styles.remove(cssClassHighlight);
+        }
+        ProofTreeCell.this.updateItem(ProofTreeCell.this.getItem(), false);
     };
+
+    /**
+     * The treeViewController used to handle the actions of the treeView.
+     */
+    private final TreeViewController treeViewController;
+
+    /**
+     * Returns the TreeViewController associated with the ProofTreeCell.
+     * 
+     * @return the {@link TreeViewController}.
+     */
+    public TreeViewController getTreeViewController() {
+        return treeViewController;
+    }
 
     /**
      * The constructor of the ProofTreeCell.
      * 
      * @param icf
-     *            the icon factory used to display node icons
+     *            the {@link IconFactory} used to display node icons
+     * @param fh
+     *          the {@link FilteringHandler} used to filter this ProofTreeCell
+     * @param tvc
+     *          the {@link TreeViewController} associated with the TreeView
      */
-    public ProofTreeCell(final IconFactory icf, final FilteringHandler fh,
-            TreeViewController tvc) {
+
+    public ProofTreeCell(final IconFactory icf, final FilteringHandler filteringHandler,
+            final TreeViewController treeViewController) {
+
         super();
-        this.fh = fh;
-        this.icf = icf;
-        this.treeViewController = tvc;
+        this.filteringHandler = filteringHandler;
+        this.iconFactory = icf;
+        this.treeViewController = treeViewController;
     }
 
     /**
-     * @param icon
-     *            the icon to set
+     * Returns the icon factory associated with the ProofTreeCell.
+     * 
+     * @return the {@link IconFactory}.
      */
-    void setIcon(final ImageView icon) {
-        this.icon = icon;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected final void updateItem(final NUINode item, final boolean empty) {
-
-        if (getItem() != null) {
-            getItem().removeSearchResultListener(searchResultListener);
-        }
-
-        super.updateItem(item, empty);
-
-        if (item == null) {
-            getStyleClass().remove(ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT);
-
-        }
-        else {
-            item.addSearchResultListener(searchResultListener);
-            if (item.isSearchResult()) {
-                if (!getStyleClass()
-                        .contains(ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT)) {
-                    getStyleClass()
-                            .add(ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT);
-                }
-            }
-            else {
-                getStyleClass()
-                        .remove(ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT);
-            }
-        }
-
-        // if null node, display nothing
-        if (empty || item == null) {
-            setText(null);
-            setGraphic(null);
-            return;
-        }
-
-        setContextMenu(new ProofTreeContextMenu(getTreeItem(), getTreeView(),
-                icf, fh, treeViewController));
-
-        // reset label and icon
-        label = new Label(item.getLabel() + " ");
-        icon = null;
-
-        // set decoration (style, icon)
-        ProofTreeStyler pts = new ProofTreeStyler(this);
-        // applies the style assigned in ProofTreeConverter to the
-        // current ProofTreeCell
-        pts.applyStyle(getItem());
-
-        // workaround to display an icon next to a label
-        setText(null);
-
-        if (icon == null) {
-            setGraphic(label);
-        }
-        else {
-            final HBox hbox = new HBox();
-            hbox.setSpacing(ICON_SPACING);
-
-            final Label iconLabel = new Label();
-            iconLabel.setGraphic(icon);
-
-            hbox.getChildren().addAll(iconLabel, label);
-            setGraphic(hbox);
-        }
+    public IconFactory getIconFactory() {
+        return iconFactory;
     }
 
     /**
@@ -170,5 +122,74 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      */
     public Label getLabel() {
         return label;
+    }
+
+    /**
+     * @param icon
+     *            the icon to set
+     */
+    protected void setIcon(final ImageView icon) {
+        this.icon = icon;
+    }
+
+    @Override
+    protected final void updateItem(final NUINode item, final boolean empty) {
+
+        final String cssHighlighting = ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT;
+
+        if (getItem() != null) {
+            getItem().removeSearchResultListener(searchResultListener);
+        }
+
+        super.updateItem(item, empty);
+
+        if (item == null) {
+            getStyleClass().remove(cssHighlighting);
+
+        }
+        else {
+            item.addSearchResultListener(searchResultListener);
+            if (item.isSearchResult()) {
+                if (!getStyleClass().contains(cssHighlighting)) {
+                    getStyleClass().add(cssHighlighting);
+                }
+            }
+            else {
+                getStyleClass().remove(cssHighlighting);
+            }
+        }
+
+        // if null node, display nothing
+        if (empty || item == null) {
+            setText(null);
+            setGraphic(null);
+            return;
+        }
+
+        setContextMenu(new ProofTreeContextMenu(getTreeItem(), getTreeView(),
+                iconFactory, filteringHandler, treeViewController));
+
+        // reset label and icon
+        label = new Label(item.getLabel() + " ");
+        icon = null;
+
+        // set decoration (style, icon)
+        final ProofTreeStyler pts = new ProofTreeStyler(this);
+        // applies the style assigned in ProofTreeConverter to the
+        // current ProofTreeCell
+        pts.applyStyle(getItem());
+
+        // workaround to display an icon next to a label
+        setText(null);
+
+        if (icon == null) {
+            setGraphic(label);
+        }
+        else {
+            final HBox hbox = new HBox(ICON_SPACING);
+            final Label iconLabel = new Label("", icon);
+            hbox.getChildren().addAll(iconLabel, label);
+            setGraphic(hbox);
+        }
     }
 }

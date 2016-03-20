@@ -6,16 +6,12 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.controller.TreeViewController;
 import de.uka.ilkd.key.nui.prooftree.filter.ProofTreeFilter;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 
 /**
@@ -42,8 +38,14 @@ public class ProofTreeContextMenu extends ContextMenu {
      */
     private final IconFactory icf;
 
+    /**
+     * The FilteringHandler used to filter the tree cells.
+     */
     private final FilteringHandler fh;
 
+    /**
+     * The reference to the TreeViewController associated with the TreeView.
+     */
     private TreeViewController treeViewController = null;
 
     /**
@@ -75,15 +77,19 @@ public class ProofTreeContextMenu extends ContextMenu {
      * The constructor.
      * 
      * @param treeItem
-     *            the treeItem of node
+     *            the {@link TreeItem} of the node
      * @param treeView
-     *            the treeview that treeItem is in
+     *            the {@link TreeView} which contains the treeItem
      * @param icf
-     *            an icon factory for creating icons
+     *            the {@link IconFactory} for creating icons
+     * @param fh
+     *            the {@link FilteringHandler} for filtering the tree
+     * @param tvc
+     *            the {@link TreeViewController} associated with the treeView
      */
     public ProofTreeContextMenu(final TreeItem<NUINode> treeItem,
             final TreeView<NUINode> treeView, final IconFactory icf,
-            final FilteringHandler fh, TreeViewController tvc) {
+            final FilteringHandler fh, final TreeViewController tvc) {
         super();
 
         this.treeItem = treeItem;
@@ -99,8 +105,8 @@ public class ProofTreeContextMenu extends ContextMenu {
     }
 
     /**
-     * {@inheritDoc} This method is called to show the contextmenu. Displays and
-     * fills the context menu.
+     * {@inheritDoc} This method is called to show the context menu. Displays
+     * and fills the context menu.
      */
     @Override
     public final void show() {
@@ -178,31 +184,36 @@ public class ProofTreeContextMenu extends ContextMenu {
         mISearch.setGraphic(icf.getImage(IconFactory.SEARCH));
         mISearch.setAccelerator(KeyCombination.keyCombination("Ctrl+F"));
         mISearch.setOnAction(aEvt -> treeViewController.openSearchView());
-        
     }
 
+    /**
+     * Adds the filter entries to the context menu.
+     */
     private void addMenuItemsFilter() {
-        Map<ProofTreeFilter, Boolean> a = fh.getFiltersMap();
+        final Map<ProofTreeFilter, Boolean> a = fh.getFiltersMap();
         for (Entry<ProofTreeFilter, Boolean> k : a.entrySet()) {
             addMenuItemFilter(k.getKey(), k.getValue());
         }
     }
 
-    private void addMenuItemFilter(ProofTreeFilter k, boolean initState) {
-        CheckMenuItem cmi = new CheckMenuItem(k.getContextMenuItemText());
+    /**
+     * Configures the filter context menu entry.
+     * 
+     * @param k
+     *            The filter to configure.
+     * @param initState
+     *            Indicates whether the filter is selected by default or not.
+     */
+    private void addMenuItemFilter(final ProofTreeFilter k,
+            final boolean initState) {
+        final CheckMenuItem cmi = new CheckMenuItem(k.getContextMenuItemText());
         cmi.setSelected(initState);
 
-        cmi.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable,
-                    Boolean oldValue, Boolean newValue) {
-                if (fh.getFilterStatus(k) != newValue) {
-                    fh.toggleFilteringStatus(k);
-                }
+        cmi.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (fh.getFilterStatus(k) != newValue) {
+                fh.toggleFilteringStatus(k);
             }
-
         });
-
         getItems().add(cmi);
     }
 

@@ -1,21 +1,14 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+import java.lang.reflect.Field;
+import java.util.function.Predicate;
+
+import de.uka.ilkd.key.nui.prooftree.filter.ProofTreeFilter;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.TreeItem;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.ObjectBinding;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-
-import java.lang.reflect.Field;
-import java.util.concurrent.Callable;
-import java.util.function.Predicate;
-
-import de.uka.ilkd.key.nui.prooftree.ProofTreeStyler.StyleConfiguration;
-import de.uka.ilkd.key.nui.prooftree.filter.ProofTreeFilter;
 
 /**
  * A node of the javafx tree item that is used in proof trees.
@@ -26,35 +19,64 @@ import de.uka.ilkd.key.nui.prooftree.filter.ProofTreeFilter;
 public class ProofTreeItem extends TreeItem<NUINode> {
 
     /**
-     * The internal list for managing children. This is used e. g. to add
-     * children.
-     */
-    private ObservableList<ProofTreeItem> internalChildren;
-
-    /**
      * The list that shows children to display. This is a filtered version of
      * internalChildren.
      */
-    private FilteredList<ProofTreeItem> filteredChildren;
+    private final FilteredList<ProofTreeItem> filteredChildren;
+
+    /**
+     * The internal list for managing children. This is used e. g. to add
+     * children.
+     */
+    private final ObservableList<ProofTreeItem> internalChildren;
 
     /**
      * Contains the fact if the item is supposed to be visible.
      */
-    private boolean visible = false;
+    private boolean visible;
 
     /**
      * Constructor.
      * 
      * @param value
      *            The NUINode encapsulated in the tree item.
+     * @throws NoSuchFieldException
      */
     public ProofTreeItem(final NUINode value) {
         super(value);
 
         internalChildren = FXCollections.observableArrayList();
-        filteredChildren = new FilteredList<ProofTreeItem>(internalChildren);
+        filteredChildren = new FilteredList<>(internalChildren);
 
         setAllChildren(filteredChildren);
+    }
+
+    /**
+     * Adds a child to the treeItem.
+     * 
+     * @param child
+     *            the child to add
+     */
+    public void addChild(final ProofTreeItem child) {
+        internalChildren.add(child);
+    }
+
+    /**
+     * Applies the visibility information of children that was stored with
+     * 'setVisible'.
+     */
+    public void applyVisibilitiyOfChildren() {
+        // define new predicate for the filtered children list
+
+        // HINT: DO NOT TRY TO USE JAVA 8 FOR THIS! (or do it and find out why it does not work)
+
+                final Predicate<? super ProofTreeItem> pred = new Predicate<ProofTreeItem>() {
+                    @Override
+                    public boolean test(final ProofTreeItem pti) {
+                        return pti.isVisible();
+                    }
+                };
+                filteredChildren.setPredicate(pred);
     }
 
     /**
@@ -70,18 +92,17 @@ public class ProofTreeItem extends TreeItem<NUINode> {
         boolean testResult = filter.test(this.getValue());
 
         if (testResult && !internalChildren.isEmpty()) {
-
             // apply filter to all children and hide node if
             // all children are hidden
             boolean allChildrenHidden = true;
-            for (ProofTreeItem child : internalChildren) {
-                final boolean childTestResult = child.filter(filter);
 
-                if (childTestResult) {
+            // check recursively if any child in this subtree is supposed to be
+            // displayed after filtering
+            for (ProofTreeItem child : internalChildren) {
+                if (child.filter(filter)) {
                     allChildrenHidden = false;
                 }
             }
-
             testResult = !allChildrenHidden;
         }
 
@@ -91,47 +112,25 @@ public class ProofTreeItem extends TreeItem<NUINode> {
 
         return testResult;
     }
-
+    
     /**
-     * Sets the 'children' field of the tree item. This works by reflection.
-     * 
-     * @param list
-     *            The children list to set.
+     * TODO
+     * @return
      */
-    @SuppressWarnings("unchecked")
-    protected void setAllChildren(final ObservableList<ProofTreeItem> list) {
-        try {
-            final Field childrenField = TreeItem.class
-                    .getDeclaredField("children");
-            childrenField.setAccessible(true);
-            childrenField.set(this, list);
-
-            final Field declaredField = TreeItem.class
-                    .getDeclaredField("childrenListener");
-            declaredField.setAccessible(true);
-
-            list.addListener(
-                    (ListChangeListener<? super ProofTreeItem>) declaredField
-                            .get(this));
-        }
-        catch (NoSuchFieldException | SecurityException
-                | IllegalArgumentException | IllegalAccessException e) {
-            throw new RuntimeException("Could not set TreeItem.children", e);
-        }
+    public FilteredList<ProofTreeItem> getFilteredChildren() {
+        return filteredChildren;
     }
 
     /**
-     * Adds a child to the treeItem.
-     * 
-     * @param child
-     *            the child to add
+     * TODO
+     * @return
      */
-    public void addChild(final ProofTreeItem child) {
-        internalChildren.add(child);
+    public ObservableList<ProofTreeItem> getInternalChildren() {
+        return internalChildren;
     }
 
     /**
-     * @return true iff the node is visible
+     * @return true if this node is visible
      */
     public boolean isVisible() {
         return visible;
@@ -149,19 +148,27 @@ public class ProofTreeItem extends TreeItem<NUINode> {
     }
 
     /**
-     * Applies the visibility information of children that was stored with
-     * 'setVisible'.
+     * Sets the 'children' field of the tree item. This works by reflection.
+     * 
+     * @param list
+     *            The children list to set.
      */
-    public void applyVisibilitiyOfChildren() {
+    @SuppressWarnings("unchecked")
+    protected final void setAllChildren(final ObservableList<ProofTreeItem> list) {
+        try {
+            final Field childrenField = TreeItem.class.getDeclaredField("children");
+            childrenField.setAccessible(true);
+            childrenField.set(this, list);
 
-        // define new predicate for the filtered children list
-        final Predicate<ProofTreeItem> pred = new Predicate<ProofTreeItem>() {
-            @Override
-            public boolean test(final ProofTreeItem pti) {
-                return pti.isVisible();
-            }
-        };
-        filteredChildren.setPredicate(pred);
+            final Field declaredField = TreeItem.class.getDeclaredField("childrenListener");
+            declaredField.setAccessible(true);
+
+            list.addListener((ListChangeListener<? super ProofTreeItem>) declaredField.get(this));
+        }
+        catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+                | IllegalAccessException e) {
+            throw new RuntimeException("Could not set TreeItem.children", e);
+        }
     }
 
 }

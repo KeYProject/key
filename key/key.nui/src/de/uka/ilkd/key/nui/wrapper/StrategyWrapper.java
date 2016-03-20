@@ -16,20 +16,18 @@ import javafx.embed.swing.SwingNode;
  * into a JavaFX component.
  * 
  * @author Patrick Jattke
- * @param <StrategySelectionView>
- * @param <AutoModeAction>
- *
+ * @author Florian Breitfelder
  */
 public class StrategyWrapper extends BasicWrapper {
 
     /**
      * Stores the StrategySelectionView.
      */
-    StrategySelectionView ssv;
+    private StrategySelectionView ssv;
     /**
      * Stores the AutoModeAction associated to the StrategySelectionView.
      */
-    AutoModeAction ama;
+    private AutoModeAction ama;
 
     /**
      * Creates a new Strategy Wrapper object.
@@ -45,7 +43,7 @@ public class StrategyWrapper extends BasicWrapper {
      * @param p
      *            The loaded proof file.
      */
-    public void refreshComponents(Proof p) {
+    public void refreshComponents(final Proof p) {
         ssv.refresh(p);
         ama.enable();
     }
@@ -53,11 +51,16 @@ public class StrategyWrapper extends BasicWrapper {
     /**
      * Creates a new StrategyComponent and returns the resulting FX SwingNode.
      * 
+     * @param proof
+     *            The proof file which should be associated with the
+     *            StrategyComponent.
+     * 
      * @return {@link SwingNode} The SwingNode which can be attached to the FX
      *         SceneGraph.
+     * 
      */
-    public SwingNode createStrategyComponent(Proof proof) {
-        MainWindow mainWindow = MainWindow.getInstance();
+    public SwingNode createStrategyComponent(final Proof proof) {
+        final MainWindow mainWindow = MainWindow.getInstance();
         mainWindow.setVisible(false);
 
         ama = new AutoModeAction(mainWindow);
@@ -78,19 +81,25 @@ public class StrategyWrapper extends BasicWrapper {
             ssv.refresh(proof);
         }
 
-        Box box = (Box) ssv.getComponent(0);
-        JScrollPane scrollPane = (JScrollPane) box.getComponent(5);
+        final Box box = (Box) ssv.getComponent(0);
+        final JScrollPane scrollPane = (JScrollPane) box.getComponent(5);
 
         ssv.removeAll();
         ssv.add(scrollPane);
 
-        SwingNode node = super.addSwingComponent(ssv);
+        final SwingNode node = super.addSwingComponent(ssv);
         return node;
     }
-    
-    public Strategy getStrategy(){
-        MainWindow mainWindow = MainWindow.getInstance();
-        return mainWindow.getMediator().getSelectionModel().getSelectedProof().getActiveStrategy();
+
+    /**
+     * Returns the strategy of the currently loaded proof.
+     * 
+     * @return {@link Strategy} of the currently loaded proof.
+     */
+    public Strategy getStrategy() {
+        final MainWindow mainWindow = MainWindow.getInstance();
+        return mainWindow.getMediator().getSelectionModel().getSelectedProof()
+                .getActiveStrategy();
     }
 
 }

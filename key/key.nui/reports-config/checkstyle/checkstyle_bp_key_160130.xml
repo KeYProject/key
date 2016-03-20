@@ -15,6 +15,7 @@ Slightly modified version of Sun Checks that better matches the default code for
     <property name="tabWidth" value="4"/>
     <module name="JavadocMethod">
       <property name="suppressLoadErrors" value="true"/>
+      <property name="allowMissingThrowsTags" value="true"/>
     </module>
     <module name="JavadocType"/>
     <module name="JavadocVariable"/>

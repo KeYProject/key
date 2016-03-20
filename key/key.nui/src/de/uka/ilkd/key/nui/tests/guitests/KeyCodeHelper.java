@@ -12,6 +12,9 @@ import javafx.scene.input.KeyCode;
  */
 public class KeyCodeHelper {
 
+    /**
+     * The {@link FxRobot} used to type in the {@link KeyCode KeyCodes}.
+     */
     private FxRobot robot;
 
     /**
@@ -22,7 +25,7 @@ public class KeyCodeHelper {
      * @param robot
      *            The FxRobot of the test class.
      */
-    public KeyCodeHelper(FxRobot robot) {
+    public KeyCodeHelper(final FxRobot robot) {
         this.robot = robot;
     }
 
@@ -34,14 +37,12 @@ public class KeyCodeHelper {
      *  [0-9],[A-Z],[a-z], {.}, {,}, {/}, {" "}, {-}, {_}
      * </pre>
      * 
-     * .
-     * 
      * @param term
      *            The word which should be converted into an array of KeyCodes.
      * @return An array of KeyCodes representing the given word.
      */
-    public KeyCode[] getKeyCode(String term) {
-        KeyCode[] c = new KeyCode[term.length()];
+    public KeyCode[] getKeyCode(final String term) {
+        final KeyCode[] c = new KeyCode[term.length()];
         String current;
         for (int i = 0; i < term.length(); i++) {
             current = Character.toString(term.charAt(i));
@@ -78,10 +79,11 @@ public class KeyCodeHelper {
      * @param keys
      *            The array consisting of key codes.
      */
-    public void typeKeys(KeyCode[] keys) {
+    public void typeKeys(final KeyCode[] keys) {
         for (int i = 0; i < keys.length; i++) {
-            if (keys[i] != null)
+            if (keys[i] != null) {
                 robot.type(keys[i]);
+            }
         }
     }
 }

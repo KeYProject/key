@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import com.sun.javafx.scene.control.skin.TreeViewSkin;
 import com.sun.javafx.scene.control.skin.VirtualContainerBase;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualFlow.ArrayLinkedList;
@@ -26,68 +25,88 @@ import javafx.util.Duration;
 
 /**
  * 
+ * Controller for handling the search functionality in the searchViewPane.
+ * 
  * @author Florian Breitfelder
+ * @author Stefan Pilot
  *
  */
 @ControllerAnnotation(createMenu = false)
 public class SearchViewController extends NUIController {
 
+    /**
+     * Indicates the direction of scrolling in the treeView for the next search
+     * result.
+     * 
+     * @author Stefan Pilot
+     *
+     */
     private enum Direction {
-        UP, DOWN
+        /**
+         * The next upper search result will be shown.
+         */
+        UP,
+        /**
+         * The next lower search result will be shown.
+         */
+        DOWN
     }
 
+    /**
+     * The number of results returned by the last search.
+     */
     private int numberOfSearchResults = 0;
 
     /**
-     * The Button toggling selectNextItem in searching
+     * The Button toggling selectNextItem in searching.
      */
     @FXML
     private Button btnSearchNext;
     /**
-     * The Button toggling selectPreviousItem in searching
+     * The Button toggling selectPreviousItem in searching.
      */
     @FXML
     private Button btnSearchPrev;
 
     /**
-     * A click on this Button closes the SearchView
+     * A click on this Button closes the SearchView.
      */
     @FXML
     private Button btnCloseSearchView;
 
     /**
-     * The TextField where search terms are entered
+     * The TextField where search terms are entered.
      */
     @FXML
     private TextField tfSearchQuery;
 
     /**
-     * Weak-referenced Set of ProofTreeCells
+     * Weak-referenced Set of ProofTreeCells.
      */
     private Set<ProofTreeCell> proofTreeCells;
 
     /**
-     * Reference of TreeView
+     * Reference of TreeView.
      */
     private TreeView<NUINode> proofTreeView;
     /**
-     * Reference of Parent Connection between TreeView and SearchView
+     * Reference of Parent Connection between TreeView and SearchView.
      */
     private Pane treeViewPane;
 
     /**
-     * The Anchor Pane holding the Search Field and its buttons
+     * The Anchor Pane holding the Search Field and its buttons.
      */
     @FXML
     private Pane searchViewPane;
 
     /**
-     * A List representation of the all the TreeItems
+     * A List representation of the all the TreeItems.
      */
     private List<TreeItem<NUINode>> treeItems;
 
     /**
-     * Set TreeView used for the search
+     * Set the TreeView used for the search.
      * 
      * @param proofTreeView
      *            reference to treeView
@@ -96,9 +115,8 @@ public class SearchViewController extends NUIController {
      * @param treeViewPane
      *            reference to treeViewPane(Parent of searchView)
      */
-    public void initSearch(TreeView<NUINode> proofTreeView,
-            Set<ProofTreeCell> proofTreeCells, Pane treeViewPane) {
-
+    public void initSearch(final TreeView<NUINode> proofTreeView,
+            final Set<ProofTreeCell> proofTreeCells, final Pane treeViewPane) {
         this.proofTreeView = proofTreeView;
         this.proofTreeCells = proofTreeCells;
         this.treeViewPane = treeViewPane;
@@ -106,69 +124,81 @@ public class SearchViewController extends NUIController {
         Platform.runLater(() -> tfSearchQuery.requestFocus());
     }
 
+    /**
+     * Moves the focus to the text field in the searchView.
+     */
     public void performFocusRequest() {
         tfSearchQuery.requestFocus();
     }
 
     /**
-     * TODO Bitte nicht löschen, in Code Reviews bitte ignorieren
+     * Returns the {@link ProofTreeCell ProofTreeCells} currently shown in the
+     * TreeView. <br />
      * 
-     * @return
+     * <b> Temporary solution, please ignore in Code Reviews </b>
+     * 
+     * @return Set&lt;ProofTreeCell&gt; containing the rendered ProofTreeCells.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "cast" })
     private Set<ProofTreeCell> getProofTreeCells() {
         try {
-            Field f = VirtualContainerBase.class.getDeclaredField("flow");
+            final Field f = VirtualContainerBase.class.getDeclaredField("flow");
             f.setAccessible(true);
-            Field g = VirtualFlow.class.getDeclaredField("cells");
+            final Field g = VirtualFlow.class.getDeclaredField("cells");
             g.setAccessible(true);
-            Set<ProofTreeCell> s = new HashSet<>();
+            final Set<ProofTreeCell> s = new HashSet<>();
             s.addAll((ArrayLinkedList<ProofTreeCell>) g
-                    .get(((VirtualFlow<ProofTreeCell>) f
-                            .get(((TreeViewSkin<NUINode>) proofTreeView
-                                    .skinProperty().get())))));
+                    .get((f.get((proofTreeView.skinProperty().get())))));
             return s;
         }
-        catch (NoSuchFieldException e) {
-            e.printStackTrace();// TODO
-        }
-        catch (SecurityException e) {
-            e.printStackTrace();// TODO
-        }
-        catch (IllegalArgumentException e) {
-            e.printStackTrace();// TODO
-        }
-        catch (IllegalAccessException e) {
-            e.printStackTrace();// TODO
+        catch (NoSuchFieldException | SecurityException
+                | IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
         }
         return null;
     }
 
     /**
      * Recursively walks through the tree, storing all items in the List being
-     * returned
+     * returned.
      * 
      * @return a List of all the TreeItems in the underlying ProofTreeView
      */
     private List<TreeItem<NUINode>> getTreeItems() {
 
         if (treeItems == null) {
+            /**
+             * Parses a Tree, beginning at <b>t</b>, and adds to list every
+             * TreeItem that is a child of <b>root</b> or of its children
+             * <b>l</b>.
+             * 
+             * @param root
+             *            Where to start parsing
+             * 
+             * @param list
+             *            Where all the TreeItems are added to
+             * 
+             * @return <b>list</b>, but with all the TreeItems appended to it
+             */
             class TreeToListHelper {
                 /**
-                 * Parses a Tree, beginning at <b>t</b>, and adds to list every
-                 * TreeItem that is a child of <b>root</b> or of its children
-                 * <b>l</b>.
+                 * Just to get rid of an odd warning, see
+                 * http://stackoverflow.com/questions/921025
+                 */
+                protected TreeToListHelper() {
+                }
+
+                /**
+                 * Converts the given {@link TreeItem} into a list containing
+                 * all elements of the tree.
                  * 
                  * @param root
-                 *            Where to start parsing
-                 * 
+                 *            The root of the (sub)tree whose nodes should be
+                 *            collected.
                  * @param list
-                 *            Where all the TreeItems are added to
-                 * 
-                 * @return <b>list</b>, but with all the TreeItems appended to
-                 *         it
+                 *            The accumulator used to collect the nodes.
+                 * @return A {@link List} of TreeItems.
                  */
-
                 private <T> List<TreeItem<T>> treeToList(final TreeItem<T> root,
                         final List<TreeItem<T>> list) {
                     if (root == null || list == null) {
@@ -198,22 +228,17 @@ public class SearchViewController extends NUIController {
      * ProofTreeView as needed. Only to be used together with
      * <tt>TreeViewController.search()</tt>.
      * 
-     * @param moveDownwards
+     * @param direction
      *            whether the selection is to be moved up- or downwards
      */
-    private void moveSelectionAndScrollIfNeeded(Direction direction) {
+    private void moveSelectionAndScrollIfNeeded(final Direction direction) {
         if (numberOfSearchResults < 1) {
             return;
         }
 
-        List<TreeItem<NUINode>> treeItems = getTreeItems();
-        // catch bad calls
-        // if (searchMatches == null || searchMatches.isEmpty())
-        // return;
-
+        final List<TreeItem<NUINode>> treeItems = getTreeItems();
         final TreeItem<NUINode> currentlySelectedItem = proofTreeView
                 .getSelectionModel().getSelectedItem();
-
         TreeItem<NUINode> itemToSelect = null;
 
         // Basically does: itemToSelect = currentlySelectedItem + 1
@@ -279,7 +304,7 @@ public class SearchViewController extends NUIController {
             }
         }
 
-        if (performScroll)
+        if (performScroll) {
             // if we are to scroll downwards, we have to subtract an offset to
             // make
             // the selected item appear in middle.
@@ -287,22 +312,33 @@ public class SearchViewController extends NUIController {
                     proofTreeView.getSelectionModel().getSelectedIndex()
                             - (direction == Direction.UP ? 0
                                     : (int) (proofTreeCells.size() / 2)));
+        }
     }
 
     @Override
     protected void init() {
+        // Define action for 'previous (<)' button
         btnSearchPrev.setOnAction(
                 (event) -> moveSelectionAndScrollIfNeeded(Direction.DOWN));
+
+        // Define action for 'next (>)' button
         btnSearchNext.setOnAction(
                 (event) -> moveSelectionAndScrollIfNeeded(Direction.UP));
+
+        // Define action for 'close (X)' button
         btnCloseSearchView.setOnAction((event) -> closeSearchView());
+
+        // Add listener for text field
         tfSearchQuery.textProperty().addListener((obs, oldText, newText) -> {
             btnSearchNext.setDisable(newText.isEmpty());
             btnSearchPrev.setDisable(newText.isEmpty());
+            // If no text was entered -> clear search
             if (newText.isEmpty()) {
                 proofTreeView.getRoot().getValue().resetSearch();
                 nui.updateStatusbar("");
             }
+            // If any text was entered -> update status bar and depending on
+            // numberOfSearchResults add/remove CSS class
             else {
                 numberOfSearchResults = proofTreeView.getRoot().getValue()
                         .search(newText);
@@ -322,12 +358,14 @@ public class SearchViewController extends NUIController {
             }
         });
 
+        // Add actions for keys ESCAPE and ENTER while focusing the
+        // searchViewPane.
         searchViewPane.setOnKeyPressed((e) -> {
             if (KeyCode.ESCAPE == e.getCode()) {
                 closeSearchView();
             }
             else if (KeyCode.ENTER == e.getCode()) {
-                PauseTransition pause = new PauseTransition(
+                final PauseTransition pause = new PauseTransition(
                         Duration.millis(130));
                 Button button;
                 button = e.isShiftDown() ? btnSearchPrev : btnSearchNext;
@@ -350,12 +388,14 @@ public class SearchViewController extends NUIController {
                 .add("/de/uka/ilkd/key/nui/components/searchView.css");
     }
 
+    /**
+     * Closes the search view.
+     */
     private void closeSearchView() {
         // delete searchView component form treeViewPane
         treeViewPane.getChildren().remove(searchViewPane);
         // reset proofTreeView
         proofTreeView.getRoot().getValue().resetSearch();
-
         tfSearchQuery.setText("");
     }
 }
