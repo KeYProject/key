@@ -118,6 +118,11 @@ public class ManualView extends AbstractViewBasedView {
    private boolean newProof;
    
    /**
+    * {@code true} if rule was applied manually and debugView is not updated yet, {@code false} otherwise.
+    */
+   private boolean beforeBaseViewUpdate;
+   
+   /**
 	 * The {@link State} which indicates hiding or showing of intermediate proofsteps.
 	 */
 	private State hideState;
@@ -204,25 +209,27 @@ public class ManualView extends AbstractViewBasedView {
 	
 	public ManualView() {
 		ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
-	      if (service != null) {
-	         Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
-	         if (hideCmd != null) {
-	            hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
-	            if (hideState != null) {
-	            	hideState.setValue(false); //TODO remove
-	            	hideState.addListener(hideStateListener);
-	            }
-	         }
-	         
-	         Command symbolicCmd = service.getCommand(ShowSymbolicExecutionTreeOnlyHandler.COMMAND_ID);
-	         if (symbolicCmd != null) {
-	            symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
-	            if (symbolicState != null) {
-	            	symbolicState.setValue(false); //TODO remove
-	            	symbolicState.addListener(symbolicStateListener);
-	            }
-	         }
-	      }
+      if (service != null) {
+         Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
+         if (hideCmd != null) {
+            hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
+            if (hideState != null) {
+            	hideState.setValue(false); //TODO remove
+            	hideState.addListener(hideStateListener);
+            }
+         }
+         
+         Command symbolicCmd = service.getCommand(ShowSymbolicExecutionTreeOnlyHandler.COMMAND_ID);
+         if (symbolicCmd != null) {
+            symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
+            if (symbolicState != null) {
+            	symbolicState.setValue(false); //TODO remove
+            	symbolicState.addListener(symbolicStateListener);
+            }
+         }
+      }
+      beforeBaseViewUpdate = false;
+	      
 	}
 	
 	protected void handleRuleApplied(ProofEvent e) {
@@ -237,8 +244,9 @@ public class ManualView extends AbstractViewBasedView {
 				}
 			}
 			selectNode(newSelectedNode);
-//			sourceViewerDecorator.showNode(newSelectedNode, SymbolicExecutionUtil.createNotationInfo(newSelectedNode));
 			setManualRule(false);
+			//don't listen to selection changes on baseView
+			beforeBaseViewUpdate = true;
 		}
 		
 	}
@@ -284,7 +292,7 @@ public class ManualView extends AbstractViewBasedView {
       getTreeViewer().setUseHashlookup(true);
       //create the source viewer
       this.sourceViewer = new SourceViewer(parentComposite, null, SWT.MULTI | SWT.BORDER
-            | SWT.FULL_SELECTION);
+            | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
       getSourceViewer().setEditable(false);
       parentComposite.setWeights(new int[]{15, 85});
       parentComposite.setOrientation(SWT.HORIZONTAL);
@@ -303,53 +311,57 @@ public class ManualView extends AbstractViewBasedView {
     * @param selection
     */
    protected void handleSelectionChanged(ISelection selection) {
-      Assert.isNotNull(selection);
-      Object[] elements = SWTUtil.toArray(selection);
-      for (Object element: elements) {
-         if (element instanceof ILaunch) {
-            element = ((ILaunch) element).getDebugTarget();
-         }
-         if (element instanceof IDebugElement) {
-            IDebugTarget target = ((IDebugElement) element).getDebugTarget();
-            if (target instanceof KeYDebugTarget) {
-               KeYDebugTarget keyTarget = (KeYDebugTarget) target;
-               if (!keyTarget.isTerminated()) {
-	        	   if (getProof() != null && !getProof().isDisposed()) {
-	        	      getProof().removeRuleAppListener(ruleAppListener);
-	        	      if (!getProof().equals(keyTarget.getProof())) {
-	        	         newProof = true;
-	        	      }
-	        	   } else {
-	        	      newProof = true;
-	        	   }
-               this.proof = keyTarget.getProof();
-               this.environment = keyTarget.getEnvironment();
-               environment.getProofControl().setMinimizeInteraction(true);
-               if (getTreeViewer() != null && getSourceViewer() != null) {
-                  updateViewer();
-               }
-               getProof().addRuleAppListener(ruleAppListener);
-               } else {
-                  proof = null;
-                  environment = null;
-                  return;
-               }
+      if (!beforeBaseViewUpdate) {
+         Assert.isNotNull(selection);
+         Object[] elements = SWTUtil.toArray(selection);
+         for (Object element: elements) {
+            if (element instanceof ILaunch) {
+               element = ((ILaunch) element).getDebugTarget();
             }
-            if (element instanceof IKeYSENode<?>) {
-               if (!(boolean) hideState.getValue()) {
-                  IKeYSENode<?> seNode = (IKeYSENode<?>) element;
+            if (element instanceof IDebugElement) {
+               IDebugTarget target = ((IDebugElement) element).getDebugTarget();
+               if (target instanceof KeYDebugTarget) {
+                  KeYDebugTarget keyTarget = (KeYDebugTarget) target;
+                  if (!keyTarget.isTerminated()) {
+   	        	   if (getProof() != null && !getProof().isDisposed()) {
+   	        	      getProof().removeRuleAppListener(ruleAppListener);
+   	        	      if (!getProof().equals(keyTarget.getProof())) {
+   	        	         newProof = true;
+   	        	      }
+   	        	   } else {
+   	        	      newProof = true;
+   	        	   }
+                  this.proof = keyTarget.getProof();
+                  this.environment = keyTarget.getEnvironment();
+                  environment.getProofControl().setMinimizeInteraction(true);
                   if (getTreeViewer() != null && getSourceViewer() != null) {
-                     Node keyNode = seNode.getExecutionNode().getProofNode();
-                     selectNode(keyNode);
-                     sourceViewerDecorator.showNode(keyNode, SymbolicExecutionUtil.createNotationInfo(getProof()));
+                     updateViewer();
+                  }
+                  getProof().addRuleAppListener(ruleAppListener);
+                  } else {
+                     proof = null;
+                     environment = null;
+                     return;
+                  }
+               }
+               if (element instanceof IKeYSENode<?>) {
+                  if (!(boolean) hideState.getValue()) {
+                     IKeYSENode<?> seNode = (IKeYSENode<?>) element;
+                     if (getTreeViewer() != null && getSourceViewer() != null) {
+                        Node keyNode = seNode.getExecutionNode().getProofNode();
+                        selectNode(keyNode);
+                        sourceViewerDecorator.showNode(keyNode, SymbolicExecutionUtil.createNotationInfo(getProof()));
+                     }
                   }
                }
             }
          }
-      }
-      if (elements.length == 0 && getTreeViewer() != null && sourceViewerDecorator != null) {
-         getTreeViewer().setInput(null);
-         sourceViewerDecorator.showNode(null, null);
+         if (elements.length == 0 && getTreeViewer() != null && sourceViewerDecorator != null) {
+            getTreeViewer().setInput(null);
+            sourceViewerDecorator.showNode(null, null);
+         }
+      } else {
+         beforeBaseViewUpdate = false;
       }
    }
 
