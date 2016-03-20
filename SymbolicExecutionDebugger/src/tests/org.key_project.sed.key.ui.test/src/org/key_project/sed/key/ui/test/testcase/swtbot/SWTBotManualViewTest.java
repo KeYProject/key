@@ -35,6 +35,74 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  *
  */
 public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
+	
+	@Test
+	public void testFilters() throws Exception {
+		IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+
+			@Override
+			public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
+				// step into
+				performStep(debugView, bot, target, 0, 0, 0);
+				SWTBotView manualView = getManualBotView(bot);
+				// activate hide intermediate proof steps filter
+				TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Hide Intermediate Proofsteps");
+				// check if hide intermediate proof steps filter is working
+				assertTrue(manualView.bot().tree().getTreeItem("10:OPEN GOAL") != null);
+				assertTrue(manualView.bot().tree().rowCount() == 1);
+				// select open goal and apply manual rule
+				TestUtilsUtil.selectInTree(manualView.bot().tree(), "10:OPEN GOAL");
+				final SWTBotStyledText styledText = manualView.bot().styledText();
+				Point point = TestUtilsUtil.selectText(styledText, "{exc:=null}");
+				TestUtilsUtil.setCursorLocation(styledText, point.x + 1, point.y + 15);
+				TestUtilsUtil.clickContextMenu(styledText, point.x + 1, point.y + 15, "ifElseUnfold");
+				// check if hide intermediate proof steps filter is still working
+				assertTrue(manualView.bot().tree().getTreeItem("11:OPEN GOAL") != null);
+				assertTrue(manualView.bot().tree().rowCount() == 1);
+				// deactivate hide intermediate proof steps filter
+				TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Hide Intermediate Proofsteps");
+				// activate show symbolic execution tree filter
+				TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Show Symbolic Execution Tree Only");
+				// check if show symbolic execution tree filter is working
+				assertTrue(manualView.bot().tree().getTreeItem("0:One Step Simplification: 1 rule") != null);
+				assertTrue(manualView.bot().tree().getTreeItem("8:result=self.equals(n)@Number;") != null);
+				assertTrue(manualView.bot().tree().getTreeItem("10:if (this.content==n.content) {                         return  true; }                 else  {                         return  false; }") != null);
+				assertTrue(manualView.bot().tree().rowCount() == 3);
+				// close the bot view
+				manualView.close();
+			}
+
+			@Override
+			public void configureDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+				TestUtilsUtil.openView(ManualView.VIEW_ID);
+			}
+
+			@Override
+			public void cleanupDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+				TestUtilsUtil.closeView(ManualView.VIEW_ID);
+			}
+		};
+		doKeYDebugTargetTest("SWTBotManualViewTest_testHideIntermediateProofStepsFilter", 
+                Activator.PLUGIN_ID, 
+                "data/number/test", 
+                true, 
+                true, 
+                createMethodSelector("Number", "equals", "QNumber;"), 
+                null, 
+                null, 
+                Boolean.FALSE, 
+                Boolean.FALSE, 
+                Boolean.FALSE, 
+                Boolean.FALSE, 
+                Boolean.FALSE, 
+                Boolean.FALSE, 
+                Boolean.FALSE, 
+                Boolean.FALSE, 
+                Boolean.FALSE, 
+                Boolean.TRUE, 
+                10, 
+                executor);
+	}
    
    /**
     * tests the manual rule application feature of the {@link ManualView}.

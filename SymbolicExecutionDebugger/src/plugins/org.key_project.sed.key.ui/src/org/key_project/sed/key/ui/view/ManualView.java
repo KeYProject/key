@@ -209,7 +209,6 @@ public class ManualView extends AbstractViewBasedView {
 	         if (hideCmd != null) {
 	            hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
 	            if (hideState != null) {
-	            	hideState.setValue(false); //TODO remove
 	            	hideState.addListener(hideStateListener);
 	            }
 	         }
@@ -218,7 +217,6 @@ public class ManualView extends AbstractViewBasedView {
 	         if (symbolicCmd != null) {
 	            symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
 	            if (symbolicState != null) {
-	            	symbolicState.setValue(false); //TODO remove
 	            	symbolicState.addListener(symbolicStateListener);
 	            }
 	         }
@@ -237,7 +235,6 @@ public class ManualView extends AbstractViewBasedView {
 				}
 			}
 			selectNode(newSelectedNode);
-//			sourceViewerDecorator.showNode(newSelectedNode, SymbolicExecutionUtil.createNotationInfo(newSelectedNode));
 			setManualRule(false);
 		}
 		
@@ -341,7 +338,6 @@ public class ManualView extends AbstractViewBasedView {
                   if (getTreeViewer() != null && getSourceViewer() != null) {
                      Node keyNode = seNode.getExecutionNode().getProofNode();
                      selectNode(keyNode);
-                     sourceViewerDecorator.showNode(keyNode, SymbolicExecutionUtil.createNotationInfo(getProof()));
                   }
                }
             }
@@ -554,8 +550,12 @@ public class ManualView extends AbstractViewBasedView {
       }
    }
    
+   /**
+	 * Makes sure that the given {@link Node} is known by the shown {@link TreeViewer}.
+	 * @param node The {@link Node} to make that is known by the shown {@link TreeViewer}.
+	 */
    protected void makeSureElementIsLoaded(Node node) {
-	// Collect unknown parents
+	   		// Collect unknown parents
 			Deque<Object> unknownParents = new LinkedList<Object>();
 			boolean unknown = true;
 			Object current = node;
@@ -582,12 +582,18 @@ public class ManualView extends AbstractViewBasedView {
 			}
    }
    
+   /**
+    * Selects the given node in the shown {@link TreeViewer}.
+    * @param node the {@link Node} to select.
+ 	*/
    protected void selectNode(Node node) {
+	   // Make sure that Node to select is loaded in lazy TreeViewer
 	   makeSureElementIsLoaded(node);
 	   
 	   Object parent = contentProvider.getParent(node);
 	   int viewIndex = contentProvider.getIndexOf(parent, node);
 	   
+	   // Select Node in lazy TreeViewer or the parent node when the node got filtered out
 	   if (viewIndex >= 0) {
 		   getTreeViewer().setSelection(SWTUtil.createSelection(node), true);
 		   sourceViewerDecorator.showNode(node, SymbolicExecutionUtil.createNotationInfo(proof));
