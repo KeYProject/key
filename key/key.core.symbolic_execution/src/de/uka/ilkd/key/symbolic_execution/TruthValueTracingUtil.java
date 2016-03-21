@@ -1001,6 +1001,19 @@ public final class TruthValueTracingUtil {
       }
       
       /**
+       * Updates a result.
+       * <p>
+       * <b>Warning: </b> {@link BranchResult}s are considered to be unmodifiable. This means that an update of the result needs to be done before results are shown to the user by the UI.
+       * @param termLabel The {@link FormulaTermLabel} to update.
+       * @param result The new result of the given {@link FormulaTermLabel}.
+       */
+      public void updateResult(FormulaTermLabel termLabel, MultiEvaluationResult result) {
+         if (termLabel != null) {
+            results.put(termLabel.getId(), result);
+         }
+      }
+      
+      /**
        * Returns the condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        * @return The condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        */

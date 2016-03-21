@@ -17,14 +17,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.KeYMethodContract;
-import org.key_project.sed.key.ui.property.AbstractTruthValueComposite.ILayoutListener;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * This composite provides the content shown in {@link PreconditionPropertySection}
@@ -63,9 +63,9 @@ public class PreconditionComposite extends AbstractTruthValueComposite {
     * {@inheritDoc}
     */
    @Override
-   protected Pair<Term, Term> computeTermToShow(IKeYSENode<?> node,
-                                                IExecutionNode<?> executionNode, 
-                                                Node keyNode) {
+   protected Triple<Term, PosInTerm, Term> computeTermToShow(IKeYSENode<?> node,
+                                                             IExecutionNode<?> executionNode, 
+                                                             Node keyNode) {
       if (node instanceof KeYMethodContract) {
          PosInOccurrence pio = executionNode.getModalityPIO();
          Term term;
@@ -80,7 +80,7 @@ public class PreconditionComposite extends AbstractTruthValueComposite {
          if (!INCLUDE_UPDATES) {
             term = TermBuilder.goBelowUpdates(term);
          }
-         return new Pair<Term, Term>(term, null);
+         return new Triple<Term, PosInTerm, Term>(term, null, null);
       }
       else {
          throw new IllegalArgumentException("Unsupported node.");

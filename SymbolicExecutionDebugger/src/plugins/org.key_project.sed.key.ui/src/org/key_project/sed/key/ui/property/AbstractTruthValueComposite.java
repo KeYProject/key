@@ -56,6 +56,7 @@ import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ObjectUtil;
 
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -70,12 +71,14 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.BranchResult;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.MultiEvaluationResult;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValueTracingResult;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * This composite provides the content shown in {@link AbstractTruthValuePropertySection}
@@ -293,19 +296,19 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
             // Get required information
             final IExecutionNode<?> executionNode = node.getExecutionNode();
             final Node keyNode = computeNodeToShow(node, executionNode);
-            final Pair<Term, Term> pair = computeTermToShow(node, executionNode, keyNode);
+            final Triple<Term, PosInTerm, Term> triple = computeTermToShow(node, executionNode, keyNode);
             // Compute result
             ITreeSettings settings = node.getExecutionNode().getSettings();
             final TruthValueTracingResult result = TruthValueTracingUtil.evaluate(keyNode, 
-                                                                                        FormulaTermLabel.NAME,
-                                                                                        settings.isUseUnicode(),
-                                                                                        settings.isUsePrettyPrinting());
+                                                                                  FormulaTermLabel.NAME,
+                                                                                  settings.isUseUnicode(),
+                                                                                  settings.isUsePrettyPrinting());
             if (!root.isDisposed()) {
                root.getDisplay().syncExec(new Runnable() {
                   @Override
                   public void run() {
                      if (!root.isDisposed()) {
-                        addNewContent(result, pair.first, pair.second, executionNode);
+                        addNewContent(result, triple.first, triple.second, triple.third, executionNode);
                      }
                   }
                });
@@ -353,26 +356,28 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    }
    
    /**
-    * Computes the {@link Sequent} to show.
+    * Computes the {@link Term} to show.
     * @param node The {@link IKeYSENode}.
     * @param executionNode The {@link IExecutionNode}.
     * @param keyNode The {@link Node}.
-    * @return The {@link Sequent} to show and optionally the uninterpreted predicate.
+    * @return The {@link Term} to show and optionally the {@link PosInTerm} of the uninterpreted predicate and the base of the {@link PosInTerm}.
     */
-   protected abstract Pair<Term, Term> computeTermToShow(IKeYSENode<?> node, 
-                                                         IExecutionNode<?> executionNode, 
-                                                         Node keyNode);
+   protected abstract Triple<Term, PosInTerm, Term> computeTermToShow(IKeYSENode<?> node, 
+                                                                      IExecutionNode<?> executionNode, 
+                                                                      Node keyNode);
 
    /**
     * Shows the given content.
     * @param result The {@link TruthValueTracingResult} to consider.
     * @param succedent The {@link Term} to show as succedent.
-    * @param uninterpretedPredicate The optional {@link Term} with the uninterpreted predicate offering the {@link FormulaTermLabel}.
+    * @param uninterpretedPredicatePosition The optional {@link PosInTerm} with the uninterpreted predicate.
+    * @param uninterpretedPredicateGroundTerm The {@link Term} in which the {@link PosInTerm} is evaluated in.
     * @param node The {@link IKeYSENode} which provides the new content.
     */
    protected void addNewContent(TruthValueTracingResult result,
                                 Term succedent,
-                                Term uninterpretedPredicate,
+                                PosInTerm uninterpretedPredicatePosition,
+                                Term uninterpretedPredicateGroundTerm,
                                 IExecutionNode<?> executionNode) {
       removeOldContent();
       BranchResult[] branchResults = result.getBranchResults();
@@ -394,7 +399,33 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
       });
       Color notConsideredColor = null;
       for (BranchResult branchResult : branchResults) {
-         if (shouldShowBranchResult(branchResult, uninterpretedPredicate)) {
+         if (shouldShowBranchResult(branchResult, uninterpretedPredicatePosition, uninterpretedPredicateGroundTerm)) {
+            // Remove uninterpreted predicate from expressions. Currently, only the AND operator is supported and should be needed.
+            if (uninterpretedPredicatePosition != null) {
+               PosInTerm currentPosition = uninterpretedPredicatePosition;
+               final Term uninterpretedPredicate = currentPosition.getSubTerm(uninterpretedPredicateGroundTerm);
+               while (currentPosition != null) {
+                  Term currentTerm = currentPosition.getSubTerm(uninterpretedPredicateGroundTerm);
+                  FormulaTermLabel label = (FormulaTermLabel)currentTerm.getLabel(FormulaTermLabel.NAME);
+                  MultiEvaluationResult labelResult = branchResult.getResult(label);
+                  if (labelResult != null) {
+                     Term instructionTerm = labelResult.getInstructionTerm();
+                     if (instructionTerm != null && instructionTerm.op() == Junctor.AND) {
+                        if (instructionTerm.sub(0).op() == uninterpretedPredicate.op()) {
+                           instructionTerm = instructionTerm.sub(1);
+                           labelResult = labelResult.newInstructionTerm(instructionTerm);
+                           branchResult.updateResult(label, labelResult);
+                        }
+                        else if (instructionTerm.sub(1).op() == uninterpretedPredicate.op()) {
+                           instructionTerm = instructionTerm.sub(0);
+                           labelResult = labelResult.newInstructionTerm(instructionTerm);
+                           branchResult.updateResult(label, labelResult);
+                        }
+                     }
+                  }
+                  currentPosition = currentPosition.up();
+               }
+            }
             // Create group
             Group viewerGroup = factory.createGroup(root, "Node " + branchResult.getLeafNode().serialNr());
             viewerGroup.setLayout(new FillLayout());
@@ -433,12 +464,14 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    /**
     * Check is the given {@link BranchResult} should be shown.
     * @param branchResult The {@link BranchResult} to check.
-    * @param uninterpretedPredicate The uninterpreted predicate which provides the {@link FormulaTermLabel}.
+    * @param uninterpretedPredicatePosition The uninterpreted predicate which provides the {@link FormulaTermLabel}.
+    * @param uninterpretedPredicateGroundTerm The {@link Term} in which the {@link PosInTerm} is evaluated in.
     * @return {@code true} show branch result, {@code false} do not show branch result.
     */
-   protected boolean shouldShowBranchResult(BranchResult branchResult, Term uninterpretedPredicate) {
+   protected boolean shouldShowBranchResult(BranchResult branchResult, PosInTerm uninterpretedPredicatePosition, Term uninterpretedPredicateGroundTerm) {
       if (branchResult != null) {
-         if (uninterpretedPredicate != null) {
+         if (uninterpretedPredicatePosition != null) {
+            Term uninterpretedPredicate = uninterpretedPredicatePosition.getSubTerm(uninterpretedPredicateGroundTerm);
             TermLabel label = uninterpretedPredicate.getLabel(FormulaTermLabel.NAME);
             if (label instanceof FormulaTermLabel) {
                TruthValue result = branchResult.evaluate((FormulaTermLabel) label);
@@ -461,18 +494,28 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * Searches the {@link Term} with the uninterpreted predicate.
     * @param term The {@link Term} to start search at.
     * @param uninterpretedPredicate The {@link Term} of the proof obligation which specifies the uninterpreted predicate.
-    * @return The found {@link Term} or {@code null} if not available.
+    * @return The {@link PosInTerm} of the uninterpreted predicate.
     */
-   protected Term findUninterpretedPredicateTerm(Term term, Term uninterpretedPredicate) {
+   protected PosInTerm findUninterpretedPredicateTerm(Term term, Term uninterpretedPredicate) {
+      return findUninterpretedPredicateTerm(term, uninterpretedPredicate, PosInTerm.getTopLevel());
+   }
+      
+   /**
+    * Searches the {@link Term} with the uninterpreted predicate.
+    * @param term The {@link Term} to start search at.
+    * @param uninterpretedPredicate The {@link Term} of the proof obligation which specifies the uninterpreted predicate.
+    * @return The {@link PosInTerm} of the uninterpreted predicate.
+    */
+   protected PosInTerm findUninterpretedPredicateTerm(Term term, Term uninterpretedPredicate, PosInTerm current) {
       if (uninterpretedPredicate != null) {
          if (term.op() == uninterpretedPredicate.op()) {
-            return term;
+            return current;
          }
          else if (term.op() == Junctor.AND) {
-            Term result = null;
+            PosInTerm result = null;
             int i = 0;
             while (result == null && i < term.arity()) {
-               result = findUninterpretedPredicateTerm(term.sub(i), uninterpretedPredicate);
+               result = findUninterpretedPredicateTerm(term.sub(i), uninterpretedPredicate, current.down(i));
                i++;
             }
             return result;
