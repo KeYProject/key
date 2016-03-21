@@ -608,7 +608,7 @@ public class MainViewController extends NUIController implements Observer {
                     AbstractProblemLoader loader = ui.load(null, proofFileName,
                             null, null, null, null, false);
                     InitConfig initConfig = loader.getInitConfig();
-                    keyEnvironment = new KeYEnvironment<DefaultUserInterfaceControl>(
+                    keyEnvironment = new KeYEnvironment<>(
                             ui, initConfig, loader.getProof(),
                             loader.getResult());
                     /*
