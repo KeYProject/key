@@ -38,12 +38,12 @@ public class FilteringHandler {
     /**
      * Prefix for binary class files.
      */
-    static final String BINARY_NAME_PREFIX = "de.uka.ilkd.key.nui.prooftree.filter.";
+    private static final String BINARY_NAME_PREFIX = "de.uka.ilkd.key.nui.prooftree.filter.";
 
     /**
      * Path where filter classes are stored.
      */
-    static final String FILTER_PATH = "filter/";
+    private static final String FILTER_PATH = "filter/";
 
     /**
      * The data model.
@@ -126,11 +126,12 @@ public class FilteringHandler {
     public void toggleFilteringStatus(final ProofTreeFilter filter) {
         final boolean newState = !filtersMap.get(filter);
         filtersMap.put(filter, newState);
-        
-        /* Attention this checks conflicts between filters. By this filters
-         * cannot be removed anymore from the package.
-         * For the future it is planned to develop a dynamic method. This is
-         * talked about with Richard Bubel.
+
+        /*
+         * Attention this checks conflicts between filters. By this filters
+         * cannot be removed anymore from the package. For the future it is
+         * planned to develop a dynamic method. This is talked about with
+         * Richard Bubel.
          */
         // Begin
         if (filter instanceof FilterHideIntermediate) {
@@ -208,9 +209,7 @@ public class FilteringHandler {
                     final String fileName = entries.nextElement().getName();
 
                     if (fileName.matches("(de/uka/ilkd/key/nui/prooftree/filter/).*(.class)")) {
-
-                        final URL url = new File(fileName).toURI().toURL();
-                        listOfURLs.add(url);
+                        listOfURLs.add(new File(fileName).toURI().toURL());
                         listOfFileNames.add(fileName.substring(fileName.lastIndexOf('/') + 1,
                                 fileName.length()));
                     }
@@ -244,20 +243,16 @@ public class FilteringHandler {
             }
         }
 
-        // Convert listOfURLs to an array of URLs. This array is needed for the
-        // classLoader
-        URL[] urls = new URL[listOfURLs.size()];
-        urls = listOfURLs.toArray(urls);
-
-        ClassLoader classLoader = null;
         try {
+            // Convert listOfURLs to an array of URLs. This array is needed for the classLoader
+            final URL[] urls = listOfURLs.toArray(new URL[] {});
+
             // initialize classLoader
-            classLoader = new URLClassLoader(urls);
-            String binaryClassName = null;
+            final URLClassLoader classLoader = new URLClassLoader(urls);
 
             for (final String fileName : listOfFileNames) {
                 // build binaryClassName to load class with classLoader
-                binaryClassName = BINARY_NAME_PREFIX
+                final String binaryClassName = BINARY_NAME_PREFIX
                         + fileName.substring(0, fileName.lastIndexOf('.'));
 
                 // Load possible filter class
@@ -280,8 +275,10 @@ public class FilteringHandler {
                     }
                 }
             }
+            classLoader.close();
         }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+        catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                | IOException e) {
             e.printStackTrace();
         }
 
