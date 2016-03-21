@@ -15,20 +15,12 @@ package de.uka.ilkd.key.logic;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -70,7 +62,7 @@ class TermImpl implements Term {
      * can't be cached because it is possible that the contained meta information
      * inside the {@link JavaBlock}, e.g. {@link PositionInfo}s, are different.
      */
-    private boolean containsJavaBlockRecursive = false;
+    private ThreeValuedTruth containsJavaBlockRecursive = ThreeValuedTruth.UNKNOWN;
     
     //-------------------------------------------------------------------------
     //constructors
@@ -88,7 +80,6 @@ class TermImpl implements Term {
 	this.javaBlock = javaBlock == null 
 	                 ? JavaBlock.EMPTY_JAVABLOCK 
 	                 : javaBlock;
-	computeContainsJavaBlockRecursive();
     }
     
 
@@ -97,25 +88,7 @@ class TermImpl implements Term {
     //internal methods
     //------------------------------------------------------------------------- 
     
-    /**
-     * Computes if a non empty {@link JavaBlock} is available in this {@link Term}
-     * or in one of its direct or indirect children. The result is stored in
-     * {@link #containsJavaBlockRecursive} available via {@link #isContainsJavaBlockRecursive()}.
-     */
-    private void computeContainsJavaBlockRecursive() {
-        if (javaBlock != null && !javaBlock.isEmpty()) {
-           containsJavaBlockRecursive = true;
-        }
-        else {
-	  for (int i = 0; i<subs.size(); i++) {
-              if (subs.get(i).isContainsJavaBlockRecursive()) {
-                 containsJavaBlockRecursive = true;
-		 return;
-              }
-           }
-        }
-    }
-
+   
    private void determineFreeVars() {
 	freeVars = DefaultImmutableSet.<QuantifiableVariable>nil();
         
@@ -142,10 +115,10 @@ class TermImpl implements Term {
      * TermCreationException is thrown.  
      */
     public Term checked() {
-    	if(op().validTopLevel(this)) {
+    	if (op.validTopLevel(this)) {
 	    return this;
 	} else {
-	    throw new TermCreationException(op(), this);
+	    throw new TermCreationException(op, this);
 	}
     }    
     
@@ -177,16 +150,6 @@ class TermImpl implements Term {
     @Override
     public Term sub(int nr) {
 	return subs.get(nr);
-    }
-    
-    
-    @Override
-    public Term subAt(PosInTerm pos) {
-        Term sub = this;
-        for(int i = 0; i<pos.depth(); i++) {	
-            sub = sub.sub(pos.getIndexAt(i));
-        }
-        return sub;
     }
     
     
@@ -610,6 +573,20 @@ class TermImpl implements Term {
      */
     @Override
     public boolean isContainsJavaBlockRecursive() {
-        return containsJavaBlockRecursive;
+        if ( containsJavaBlockRecursive == ThreeValuedTruth.UNKNOWN ) {
+            ThreeValuedTruth result = ThreeValuedTruth.FALSE;
+            if (javaBlock != null && !javaBlock.isEmpty() ) {
+                result = ThreeValuedTruth.TRUE;
+            } else {                
+                for (int i = 0, arity = subs.size(); i<arity; i++) {
+                    if (subs.get(i).isContainsJavaBlockRecursive()) {
+                        result = ThreeValuedTruth.TRUE;
+                        break;
+                    }
+                }
+            }
+            this.containsJavaBlockRecursive = result;
+        }
+        return containsJavaBlockRecursive == ThreeValuedTruth.TRUE;        
     }
 }

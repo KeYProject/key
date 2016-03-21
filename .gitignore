@@ -23,3 +23,6 @@ smt-solvers
 *.nav
 *.out
 *.snm
+
+*.serialized
+**/testresults/**

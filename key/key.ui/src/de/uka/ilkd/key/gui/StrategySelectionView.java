@@ -235,6 +235,7 @@ public final class StrategySelectionView extends JPanel {
             components.setMaxRuleAppSlider(maxSlider);
             maxSlider.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent e) {
+                    predefChanged = true;
                     refreshDefaultButton();
                 }
             });
@@ -512,12 +513,13 @@ public final class StrategySelectionView extends JPanel {
                                     .createDefaultStrategyProperties();
                 }
 
-                predefChanged = false;
-
                 mediator.getSelectedProof().getSettings().getStrategySettings()
                         .setMaxSteps(newMaxSteps);
                 updateStrategySettings(JAVACARDDL_STRATEGY_NAME, newProps);
+
+                predefChanged = false;
                 refresh(mediator.getSelectedProof());
+
             }
         });
 
@@ -686,13 +688,13 @@ public final class StrategySelectionView extends JPanel {
          * Maps a property key to the {@link JRadioButton}s which defines the
          * values.
          */
-        private Map<String, List<JRadioButton>> propertyButtons =
+        private final Map<String, List<JRadioButton>> propertyButtons =
                 new HashMap<String, List<JRadioButton>>();
 
         /**
          * Maps a property to the used {@link ButtonGroup}.
          */
-        private Map<String, ButtonGroup> propertyGroups =
+        private final Map<String, ButtonGroup> propertyGroups =
                 new HashMap<String, ButtonGroup>();
 
         /**

@@ -154,7 +154,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
     protected boolean noDuplicateFindTaclet(TacletApp app,
                                             PosInOccurrence pos,
                                             Goal goal) {
-        final SequentFormula focusFor = pos.constrainedFormula ();
+        final SequentFormula focusFor = pos.sequentFormula ();
         final boolean antec = pos.isInAntec ();
     
         Node node = goal.node ();

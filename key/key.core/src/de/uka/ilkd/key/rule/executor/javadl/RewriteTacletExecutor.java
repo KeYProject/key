@@ -84,9 +84,9 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
                     Services           services,
                     MatchConditions    matchCond,
                     RuleApp ruleApp) {
-    Term term = posOfFind.constrainedFormula().formula();
-    IntIterator it = posOfFind.posInTerm().iterator();
-    Term rwTemplate=gt.replaceWith();
+    final Term term = posOfFind.sequentFormula().formula();
+    final IntIterator it = posOfFind.posInTerm().iterator();
+    final Term rwTemplate = gt.replaceWith();
 
     Term formula = replace(term,
                            rwTemplate,
@@ -101,7 +101,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
                            ruleApp);
     formula = TermLabelManager.refactorSequentFormula(termLabelState, services, formula, posOfFind, taclet, goal, null, rwTemplate);
     if(term == formula) {
-        return posOfFind.constrainedFormula();
+        return posOfFind.sequentFormula();
     } else {
         return new SequentFormula(formula);
     }
@@ -144,7 +144,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
          // Then there was no replacewith...
          // This is strange in a RewriteTaclet, but who knows...
          // However, term label refactorings have to be performed.
-         Term oldFormula = posOfFind.constrainedFormula().formula();
+         Term oldFormula = posOfFind.sequentFormula().formula();
          Term newFormula = TermLabelManager.refactorSequentFormula(termLabelState, services, oldFormula, 
                  posOfFind, taclet, goal, null, null);
          if (oldFormula != newFormula) {

@@ -228,7 +228,7 @@ public class TermPropertySection extends AbstractNodePropertySection {
                         ;
                      }
                   }
-                  sb.append(" of " + pio.constrainedFormula());
+                  sb.append(" of " + pio.sequentFormula());
                }
             }
          }

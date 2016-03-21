@@ -418,7 +418,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             ifFmlInst = null;
         } else {          
             final IfFormulaInstSeq ifInst = new IfFormulaInstSeq(seq,
-	        ifPIO.isInAntec(), ifPIO.constrainedFormula());
+	        ifPIO.isInAntec(), ifPIO.sequentFormula());
             ifFmlInst = ImmutableSLList.<IfFormulaInstantiation>nil()
                     .prepend(ifInst);
         }

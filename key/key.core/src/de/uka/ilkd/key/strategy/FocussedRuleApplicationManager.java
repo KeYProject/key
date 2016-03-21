@@ -151,7 +151,7 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     private boolean isSameFormula (PosInOccurrence pio1,
                                    PosInOccurrence pio2) {
         return pio2.isInAntec () == pio1.isInAntec ()
-               && pio2.constrainedFormula ().equals ( pio1.constrainedFormula () );
+               && pio2.sequentFormula ().equals ( pio1.sequentFormula () );
     }
 
     private PosInOccurrence getPIOForFocussedSubterm () {
@@ -162,7 +162,7 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
 
         return
             focussedSubterm
-            .replaceConstrainedFormula ( formula.constrainedFormula () );
+            .replaceConstrainedFormula ( formula.sequentFormula () );
     }
     
     private boolean isBelow (PosInOccurrence over, PosInOccurrence under) {

@@ -70,11 +70,11 @@ public class PreconditionComposite extends AbstractTruthValueComposite {
          PosInOccurrence pio = executionNode.getModalityPIO();
          Term term;
          if (pio.isInAntec()) {
-            int index = executionNode.getProofNode().sequent().antecedent().indexOf(pio.constrainedFormula());
+            int index = executionNode.getProofNode().sequent().antecedent().indexOf(pio.sequentFormula());
             term = keyNode.sequent().antecedent().get(index).formula();
          }
          else {
-            int index = executionNode.getProofNode().sequent().succedent().indexOf(pio.constrainedFormula());
+            int index = executionNode.getProofNode().sequent().succedent().indexOf(pio.sequentFormula());
             term = keyNode.sequent().succedent().get(index).formula();
          }
          if (!INCLUDE_UPDATES) {

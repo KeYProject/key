@@ -38,7 +38,7 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Analyser analyser = new Analyser ();
-        if ( !analyser.analyse ( pos.constrainedFormula ().formula () ) )
+        if ( !analyser.analyse ( pos.sequentFormula ().formula () ) )
             return false;
 
         if ( analyser.binOp == Junctor.AND )

@@ -81,7 +81,7 @@ public class Proof implements Named {
     /**
      * The time when the {@link Proof} instance was created.
      */
-    final long creationTime = System.nanoTime();
+    final long creationTime = System.currentTimeMillis();
 
     /** name of the proof */
     private final Name name;

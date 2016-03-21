@@ -411,13 +411,13 @@ public final class OneStepSimplifier implements BuiltInRule {
 
         SVInstantiations svi = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         FormulaSV sv = SchemaVariableFactory.createFormulaSV(new Name("b"));
-        svi.add(sv, pio.constrainedFormula().formula(), lastProof.getServices());
+        svi.add(sv, pio.sequentFormula().formula(), lastProof.getServices());
 
         PosInOccurrence applicatinPIO = new PosInOccurrence(new SequentFormula(formula), 
                                                             PosInTerm.getTopLevel(), // TODO: This should be the precise sub term
                                                             inAntecedent); // It is required to create a new PosInOccurrence because formula and pio.constrainedFormula().formula() are only equals module renamings and term labels
         ImmutableList<IfFormulaInstantiation> ifInst = ImmutableSLList.nil();
-        ifInst = ifInst.append(new IfFormulaInstDirect(pio.constrainedFormula()));
+        ifInst = ifInst.append(new IfFormulaInstDirect(pio.sequentFormula()));
         TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO, lastProof.getServices());
         return ta;
     }
@@ -469,7 +469,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         //collect context formulas (potential if-insts for replace-known)
         final Map<TermReplacementKey,PosInOccurrence> context
             = new LinkedHashMap<TermReplacementKey,PosInOccurrence>();
-        final SequentFormula cf = ossPIO.constrainedFormula();
+        final SequentFormula cf = ossPIO.sequentFormula();
         for(SequentFormula ante : seq.antecedent()) {
             if(!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
                 context.put(
@@ -583,7 +583,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
         //applicable to the formula?
         return applicableTo(goal.proof().getServices(),
-                        pio.constrainedFormula(),
+                        pio.sequentFormula(),
                         pio.isInAntec(),
                         goal,
                         null);

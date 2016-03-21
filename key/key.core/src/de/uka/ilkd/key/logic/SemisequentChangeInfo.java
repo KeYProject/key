@@ -86,7 +86,7 @@ public class SemisequentChangeInfo {
 	// This information can overwrite older records about removed
 	// formulas
 	removed  = removed.removeAll
-	    ( fci.getPositionOfModification ().constrainedFormula () );
+	    ( fci.getPositionOfModification ().sequentFormula () );
 	modified = modified.prepend ( fci );
 	lastFormulaIndex = idx;
     }
