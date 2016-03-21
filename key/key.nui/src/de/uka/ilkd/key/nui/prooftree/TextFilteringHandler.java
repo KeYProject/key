@@ -26,9 +26,9 @@ public final class TextFilteringHandler {
         // label matches -> copy subtree
         if (matchesFilter(root, search)) {
             // TODO set parent??
-            final NUINode filteredTreeRoot = root.clone();
+            //final NUINode filteredTreeRoot = root.clone();
 
-            return filteredTreeRoot;
+            //return filteredTreeRoot;
         }
         // branch nodes -> look at children
         else if (root instanceof NUIBranchNode) {
@@ -46,7 +46,7 @@ public final class TextFilteringHandler {
             // if children match it is also a match
             if (!matchedChildren.isEmpty()) {
 
-                final NUIBranchNode filteredRoot = rootBN.cloneWithoutChildren();
+                final NUIBranchNode filteredRoot = null;//rootBN.cloneWithoutChildren();
                 filteredRoot.setChildren(matchedChildren);
 
                 // set parent for children

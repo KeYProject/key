@@ -54,37 +54,6 @@ public class NUIBranchNode extends NUINode {
 
     }
 
-    @Override
-    public NUIBranchNode clone() throws CloneNotSupportedException {
-        // create clone
-        final NUIBranchNode cloned = new NUIBranchNode(proofParentNode);
-        this.copyFields(this, cloned);
-
-        // set children
-        final LinkedList<NUINode> newChildren = new LinkedList<>();
-        for (final NUINode child : this.children) {
-            final NUINode clonedChild = child.clone();
-            clonedChild.setParent(cloned);
-            newChildren.add(clonedChild);
-        }
-        cloned.setChildren(newChildren);
-
-        return cloned;
-    }
-
-    /**
-     * Clones the branch node without children. The children list will be empty.
-     * 
-     * @return the cloned branch node
-     */
-    public NUIBranchNode cloneWithoutChildren() {
-        // create clone
-        final NUIBranchNode cloned = new NUIBranchNode(proofParentNode);
-        this.copyFields(this, cloned);
-
-        return cloned;
-    }
-
     /**
      * Returns a list of children of the branch node.
      * 

@@ -20,6 +20,9 @@ import java.util.jar.JarFile;
 import de.uka.ilkd.key.nui.DataModel;
 import de.uka.ilkd.key.nui.prooftree.filter.FilterAnnotation;
 import de.uka.ilkd.key.nui.prooftree.filter.FilterCombineAND;
+import de.uka.ilkd.key.nui.prooftree.filter.FilterHideIntermediate;
+import de.uka.ilkd.key.nui.prooftree.filter.FilterHideNonInteractive;
+import de.uka.ilkd.key.nui.prooftree.filter.FilterHideNonSymbolicExecution;
 import de.uka.ilkd.key.nui.prooftree.filter.FilterShowAll;
 import de.uka.ilkd.key.nui.prooftree.filter.ProofTreeFilter;
 
@@ -123,6 +126,30 @@ public class FilteringHandler {
     public void toggleFilteringStatus(final ProofTreeFilter filter) {
         final boolean newState = !filtersMap.get(filter);
         filtersMap.put(filter, newState);
+        
+        /* Attention this checks conflicts between filters. By this filters
+         * cannot be removed anymore from the package.
+         * For the future it is planned to develop a dynamic method. This is
+         * talked about with Richard Bubel.
+         */
+        // Begin
+        if (filter instanceof FilterHideIntermediate) {
+            filtersMap.forEach((mapFilter, active) -> {
+                if (active && (mapFilter instanceof FilterHideNonInteractive
+                        || mapFilter instanceof FilterHideNonSymbolicExecution)) {
+                    filtersMap.put(mapFilter, false);
+                }
+            });
+        }
+        else if (filter instanceof FilterHideNonInteractive
+                || filter instanceof FilterHideNonSymbolicExecution) {
+            filtersMap.forEach((mapFilter, active) -> {
+                if (active && mapFilter instanceof FilterHideIntermediate) {
+                    filtersMap.put(mapFilter, false);
+                }
+            });
+        }
+        // End
 
         applyFilters();
     }
