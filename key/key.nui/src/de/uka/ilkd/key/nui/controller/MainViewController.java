@@ -20,7 +20,6 @@ import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.application.Platform;
@@ -608,7 +607,7 @@ public class MainViewController extends NUIController implements Observer {
                     AbstractProblemLoader loader = ui.load(null, proofFileName,
                             null, null, null, null, false);
                     InitConfig initConfig = loader.getInitConfig();
-                    keyEnvironment = new KeYEnvironment<DefaultUserInterfaceControl>(
+                    keyEnvironment = new KeYEnvironment<>(
                             ui, initConfig, loader.getProof(),
                             loader.getResult());
                     /*

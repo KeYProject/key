@@ -46,7 +46,7 @@ public final class TextFilteringHandler {
             // if children match it is also a match
             if (!matchedChildren.isEmpty()) {
 
-                final NUIBranchNode filteredRoot = rootBN.cloneWithoutChildren();
+                final NUIBranchNode filteredRoot = null;//rootBN.cloneWithoutChildren();
                 filteredRoot.setChildren(matchedChildren);
 
                 // set parent for children

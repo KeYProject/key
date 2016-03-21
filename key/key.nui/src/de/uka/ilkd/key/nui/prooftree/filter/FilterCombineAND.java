@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.nui.prooftree.filter;
 
-import java.util.function.Predicate;
-
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 
 /**

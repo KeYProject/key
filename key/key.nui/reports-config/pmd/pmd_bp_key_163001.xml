@@ -58,7 +58,6 @@
    <rule ref="rulesets/java/basic.xml/BigIntegerInstantiation"/>
    <rule ref="rulesets/java/naming.xml/BooleanGetMethodName"/>
    <rule ref="rulesets/java/basic.xml/BooleanInstantiation"/>
-<!--   <rule ref="rulesets/java/controversial.xml/BooleanInversion"/> -->
    <rule ref="rulesets/java/basic.xml/BrokenNullCheck"/>
    <rule ref="rulesets/java/migrating.xml/ByteInstantiation"/>
    <rule ref="rulesets/java/android.xml/CallSuperFirst"/>
@@ -74,8 +73,6 @@
    <rule ref="rulesets/java/design.xml/CloseResource"/>
    <rule ref="rulesets/java/basic.xml/CollapsibleIfStatements"/>
    <rule ref="rulesets/java/comments.xml/CommentContent"/>
-   <rule ref="rulesets/java/comments.xml/CommentRequired"/>
-   <rule ref="rulesets/java/comments.xml/CommentSize"/>
    <rule ref="rulesets/java/design.xml/CompareObjectsWithEquals"/>
    <rule ref="rulesets/java/design.xml/ConfusingTernary"/>
    <rule ref="rulesets/java/strings.xml/ConsecutiveAppendsShouldReuse"/>
@@ -161,7 +158,6 @@
    <rule ref="rulesets/java/migrating.xml/LongInstantiation"/>
    <rule ref="rulesets/java/naming.xml/LongVariable"/>
    <rule ref="rulesets/java/coupling.xml/LooseCoupling"/>
-   <!-- <rule ref="rulesets/java/coupling.xml/LoosePackageCoupling"/> -->
    <rule ref="rulesets/java/j2ee.xml/MDBAndSessionBeanNamingConvention"/>
    <rule ref="rulesets/java/optimizations.xml/MethodArgumentCouldBeFinal"/>
    <rule ref="rulesets/java/naming.xml/MethodNamingConventions"/>
@@ -262,7 +258,6 @@
    <rule ref="rulesets/java/logging-jakarta-commons.xml/UseCorrectExceptionLogging"/>
    <rule ref="rulesets/java/strings.xml/UseEqualsToCompareStrings"/>
    <rule ref="rulesets/java/strings.xml/UseIndexOfChar"/>
-   <rule ref="rulesets/java/design.xml/UseLocaleWithCaseConversions"/>
    <rule ref="rulesets/java/design.xml/UseNotifyAllInsteadOfNotify"/>
    <rule ref="rulesets/java/controversial.xml/UseObjectForClearerAPI"/>
    <rule ref="rulesets/java/j2ee.xml/UseProperClassLoader"/>
