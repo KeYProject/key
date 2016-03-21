@@ -43,10 +43,11 @@ public class StrategyViewController extends NUIController implements Observer {
     /**
      * The default value for the maximum number of rule applications.
      */
-    private static int DEFAULT_MAX_RULE_APPL = 10;
+    private static int defaultMaxRuleApplications = 10;
 
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired",
+            "PMD.AvoidDuplicateLiterals" })
     private ToggleGroup arithmeticTreatment;
 
     @FXML
@@ -65,7 +66,7 @@ public class StrategyViewController extends NUIController implements Observer {
      * The current value of the slider.
      */
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
-    private int currentSliderValue = DEFAULT_MAX_RULE_APPL;
+    private int currSliderVal = defaultMaxRuleApplications;
 
     @FXML
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
@@ -131,7 +132,7 @@ public class StrategyViewController extends NUIController implements Observer {
 
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
 
-    private StrategyWrapper strategyWrapper = null;
+    private StrategyWrapper strategyWrapper;
 
     @FXML
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
@@ -151,7 +152,7 @@ public class StrategyViewController extends NUIController implements Observer {
      * @return
      */
     public int getCurrentSliderValue() {
-        return currentSliderValue;
+        return currSliderVal;
     }
 
     /**
@@ -180,63 +181,68 @@ public class StrategyViewController extends NUIController implements Observer {
      */
     public void handleOnAction(final ActionEvent actionEvent) throws ControllerNotFoundException {
 
-        String filename;
-        try {
-            filename = dataModel.getLoadedTreeViewState().getProof().getProofFile().getName();
-        }
-        catch (NullPointerException e2) {
+        final String filename;
+        final TreeViewState loadedTreeViewState = dataModel.getLoadedTreeViewState();
+        if (loadedTreeViewState == null) {
             nui.updateStatusbar(bundle.getString("errorProofFileMissing"));
-            return;
+
         }
+        else {
 
-        // retrieve proof file and init proofStarter
+            filename = dataModel.getLoadedTreeViewState().getProof().getProofFile().getName();
 
-        final TreeViewState treeViewState = dataModel.getTreeViewState(filename);
-        final Proof proof = treeViewState.getProof();
-        final ProofStarter proofStarter = new ProofStarter(false);
-        proofStarter.init(proof);
+            // retrieve proof file and init proofStarter
 
-        // TODO
-        final Strategy strategy = strategyWrapper.getStrategy();
-        proofStarter.setStrategy(strategy);
-        // restrict maximum number of rule applications based on slider value
-        // only set value of slider if slider was moved
-        if (currentSliderValue > 0) {
-            proofStarter.setMaxRuleApplications(currentSliderValue);
-        }
+            final TreeViewState treeViewState = dataModel.getTreeViewState(filename);
+            final Proof proof = treeViewState.getProof();
+            final ProofStarter proofStarter = new ProofStarter(false);
+            proofStarter.init(proof);
 
-        // start automatic proof
-        final ApplyStrategyInfo strategyInfo = proofStarter.start();
+            // TODO
+            final Strategy strategy = strategyWrapper.getStrategy();
+            proofStarter.setStrategy(strategy);
+            // restrict maximum number of rule applications based on slider
+            // value
+            // only set value of slider if slider was moved
+            if (currSliderVal > 0) {
+                proofStarter.setMaxRuleApplications(currSliderVal);
+            }
 
-        // update statusbar
-        nui.updateStatusbar(strategyInfo.reason());
+            // start automatic proof
+            final ApplyStrategyInfo strategyInfo = proofStarter.start();
 
-        // if automatic rule application could not be performed -> no rendering
-        // of proof required
-        if (strategyInfo.getAppliedRuleApps() > 0) {
-            // load updated proof
-            final Proof updatedProof = proofStarter.getProof();
+            // update statusbar
+            nui.updateStatusbar(strategyInfo.reason());
 
-            // create new tree from updateProof
+            // if automatic rule application could not be performed -> no
+            // rendering
+            // of proof required
+            if (strategyInfo.getAppliedRuleApps() > 0) {
+                // load updated proof
+                final Proof updatedProof = proofStarter.getProof();
 
-            final ProofTreeItem fxtree = new ProofTreeConverter(updatedProof).createFXProofTree();
+                // create new tree from updateProof
 
-            // Create new TreeViewState for updatedProof
-            final TreeViewState updatedTreeViewState = new TreeViewState(updatedProof, fxtree);
+                final ProofTreeItem fxtree = new ProofTreeConverter(updatedProof)
+                        .createFXProofTree();
 
-            // update datamodel
-            dataModel.saveTreeViewState(updatedTreeViewState, filename);
+                // Create new TreeViewState for updatedProof
+                final TreeViewState updatedTreeViewState = new TreeViewState(updatedProof, fxtree);
 
+                // update datamodel
+                dataModel.saveTreeViewState(updatedTreeViewState, filename);
+
+            }
         }
     }
 
     /**
      * TODO
      * 
-     * @param currentSliderValue
+     * @param currSliderVal
      */
-    public void setCurrentSliderValue(final int currentSliderValue) {
-        this.currentSliderValue = currentSliderValue;
+    public void setCurrSliderVal(final int currSliderVal) {
+        this.currSliderVal = currSliderVal;
     }
 
     /**
@@ -244,7 +250,7 @@ public class StrategyViewController extends NUIController implements Observer {
      * 
      * @param goButtonImage
      */
-    public void setGoButtonImage(ImageView goButtonImage) {
+    public void setGoButtonImage(final ImageView goButtonImage) {
         this.goButtonImage = goButtonImage;
     }
 
@@ -253,7 +259,7 @@ public class StrategyViewController extends NUIController implements Observer {
      * 
      * @param strategyWrapper
      */
-    public void setStrategyWrapper(StrategyWrapper strategyWrapper) {
+    public void setStrategyWrapper(final StrategyWrapper strategyWrapper) {
         this.strategyWrapper = strategyWrapper;
     }
 
@@ -357,7 +363,6 @@ public class StrategyViewController extends NUIController implements Observer {
             }
 
             @Override
-
             public String toString(final Double n) {
                 final int val = (int) Math.pow(10, n);
                 if (val < 10000) {
@@ -376,10 +381,10 @@ public class StrategyViewController extends NUIController implements Observer {
 
         maxRuleAppSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             calculateCurrentSliderValue(newVal);
-            maxRuleAppLabel.setText(bundle.getString("maxRuleAppLabel") + " " + currentSliderValue);
+            maxRuleAppLabel.setText(bundle.getString("maxRuleAppLabel") + " " + currSliderVal);
 
         });
-        maxRuleAppLabel.setText(bundle.getString("maxRuleAppLabel") + " " + currentSliderValue);
+        maxRuleAppLabel.setText(bundle.getString("maxRuleAppLabel") + " " + currSliderVal);
     }
 
 }
