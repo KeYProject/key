@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
 import de.uka.ilkd.key.nui.controller.ControllerAnnotation;
 import de.uka.ilkd.key.nui.controller.MainViewController;
 import de.uka.ilkd.key.nui.controller.MainViewController.Place;
@@ -37,6 +37,7 @@ import javafx.stage.Stage;
  * @author Patrick Jattke
  *
  */
+@SuppressWarnings("PMD.ShortClassName")
 public class NUI extends Application {
 
     /**
@@ -53,6 +54,57 @@ public class NUI extends Application {
      * The filename of the mainView, without extension (.fxml).
      */
     private static final String MAINVIEW_FILENAME = "MainView";
+
+    /**
+     * The currently loaded resource bundle (language file).
+     */
+    private ResourceBundle bundle;
+
+    /**
+     * Contains the loaded components, where
+     * <ul>
+     * <li>String represents the fx:id of the loaded component.
+     * <li>Pane is the reference to the loaded component.
+     * </ul>
+     */
+    private final Map<String, Pane> components = new ConcurrentHashMap<>();
+
+    /**
+     * Contains references to all loaded controllers, where <br \>
+     * <ul>
+     * <li>String is the fx:id of the loaded controller.
+     * <li>NUIController is the reference to the loaded controller.
+     * </ul>
+     */
+    private final Map<String, NUIController> controllers = new ConcurrentHashMap<>();
+
+    /**
+     * The data model used to store the loaded proof as a {@link TreeViewState}.
+     */
+    private DataModel dataModel;
+
+    /**
+     * A reference to the {@link MainViewController}.
+     */
+    private MainViewController mainViewCont;
+
+    /**
+     * The root border pane where all others components get loaded in.
+     */
+    private BorderPane root;
+    /**
+     * Contains the loaded toggle groups, where
+     * <ul>
+     * <li>String represents the fx:id of the loaded toggle group.
+     * <li>ToggleGroup is the reference to the loaded toggle group.
+     * </ul>
+     */
+    private final Map<String, ToggleGroup> toggleGroups = new HashMap<>();
+
+    /**
+     * The menu "View" of the menu bar.
+     */
+    private Menu viewPositionMenu;
 
     /**
      * Returns the proof file initially loaded.
@@ -77,57 +129,6 @@ public class NUI extends Application {
         }
         launch(args);
     }
-
-    /**
-     * The currently loaded resource bundle (language file).
-     */
-    private ResourceBundle bundle;
-
-    /**
-     * Contains the loaded components, where
-     * <ul>
-     * <li>String represents the fx:id of the loaded component.
-     * <li>Pane is the reference to the loaded component.
-     * </ul>
-     */
-    private final Map<String, Pane> components = new HashMap<>();
-
-    /**
-     * Contains references to all loaded controllers, where <br \>
-     * <ul>
-     * <li>String is the fx:id of the loaded controller.
-     * <li>NUIController is the reference to the loaded controller.
-     * </ul>
-     */
-    private final Map<String, NUIController> controllers = new HashMap<>();
-
-    /**
-     * The data model used to store the loaded proof as a {@link TreeViewState}.
-     */
-    private DataModel dataModel;
-    /**
-     * A reference to the {@link MainViewController}.
-     */
-    private MainViewController mainViewCont;
-
-    /**
-     * The root border pane where all others components get loaded in.
-     */
-    private BorderPane root;
-
-    /**
-     * Contains the loaded toggle groups, where
-     * <ul>
-     * <li>String represents the fx:id of the loaded toggle group.
-     * <li>ToggleGroup is the reference to the loaded toggle group.
-     * </ul>
-     */
-    private final Map<String, ToggleGroup> toggleGroups = new HashMap<>();
-
-    /**
-     * The menu "View" of the menu bar.
-     */
-    private Menu viewPositionMenu;
 
     /**
      * TODO
@@ -280,7 +281,6 @@ public class NUI extends Application {
                 getClass().getResourceAsStream("bundle_en_EN.properties"));
         dataModel = new DataModel(this, bundle);
         final FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(filename), bundle);
-        System.out.println("start launched successfully.");
         root = fxmlLoader.load();
         components.put(MAINVIEW_FILENAME, root);
 
@@ -321,7 +321,7 @@ public class NUI extends Application {
      * 
      * @param dataModel
      */
-    public void setDataModel(DataModel dataModel) {
+    public void setDataModel(final DataModel dataModel) {
         this.dataModel = dataModel;
     }
 
@@ -477,31 +477,26 @@ public class NUI extends Application {
         // before you can get the controller
         // you have to call fxmlLoader.load()
         final NUIController nuiController = fxmlLoader.getController();
-        if (nuiController != null) {
-            nuiController.constructor(this, dataModel, bundle, component.getId(), fileName);
+        if (nuiController == null) {
+            throw new RuntimeException();
+        }
+        nuiController.constructor(this, dataModel, bundle, component.getId(), fileName);
 
-            controllers.put(component.getId(), nuiController);
+        controllers.put(component.getId(), nuiController);
 
-            final Annotation[] annotations = nuiController.getClass().getAnnotations();
+        final Annotation[] annotations = nuiController.getClass().getAnnotations();
 
-            // create a view position menu for every component
-            if (annotations != null) {
-                for (final Annotation annotation : annotations) {
-                    if (annotation instanceof ControllerAnnotation) {
-                        final ControllerAnnotation ctrlAnnotation = (ControllerAnnotation) annotation;
-                        if (ctrlAnnotation.createMenu()) {
-                            final ToggleGroup toggleGroup = new ToggleGroup();
-                            toggleGroups.put(component.getId(), toggleGroup);
-                            viewPositionMenu.getItems()
-                                    .add(createSubMenu(component.getId(), toggleGroup));
-                            break;
-                        }
-                    }
+        // create a view position menu for every component
+        if (annotations != null) {
+            for (final Annotation annotation : annotations) {
+                if (annotation instanceof ControllerAnnotation
+                        && ((ControllerAnnotation) annotation).createMenu()) {
+                    final ToggleGroup toggleGroup = new ToggleGroup();
+                    toggleGroups.put(component.getId(), toggleGroup);
+                    viewPositionMenu.getItems().add(createSubMenu(component.getId(), toggleGroup));
+                    break;
                 }
             }
-        }
-        else {
-            throw new RuntimeException();
         }
     }
 
