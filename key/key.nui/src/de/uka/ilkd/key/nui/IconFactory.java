@@ -20,11 +20,27 @@ public class IconFactory {
      * The width of produced icons in pixels.
      */
     private final int iconSizeWidth;
+    
+    /**
+     * TODO
+     * @return
+     */
+    public int getIconSizeWidth() {
+        return iconSizeWidth;
+    }
 
     /**
      * The height of produced icons in pixels.
      */
     private final int iconSizeHeight;
+
+    /**
+     * TODO
+     * @return
+     */
+    public int getIconSizeHeight() {
+        return iconSizeHeight;
+    }
 
     /**
      * the relative path to the root folder where icons can be found.
@@ -35,6 +51,14 @@ public class IconFactory {
      * An HashMap for storing loaded icon images.
      */
     private final Map<String, Image> icons = new HashMap<>();
+
+    /**
+     * TODO
+     * @return
+     */
+    public Map<String, Image> getIcons() {
+        return icons;
+    }
 
     // Inner Nodes
     /** file name of open branch node icon. */

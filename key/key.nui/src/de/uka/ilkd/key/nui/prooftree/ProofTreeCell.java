@@ -48,6 +48,35 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     private Label label;
 
     /**
+     * TODO
+     * @return
+     */
+    public FilteringHandler getFilteringHandler() {
+        return filteringHandler;
+    }
+    /**
+     * TODO
+     * @param filteringHandler
+     */
+    public void setFilteringHandler(final FilteringHandler filteringHandler) {
+        this.filteringHandler = filteringHandler;
+    }
+    /**
+     * TODO
+     * @return
+     */
+    public ChangeListener<Boolean> getSearchResultListener() {
+        return searchResultListener;
+    }
+    /**
+     * TODO
+     * @param label
+     */
+    public void setLabel(final Label label) {
+        this.label = label;
+    }
+
+    /**
      * The change listener registered to this ProofTreeCell.
      */
     private final ChangeListener<Boolean> searchResultListener = (observable,

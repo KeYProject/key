@@ -18,7 +18,7 @@ import javafx.scene.control.TextArea;
 public class ProofViewController extends NUIController implements Observer {
 
     @FXML
-    private TextArea textAreaProof;
+    private transient TextArea textAreaProof;
 
     @Override
     protected void init() {

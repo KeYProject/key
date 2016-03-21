@@ -57,6 +57,21 @@ public class StrategyViewController extends NUIController implements Observer {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ImageView goButtonImage;
 
+        /**
+         * TODO
+         * @return
+         */
+    public ImageView getGoButtonImage() {
+        return goButtonImage;
+    }
+    /**
+     * TODO
+     * @param goButtonImage
+     */
+    public void setGoButtonImage(ImageView goButtonImage) {
+        this.goButtonImage = goButtonImage;
+    }
+
     @FXML
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup stopAt;
@@ -145,6 +160,20 @@ public class StrategyViewController extends NUIController implements Observer {
 
     private StrategyWrapper strategyWrapper = null;
 
+        /**
+         * TODO
+         * @return
+         */
+    public StrategyWrapper getStrategyWrapper() {
+        return strategyWrapper;
+    }
+    /**
+     * TODO
+     * @param strategyWrapper
+     */
+    public void setStrategyWrapper(StrategyWrapper strategyWrapper) {
+        this.strategyWrapper = strategyWrapper;
+    }
     @Override
     protected void init() {
         dataModel.addObserver(this);

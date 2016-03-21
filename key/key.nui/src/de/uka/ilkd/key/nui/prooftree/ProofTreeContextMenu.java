@@ -49,6 +49,49 @@ public class ProofTreeContextMenu extends ContextMenu {
     private TreeViewController treeViewController = null;
 
     /**
+     * TODO
+     * @return
+     */
+    public TreeViewController getTreeViewController() {
+        return treeViewController;
+    }
+    /**
+     * TODO
+     * @param treeViewController
+     */
+    public void setTreeViewController(final TreeViewController treeViewController) {
+        this.treeViewController = treeViewController;
+    }
+    /**
+     * TODO
+     * @return
+     */
+    public TreeItem<NUINode> getTreeItem() {
+        return treeItem;
+    }
+    /**
+     * TODO
+     * @return
+     */
+    public TreeView<NUINode> getTreeView() {
+        return treeView;
+    }
+    /**
+     * TODO
+     * @return
+     */
+    public IconFactory getIcf() {
+        return icf;
+    }
+    /**
+     * TODO
+     * @return
+     */
+    public FilteringHandler getFh() {
+        return fh;
+    }
+
+    /**
      * The label of the context menu "expand all" label.
      */
     private static final String LBL_EXPAND_ALL = "Expand All";

@@ -54,6 +54,14 @@ public class NUI extends Application {
     private final Map<String, NUIController> controllers = new HashMap<>();
 
     /**
+     * TODO
+     * @return
+     */
+    public Map<String, NUIController> getControllers() {
+        return controllers;
+    }
+
+    /**
      * Contains the loaded components, where
      * <ul>
      * <li>String represents the fx:id of the loaded component.
@@ -61,6 +69,14 @@ public class NUI extends Application {
      * </ul>
      */
     private final Map<String, Pane> components = new HashMap<>();
+
+    /**
+     * TODO
+     * @return
+     */
+    public Map<String, Pane> getComponents() {
+        return components;
+    }
 
     /**
      * Contains the loaded toggle groups, where
@@ -72,9 +88,32 @@ public class NUI extends Application {
     private final Map<String, ToggleGroup> toggleGroups = new HashMap<>();
 
     /**
+     * TODO
+     * @return
+     */
+    public Map<String, ToggleGroup> getToggleGroups() {
+        return toggleGroups;
+    }
+
+    /**
      * The currently loaded resource bundle (language file).
      */
     private ResourceBundle bundle;
+
+    /**
+     * TODO
+     * @return
+     */
+    public ResourceBundle getBundle() {
+        return bundle;
+    }
+    /**
+     * TODO
+     * @param bundle
+     */
+    public void setBundle(final ResourceBundle bundle) {
+        this.bundle = bundle;
+    }
 
     /**
      * The root border pane where all others components get loaded in.
@@ -82,14 +121,52 @@ public class NUI extends Application {
     private BorderPane root;
 
     /**
+     * TODO
+     * @param root
+     */
+    public void setRoot(final BorderPane root) {
+        this.root = root;
+    }
+
+    /**
      * A reference to the {@link MainViewController}.
      */
     private MainViewController mainViewCont;
 
     /**
+     * TODO
+     * @return
+     */
+    public MainViewController getMainViewCont() {
+        return mainViewCont;
+    }
+    /**
+     * TODO
+     * @param mainViewCont
+     */
+    public void setMainViewCont(final MainViewController mainViewCont) {
+        this.mainViewCont = mainViewCont;
+    }
+
+    /**
      * The menu "View" of the menu bar.
      */
     private Menu viewPositionMenu;
+
+    /**
+     * TODO
+     * @return
+     */
+    public Menu getViewPositionMenu() {
+        return viewPositionMenu;
+    }
+    /**
+     * TODO
+     * @param viewPositionMenu
+     */
+    public void setViewPositionMenu(final Menu viewPositionMenu) {
+        this.viewPositionMenu = viewPositionMenu;
+    }
 
     /**
      * The filename of the mainView, without extension (.fxml).
@@ -105,6 +182,14 @@ public class NUI extends Application {
      * The data model used to store the loaded proof as a {@link TreeViewState}.
      */
     private DataModel dataModel;
+
+    /**
+     * TODO
+     * @param dataModel
+     */
+    public void setDataModel(DataModel dataModel) {
+        this.dataModel = dataModel;
+    }
 
     /**
      * The main method.

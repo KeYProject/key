@@ -35,6 +35,21 @@ public class OpenProofsViewController extends NUIController
      */
     private ContextMenu contextMenu;
 
+    /**
+     * TODO
+     * @return
+     */
+    public ContextMenu getContextMenu() {
+        return contextMenu;
+    }
+    /**
+     * TODO
+     * @param contextMenu
+     */
+    public void setContextMenu(ContextMenu contextMenu) {
+        this.contextMenu = contextMenu;
+    }
+
     @Override
     protected void init() {
         dataModel.addObserver(this);

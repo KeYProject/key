@@ -13,6 +13,12 @@ import de.uka.ilkd.key.proof.Proof;
 public class TreeViewState {
 
     /**
+     * Indicates whether the proof was modified after loading it into the
+     * treeView.
+     */
+    private boolean isModified;
+
+    /**
      * The proof file of the state.
      */
     private Proof proof;
@@ -21,12 +27,6 @@ public class TreeViewState {
      * The generated tree, associated with the proof.
      */
     private final ProofTreeItem treeItem;
-
-    /**
-     * Indicates whether the proof was modified after loading it into the
-     * treeView.
-     */
-    private boolean isModified;
 
     /**
      * Creates a new TreeViewState.
@@ -61,6 +61,16 @@ public class TreeViewState {
     }
 
     /**
+     * Returns TRUE if the proof of the TreeViewState was modified after loading
+     * or after last saving it, else returns FALSE.
+     * 
+     * @return the status of the changes at the proof file.
+     */
+    public boolean isModified() {
+        return this.isModified;
+    }
+
+    /**
      * Indicates whether the proof of the TreeViewState was changed after
      * loading it initially. This information is used to show the confirmation
      * dialog before closing KeY, if the loaded proof was modified during the
@@ -72,16 +82,6 @@ public class TreeViewState {
      */
     protected void setModified(final boolean bool) {
         this.isModified = bool;
-    }
-
-    /**
-     * Returns TRUE if the proof of the TreeViewState was modified after loading
-     * or after last saving it, else returns FALSE.
-     * 
-     * @return the status of the changes at the proof file.
-     */
-    public boolean isModified() {
-        return this.isModified;
     }
 
     /**
