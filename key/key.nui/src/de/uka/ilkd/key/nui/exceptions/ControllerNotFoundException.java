@@ -28,10 +28,27 @@ public class ControllerNotFoundException extends NUIException {
         this.file = file;
     }
 
+    /**
+     * TODO
+     * 
+     * @return
+     */
+    public String getFile() {
+        return file;
+    }
+
     @Override
     public String getMessage() {
         return "Can't load controller " + file;
 
+    }
+
+    /**
+     * TODO
+     * @param file
+     */
+    public void setFile(final String file) {
+        this.file = file;
     }
 
 }

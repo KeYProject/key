@@ -30,7 +30,7 @@ public class OpenProofsViewController extends NUIController
      */
     private ContextMenu contextMenu;
     @FXML
-    private ListView<String> listView;
+    private transient ListView<String> listView;
 
     @FXML
     private Pane openProofsViewPane;

@@ -34,4 +34,22 @@ public class ToggleGroupNotFoundException extends NUIException {
 
     }
 
+    /**
+     * TODO
+     * 
+     * @return
+     */
+    public String getToggleGroup() {
+        return toggleGroup;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param toggleGroup
+     */
+    public void setToggleGroup(String toggleGroup) {
+        this.toggleGroup = toggleGroup;
+    }
+
 }

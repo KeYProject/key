@@ -40,6 +40,15 @@ public class FilterMultiple implements ProofTreeFilter {
     }
 
     /**
+     * TODO
+     * 
+     * @return
+     */
+    public List<ProofTreeFilter> getFilters() {
+        return filters;
+    }
+
+    /**
      * Sets all the list of filters.
      * 
      * @param filters

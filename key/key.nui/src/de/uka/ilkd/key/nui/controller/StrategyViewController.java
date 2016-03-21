@@ -90,11 +90,11 @@ public class StrategyViewController extends NUIController implements Observer {
 
     @FXML
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
-    private Label maxRuleAppLabel;
+    private transient Label maxRuleAppLabel;
 
     @FXML
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
-    private Slider maxRuleAppSlider;
+    private transient Slider maxRuleAppSlider;
 
     @FXML
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
@@ -102,7 +102,7 @@ public class StrategyViewController extends NUIController implements Observer {
 
     @FXML
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
-    private AnchorPane proofSearchStrategy;
+    private transient AnchorPane proofSearchStrategy;
 
     @FXML
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
@@ -144,6 +144,15 @@ public class StrategyViewController extends NUIController implements Observer {
     @FXML
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup userOptions3;
+
+    /**
+     * TODO
+     * 
+     * @return
+     */
+    public int getCurrentSliderValue() {
+        return currentSliderValue;
+    }
 
     /**
      * TODO
@@ -219,6 +228,15 @@ public class StrategyViewController extends NUIController implements Observer {
             dataModel.saveTreeViewState(updatedTreeViewState, filename);
 
         }
+    }
+
+    /**
+     * TODO
+     * 
+     * @param currentSliderValue
+     */
+    public void setCurrentSliderValue(final int currentSliderValue) {
+        this.currentSliderValue = currentSliderValue;
     }
 
     /**

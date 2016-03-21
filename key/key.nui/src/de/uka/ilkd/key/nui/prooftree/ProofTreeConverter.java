@@ -27,15 +27,14 @@ public class ProofTreeConverter {
     private static final String LBL_ROOT = "Proof Tree";
 
     /**
-     * The root node of the NUI tree.
-     */
-    private NUIBranchNode nuiRoot;
-
-    /**
      * A list of leafs that are marked as linked.
      */
     private List<NUINode> linkedLeafs;
 
+    /**
+     * The root node of the NUI tree.
+     */
+    private NUIBranchNode nuiRoot;
     /**
      * Constructor. Loads a proof into the converter.
      * 
@@ -69,6 +68,21 @@ public class ProofTreeConverter {
     }
 
     /**
+     * TODO
+     * @return
+     */
+    public NUIBranchNode getNuiRoot() {
+        return nuiRoot;
+    }
+
+    /**
+     * @return the root node of the converted tree.
+     */
+    public NUIBranchNode getRootNode() {
+        return nuiRoot;
+    }
+
+    /**
      * Loads a proof tree by converting it to a NUITree which is used as an
      * intermediate representation (decorated abstract tree).
      *
@@ -92,6 +106,14 @@ public class ProofTreeConverter {
 
         // set linked leafs
         linkedLeafs.forEach((linkedLeaf) -> setNUINodeLinkedTrue(linkedLeaf));
+    }
+
+    /**
+     * TODO
+     * @param nuiRoot
+     */
+    public void setNuiRoot(final NUIBranchNode nuiRoot) {
+        this.nuiRoot = nuiRoot;
     }
 
     /**
@@ -228,29 +250,6 @@ public class ProofTreeConverter {
     }
 
     /**
-     * Sets for a node the field interactive = true and propagates this.
-     * information to its parents. This method should be called only if the full
-     * NUITree was created. Otherwise it will work not correctly.
-     * 
-     * @param newNode
-     *            the node for that interactive should be set true
-     */
-    private void setNUINodeLinkedTrue(final NUINode newNode) {
-        newNode.setLinked(true);
-        newNode.setStyleConfiguration();
-
-        // propagate linked information to parent
-        final NUINode parent = newNode.getParent();
-        if (parent != null && parent instanceof NUIBranchNode) {
-            final NUIBranchNode parentBranch = (NUIBranchNode) parent;
-            if (parentBranch.hasOnlyLinkedBranchChildren()) {
-                // if parent has only linked branch children, mark as linked.
-                setNUINodeLinkedTrue(parentBranch);
-            }
-        }
-    }
-
-    /**
      * Converts the root branch of a tree from type
      * {@link de.uka.ilkd.key.nui.proofTree.Node}, a so called NUITree, to a
      * FXTree. The FXTree consists of TreeItem<NUINode> which are decorated
@@ -286,9 +285,25 @@ public class ProofTreeConverter {
     }
 
     /**
-     * @return the root node of the converted tree.
+     * Sets for a node the field interactive = true and propagates this.
+     * information to its parents. This method should be called only if the full
+     * NUITree was created. Otherwise it will work not correctly.
+     * 
+     * @param newNode
+     *            the node for that interactive should be set true
      */
-    public NUIBranchNode getRootNode() {
-        return nuiRoot;
+    private void setNUINodeLinkedTrue(final NUINode newNode) {
+        newNode.setLinked(true);
+        newNode.setStyleConfiguration();
+
+        // propagate linked information to parent
+        final NUINode parent = newNode.getParent();
+        if (parent != null && parent instanceof NUIBranchNode) {
+            final NUIBranchNode parentBranch = (NUIBranchNode) parent;
+            if (parentBranch.hasOnlyLinkedBranchChildren()) {
+                // if parent has only linked branch children, mark as linked.
+                setNUINodeLinkedTrue(parentBranch);
+            }
+        }
     }
 }
