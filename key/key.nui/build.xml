@@ -109,6 +109,7 @@
 		<copy todir="${basedir}/KeY.jar">
 			<fileset dir="${basedir}/KeY.jar-template" />
 			<fileset dir="${key.dir}/key.util/bin/" />
+			<fileset dir="${key.dir}/key.ui/bin/" />
 			<fileset dir="${key.dir}/key.core/bin/" />
 			<fileset dir="${key.dir}/key.nui/bin/" />
 			<fileset dir="${key.dir}/key.core.symbolic_execution/bin/" />
