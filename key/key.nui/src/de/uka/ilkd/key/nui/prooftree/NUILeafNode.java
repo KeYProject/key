@@ -26,15 +26,6 @@ public class NUILeafNode extends NUINode {
         this.proofNode = proofNode;
     }
 
-    @Override
-    public NUILeafNode clone(){
-        // create clone
-        final NUILeafNode cloned = new NUILeafNode(proofNode);
-        this.copyFields(this, cloned);
-
-        return cloned;
-    }
-
     /**
      * Returns the corresponding proof node of the leaf node.
      * 

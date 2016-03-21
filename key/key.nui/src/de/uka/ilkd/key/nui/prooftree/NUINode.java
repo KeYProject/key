@@ -26,7 +26,7 @@ import javafx.beans.value.ChangeListener;
  * @author Patrick Jattke
  *
  */
-public abstract class NUINode implements Cloneable {
+public abstract class NUINode {
     /**
      * Marks if the node has the active property.
      */
@@ -108,16 +108,6 @@ public abstract class NUINode implements Cloneable {
         list.add(this);
         return list;
     }
-
-    /**
-     * Clones the NUINode. Attention, normally the parent is not set because the
-     * cloned one is not known.
-     * 
-     * @return the cloned nuiNode
-     */
-    @Override
-    public abstract NUINode clone() throws CloneNotSupportedException;
-
 
     /**
      * Retrieves the label (name) of the node. <br>
