@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nui.controller;
 
+import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -297,50 +298,19 @@ public class StrategyViewController extends NUIController implements Observer {
      */
     private void calculateCurrentSliderValue(final Number newVal) {
         final double sliderValue = newVal.doubleValue();
+        final double roundSliderValue = Math.floor(sliderValue);
 
         if (sliderValue > 0.0 && sliderValue < 1.0) {
-            currentSliderValue = ((int) (sliderValue % 9.0 * 10.0)) + 1;
-        }
-        else if (sliderValue > 1.0 && sliderValue < 2.0) {
-            currentSliderValue = ((int) (((sliderValue % 9.0) - 1) * 10) * 10) + 10;
-        }
-        else if (sliderValue > 2.0 && sliderValue < 3.0) {
-            currentSliderValue = ((int) (((sliderValue % 9.0) - 2) * 10) * 100) + 100;
-        }
-        else if (sliderValue > 3.0 && sliderValue < 4.0) {
-            currentSliderValue = ((int) (((sliderValue % 9.0) - 3) * 10) * 1000) + 1000;
-        }
-        else if (sliderValue > 4.0 && sliderValue < 5.0) {
-            currentSliderValue = ((int) (((sliderValue % 9.0) - 4) * 10) * 10000) + 10000;
-        }
-        else if (sliderValue > 5.0 && sliderValue < 6.0) {
-            currentSliderValue = ((int) (((sliderValue % 9.0) - 5) * 10) * 100000) + 100000;
+            currSliderVal = (int) Math.floor(sliderValue % 9.0 * 10.0) + 1;
         }
         else {
-            switch (newVal.intValue()) {
-            case 1:
-                currentSliderValue = 10;
-                break;
-            case 2:
-                currentSliderValue = 100;
-                break;
-            case 3:
-                currentSliderValue = 1000;
-                break;
-            case 4:
-                currentSliderValue = 10000;
-                break;
-            case 5:
-                currentSliderValue = 100000;
-                break;
-            case 6:
-                currentSliderValue = 1000000;
-                break;
-            default:
-
-                // This should never happen
-
-                break;
+            final double sliderCoefficient = Math.pow(10, roundSliderValue);
+            if (Arrays.asList(new int[] { 1, 2, 3, 4, 5, 6 }).contains(sliderValue)) {
+                currSliderVal = (int) sliderCoefficient;
+            }
+            else {
+                currSliderVal = (int) (Math.floor((sliderValue % 9.0 - roundSliderValue) * 10)
+                        * sliderCoefficient + sliderCoefficient);
             }
         }
     }
@@ -363,8 +333,8 @@ public class StrategyViewController extends NUIController implements Observer {
             }
 
             @Override
-            public String toString(final Double n) {
-                final int val = (int) Math.pow(10, n);
+            public String toString(final Double number) {
+                final int val = (int) Math.pow(10, number);
                 if (val < 10000) {
                     return String.valueOf(val);
                 }
