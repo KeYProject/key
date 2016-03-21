@@ -138,6 +138,9 @@ public class MainViewController extends NUIController implements Observer {
     private final ObservableMap<String, Place> placeComponent = new ObservableMapWrapper<>(
             new HashMap<>());
 
+    /**
+     * The KeYEnvironment used to load the proof.
+     */
     private KeYEnvironment<DefaultUserInterfaceControl> keyEnvironment;
 
     /**
@@ -538,6 +541,9 @@ public class MainViewController extends NUIController implements Observer {
                         "stop0", new Class[] { Object.class });
                 tsm.setAccessible(true);
                 tsm.invoke(loadingThread, new ThreadDeath());
+                if (keyEnvironment != null) {
+                    keyEnvironment.dispose();
+                }
             }
             catch (NoSuchMethodException | SecurityException
                     | IllegalAccessException | IllegalArgumentException

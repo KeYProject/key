@@ -30,6 +30,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/key.ui"/>
-	<classpathentry kind="lib" path="/usr/share/java/hamcrest/all.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
