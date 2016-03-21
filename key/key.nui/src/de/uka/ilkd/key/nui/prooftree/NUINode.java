@@ -425,24 +425,6 @@ public abstract class NUINode {
     }
 
     /**
-     * Copies the fields of a NUINode to another.
-     * 
-     * @param source
-     *            the source of the field values
-     * @param target
-     *            the target where the fields have to be set.
-     */
-    protected void copyFields(final NUINode source, final NUINode target) {
-        source.setActive(target.isActive());
-        source.setClosed(target.isClosed());
-        source.setHasNotes(target.hasNotes());
-        source.setInteractive(target.isInteractive());
-        source.setLabel(target.getLabel());
-        source.setLinked(target.isLinked());
-        source.setSerialNumber(target.getSerialNumber());
-    }
-
-    /**
      * Determines and sets the {@link StyleConfiguration} of this node. This
      * configuration is later applied to the rendered {@link ProofTreeCell}.
      * <p>

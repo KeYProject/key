@@ -55,19 +55,6 @@ public class NUIBranchNode extends NUINode {
     }
 
     /**
-     * Clones the branch node without children. The children list will be empty.
-     * 
-     * @return the cloned branch node
-     */
-    public NUIBranchNode cloneWithoutChildren() {
-        // create clone
-        final NUIBranchNode cloned = new NUIBranchNode(proofParentNode);
-        this.copyFields(this, cloned);
-
-        return cloned;
-    }
-
-    /**
      * Returns a list of children of the branch node.
      * 
      * @return children A LinkedList of the branch node's children.
