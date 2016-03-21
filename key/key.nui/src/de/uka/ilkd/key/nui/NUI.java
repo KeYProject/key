@@ -42,7 +42,7 @@ public class NUI extends Application {
     /**
      * Directory containing the component files (.fxml).
      */
-    private static final String COMPONENTS_DIR = "components";
+    private static final String COMPONENTS_DIR = "components/";
 
     /**
      * The proof file initially (at program startup) loaded.
@@ -469,7 +469,7 @@ public class NUI extends Application {
      */
     private void loadComponent(final String fileName) throws IOException {
         final FXMLLoader fxmlLoader = new FXMLLoader(
-                getClass().getResource(COMPONENTS_DIR + File.separator + fileName), bundle);
+                getClass().getResource(COMPONENTS_DIR + fileName), bundle);
 
         // String componentName = cutFileExtension(file.getName());
         final Pane component = fxmlLoader.load();
@@ -523,7 +523,7 @@ public class NUI extends Application {
             final Enumeration<JarEntry> entries = jar.entries();
             while (entries.hasMoreElements()) {
                 final String fileName = entries.nextElement().getName();
-                if (fileName.matches("(de/uka/ilkd/key/nui/" + COMPONENTS_DIR + "/).*(.fxml)")) {
+                if (fileName.matches("(de/uka/ilkd/key/nui/" + COMPONENTS_DIR + ").*(.fxml)")) {
                     loadComponent(
                             fileName.substring(fileName.lastIndexOf('/') + 1, fileName.length()));
                 }
