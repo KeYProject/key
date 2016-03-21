@@ -277,7 +277,7 @@ public class StrategyViewController extends NUIController implements Observer {
         proofSearchStrategy.getChildren().clear();
         SwingUtilities.invokeLater(() -> {
             final SwingNode swingNode = strategyWrapper.createStrategyComponent(proof);
-
+            
             Platform.runLater(() -> proofSearchStrategy.getChildren().add(swingNode));
 
         });

@@ -9,6 +9,9 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.swing.SwingUtilities;
+
 import com.sun.javafx.collections.ObservableMapWrapper;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -162,6 +165,12 @@ public class MainViewController extends NUIController implements Observer {
         return placeComponent;
     }
 
+    @FXML
+    private void closeButtonAction() {
+        Platform.exit();
+        MainWindow.getInstance().dispose();
+    }
+    
     /**
      * Handles the ActionEvent resulting in the user clicking "Open Proof..." in
      * the File menu. Usually <b> not to be called by developers. </b>
@@ -260,6 +269,7 @@ public class MainViewController extends NUIController implements Observer {
         if (dataModel.getLoadedTreeViewState() == null
                 || !(dataModel.getLoadedTreeViewState().isModified())) {
             Platform.exit();
+            MainWindow.getInstance().dispose();
             return;
         }
 
@@ -292,6 +302,7 @@ public class MainViewController extends NUIController implements Observer {
             }
             // Close application without saving
             Platform.exit();
+            MainWindow.getInstance().dispose();
         }
 
         // If CANCEL was selected (or in any other case): do not close KeY
