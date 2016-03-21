@@ -24,72 +24,14 @@ import javafx.scene.input.KeyCombination;
 public class ProofTreeContextMenu extends ContextMenu {
 
     /**
-     * The treeItem of node.
+     * The label of the context menu "collapse all" label.
      */
-    private final TreeItem<NUINode> treeItem;
+    private static final String LBL_COLLAPSE_ALL = "Collapse All";
 
     /**
-     * The treeView that node is in.
+     * The label of the context menu "collapse below" label.
      */
-    private final TreeView<NUINode> treeView;
-
-    /**
-     * The IconFactory used to create the required icons.
-     */
-    private final IconFactory icf;
-
-    /**
-     * The FilteringHandler used to filter the tree cells.
-     */
-    private final FilteringHandler fh;
-
-    /**
-     * The reference to the TreeViewController associated with the TreeView.
-     */
-    private TreeViewController treeViewController = null;
-
-    /**
-     * TODO
-     * @return
-     */
-    public TreeViewController getTreeViewController() {
-        return treeViewController;
-    }
-    /**
-     * TODO
-     * @param treeViewController
-     */
-    public void setTreeViewController(final TreeViewController treeViewController) {
-        this.treeViewController = treeViewController;
-    }
-    /**
-     * TODO
-     * @return
-     */
-    public TreeItem<NUINode> getTreeItem() {
-        return treeItem;
-    }
-    /**
-     * TODO
-     * @return
-     */
-    public TreeView<NUINode> getTreeView() {
-        return treeView;
-    }
-    /**
-     * TODO
-     * @return
-     */
-    public IconFactory getIcf() {
-        return icf;
-    }
-    /**
-     * TODO
-     * @return
-     */
-    public FilteringHandler getFh() {
-        return fh;
-    }
+    private static final String LBL_COLLAPSE_BELOW = "Collapse Below";
 
     /**
      * The label of the context menu "expand all" label.
@@ -102,19 +44,30 @@ public class ProofTreeContextMenu extends ContextMenu {
     private static final String LBL_EXPAND_BELOW = "Expand Below";
 
     /**
-     * The label of the context menu "collapse all" label.
-     */
-    private static final String LBL_COLLAPSE_ALL = "Collapse All";
-
-    /**
-     * The label of the context menu "collapse below" label.
-     */
-    private static final String LBL_COLLAPSE_BELOW = "Collapse Below";
-
-    /**
      * The label of the context menu "search" label.
      */
     private static final String LBL_SEARCH = "Search";
+
+    /**
+     * The FilteringHandler used to filter the tree cells.
+     */
+    private final FilteringHandler fh;
+    /**
+     * The IconFactory used to create the required icons.
+     */
+    private final IconFactory icf;
+    /**
+     * The treeItem of node.
+     */
+    private final TreeItem<NUINode> treeItem;
+    /**
+     * The treeView that node is in.
+     */
+    private final TreeView<NUINode> treeView;
+    /**
+     * The reference to the TreeViewController associated with the TreeView.
+     */
+    private TreeViewController treeViewController = null;
 
     /**
      * The constructor.
@@ -130,9 +83,8 @@ public class ProofTreeContextMenu extends ContextMenu {
      * @param tvc
      *            the {@link TreeViewController} associated with the treeView
      */
-    public ProofTreeContextMenu(final TreeItem<NUINode> treeItem,
-            final TreeView<NUINode> treeView, final IconFactory icf,
-            final FilteringHandler fh, final TreeViewController tvc) {
+    public ProofTreeContextMenu(final TreeItem<NUINode> treeItem, final TreeView<NUINode> treeView,
+            final IconFactory icf, final FilteringHandler fh, final TreeViewController tvc) {
         super();
 
         this.treeItem = treeItem;
@@ -145,6 +97,60 @@ public class ProofTreeContextMenu extends ContextMenu {
         // Add dummy so that the context menu can be displayed.
         // It is put in in the method "show".
         addSeparator();
+    }
+
+    /**
+     * TODO
+     * 
+     * @return
+     */
+    public FilteringHandler getFh() {
+        return fh;
+    }
+
+    /**
+     * TODO
+     * 
+     * @return
+     */
+    public IconFactory getIcf() {
+        return icf;
+    }
+
+    /**
+     * TODO
+     * 
+     * @return
+     */
+    public TreeItem<NUINode> getTreeItem() {
+        return treeItem;
+    }
+
+    /**
+     * TODO
+     * 
+     * @return
+     */
+    public TreeView<NUINode> getTreeView() {
+        return treeView;
+    }
+
+    /**
+     * TODO
+     * 
+     * @return
+     */
+    public TreeViewController getTreeViewController() {
+        return treeViewController;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param treeViewController
+     */
+    public void setTreeViewController(final TreeViewController treeViewController) {
+        this.treeViewController = treeViewController;
     }
 
     /**
@@ -171,10 +177,22 @@ public class ProofTreeContextMenu extends ContextMenu {
     }
 
     /**
-     * Adds a separator to the context menu.
+     * Adds the entry ExpandAll to the context menu.
      */
-    private void addSeparator() {
-        getItems().add(new SeparatorMenuItem());
+    private void addMenuItemCollapseAll() {
+        final MenuItem miCollapseAll = new MenuItem(LBL_COLLAPSE_ALL);
+        miCollapseAll.setGraphic(icf.getImage(IconFactory.COLLAPSE));
+        getItems().add(miCollapseAll);
+        miCollapseAll.setOnAction(aEvt -> ProofTreeActions.collapseAll(treeView.getRoot()));
+    }
+
+    /**
+     * Adds the entry ExpandAll to the context menu.
+     */
+    private void addMenuItemCollapseBelow() {
+        final MenuItem miCollapse = new MenuItem(LBL_COLLAPSE_BELOW);
+        getItems().add(miCollapse);
+        miCollapse.setOnAction(aEvt -> ProofTreeActions.collapseBelow(treeItem));
     }
 
     /**
@@ -184,8 +202,7 @@ public class ProofTreeContextMenu extends ContextMenu {
         final MenuItem miExpandAll = new MenuItem(LBL_EXPAND_ALL);
         miExpandAll.setGraphic(icf.getImage(IconFactory.EXPAND));
         getItems().add(miExpandAll);
-        miExpandAll.setOnAction(
-                aEvt -> ProofTreeActions.expandAll(treeView.getRoot()));
+        miExpandAll.setOnAction(aEvt -> ProofTreeActions.expandAll(treeView.getRoot()));
     }
 
     /**
@@ -198,24 +215,23 @@ public class ProofTreeContextMenu extends ContextMenu {
     }
 
     /**
-     * Adds the entry ExpandAll to the context menu.
+     * Configures the filter context menu entry.
+     * 
+     * @param k
+     *            The filter to configure.
+     * @param initState
+     *            Indicates whether the filter is selected by default or not.
      */
-    private void addMenuItemCollapseAll() {
-        final MenuItem miCollapseAll = new MenuItem(LBL_COLLAPSE_ALL);
-        miCollapseAll.setGraphic(icf.getImage(IconFactory.COLLAPSE));
-        getItems().add(miCollapseAll);
-        miCollapseAll.setOnAction(
-                aEvt -> ProofTreeActions.collapseAll(treeView.getRoot()));
-    }
+    private void addMenuItemFilter(final ProofTreeFilter k, final boolean initState) {
+        final CheckMenuItem cmi = new CheckMenuItem(k.getContextMenuItemText());
+        cmi.setSelected(initState);
 
-    /**
-     * Adds the entry ExpandAll to the context menu.
-     */
-    private void addMenuItemCollapseBelow() {
-        final MenuItem miCollapse = new MenuItem(LBL_COLLAPSE_BELOW);
-        getItems().add(miCollapse);
-        miCollapse
-                .setOnAction(aEvt -> ProofTreeActions.collapseBelow(treeItem));
+        cmi.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (fh.getFilterStatus(k) != newValue) {
+                fh.toggleFilteringStatus(k);
+            }
+        });
+        getItems().add(cmi);
     }
 
     /**
@@ -240,24 +256,10 @@ public class ProofTreeContextMenu extends ContextMenu {
     }
 
     /**
-     * Configures the filter context menu entry.
-     * 
-     * @param k
-     *            The filter to configure.
-     * @param initState
-     *            Indicates whether the filter is selected by default or not.
+     * Adds a separator to the context menu.
      */
-    private void addMenuItemFilter(final ProofTreeFilter k,
-            final boolean initState) {
-        final CheckMenuItem cmi = new CheckMenuItem(k.getContextMenuItemText());
-        cmi.setSelected(initState);
-
-        cmi.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (fh.getFilterStatus(k) != newValue) {
-                fh.toggleFilteringStatus(k);
-            }
-        });
-        getItems().add(cmi);
+    private void addSeparator() {
+        getItems().add(new SeparatorMenuItem());
     }
 
 }

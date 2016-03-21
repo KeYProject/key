@@ -33,16 +33,9 @@ import de.uka.ilkd.key.nui.prooftree.filter.ProofTreeFilter;
 public class FilteringHandler {
 
     /**
-     * A map storing filters with their respective activation flag.
+     * Prefix for binary class files.
      */
-
-    final private Map<ProofTreeFilter, Boolean> filtersMap = Collections
-            .synchronizedMap(new ConcurrentHashMap<>());
-
-    /**
-     * The data model.
-     */
-    private final DataModel dataModel;
+    static final String BINARY_NAME_PREFIX = "de.uka.ilkd.key.nui.prooftree.filter.";
 
     /**
      * Path where filter classes are stored.
@@ -50,18 +43,16 @@ public class FilteringHandler {
     static final String FILTER_PATH = "filter/";
 
     /**
-     * Prefix for binary class files.
+     * The data model.
      */
-    static final String BINARY_NAME_PREFIX = "de.uka.ilkd.key.nui.prooftree.filter.";
+    private final DataModel dataModel;
 
     /**
-     * TODO
-     * 
-     * @return
+     * A map storing filters with their respective activation flag.
      */
-    public DataModel getDataModel() {
-        return dataModel;
-    }
+
+    final private Map<ProofTreeFilter, Boolean> filtersMap = Collections
+            .synchronizedMap(new ConcurrentHashMap<>());
 
     /**
      * Constructor.
@@ -84,6 +75,35 @@ public class FilteringHandler {
     }
 
     /**
+     * TODO
+     * 
+     * @return
+     */
+    public DataModel getDataModel() {
+        return dataModel;
+    }
+
+    /**
+     * Returns the list of loaded filters.
+     * 
+     * @return the {@link #filtersMap}.
+     */
+    public Map<ProofTreeFilter, Boolean> getFiltersMap() {
+        return filtersMap;
+    }
+
+    /**
+     * Returns the activation status for a filter.
+     * 
+     * @param filter
+     *            The filter to check
+     * @return true iff the filter is activated
+     */
+    public boolean getFilterStatus(final ProofTreeFilter filter) {
+        return filtersMap.get(filter);
+    }
+
+    /**
      * Resets all active filters.
      */
     public final void reinit() {
@@ -92,6 +112,50 @@ public class FilteringHandler {
                 filtersMap.put(filter, false);
             }
         });
+    }
+
+    /**
+     * Toggles the activation status for a filter.
+     * 
+     * @param filter
+     *            The filter to change the status of.
+     */
+    public void toggleFilteringStatus(final ProofTreeFilter filter) {
+        final boolean newState = !filtersMap.get(filter);
+        filtersMap.put(filter, newState);
+
+        applyFilters();
+    }
+
+    /**
+     * Applies the filters that are currently set to active.
+     */
+    private void applyFilters() {
+
+        if (dataModel.getLoadedTreeViewState() != null) {
+            dataModel.getLoadedTreeViewState().getTreeItem().filter(
+                    // reduces all active filters to one
+                    getActiveFilters().stream().reduce(new FilterShowAll(), (firstFilter,
+                            secondFilter) -> new FilterCombineAND(firstFilter, secondFilter)));
+        }
+    }
+
+    /**
+     * Returns a list of the currently active filters.
+     * 
+     * @return A list of the currently active filters.
+     */
+    private List<ProofTreeFilter> getActiveFilters() {
+
+        final List<ProofTreeFilter> filters = new LinkedList<>();
+
+        filtersMap.forEach((filter, active) -> {
+            if (active) {
+                filters.add(filter);
+            }
+        });
+
+        return filters;
     }
 
     /**
@@ -195,70 +259,6 @@ public class FilteringHandler {
         }
 
         return filters;
-    }
-
-    /**
-     * Returns a list of the currently active filters.
-     * 
-     * @return A list of the currently active filters.
-     */
-    private List<ProofTreeFilter> getActiveFilters() {
-
-        final List<ProofTreeFilter> filters = new LinkedList<>();
-
-        filtersMap.forEach((filter, active) -> {
-            if (active) {
-                filters.add(filter);
-            }
-        });
-
-        return filters;
-    }
-
-    /**
-     * Applies the filters that are currently set to active.
-     */
-    private void applyFilters() {
-
-        if (dataModel.getLoadedTreeViewState() != null) {
-            dataModel.getLoadedTreeViewState().getTreeItem().filter(
-                    // reduces all active filters to one
-                    getActiveFilters().stream().reduce(new FilterShowAll(), (firstFilter,
-                            secondFilter) -> new FilterCombineAND(firstFilter, secondFilter)));
-        }
-    }
-
-    /**
-     * Returns the list of loaded filters.
-     * 
-     * @return the {@link #filtersMap}.
-     */
-    public Map<ProofTreeFilter, Boolean> getFiltersMap() {
-        return filtersMap;
-    }
-
-    /**
-     * Returns the activation status for a filter.
-     * 
-     * @param filter
-     *            The filter to check
-     * @return true iff the filter is activated
-     */
-    public boolean getFilterStatus(final ProofTreeFilter filter) {
-        return filtersMap.get(filter);
-    }
-
-    /**
-     * Toggles the activation status for a filter.
-     * 
-     * @param filter
-     *            The filter to change the status of.
-     */
-    public void toggleFilteringStatus(final ProofTreeFilter filter) {
-        final boolean newState = !filtersMap.get(filter);
-        filtersMap.put(filter, newState);
-
-        applyFilters();
     }
 
 }

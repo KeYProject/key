@@ -33,14 +33,14 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     private FilteringHandler filteringHandler;
 
     /**
-     * The IconFactory used to create the required icons.
-     */
-    private final IconFactory iconFactory;
-
-    /**
      * The icon that will be displayed left next to the label.
      */
     private ImageView icon;
+
+    /**
+     * The IconFactory used to create the required icons.
+     */
+    private final IconFactory iconFactory;
 
     /**
      * The label that will be displayed.
@@ -48,39 +48,10 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     private Label label;
 
     /**
-     * TODO
-     * @return
-     */
-    public FilteringHandler getFilteringHandler() {
-        return filteringHandler;
-    }
-    /**
-     * TODO
-     * @param filteringHandler
-     */
-    public void setFilteringHandler(final FilteringHandler filteringHandler) {
-        this.filteringHandler = filteringHandler;
-    }
-    /**
-     * TODO
-     * @return
-     */
-    public ChangeListener<Boolean> getSearchResultListener() {
-        return searchResultListener;
-    }
-    /**
-     * TODO
-     * @param label
-     */
-    public void setLabel(final Label label) {
-        this.label = label;
-    }
-
-    /**
      * The change listener registered to this ProofTreeCell.
      */
-    private final ChangeListener<Boolean> searchResultListener = (observable,
-            didMatchSearch, nowMatchesSearch) -> {
+    private final ChangeListener<Boolean> searchResultListener = (observable, didMatchSearch,
+            nowMatchesSearch) -> {
         final ObservableList<String> styles = getStyleClass();
         final String cssClassHighlight = ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT;
         if (nowMatchesSearch && !styles.contains(cssClassHighlight)) {
@@ -91,20 +62,10 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         }
         ProofTreeCell.this.updateItem(ProofTreeCell.this.getItem(), false);
     };
-
     /**
      * The treeViewController used to handle the actions of the treeView.
      */
     private final TreeViewController treeViewController;
-
-    /**
-     * Returns the TreeViewController associated with the ProofTreeCell.
-     * 
-     * @return the {@link TreeViewController}.
-     */
-    public TreeViewController getTreeViewController() {
-        return treeViewController;
-    }
 
     /**
      * The constructor of the ProofTreeCell.
@@ -112,9 +73,9 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      * @param icf
      *            the {@link IconFactory} used to display node icons
      * @param fh
-     *          the {@link FilteringHandler} used to filter this ProofTreeCell
+     *            the {@link FilteringHandler} used to filter this ProofTreeCell
      * @param tvc
-     *          the {@link TreeViewController} associated with the TreeView
+     *            the {@link TreeViewController} associated with the TreeView
      */
 
     public ProofTreeCell(final IconFactory icf, final FilteringHandler filteringHandler,
@@ -127,12 +88,12 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     }
 
     /**
-     * Returns the icon factory associated with the ProofTreeCell.
+     * TODO
      * 
-     * @return the {@link IconFactory}.
+     * @return
      */
-    public IconFactory getIconFactory() {
-        return iconFactory;
+    public FilteringHandler getFilteringHandler() {
+        return filteringHandler;
     }
 
     /**
@@ -145,12 +106,57 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     }
 
     /**
+     * Returns the icon factory associated with the ProofTreeCell.
+     * 
+     * @return the {@link IconFactory}.
+     */
+    public IconFactory getIconFactory() {
+        return iconFactory;
+    }
+
+    /**
      * Returns the label associated with the ProofTreeCell.
      * 
      * @return label the {@link Label} used by the {@link ProofTreeCell}.
      */
     public Label getLabel() {
         return label;
+    }
+
+    /**
+     * TODO
+     * 
+     * @return
+     */
+    public ChangeListener<Boolean> getSearchResultListener() {
+        return searchResultListener;
+    }
+
+    /**
+     * Returns the TreeViewController associated with the ProofTreeCell.
+     * 
+     * @return the {@link TreeViewController}.
+     */
+    public TreeViewController getTreeViewController() {
+        return treeViewController;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param filteringHandler
+     */
+    public void setFilteringHandler(final FilteringHandler filteringHandler) {
+        this.filteringHandler = filteringHandler;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param label
+     */
+    public void setLabel(final Label label) {
+        this.label = label;
     }
 
     /**
@@ -195,8 +201,8 @@ public class ProofTreeCell extends TreeCell<NUINode> {
             return;
         }
 
-        setContextMenu(new ProofTreeContextMenu(getTreeItem(), getTreeView(),
-                iconFactory, filteringHandler, treeViewController));
+        setContextMenu(new ProofTreeContextMenu(getTreeItem(), getTreeView(), iconFactory,
+                filteringHandler, treeViewController));
 
         // reset label and icon
         label = new Label(item.getLabel() + " ");

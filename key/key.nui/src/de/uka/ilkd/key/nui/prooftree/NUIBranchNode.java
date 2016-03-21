@@ -44,6 +44,47 @@ public class NUIBranchNode extends NUINode {
         this.children.add(child);
     }
 
+    @Override
+    public List<NUINode> asList() {
+
+        final List<NUINode> list = new LinkedList<>();
+        list.add(this);
+        children.forEach((child) -> list.addAll(child.asList()));
+        return list;
+
+    }
+
+    @Override
+    public NUIBranchNode clone() throws CloneNotSupportedException {
+        // create clone
+        final NUIBranchNode cloned = new NUIBranchNode(proofParentNode);
+        this.copyFields(this, cloned);
+
+        // set children
+        final LinkedList<NUINode> newChildren = new LinkedList<>();
+        for (final NUINode child : this.children) {
+            final NUINode clonedChild = child.clone();
+            clonedChild.setParent(cloned);
+            newChildren.add(clonedChild);
+        }
+        cloned.setChildren(newChildren);
+
+        return cloned;
+    }
+
+    /**
+     * Clones the branch node without children. The children list will be empty.
+     * 
+     * @return the cloned branch node
+     */
+    public NUIBranchNode cloneWithoutChildren() {
+        // create clone
+        final NUIBranchNode cloned = new NUIBranchNode(proofParentNode);
+        this.copyFields(this, cloned);
+
+        return cloned;
+    }
+
     /**
      * Returns a list of children of the branch node.
      * 
@@ -51,16 +92,6 @@ public class NUIBranchNode extends NUINode {
      */
     public final List<NUINode> getChildren() {
         return children;
-    }
-
-    /**
-     * Sets the children of the branch node.
-     * 
-     * @param children
-     *            The children to set for the branch node.
-     */
-    public void setChildren(final List<NUINode> children) {
-        this.children = children;
     }
 
     /**
@@ -109,6 +140,16 @@ public class NUIBranchNode extends NUINode {
     }
 
     /**
+     * Sets the children of the branch node.
+     * 
+     * @param children
+     *            The children to set for the branch node.
+     */
+    public void setChildren(final List<NUINode> children) {
+        this.children = children;
+    }
+
+    /**
      * Sets the parent node of the branch node.
      * 
      * @param parent
@@ -116,47 +157,6 @@ public class NUIBranchNode extends NUINode {
      */
     public final void setProofParentNode(final de.uka.ilkd.key.proof.Node parent) {
         this.proofParentNode = parent;
-    }
-
-    @Override
-    public NUIBranchNode clone() throws CloneNotSupportedException {
-        // create clone
-        final NUIBranchNode cloned = new NUIBranchNode(proofParentNode);
-        this.copyFields(this, cloned);
-
-        // set children
-        final LinkedList<NUINode> newChildren = new LinkedList<>();
-        for (final NUINode child : this.children) {
-            final NUINode clonedChild = child.clone();
-            clonedChild.setParent(cloned);
-            newChildren.add(clonedChild);
-        }
-        cloned.setChildren(newChildren);
-
-        return cloned;
-    }
-
-    /**
-     * Clones the branch node without children. The children list will be empty.
-     * 
-     * @return the cloned branch node
-     */
-    public NUIBranchNode cloneWithoutChildren() {
-        // create clone
-        final NUIBranchNode cloned = new NUIBranchNode(proofParentNode);
-        this.copyFields(this, cloned);
-
-        return cloned;
-    }
-
-    @Override
-    public List<NUINode> asList() {
-
-        final List<NUINode> list = new LinkedList<>();
-        list.add(this);
-        children.forEach((child) -> list.addAll(child.asList()));
-        return list;
-
     }
 
 }

@@ -43,19 +43,20 @@ public class SearchViewController extends NUIController {
      */
     private enum Direction {
         /**
-         * The next upper search result will be shown.
-         */
-        UP,
-        /**
          * The next lower search result will be shown.
          */
-        DOWN
+        DOWN,
+        /**
+         * The next upper search result will be shown.
+         */
+        UP
     }
 
     /**
-     * The number of results returned by the last search.
+     * A click on this Button closes the SearchView.
      */
-    private int numberOfSearchResults = 0;
+    @FXML
+    private Button btnCloseSearchView;
 
     /**
      * The Button toggling selectNextItem in searching.
@@ -69,16 +70,9 @@ public class SearchViewController extends NUIController {
     private Button btnSearchPrev;
 
     /**
-     * A click on this Button closes the SearchView.
+     * The number of results returned by the last search.
      */
-    @FXML
-    private Button btnCloseSearchView;
-
-    /**
-     * The TextField where search terms are entered.
-     */
-    @FXML
-    private TextField tfSearchQuery;
+    private int numberOfSearchResults = 0;
 
     /**
      * Weak-referenced Set of ProofTreeCells.
@@ -89,21 +83,27 @@ public class SearchViewController extends NUIController {
      * Reference of TreeView.
      */
     private TreeView<NUINode> proofTreeView;
-    /**
-     * Reference of Parent Connection between TreeView and SearchView.
-     */
-    private Pane treeViewPane;
 
     /**
      * The Anchor Pane holding the Search Field and its buttons.
      */
     @FXML
     private Pane searchViewPane;
+    /**
+     * The TextField where search terms are entered.
+     */
+    @FXML
+    private TextField tfSearchQuery;
 
     /**
      * A List representation of the all the TreeItems.
      */
     private List<TreeItem<NUINode>> treeItems;
+
+    /**
+     * Reference of Parent Connection between TreeView and SearchView.
+     */
+    private Pane treeViewPane;
 
     /**
      * Set the TreeView used for the search.
@@ -132,6 +132,17 @@ public class SearchViewController extends NUIController {
     }
 
     /**
+     * Closes the search view.
+     */
+    private void closeSearchView() {
+        // delete searchView component form treeViewPane
+        treeViewPane.getChildren().remove(searchViewPane);
+        // reset proofTreeView
+        proofTreeView.getRoot().getValue().resetSearch();
+        tfSearchQuery.setText("");
+    }
+
+    /**
      * Returns the {@link ProofTreeCell ProofTreeCells} currently shown in the
      * TreeView. <br />
      * 
@@ -151,8 +162,8 @@ public class SearchViewController extends NUIController {
                     .get((f.get((proofTreeView.skinProperty().get())))));
             return s;
         }
-        catch (NoSuchFieldException | SecurityException
-                | IllegalArgumentException | IllegalAccessException e) {
+        catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+                | IllegalAccessException e) {
             e.printStackTrace();
         }
         return null;
@@ -207,15 +218,13 @@ public class SearchViewController extends NUIController {
                     list.add(root);
                     if (!root.getChildren().isEmpty()) {
                         for (TreeItem<T> ti : root.getChildren()) {
-                            list.addAll(treeToList(ti,
-                                    new LinkedList<TreeItem<T>>()));
+                            list.addAll(treeToList(ti, new LinkedList<TreeItem<T>>()));
                         }
                     }
                     return list;
                 }
             }
-            treeItems = (new TreeToListHelper()).treeToList(
-                    proofTreeView.getRoot(),
+            treeItems = (new TreeToListHelper()).treeToList(proofTreeView.getRoot(),
                     new LinkedList<TreeItem<NUINode>>());
         }
 
@@ -237,16 +246,15 @@ public class SearchViewController extends NUIController {
         }
 
         final List<TreeItem<NUINode>> treeItems = getTreeItems();
-        final TreeItem<NUINode> currentlySelectedItem = proofTreeView
-                .getSelectionModel().getSelectedItem();
+        final TreeItem<NUINode> currentlySelectedItem = proofTreeView.getSelectionModel()
+                .getSelectedItem();
         TreeItem<NUINode> itemToSelect = null;
 
         // Basically does: itemToSelect = currentlySelectedItem + 1
         if (currentlySelectedItem == null
-                || direction == Direction.UP && (treeItems
-                        .indexOf(currentlySelectedItem) == treeItems.size() - 1)
-                || direction == Direction.DOWN
-                        && (treeItems.indexOf(currentlySelectedItem) == 0)) {
+                || direction == Direction.UP
+                        && (treeItems.indexOf(currentlySelectedItem) == treeItems.size() - 1)
+                || direction == Direction.DOWN && (treeItems.indexOf(currentlySelectedItem) == 0)) {
             if (direction == Direction.UP) {
                 itemToSelect = treeItems.get(0);
             }
@@ -256,22 +264,19 @@ public class SearchViewController extends NUIController {
         }
         else {
             if (direction == Direction.UP) {
-                itemToSelect = treeItems
-                        .get(treeItems.indexOf(currentlySelectedItem) + 1);
+                itemToSelect = treeItems.get(treeItems.indexOf(currentlySelectedItem) + 1);
             }
             else {
-                itemToSelect = treeItems
-                        .get(treeItems.indexOf(currentlySelectedItem) - 1);
+                itemToSelect = treeItems.get(treeItems.indexOf(currentlySelectedItem) - 1);
             }
         }
 
         // Basically does: while(!searchMatches.contains(itemToSelect))
         // itemToSelect++;
         while (!itemToSelect.getValue().isSearchResult()) {
-            if ((direction == Direction.UP && (treeItems
-                    .indexOf(itemToSelect) == treeItems.size() - 1))
-                    || (direction == Direction.DOWN
-                            && (treeItems.indexOf(itemToSelect) == 0))) {
+            if ((direction == Direction.UP
+                    && (treeItems.indexOf(itemToSelect) == treeItems.size() - 1))
+                    || (direction == Direction.DOWN && (treeItems.indexOf(itemToSelect) == 0))) {
                 itemToSelect = direction == Direction.UP ? treeItems.get(0)
                         : treeItems.get(treeItems.size() - 1);
             }
@@ -308,22 +313,18 @@ public class SearchViewController extends NUIController {
             // if we are to scroll downwards, we have to subtract an offset to
             // make
             // the selected item appear in middle.
-            proofTreeView.scrollTo(
-                    proofTreeView.getSelectionModel().getSelectedIndex()
-                            - (direction == Direction.UP ? 0
-                                    : (int) (proofTreeCells.size() / 2)));
+            proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex()
+                    - (direction == Direction.UP ? 0 : (int) (proofTreeCells.size() / 2)));
         }
     }
 
     @Override
     protected void init() {
         // Define action for 'previous (<)' button
-        btnSearchPrev.setOnAction(
-                (event) -> moveSelectionAndScrollIfNeeded(Direction.DOWN));
+        btnSearchPrev.setOnAction((event) -> moveSelectionAndScrollIfNeeded(Direction.DOWN));
 
         // Define action for 'next (>)' button
-        btnSearchNext.setOnAction(
-                (event) -> moveSelectionAndScrollIfNeeded(Direction.UP));
+        btnSearchNext.setOnAction((event) -> moveSelectionAndScrollIfNeeded(Direction.UP));
 
         // Define action for 'close (X)' button
         btnCloseSearchView.setOnAction((event) -> closeSearchView());
@@ -340,11 +341,9 @@ public class SearchViewController extends NUIController {
             // If any text was entered -> update status bar and depending on
             // numberOfSearchResults add/remove CSS class
             else {
-                numberOfSearchResults = proofTreeView.getRoot().getValue()
-                        .search(newText);
+                numberOfSearchResults = proofTreeView.getRoot().getValue().search(newText);
 
-                nui.updateStatusbar(
-                        "Number of Search Results: " + numberOfSearchResults);
+                nui.updateStatusbar("Number of Search Results: " + numberOfSearchResults);
 
                 if (numberOfSearchResults == 0) {
                     // adds the style class for no search results
@@ -352,8 +351,7 @@ public class SearchViewController extends NUIController {
                 }
                 else {
                     // removes the style class for no search results
-                    tfSearchQuery.getStyleClass()
-                            .removeIf((e) -> e.equals("search-noResults"));
+                    tfSearchQuery.getStyleClass().removeIf((e) -> e.equals("search-noResults"));
                 }
             }
         });
@@ -365,8 +363,7 @@ public class SearchViewController extends NUIController {
                 closeSearchView();
             }
             else if (KeyCode.ENTER == e.getCode()) {
-                final PauseTransition pause = new PauseTransition(
-                        Duration.millis(130));
+                final PauseTransition pause = new PauseTransition(Duration.millis(130));
                 Button button;
                 button = e.isShiftDown() ? btnSearchPrev : btnSearchNext;
                 button.arm();
@@ -384,18 +381,6 @@ public class SearchViewController extends NUIController {
          * searchViewPane.getStylesheets().add(getClass()
          * .getResource("../components/searchView.css").toExternalForm());
          */
-        searchViewPane.getStylesheets()
-                .add("/de/uka/ilkd/key/nui/components/searchView.css");
-    }
-
-    /**
-     * Closes the search view.
-     */
-    private void closeSearchView() {
-        // delete searchView component form treeViewPane
-        treeViewPane.getChildren().remove(searchViewPane);
-        // reset proofTreeView
-        proofTreeView.getRoot().getValue().resetSearch();
-        tfSearchQuery.setText("");
+        searchViewPane.getStylesheets().add("/de/uka/ilkd/key/nui/components/searchView.css");
     }
 }

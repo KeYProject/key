@@ -25,15 +25,15 @@ import javafx.scene.layout.Pane;
 public class OpenProofsViewController extends NUIController
         implements Observer {
 
-    @FXML
-    private Pane openProofsViewPane;
-    @FXML
-    private ListView<String> listView;
-
     /**
      * The context menu shown when the user right-clicks on an loaded proof.
      */
     private ContextMenu contextMenu;
+    @FXML
+    private ListView<String> listView;
+
+    @FXML
+    private Pane openProofsViewPane;
 
     /**
      * TODO
@@ -51,28 +51,16 @@ public class OpenProofsViewController extends NUIController
     }
 
     @Override
-    protected void init() {
-        dataModel.addObserver(this);
-        // Action to be performed if user clicks (left) on a proof entry
-        listView.setOnMouseClicked((event) -> {
-            final String selectedItem = listView.getSelectionModel()
-                    .getSelectedItem();
-            if (selectedItem != null) {
-                dataModel.loadProofFormMemory(selectedItem);
-            }
-        });
-
-        final MenuItem deleteProof = new MenuItem(
-                bundle.getString("closeProof"));
-        contextMenu = new ContextMenu(deleteProof);
-
-        // Action to be performed if user clicks on 'Close Proof' in the context
-        // menu
-        deleteProof.setOnAction((event) -> {
-            showSaveDialog();
-            dataModel.removeProof(
-                    listView.getSelectionModel().getSelectedItem());
-        });
+    public void update(final Observable observable, final Object arg) {
+        final ObservableList<String> loadedProofs = dataModel.getListOfProofs();
+        if (loadedProofs.size() >= 1) {
+            listView.setContextMenu(contextMenu);
+        }
+        else {
+            listView.setContextMenu(null);
+        }
+        listView.setItems(loadedProofs);
+        listView.getSelectionModel().select(arg.toString());
     }
 
     /**
@@ -123,16 +111,27 @@ public class OpenProofsViewController extends NUIController
     }
 
     @Override
-    public void update(final Observable observable, final Object arg) {
-        final ObservableList<String> loadedProofs = dataModel.getListOfProofs();
-        if (loadedProofs.size() >= 1) {
-            listView.setContextMenu(contextMenu);
-        }
-        else {
-            listView.setContextMenu(null);
-        }
-        listView.setItems(loadedProofs);
-        listView.getSelectionModel().select(arg.toString());
+    protected void init() {
+        dataModel.addObserver(this);
+        // Action to be performed if user clicks (left) on a proof entry
+        listView.setOnMouseClicked((event) -> {
+            final String selectedItem = listView.getSelectionModel()
+                    .getSelectedItem();
+            if (selectedItem != null) {
+                dataModel.loadProofFormMemory(selectedItem);
+            }
+        });
+
+        final MenuItem deleteProof = new MenuItem(
+                bundle.getString("closeProof"));
+        contextMenu = new ContextMenu(deleteProof);
+
+        // Action to be performed if user clicks on 'Close Proof' in the context
+        // menu
+        deleteProof.setOnAction((event) -> {
+            showSaveDialog();
+            dataModel.removeProof(listView.getSelectionModel().getSelectedItem());
+        });
     }
 
 }

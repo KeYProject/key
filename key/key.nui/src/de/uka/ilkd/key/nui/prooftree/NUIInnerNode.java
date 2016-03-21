@@ -26,15 +26,6 @@ public class NUIInnerNode extends NUINode {
         this.proofNode = pNode;
     }
 
-    /**
-     * Returns the proof node of the inner node.
-     * 
-     * @return proofNode The proof node of the inner node.
-     */
-    public final de.uka.ilkd.key.proof.Node getProofNode() {
-        return proofNode;
-    }
-
     @Override
     public NUIInnerNode clone() {
         // create clone
@@ -42,5 +33,14 @@ public class NUIInnerNode extends NUINode {
         this.copyFields(this, cloned);
 
         return cloned;
+    }
+
+    /**
+     * Returns the proof node of the inner node.
+     * 
+     * @return proofNode The proof node of the inner node.
+     */
+    public final de.uka.ilkd.key.proof.Node getProofNode() {
+        return proofNode;
     }
 }

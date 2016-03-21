@@ -12,12 +12,12 @@ import de.uka.ilkd.key.nui.prooftree.NUINode;
 public class FilterHideClosed implements ProofTreeFilter {
 
     @Override
-    public boolean test(final NUINode node) {
-        return !node.isClosed();
+    public String getContextMenuItemText() {
+        return "Hide Closed";
     }
 
     @Override
-    public String getContextMenuItemText() {
-        return "Hide Closed";
+    public boolean test(final NUINode node) {
+        return !node.isClosed();
     }
 }

@@ -64,71 +64,91 @@ public abstract class NUIController {
 
         init();
     }
+
     /**
      * TODO
+     * 
      * @return
      */
     public ResourceBundle getBundle() {
         return bundle;
     }
+
     /**
      * TODO
+     * 
      * @return
      */
     public String getComponentName() {
         return componentName;
     }
+
     /**
      * TODO
+     * 
      * @return
      */
     public DataModel getDataModel() {
         return dataModel;
     }
+
     /**
      * TODO
+     * 
      * @return
      */
     public String getFilename() {
         return filename;
     }
+
     /**
      * TODO
+     * 
      * @return
      */
     public NUI getNui() {
         return nui;
     }
+
     /**
      * TODO
+     * 
      * @param bundle
      */
     public void setBundle(final ResourceBundle bundle) {
         this.bundle = bundle;
     }
+
     /**
      * TODO
+     * 
      * @param componentName
      */
     public void setComponentName(final String componentName) {
         this.componentName = componentName;
     }
+
     /**
      * TODO
+     * 
      * @param dataModel
      */
     public void setDataModel(final DataModel dataModel) {
         this.dataModel = dataModel;
     }
+
     /**
      * TODO
+     * 
      * @param filename
      */
     public void setFilename(final String filename) {
         this.filename = filename;
     }
+
     /**
      * TODO
+     * 
      * @param nui
      */
     public void setNui(final NUI nui) {

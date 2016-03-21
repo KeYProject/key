@@ -14,16 +14,16 @@ import de.uka.ilkd.key.nui.prooftree.NUINode;
 public class FilterHideNonInteractive implements ProofTreeFilter {
 
     @Override
+    public String getContextMenuItemText() {
+        return "Hide Non-Interactive";
+    }
+
+    @Override
     public boolean test(final NUINode node) {
         if (node instanceof NUIBranchNode || node instanceof NUILeafNode) {
             return true;
         }
         return node.isInteractive();
-    }
-
-    @Override
-    public String getContextMenuItemText() {
-        return "Hide Non-Interactive";
     }
 
 }

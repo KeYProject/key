@@ -12,12 +12,6 @@ import java.util.LinkedList;
 public final class TextFilteringHandler {
 
     /**
-     * Utility class should not be instantiated.
-     */
-    private TextFilteringHandler() {
-    }
-
-    /**
      * Returns a subtree consisting of only matching nodes.
      * 
      * @param root
@@ -80,5 +74,11 @@ public final class TextFilteringHandler {
         final String lblLC = node.getLabel().toLowerCase();
         final String filterLC = filter.toLowerCase();
         return lblLC.contains(filterLC);
+    }
+
+    /**
+     * Utility class should not be instantiated.
+     */
+    private TextFilteringHandler() {
     }
 }

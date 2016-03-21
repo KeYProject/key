@@ -26,15 +26,6 @@ public class NUILeafNode extends NUINode {
         this.proofNode = proofNode;
     }
 
-    /**
-     * Returns the corresponding proof node of the leaf node.
-     * 
-     * @return proofNode The proof node of the leaf node.
-     */
-    public final de.uka.ilkd.key.proof.Node getProofNode() {
-        return proofNode;
-    }
-
     @Override
     public NUILeafNode clone(){
         // create clone
@@ -42,5 +33,14 @@ public class NUILeafNode extends NUINode {
         this.copyFields(this, cloned);
 
         return cloned;
+    }
+
+    /**
+     * Returns the corresponding proof node of the leaf node.
+     * 
+     * @return proofNode The proof node of the leaf node.
+     */
+    public final de.uka.ilkd.key.proof.Node getProofNode() {
+        return proofNode;
     }
 }

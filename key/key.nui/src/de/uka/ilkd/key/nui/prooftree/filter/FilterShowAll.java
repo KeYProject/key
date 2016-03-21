@@ -11,12 +11,12 @@ import de.uka.ilkd.key.nui.prooftree.NUINode;
 public class FilterShowAll implements ProofTreeFilter {
 
     @Override
-    public boolean test(final NUINode node) {
-        return true;
+    public String getContextMenuItemText() {
+        return "";
     }
 
     @Override
-    public String getContextMenuItemText() {
-        return "";
+    public boolean test(final NUINode node) {
+        return true;
     }
 }

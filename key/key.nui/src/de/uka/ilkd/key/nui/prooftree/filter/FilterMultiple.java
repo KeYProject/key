@@ -17,16 +17,6 @@ public class FilterMultiple implements ProofTreeFilter {
      */
     private List<ProofTreeFilter> filters = new LinkedList<>();
 
-    @Override
-    public boolean test(final NUINode node) {
-        for (final Predicate<NUINode> filter : filters) {
-            if (!filter.test(node)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /**
      * Adds a filter to the combination.
      * 
@@ -35,16 +25,6 @@ public class FilterMultiple implements ProofTreeFilter {
      */
     public void addFilter(final ProofTreeFilter filter) {
         filters.add(filter);
-    }
-
-    /**
-     * Sets all the list of filters.
-     * 
-     * @param filters
-     *            The list of filters.
-     */
-    public void setAllFilters(final List<ProofTreeFilter> filters) {
-        this.filters = filters;
     }
 
     /**
@@ -57,5 +37,25 @@ public class FilterMultiple implements ProofTreeFilter {
     @Override
     public String getContextMenuItemText() {
         return "";
+    }
+
+    /**
+     * Sets all the list of filters.
+     * 
+     * @param filters
+     *            The list of filters.
+     */
+    public void setAllFilters(final List<ProofTreeFilter> filters) {
+        this.filters = filters;
+    }
+
+    @Override
+    public boolean test(final NUINode node) {
+        for (final Predicate<NUINode> filter : filters) {
+            if (!filter.test(node)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

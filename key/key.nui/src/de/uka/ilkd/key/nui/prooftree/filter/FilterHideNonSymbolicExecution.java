@@ -15,15 +15,15 @@ import de.uka.ilkd.key.nui.prooftree.NUINode;
 public class FilterHideNonSymbolicExecution implements ProofTreeFilter {
 
     @Override
+    public String getContextMenuItemText() {
+        return "Hide Non-Symbolic-Execution";
+    }
+
+    @Override
     public boolean test(final NUINode node) {
         if (node instanceof NUIBranchNode || node instanceof NUILeafNode) {
             return true;
         }
         return node.isSymbolicExecution();
-    }
-
-    @Override
-    public String getContextMenuItemText() {
-        return "Hide Non-Symbolic-Execution";
     }
 }

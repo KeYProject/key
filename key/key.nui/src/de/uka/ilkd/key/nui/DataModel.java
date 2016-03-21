@@ -32,14 +32,6 @@ public class DataModel extends Observable {
     private TreeViewState loadedTreeViewState;
 
     /**
-     * TODO
-     * @param loadedTreeViewState
-     */
-    public void setLoadedTreeViewState(final TreeViewState loadedTreeViewState) {
-        this.loadedTreeViewState = loadedTreeViewState;
-    }
-
-    /**
      * An instance representing the associated NUI.
      */
     private final NUI nui;
@@ -197,6 +189,15 @@ public class DataModel extends Observable {
         loadedTreeViewState = treeViewState;
         this.setChanged();
         this.notifyObservers(name);
+    }
+
+    /**
+     * TODO
+     * 
+     * @param loadedTreeViewState
+     */
+    public void setLoadedTreeViewState(final TreeViewState loadedTreeViewState) {
+        this.loadedTreeViewState = loadedTreeViewState;
     }
 
 }
