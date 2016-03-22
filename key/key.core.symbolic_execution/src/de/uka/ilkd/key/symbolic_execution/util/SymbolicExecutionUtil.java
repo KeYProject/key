@@ -2245,8 +2245,9 @@ public final class SymbolicExecutionUtil {
     * @return The {@link Term} in the other {@link Node} described by the {@link PosInOccurrence} or {@code null} if not available.
     */
    public static Term posInOccurrenceInOtherNode(Node original, PosInOccurrence pio, Node toApplyOn) {
-      if (original != null && toApplyOn != null) {
-         return posInOccurrenceInOtherNode(original.sequent(), pio, toApplyOn.sequent());
+      PosInOccurrence appliedPIO = posInOccurrenceToOtherSequent(original, pio, toApplyOn);
+      if (appliedPIO != null) {
+         return appliedPIO.subTerm();
       }
       else {
          return null;
@@ -2261,9 +2262,44 @@ public final class SymbolicExecutionUtil {
     * @param toApplyOn The new {@link Sequent} to apply the {@link PosInOccurrence} on.
     * @return The {@link Term} in the other {@link Sequent} described by the {@link PosInOccurrence} or {@code null} if not available.
     */
-   public static Term posInOccurrenceInOtherNode(Sequent original, PosInOccurrence pio,
-                                                 Sequent toApplyOn) {
-      if (original != null && pio != null && toApplyOn != null) {
+   public static Term posInOccurrenceInOtherNode(Sequent original, PosInOccurrence pio, Sequent toApplyOn) {
+      PosInOccurrence appliedPIO = posInOccurrenceToOtherSequent(original, pio, toApplyOn);
+      if (appliedPIO != null) {
+         return appliedPIO.subTerm();
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Returns the {@link PosInOccurrence} described by the given {@link PosInOccurrence} of the original {@link Node}
+    * in the {@link Node} to apply too.
+    * @param original The original {@link Node} on which the given {@link PosInOccurrence} works.
+    * @param pio The given {@link PosInOccurrence}.
+    * @param toApplyTo The new {@link Node} to apply the {@link PosInOccurrence} to.
+    * @return The {@link PosInOccurrence} in the other {@link Node} described by the {@link PosInOccurrence} or {@code null} if not available.
+    */
+   public static PosInOccurrence posInOccurrenceToOtherSequent(Node original, PosInOccurrence pio, Node toApplyTo) {
+      if (original != null && toApplyTo != null) {
+         return posInOccurrenceToOtherSequent(original.sequent(), pio, toApplyTo.sequent());
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Returns the {@link PosInOccurrence} described by the given {@link PosInOccurrence} of the original {@link Sequent}
+    * in the {@link Sequent} to apply too.
+    * @param original The original {@link Sequent} on which the given {@link PosInOccurrence} works.
+    * @param pio The given {@link PosInOccurrence}.
+    * @param toApplyTo The new {@link Sequent} to apply the {@link PosInOccurrence} to.
+    * @return The {@link PosInOccurrence} in the other {@link Sequent} described by the {@link PosInOccurrence} or {@code null} if not available.
+    */
+   public static PosInOccurrence posInOccurrenceToOtherSequent(Sequent original, PosInOccurrence pio,
+                                                               Sequent toApplyTo) {
+      if (original != null && pio != null && toApplyTo != null) {
          // Search index of formula in original sequent
          SequentFormula originalSF = pio.sequentFormula();
          boolean antecendet = pio.isInAntec();
@@ -2275,9 +2311,8 @@ public final class SymbolicExecutionUtil {
             index = original.succedent().indexOf(originalSF);
          }
          if (index >= 0) {
-            final SequentFormula toApplyOnSF =
-                    (antecendet ? toApplyOn.antecedent() : toApplyOn.succedent()).get(index);
-            return pio.posInTerm().getSubTerm(toApplyOnSF.formula());
+            final SequentFormula toApplyToSF = (antecendet ? toApplyTo.antecedent() : toApplyTo.succedent()).get(index);
+            return new PosInOccurrence(toApplyToSF, pio.posInTerm(), antecendet);
          }
          else {
             return null;

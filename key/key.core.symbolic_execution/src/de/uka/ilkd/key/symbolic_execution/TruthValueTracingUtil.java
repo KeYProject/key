@@ -177,9 +177,9 @@ public final class TruthValueTracingUtil {
     * @throws ProofInputException Occurred Exception
     */
    public static TruthValueTracingResult evaluate(Node node, 
-                                                    Name termLabelName,
-                                                    boolean useUnicode,
-                                                    boolean usePrettyPrinting) throws ProofInputException {
+                                                  Name termLabelName,
+                                                  boolean useUnicode,
+                                                  boolean usePrettyPrinting) throws ProofInputException {
       TruthValueTracingResult result = new TruthValueTracingResult();
       Deque<Map<String, MultiEvaluationResult>> evaluationStack = new LinkedList<Map<String, MultiEvaluationResult>>();
       evaluationStack.addFirst(new HashMap<String, MultiEvaluationResult>());
@@ -211,8 +211,6 @@ public final class TruthValueTracingUtil {
       // Analyze applied rule
       boolean childrenAlreadyTreated = false;
       if (node.getAppliedRuleApp() instanceof TacletApp) {
-         // Check for new minor ids created by parent rule application
-         updatePredicateResultBasedOnNewMinorIds(node, termLabelName, services.getTermBuilder(), currentResults);
          TacletApp tacletApp = (TacletApp) node.getAppliedRuleApp();
          List<LabelOccurrence> labels = findInvolvedLabels(node.sequent(), tacletApp, termLabelName);
          if (!labels.isEmpty()) {
@@ -222,6 +220,8 @@ public final class TruthValueTracingUtil {
                int i = 0;
                for (TacletGoalTemplate tacletGoal : taclet.goalTemplates().reverse()) {
                   Map<String, MultiEvaluationResult> childResults = new HashMap<String, MultiEvaluationResult>(currentResults);
+                  // Check for new minor ids created by parent rule application
+                  updatePredicateResultBasedOnNewMinorIds(node.child(i), termLabelName, services.getTermBuilder(), childResults);
                   analyzeTacletGoal(node, tacletApp, tacletGoal, labels, services, childResults);
                   // Evaluate children with branch specific Taclet result
                   evaluationStack.addFirst(childResults);
@@ -254,6 +254,12 @@ public final class TruthValueTracingUtil {
             }
             parentPio = protocolApp.posInOccurrence();
          }
+         // Compare last PIO with PIO in child sequent (Attention: Child PIO is computed with help of the PIO of the OSS)
+         if (parentPio != null) {
+            assert 1 == node.childrenCount() : "Implementaton of the OneStepSimplifierRule has changed.";
+            PosInOccurrence childPio = SymbolicExecutionUtil.posInOccurrenceToOtherSequent(node, node.getAppliedRuleApp().posInOccurrence(), node.child(0));
+            updatePredicateResultBasedOnNewMinorIdsOSS(childPio, parentPio, termLabelName, services.getTermBuilder(), currentResults);
+         }
       }
       // Analyze children
       int childCount = node.childrenCount();
@@ -265,7 +271,10 @@ public final class TruthValueTracingUtil {
       else if (!childrenAlreadyTreated) {
          // Evaluate children in case that branch specific Taclet results are not available and thus not evaluated yet.
          for (int i = 0; i < childCount; i++) {
-            evaluationStack.addFirst(new HashMap<String, MultiEvaluationResult>(currentResults));
+            Map<String, MultiEvaluationResult> childResults = new HashMap<String, MultiEvaluationResult>(currentResults);
+            // Check for new minor ids created by parent rule application
+            updatePredicateResultBasedOnNewMinorIds(node.child(i), termLabelName, services.getTermBuilder(), childResults);
+            evaluationStack.addFirst(childResults);
             evaluateNode(evaluationNode, useUnicode, usePrettyPrinting, node.child(i), termLabelName, evaluationStack, result, services);
             evaluationStack.removeFirst();
          }
@@ -490,7 +499,7 @@ public final class TruthValueTracingUtil {
                currentPio = currentPio.up();
                checkForNewMinorIds(childNode, currentPio.subTerm(), termLabelName, parentPio, tb, results);
             }
-            // Check if instations
+            // Check if instantiations
             if (parentRuleApp instanceof TacletApp) {
                TacletApp ta = (TacletApp) parentRuleApp;
                if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {

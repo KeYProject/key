@@ -107,7 +107,7 @@ public class TruthValueTracingViewerDecorator extends ProofSourceViewerDecorator
       VisibleTermLabels visibleTermLabels = new VisibleTermLabels() {
          @Override
          public boolean contains(Name name) {
-            return true || !ObjectUtil.equals(name, branchResult.getTermLabelName());
+            return !ObjectUtil.equals(name, branchResult.getTermLabelName());
          }
       };
       String text = showSequent(sequent, services, notationInfo, visibleTermLabels);

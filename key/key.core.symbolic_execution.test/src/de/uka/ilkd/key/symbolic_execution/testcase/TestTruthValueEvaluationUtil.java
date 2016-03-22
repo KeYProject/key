@@ -29,6 +29,63 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestCase {
    
    /**
+    * Tests example: /set/truthValueAssignableAndLoop
+    */
+   public void testTruthValueAssignableAndLoop() throws Exception {
+      // Create expected results
+      ExpectedBranchResult goal430 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.FALSE));
+      ExpectedTruthValueEvaluationResult resultExceptionBranch = new ExpectedTruthValueEvaluationResult(goal430);
+      ExpectedBranchResult goal478 = new ExpectedBranchResult(new ExpectedTruthValueResult("7.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("8.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult resultInvInitial = new ExpectedTruthValueEvaluationResult(goal478);
+      ExpectedBranchResult goal922 = new ExpectedBranchResult(new ExpectedTruthValueResult("19.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("20.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult resultPrecondition = new ExpectedTruthValueEvaluationResult(goal922);
+      ExpectedBranchResult goal886 = new ExpectedBranchResult();
+      ExpectedBranchResult goal869 = new ExpectedBranchResult(new ExpectedTruthValueResult("9.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("14.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("15.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("16.0", TruthValue.TRUE));
+      ExpectedBranchResult goal868 = new ExpectedBranchResult(new ExpectedTruthValueResult("9.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("14.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("15.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("16.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult resultLoopEnd = new ExpectedTruthValueEvaluationResult(goal868, goal869, goal886);
+      ExpectedBranchResult goal1113 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("2.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("5.0", TruthValue.UNKNOWN),
+                                                               new ExpectedTruthValueResult("6.0", TruthValue.UNKNOWN));
+      ExpectedBranchResult goal1134 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("2.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("6.0", TruthValue.TRUE));
+      ExpectedBranchResult goal1137 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("2.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("4.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult result5 = new ExpectedTruthValueEvaluationResult(goal1113, goal1134, goal1137);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueAssignableAndLoop/test/MagicProofNoOSS.proof", 
+                                 "/set/truthValueAssignableAndLoop/oracle/MagicProofNoOSS.xml",
+                                 true,
+                                 true,
+                                 resultExceptionBranch,
+                                 resultInvInitial,
+                                 resultPrecondition,
+                                 resultLoopEnd,
+                                 result5);
+   }
+   
+   /**
     * Tests example: /set/truthValueAnd
     */
    public void testAnd3_replaceKnown() throws Exception {
@@ -790,18 +847,18 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    protected void assertBranchResult(ExpectedBranchResult expected, BranchResult current) {
       Map<String, MultiEvaluationResult> currentResults = current.getResults();
-      assertTrue(expected.labelResults.size() <= currentResults.size());
+      assertTrue("To many expected results at goal " + current.getLeafNode().serialNr(), expected.labelResults.size() <= currentResults.size());
       for (Entry<String, TruthValue> expectedEntry : expected.labelResults.entrySet()) {
          MultiEvaluationResult currentInstruction = currentResults.get(expectedEntry.getKey());
-         assertNotNull(currentInstruction);
+         assertNotNull("Current result of " + expectedEntry.getKey() + " is missing at goal " + current.getLeafNode().serialNr() + ".", currentInstruction);
          TruthValue currentResult = currentInstruction.evaluate(current.getTermLabelName(), currentResults);
          TruthValue expectedValue = expectedEntry.getValue();
          if (expectedValue == null) {
             assertNull(currentResult);
          }
          else {
-            assertNotNull(currentResult);
-            assertEquals(expectedEntry.getKey(), expectedValue, currentResult);
+            assertNotNull("Current result of " + expectedEntry.getKey() + " at goal " + current.getLeafNode().serialNr() + " is not available.", currentResult);
+            assertEquals("Wrong truth value of " + expectedEntry.getKey() + " at goal " + current.getLeafNode().serialNr() + ".", expectedValue, currentResult);
          }
       }
    }
