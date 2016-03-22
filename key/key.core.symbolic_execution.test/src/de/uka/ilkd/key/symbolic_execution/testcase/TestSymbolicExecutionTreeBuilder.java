@@ -43,6 +43,28 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
+   
+   /**
+    * Tests example: /set/useLoopInvariantWithoutDecreasing
+    */
+   public void testUseLoopInvariantWithoutDecreasing() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/useLoopInvariantWithoutDecreasing/test/LoopInvArrayExample.proof",
+                          "/set/useLoopInvariantWithoutDecreasing/oracle/LoopInvArrayExample.xml",
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
    /**
     * Tests example: /set/simpleIf
     */

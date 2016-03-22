@@ -173,7 +173,7 @@ public interface LoopInvariant extends SpecificationElement {
     /**
      * Returns the invariant in pretty plain text format.
      */
-    public String getPlainText(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols);
+    public String getPlainText(Services services, Iterable<LocationVariable> heapContext, boolean usePrettyPrinting, boolean useUnicodeSymbols);
 
     public String getUniqueName();
 

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  * Defines the basic methods and properties each element in the 
@@ -56,6 +57,12 @@ public interface IExecutionElement {
     * @return The {@link Node} in KeY's proof tree which is represented by this execution tree node.
     */
    public Node getProofNode();
+   
+   /**
+    * Returns the applied {@link RuleApp}.
+    * @return The applied {@link RuleApp}.
+    */
+   public RuleApp getAppliedRuleApp();
    
    /**
     * Returns the {@link PosInOccurrence} of the modality of interest including updates.
