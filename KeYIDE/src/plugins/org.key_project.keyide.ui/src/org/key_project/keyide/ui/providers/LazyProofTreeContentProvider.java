@@ -226,10 +226,10 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 */
 	protected int doUpdateChildCount(Object element, int currentChildCount) {
 		if (element instanceof Proof) {
-			Proof proof = (Proof) element;
-			Node branchNode = proof.root();
+			Proof currentProof = (Proof) element;
+			Node branchNode = currentProof.root();
 			int childCount = getBranchFolderChildCount(branchNode);
-			int folderCount = getFolderCountInBranch(proof);
+			int folderCount = getFolderCountInBranch(currentProof);
 			viewer.setChildCount(element, childCount + folderCount);
 			return childCount + folderCount;
 		}
@@ -373,7 +373,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 						if (SymbolicExecutionUtil.isTerminationNode(startNode, startNode.getAppliedRuleApp())) {
 							count = nodeCount;
 							break;
-						} else if (isExecutionNode(startNode)){
+						} else if (isExecutionNode(startNode)) {
 							break;
 						}
 					}
@@ -484,7 +484,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 								node = node.child(0);
 							}
 							break;
-						} else if (isExecutionNode(parentNode)){
+						} else if (isExecutionNode(parentNode)) {
 							return null;
 						}
 					}
@@ -500,13 +500,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		// element is a BranchFolder
 		else {
 			int folderIndex = index - childCount;
-			// does the same as the code in comments beneath but also works when a filter is active
 			while (node.childrenCount() == 1) {
 				node = node.child(0);
 			}
-//			for (int i = 0; i < childCount - 1; i++) {
-//				node = node.child(0);
-//			}
 			BranchFolder branchFolder = new BranchFolder(
 					node.child(folderIndex));
 			branchFolders.put(node.child(folderIndex), branchFolder);
