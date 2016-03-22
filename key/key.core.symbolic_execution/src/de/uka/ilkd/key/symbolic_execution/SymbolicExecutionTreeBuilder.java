@@ -494,19 +494,19 @@ public class SymbolicExecutionTreeBuilder {
     */
    public void prune(Node node) { 
       HashSet<AbstractExecutionNode<?>> exNodesToDelete = new HashSet<AbstractExecutionNode<?>>(proof.countNodes());
-      IExecutionNode<?> firstFather = getExecutionNode(node);
+      IExecutionNode<?> firstExNode = getExecutionNode(node);
       boolean pruneOnExNode = false;
       
       // search for the first node in the parent hierarchy (including the node itself) who is an AbstractExecutionNode
-      if (firstFather != null && firstFather != startNode) {
+      if (firstExNode != null && firstExNode != startNode) {
          pruneOnExNode = true;
       }
-      else while (firstFather == null) {
+      else while (firstExNode == null) {
          node = node.parent();
-         firstFather = getExecutionNode(node);
+         firstExNode = getExecutionNode(node);
       }
       // determine which nodes should be pruned
-      ExecutionNodePreorderIterator subtreeToBePruned = new ExecutionNodePreorderIterator(firstFather);
+      ExecutionNodePreorderIterator subtreeToBePruned = new ExecutionNodePreorderIterator(firstExNode);
       if (!pruneOnExNode) {
          subtreeToBePruned.next();
       }

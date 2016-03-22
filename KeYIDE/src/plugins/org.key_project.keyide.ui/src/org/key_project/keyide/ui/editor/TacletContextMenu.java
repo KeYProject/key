@@ -13,6 +13,7 @@
 
 package org.key_project.keyide.ui.editor;
 
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.eclipse.jface.action.MenuManager;
@@ -77,14 +78,32 @@ public class TacletContextMenu extends ExtensionContributionFactory {
             // Add macros
             MenuManager macroMenu = new MenuManager("Strategy macros");
             Iterable<ProofMacro> allMacros = ProofMacroMenu.REGISTERED_MACROS;
+            HashMap<String, MenuManager> menus = new HashMap<String, MenuManager>();
             for (ProofMacro macro : allMacros) {
                if (macro.canApplyTo(goal.node(), pos.getPosInOccurrence())) {
                   CommandContributionItemParameter p = new CommandContributionItemParameter(serviceLocator, "", "org.key_project.keyide.ui.commands.applyrule", SWT.PUSH);
                   p.label = macro.getName();
                   MacroCommandContributionItem item = new MacroCommandContributionItem(p, goal.node(), macro, keyEditor.getUI(), pos);
                   item.setVisible(true);
-                  macroMenu.add(item);
+                  
+                  // sort macros into submenus by their category
+                  String category = macro.getCategory();
+                  MenuManager menu = menus.get(category);
+                  if (category == null) {
+                     macroMenu.add(item);
+                  } else {
+                     if (menu != null) {
+                        menu.add(item);
+                     } else {
+                        MenuManager newMenu = new MenuManager(category);
+                        newMenu.add(item);
+                        menus.put(category, newMenu);
+                     }
+                  }
                }
+            }
+            for (MenuManager subMenu : menus.values()) {
+               macroMenu.add(subMenu);
             }
             additions.addContributionItem(macroMenu, null); 
          }
