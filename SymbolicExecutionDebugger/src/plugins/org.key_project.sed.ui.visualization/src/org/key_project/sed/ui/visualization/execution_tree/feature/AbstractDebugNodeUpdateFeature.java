@@ -27,13 +27,17 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IReason;
+import org.eclipse.graphiti.features.IRemoveFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
+import org.eclipse.graphiti.features.context.IRemoveContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.AreaContext;
 import org.eclipse.graphiti.features.context.impl.LayoutContext;
+import org.eclipse.graphiti.features.context.impl.RemoveContext;
 import org.eclipse.graphiti.features.context.impl.UpdateContext;
 import org.eclipse.graphiti.features.impl.AbstractUpdateFeature;
+import org.eclipse.graphiti.features.impl.DefaultRemoveFeature;
 import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
@@ -227,8 +231,10 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       else {
          try {
             PictogramElement pe = context.getPictogramElement();
-
-            if (isNameUpdateNeeded(pe)) {
+            if (isPruneUpdateNeeded(pe)) {
+            	return Reason.createTrueReason("Node got pruned");
+            	
+            } else if (isNameUpdateNeeded(pe)) {
                return Reason.createTrueReason("Name is out of date.");
             }
             else {
@@ -247,6 +253,23 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          }
       }
    }
+   
+	/**
+	 * Checks if the business object of the given {@link PictogramElement} got pruned.
+	 * @param pe the {@link PictogramElement}.
+	 * @return true if the business object got pruned; otherwise false.
+	 * @throws DebugException
+	 */
+	protected boolean isPruneUpdateNeeded(PictogramElement pe) throws DebugException {
+		Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pe);
+		if (bo instanceof ISENode) {
+			ISENode node = (ISENode) bo;
+			if (!node.hasChildren() && node.getParent() != null && !node.getParent().hasChildren()) {
+				return true;
+			}
+		}
+		return false;
+	}
    
    /**
     * Checks if the shown name in the given {@link PictogramElement}
@@ -393,6 +416,14 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       }
       else {
          try {
+        	// remove pruned nodes
+        	if (isPruneUpdateNeeded(context.getPictogramElement())) {
+        		IRemoveContext removeContext = new RemoveContext(context.getPictogramElement());
+				IRemoveFeature feature = new DefaultRemoveFeature(getFeatureProvider());
+				feature.execute(removeContext);
+				return true;
+        	}
+        	
             // Define monitor to use
             IProgressMonitor monitor = GraphitiUtil.getProgressMonitor(context);
             // Update name
