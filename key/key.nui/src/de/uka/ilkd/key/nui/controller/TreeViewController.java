@@ -5,7 +5,6 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 import java.util.WeakHashMap;
-
 import de.uka.ilkd.key.nui.DataModel;
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.TreeViewState;
@@ -181,6 +180,25 @@ public class TreeViewController extends NUIController implements Observer {
         }
     }
 
+    private Pane filterViewHBox;
+    private FilterViewController filterViewController;
+
+    public final void openFilterView() {
+        if (filterViewHBox != null || filterViewController != null) {
+            filterViewController.initializeFiltering(filteringHandler, treeViewPane);
+            if (!treeViewPane.getChildren().contains(filterViewHBox)) {
+                treeViewPane.getChildren().add(filterViewHBox);
+            }
+        }
+    }
+
+    public void addFilterView(final Pane filterViewHBox, final NUIController nuiController) {
+        this.filterViewHBox = filterViewHBox;
+        if (nuiController instanceof FilterViewController) {
+            this.filterViewController = (FilterViewController) nuiController;
+        }
+    }
+
     /**
      * TODO
      * 
@@ -275,6 +293,19 @@ public class TreeViewController extends NUIController implements Observer {
                             && dataModel.getLoadedTreeViewState() != null) {
                         openSearchView();
                     }
+
+                    if (event.getCode().equals(KeyCode.G) && event.isShortcutDown()
+                            && dataModel.getLoadedTreeViewState() != null) {
+                        openFilterView();
+                    }
+                    /*
+                     * if (event.isShortcutDown() &&
+                     * dataModel.getLoadedTreeViewState() != null) { switch
+                     * (event.getCode()) { case F: openSearchView(); break; case
+                     * G: openFilterView(); break; default: break; } }
+                     * 
+                     * });
+                     */
                 });
             }
             catch (ControllerNotFoundException exception) {

@@ -16,7 +16,6 @@ import java.util.Observable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
 import de.uka.ilkd.key.nui.DataModel;
 import de.uka.ilkd.key.nui.prooftree.filter.FilterAnnotation;
 import de.uka.ilkd.key.nui.prooftree.filter.FilterCombineAND;
@@ -53,7 +52,6 @@ public class FilteringHandler {
     /**
      * A map storing filters with their respective activation flag.
      */
-
     final private Map<ProofTreeFilter, Boolean> filtersMap = Collections
             .synchronizedMap(new ConcurrentHashMap<>());
 
@@ -78,8 +76,16 @@ public class FilteringHandler {
     }
 
     /**
+     * Applies the given {@link ProofTreeFilter} to the ProofTree.
+     * @param proofTreeFilter the filter to apply.
+     */
+    public void filterBy(final ProofTreeFilter proofTreeFilter) {
+        filtersMap.put(proofTreeFilter, true);
+        applyFilters();
+    }
+
+    /**
      * TODO
-     * 
      * @return
      */
     public DataModel getDataModel() {
@@ -115,6 +121,15 @@ public class FilteringHandler {
                 filtersMap.put(filter, false);
             }
         });
+    }
+
+    /**
+     * Stops applying the referenced {@link ProofTreeFilter} to the ProofTree.
+     * @param proofTreeFilter the filter to stop applying.
+     */
+    public void stopFilteringBy(final ProofTreeFilter proofTreeFilter) {
+        filtersMap.remove(proofTreeFilter);
+        applyFilters();
     }
 
     /**
@@ -244,7 +259,8 @@ public class FilteringHandler {
         }
 
         try {
-            // Convert listOfURLs to an array of URLs. This array is needed for the classLoader
+            // Convert listOfURLs to an array of URLs. This array is needed for
+            // the classLoader
             final URL[] urls = listOfURLs.toArray(new URL[] {});
 
             // initialize classLoader

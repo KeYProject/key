@@ -135,7 +135,7 @@ public class SearchViewController extends NUIController {
      * Closes the search view.
      */
     private void closeSearchView() {
-        // delete searchView component form treeViewPane
+        // delete searchView component from treeViewPane
         treeViewPane.getChildren().remove(searchViewPane);
         // reset proofTreeView
         proofTreeView.getRoot().getValue().resetSearch();
@@ -150,7 +150,7 @@ public class SearchViewController extends NUIController {
      * 
      * @return Set&lt;ProofTreeCell&gt; containing the rendered ProofTreeCells.
      */
-    @SuppressWarnings({ "unchecked", "cast" })
+    @SuppressWarnings({ "unchecked" })
     private Set<ProofTreeCell> getProofTreeCells() {
         try {
             final Field f = VirtualContainerBase.class.getDeclaredField("flow");

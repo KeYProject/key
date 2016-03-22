@@ -295,8 +295,13 @@ public class NUI extends Application {
         // Load all components
         loadComponents();
 
-        ((TreeViewController) getController("treeViewPane"))
-                .addSearchView(getComponent("searchViewPane"), getController("searchViewPane"));
+        final TreeViewController treeViewController = ((TreeViewController) getController(
+                "treeViewPane"));
+        treeViewController.addSearchView(getComponent("searchViewPane"),
+                getController("searchViewPane"));
+        treeViewController.addFilterView(getComponent("filterViewHBox"),
+                getController("filterViewHBox"));
+
         // create file menu for MainView
         mainViewCont.getViewMenu().getItems().add(viewPositionMenu);
 

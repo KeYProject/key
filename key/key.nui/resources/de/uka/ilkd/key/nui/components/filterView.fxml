@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<HBox fx:id="filterViewHBox" HBox.hgrow="ALWAYS"
+   xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+   fx:controller="de.uka.ilkd.key.nui.controller.FilterViewController">
+   <children>
+      <TextField fx:id="tfFilterQuery" promptText="Filter"
+         layoutY="3.0" minWidth="100.0"
+         AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+         AnchorPane.topAnchor="0.0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" />
+      <ToggleButton fx:id="btnToggleFilter" text="F" textAlignment="CENTER"
+         AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0"
+         AnchorPane.topAnchor="0.0" minWidth="-Infinity" />
+      <Button fx:id="btnCloseView" text="X" textAlignment="CENTER"
+         AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0"
+         AnchorPane.topAnchor="0.0" minWidth="-Infinity" />
+   </children>
+
+</HBox>
