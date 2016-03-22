@@ -47,6 +47,11 @@ public class ProofTreeContextMenu extends ContextMenu {
      * The label of the context menu "search" label.
      */
     private static final String LBL_SEARCH = "Search";
+    
+    /**
+     * The label of the contect menu "filter" label.
+     */
+    private static final String LBL_FILTER = "Filter by text";
 
     /**
      * The FilteringHandler used to filter the tree cells.
@@ -174,6 +179,10 @@ public class ProofTreeContextMenu extends ContextMenu {
 
         addMenuItemSearch();
         addMenuItemsFilter();
+
+        addSeparator();
+
+        addMenuItemTextFilter();
     }
 
     /**
@@ -260,6 +269,16 @@ public class ProofTreeContextMenu extends ContextMenu {
      */
     private void addSeparator() {
         getItems().add(new SeparatorMenuItem());
+    }
+
+    /**
+     * Adds the entry "Filter by text" to the context menu.
+     */
+    private void addMenuItemTextFilter(){
+        final MenuItem mIFilter = new MenuItem(LBL_FILTER);
+        getItems().add(mIFilter);
+        mIFilter.setAccelerator(KeyCombination.keyCombination("Ctrl+G"));
+        mIFilter.setOnAction(event -> treeViewController.openFilterView());
     }
 
 }
