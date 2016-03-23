@@ -157,6 +157,23 @@
             commandId="org.key_project.keyide.ui.commands.pruneProof">
          <enabledWhen>
             <and>
+               <or>
+                  <with
+                        variable="activeEditor">
+                     <test
+                           forcePluginActivation="true"
+                           property="org.key_project.keyide.ui.canPruneProof"
+                           value="true">
+                     </test>
+                  </with>
+                  <not>
+                     <with
+                           variable="activeEditorId">
+                        <equals
+                              value="org.key_project.keyide.ui.editor">
+                        </equals>
+                     </with>
+                  </not></or>
             <with
                   variable="activeMenuSelection">
                <and>
@@ -165,14 +182,6 @@
                         property="org.key_project.keyide.ui.nodeSupportsPruning">
                   </test>
                </and>
-            </with>
-            <with
-                  variable="activeEditor">
-               <test
-                     forcePluginActivation="true"
-                     property="org.key_project.keyide.ui.canPruneProof"
-                     value="true">
-               </test>
             </with>
             </and>
          </enabledWhen>

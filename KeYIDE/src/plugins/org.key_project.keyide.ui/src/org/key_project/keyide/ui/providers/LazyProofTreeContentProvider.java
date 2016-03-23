@@ -156,7 +156,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		}
 		if (newInput instanceof Proof) {
 			this.proof = (Proof) newInput;
-			proof.addProofTreeListener(proofTreeListener);
+			if (!proof.isDisposed()) {
+			   proof.addProofTreeListener(proofTreeListener);
+			}
 		} else {
 			this.proof = null;
 		}
