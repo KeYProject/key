@@ -38,6 +38,7 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.SVInstantiationException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -441,21 +442,15 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
    
    /**
     * Stores the information and applies a freshly created taclet application.
-    * @throws Exception 
+    * @throws SVInstantiationException Occurred Exception.
     */
-   public void finish() {
-      try {
-         validationViewUpdate();
-         TacletApp app = getCurrentModel().createTacletApp();
-         if (app == null) {
-            return;
-         }
-         goal.apply(app);
-      }  catch (Exception exc) {
-         exc.printStackTrace();
-         //TODO: Handle this
+   public void finish() throws SVInstantiationException {
+      validationViewUpdate();
+      TacletApp app = getCurrentModel().createTacletApp();
+      if (app == null) {
          return;
-      } 
+      }
+      goal.apply(app);
       InstantiationFileHandler.saveListFor(getCurrentModel());
    }
 }
