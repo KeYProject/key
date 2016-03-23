@@ -267,10 +267,12 @@ public class StrategyViewController extends NUIController implements Observer {
     @Override
 
     public void update(final Observable obs, final Object arg) {
-        final TreeViewState treeViewState = ((DataModel) obs).getTreeViewState(arg.toString());
+        if (obs instanceof DataModel) {
+            final TreeViewState treeViewState = ((DataModel) obs).getTreeViewState(arg.toString());
 
-        if (treeViewState != null) {
-            addStrategyViewSwing(treeViewState.getProof());
+            if (treeViewState != null) {
+                addStrategyViewSwing(treeViewState.getProof());
+            }
         }
     }
 
@@ -284,7 +286,7 @@ public class StrategyViewController extends NUIController implements Observer {
         proofSearchStrategy.getChildren().clear();
         SwingUtilities.invokeLater(() -> {
             final SwingNode swingNode = strategyWrapper.createStrategyComponent(proof);
-            
+
             Platform.runLater(() -> proofSearchStrategy.getChildren().add(swingNode));
 
         });

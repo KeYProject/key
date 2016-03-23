@@ -26,7 +26,7 @@ public class ProofViewController extends NUIController implements Observer {
         if (treeViewState != null) {
             textAreaProof.setText(treeViewState.getProof().getStatistics().toString());
         }
-        else if (((DataModel) observable).getListOfProofs().size() >= 1) {
+        else if (observable instanceof DataModel && ((DataModel) observable).getListOfProofs().size() >= 1) {
             textAreaProof.setText(bundle.getString("noProofSelected"));
         }
         else {

@@ -210,7 +210,7 @@ public class FilteringHandler {
      *
      */
     @SuppressWarnings("PMD.AtLeastOneConstructor")
-    private class reflectionWrapper {
+    private static class reflectionWrapper {
 
         /**
          * Path where filter classes are stored.
@@ -236,8 +236,8 @@ public class FilteringHandler {
          *             Rethrow this as a runtime exception.
          */
         @SuppressWarnings("PMD.AvoidInstantiatingObjectsInsideLoops")
-        private SimpleImmutableEntry<List<URL>, List<String>> getFilterFilesInJar(final File jarFile)
-                throws IOException {
+        private SimpleImmutableEntry<List<URL>, List<String>> getFilterFilesInJar(
+                final File jarFile) throws IOException {
             final JarFile jar = new JarFile(jarFile);
             final Enumeration<JarEntry> entries = jar.entries();
             jar.close();
@@ -268,6 +268,9 @@ public class FilteringHandler {
             // Look for all class files in PATH and store their urls
             final File[] files = new File(getClass().getResource(FILTER_PATH).getPath())
                     .listFiles();
+            if (files == null) {
+                throw new MalformedURLException("Could not load filter files");
+            }
             for (final File file : files) {
                 if (file.isFile() && file.getName().matches(".*(.class)")) {
                     final URL urlClassFile = file.toURI().toURL();
@@ -307,7 +310,7 @@ public class FilteringHandler {
      * 
      * @return A list of filters
      */
-    private List<ProofTreeFilter> searchFilterClasses() {
+    private static List<ProofTreeFilter> searchFilterClasses() {
 
         final SimpleImmutableEntry<List<URL>, List<String>> files = new reflectionWrapper()
                 .getFilterFiles();

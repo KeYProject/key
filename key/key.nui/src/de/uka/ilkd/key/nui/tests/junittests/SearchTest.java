@@ -28,16 +28,15 @@ public class SearchTest {
     private static final String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
 
     /**
-     * The ProofTreeVisualizer used to load the test file.
+     * The ProofTreeVis. ualizer used to load the test file.
      */
-    private static ProofTreeConverter ptVisualizer;
+    private ProofTreeConverter ptVisualizer;
 
     /**
      * 
      */
     @Before
     public void setUp() {
-
         final File proofFile = new File(TESTFILE_01);
         KeYEnvironment<?> environment = null;
         try {
@@ -160,7 +159,7 @@ public class SearchTest {
      * @return True iff the size of the result list equals the expectedSize.
      */
 
-    private static boolean searchAndCompareSize(final String searchTerm, final int expectedSize) {
+    private boolean searchAndCompareSize(final String searchTerm, final int expectedSize) {
         ptVisualizer.getRootNode().search(searchTerm);
         return expectedSize == ptVisualizer.getRootNode().asList().stream()
                 .filter((node) -> node.isSearchResult()).count();

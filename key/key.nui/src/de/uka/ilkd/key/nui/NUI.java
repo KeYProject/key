@@ -453,13 +453,9 @@ public class NUI extends Application {
         final String middleText = bundle.getString("middle");
 
         addRadioMenuItem(hideText, menuName, toggleGroup, true, Place.HIDDEN, menu);
-
         addRadioMenuItem(leftText, menuName, toggleGroup, false, Place.LEFT, menu);
-
         addRadioMenuItem(rightText, menuName, toggleGroup, false, Place.RIGHT, menu);
-
         addRadioMenuItem(bottomText, menuName, toggleGroup, false, Place.BOTTOM, menu);
-
         addRadioMenuItem(middleText, menuName, toggleGroup, false, Place.MIDDLE, menu);
 
         return menu;
@@ -534,6 +530,10 @@ public class NUI extends Application {
         else {// Run with IDE
             final File[] files = new File(getClass().getResource(COMPONENTS_DIR).getPath())
                     .listFiles();
+
+            if (files == null) {
+                throw new IOException("Could not load NUI components");
+            }
 
             for (final File file : files) {
                 if (file.isFile() && file.getName().matches(".*[.fxml]")) {

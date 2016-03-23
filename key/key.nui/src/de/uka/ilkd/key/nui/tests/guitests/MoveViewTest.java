@@ -18,10 +18,10 @@ import org.junit.Test;
 public class MoveViewTest extends NUITest {
 
     // IDs of the panes where the views can be placed on
-    private final String DIRECTION_BOTTOM = "bottom";
-    private final String DIRECTION_RIGHT = "right";
-    private final String DIRECTION_LEFT = "left";
-    private final String DIRECTION_MIDDLE = "middle";
+    private static final String DIRECTION_BOTTOM = "bottom";
+    private static final String DIRECTION_RIGHT = "right";
+    private static final String DIRECTION_LEFT = "left";
+    private static final String DIRECTION_MIDDLE = "middle";
 
     // Text of the items in the menu bar
     private static final String MENUBAR_ABOUT = "About";

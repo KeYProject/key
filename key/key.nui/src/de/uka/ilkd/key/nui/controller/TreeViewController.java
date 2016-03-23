@@ -255,11 +255,14 @@ public class TreeViewController extends NUIController implements Observer {
 
     @Override
     public void update(final Observable obs, final Object arg) {
-        final TreeViewState treeViewState = ((DataModel) obs).getTreeViewState((String) arg);
-        final ProofTreeItem treeItem = (treeViewState == null) ? null : treeViewState.getTreeItem();
+        if (obs instanceof DataModel) {
+            final TreeViewState treeViewState = ((DataModel) obs).getTreeViewState((String) arg);
+            final ProofTreeItem treeItem = (treeViewState == null) ? null
+                    : treeViewState.getTreeItem();
 
-        // update the proofTreeView component in the treeView
-        proofTreeView.setRoot(treeItem);
+            // update the proofTreeView component in the treeView
+            proofTreeView.setRoot(treeItem);
+        }
     }
 
     /**
