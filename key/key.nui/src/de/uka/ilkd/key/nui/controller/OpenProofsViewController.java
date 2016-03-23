@@ -52,7 +52,7 @@ public class OpenProofsViewController extends NUIController
 
     @Override
     public void update(final Observable observable, final Object arg) {
-        final ObservableList<String> loadedProofs = dataModel.getListOfProofs();
+        final ObservableList<String> loadedProofs = getDataModel().getListOfProofs();
         if (loadedProofs.size() >= 1) {
             listView.setContextMenu(contextMenu);
         }
@@ -69,35 +69,35 @@ public class OpenProofsViewController extends NUIController
      */
     private void showSaveDialog() {
         // If file was not changed: do nothing
-        if (!dataModel.getLoadedTreeViewState().isModified()) {
+        if (!getDataModel().getLoadedTreeViewState().isModified()) {
             return;
         }
 
         // File was changed: ask user if he wants to save changes
         // create alert window
         final Alert alert = new Alert(AlertType.CONFIRMATION);
-        alert.setTitle(bundle.getString("dialogTitle"));
+        alert.setTitle(getBundle().getString("dialogTitle"));
 
         // --- define text for header and content area
-        final String filename = dataModel.getLoadedTreeViewState().getProof()
+        final String filename = getDataModel().getLoadedTreeViewState().getProof()
                 .getProofFile().getName();
         alert.setHeaderText(MessageFormat.format(
-                bundle.getString("dialogHeader"), "'" + filename + "'"));
-        alert.setContentText(bundle.getString("dialogQuestion"));
+                getBundle().getString("dialogHeader"), "'" + filename + "'"));
+        alert.setContentText(getBundle().getString("dialogQuestion"));
 
         // --- define button types
         final ButtonType buttonSaveAs = new ButtonType(
-                bundle.getString("dialogSaveAs"));
+                getBundle().getString("dialogSaveAs"));
         final ButtonType buttonClose = new ButtonType(
-                bundle.getString("dialogExit"));
+                getBundle().getString("dialogExit"));
         final ButtonType buttonAbort = new ButtonType(
-                bundle.getString("dialogAbort"));
+                getBundle().getString("dialogAbort"));
         alert.getButtonTypes().setAll(buttonSaveAs, buttonClose, buttonAbort);
 
         final Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == buttonSaveAs) {
             try {
-                ((MainViewController) nui.getController("MainView"))
+                ((MainViewController) getNui().getController("MainView"))
                         .saveProofAsDialog();
             }
             catch (ControllerNotFoundException e) {
@@ -112,25 +112,25 @@ public class OpenProofsViewController extends NUIController
 
     @Override
     protected void init() {
-        dataModel.addObserver(this);
+        getDataModel().addObserver(this);
         // Action to be performed if user clicks (left) on a proof entry
         listView.setOnMouseClicked((event) -> {
             final String selectedItem = listView.getSelectionModel()
                     .getSelectedItem();
             if (selectedItem != null) {
-                dataModel.loadProofFormMemory(selectedItem);
+                getDataModel().loadProofFormMemory(selectedItem);
             }
         });
 
         final MenuItem deleteProof = new MenuItem(
-                bundle.getString("closeProof"));
+                getBundle().getString("closeProof"));
         contextMenu = new ContextMenu(deleteProof);
 
         // Action to be performed if user clicks on 'Close Proof' in the context
         // menu
         deleteProof.setOnAction((event) -> {
             showSaveDialog();
-            dataModel.removeProof(listView.getSelectionModel().getSelectedItem());
+            getDataModel().removeProof(listView.getSelectionModel().getSelectedItem());
         });
     }
 

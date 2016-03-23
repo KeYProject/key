@@ -529,7 +529,7 @@ public class NUI extends Application {
             jar.close();
         }
 
-        else {// Run with IDE
+        else { // Run with IDE
             final File[] files = new File(getClass().getResource(COMPONENTS_DIR).getPath())
                     .listFiles();
 

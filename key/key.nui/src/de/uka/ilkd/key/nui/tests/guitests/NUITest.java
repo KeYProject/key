@@ -25,14 +25,22 @@ public class NUITest extends GuiTest {
      * Allows access to all loaded files.
      */
     public NUI nui;
-
+    // TODO must this be public?
+    // If yes, surround with
+    // CHECKSTYLE.OFF: VisibilityModifierCheck <justification>
+    // <code to ignore>
+    // CHECKSTYLE.ON: VisibilityModifierCheck
 
     /**
      * DataModel contains all loaded proofs.
      */
 
     public DataModel dataModel;
-
+    // TODO must this be public?
+    // If yes, surround with
+    // CHECKSTYLE.OFF: VisibilityModifierCheck <justification>
+    // <code to ignore>
+    // CHECKSTYLE.ON: VisibilityModifierCheck
 
     @Override
     /**
@@ -47,8 +55,8 @@ public class NUITest extends GuiTest {
             nui.initializeNUI();
             dataModel = nui.getDataModel();
         }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
+        catch (Exception e) { // NOPMD
+            System.out.println(e.getMessage()); // NOPMD
         }
         return nui.getRoot();
     }
@@ -57,7 +65,6 @@ public class NUITest extends GuiTest {
      * Can used to wait until some event occur.
      * 
      * Wait until NUI statustext is equal to the parameter statustext.
-     * 
      * @param statustext
      *            The status text to wait for.
      */
@@ -65,7 +72,9 @@ public class NUITest extends GuiTest {
         final Label label = ((Label) find("#statustext"));
 
         while (!label.getText().equals(statustext)) {
+            //CHECKSTYLE.OFF MagicNumberCheck -- externalizing this makes no sense
             sleep(2000);
+            //CHECKSTYLE.ON MagicNumberCheck
         }
     }
 
@@ -81,7 +90,6 @@ public class NUITest extends GuiTest {
 
     protected void loadProof(final String filename, final boolean cancelLoading) {
 
-
         // open load file dialog
         clickOn("File").clickOn("Open Proof...");
 
@@ -95,7 +103,7 @@ public class NUITest extends GuiTest {
         if (cancelLoading) {// cancel loading process
             clickOn("#cancelButton");
 
-            Label label = ((Label) find("#statustext"));
+            final Label label = ((Label) find("#statustext"));
             // Loading process was canceled
             assertTrue(label.getText().equals("Loading has been cancelled."));
         }
@@ -107,8 +115,6 @@ public class NUITest extends GuiTest {
             // check if proof was loaded and stored in the datamodel
 
             final TreeViewState treeViewState = dataModel.getTreeViewState(filename);
-
-    
 
             assertTrue(treeViewState != null);
             assertTrue(treeViewState.getProof() != null);

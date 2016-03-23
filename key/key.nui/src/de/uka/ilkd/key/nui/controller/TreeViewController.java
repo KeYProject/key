@@ -90,6 +90,7 @@ public class TreeViewController extends NUIController implements Observer {
 
     /**
      * Getter.
+     * 
      * @return the {@link FilteringHandler}
      */
     public FilteringHandler getFilteringHandler() {
@@ -98,6 +99,7 @@ public class TreeViewController extends NUIController implements Observer {
 
     /**
      * Getter.
+     * 
      * @return the {@link IconFactory}.
      */
     public IconFactory getIcf() {
@@ -117,6 +119,7 @@ public class TreeViewController extends NUIController implements Observer {
 
     /**
      * Getter.
+     * 
      * @return the {@link TreeView}&lt;{@link NUINode}&gt;
      */
     public TreeView<NUINode> getProofTreeView() {
@@ -125,6 +128,7 @@ public class TreeViewController extends NUIController implements Observer {
 
     /**
      * Getter.
+     * 
      * @return the {@link SearchViewController}.
      */
     public SearchViewController getSearchViewController() {
@@ -133,6 +137,7 @@ public class TreeViewController extends NUIController implements Observer {
 
     /**
      * Getter.
+     * 
      * @return the {@link SearchViewPane}.
      */
     public Pane getSearchViewPane() {
@@ -141,6 +146,7 @@ public class TreeViewController extends NUIController implements Observer {
 
     /**
      * Getter.
+     * 
      * @return the {@link VBox}.
      */
     public VBox getTreeViewPane() {
@@ -186,7 +192,9 @@ public class TreeViewController extends NUIController implements Observer {
 
     /**
      * Setter.
-     * @param filteringHandler the {@link FilteringHandler} you want to set.
+     * 
+     * @param filteringHandler
+     *            the {@link FilteringHandler} you want to set.
      */
     public void setFilteringHandler(final FilteringHandler filteringHandler) {
         this.filteringHandler = filteringHandler;
@@ -194,7 +202,9 @@ public class TreeViewController extends NUIController implements Observer {
 
     /**
      * Setter.
-     * @param icf the {@link IconFactory} you want to set.
+     * 
+     * @param icf
+     *            the {@link IconFactory} you want to set.
      */
     public void setIcf(final IconFactory icf) {
         this.icf = icf;
@@ -202,7 +212,9 @@ public class TreeViewController extends NUIController implements Observer {
 
     /**
      * Setter.
-     * @param proofTreeView the {@link TreeView}&lt;{@link NUINode}&gt; you want to set.
+     * 
+     * @param proofTreeView
+     *            the {@link TreeView}&lt;{@link NUINode}&gt; you want to set.
      */
     public void setProofTreeView(final TreeView<NUINode> proofTreeView) {
         this.proofTreeView = proofTreeView;
@@ -210,7 +222,9 @@ public class TreeViewController extends NUIController implements Observer {
 
     /**
      * Setter.
-     * @param searchViewController the {@link SearchViewController} you want to set.
+     * 
+     * @param searchViewController
+     *            the {@link SearchViewController} you want to set.
      */
     public void setSearchViewController(final SearchViewController searchViewController) {
         this.searchViewController = searchViewController;
@@ -218,7 +232,9 @@ public class TreeViewController extends NUIController implements Observer {
 
     /**
      * Setter.
-     * @param searchViewPane the{@link Pane} you want to set.
+     * 
+     * @param searchViewPane
+     *            the{@link Pane} you want to set.
      */
     public void setSearchViewPane(final Pane searchViewPane) {
         this.searchViewPane = searchViewPane;
@@ -226,7 +242,9 @@ public class TreeViewController extends NUIController implements Observer {
 
     /**
      * Setter.
-     * @param treeViewPane the {@link Pane} you want to set.
+     * 
+     * @param treeViewPane
+     *            the {@link Pane} you want to set.
      */
     public void setTreeViewPane(final VBox treeViewPane) {
         this.treeViewPane = treeViewPane;
@@ -237,9 +255,10 @@ public class TreeViewController extends NUIController implements Observer {
         if (obs instanceof DataModel) {
             final TreeViewState treeViewState = ((DataModel) obs).getTreeViewState((String) arg);
             final ProofTreeItem treeItem;
-            if(treeViewState == null){
+            if (treeViewState == null) {
                 treeItem = null;
-            } else {
+            }
+            else {
                 treeItem = treeViewState.getTreeItem();
             }
 
@@ -268,20 +287,20 @@ public class TreeViewController extends NUIController implements Observer {
     @Override
     protected void init() {
         icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
-        filteringHandler = new FilteringHandler(dataModel);
+        filteringHandler = new FilteringHandler(getDataModel());
 
         Platform.runLater(() -> {
             // listener for opening search view
             try {
-                ((MainViewController) nui.getController("MainView"))
+                ((MainViewController) getNui().getController("MainView"))
                         .registerKeyListener((event) -> {
                     if (event.getCode().equals(KeyCode.F) && event.isShortcutDown()
-                            && dataModel.getLoadedTreeViewState() != null) {
+                            && getDataModel().getLoadedTreeViewState() != null) {
                         openSearchView();
                     }
 
                     if (event.getCode().equals(KeyCode.G) && event.isShortcutDown()
-                            && dataModel.getLoadedTreeViewState() != null) {
+                            && getDataModel().getLoadedTreeViewState() != null) {
                         openFilterView();
                     }
                     /*
@@ -311,7 +330,7 @@ public class TreeViewController extends NUIController implements Observer {
         });
 
         // register to the data model
-        dataModel.addObserver(this);
+        getDataModel().addObserver(this);
     }
 
 }

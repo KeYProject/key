@@ -35,6 +35,7 @@ public class ProofTreeConverter {
      * The root node of the NUI tree.
      */
     private NUIBranchNode nuiRoot;
+
     /**
      * Constructor. Loads a proof into the converter.
      * 
@@ -116,14 +117,14 @@ public class ProofTreeConverter {
      *            {@link de.uka.ilkd.key.nui.NUI.prooftree.NUINode} the node
      *            where the converted proof tree should be added to
      */
-    private void addProofTreeToNUITree(final Node proofNode,
-            final NUIBranchNode parent) {
+    private void addProofTreeToNUITree(final Node proofNode, final NUIBranchNode parent) {
         final Proof proof = proofNode.proof();
         final NUINode newNode;
         // Create NUI node -----------------------------------------------------
-        if(proofNode.leaf()){
+        if (proofNode.leaf()) {
             newNode = new NUILeafNode(proofNode);
-        } else {
+        }
+        else {
             newNode = new NUIInnerNode(proofNode);
         }
 
@@ -152,8 +153,7 @@ public class ProofTreeConverter {
                 final NUIBranchNode branchNode = new NUIBranchNode(proofNode);
                 String branchLabel = child.getNodeInfo().getBranchLabel();
                 if (branchLabel == null) {
-                    final int caseNumber = (child.parent().getChildNr(child)
-                            + 1);
+                    final int caseNumber = (child.parent().getChildNr(child) + 1);
                     branchLabel = "Case " + caseNumber;
                 }
                 branchNode.setSerialNumber(branchLabel.replace(" ", "_"));
@@ -186,8 +186,8 @@ public class ProofTreeConverter {
      * @param newNode
      *            The NUINode object where the information should be added to.
      */
-    private void assignNUIFieldsAndStyle(final Node proofNode,
-            final Proof proof, final NUINode newNode) {
+    private void assignNUIFieldsAndStyle(final Node proofNode, final Proof proof,
+            final NUINode newNode) {
         final Goal goal = proof.getGoal(proofNode);
         if (proofNode.leaf()) {
             if (goal == null) {
@@ -207,8 +207,7 @@ public class ProofTreeConverter {
         else {
             // node is not a leaf
             newNode.setClosed(proofNode.isClosed());
-            newNode.setInteractive(
-                    proofNode.getNodeInfo().getInteractiveRuleApplication());
+            newNode.setInteractive(proofNode.getNodeInfo().getInteractiveRuleApplication());
 
         }
         // Set parameters which exist at all nodes
@@ -221,8 +220,7 @@ public class ProofTreeConverter {
         boolean symbolicExecution;
         final RuleApp rule = proofNode.getAppliedRuleApp();
         if (rule instanceof TacletApp) {
-            symbolicExecution = NodeInfo
-                    .isSymbolicExecution(((TacletApp) rule).taclet());
+            symbolicExecution = NodeInfo.isSymbolicExecution(((TacletApp) rule).taclet());
         }
         else if (rule instanceof IBuiltInRuleApp) {
             symbolicExecution = true;

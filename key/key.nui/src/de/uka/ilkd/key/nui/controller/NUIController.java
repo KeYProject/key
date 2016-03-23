@@ -17,26 +17,26 @@ public abstract class NUIController {
     /**
      * The bundle used for internationalization of text strings.
      */
-    protected ResourceBundle bundle;
+    private ResourceBundle bundle;
     /**
      * The fx:id of the controller.
      */
-    protected String componentName;
+    private String componentName;
 
     /**
      * The data model linked to application.
      */
-    protected DataModel dataModel;
+    private DataModel dataModel;
 
     /**
      * The filename of the associated FXML file.
      */
-    protected String filename;
+    private String filename;
 
     /**
      * A reference to the {@link NUI} which manages the main application.
      */
-    protected NUI nui;
+    private NUI nui;
 
     /**
      * Replaces the usual java constructor, because JavaFX does not allow to use
@@ -69,7 +69,7 @@ public abstract class NUIController {
      * Getter.
      * @return the {@link ResourceBundle}.
      */
-    public ResourceBundle getBundle() {
+    protected ResourceBundle getBundle() {
         return bundle;
     }
 
@@ -77,7 +77,7 @@ public abstract class NUIController {
      * Getter.
      * @return the componentName as {@link String}.
      */
-    public String getComponentName() {
+    protected String getComponentName() {
         return componentName;
     }
 
@@ -85,7 +85,7 @@ public abstract class NUIController {
      * Getter.
      * @return the {@link DataModel}.
      */
-    public DataModel getDataModel() {
+    protected DataModel getDataModel() {
         return dataModel;
     }
 
@@ -93,7 +93,7 @@ public abstract class NUIController {
      * Getter.
      * @return the filename as {@link String}.
      */
-    public String getFilename() {
+    protected String getFilename() {
         return filename;
     }
 
@@ -101,15 +101,15 @@ public abstract class NUIController {
      * Getter.
      * @return the {@link NUI}.
      */
-    public NUI getNui() {
+    protected NUI getNui() {
         return nui;
     }
 
     /**
-     * Getter.
+     * Setter.
      * @param bundle the {@link ResourceBundle} to set.
      */
-    public void setBundle(final ResourceBundle bundle) {
+    protected void setBundle(final ResourceBundle bundle) {
         this.bundle = bundle;
     }
 
@@ -117,7 +117,7 @@ public abstract class NUIController {
      * Setter.
      * @param componentName the {@link String} to set.
      */
-    public void setComponentName(final String componentName) {
+    protected void setComponentName(final String componentName) {
         this.componentName = componentName;
     }
 
@@ -125,7 +125,7 @@ public abstract class NUIController {
      * Setter.
      * @param dataModel the {@link DataModel} to set.
      */
-    public void setDataModel(final DataModel dataModel) {
+    protected void setDataModel(final DataModel dataModel) {
         this.dataModel = dataModel;
     }
 
@@ -133,7 +133,7 @@ public abstract class NUIController {
      * Setter.
      * @param filename the {@link String} to set.
      */
-    public void setFilename(final String filename) {
+    protected void setFilename(final String filename) {
         this.filename = filename;
     }
 

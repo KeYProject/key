@@ -25,7 +25,8 @@ public class SearchTest {
     /**
      * The proof file used for this test.
      */
-    private static final String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
+    private static final String TESTFILE_01
+        = "resources//de/uka//ilkd//key//examples//example01.proof";
 
     /**
      * The ProofTreeVis. ualizer used to load the test file.
@@ -64,36 +65,42 @@ public class SearchTest {
     public void testSearchNumberOfFindings() {
         // 01_CommonSearch
         final String searchTerm01 = "polySimp_pullOutFactor0b";
-        assertTrue(searchAndCompareSize(searchTerm01, 6));
+        final int numResults01 = 6;
+        assertTrue(searchAndCompareSize(searchTerm01, numResults01));
 
         // 02_CommonSearch
         final String searchTerm02 = "neg_literal";
-        assertTrue(searchAndCompareSize(searchTerm02, 9));
+        final int numResults02 = 9;
+        assertTrue(searchAndCompareSize(searchTerm02, numResults02));
 
         // 02_CommonSearch - test upper case
-        assertTrue(searchAndCompareSize(searchTerm02.toUpperCase(), 9));
+        assertTrue(searchAndCompareSize(searchTerm02.toUpperCase(), numResults02));
 
         // 03_CommonSearch
         final String searchTerm03 = "polySimp_";
-        assertTrue(searchAndCompareSize(searchTerm03, 142));
+        final int numResults03 = 142;
+        assertTrue(searchAndCompareSize(searchTerm03, numResults03));
 
         // 04_CommonSearch
         final String searchTerm04 = "inEqSimp_contradInEq0";
-        assertTrue(searchAndCompareSize(searchTerm04, 4));
+        final int numResults04 = 4;
+        assertTrue(searchAndCompareSize(searchTerm04, numResults04));
 
         // 04_CommonSearch - test upper case
-        assertTrue(searchAndCompareSize(searchTerm04.toUpperCase(), 4));
+        assertTrue(searchAndCompareSize(searchTerm04.toUpperCase(), numResults04));
 
         // 05_CommonSearch - test if beginning of term is found
         final String searchTerm05 = "qeq";
-        assertTrue(searchAndCompareSize(searchTerm05, 49));
+        final int numResults05 = 49;
+        assertTrue(searchAndCompareSize(searchTerm05, numResults05));
 
         // 05_CommonSearch - test upper case
-        assertTrue(searchAndCompareSize(searchTerm05.toUpperCase(), 49));
+        assertTrue(searchAndCompareSize(searchTerm05.toUpperCase(), numResults05));
 
         // 06_CommonSearch
         final String searchTerm06 = "CUT: a <= -1 | a >= 1 FALSE";
-        assertTrue(searchAndCompareSize(searchTerm06, 2));
+        final int numResults06 = 2;
+        assertTrue(searchAndCompareSize(searchTerm06, numResults06));
 
     }
 

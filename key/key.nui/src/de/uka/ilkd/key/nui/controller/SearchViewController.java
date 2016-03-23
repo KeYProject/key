@@ -320,7 +320,8 @@ public class SearchViewController extends NUIController {
             final int offset;
             if (direction == Direction.DOWN) {
                 offset = proofTreeCells.size() / 2;
-            } else {
+            }
+            else {
                 offset = 0;
             }
             proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex() - offset);
@@ -345,14 +346,14 @@ public class SearchViewController extends NUIController {
             // If no text was entered -> clear search
             if (newText.isEmpty()) {
                 proofTreeView.getRoot().getValue().resetSearch();
-                nui.updateStatusbar("");
+                getNui().updateStatusbar("");
             }
             // If any text was entered -> update status bar and depending on
             // numberOfSearchResults add/remove CSS class
             else {
                 numberOfSearchResults = proofTreeView.getRoot().getValue().search(newText);
 
-                nui.updateStatusbar("Number of Search Results: " + numberOfSearchResults);
+                getNui().updateStatusbar("Number of Search Results: " + numberOfSearchResults);
 
                 if (numberOfSearchResults == 0) {
                     // adds the style class for no search results
@@ -374,9 +375,10 @@ public class SearchViewController extends NUIController {
             else if (KeyCode.ENTER == e.getCode()) {
                 final PauseTransition pause = new PauseTransition(Duration.millis(130));
                 final Button button;
-                if(e.isShiftDown()){
+                if (e.isShiftDown()) {
                     button = btnSearchPrev;
-                } else {
+                }
+                else {
                     button = btnSearchNext;
                 }
                 button.arm();

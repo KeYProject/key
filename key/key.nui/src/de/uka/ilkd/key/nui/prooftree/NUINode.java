@@ -141,6 +141,7 @@ public abstract class NUINode {
 
     /**
      * Getter.
+     * 
      * @return the {@link StyleConfiguration}.
      */
     public StyleConfiguration getStyle() {
@@ -276,7 +277,10 @@ public abstract class NUINode {
 
         final boolean match = getLabel().toLowerCase().contains(term.toLowerCase());
         setSearchResult(match);
+        // CHECKSTYLE OFF: AvoidInlineConditionalsCheck
+        // -- this is much more readable than any alternative.
         return match ? 1 : 0;
+        // CHECKSTYLE ON: AvoidInlineConditionalsCheck
     }
 
     /**
@@ -390,7 +394,9 @@ public abstract class NUINode {
 
     /**
      * Setter.
-     * @param style the {@link StyleConfiguration}
+     * 
+     * @param style
+     *            the {@link StyleConfiguration}
      */
     public void setStyle(final StyleConfiguration style) {
         this.style = style;

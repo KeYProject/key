@@ -143,8 +143,11 @@ public final class ProofTreeStyler {
             final int prime = 31;
             int result = 1;
             result = prime * result + getOuterType().hashCode();
+            //CHECKSTYLE.OFF: AvoidInlineConditionalsCheck
+            // -- this is much more readable than two if statements
             result = prime * result + ((cssClasses == null) ? 0 : cssClasses.hashCode());
-            result = prime * result + ((iconImage == null) ? 0 : iconImage.hashCode());
+            result = prime * result + ((iconImage  == null) ? 0 :  iconImage.hashCode());
+            //CHECKSTYLE.ON: AvoidInlineConditionalsCheck
             return result;
         }
 

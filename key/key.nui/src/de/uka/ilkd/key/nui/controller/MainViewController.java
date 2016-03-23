@@ -2,6 +2,7 @@ package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -178,11 +179,11 @@ public class MainViewController extends NUIController implements Observer {
     public final void handleOpenProof(final ActionEvent e) {
         final FileChooser fileChooser = new FileChooser();
 
-        final TreeViewState loadedTVS = dataModel.getLoadedTreeViewState();
+        final TreeViewState loadedTVS = getDataModel().getLoadedTreeViewState();
         // set default directory to location where currently loaded proof is
         // located
         File parentDirectory = null;
-        if (dataModel.getLoadedTreeViewState() != null) {
+        if (getDataModel().getLoadedTreeViewState() != null) {
             parentDirectory = loadedTVS.getProof().getProofFile().getParentFile();
         }
         if (parentDirectory != null) {
@@ -260,8 +261,8 @@ public class MainViewController extends NUIController implements Observer {
     public final void handleCloseWindow(final Event e) {
         // If no proof file was loaded OR file was not changed: close
         // application immediately
-        if (dataModel.getLoadedTreeViewState() == null
-                || !(dataModel.getLoadedTreeViewState().isModified())) {
+        if (getDataModel().getLoadedTreeViewState() == null
+                || !(getDataModel().getLoadedTreeViewState().isModified())) {
             Platform.exit();
             MainWindow.getInstance().dispose();
             return;
@@ -270,19 +271,19 @@ public class MainViewController extends NUIController implements Observer {
         // File was changed: ask user if he wants to save changes
         // create alert window
         final Alert alert = new Alert(AlertType.CONFIRMATION);
-        alert.setTitle(bundle.getString("dialogTitle"));
+        alert.setTitle(getBundle().getString("dialogTitle"));
 
         // --- define text for header and content area
-        final String filename = dataModel.getLoadedTreeViewState().getProof().getProofFile()
+        final String filename = getDataModel().getLoadedTreeViewState().getProof().getProofFile()
                 .getName();
         alert.setHeaderText(
-                MessageFormat.format(bundle.getString("dialogHeader"), "'" + filename + "'"));
-        alert.setContentText(bundle.getString("dialogQuestion"));
+                MessageFormat.format(getBundle().getString("dialogHeader"), "'" + filename + "'"));
+        alert.setContentText(getBundle().getString("dialogQuestion"));
 
         // --- define button types
-        final ButtonType buttonSaveAs = new ButtonType(bundle.getString("dialogSaveAs"));
-        final ButtonType buttonClose = new ButtonType(bundle.getString("dialogExit"));
-        final ButtonType buttonAbort = new ButtonType(bundle.getString("dialogAbort"));
+        final ButtonType buttonSaveAs = new ButtonType(getBundle().getString("dialogSaveAs"));
+        final ButtonType buttonClose  = new ButtonType(getBundle().getString("dialogExit"));
+        final ButtonType buttonAbort  = new ButtonType(getBundle().getString("dialogAbort"));
         alert.getButtonTypes().setAll(buttonSaveAs, buttonClose, buttonAbort);
 
         final Optional<ButtonType> result = alert.showAndWait();
@@ -311,11 +312,11 @@ public class MainViewController extends NUIController implements Observer {
     @FXML
     protected final void handleSaveProof(final ActionEvent e) {
         // retrieve last saved location from proof file
-        final Proof loadedProof = dataModel.getLoadedTreeViewState().getProof();
+        final Proof loadedProof = getDataModel().getLoadedTreeViewState().getProof();
 
         if (loadedProof != null && loadedProof.getProofFile() != null) {
             // call saveProof with proof file
-            dataModel.saveProof(loadedProof, loadedProof.getProofFile());
+            getDataModel().saveProof(loadedProof, loadedProof.getProofFile());
         }
         else {
             // open dialog with file chooser
@@ -340,11 +341,11 @@ public class MainViewController extends NUIController implements Observer {
      */
     public void saveProofAsDialog() {
         // Get loaded proof
-        final Proof loadedProof = dataModel.getLoadedTreeViewState().getProof();
+        final Proof loadedProof = getDataModel().getLoadedTreeViewState().getProof();
 
         // Open file picker window
         final FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(bundle.getString("fileChooserSaveTitle"));
+        fileChooser.setTitle(getBundle().getString("fileChooserSaveTitle"));
         // set initial directory to last saved location (if available)
         if (loadedProof.getProofFile() != null) {
             // if file has a parent directory, set initial directory
@@ -361,7 +362,7 @@ public class MainViewController extends NUIController implements Observer {
 
         // save proof file if any destination was specified
         if (selectedFile != null) {
-            dataModel.saveProof(loadedProof, selectedFile);
+            getDataModel().saveProof(loadedProof, selectedFile);
         }
     }
 
@@ -389,7 +390,7 @@ public class MainViewController extends NUIController implements Observer {
         selectToggle(component.getId(), place);
         if (place == Place.HIDDEN) {
             component.setVisible(false);
-            nui.getRoot().getChildren().remove(component);
+            getNui().getRoot().getChildren().remove(component);
         }
         else {
             component.setVisible(true);
@@ -425,7 +426,7 @@ public class MainViewController extends NUIController implements Observer {
      */
     private void selectToggle(final String componentName, final Place place) {
         try {
-            for (final Toggle t : nui.getToggleGroup(componentName).getToggles()) {
+            for (final Toggle t : getNui().getToggleGroup(componentName).getToggles()) {
                 if (t.getUserData().equals(place)) {
                     t.setSelected(true);
                 }
@@ -452,16 +453,16 @@ public class MainViewController extends NUIController implements Observer {
             final String clickedText = clickedItem.getText();
             Place place;
 
-            if (clickedItem.getText().equals(bundle.getString("left"))) {
+            if (clickedItem.getText().equals(getBundle().getString("left"))) {
                 place = Place.LEFT;
             }
-            else if (clickedText.equals(bundle.getString("middle"))) {
+            else if (clickedText.equals(getBundle().getString("middle"))) {
                 place = Place.MIDDLE;
             }
-            else if (clickedText.equals(bundle.getString("right"))) {
+            else if (clickedText.equals(getBundle().getString("right"))) {
                 place = Place.RIGHT;
             }
-            else if (clickedText.equals(bundle.getString("bottom"))) {
+            else if (clickedText.equals(getBundle().getString("bottom"))) {
                 place = Place.BOTTOM;
             }
             else {
@@ -485,7 +486,7 @@ public class MainViewController extends NUIController implements Observer {
 
     @Override
     protected void init() {
-        dataModel.addObserver(this);
+        getDataModel().addObserver(this);
     }
 
     /**
@@ -511,7 +512,7 @@ public class MainViewController extends NUIController implements Observer {
      */
     @Override
     public void update(final Observable o, final Object arg) {
-        if (dataModel.getLoadedTreeViewState() == null) {
+        if (getDataModel().getLoadedTreeViewState() == null) {
             saveProof.setVisible(false);
             saveProofAs.setVisible(false);
         }
@@ -535,7 +536,7 @@ public class MainViewController extends NUIController implements Observer {
              * KeYEnvironment.load doesn't support interrupting
              */
             try {
-                java.lang.reflect.Method tsm = Thread.class.getDeclaredMethod("stop0",
+                final Method tsm = Thread.class.getDeclaredMethod("stop0",
                         new Class[] { Object.class });
                 tsm.setAccessible(true);
                 tsm.invoke(loadingThread, new ThreadDeath());
@@ -577,7 +578,7 @@ public class MainViewController extends NUIController implements Observer {
         // --> ProofTreeItem (JavaFX)
 
         statustext.setText(
-                MessageFormat.format(bundle.getString("statusLoading"), proofFileName.getName()));
+                MessageFormat.format(getBundle().getString("statusLoading"), proofFileName.getName()));
         progressIndicator.setVisible(true);
         cancelButton.setVisible(true);
         root.setCursor(Cursor.WAIT);
@@ -600,10 +601,10 @@ public class MainViewController extends NUIController implements Observer {
                     System.out.println("Start loading proof: " + proofFileName);
 
                     // Load proof
-                    DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(null);
-                    AbstractProblemLoader loader = ui.load(null, proofFileName, null, null, null,
+                    final DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(null);
+                    final AbstractProblemLoader loader = ui.load(null, proofFileName, null, null, null,
                             null, false);
-                    InitConfig initConfig = loader.getInitConfig();
+                    final InitConfig initConfig = loader.getInitConfig();
                     keyEnvironment = new KeYEnvironment<>(ui, initConfig, loader.getProof(),
                             loader.getResult());
                     /*
@@ -628,7 +629,7 @@ public class MainViewController extends NUIController implements Observer {
                         // reset set gui waiting state
                         Platform.runLater(() -> {
                             // Store state of treeView into data model.
-                            dataModel.saveTreeViewState(new TreeViewState(proof, fxtree),
+                            getDataModel().saveTreeViewState(new TreeViewState(proof, fxtree),
                                     proofFileName.getName());
 
                             statustext.setText("Ready.");

@@ -46,7 +46,7 @@ public class ProofTreeContextMenu extends ContextMenu {
      * The label of the context menu "search" label.
      */
     private static final String LBL_SEARCH = "Search";
-    
+
     /**
      * The label of the contect menu "filter" label.
      */
@@ -105,6 +105,7 @@ public class ProofTreeContextMenu extends ContextMenu {
 
     /**
      * Getter.
+     * 
      * @return the {@link FilteringHandler}.
      */
     public FilteringHandler getFh() {
@@ -113,6 +114,7 @@ public class ProofTreeContextMenu extends ContextMenu {
 
     /**
      * Getter.
+     * 
      * @return the {@link IconFactory}.
      */
     public IconFactory getIcf() {
@@ -121,6 +123,7 @@ public class ProofTreeContextMenu extends ContextMenu {
 
     /**
      * Getter.
+     * 
      * @return {@link TreeItem}&lt;{@link NUINode}&gt;
      */
     public TreeItem<NUINode> getTreeItem() {
@@ -129,6 +132,7 @@ public class ProofTreeContextMenu extends ContextMenu {
 
     /**
      * Getter.
+     * 
      * @return the {@link TreeView}&lt;{@link NUINode}&gt;
      */
     public TreeView<NUINode> getTreeView() {
@@ -137,6 +141,7 @@ public class ProofTreeContextMenu extends ContextMenu {
 
     /**
      * Getter.
+     * 
      * @return the {@link TreeViewController}
      */
     public TreeViewController getTreeViewController() {
@@ -145,7 +150,9 @@ public class ProofTreeContextMenu extends ContextMenu {
 
     /**
      * Setter.
-     * @param treeVC the {@link TreeViewController} you want to set.
+     * 
+     * @param treeVC
+     *            the {@link TreeViewController} you want to set.
      */
     public void setTreeViewController(final TreeViewController treeVC) {
         this.treeViewController = treeVC;
@@ -267,7 +274,7 @@ public class ProofTreeContextMenu extends ContextMenu {
     /**
      * Adds the entry "Filter by text" to the context menu.
      */
-    private void addMenuItemTextFilter(){
+    private void addMenuItemTextFilter() {
         final MenuItem mIFilter = new MenuItem(LBL_FILTER);
         getItems().add(mIFilter);
         mIFilter.setAccelerator(KeyCombination.keyCombination("Ctrl+G"));

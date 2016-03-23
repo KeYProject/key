@@ -84,6 +84,7 @@ public class FilteringHandler {
 
     /**
      * Getter.
+     * 
      * @return the {@link DataModel}
      */
     public DataModel getDataModel() {
@@ -92,6 +93,7 @@ public class FilteringHandler {
 
     /**
      * Returns the list of loaded filters.
+     * 
      * @return the {@link #filtersMap}.
      */
     public Map<ProofTreeFilter, Boolean> getFiltersMap() {
@@ -217,11 +219,11 @@ public class FilteringHandler {
         /**
          * Stores the URLs of all filters.
          */
-        private final transient  List<URL> listOfURLs = new ArrayList<>();
+        private final transient List<URL> listOfURLs = new ArrayList<>();
         /**
          * Stores the File Names of all filters.
          */
-        private final transient  List<String> listOfFileNames = new ArrayList<>();
+        private final transient List<String> listOfFileNames = new ArrayList<>();
 
         /**
          * Retrieves the filters URLs and names if KeY is run from a .jar file.

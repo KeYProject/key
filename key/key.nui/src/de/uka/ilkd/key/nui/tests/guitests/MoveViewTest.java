@@ -1,5 +1,4 @@
 package de.uka.ilkd.key.nui.tests.guitests;
-
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
@@ -90,8 +89,8 @@ public class MoveViewTest extends NUITest {
          * componendId must starts with # hence testfx interprets componedId as
          * JavaFX fxid
          */
-        String componendId = "#openProofsViewPane";
-        String subMenuName = nui.getText("openProofsViewPane");
+        final String componendId = "#openProofsViewPane";
+        final String subMenuName = nui.getText("openProofsViewPane");
 
         loadProof("example01.proof", false);
         moveViewTester(componendId, subMenuName);
@@ -106,8 +105,8 @@ public class MoveViewTest extends NUITest {
          * componendId must starts with # hence testfx interprets componedId as
          * JavaFX fxid
          */
-        String componendId = "#treeViewPane";
-        String subMenuName = nui.getText("treeViewPane");
+        final String componendId = "#treeViewPane";
+        final String subMenuName = nui.getText("treeViewPane");
 
         loadProof("example01.proof", false);
         moveViewTester(componendId, subMenuName);
@@ -122,8 +121,8 @@ public class MoveViewTest extends NUITest {
          * componendId must starts with # hence testfx interprets componedId as
          * JavaFX fxid
          */
-        String componendId = "#strategyViewPane";
-        String subMenuName = nui.getText("strategyViewPane");
+        final String componendId = "#strategyViewPane";
+        final String subMenuName = nui.getText("strategyViewPane");
 
         loadProof("example01.proof", false);
         moveViewTester(componendId, subMenuName);
@@ -138,8 +137,8 @@ public class MoveViewTest extends NUITest {
          * componendId must starts with # hence testfx interprets componedId as
          * JavaFX fxid
          */
-        String componendId = "#proofViewPane";
-        String subMenuName = nui.getText("proofViewPane");
+        final String componendId = "#proofViewPane";
+        final String subMenuName = nui.getText("proofViewPane");
 
         loadProof("example01.proof", false);
         moveViewTester(componendId, subMenuName);

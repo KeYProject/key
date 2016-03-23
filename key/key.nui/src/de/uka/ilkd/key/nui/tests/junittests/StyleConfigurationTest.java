@@ -35,17 +35,20 @@ public class StyleConfigurationTest {
      * The testfile 01 used for the tests.
      */
 
-    private static String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
+    private final static String TESTFILE_01
+        = "resources//de/uka//ilkd//key//examples//example01.proof";
 
     /**
      * The testfile 02 used for the tests.
      */
-    private static String TESTFILE_02 = "resources//de/uka//ilkd//key//examples//example02.proof";
+    private final static String TESTFILE_02
+        = "resources//de/uka//ilkd//key//examples//example02.proof";
 
     /**
      * The testfile 03 used for the tests.
      */
-    private static String TESTFILE_03 = "resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof";
+    private final static String TESTFILE_03
+        = "resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof";
 
     /**
      * The ProofTreeVisualizer used to load the test file.

@@ -68,15 +68,16 @@ public class ProofTreeItem extends TreeItem<NUINode> {
     public void applyVisibilitiyOfChildren() {
         // define new predicate for the filtered children list
 
-        // HINT: DO NOT TRY TO USE JAVA 8 FOR THIS! (or do it and find out why it does not work)
+        // HINT: DO NOT TRY TO USE JAVA 8 FOR THIS! (or do it and find out why
+        // it does not work)
 
-                final Predicate<? super ProofTreeItem> pred = new Predicate<ProofTreeItem>() {
-                    @Override
-                    public boolean test(final ProofTreeItem pti) {
-                        return pti.isVisible();
-                    }
-                };
-                filteredChildren.setPredicate(pred);
+        final Predicate<? super ProofTreeItem> pred = new Predicate<ProofTreeItem>() {
+            @Override
+            public boolean test(final ProofTreeItem pti) {
+                return pti.isVisible();
+            }
+        };
+        filteredChildren.setPredicate(pred);
     }
 
     /**
@@ -115,7 +116,9 @@ public class ProofTreeItem extends TreeItem<NUINode> {
 
     /**
      * Getter.
-     * @return a {@link FilteredList}&lt;{@link ProofTreeItem}&gt; containing the currently visible children.
+     * 
+     * @return a {@link FilteredList}&lt;{@link ProofTreeItem}&gt; containing
+     *         the currently visible children.
      */
     public FilteredList<ProofTreeItem> getFilteredChildren() {
         return filteredChildren;
@@ -123,7 +126,9 @@ public class ProofTreeItem extends TreeItem<NUINode> {
 
     /**
      * Getter.
-     * @return a {@link ObservableList}&lt;{@link ProofTreeItem}&gt; containing the actual children (no filters applied).
+     * 
+     * @return a {@link ObservableList}&lt;{@link ProofTreeItem}&gt; containing
+     *         the actual children (no filters applied).
      */
     public ObservableList<ProofTreeItem> getInternalChildren() {
         return internalChildren;

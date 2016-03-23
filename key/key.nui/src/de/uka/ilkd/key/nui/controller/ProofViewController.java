@@ -15,6 +15,7 @@ import javafx.scene.control.TextArea;
  *
  */
 @ControllerAnnotation(createMenu = true)
+@SuppressWarnings("PMD.AtLeastOneConstructor") // makes no sense in classes marshaled from fxml
 public class ProofViewController extends NUIController implements Observer {
 
     @FXML
@@ -22,20 +23,21 @@ public class ProofViewController extends NUIController implements Observer {
 
     @Override
     public void update(final Observable observable, final Object arg) {
-        final TreeViewState treeViewState = dataModel.getTreeViewState(arg.toString());
+        final TreeViewState treeViewState = getDataModel().getTreeViewState(arg.toString());
         if (treeViewState != null) {
             textAreaProof.setText(treeViewState.getProof().getStatistics().toString());
         }
-        else if (observable instanceof DataModel && ((DataModel) observable).getListOfProofs().size() >= 1) {
-            textAreaProof.setText(bundle.getString("noProofSelected"));
+        else if (observable instanceof DataModel
+                && ((DataModel) observable).getListOfProofs().size() >= 1) {
+            textAreaProof.setText(getBundle().getString("noProofSelected"));
         }
         else {
-            textAreaProof.setText(bundle.getString("noProofLoaded"));
+            textAreaProof.setText(getBundle().getString("noProofLoaded"));
         }
     }
 
     @Override
     protected void init() {
-        dataModel.addObserver(this);
+        getDataModel().addObserver(this);
     }
 }
