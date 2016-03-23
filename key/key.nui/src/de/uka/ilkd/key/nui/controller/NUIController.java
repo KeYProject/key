@@ -66,90 +66,80 @@ public abstract class NUIController {
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link ResourceBundle}.
      */
     public ResourceBundle getBundle() {
         return bundle;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the componentName as {@link String}.
      */
     public String getComponentName() {
         return componentName;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link DataModel}.
      */
     public DataModel getDataModel() {
         return dataModel;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the filename as {@link String}.
      */
     public String getFilename() {
         return filename;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link NUI}.
      */
     public NUI getNui() {
         return nui;
     }
 
     /**
-     * TODO
-     * 
-     * @param bundle
+     * Getter.
+     * @param bundle the {@link ResourceBundle} to set.
      */
     public void setBundle(final ResourceBundle bundle) {
         this.bundle = bundle;
     }
 
     /**
-     * TODO
-     * 
-     * @param componentName
+     * Setter.
+     * @param componentName the {@link String} to set.
      */
     public void setComponentName(final String componentName) {
         this.componentName = componentName;
     }
 
     /**
-     * TODO
-     * 
-     * @param dataModel
+     * Setter.
+     * @param dataModel the {@link DataModel} to set.
      */
     public void setDataModel(final DataModel dataModel) {
         this.dataModel = dataModel;
     }
 
     /**
-     * TODO
-     * 
-     * @param filename
+     * Setter.
+     * @param filename the {@link String} to set.
      */
     public void setFilename(final String filename) {
         this.filename = filename;
     }
 
     /**
-     * TODO
-     * 
-     * @param nui
+     * Setter.
+     * @param nui the {@link NUI} to set.
      */
     public void setNui(final NUI nui) {
         this.nui = nui;
