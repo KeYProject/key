@@ -33,6 +33,35 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestCase {
    
    /**
+    * Tests example: /set/truthValueRejectedFormula
+    */
+   public void testValueRejectedFormula() throws Exception {
+      // Create expected results
+      ExpectedBranchResult goal31 = new ExpectedBranchResult(new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("7.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("8.0", TruthValue.TRUE));
+      ExpectedBranchResult goal33 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("2.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("7.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("8.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult result = new ExpectedTruthValueEvaluationResult(goal31, goal33);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueRejectedFormula/test/LabelLostVerification.proof", 
+                                 "/set/truthValueRejectedFormula/oracle/LabelLostVerification.xml",
+                                 false,
+                                 false,
+                                 result);
+   }
+   
+   /**
     * Tests example: /set/truthValueAddingOfLabeledSubtree
     */
    public void testAddingOfLabeledSubtree() throws Exception {

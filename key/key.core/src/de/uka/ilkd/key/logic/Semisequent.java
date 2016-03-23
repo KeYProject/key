@@ -166,7 +166,7 @@ public class Semisequent implements Iterable<SequentFormula> {
 
 	    if (sequentFormula != null && cf.formula().equalsModRenaming(sequentFormula.formula())) {
 
-	    semiCI.rejectedFormula( cf );
+	    semiCI.rejectedFormula( sequentFormula );
 		return semiCI; // semisequent already contains formula
 
 	    }

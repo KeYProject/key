@@ -100,6 +100,8 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
                     tacletApp.posInOccurrence(),
                     services,
                     mc);
+            
+            TermLabelManager.mergeLabels(currentSequent, services);
 
             currentGoal.setSequent(currentSequent);
 

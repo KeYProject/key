@@ -92,14 +92,14 @@ public class SimplifyTermProfile extends JavaProfile {
          }
        });
        result = result.prepend(new TermLabelConfiguration(SymbolicExecutionUtil.RESULT_LABEL_NAME,
-             new SingletonLabelFactory<TermLabel>(SymbolicExecutionUtil.RESULT_LABEL),
-             null,
-             symExcPolicies,
-             null,
-             null,
-             null,
-             null
-             ));       
+                                                          new SingletonLabelFactory<TermLabel>(SymbolicExecutionUtil.RESULT_LABEL),
+                                                          null,
+                                                          symExcPolicies,
+                                                          null,
+                                                          null,
+                                                          null,
+                                                          null,
+                                                          null));       
       return result;
    }
 

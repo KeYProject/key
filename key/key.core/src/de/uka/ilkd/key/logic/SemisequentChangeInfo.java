@@ -34,7 +34,7 @@ public class SemisequentChangeInfo {
      * contains formulas that have been tried to add, but which have been rejected due to
      * already existing formulas in the sequent subsuming these formulas 
      */
-    public ImmutableList<SequentFormula> rejected = ImmutableSLList.<SequentFormula>nil(); 
+    private ImmutableList<SequentFormula> rejected = ImmutableSLList.<SequentFormula>nil(); 
     
     /** */
     private int lastFormulaIndex = -1;
