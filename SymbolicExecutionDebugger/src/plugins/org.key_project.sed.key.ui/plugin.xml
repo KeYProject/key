@@ -146,6 +146,44 @@
             id="org.key_project.sed.key.ui.commands.applyRule"
             name="Apply a Rule">
       </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Stops the auto mode."
+            id="org.key_project.sed.key.ui.stopAutoModeCommand"
+            name="Stop Auto Mode">
+      </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Starts the auto mode with the current specification."
+            id="org.key_project.sed.key.ui.startAutoModeCommand"
+            name="Start Auto Mode">
+      </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Generates test cases for open goals."
+            id="org.key_project.sed.key.ui.generateTestCases"
+            name="Generate test cases.">
+      </command>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="If selected auto mode will stop at breakpoints and ignore them otherwise."
+            id="org.key_project.sed.key.ui.stopAtBreakpoints"
+            name="Stop At Breakpoints">
+         <state
+               id="org.eclipse.ui.commands.toggleState">
+            <class
+                  class="org.eclipse.ui.handlers.RegistryToggleState">
+               <parameter
+                     name="default"
+                     value="false">
+               </parameter>
+               <parameter
+                     name="persisted"
+                     value="true">
+               </parameter>
+            </class>
+         </state>
+      </command>
    </extension>
       <extension
             point="org.eclipse.ui.commandImages">
@@ -168,6 +206,22 @@
          <image
                commandId="org.key_project.sed.key.ui.openProofCommand"
                icon="icons/logo16.gif">
+         </image>
+         <image
+               commandId="org.key_project.sed.key.ui.stopAutoModeCommand"
+               icon="icons/terminatedlaunch_obj.gif">
+         </image>
+         <image
+               commandId="org.key_project.sed.key.ui.startAutoModeCommand"
+               icon="icons/nav_go.gif">
+         </image>
+         <image
+               commandId="org.key_project.sed.key.ui.generateTestCases"
+               icon="icons/testGeneration.png">
+         </image>
+         <image
+               commandId="org.key_project.sed.key.ui.stopAtBreakpoints"
+               icon="icons/stopAtBreakpoints.gif">
          </image>
       </extension>
       <extension
@@ -264,6 +318,50 @@
          <handler
                class="org.key_project.keyide.ui.handlers.ApplyRuleHandler"
                commandId="org.key_project.sed.key.ui.commands.applyRule">
+         </handler>
+         <handler
+               class="org.key_project.sed.key.ui.command.StartAutoModeHandlerSED"
+               commandId="org.key_project.sed.key.ui.startAutoModeCommand">
+            <enabledWhen>
+               <and>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.sed.key.ui.isNotAutoMode"
+                        value="true">
+                  </test>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.sed.key.ui.proofIsNotClosed"
+                        value="true">
+                  </test>
+               </and>
+            </enabledWhen>
+         </handler>
+         <handler
+               class="org.key_project.keyide.ui.handlers.StopAutoModeHandler"
+               commandId="org.key_project.sed.key.ui.stopAutoModeCommand">
+            <enabledWhen>
+               <test
+                     forcePluginActivation="true"
+                     property="org.key_project.sed.key.ui.isAutoMode"
+                     value="true">
+               </test>
+            </enabledWhen>
+         </handler>
+         <handler
+               class="org.key_project.sed.key.ui.command.GenerateTestCasesHandlerSED"
+               commandId="org.key_project.sed.key.ui.generateTestCases">
+            <enabledWhen>
+               <test
+                     forcePluginActivation="true"
+                     property="org.key_project.sed.key.ui.isNotAutoMode"
+                     value="true">
+               </test>
+            </enabledWhen>
+         </handler>
+         <handler
+               class="org.key_project.keyide.ui.handlers.BreakpointToggleHandler"
+               commandId="org.key_project.sed.key.ui.stopAtBreakpoints">
          </handler>
       </extension>
    <extension
@@ -579,6 +677,39 @@
                class="org.key_project.sed.key.ui.view.RuleAppContextMenu"
                locationURI="popup:org.key_project.sed.key.ui.ManualView.popup?before=group.add">
          </menuContribution>
+         <menuContribution
+               allPopups="false"
+               locationURI="toolbar:org.key_project.sed.key.ui.view.ManualView">
+            <command
+                  commandId="org.key_project.sed.key.ui.startAutoModeCommand"
+                  icon="icons/nav_go.gif"
+                  id="org.key_project.sed.key.ui.startAutoModeCommand"
+                  label="Start Auto Mode"
+                  tooltip="Start Auto Mode">
+            </command>
+            <command
+                  commandId="org.key_project.sed.key.ui.stopAutoModeCommand"
+                  icon="icons/terminatedlaunch_obj.gif"
+                  id="org.key_project.sed.key.ui.stopAutoModeCommand"
+                  label="Stop Auto Mode"
+                  tooltip="Stop Auto Mode">
+            </command>
+            <command
+                  commandId="org.key_project.sed.key.ui.generateTestCases"
+                  icon="icons/testGeneration.png"
+                  id="org.key_project.sed.key.ui.generateTestCases"
+                  label="Generate Test Cases"
+                  tooltip="Generate test cases for open goals">
+            </command>
+            <command
+                  commandId="org.key_project.sed.key.ui.stopAtBreakpoints"
+                  icon="icons/stopAtBreakpoints.gif"
+                  id="org.key_project.sed.key.ui.stopAtBreakpoints"
+                  label="Stop At Breakpoints"
+                  style="toggle"
+                  tooltip="Stop at breakpoints">
+            </command>
+         </menuContribution>
       </extension>
       <extension
             point="org.eclipse.core.expressions.propertyTesters">
@@ -602,6 +733,20 @@
                namespace="org.key_project.sed.key.ui"
                properties="canVisualizeMemoryLayouts"
                type="java.lang.Object">
+         </propertyTester>
+         <propertyTester
+               class="org.key_project.sed.key.ui.propertyTester.AutoModePropertyTesterSED"
+               id="org.key_project.sed.key.ui.autoModePropertyTesterSED"
+               namespace="org.key_project.sed.key.ui"
+               properties="isAutoMode, isNotAutoMode, proofIsNotClosed"
+               type="java.lang.Object">
+         </propertyTester>
+         <propertyTester
+               class="org.key_project.keyide.ui.propertyTester.PruneProofPropertyTester"
+               id="org.key_project.keyide.ui.PruneProofTester"
+               namespace="org.key_project.keyide.ui"
+               properties="nodeSupportsPruning"
+               type="org.eclipse.jface.viewers.IStructuredSelection">
          </propertyTester>
       </extension>
       <extension
