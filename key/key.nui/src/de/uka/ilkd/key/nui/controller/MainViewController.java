@@ -10,8 +10,6 @@ import java.util.Observer;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.swing.SwingUtilities;
-
 import com.sun.javafx.collections.ObservableMapWrapper;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -166,7 +164,7 @@ public class MainViewController extends NUIController implements Observer {
     }
 
     @FXML
-    private void closeButtonAction() {
+    private static void closeButtonAction() {
         Platform.exit();
         MainWindow.getInstance().dispose();
     }
