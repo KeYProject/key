@@ -435,8 +435,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 			childCount = getBranchFolderChildCount(node);
 		}
 		if (parent instanceof Proof) {
-			Proof proof = (Proof) parent;
-			node = proof.root();
+			Proof currentProof = (Proof) parent;
+			node = currentProof.root();
 			childCount = getBranchFolderChildCount(node);
 		} else if (parent instanceof BranchFolder) {
 			BranchFolder branchFolder = (BranchFolder) parent;
