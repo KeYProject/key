@@ -246,7 +246,6 @@ public class ManualView extends AbstractViewBasedView {
          if (hideCmd != null) {
             hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
             if (hideState != null) {
-            	hideState.setValue(false); //TODO remove
             	hideState.addListener(hideStateListener);
             }
          }
@@ -255,7 +254,6 @@ public class ManualView extends AbstractViewBasedView {
          if (symbolicCmd != null) {
             symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
             if (symbolicState != null) {
-            	symbolicState.setValue(false); //TODO remove
             	symbolicState.addListener(symbolicStateListener);
             }
          }
@@ -285,7 +283,7 @@ public class ManualView extends AbstractViewBasedView {
 					newSelectedNode = child;
 				}
 			}
-			selectNode(newSelectedNode);
+			selectNodeThreadSafe(newSelectedNode);
 			setManualRule(false);
 			//don't listen to selection changes on baseView
 			beforeBaseViewUpdate = true;
@@ -306,7 +304,7 @@ public class ManualView extends AbstractViewBasedView {
 		Node selectedNode = getSelectedNode();
 		contentProvider.setHideState((boolean) state.getValue());
 		getTreeViewer().setInput(proof);
-		selectNode(selectedNode);
+		selectNodeThreadSafe(selectedNode);
 	}
 	
 	/**
@@ -318,7 +316,7 @@ public class ManualView extends AbstractViewBasedView {
 		Node selectedNode = getSelectedNode();
 		contentProvider.setSymbolicState((boolean) state.getValue());
 		getTreeViewer().setInput(proof);
-		selectNode(selectedNode);
+		selectNodeThreadSafe(selectedNode);
 	}
    
 	/**
@@ -413,8 +411,7 @@ public class ManualView extends AbstractViewBasedView {
                      IKeYSENode<?> seNode = (IKeYSENode<?>) element;
                      if (getTreeViewer() != null && getSourceViewer() != null) {
                         Node keyNode = seNode.getExecutionNode().getProofNode();
-                        selectNode(keyNode);
-                        sourceViewerDecorator.showNode(keyNode, SymbolicExecutionUtil.createNotationInfo(getProof()));
+                        selectNodeThreadSafe(keyNode);
                      }
                   }
                }
@@ -636,33 +633,33 @@ public class ManualView extends AbstractViewBasedView {
       }
    }
    
-   protected void makeSureElementIsLoaded(Node node) {
-	// Collect unknown parents
-			Deque<Object> unknownParents = new LinkedList<Object>();
-			boolean unknown = true;
-			Object current = node;
-			while (unknown && current != null) {
-				if (getTreeViewer().testFindItem(current) == null) {
-					unknownParents.addFirst(current);
-				} else {
-					unknown = false;
-				}
-				current = contentProvider.getParent(current);
+	protected void makeSureElementIsLoaded(Node node) {
+		// Collect unknown parents
+		Deque<Object> unknownParents = new LinkedList<Object>();
+		boolean unknown = true;
+		Object current = node;
+		while (unknown && current != null) {
+			if (getTreeViewer().testFindItem(current) == null) {
+				unknownParents.addFirst(current);
+			} else {
+				unknown = false;
 			}
-			// Inject unknown elements
-			for (Object unknownElement : unknownParents) {
-				Object parent = contentProvider.getParent(unknownElement);
-				int viewIndex = contentProvider.getIndexOf(parent, unknownElement);
-				if (contentProvider.getHideState() == false && contentProvider.getSymbolicState() == false) {
-				   Assert.isTrue(viewIndex >= 0, "Content provider returned wrong parents or child index computation is buggy.");
-				   contentProvider.updateChildCount(parent, 0);
-				   contentProvider.updateElement(parent, viewIndex);
-				} else if (viewIndex >= 0){
-					contentProvider.updateChildCount(parent, 0);
-					contentProvider.updateElement(parent, viewIndex);
-				}
+			current = contentProvider.getParent(current);
+		}
+		// Inject unknown elements
+		for (Object unknownElement : unknownParents) {
+			Object parent = contentProvider.getParent(unknownElement);
+			int viewIndex = contentProvider.getIndexOf(parent, unknownElement);
+			if (contentProvider.getHideState() == false && contentProvider.getSymbolicState() == false) {
+				Assert.isTrue(viewIndex >= 0, "Content provider returned wrong parents or child index computation is buggy.");
+				contentProvider.updateChildCount(parent, 0);
+				contentProvider.updateElement(parent, viewIndex);
+			} else if (viewIndex >= 0) {
+				contentProvider.updateChildCount(parent, 0);
+				contentProvider.updateElement(parent, viewIndex);
 			}
-   }
+		}
+	}
    
    protected void selectNode(Node node) {
 	   makeSureElementIsLoaded(node);
@@ -681,6 +678,20 @@ public class ManualView extends AbstractViewBasedView {
 		      sourceViewerDecorator.showNode(((BranchFolder) parent).getChild(), SymbolicExecutionUtil.createNotationInfo(proof));
 		   }
 	   }
+   }
+   
+   protected void selectNodeThreadSafe(final Node node) {
+	   
+	   if (!treeViewer.getControl().getDisplay().isDisposed()) {
+		   treeViewer.getControl().getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (!treeViewer.getControl().isDisposed()) {
+						selectNode(node);
+					}
+				}
+			});
+		}
    }
    
    /**

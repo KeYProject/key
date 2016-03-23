@@ -8,11 +8,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugEvent;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.model.IDebugElement;
@@ -50,6 +52,8 @@ import org.key_project.sed.core.model.event.ISEAnnotationListener;
 import org.key_project.sed.core.model.event.SEAnnotationEvent;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
 import org.key_project.sed.ui.visualization.execution_tree.feature.AbstractDebugNodeUpdateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.DebugTargetConnectFeature;
+import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.execution_tree.service.SENotificationService;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
@@ -280,7 +284,11 @@ public class ExecutionTreeDiagramBehavior extends DiagramBehavior {
       }
       // Update diagram content if required.
       if (updateRequired) {
-         // Do an asynchronous update in the UI thread (same behavior as DomainModelChangeListener which is responsible for changes in EMF objects)
+    	  
+    	 // TODO implement a better way to check if the proof got pruned and an update is needed
+    	 boolean isPruneUpdateNeeded = isPruneUpdateNeeded(GraphitiUtil.getAllPictogramElements(getDiagram()));
+         
+    	 // Do an asynchronous update in the UI thread (same behavior as DomainModelChangeListener which is responsible for changes in EMF objects)
          AbstractDependingOnObjectsJob.cancelJobs(diagramEditor);
          new AbstractDependingOnObjectsJob("Updating Symbolic Execution Tree", diagramEditor) {
             @Override
@@ -288,8 +296,44 @@ public class ExecutionTreeDiagramBehavior extends DiagramBehavior {
                return updateDiagramInJob(monitor);
             }
          }.schedule();
+         
+         // TODO implement a better way to update the diagram if the proof got pruned
+         // the solution beneath may be inefficient because it removes the entire diagram and recreates it instead of updating
+         if (isPruneUpdateNeeded) {
+        	 final IDiagramTypeProvider typeProvider = diagramEditor.getDiagramTypeProvider();
+        	 Assert.isNotNull(typeProvider);
+        	 final IFeatureProvider featureProvider = typeProvider.getFeatureProvider();
+        	 Assert.isTrue(featureProvider instanceof ExecutionTreeFeatureProvider);
+        	 ICustomFeature feature = new DebugTargetConnectFeature((ExecutionTreeFeatureProvider) featureProvider);
+        	 ICustomContext context = new CustomContext(new PictogramElement[] { typeProvider.getDiagram() });
+        	 context.putProperty(DebugTargetConnectFeature.PROPERTY_DEBUG_TARGETS, targets);
+        	 diagramEditor.executeFeatureInJob("Changing Symbolic Execution Tree", feature, context);
+         }
       }
    }
+   
+   /**
+	 * Checks if a proof update is needed and some {@link PictogramElement}s need to be removed.
+	 * @param pes the {@link PictogramElement}s to check.
+	 * @return true if some {@link PictogramElement}s need to be removed; otherwise false.
+	 */
+	private boolean isPruneUpdateNeeded(PictogramElement[] pes) {
+		// only a quick solution to check if the proof got pruned and an update is needed
+		for (PictogramElement pe : pes) {
+			Object bo = diagramEditor.getDiagramTypeProvider().getFeatureProvider().getBusinessObjectForPictogramElement(pe);
+			if (bo instanceof ISENode) {
+				ISENode node = (ISENode) bo;
+				try {
+					if (!node.hasChildren() && node.getParent() != null && !node.getParent().hasChildren()) {
+						return true;
+					}
+				} catch (DebugException e) {
+					LogUtil.getLogger().logError(e);
+				}
+			}
+		}
+		return false;
+	}
    
    /**
     * Changes the content of the shown {@link Diagram}.
