@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
@@ -574,14 +575,26 @@ public final class TruthValueTracingUtil {
                                                final List<Term> resultToFill) {
       sf.formula().execPreOrder(new DefaultVisitor() {
          @Override
+         public boolean visitSubtree(Term visited) {
+            return !hasLabelOfInterest(visited);
+         }
+         
+         @Override
          public void visit(Term visited) {
+            if (hasLabelOfInterest(visited)) {
+               resultToFill.add(visited);
+            }
+         }
+         
+         protected boolean hasLabelOfInterest(Term visited) {
             TermLabel visitedLabel = visited.getLabel(labelName);
             if (visitedLabel instanceof FormulaTermLabel) {
                FormulaTermLabel pLabel = (FormulaTermLabel) visitedLabel;
                String[] beforeIds = pLabel.getBeforeIds();
-               if (ArrayUtil.contains(beforeIds, labelId)) {
-                  resultToFill.add(visited);
-               }
+               return ArrayUtil.contains(beforeIds, labelId);
+            }
+            else {
+               return false;
             }
          }
       });
@@ -781,6 +794,17 @@ public final class TruthValueTracingUtil {
          return "true=" + evaluatesToTrue +
                 ", false=" + evaluatesToFalse +
                 ", instruction=" + instructionTerm;
+      }
+      
+      /**
+       * Creates a pretty printed {@link String}.
+       * @param services The {@link Services} to use.
+       * @return The pretty printed {@link String}.
+       */
+      public String toPrettyString(Services services) {
+         return "true=" + evaluatesToTrue +
+                ", false=" + evaluatesToFalse +
+                (instructionTerm != null ? ", instruction:\n" + ProofSaver.printTerm(instructionTerm, services) : "");
       }
 
       /**
@@ -1095,6 +1119,32 @@ public final class TruthValueTracingUtil {
             sb.append(entry.getValue().evaluate(termLabelName, results));
             sb.append(" :: ");
             sb.append(entry.getValue());
+         }
+         return sb.toString();
+      }
+      
+      /**
+       * Creates a pretty printed {@link String}.
+       * @return The pretty printed {@link String}.
+       */
+      public String toPrettyString() {
+         StringBuffer sb = new StringBuffer();
+         sb.append("Goal ");
+         sb.append(leafNode.serialNr());
+         sb.append("\n");
+         boolean afterFirst = false;
+         for (Entry<String, MultiEvaluationResult> entry : results.entrySet()) {
+            if (afterFirst) {
+               sb.append("\n");
+            }
+            else {
+               afterFirst = true;
+            }
+            sb.append(entry.getKey());
+            sb.append(" = ");
+            sb.append(entry.getValue().evaluate(termLabelName, results));
+            sb.append(" :: ");
+            sb.append(entry.getValue().toPrettyString(leafNode.proof().getServices()));
          }
          return sb.toString();
       }

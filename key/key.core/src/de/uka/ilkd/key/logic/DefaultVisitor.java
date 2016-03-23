@@ -17,13 +17,16 @@ package de.uka.ilkd.key.logic;
  * This abstract Vistor class declares the interface for a common term visitor.
  */
 public abstract class DefaultVisitor implements Visitor {	
+    @Override
+    public boolean visitSubtree(Term visited) {
+        return true;
+    }
 
-    public abstract void visit(Term visited);
-
+    @Override
     public void subtreeEntered(Term subtreeRoot){
     }
 
+    @Override
     public void subtreeLeft(Term subtreeRoot){
-    }
-    
+    }    
 }

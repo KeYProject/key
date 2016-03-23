@@ -195,6 +195,11 @@ abstract class ReplaceAndRegisterMethod {
         private HashSet<QuantifiableVariable> vars = new LinkedHashSet<QuantifiableVariable>();
 
         @Override
+        public boolean visitSubtree(Term visited) {
+            return true;
+        }
+
+        @Override
         public void visit(Term visited) {
             final ImmutableArray<QuantifiableVariable> boundVars = visited.boundVars();
             for (QuantifiableVariable var : boundVars) vars.add(var);

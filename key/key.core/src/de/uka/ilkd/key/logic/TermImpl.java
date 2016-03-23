@@ -228,23 +228,27 @@ class TermImpl implements Term {
     
     @Override
     public void execPostOrder(Visitor visitor) {
-	visitor.subtreeEntered(this);
-	for(int i = 0, ar = arity(); i < ar; i++) {
-	    sub(i).execPostOrder(visitor);
-	}
-	visitor.visit(this);
-	visitor.subtreeLeft(this);
+       visitor.subtreeEntered(this);
+       if (visitor.visitSubtree(this)) {
+          for(int i = 0, ar = arity(); i < ar; i++) {
+             sub(i).execPostOrder(visitor);
+          }
+       }
+       visitor.visit(this);
+       visitor.subtreeLeft(this);
     }
 
 
     @Override
     public void execPreOrder(Visitor visitor) {
-	visitor.subtreeEntered(this);
-	visitor.visit(this);
-	for (int i = 0, ar = arity(); i < ar; i++) {
-	    sub(i).execPreOrder(visitor);
-	}
-	visitor.subtreeLeft(this);	
+       visitor.subtreeEntered(this);
+       visitor.visit(this);
+       if (visitor.visitSubtree(this)) {
+          for (int i = 0, ar = arity(); i < ar; i++) {
+              sub(i).execPreOrder(visitor);
+          }
+       }
+       visitor.subtreeLeft(this); 
     }
     
 

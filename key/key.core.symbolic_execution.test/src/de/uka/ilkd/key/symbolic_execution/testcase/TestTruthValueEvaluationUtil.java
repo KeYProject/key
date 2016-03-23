@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.proof.Node;
@@ -26,12 +29,42 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
  * Tests for {@link TruthValueTracingUtil}.
  * @author Martin Hentschel
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestCase {
+   
+   /**
+    * Tests example: /set/truthValueAddingOfLabeledSubtree
+    */
+   public void testAddingOfLabeledSubtree() throws Exception {
+      // Create expected results
+      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedTruthValueResult("13.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("14.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("15.0", TruthValue.FALSE),
+                                                             new ExpectedTruthValueResult("16.0", TruthValue.UNKNOWN),
+                                                             new ExpectedTruthValueResult("17.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult resultInvInitial = new ExpectedTruthValueEvaluationResult(goal53);
+      ExpectedBranchResult goal141 = new ExpectedBranchResult();
+      ExpectedTruthValueEvaluationResult resultInvTermination = new ExpectedTruthValueEvaluationResult(goal141);
+      ExpectedBranchResult goal214 = new ExpectedBranchResult();
+      ExpectedBranchResult goal229 = new ExpectedBranchResult();
+      ExpectedBranchResult goal233 = new ExpectedBranchResult();
+      ExpectedBranchResult goal231 = new ExpectedBranchResult();
+      ExpectedBranchResult goal216 = new ExpectedBranchResult();
+      ExpectedTruthValueEvaluationResult resultNormalTermination = new ExpectedTruthValueEvaluationResult(goal214, goal229, goal233, goal231, goal216);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueAddingOfLabeledSubtree/test/ImmutableList.proof", 
+                                 "/set/truthValueAddingOfLabeledSubtree/oracle/ImmutableList.xml",
+                                 false,
+                                 false,
+                                 resultInvInitial,
+                                 resultInvTermination,
+                                 resultNormalTermination);
+   }
    
    /**
     * Tests example: /set/truthValueAssignableAndLoop
     */
-   public void testTruthValueAssignableAndLoop() throws Exception {
+   public void testAssignableAndLoop() throws Exception {
       // Create expected results
       ExpectedBranchResult goal430 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.FALSE),
                                                               new ExpectedTruthValueResult("4.0", TruthValue.FALSE),
