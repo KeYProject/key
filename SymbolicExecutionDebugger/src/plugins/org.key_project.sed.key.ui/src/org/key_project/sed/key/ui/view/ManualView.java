@@ -7,7 +7,9 @@ import java.util.LinkedList;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.IStateListener;
 import org.eclipse.core.commands.State;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
@@ -37,6 +39,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.RegistryToggleState;
+import org.key_project.key4eclipse.common.ui.breakpoints.KeYBreakpointManager;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
 import org.key_project.keyide.ui.handlers.HideIntermediateProofstepsHandler;
 import org.key_project.keyide.ui.handlers.ShowSymbolicExecutionTreeOnlyHandler;
@@ -113,6 +116,11 @@ public class ManualView extends AbstractViewBasedView {
    private ProofSourceViewerDecorator sourceViewerDecorator;
    
    /**
+    * 
+    */
+   private IProject currentProject;
+   
+   /**
     * indicates whether there is a new prof loaded or not.
     */
    private boolean newProof;
@@ -132,6 +140,11 @@ public class ManualView extends AbstractViewBasedView {
 	 */
 	private State symbolicState;
    
+	/**
+	 * The {@link State} for stopping at breakpoints while auto mode is running. 
+	 */
+	private State breakpointState;
+	
    /**
     * the {@link ISelectionChangedListener} for the {@link IDebugView}.
     */
@@ -196,6 +209,23 @@ public class ManualView extends AbstractViewBasedView {
       }
 	};
 	
+	/**
+	 * The {@link IStateListener} to listen to changes on the breakpointState.
+	 */
+	private IStateListener breakpointStateListener = new IStateListener() {
+
+      @Override
+      public void handleStateChange(State state, Object oldValue) {
+         handleBreakpointStateChanged(state, oldValue);
+      }
+	   
+	};
+	
+	/**
+	 * 
+	 */
+	private KeYBreakpointManager breakpointManager;
+	
 	private RuleAppListener ruleAppListener = new RuleAppListener() {
 		
 		@Override
@@ -206,8 +236,10 @@ public class ManualView extends AbstractViewBasedView {
 	};
 
 	private boolean isManualRule;
+
 	
 	public ManualView() {
+	   
 		ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
       if (service != null) {
          Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
@@ -225,6 +257,16 @@ public class ManualView extends AbstractViewBasedView {
             if (symbolicState != null) {
             	symbolicState.setValue(false); //TODO remove
             	symbolicState.addListener(symbolicStateListener);
+            }
+         }
+         
+         Command breakpointCmd = service.getCommand(ShowSymbolicExecutionTreeOnlyHandler.COMMAND_ID);
+         if (breakpointCmd != null) {
+            if (hideCmd != null) {
+               breakpointState = hideCmd.getState(RegistryToggleState.STATE_ID);
+               if (breakpointState != null) {
+                  breakpointState.addListener(breakpointStateListener);
+               }
             }
          }
       }
@@ -279,7 +321,17 @@ public class ManualView extends AbstractViewBasedView {
 		selectNode(selectedNode);
 	}
    
-
+	/**
+	 * 
+	 */
+	protected void handleBreakpointStateChanged(State state, Object oldValue) {
+	   if (state.getValue() instanceof Boolean) {
+	      breakpointManager.setEnabled((boolean) state.getValue());
+	   } else {
+	      breakpointManager.setEnabled(false);
+	   }
+	}
+	
    /**
     * {@inheritDoc}
     */
@@ -290,6 +342,10 @@ public class ManualView extends AbstractViewBasedView {
       this.treeViewer = new TreeViewer(parentComposite, SWT.SINGLE | SWT.H_SCROLL
             | SWT.V_SCROLL | SWT.VIRTUAL | SWT.BORDER);
       getTreeViewer().setUseHashlookup(true);
+      this.contentProvider = new LazyProofTreeContentProvider();
+      contentProvider.setHideState((boolean) hideState.getValue());
+      contentProvider.setSymbolicState((boolean) symbolicState.getValue());
+      getTreeViewer().setContentProvider(contentProvider);
       //create the source viewer
       this.sourceViewer = new SourceViewer(parentComposite, null, SWT.MULTI | SWT.BORDER
             | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -325,6 +381,7 @@ public class ManualView extends AbstractViewBasedView {
                   if (!keyTarget.isTerminated()) {
    	        	   if (getProof() != null && !getProof().isDisposed()) {
    	        	      getProof().removeRuleAppListener(ruleAppListener);
+   	        	      DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(breakpointManager);
    	        	      if (!getProof().equals(keyTarget.getProof())) {
    	        	         newProof = true;
    	        	      }
@@ -333,11 +390,18 @@ public class ManualView extends AbstractViewBasedView {
    	        	   }
                   this.proof = keyTarget.getProof();
                   this.environment = keyTarget.getEnvironment();
+                  if (keyTarget.getMethod() != null) {
+                     this.currentProject = keyTarget.getMethod().getResource().getProject();
+                  } else {
+                     this.currentProject = null;
+                  }
                   environment.getProofControl().setMinimizeInteraction(true);
                   if (getTreeViewer() != null && getSourceViewer() != null) {
                      updateViewer();
                   }
                   getProof().addRuleAppListener(ruleAppListener);
+                  breakpointManager = new KeYBreakpointManager(getProof());
+                  DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
                   } else {
                      proof = null;
                      environment = null;
@@ -373,15 +437,9 @@ public class ManualView extends AbstractViewBasedView {
       Assert.isNotNull(getTreeViewer());
       Assert.isNotNull(getSourceViewer());
       Assert.isNotNull(sourceViewerDecorator);
-      this.contentProvider = new LazyProofTreeContentProvider();
-      // initialize boolean flags for hideIntermediateProofSteps and showSymbolicExecutionTree outline filter
-      contentProvider.setHideState((boolean) hideState.getValue());
-      contentProvider.setSymbolicState((boolean) symbolicState.getValue());
-      getTreeViewer().setContentProvider(contentProvider);
-      
+      getTreeViewer().setInput(getProof());
       this.labelProvider = new ProofTreeLabelProvider(getTreeViewer(), environment.getProofControl(), getProof());
       getTreeViewer().setLabelProvider(labelProvider);
-      getTreeViewer().setInput(getProof());
       contentProvider.injectTopLevelElements();
       
       getTreeViewer().setSelection(SWTUtil.createSelection(getProof().root()), true);
@@ -475,6 +533,12 @@ public class ManualView extends AbstractViewBasedView {
       if (symbolicState != null) {
     	  symbolicState.removeListener(symbolicStateListener);
       }	
+      if (breakpointState != null) {
+         breakpointState.removeListener(breakpointStateListener);
+      }
+      if (breakpointManager != null) {
+         DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(breakpointManager);
+      }
       getSite().getPage().removeSelectionListener(selectionListener);
       
       super.dispose();
@@ -652,6 +716,10 @@ public class ManualView extends AbstractViewBasedView {
    
    public SourceViewer getSourceViewer() {
       return sourceViewer;
+   }
+   
+   public IProject getProject() {
+      return currentProject;
    }
    
 }
