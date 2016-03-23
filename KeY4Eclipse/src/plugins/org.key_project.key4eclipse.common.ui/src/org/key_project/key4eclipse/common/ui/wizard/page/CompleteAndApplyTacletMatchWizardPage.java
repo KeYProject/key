@@ -380,34 +380,60 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       table.setLinesVisible(true);
    }
    
-   private void mkAssumptionsSpec(int id){
+   private void mkAssumptionsSpec(final int id){
       final TacletInstantiationModel model = models[id];
       Composite ifSelectionViewComposite = new Composite(assumptionViewGrp, SWT.NONE);
       ifSelectionViewComposite.setLayout(new GridLayout(2, false));
+      final Services svc = model.proof().getServices();
       
+      //For each required Assumption:
       for (int i = 0; i < model.ifChoiceModelCount(); i++) {
+         //create a line in the assumptions field:
+         //assumption text
          String text = ProofSaver.printAnything(model.ifFma(i), model.proof().getServices());
          Text assumption = new Text(ifSelectionViewComposite, SWT.READ_ONLY);
          assumption.setText(text);
-         TacletAssumesModel tam = model.ifChoiceModel(i);
+         final TacletAssumesModel tam = model.ifChoiceModel(i);
+         //combo box
          final Combo c = new Combo(ifSelectionViewComposite, SWT.DROP_DOWN);
-         Services svc = model.proof().getServices();
          final int ifChoiceModelID = i;
+         int manualInputIDTemp = -1;
+         //combo box contents:
          for (int j = 0; j < tam.getSize(); j++) {
             String ifSelection =tam.getElementAt(j).toString(svc);
             if(! ifSelection.equals("Manual Input")) {
                c.add(ifSelection);
+            } else {
+               //Do not use Manual Input items, instead keep their position for later use.
+               manualInputIDTemp = j;
             }
             
          }
+         final int manualInputID = manualInputIDTemp;
+         c.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+               //feed back to model: assumption selection changed.
+               tam.setSelectedItem(tam.getElementAt(c.getSelectionIndex()));
+            }
+         });
          c.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent e) {
-               //FIXME: Decide the following: Do we need to call
-               //    c.setItem
-               //or find another way to set the Combo text
-               //
-               //Validate whether setManualInput works as expected.
+               //defaults to -1 if c's text cannot be found in the model.
+               //That is, if the user entered something.
+               int index = c.getSelectionIndex();
+               
+               //set the input we received.
+               //No ill effects if the selected Item is not Manual Input.
                model.setManualInput(ifChoiceModelID, c.getText());
+               
+               if (index == -1) {
+                  //Manual Input
+                  tam.setSelectedItem(tam.getElementAt(manualInputID));
+               } else {
+                  //Existing Selection
+                  tam.setSelectedItem(tam.getElementAt(index));
+               }
             }
          });
       }
@@ -415,6 +441,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
    
    /**
     * Stores the information and applies a freshly created taclet application.
+    * @throws Exception 
     */
    public void finish() {
       try {
@@ -426,6 +453,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
          goal.apply(app);
       }  catch (Exception exc) {
          exc.printStackTrace();
+         //TODO: Handle this
          return;
       } 
       InstantiationFileHandler.saveListFor(getCurrentModel());

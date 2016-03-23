@@ -28,6 +28,7 @@ import org.key_project.key4eclipse.common.ui.test.Activator;
 import org.key_project.key4eclipse.common.ui.util.EclipseUserInterfaceCustomization;
 import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
@@ -36,6 +37,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
@@ -79,6 +81,10 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
     */
    private KeYEnvironment<DefaultUserInterfaceControl> environment = null;
 
+   /**
+    * Tests whether finishing the dialog works as expected.
+    * @throws Exception
+    */
    @Test
    public void testFinish() throws Exception {
       try {
@@ -105,6 +111,10 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
       }
    }
    
+   /**
+    * Tests whether cancelling the dialog works as expected.
+    * @throws Exception
+    */
    @Test
    public void testCancel() throws Exception {
       try {
@@ -136,6 +146,10 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
       }
    }
    
+   /**
+    * Tests whether picking pre-set assumptions works as expected.
+    * @throws Exception
+    */
    @Test
    public void testAssumptions() throws Exception {
       try {
@@ -148,7 +162,7 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
          
          //instantiate the two assumptions
          dialogShell.bot().comboBox("").setSelection("5 >= 0");
-         dialogShell.bot().comboBox("").setText("3 >= 0");// .setSelection("3 >= 0");
+         dialogShell.bot().comboBox("").setSelection("10 >= 0");
          dialogShell.bot().button("Finish").click();
          
          //assert that expected change happened
@@ -156,6 +170,41 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
          assertFalse(oldProofText.contains("true"));
          assertTrue(newProofText.contains("true"));
          assertFalse(oldProofText.equals(newProofText));
+      } finally {
+         restore();
+      }
+   }
+   
+   /**
+    * Tests whether manually defining assumptions works as expected.
+    * @throws Exception
+    */
+   @Test
+   public void testAssumptionsManualInput() throws Exception {
+      try {
+         //load a proof file
+         setupTest("multiSelectsInAssume.proof");
+         openRuleDialog("y", "multiSelectsInAssume", 2);
+         
+         //backup the old open goal's text
+         String oldProofText = proof.openGoals().head().toString();
+         
+         //instantiate the two assumptions
+         dialogShell.bot().comboBox("").setText("6 >= 0");
+         dialogShell.bot().comboBox("").setText("7 >= 0");
+         dialogShell.bot().button("Finish").click();
+         
+         //assert that expected change happened:
+         //Namely, that we have two goals, one with the assumption true, one where we try to prove the assumption.
+         ImmutableList<Goal> goals = proof.openGoals();
+         Goal goal2 = goals.head();
+         Goal goal1 = goals.tail().head();
+         String g1Text = goal1.toString();
+         String g2Text = goal2.toString();
+         assertFalse(oldProofText.contains("true"));
+         assertTrue(g1Text.contains("6 >= 0 & 7 >= 0, x * y >= 0"));
+         assertTrue(g2Text.contains("7 >= 0, 6 >= 0"));
+         assertTrue(g2Text.contains("true"));
       } finally {
          restore();
       }
@@ -221,6 +270,10 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
       if (run.getException() != null) {
          throw run.getException();
       }
+      
+      //Unminimize Interactions, so that we can use the required Taclets.
+      TestUtilsUtil.clickDirectly(bot.toolbarToggleButtonWithTooltip("Minimize Interactions"));
+      
       editor = bot.activeEditor();
       assertNotNull(editor);
    }
@@ -229,9 +282,10 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
     * opens a Taclet Dialog.
     * @param location The text snippet where to look for the rule
     * @param rule The name of the rule to be applied
+    * @param offset The offset in chars where to click relative to location
     */
    private void openRuleDialog(String location, String rule, int offset) {
-      //click context menu / text we're looking for: The first { should be the start of the update.
+      //click context menu / text we're looking for.
       final SWTBotStyledText styledText = editor.bot().styledText();
       Point point = TestUtilsUtil.selectText(styledText, location);
       point.x = point.x - 1 + offset;
@@ -247,6 +301,8 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
     * restores the initial conditions.
     */
    private void restore() {
+      //re-minimize Interactions
+      TestUtilsUtil.clickDirectly(bot.toolbarToggleButtonWithTooltip("Minimize Interactions"));
       if (dialogShell != null) {
          dialogShell.close();
          dialogShell = null;
