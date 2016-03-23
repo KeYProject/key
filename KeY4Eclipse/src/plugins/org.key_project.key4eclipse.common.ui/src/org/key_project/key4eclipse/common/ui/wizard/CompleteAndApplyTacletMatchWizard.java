@@ -4,6 +4,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.key4eclipse.common.ui.util.EclipseUserInterfaceCustomization;
+import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.key4eclipse.common.ui.wizard.page.CompleteAndApplyTacletMatchWizardPage;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
@@ -55,8 +56,15 @@ public class CompleteAndApplyTacletMatchWizard extends Wizard {
     */
    @Override
    public boolean performFinish() {
-      completePage.finish();
-      return true;
+      try {
+         completePage.finish();
+         return true;
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+         return false;
+      }
    }
    
    /**
