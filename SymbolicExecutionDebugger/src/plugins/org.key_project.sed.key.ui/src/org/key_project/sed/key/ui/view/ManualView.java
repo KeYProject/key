@@ -381,8 +381,12 @@ public class ManualView extends AbstractViewBasedView {
       getTreeViewer().setInput(getProof());
       contentProvider.injectTopLevelElements();
       
+      getTreeViewer().setSelection(SWTUtil.createSelection(getProof().root()), true);
       createTreeViewerContextMenu();
-      selectNodeThreadSafe(proof.root());
+      if (!(boolean) hideState.getValue() || newProof) {
+         sourceViewerDecorator.showNode(getProof().root(), SymbolicExecutionUtil.createNotationInfo(getProof()));
+         newProof = false;
+      }
       getSourceViewer().getControl().setSize(1000,1000);
       createSourceViewerContextMenu();
    }
