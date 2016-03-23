@@ -393,8 +393,9 @@ public class MainViewController extends NUIController implements Observer {
         }
         else {
             component.setVisible(true);
-            if (!getPane(place).getChildren().contains(component))
+            if (!getPane(place).getChildren().contains(component)) {
                 getPane(place).getChildren().add(component);
+            }
         }
     }
 

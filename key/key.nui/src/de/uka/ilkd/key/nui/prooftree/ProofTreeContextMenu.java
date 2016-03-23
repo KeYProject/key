@@ -2,9 +2,6 @@ package de.uka.ilkd.key.nui.prooftree;
 
 import java.util.Map;
 import java.util.Map.Entry;
-
-import com.sun.webkit.ThemeClient;
-
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.controller.TreeViewController;
 import de.uka.ilkd.key.nui.prooftree.filter.ProofTreeFilter;

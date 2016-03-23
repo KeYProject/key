@@ -103,7 +103,7 @@ public final class ProofTreeStyler {
 
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(final Object obj) {
 
             return obj instanceof StyleConfiguration && !(
 
@@ -111,7 +111,7 @@ public final class ProofTreeStyler {
             getCssClasses().stream()
                     .anyMatch((item) -> !((StyleConfiguration) obj).getCssClasses().contains(item))
 
-                    || ( // Check if image is the same
+                    || (// Check if image is the same
 
             // First check if images are set
             getIconImage() != null && ((StyleConfiguration) obj).getIconImage() != null

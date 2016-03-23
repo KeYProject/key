@@ -61,7 +61,7 @@ public class TreeViewController extends NUIController implements Observer {
      */
     private SearchViewController searchViewController;
     /**
-     * Includes the Sub-Window for search
+     * Includes the Sub-Window for search.
      */
     private Pane searchViewPane;
 
@@ -236,8 +236,12 @@ public class TreeViewController extends NUIController implements Observer {
     public void update(final Observable obs, final Object arg) {
         if (obs instanceof DataModel) {
             final TreeViewState treeViewState = ((DataModel) obs).getTreeViewState((String) arg);
-            final ProofTreeItem treeItem = (treeViewState == null) ? null
-                    : treeViewState.getTreeItem();
+            final ProofTreeItem treeItem;
+            if(treeViewState == null){
+                treeItem = null;
+            } else {
+                treeItem = treeViewState.getTreeItem();
+            }
 
             // update the proofTreeView component in the treeView
             proofTreeView.setRoot(treeItem);

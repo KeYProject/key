@@ -274,16 +274,21 @@ public class SearchViewController extends NUIController {
         // Basically does: while(!searchMatches.contains(itemToSelect))
         // itemToSelect++;
         while (!itemToSelect.getValue().isSearchResult()) {
-            if ((direction == Direction.UP
-                    && (treeItems.indexOf(itemToSelect) == treeItems.size() - 1))
-                    || (direction == Direction.DOWN && (treeItems.indexOf(itemToSelect) == 0))) {
-                itemToSelect = direction == Direction.UP ? treeItems.get(0)
-                        : treeItems.get(treeItems.size() - 1);
+            if (direction == Direction.UP) {
+                if (treeItems.indexOf(itemToSelect) == treeItems.size() - 1) {
+                    itemToSelect = treeItems.get(0);
+                }
+                else {
+                    itemToSelect = treeItems.get(treeItems.indexOf(itemToSelect) + 1);
+                }
             }
             else {
-                itemToSelect = direction == Direction.UP
-                        ? treeItems.get(treeItems.indexOf(itemToSelect) + 1)
-                        : treeItems.get(treeItems.indexOf(itemToSelect) - 1);
+                if (treeItems.indexOf(itemToSelect) == 0) {
+                    itemToSelect = treeItems.get(treeItems.size() - 1);
+                }
+                else {
+                    itemToSelect = treeItems.get(treeItems.indexOf(itemToSelect) - 1);
+                }
             }
         }
 
@@ -311,10 +316,14 @@ public class SearchViewController extends NUIController {
 
         if (performScroll) {
             // if we are to scroll downwards, we have to subtract an offset to
-            // make
-            // the selected item appear in middle.
-            proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex()
-                    - (direction == Direction.UP ? 0 : (int) (proofTreeCells.size() / 2)));
+            // make the selected item appear in middle.
+            final int offset;
+            if (direction == Direction.DOWN) {
+                offset = proofTreeCells.size() / 2;
+            } else {
+                offset = 0;
+            }
+            proofTreeView.scrollTo(proofTreeView.getSelectionModel().getSelectedIndex() - offset);
         }
     }
 
@@ -364,8 +373,12 @@ public class SearchViewController extends NUIController {
             }
             else if (KeyCode.ENTER == e.getCode()) {
                 final PauseTransition pause = new PauseTransition(Duration.millis(130));
-                Button button;
-                button = e.isShiftDown() ? btnSearchPrev : btnSearchNext;
+                final Button button;
+                if(e.isShiftDown()){
+                    button = btnSearchPrev;
+                } else {
+                    button = btnSearchNext;
+                }
                 button.arm();
                 pause.setOnFinished(event -> {
                     button.disarm();

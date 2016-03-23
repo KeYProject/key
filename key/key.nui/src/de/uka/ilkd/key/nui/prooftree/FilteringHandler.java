@@ -48,7 +48,7 @@ public class FilteringHandler {
     /**
      * A map storing filters with their respective activation flag.
      */
-    final private Map<ProofTreeFilter, Boolean> filtersMap = Collections
+    private final Map<ProofTreeFilter, Boolean> filtersMap = Collections
             .synchronizedMap(new ConcurrentHashMap<>());
 
     /**
@@ -208,7 +208,7 @@ public class FilteringHandler {
      *
      */
     @SuppressWarnings("PMD.AtLeastOneConstructor")
-    private static class reflectionWrapper {
+    private static class ReflectionWrapper {
 
         /**
          * Path where filter classes are stored.
@@ -217,11 +217,11 @@ public class FilteringHandler {
         /**
          * Stores the URLs of all filters.
          */
-        private transient final List<URL> listOfURLs = new ArrayList<>();
+        private final transient  List<URL> listOfURLs = new ArrayList<>();
         /**
          * Stores the File Names of all filters.
          */
-        private transient final List<String> listOfFileNames = new ArrayList<>();
+        private final transient  List<String> listOfFileNames = new ArrayList<>();
 
         /**
          * Retrieves the filters URLs and names if KeY is run from a .jar file.
@@ -253,7 +253,7 @@ public class FilteringHandler {
 
         /**
          * Retrieves the filters URLs and names if KeY is built from scratch
-         * (and not to a .jar file)
+         * (and not to a .jar file).
          * 
          * @return A SimpleImmutableEntry containing a List&lt;URL&gt; and a
          *         List&lt;String&gt;
@@ -310,7 +310,7 @@ public class FilteringHandler {
      */
     private static List<ProofTreeFilter> searchFilterClasses() {
 
-        final SimpleImmutableEntry<List<URL>, List<String>> files = new reflectionWrapper()
+        final SimpleImmutableEntry<List<URL>, List<String>> files = new ReflectionWrapper()
                 .getFilterFiles();
 
         final List<ProofTreeFilter> filters = new LinkedList<>();

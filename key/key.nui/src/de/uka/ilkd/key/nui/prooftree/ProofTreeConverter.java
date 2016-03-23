@@ -119,10 +119,13 @@ public class ProofTreeConverter {
     private void addProofTreeToNUITree(final Node proofNode,
             final NUIBranchNode parent) {
         final Proof proof = proofNode.proof();
-        NUINode newNode;
+        final NUINode newNode;
         // Create NUI node -----------------------------------------------------
-        newNode = proofNode.leaf() ? new NUILeafNode(proofNode)
-                : new NUIInnerNode(proofNode);
+        if(proofNode.leaf()){
+            newNode = new NUILeafNode(proofNode);
+        } else {
+            newNode = new NUIInnerNode(proofNode);
+        }
 
         // Add created node to parent
         parent.addChild(newNode);
