@@ -83,9 +83,8 @@ public class FilteringHandler {
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link DataModel}
      */
     public DataModel getDataModel() {
         return dataModel;
@@ -93,7 +92,6 @@ public class FilteringHandler {
 
     /**
      * Returns the list of loaded filters.
-     * 
      * @return the {@link #filtersMap}.
      */
     public Map<ProofTreeFilter, Boolean> getFiltersMap() {

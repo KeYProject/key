@@ -221,18 +221,16 @@ public final class ProofTreeStyler {
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link IconFactory}.
      */
     public IconFactory getIcf() {
         return icf;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link ProofTreeCell}.
      */
     public ProofTreeCell getPtc() {
         return ptc;
@@ -282,15 +280,6 @@ public final class ProofTreeStyler {
 
         // otherwise an empty style configuration is returned
         return new StyleConfiguration();
-    }
-
-    /**
-     * TODO
-     * 
-     * @param ptc
-     */
-    public void setPtc(final ProofTreeCell ptc) {
-        this.ptc = ptc;
     }
 
     /**

@@ -89,27 +89,16 @@ public class TreeViewController extends NUIController implements Observer {
     }
 
     /**
-     * TODO
-     * 
-     * @return
-     */
-    public FilteringHandler getFh() {
-        return filteringHandler;
-    }
-
-    /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link FilteringHandler}
      */
     public FilteringHandler getFilteringHandler() {
         return filteringHandler;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link IconFactory}.
      */
     public IconFactory getIcf() {
         return icf;
@@ -127,36 +116,32 @@ public class TreeViewController extends NUIController implements Observer {
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link TreeView}&lt;{@link NUINode}&gt;
      */
     public TreeView<NUINode> getProofTreeView() {
         return proofTreeView;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link SearchViewController}.
      */
     public SearchViewController getSearchViewController() {
         return searchViewController;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link SearchViewPane}.
      */
     public Pane getSearchViewPane() {
         return searchViewPane;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link VBox}.
      */
     public VBox getTreeViewPane() {
         return treeViewPane;
@@ -200,54 +185,48 @@ public class TreeViewController extends NUIController implements Observer {
     }
 
     /**
-     * TODO
-     * 
-     * @param filteringHandler
+     * Setter.
+     * @param filteringHandler the {@link FilteringHandler} you want to set.
      */
     public void setFilteringHandler(final FilteringHandler filteringHandler) {
         this.filteringHandler = filteringHandler;
     }
 
     /**
-     * TODO
-     * 
-     * @param icf
+     * Setter.
+     * @param icf the {@link IconFactory} you want to set.
      */
     public void setIcf(final IconFactory icf) {
         this.icf = icf;
     }
 
     /**
-     * TODO
-     * 
-     * @param proofTreeView
+     * Setter.
+     * @param proofTreeView the {@link TreeView}&lt;{@link NUINode}&gt; you want to set.
      */
     public void setProofTreeView(final TreeView<NUINode> proofTreeView) {
         this.proofTreeView = proofTreeView;
     }
 
     /**
-     * TODO
-     * 
-     * @param searchViewController
+     * Setter.
+     * @param searchViewController the {@link SearchViewController} you want to set.
      */
     public void setSearchViewController(final SearchViewController searchViewController) {
         this.searchViewController = searchViewController;
     }
 
     /**
-     * TODO
-     * 
-     * @param searchViewPane
+     * Setter.
+     * @param searchViewPane the{@link Pane} you want to set.
      */
     public void setSearchViewPane(final Pane searchViewPane) {
         this.searchViewPane = searchViewPane;
     }
 
     /**
-     * TODO
-     * 
-     * @param treeViewPane
+     * Setter.
+     * @param treeViewPane the {@link Pane} you want to set.
      */
     public void setTreeViewPane(final VBox treeViewPane) {
         this.treeViewPane = treeViewPane;

@@ -35,18 +35,16 @@ public class ToggleGroupNotFoundException extends NUIException {
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return a {@link String} representing the the ToggleGroups fx:id.
      */
     public String getToggleGroup() {
         return toggleGroup;
     }
 
     /**
-     * TODO
-     * 
-     * @param toggleGroup
+     * Setter.
+     * @param a {@link String} representing the the ToggleGroups fx:id.
      */
     public void setToggleGroup(String toggleGroup) {
         this.toggleGroup = toggleGroup;

@@ -68,14 +68,6 @@ public class ProofTreeConverter {
     }
 
     /**
-     * TODO
-     * @return
-     */
-    public NUIBranchNode getNuiRoot() {
-        return nuiRoot;
-    }
-
-    /**
      * @return the root node of the converted tree.
      */
     public NUIBranchNode getRootNode() {
@@ -106,14 +98,6 @@ public class ProofTreeConverter {
 
         // set linked leafs
         linkedLeafs.forEach((linkedLeaf) -> setNUINodeLinkedTrue(linkedLeaf));
-    }
-
-    /**
-     * TODO
-     * @param nuiRoot
-     */
-    public void setNuiRoot(final NUIBranchNode nuiRoot) {
-        this.nuiRoot = nuiRoot;
     }
 
     /**

@@ -27,11 +27,9 @@ public class ControllerNotFoundException extends NUIException {
     public ControllerNotFoundException(final String file) {
         this.file = file;
     }
-
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return a {@link String} representing the file name.
      */
     public String getFile() {
         return file;
@@ -44,8 +42,8 @@ public class ControllerNotFoundException extends NUIException {
     }
 
     /**
-     * TODO
-     * @param file
+     * Setter.
+     * @param a {@link String} representing the file name.
      */
     public void setFile(final String file) {
         this.file = file;

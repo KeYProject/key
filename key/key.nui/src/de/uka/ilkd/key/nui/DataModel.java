@@ -37,7 +37,7 @@ public class DataModel extends Observable {
     private final NUI nui;
 
     /**
-     * HashMap storing the pairs of (String, {@link TreeViewState}), where
+     * Map storing the pairs of (String, {@link TreeViewState}), where
      * String represents the filename of the proof file.
      */
     private final Map<String, TreeViewState> treeViewStates = new ConcurrentHashMap<>();
@@ -57,9 +57,8 @@ public class DataModel extends Observable {
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link ResourceBundle}.
      */
     public ResourceBundle getBundle() {
         return bundle;
@@ -89,9 +88,8 @@ public class DataModel extends Observable {
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link NUI}
      */
     public NUI getNui() {
         return nui;
@@ -110,9 +108,9 @@ public class DataModel extends Observable {
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return a Map&lt;String, {@link TreeViewState}&gt;, where the
+     * String represents the filename of the proof file.
      */
     public Map<String, TreeViewState> getTreeViewStates() {
         return treeViewStates;
@@ -192,12 +190,11 @@ public class DataModel extends Observable {
     }
 
     /**
-     * TODO
-     * 
-     * @param loadedTreeViewState
+     * Setter.
+     * @param loadedTVS the {@link TreeViewState} you want to set.
      */
-    public void setLoadedTreeViewState(final TreeViewState loadedTreeViewState) {
-        this.loadedTreeViewState = loadedTreeViewState;
+    public void setLoadedTreeViewState(final TreeViewState loadedTVS) {
+        this.loadedTreeViewState = loadedTVS;
     }
 
 }

@@ -112,18 +112,18 @@ public class ProofTreeItem extends TreeItem<NUINode> {
 
         return testResult;
     }
-    
+
     /**
-     * TODO
-     * @return
+     * Getter.
+     * @return a {@link FilteredList}&lt;{@link ProofTreeItem}&gt; containing the currently visible children.
      */
     public FilteredList<ProofTreeItem> getFilteredChildren() {
         return filteredChildren;
     }
 
     /**
-     * TODO
-     * @return
+     * Getter.
+     * @return a {@link ObservableList}&lt;{@link ProofTreeItem}&gt; containing the actual children (no filters applied).
      */
     public ObservableList<ProofTreeItem> getInternalChildren() {
         return internalChildren;

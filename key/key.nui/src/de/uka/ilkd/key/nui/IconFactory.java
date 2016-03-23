@@ -54,6 +54,19 @@ public class IconFactory {
 
     /** file name of search icon. */
     public static final String SEARCH = folderRoot + "search.png";
+    /**
+     * An HashMap for storing loaded icon images.
+     */
+    private final Map<String, Image> icons = new HashMap<>();
+
+    /**
+     * The height of produced icons in pixels.
+     */
+    private final int iconSizeHeight;
+    /**
+     * The width of produced icons in pixels.
+     */
+    private final int iconSizeWidth;
 
     /**
      * Scales an given image to a desired size indicated by x (width) and y
@@ -76,22 +89,8 @@ public class IconFactory {
     }
 
     /**
-     * An HashMap for storing loaded icon images.
-     */
-    private final Map<String, Image> icons = new HashMap<>();
-
-    /**
-     * The height of produced icons in pixels.
-     */
-    private final int iconSizeHeight;
-    /**
-     * The width of produced icons in pixels.
-     */
-    private final int iconSizeWidth;
-
-    /**
      * The constructor.
-     * 
+     *
      * @param width
      *            the width of icons in pixels.
      * @param height
@@ -103,27 +102,27 @@ public class IconFactory {
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     *
+     * @return a {@link Map}&lt;{@link String}, {@link Image}&gt;
      */
     public Map<String, Image> getIcons() {
         return icons;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     *
+     * @return an int representing the heigth of an item.
      */
     public int getIconSizeHeight() {
         return iconSizeHeight;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     *
+     * @return an int representing the width of an icon.
      */
     public int getIconSizeWidth() {
         return iconSizeWidth;
@@ -133,7 +132,7 @@ public class IconFactory {
      * Returns an ImageView (scaled image) based on the given imageFilename in
      * the directory folderRoot. If the image was demanded once before a stored
      * image will be returned.
-     * 
+     *
      * @param imageConstant
      *            The name of the image, e. g. IconFactory.KEY_INNER_NODE_OPEN
      * @return ImageView object of JavaFX
@@ -146,11 +145,11 @@ public class IconFactory {
         else {
             final File jarFile = new File(
                     getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
-            if (!jarFile.isFile()) {
-                img = new Image(getClass().getResourceAsStream(imageConstant));
+            if (jarFile.isFile()) {
+                img = new Image("/de/uka/ilkd/key/nui/" + imageConstant);
             }
             else {
-                img = new Image("/de/uka/ilkd/key/nui/" + imageConstant);
+                img = new Image(getClass().getResourceAsStream(imageConstant));
             }
             icons.put(imageConstant, img);
         }

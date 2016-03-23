@@ -36,17 +36,17 @@ public class OpenProofsViewController extends NUIController
     private Pane openProofsViewPane;
 
     /**
-     * TODO
-     * @return
+     * Getter.
+     * @return the {@link ContextMenu}.
      */
     public ContextMenu getContextMenu() {
         return contextMenu;
     }
     /**
-     * TODO
-     * @param contextMenu
+     * Getter.
+     * @param contextMenu the {@link ContextMenu} you want to set.
      */
-    public void setContextMenu(ContextMenu contextMenu) {
+    public void setContextMenu(final ContextMenu contextMenu) {
         this.contextMenu = contextMenu;
     }
 

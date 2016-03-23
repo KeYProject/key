@@ -88,9 +88,8 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link FilteringHandler}
      */
     public FilteringHandler getFilteringHandler() {
         return filteringHandler;
@@ -124,9 +123,8 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link ChangeListener}&lt;{@link Boolean}&gt;
      */
     public ChangeListener<Boolean> getSearchResultListener() {
         return searchResultListener;
@@ -142,18 +140,16 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     }
 
     /**
-     * TODO
-     * 
-     * @param filteringHandler
+     * Setter.
+     * @param filteringHandler the {@link FilteringHandler} you want to set.
      */
     public void setFilteringHandler(final FilteringHandler filteringHandler) {
         this.filteringHandler = filteringHandler;
     }
 
     /**
-     * TODO
-     * 
-     * @param label
+     * Setter.
+     * @param label the {@link Label} you want to set.
      */
     public void setLabel(final Label label) {
         this.label = label;

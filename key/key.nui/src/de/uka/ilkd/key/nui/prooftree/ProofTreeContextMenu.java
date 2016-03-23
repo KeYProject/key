@@ -3,6 +3,8 @@ package de.uka.ilkd.key.nui.prooftree;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.sun.webkit.ThemeClient;
+
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.controller.TreeViewController;
 import de.uka.ilkd.key.nui.prooftree.filter.ProofTreeFilter;
@@ -105,57 +107,51 @@ public class ProofTreeContextMenu extends ContextMenu {
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link FilteringHandler}.
      */
     public FilteringHandler getFh() {
         return fh;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link IconFactory}.
      */
     public IconFactory getIcf() {
         return icf;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return {@link TreeItem}&lt;{@link NUINode}&gt;
      */
     public TreeItem<NUINode> getTreeItem() {
         return treeItem;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link TreeView}&lt;{@link NUINode}&gt;
      */
     public TreeView<NUINode> getTreeView() {
         return treeView;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link TreeViewController}
      */
     public TreeViewController getTreeViewController() {
         return treeViewController;
     }
 
     /**
-     * TODO
-     * 
-     * @param treeViewController
+     * Setter.
+     * @param treeVC the {@link TreeViewController} you want to set.
      */
-    public void setTreeViewController(final TreeViewController treeViewController) {
-        this.treeViewController = treeViewController;
+    public void setTreeViewController(final TreeViewController treeVC) {
+        this.treeViewController = treeVC;
     }
 
     /**

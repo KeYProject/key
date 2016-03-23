@@ -140,8 +140,8 @@ public abstract class NUINode {
     }
 
     /**
-     * TODO
-     * @return
+     * Getter.
+     * @return the {@link StyleConfiguration}.
      */
     public StyleConfiguration getStyle() {
         return style;
@@ -389,8 +389,8 @@ public abstract class NUINode {
     }
 
     /**
-     * TODO
-     * @param style
+     * Setter.
+     * @param style the {@link StyleConfiguration}
      */
     public void setStyle(final StyleConfiguration style) {
         this.style = style;

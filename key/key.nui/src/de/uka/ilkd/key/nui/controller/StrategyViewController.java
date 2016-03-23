@@ -67,7 +67,7 @@ public class StrategyViewController extends NUIController implements Observer {
      * The current value of the slider.
      */
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
-    private int currSliderVal = defaultMaxRuleApplications;
+    private transient int currSliderVal = defaultMaxRuleApplications;
 
     @FXML
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
@@ -148,27 +148,16 @@ public class StrategyViewController extends NUIController implements Observer {
     private ToggleGroup userOptions3;
 
     /**
-     * TODO
-     * 
-     * @return
-     */
-    public int getCurrentSliderValue() {
-        return currSliderVal;
-    }
-
-    /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return an {@link ImageView} containing the "Go"-Button image
      */
     public ImageView getGoButtonImage() {
         return goButtonImage;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     * @return the {@link StrategyWrapper}.
      */
     public StrategyWrapper getStrategyWrapper() {
         return strategyWrapper;
@@ -238,34 +227,22 @@ public class StrategyViewController extends NUIController implements Observer {
     }
 
     /**
-     * TODO
-     * 
-     * @param currSliderVal
-     */
-    public void setCurrSliderVal(final int currSliderVal) {
-        this.currSliderVal = currSliderVal;
-    }
-
-    /**
-     * TODO
-     * 
-     * @param goButtonImage
+     * Setter.
+     * @param goButtonImage an {@link ImageView}.
      */
     public void setGoButtonImage(final ImageView goButtonImage) {
         this.goButtonImage = goButtonImage;
     }
 
     /**
-     * TODO
-     * 
-     * @param strategyWrapper
+     * Setter.
+     * @param strategyWrapper a {@link StrategyWrapper}.
      */
     public void setStrategyWrapper(final StrategyWrapper strategyWrapper) {
         this.strategyWrapper = strategyWrapper;
     }
 
     @Override
-
     public void update(final Observable obs, final Object arg) {
         if (obs instanceof DataModel) {
             final TreeViewState treeViewState = ((DataModel) obs).getTreeViewState(arg.toString());

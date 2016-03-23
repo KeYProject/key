@@ -17,8 +17,8 @@ public class ComponentNotFoundException extends NUIException {
      */
     private final String file;
     /**
-     * TODO
-     * @return
+     * Getter.
+     * @return a {@link String} representing the file name.
      */
     public String getFile() {
         return file;

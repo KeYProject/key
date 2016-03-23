@@ -131,9 +131,9 @@ public class NUI extends Application {
     }
 
     /**
-     * TODO
+     * Getter.
      * 
-     * @return
+     * @return the {@link ResourceBundle}.
      */
     public ResourceBundle getBundle() {
         return bundle;
@@ -157,9 +157,10 @@ public class NUI extends Application {
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     *
+     * @return a {@link Map}&lt;{@link String}, {@link Pane}&gt; of all
+     *         NUIComponents with their respective FX:IDs.a
      */
     public Map<String, Pane> getComponents() {
         return components;
@@ -168,7 +169,7 @@ public class NUI extends Application {
     /**
      * Returns the controller with the specified fx:id of the list of loaded
      * controller {@link #controllers}.
-     * 
+     *
      * @param name
      *            The fx:id of the controller.
      * @return A subclass of NUIController, which is a reference to the
@@ -184,9 +185,11 @@ public class NUI extends Application {
     }
 
     /**
-     * TODO
+     * Getter.
      * 
-     * @return
+     * @return a {@link Map}&lt;{@link String}, {@link NUIController}&gt;
+     *         containing all the Controllers with the FX:IDs of their
+     *         respective components.F
      */
     public Map<String, NUIController> getControllers() {
         return controllers;
@@ -195,16 +198,16 @@ public class NUI extends Application {
     /**
      * Returns a reference to the DataModel.
      * 
-     * @return dataModel
+     * @return dataModel the {@link DataModel}.
      */
     public DataModel getDataModel() {
         return dataModel;
     }
 
     /**
-     * TODO
+     * Getter.
      * 
-     * @return
+     * @return the {@link MainViewController}.
      */
     public MainViewController getMainViewCont() {
         return mainViewCont;
@@ -247,18 +250,22 @@ public class NUI extends Application {
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     *
+     * @return {@link Map}&lt;{@link String}, {@link ToggleGroup}&gt;, where
+     *         <ul>
+     *         <li>String represents the fx:id of the loaded toggle group.
+     *         <li>ToggleGroup is the reference to the loaded toggle group.
+     *         </ul>
      */
     public Map<String, ToggleGroup> getToggleGroups() {
         return toggleGroups;
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * Getter.
+     *
+     * @return the {@link Menu}.
      */
     public Menu getViewPositionMenu() {
         return viewPositionMenu;
@@ -313,45 +320,40 @@ public class NUI extends Application {
     }
 
     /**
-     * TODO
-     * 
-     * @param bundle
+     * Setter.
+     * @param bundle the {@link ResourceBundle} you want to set.
      */
     public void setBundle(final ResourceBundle bundle) {
         this.bundle = bundle;
     }
 
     /**
-     * TODO
-     * 
-     * @param dataModel
+     * Setter.
+     * @param dataModel the {@link DataModel} you want to set.
      */
     public void setDataModel(final DataModel dataModel) {
         this.dataModel = dataModel;
     }
 
     /**
-     * TODO
-     * 
-     * @param mainViewCont
+     * Setter.
+     * @param mainViewCont the {@link MainViewController} you want to set.
      */
     public void setMainViewCont(final MainViewController mainViewCont) {
         this.mainViewCont = mainViewCont;
     }
 
     /**
-     * TODO
-     * 
-     * @param root
+     * Setter.
+     * @param root the {@link ResourceBundle} you want to set.
      */
     public void setRoot(final BorderPane root) {
         this.root = root;
     }
 
     /**
-     * TODO
-     * 
-     * @param viewPositionMenu
+     * Setter.
+     * @param viewPositionMenu the {@link Menu} you want to set.
      */
     public void setViewPositionMenu(final Menu viewPositionMenu) {
         this.viewPositionMenu = viewPositionMenu;
