@@ -223,12 +223,12 @@ public class ProofTreeLabelProvider extends LabelProvider {
 			} else if (node.root()) {
 				return KeYImages.getImage(KeYImages.THREAD);
 
-			} else if (node.parent().childrenCount() > 1) {
-				return KeYImages.getImage(KeYImages.BRANCH_CONDITION);
-
 			} else if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, node.getAppliedRuleApp())) {
 				// Get position information
-				PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
+				PositionInfo posInfo = null;
+				if (statement != null) {
+					posInfo = statement.getPositionInfo();
+				}
 
 				if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement)) {
 					return KeYImages.getImage(KeYImages.METHOD_CALL);

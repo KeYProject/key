@@ -18,6 +18,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.swt.widgets.Event;
 import org.key_project.keyide.ui.editor.BuiltInRuleCommandContributionItem;
+import org.key_project.keyide.ui.editor.MacroCommandContributionItem;
 import org.key_project.keyide.ui.editor.TacletCommandContributionItem;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -55,6 +56,12 @@ public class ApplyRuleHandler extends AbstractHandler {
             UserInterfaceControl ui = item.getUi();
             PosInSequent pos = item.getPosInSequent();
             ui.getProofControl().selectedBuiltInRule(item.getGoal(), rule, pos.getPosInOccurrence(), false);
+         }
+         // run the selected macro
+         else if (data instanceof MacroCommandContributionItem) {
+            MacroCommandContributionItem item = (MacroCommandContributionItem)data;
+            UserInterfaceControl ui = item.getUi();
+            ui.getProofControl().runMacro(item.getNode(), item.getMacro(), item.getPosInSequent().getPosInOccurrence());
          }
       }
       return null;
