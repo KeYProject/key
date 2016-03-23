@@ -5,10 +5,10 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -22,6 +22,7 @@ import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.test.testcase.swtbot.AbstractKeYDebugTargetTestCase;
 import org.key_project.sed.key.ui.test.Activator;
 import org.key_project.sed.key.ui.view.ManualView;
+import org.key_project.ui.test.util.TestKeYUIUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
@@ -36,6 +37,76 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  *
  */
 public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
+   
+   /**
+    * tests the auto mode toolbar buttons in the view.
+    * @throws Exception
+    */
+   public void testAutoMode() throws Exception {
+      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+
+         @Override
+         public void configureDebugPerspective(SWTWorkbenchBot bot,
+               IPerspectiveDescriptor debugPerspective) throws Exception {
+            TestUtilsUtil.openView(ManualView.VIEW_ID);
+         }
+
+         @Override
+         public void test(SWTWorkbenchBot bot, IJavaProject project,
+               IMethod method, String targetName, SWTBotView debugView,
+               SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch)
+               throws Exception {
+            SWTBotView view = getManualBotView(bot);
+            ManualView manualView = getManualView(view);
+            assertNotNull(manualView.getProof());
+            assertTrue(!manualView.getProof().closed());
+            //make sure that both buttons are visible and correctly enabled
+            assertTrue(view.toolbarButton("Start Auto Mode").isVisible());
+            assertTrue(view.toolbarButton("Start Auto Mode").isEnabled());
+            assertTrue(view.toolbarButton("Stop Auto Mode").isVisible());
+            assertFalse(view.toolbarButton("Stop Auto Mode").isEnabled());
+            //start auto mode
+            TestUtilsUtil.clickDirectly(view.toolbarButton("Start Auto Mode"));
+            TestKeYUIUtil.waitWhileAutoMode(bot, manualView.getEnvironment().getUi());
+            assertFalse(manualView.getProof().closed());
+            bot.waitWhile(Conditions.widgetIsEnabled(view.toolbarButton("Stop Auto Mode")));
+            bot.waitUntil(Conditions.widgetIsEnabled(view.toolbarButton("Start Auto Mode")));
+            //make sure that auto mode can be started again
+            assertTrue(view.toolbarButton("Start Auto Mode").isEnabled()); 
+            assertFalse(view.toolbarButton("Stop Auto Mode").isEnabled());
+            view.close();
+         }
+
+         @Override
+         public void cleanupDebugPerspective(SWTWorkbenchBot bot,
+               IPerspectiveDescriptor debugPerspective) throws Exception {
+            if (TestUtilsUtil.findView(ManualView.VIEW_ID) != null) {
+               TestUtilsUtil.closeView(ManualView.VIEW_ID);
+            }
+         }
+         
+      };
+      doKeYDebugTargetTest("SWTBotManualViewTest_testAutoMode", 
+                           Activator.PLUGIN_ID, 
+                           "data/number/test", 
+                           true, 
+                           true, 
+                           createMethodSelector("Number", "equals", "QNumber;"), 
+                           null, 
+                           null, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.TRUE, 
+                           10, 
+                           executor);
+   }
 	
 	/**
 	 * tests the filter features of the {@link ManualView}
@@ -95,7 +166,7 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
 				TestUtilsUtil.closeView(ManualView.VIEW_ID);
 			}
 		};
-		doKeYDebugTargetTest("SWTBotManualViewTest_testHideIntermediateProofStepsFilter", 
+		doKeYDebugTargetTest("SWTBotManualViewTest_testFilters", 
                 Activator.PLUGIN_ID, 
                 "data/number/test", 
                 true, 

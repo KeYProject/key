@@ -156,7 +156,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		}
 		if (newInput instanceof Proof) {
 			this.proof = (Proof) newInput;
-			proof.addProofTreeListener(proofTreeListener);
+			if (!proof.isDisposed()) {
+			   proof.addProofTreeListener(proofTreeListener);
+			}
 		} else {
 			this.proof = null;
 		}
@@ -435,8 +437,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 			childCount = getBranchFolderChildCount(node);
 		}
 		if (parent instanceof Proof) {
-			Proof proof = (Proof) parent;
-			node = proof.root();
+			Proof currentProof = (Proof) parent;
+			node = currentProof.root();
 			childCount = getBranchFolderChildCount(node);
 		} else if (parent instanceof BranchFolder) {
 			BranchFolder branchFolder = (BranchFolder) parent;

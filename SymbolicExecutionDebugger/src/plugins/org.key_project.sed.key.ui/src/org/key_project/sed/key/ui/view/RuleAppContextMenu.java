@@ -2,6 +2,7 @@ package org.key_project.sed.key.ui.view;
 
 import java.util.Iterator;
 
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
@@ -9,11 +10,14 @@ import org.eclipse.ui.menus.ExtensionContributionFactory;
 import org.eclipse.ui.menus.IContributionRoot;
 import org.eclipse.ui.services.IServiceLocator;
 import org.key_project.keyide.ui.editor.BuiltInRuleCommandContributionItem;
+import org.key_project.keyide.ui.editor.MacroCommandContributionItem;
 import org.key_project.keyide.ui.editor.TacletCommandContributionItem;
 import org.key_project.keyide.ui.util.KeYIDEUtil;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
+import de.uka.ilkd.key.gui.ProofMacroMenu;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -63,6 +67,22 @@ public class RuleAppContextMenu extends ExtensionContributionFactory {
                additions.addContributionItem(item,  null);
             }
             view.setManualRule(true);
+            
+         // Add macros
+            MenuManager macroMenu = new MenuManager("Strategy macros");
+            Iterable<ProofMacro> allMacros = ProofMacroMenu.REGISTERED_MACROS;
+            for (ProofMacro macro : allMacros) {
+               if (macro.canApplyTo(goal.node(), position.getPosInOccurrence())) {
+                  CommandContributionItemParameter p = new CommandContributionItemParameter(serviceLocator, "", 
+                                                                                            "org.key_project.sed.key.ui.commands.applyRule", 
+                                                                                            SWT.PUSH);
+                  p.label = macro.getName();
+                  MacroCommandContributionItem item = new MacroCommandContributionItem(p, goal.node(), macro, view.getEnvironment().getUi(), position);
+                  item.setVisible(true);
+                  macroMenu.add(item);
+               }
+            }
+            additions.addContributionItem(macroMenu, null); 
          }
       }
    }
