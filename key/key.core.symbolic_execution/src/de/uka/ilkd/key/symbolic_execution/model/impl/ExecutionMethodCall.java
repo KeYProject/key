@@ -79,7 +79,7 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
     * @author Anna Filighera
     */
    public void removeMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
-      methodReturns.removeAll(methodReturn);
+      methodReturns = methodReturns.removeAll(methodReturn);
    }
    
    /**

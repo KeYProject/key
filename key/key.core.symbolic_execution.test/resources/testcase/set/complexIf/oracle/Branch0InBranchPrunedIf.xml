@@ -17,12 +17,9 @@
             <branchCondition name="gt(j,i)" pathCondition="gt(j,i)" pathConditionChanged="true" branchCondition="gt(j,i)" mergedBranchCondition="false" isBranchConditionComputed="true">
             </branchCondition>
             <blockCompletionEntry path="/0/0/0/0/0"/>
-            <blockCompletionEntry path="/"/>
          </branchStatement>
       </statement>
       <methodReturnEntry path="/0/0/0/0/0/0/0"/>
-      <methodReturnEntry path="/"/>
    </methodCall>
    <terminationEntry path="/0/0/0/0/0/0/0/0"/>
-   <terminationEntry path="/"/>
 </start>

@@ -115,6 +115,6 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement> impleme
     * @author Anna Filighera
     */
    public void removeTermination(IExecutionTermination termination) {
-      terminations.removeAll(termination);
+      terminations = terminations.removeAll(termination);
    }
 }
