@@ -17,15 +17,10 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotWorkbenchPart;
-import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
-import org.eclipse.ui.IEditorReference;
 import org.junit.Test;
-import org.key_project.core.test.util.SuspendingStopCondition;
 import org.key_project.keyide.ui.editor.KeYEditor;
-import org.key_project.keyide.ui.handlers.StartAutoModeHandler;
 import org.key_project.ui.test.util.TestKeYUIUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -49,6 +44,7 @@ import de.uka.ilkd.key.proof.Proof;
 public class SWTBotMinimizeInteractionsHandlerTest extends AbstractSWTBotKeYEditorTest {
    /**
     * Tests whether a specific rule appears when minimize interactions is disabled.
+    * @throws Exception 
     */
    @Test
    public void testDisabled() throws Exception {
@@ -60,7 +56,7 @@ public class SWTBotMinimizeInteractionsHandlerTest extends AbstractSWTBotKeYEdit
                           SWTWorkbenchBot bot, 
                           SWTBotEditor editor, 
                           KeYEditor keyEditor) throws Exception {
-            boolean checked_initial = bot.toolbarToggleButtonWithTooltip("Minimize Interactions").isChecked();
+            boolean checkedInitial = bot.toolbarToggleButtonWithTooltip("Minimize Interactions").isChecked();
             assertNotNull(keyEditor.getCurrentProof());
             
             String rule = "replace_known_right";
@@ -68,19 +64,19 @@ public class SWTBotMinimizeInteractionsHandlerTest extends AbstractSWTBotKeYEdit
             // right click 3 places to the left of the first '&' and check for the rule
             try {
                //make sure it's disabled.
-               if(checked_initial){
+               if (checkedInitial) {
                   TestUtilsUtil.clickDirectly(bot.toolbarToggleButtonWithTooltip("Minimize Interactions"));
                }
                boolean exists = canOpenRuleDialog(bot, editor, "&", rule, -3);
                
-               //consequently, since we toggled that, we should have seen it exactly once:
-               assert(exists);
+               //the rule should be visible.
+               assert (exists);
             } catch (Exception e) {
-               assert(false);
+               assert (false);
             } finally {
                //click the button if state differs from initial state.
                //restores initial state
-               if (bot.toolbarToggleButtonWithTooltip("Minimize Interactions").isChecked() != checked_initial) {
+               if (bot.toolbarToggleButtonWithTooltip("Minimize Interactions").isChecked() != checkedInitial) {
                   TestUtilsUtil.clickDirectly(bot.toolbarToggleButtonWithTooltip("Minimize Interactions"));
                }
             }
@@ -97,6 +93,7 @@ public class SWTBotMinimizeInteractionsHandlerTest extends AbstractSWTBotKeYEdit
    
    /**
     * Tests whether a specific rule appears when minimize interactions is disabled.
+    * @throws Exception
     */
    @Test
    public void testEnabled() throws Exception {
@@ -108,7 +105,7 @@ public class SWTBotMinimizeInteractionsHandlerTest extends AbstractSWTBotKeYEdit
                           SWTWorkbenchBot bot, 
                           SWTBotEditor editor, 
                           KeYEditor keyEditor) throws Exception {
-            boolean checked_initial = bot.toolbarToggleButtonWithTooltip("Minimize Interactions").isChecked();
+            boolean checkedInitial = bot.toolbarToggleButtonWithTooltip("Minimize Interactions").isChecked();
             assertNotNull(keyEditor.getCurrentProof());
             
             String rule = "replace_known_right";
@@ -116,17 +113,17 @@ public class SWTBotMinimizeInteractionsHandlerTest extends AbstractSWTBotKeYEdit
             // right click 3 places to the left of the first '&' and check for the rule
             try {
                //make sure it's disabled.
-               if(!checked_initial){
+               if (!checkedInitial) {
                   TestUtilsUtil.clickDirectly(bot.toolbarToggleButtonWithTooltip("Minimize Interactions"));
                }
                boolean exists = canOpenRuleDialog(bot, editor, "&", rule, -3);
                
-               //consequently, since we toggled that, we should have seen it exactly once:
+               //the rule should not be visible
                assertFalse(exists);
             } finally {
                //click the button if state differs from initial state.
                //restores initial state
-               if (bot.toolbarToggleButtonWithTooltip("Minimize Interactions").isChecked() != checked_initial) {
+               if (bot.toolbarToggleButtonWithTooltip("Minimize Interactions").isChecked() != checkedInitial) {
                   TestUtilsUtil.clickDirectly(bot.toolbarToggleButtonWithTooltip("Minimize Interactions"));
                }
             }
@@ -143,10 +140,12 @@ public class SWTBotMinimizeInteractionsHandlerTest extends AbstractSWTBotKeYEdit
    
    /**
     * determines whether a rule is applicable on the given text.
+    * @param bot The SWTBot used
+    * @param editor The SWTBotEditor used
     * @param location The text snippet where to look for the rule
     * @param rule The name of the rule to be applied
     * @param offset The offset in chars where to look relative to location
-    * @param editor 
+    * @return whether the rule is available
     */
    private boolean canOpenRuleDialog(SWTWorkbenchBot bot, SWTBotEditor editor, String location, String rule, int offset) {
       //click context menu / text we're looking for.
@@ -156,11 +155,11 @@ public class SWTBotMinimizeInteractionsHandlerTest extends AbstractSWTBotKeYEdit
       
       TestUtilsUtil.setCursorLocation(styledText, point.x, point.y);
       
-      //Try to apply the specified rule, return null if not found. 
+      //Try to apply the specified rule, return false if not found. 
       //If not found, this should not timeout like SWT would.
       try {
          TestUtilsUtil.clickContextMenu(styledText, point.x, point.y, rule);
-      } catch(Exception e) {
+      } catch (Exception e) {
          return false;
       }
       //cancel the rule application dialog.
