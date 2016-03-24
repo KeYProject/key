@@ -38,20 +38,20 @@ public class StrategyViewController extends NUIController implements Observer {
     /**
      * The constant 10.
      */
-    private static final int ten = 10;
+    private static final int TEN = 10;
     /**
      * [1, 6].
      */
-    private static final int[] intRangeOneToSix = { 1, 2, 3, 4, 5, 6 };
+    private static final int[] INT_RANGE_ONE_TO_SIX = { 1, 2, 3, 4, 5, 6 };
     /**
      * The constant 9.
      */
-    private static final int nine = 9;
+    private static final int NINE = 9;
 
     /**
      * The default value for the maximum number of rule applications.
      */
-    private static int defaultMaxRuleApplications = ten;
+    private static int defaultMaxRuleApplications = TEN;
 
     @FXML
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired",
@@ -289,18 +289,18 @@ public class StrategyViewController extends NUIController implements Observer {
     private void calculateCurrentSliderValue(final Number newVal) {
         final double sliderValue = newVal.doubleValue();
         final double roundSliderValue = Math.floor(sliderValue);
-        final double vWNOAN = sliderValue % nine;
+        final double vWNOAN = sliderValue % NINE;
 
         if (sliderValue > 0 && sliderValue < 1) {
-            currSliderVal = (int) Math.floor(vWNOAN * ten) + 1;
+            currSliderVal = (int) Math.floor(vWNOAN * TEN) + 1;
         }
         else {
-            final double sliderCoefficient = Math.pow(ten, roundSliderValue);
-            if (Arrays.asList(intRangeOneToSix).contains(sliderValue)) {
+            final double sliderCoefficient = Math.pow(TEN, roundSliderValue);
+            if (Arrays.asList(INT_RANGE_ONE_TO_SIX).contains(sliderValue)) {
                 currSliderVal = (int) sliderCoefficient;
             }
             else {
-                currSliderVal = (int) (Math.floor((vWNOAN - roundSliderValue) * ten)
+                currSliderVal = (int) (Math.floor((vWNOAN - roundSliderValue) * TEN)
                         * sliderCoefficient + sliderCoefficient);
             }
         }
@@ -325,11 +325,11 @@ public class StrategyViewController extends NUIController implements Observer {
 
             @Override
             public String toString(final Double number) {
-                final int val = (int) Math.pow(ten, number);
+                final int val = (int) Math.pow(TEN, number);
 
-                if (val < ten)
+                if (val < TEN)
                     return String.valueOf(val);
-                //CHECKSTYLE.OFF MagicNumberCheck -- externalizing these constants makes no sense
+                //CHECKSTYLE.OFF: MagicNumberCheck -- externalizing these constants makes no sense
                 if (val < 10000) {
                     return String.valueOf(val);
                 }
@@ -337,7 +337,7 @@ public class StrategyViewController extends NUIController implements Observer {
                     return (val / 1000) + "k";
                 }
                 return (val / 1000000) + "M";
-                //CHECKSTYLE.ON MagicNumberCheck
+                //CHECKSTYLE.ON: MagicNumberCheck
             }
         });
 

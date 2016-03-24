@@ -55,7 +55,7 @@ public class ProofTreeContextMenu extends ContextMenu {
     /**
      * The FilteringHandler used to filter the tree cells.
      */
-    private final FilteringHandler fh;
+    private final FilteringHandler filteringHandler;
     /**
      * The IconFactory used to create the required icons.
      */
@@ -71,7 +71,7 @@ public class ProofTreeContextMenu extends ContextMenu {
     /**
      * The reference to the TreeViewController associated with the TreeView.
      */
-    private TreeViewController treeViewController = null;
+    private TreeViewController treeViewController;
 
     /**
      * The constructor.
@@ -82,20 +82,20 @@ public class ProofTreeContextMenu extends ContextMenu {
      *            the {@link TreeView} which contains the treeItem
      * @param icf
      *            the {@link IconFactory} for creating icons
-     * @param fh
+     * @param filteringHandler
      *            the {@link FilteringHandler} for filtering the tree
      * @param tvc
      *            the {@link TreeViewController} associated with the treeView
      */
     public ProofTreeContextMenu(final TreeItem<NUINode> treeItem, final TreeView<NUINode> treeView,
-            final IconFactory icf, final FilteringHandler fh, final TreeViewController tvc) {
+            final IconFactory icf, final FilteringHandler filteringHandler, final TreeViewController tvc) {
         super();
 
         this.treeItem = treeItem;
         this.treeView = treeView;
 
         this.icf = icf;
-        this.fh = fh;
+        this.filteringHandler = filteringHandler;
         this.treeViewController = tvc;
 
         // Add dummy so that the context menu can be displayed.
@@ -109,7 +109,7 @@ public class ProofTreeContextMenu extends ContextMenu {
      * @return the {@link FilteringHandler}.
      */
     public FilteringHandler getFh() {
-        return fh;
+        return filteringHandler;
     }
 
     /**
@@ -226,18 +226,18 @@ public class ProofTreeContextMenu extends ContextMenu {
     /**
      * Configures the filter context menu entry.
      * 
-     * @param k
+     * @param filter
      *            The filter to configure.
      * @param initState
      *            Indicates whether the filter is selected by default or not.
      */
-    private void addMenuItemFilter(final ProofTreeFilter k, final boolean initState) {
-        final CheckMenuItem cmi = new CheckMenuItem(k.getContextMenuItemText());
+    private void addMenuItemFilter(final ProofTreeFilter filter, final boolean initState) {
+        final CheckMenuItem cmi = new CheckMenuItem(filter.getContextMenuItemText());
         cmi.setSelected(initState);
 
         cmi.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (fh.getFilterStatus(k) != newValue) {
-                fh.toggleFilteringStatus(k);
+            if (filteringHandler.getFilterStatus(filter) != newValue) {
+                filteringHandler.toggleFilteringStatus(filter);
             }
         });
         getItems().add(cmi);
@@ -258,9 +258,8 @@ public class ProofTreeContextMenu extends ContextMenu {
      * Adds the filter entries to the context menu.
      */
     private void addMenuItemsFilter() {
-        final Map<ProofTreeFilter, Boolean> a = fh.getFiltersMap();
-        for (Entry<ProofTreeFilter, Boolean> k : a.entrySet()) {
-            addMenuItemFilter(k.getKey(), k.getValue());
+        for (final Entry<ProofTreeFilter, Boolean> entry : filteringHandler.getFiltersMap().entrySet()) {
+            addMenuItemFilter(entry.getKey(), entry.getValue());
         }
     }
 

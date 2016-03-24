@@ -35,7 +35,7 @@ public final class ProofTreeStyler {
     /**
      * Style for interactive inner nodes.
      */
-    private static StyleConfiguration innerNodeInteractive;
+    private static StyleConfiguration innerNdeInteractv;
 
     /**
      * Style for closed leaf nodes.
@@ -45,7 +45,7 @@ public final class ProofTreeStyler {
     /**
      * Style for interactive leaf nodes.
      */
-    private static StyleConfiguration leafNodeInteractive;
+    private static StyleConfiguration leafNodeInteractv;
 
     /**
      * Style for linked leaf nodes.
@@ -114,7 +114,8 @@ public final class ProofTreeStyler {
                     || (// Check if image is the same
 
             // First check if images are set
-            getIconImage() != null && ((StyleConfiguration) obj).getIconImage() != null
+            // NOPMD Justification: These parentheses are not useless.
+            getIconImage() != null && ((StyleConfiguration) obj).getIconImage() != null //NOPMD
             // Then compare the image filename stored in ID field
                     && !(getIconImage().getId()
                             .equals(((StyleConfiguration) obj).getIconImage().getId()))));
@@ -140,7 +141,7 @@ public final class ProofTreeStyler {
 
         @Override
         public int hashCode() {
-            final int prime = 31;
+            final int prime = 31; //NOPMD externalization is useless
             int result = 1;
             result = prime * result + getOuterType().hashCode();
             //CHECKSTYLE.OFF: AvoidInlineConditionalsCheck
@@ -240,6 +241,14 @@ public final class ProofTreeStyler {
     }
 
     /**
+     * Setter.
+     * @param ptc The {@link ProofTreeCell} you want to set.
+     */
+    public void setPtc(final ProofTreeCell ptc) {
+        this.ptc = ptc;
+    }
+
+    /**
      * Returns the matching {@link StyleConfiguration} for the given type of
      * {@link NUINode}. If no type matches, an empty StyleConfiguration is
      * returned.
@@ -270,7 +279,7 @@ public final class ProofTreeStyler {
                 return leafNodeLinked;
             }
             else if (node.isInteractive()) {
-                return leafNodeInteractive;
+                return leafNodeInteractv;
             }
             else {
                 return leafNodeOpen;
@@ -278,7 +287,7 @@ public final class ProofTreeStyler {
         }
         // if the node is an inner node
         else if (node instanceof NUIInnerNode && node.isInteractive()) {
-            return innerNodeInteractive;
+            return innerNdeInteractv;
         }
 
         // otherwise an empty style configuration is returned
@@ -309,8 +318,8 @@ public final class ProofTreeStyler {
         branchNodeOpen.setIconImage(IconFactory.BRANCH_OPEN);
 
         // initialize default styles for interactive inner nodes
-        innerNodeInteractive = new StyleConfiguration();
-        innerNodeInteractive.setIconImage(IconFactory.INNER_INTERACTIVE);
+        innerNdeInteractv = new StyleConfiguration();
+        innerNdeInteractv.setIconImage(IconFactory.INNER_INTERACTIVE);
 
         // initialize default styles for closed leaf nodes
         leafNodeClosed = new StyleConfiguration();
@@ -325,10 +334,10 @@ public final class ProofTreeStyler {
         leafNodeLinked.setIconImage(IconFactory.LEAF_LINKED);
 
         // initialize default styles for interactive leaf nodes
-        leafNodeInteractive = new StyleConfiguration();
-        leafNodeInteractive.addCssClass(ProofTreeStyleConstants.CSS_NODE_INTERACTIVE);
-        leafNodeInteractive.addCssClass(ProofTreeStyleConstants.CSS_NODE_LEAF);
-        leafNodeInteractive.setIconImage(IconFactory.LEAF_INTERACTIVE);
+        leafNodeInteractv = new StyleConfiguration();
+        leafNodeInteractv.addCssClass(ProofTreeStyleConstants.CSS_NODE_INTERACTIVE);
+        leafNodeInteractv.addCssClass(ProofTreeStyleConstants.CSS_NODE_LEAF);
+        leafNodeInteractv.setIconImage(IconFactory.LEAF_INTERACTIVE);
 
         // initialize default styles for open leaf nodes
         leafNodeOpen = new StyleConfiguration();
@@ -336,5 +345,4 @@ public final class ProofTreeStyler {
         leafNodeOpen.addCssClass(ProofTreeStyleConstants.CSS_NODE_LEAF);
         leafNodeOpen.setIconImage(IconFactory.LEAF_OPEN);
     }
-
 }

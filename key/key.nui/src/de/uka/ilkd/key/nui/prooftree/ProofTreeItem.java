@@ -72,6 +72,7 @@ public class ProofTreeItem extends TreeItem<NUINode> {
         // it does not work)
 
         final Predicate<? super ProofTreeItem> pred = new Predicate<ProofTreeItem>() {
+            @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
             @Override
             public boolean test(final ProofTreeItem pti) {
                 return pti.isVisible();

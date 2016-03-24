@@ -25,7 +25,7 @@ public class NUITest extends GuiTest {
      * Allows access to all loaded files.
      */
     public NUI nui;
-    // TODO must this be public?
+    // TODO is it necessary that this is public?
     // If yes, surround with
     // CHECKSTYLE.OFF: VisibilityModifierCheck <justification>
     // <code to ignore>
@@ -36,7 +36,7 @@ public class NUITest extends GuiTest {
      */
 
     public DataModel dataModel;
-    // TODO must this be public?
+    // TODO is it necessary that this is public?
     // If yes, surround with
     // CHECKSTYLE.OFF: VisibilityModifierCheck <justification>
     // <code to ignore>
@@ -72,9 +72,9 @@ public class NUITest extends GuiTest {
         final Label label = ((Label) find("#statustext"));
 
         while (!label.getText().equals(statustext)) {
-            //CHECKSTYLE.OFF MagicNumberCheck -- externalizing this makes no sense
+            //CHECKSTYLE.OFF: MagicNumberCheck -- externalizing this makes no sense
             sleep(2000);
-            //CHECKSTYLE.ON MagicNumberCheck
+            //CHECKSTYLE.ON: MagicNumberCheck
         }
     }
 

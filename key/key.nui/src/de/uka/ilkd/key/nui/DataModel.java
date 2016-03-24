@@ -29,7 +29,7 @@ public class DataModel extends Observable {
      * Represents the lastly stored TreeViewState, therefore it is displayed
      * currently in the TreeView.
      */
-    private TreeViewState loadedTreeViewState;
+    private TreeViewState loaddTriVwStat;
 
     /**
      * An instance representing the associated NUI.
@@ -84,7 +84,7 @@ public class DataModel extends Observable {
      * @return TreeViewState currently loaded in the TreeView.
      */
     public TreeViewState getLoadedTreeViewState() {
-        return loadedTreeViewState;
+        return loaddTriVwStat;
     }
 
     /**
@@ -124,7 +124,7 @@ public class DataModel extends Observable {
      *            The filename of the proof to be loaded.
      */
     public void loadProofFormMemory(final String proofName) {
-        loadedTreeViewState = treeViewStates.get(proofName);
+        loaddTriVwStat = treeViewStates.get(proofName);
         this.setChanged();
         this.notifyObservers(proofName);
     }
@@ -137,8 +137,8 @@ public class DataModel extends Observable {
      *            The proof's filename associated with the TreeViewState.
      */
     public void removeProof(final String proofName) {
-        if (loadedTreeViewState.equals(treeViewStates.get(proofName))) {
-            loadedTreeViewState = null;
+        if (loaddTriVwStat.equals(treeViewStates.get(proofName))) {
+            loaddTriVwStat = null;
         }
         treeViewStates.remove(proofName);
         this.setChanged();
@@ -184,7 +184,7 @@ public class DataModel extends Observable {
             treeViewState.setModified(true);
         }
         treeViewStates.put(name, treeViewState);
-        loadedTreeViewState = treeViewState;
+        loaddTriVwStat = treeViewState;
         this.setChanged();
         this.notifyObservers(name);
     }
@@ -193,8 +193,16 @@ public class DataModel extends Observable {
      * Setter.
      * @param loadedTVS the {@link TreeViewState} you want to set.
      */
-    public void setLoadedTreeViewState(final TreeViewState loadedTVS) {
-        this.loadedTreeViewState = loadedTVS;
+    public void setLoaddTriVwStat(final TreeViewState loadedTVS) {
+        this.loaddTriVwStat = loadedTVS;
+    }
+
+    /**
+     * Getter.
+     * @return the {@link TreeViewState}
+     */
+    public TreeViewState getLoaddTriVwStat() {
+        return loaddTriVwStat;
     }
 
 }

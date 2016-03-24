@@ -277,10 +277,10 @@ public abstract class NUINode {
 
         final boolean match = getLabel().toLowerCase().contains(term.toLowerCase());
         setSearchResult(match);
-        // CHECKSTYLE OFF: AvoidInlineConditionalsCheck
+        // CHECKSTYLE.OFF: AvoidInlineConditionalsCheck
         // -- this is much more readable than any alternative.
         return match ? 1 : 0;
-        // CHECKSTYLE ON: AvoidInlineConditionalsCheck
+        // CHECKSTYLE.ON: AvoidInlineConditionalsCheck
     }
 
     /**
