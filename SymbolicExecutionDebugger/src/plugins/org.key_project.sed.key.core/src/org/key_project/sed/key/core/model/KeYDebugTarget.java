@@ -721,4 +721,14 @@ public class KeYDebugTarget extends AbstractSEDebugTarget {
    public boolean isGroupingSupported() {
       return launchSettings.isGroupingEnabled();
    }
+   
+   /**
+    * Deletes the given {@link IExecutionNode} from the map containing references between {@link IExecutionNode}'s 
+    * and their corresponding {@link IKeYSENode}'s.
+    * @param executionNode The {@link IExecutionNode} to be removed.
+    * @author Anna Filighera
+    */
+   public void removeExecutionNode(IExecutionNode<?> executionNode) {
+	   executionToDebugMapping.remove(executionNode);
+   }
 }

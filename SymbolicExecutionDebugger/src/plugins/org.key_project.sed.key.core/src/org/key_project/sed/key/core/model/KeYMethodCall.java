@@ -501,4 +501,21 @@ public class KeYMethodCall extends AbstractSEMethodCall implements IKeYSENode<IE
    public boolean isTruthValueEvaluationEnabled() {
       return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
    }
+   
+   /**
+    * Returns the map containing all method returns. 
+    * @return The map containing the {@link IExecutionBaseMethodReturn}'s and their corresponding {@link IKeYBaseMethodReturn}'s.
+    * @author Anna Filighera
+    */
+   public Map<IExecutionBaseMethodReturn<?>, IKeYBaseMethodReturn> getAllMethodReturns() {
+	   return knownMethodReturns;
+   }
+   
+   /**
+    * Removes the given {@link IExecutionBaseMethodReturn} from the method return map.
+    * @author Anna Filighera
+    */
+   public void removeMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
+	   knownMethodReturns.remove(methodReturn);
+   }
 }
