@@ -14,6 +14,7 @@ import com.sun.javafx.collections.ObservableMapWrapper;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.TreeViewState;
 import de.uka.ilkd.key.nui.exceptions.ToggleGroupNotFoundException;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
@@ -42,6 +43,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Toggle;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -113,6 +115,8 @@ public class MainViewController extends NUIController implements Observer {
     private ProgressIndicator progressIndicator;
     @FXML
     private Button cancelButton;
+    @FXML
+    private ImageView cancelButtonImage;
 
     /**
      * An atomic boolean to indicate if loading is in progress While this is set
@@ -184,18 +188,20 @@ public class MainViewController extends NUIController implements Observer {
         // located
         File parentDirectory = null;
         if (getDataModel().getLoadedTreeViewState() != null) {
-            parentDirectory = loadedTVS.getProof().getProofFile().getParentFile();
+            parentDirectory = loadedTVS.getProof().getProofFile()
+                    .getParentFile();
         }
         if (parentDirectory != null) {
             fileChooser.setInitialDirectory(parentDirectory);
         }
         // if no proof is loaded, use the example directory (default)
         else {
-            final File jarFile = new File(
-                    getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
+            final File jarFile = new File(getClass().getProtectionDomain()
+                    .getCodeSource().getLocation().getPath());
             if (!jarFile.isFile()) { // one for gui tests, while running
                                      // application in ide
-                fileChooser.setInitialDirectory(new File("resources/de/uka/ilkd/key/examples"));
+                fileChooser.setInitialDirectory(
+                        new File("resources/de/uka/ilkd/key/examples"));
             }
         }
 
@@ -244,9 +250,9 @@ public class MainViewController extends NUIController implements Observer {
     @FXML
     protected void handleAboutWindow(final ActionEvent e) {
         final Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("KeY");
-        alert.setHeaderText("KeY");
-        alert.setContentText("Version: Bachelor Praktikum Gruppe 10");
+        alert.setTitle(getBundle().getString("aboutTitle"));
+        alert.setHeaderText(getBundle().getString("aboutHeader"));
+        alert.setContentText(getBundle().getString("aboutText"));
         alert.showAndWait();
     }
 
@@ -274,29 +280,32 @@ public class MainViewController extends NUIController implements Observer {
         alert.setTitle(getBundle().getString("dialogTitle"));
 
         // --- define text for header and content area
-        final String filename = getDataModel().getLoadedTreeViewState().getProof().getProofFile()
-                .getName();
-        alert.setHeaderText(
-                MessageFormat.format(getBundle().getString("dialogHeader"), "'" + filename + "'"));
+        final String filename = getDataModel().getLoadedTreeViewState()
+                .getProof().getProofFile().getName();
+        alert.setHeaderText(MessageFormat.format(
+                getBundle().getString("dialogHeader"), "'" + filename + "'"));
         alert.setContentText(getBundle().getString("dialogQuestion"));
 
         // --- define button types
-        final ButtonType buttonSaveAs = new ButtonType(getBundle().getString("dialogSaveAs"));
-        final ButtonType buttonClose  = new ButtonType(getBundle().getString("dialogExit"));
-        final ButtonType buttonAbort  = new ButtonType(getBundle().getString("dialogAbort"));
+        final ButtonType buttonSaveAs = new ButtonType(
+                getBundle().getString("dialogSaveAs"));
+        final ButtonType buttonClose = new ButtonType(
+                getBundle().getString("dialogExit"));
+        final ButtonType buttonAbort = new ButtonType(
+                getBundle().getString("dialogAbort"));
         alert.getButtonTypes().setAll(buttonSaveAs, buttonClose, buttonAbort);
 
         final Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == buttonSaveAs || result.get() == buttonClose) {
+        boolean fileSaved = false;
+        if (result.get() == buttonSaveAs) {
             // If YES was selected: save changes made to file
-            if (result.get() == buttonSaveAs) {
-                handleSaveProofAs(null);
-            }
+            fileSaved = saveProofAsDialog();
+        }
+        if (fileSaved || result.get() == buttonClose) {
             // Close application without saving
             Platform.exit();
             MainWindow.getInstance().dispose();
         }
-
         // If CANCEL was selected (or in any other case): do not close KeY
         alert.close();
         e.consume();
@@ -312,7 +321,8 @@ public class MainViewController extends NUIController implements Observer {
     @FXML
     protected final void handleSaveProof(final ActionEvent e) {
         // retrieve last saved location from proof file
-        final Proof loadedProof = getDataModel().getLoadedTreeViewState().getProof();
+        final Proof loadedProof = getDataModel().getLoadedTreeViewState()
+                .getProof();
 
         if (loadedProof != null && loadedProof.getProofFile() != null) {
             // call saveProof with proof file
@@ -338,10 +348,13 @@ public class MainViewController extends NUIController implements Observer {
 
     /**
      * Shows a save dialog with a file chooser.
+     * 
+     * @return true iff the currently opened file was saved, otherwise false
      */
-    public void saveProofAsDialog() {
+    public boolean saveProofAsDialog() {
         // Get loaded proof
-        final Proof loadedProof = getDataModel().getLoadedTreeViewState().getProof();
+        final Proof loadedProof = getDataModel().getLoadedTreeViewState()
+                .getProof();
 
         // Open file picker window
         final FileChooser fileChooser = new FileChooser();
@@ -354,8 +367,8 @@ public class MainViewController extends NUIController implements Observer {
                 fileChooser.setInitialDirectory(parentDir);
             }
         }
-        final FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Proof files",
-                "*.proof");
+        final FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                "Proof files", "*.proof");
         fileChooser.getExtensionFilters().add(extFilter);
 
         final File selectedFile = fileChooser.showSaveDialog(contextMenu);
@@ -363,7 +376,9 @@ public class MainViewController extends NUIController implements Observer {
         // save proof file if any destination was specified
         if (selectedFile != null) {
             getDataModel().saveProof(loadedProof, selectedFile);
+            return true;
         }
+        return false;
     }
 
     /**
@@ -426,7 +441,8 @@ public class MainViewController extends NUIController implements Observer {
      */
     private void selectToggle(final String componentName, final Place place) {
         try {
-            for (final Toggle t : getNui().getToggleGroup(componentName).getToggles()) {
+            for (final Toggle t : getNui().getToggleGroup(componentName)
+                    .getToggles()) {
                 if (t.getUserData().equals(place)) {
                     t.setSelected(true);
                 }
@@ -447,9 +463,11 @@ public class MainViewController extends NUIController implements Observer {
      */
     public EventHandler<ActionEvent> getNewHandleLoadComponent() {
         return ((actionEvent) -> {
-            final RadioMenuItem clickedItem = (RadioMenuItem) actionEvent.getSource();
+            final RadioMenuItem clickedItem = (RadioMenuItem) actionEvent
+                    .getSource();
             // e.g. "treeView", "proofView"
-            final String componentName = (String) clickedItem.getProperties().get("componentName");
+            final String componentName = (String) clickedItem.getProperties()
+                    .get("componentName");
             final String clickedText = clickedItem.getText();
             Place place;
 
@@ -487,6 +505,9 @@ public class MainViewController extends NUIController implements Observer {
     @Override
     protected void init() {
         getDataModel().addObserver(this);
+        IconFactory icf = new IconFactory(13, 13);
+        this.cancelButtonImage
+                .setImage(icf.getImage(IconFactory.CANCEL_BUTTON).getImage());
     }
 
     /**
@@ -529,7 +550,8 @@ public class MainViewController extends NUIController implements Observer {
     private void cancelLoadProof() {
 
         // try to set loading status atomically
-        final boolean hasBeenCanceled = isLoadingProof.compareAndSet(true, false);
+        final boolean hasBeenCanceled = isLoadingProof.compareAndSet(true,
+                false);
         if (hasBeenCanceled) {
             /*
              * Not a very kind way to stop a thread However the method
@@ -544,12 +566,12 @@ public class MainViewController extends NUIController implements Observer {
                     keyEnvironment.dispose();
                 }
             }
-            catch (NoSuchMethodException | SecurityException | IllegalAccessException
-                    | IllegalArgumentException | InvocationTargetException e) {
+            catch (NoSuchMethodException | SecurityException
+                    | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException e) {
                 // Exception can be ignored, because KeYEnvironment object will
                 // be re-created by next proof loading
             }
-
             // reset loading state
             Platform.runLater(() -> {
                 statustext.setText("Loading has been cancelled.");
@@ -578,7 +600,8 @@ public class MainViewController extends NUIController implements Observer {
         // --> ProofTreeItem (JavaFX)
 
         statustext.setText(
-                MessageFormat.format(getBundle().getString("statusLoading"), proofFileName.getName()));
+                MessageFormat.format(getBundle().getString("statusLoading"),
+                        proofFileName.getName()));
         progressIndicator.setVisible(true);
         cancelButton.setVisible(true);
         root.setCursor(Cursor.WAIT);
@@ -597,54 +620,64 @@ public class MainViewController extends NUIController implements Observer {
                     // important to initialize KeYEnvironment
                     final MainWindow mainWindow = MainWindow.getInstance();
                     mainWindow.setVisible(false);
-                    // load proof
-                    System.out.println("Start loading proof: " + proofFileName);
 
                     // Load proof
-                    final DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(null);
-                    final AbstractProblemLoader loader = ui.load(null, proofFileName, null, null, null,
-                            null, false);
+                    final DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(
+                            null);
+                    final AbstractProblemLoader loader = ui.load(null,
+                            proofFileName, null, null, null, null, false);
                     final InitConfig initConfig = loader.getInitConfig();
-                    keyEnvironment = new KeYEnvironment<>(ui, initConfig, loader.getProof(),
-                            loader.getResult());
-                    /*
-                     * final KeYEnvironment<?> environment =
-                     * KeYEnvironment.load( JavaProfile.getDefaultInstance(),
-                     * proofFileName, null, null, null, true);
-                     * 
-                     * final Proof proof = environment.getLoadedProof();
-                     */
-                    final Proof proof = keyEnvironment.getLoadedProof();
-                    proof.setProofFile(proofFileName);
-
-                    System.out.println("loading finished!");
-
-                    // convert proof to fx tree
-                    final ProofTreeItem fxtree = new ProofTreeConverter(proof).createFXProofTree();
-
-                    // set Loading = false as you can no longer cancel
-                    final boolean hasNotBeenCanceled = isLoadingProof.compareAndSet(true, false);
-
-                    if (hasNotBeenCanceled) {
-                        // reset set gui waiting state
+                    keyEnvironment = new KeYEnvironment<>(ui, initConfig,
+                            loader.getProof(), loader.getResult());
+                }
+                catch (ProblemLoaderException e) {
+                    // ThreadDeath is thrown by CancelButton and can thus be
+                    // ignored
+                    if (!e.getMessage().contains("java.lang.ThreadDeath")) {
                         Platform.runLater(() -> {
-                            // Store state of treeView into data model.
-                            getDataModel().saveTreeViewState(new TreeViewState(proof, fxtree),
-                                    proofFileName.getName());
-
-                            statustext.setText("Ready.");
-                            progressIndicator.setVisible(false);
-                            cancelButton.setVisible(false);
-                            root.setCursor(Cursor.DEFAULT);
-                            openProof.setDisable(false);
+                            cancelLoadProof();
+                            Alert exceptionAlert = new Alert(AlertType.ERROR);
+                            exceptionAlert.setTitle(getBundle()
+                                    .getString("errorLoadingFileTitle"));
+                            exceptionAlert.setHeaderText(getBundle()
+                                    .getString("errorLoadingFileHeader"));
+                            exceptionAlert.setContentText(MessageFormat.format(
+                                    getBundle()
+                                            .getString("errorLoadingFileText"),
+                                    proofFileName, e.getCause()));
+                            exceptionAlert.show();
                         });
-                    }
 
+                    }
                 }
-                catch (ProblemLoaderException | java.lang.ThreadDeath e) {
-                    // This Exception is thrown if the thread has been killed
-                    // and can thus be ignored.
+
+                final Proof proof = keyEnvironment.getLoadedProof();
+                proof.setProofFile(proofFileName);
+
+                // convert proof to fx tree
+                final ProofTreeItem fxtree = new ProofTreeConverter(proof)
+                        .createFXProofTree();
+
+                // set Loading = false as you can no longer cancel
+                final boolean hasNotBeenCanceled = isLoadingProof
+                        .compareAndSet(true, false);
+
+                if (hasNotBeenCanceled) {
+                    // reset set gui waiting state
+                    Platform.runLater(() -> {
+                        // Store state of treeView into data model.
+                        getDataModel().saveTreeViewState(
+                                new TreeViewState(proof, fxtree),
+                                proofFileName.getName());
+
+                        statustext.setText("Ready.");
+                        progressIndicator.setVisible(false);
+                        cancelButton.setVisible(false);
+                        root.setCursor(Cursor.DEFAULT);
+                        openProof.setDisable(false);
+                    });
                 }
+
                 return null;
             }
 

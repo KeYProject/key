@@ -18,6 +18,13 @@ public class IconFactory {
      */
     private static String folderRoot = "components/images/";
 
+    // Main Window
+    /**
+     * file name of the icon used in the cancel button of the MainViewController
+     */
+    public static final String CANCEL_BUTTON = "images/cancelButton.png";
+
+    // Branch Nodes
     /** file name of closed branch node icon. */
     public static final String BRANCH_CLOSED = folderRoot + "closedBranch.png";
 
@@ -40,13 +47,15 @@ public class IconFactory {
     public static final String GO_BUTTON = folderRoot + "goButton.png";
 
     /** file name of interactive inner node icon. */
-    public static final String INNER_INTERACTIVE = folderRoot + "interactiveNode.png";
+    public static final String INNER_INTERACTIVE = folderRoot
+            + "interactiveNode.png";
 
     /** file name of closed leaf node icon. */
     public static final String LEAF_CLOSED = folderRoot + "closedGoalFlag.png";
     // Leafs
     /** file name of interactive leaf node icon. */
-    public static final String LEAF_INTERACTIVE = folderRoot + "interactiveGoal.png";
+    public static final String LEAF_INTERACTIVE = folderRoot
+            + "interactiveGoal.png";
     /** file name of linked leaf node icon. */
     public static final String LEAF_LINKED = folderRoot + "linkedNode.png";
     /** file name of open leaf node icon. */
@@ -80,7 +89,8 @@ public class IconFactory {
      *            The desired height
      * @return an ImageView containing the scaled Image
      */
-    private static ImageView scaleIcon(final Image image, final int width, final int height) {
+    private static ImageView scaleIcon(final Image image, final int width,
+            final int height) {
         final ImageView view = new ImageView(image);
         view.setFitWidth(width);
         view.setFitHeight(height);
@@ -143,8 +153,8 @@ public class IconFactory {
             img = icons.get(imageConstant);
         }
         else {
-            final File jarFile = new File(
-                    getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
+            final File jarFile = new File(getClass().getProtectionDomain()
+                    .getCodeSource().getLocation().getPath());
             if (jarFile.isFile()) {
                 img = new Image("/de/uka/ilkd/key/nui/" + imageConstant);
             }
