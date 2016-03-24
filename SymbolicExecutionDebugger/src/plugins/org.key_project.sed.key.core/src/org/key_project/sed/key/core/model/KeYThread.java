@@ -333,8 +333,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
       }
       try {
          super.suspend();
-      }
-      catch (DebugException exception) {
+      } catch (DebugException exception) {
          LogUtil.getLogger().logError(exception);
       }
    }

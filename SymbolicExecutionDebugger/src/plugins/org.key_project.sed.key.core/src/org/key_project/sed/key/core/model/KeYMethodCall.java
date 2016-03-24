@@ -513,6 +513,7 @@ public class KeYMethodCall extends AbstractSEMethodCall implements IKeYSENode<IE
    
    /**
     * Removes the given {@link IExecutionBaseMethodReturn} from the method return map.
+    * @param methodReturn The {@link IExecutionBaseMethodReturn} to be removed.
     * @author Anna Filighera
     */
    public void removeMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {

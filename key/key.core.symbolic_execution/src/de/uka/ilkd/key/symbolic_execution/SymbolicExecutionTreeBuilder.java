@@ -490,8 +490,9 @@ public class SymbolicExecutionTreeBuilder {
       return completions;
    }
    /**
-    * Prunes the symbolic execution tree to match the beforehand pruned proof.
-    * @param node Node to be pruned.
+    * Prunes the symbolic execution tree at the first {@link IExecutionNode} in the parent hierarchy of the given 
+    * {@link Node} (including the Node itself).
+    * @param node {@link Node} to be pruned.
     * @author Anna Filighera
     * @return The {@link AbstractExecutionNode}'s which where deleted.
     */
@@ -503,10 +504,11 @@ public class SymbolicExecutionTreeBuilder {
       // search for the first node in the parent hierarchy (including the node itself) who is an AbstractExecutionNode
       if (firstFather != null && firstFather != startNode) {
          pruneOnExNode = true;
-      }
-      else while (firstFather == null) {
-         node = node.parent();
-         firstFather = getExecutionNode(node);
+      } else {
+    	  while (firstFather == null) {
+    		  node = node.parent();
+    	      firstFather = getExecutionNode(node);
+    	  }
       }
       // determine which nodes should be pruned
       ExecutionNodePreorderIterator subtreeToBePruned = new ExecutionNodePreorderIterator(firstFather);
