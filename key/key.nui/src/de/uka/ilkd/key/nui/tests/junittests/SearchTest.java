@@ -45,7 +45,7 @@ public class SearchTest {
                     null, null, true);
         }
         catch (ProblemLoaderException e) {
-            throw new RuntimeException("Could not set up testing environment.", e);
+            throw new IllegalStateException("Could not set up testing environment.", e);
         }
         ptVisualizer = new ProofTreeConverter(environment.getLoadedProof());
     }

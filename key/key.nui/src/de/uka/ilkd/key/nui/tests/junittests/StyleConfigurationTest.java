@@ -72,7 +72,7 @@ public class StyleConfigurationTest {
                     null, null, true);
         }
         catch (ProblemLoaderException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
 
         final Proof proof = environment.getLoadedProof();

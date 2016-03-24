@@ -321,7 +321,9 @@ public class NUI extends Application {
 
     /**
      * Setter.
-     * @param bundle the {@link ResourceBundle} you want to set.
+     * 
+     * @param bundle
+     *            the {@link ResourceBundle} you want to set.
      */
     public void setBundle(final ResourceBundle bundle) {
         this.bundle = bundle;
@@ -329,7 +331,9 @@ public class NUI extends Application {
 
     /**
      * Setter.
-     * @param dataModel the {@link DataModel} you want to set.
+     * 
+     * @param dataModel
+     *            the {@link DataModel} you want to set.
      */
     public void setDataModel(final DataModel dataModel) {
         this.dataModel = dataModel;
@@ -337,7 +341,9 @@ public class NUI extends Application {
 
     /**
      * Setter.
-     * @param mainViewCont the {@link MainViewController} you want to set.
+     * 
+     * @param mainViewCont
+     *            the {@link MainViewController} you want to set.
      */
     public void setMainViewCont(final MainViewController mainViewCont) {
         this.mainViewCont = mainViewCont;
@@ -345,7 +351,9 @@ public class NUI extends Application {
 
     /**
      * Setter.
-     * @param root the {@link ResourceBundle} you want to set.
+     * 
+     * @param root
+     *            the {@link ResourceBundle} you want to set.
      */
     public void setRoot(final BorderPane root) {
         this.root = root;
@@ -353,7 +361,9 @@ public class NUI extends Application {
 
     /**
      * Setter.
-     * @param viewPositionMenu the {@link Menu} you want to set.
+     * 
+     * @param viewPositionMenu
+     *            the {@link Menu} you want to set.
      */
     public void setViewPositionMenu(final Menu viewPositionMenu) {
         this.viewPositionMenu = viewPositionMenu;
@@ -481,7 +491,8 @@ public class NUI extends Application {
         // you have to call fxmlLoader.load()
         final NUIController nuiController = fxmlLoader.getController();
         if (nuiController == null) {
-            throw new RuntimeException();
+            throw new IllegalStateException(
+                    "Marhshaling the component with the file name " + fileName + " failed.");
         }
         nuiController.constructor(this, dataModel, bundle, component.getId(), fileName);
 

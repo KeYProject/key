@@ -298,7 +298,7 @@ public class FilteringHandler {
                 return getFilterFilesInIDE();
             }
             catch (IOException e) {
-                throw new RuntimeException(
+                throw new IllegalStateException(
                         "An IO Exception occured when trying to load filter rules.", e);
             }
         }

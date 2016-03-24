@@ -173,7 +173,7 @@ public class ProofTreeItem extends TreeItem<NUINode> {
         }
         catch (NoSuchFieldException | SecurityException | IllegalArgumentException
                 | IllegalAccessException e) {
-            throw new RuntimeException("Could not set TreeItem.children", e);
+            throw new IllegalStateException("Could not set TreeItem.children", e);
         }
     }
 
