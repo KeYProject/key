@@ -313,12 +313,12 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    };
 
    /**
-    * the state of the minimize interactions button
+    * The state of the minimize interactions button.
     */
    private State minimizeInteractionState;
 
    /**
-    * listens for changes on minimizeInteractionState
+    * Listens for changes on minimizeInteractionState.
     */
    private final IStateListener minimizeInteractionsListener = new IStateListener() {
       @Override
@@ -774,6 +774,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    }
 
    /**
+    * Returns whether interactions are minimized.
     * @return whether interactions are minimized
     */
    public boolean isMinimizeInteractions() {
