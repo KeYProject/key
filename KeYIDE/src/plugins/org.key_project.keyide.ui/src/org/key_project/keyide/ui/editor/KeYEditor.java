@@ -312,8 +312,14 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       }
    };
 
+   /**
+    * the state of the minimize interactions button
+    */
    private State minimizeInteractionState;
 
+   /**
+    * listens for changes on minimizeInteractionState
+    */
    private final IStateListener minimizeInteractionsListener = new IStateListener() {
       @Override
       public void handleStateChange(State state, Object oldValue) {
@@ -716,8 +722,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
 
    /**
     * Handles a change in the state of the Minimize Interactions context menu filter.
-    * @param state The state that has changed; never null. The value for this state has been updated to the new value.
-    * @param oldValue The old value; may be anything.
+    * @author Viktor Pfanschilling
     */
    protected void handleMinimizeInteractionStateChanged() {
       boolean minimized = isMinimizeInteractions();
@@ -769,11 +774,11 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    }
 
    /**
-    * @return
+    * @return whether interactions are minimized
     */
    public boolean isMinimizeInteractions() {
       Object value = minimizeInteractionState.getValue();
-      boolean minimized = (value instanceof Boolean && ((Boolean)value).booleanValue());
+      boolean minimized = (value instanceof Boolean && ((Boolean) value).booleanValue());
       return minimized;
    }
    
