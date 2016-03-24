@@ -94,7 +94,7 @@ public final class KeYModelUtil {
     * which are added after the existing {@link IKeYSENode}s.
     * </p>
     * @param parent The parent {@link IKeYSENode} in the debug model.
-    * @param oldChildren The existing {@link IKeYSENode}s to keep.
+    * @param oldChildren The existing {@link IKeYSENode}s.
     * @param executionChildren The {@link IExecutionNode}s of the execution tree to create debug model representations for.
     * @return The created debug model representations.
     * @throws DebugException Occurred Exception.

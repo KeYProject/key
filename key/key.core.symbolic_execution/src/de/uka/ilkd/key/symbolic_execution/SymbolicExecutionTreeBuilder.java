@@ -63,6 +63,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.AbstractKeYlessExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
@@ -70,6 +71,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionBlockStartNode;
@@ -491,8 +493,9 @@ public class SymbolicExecutionTreeBuilder {
     * Prunes the symbolic execution tree to match the beforehand pruned proof.
     * @param node Node to be pruned.
     * @author Anna Filighera
+    * @return The {@link AbstractExecutionNode}'s which where deleted.
     */
-   public void prune(Node node) { 
+   public HashSet<AbstractExecutionNode<?>> prune(Node node) { 
       HashSet<AbstractExecutionNode<?>> exNodesToDelete = new HashSet<AbstractExecutionNode<?>>(proof.countNodes());
       IExecutionNode<?> firstFather = getExecutionNode(node);
       boolean pruneOnExNode = false;
@@ -562,7 +565,21 @@ public class SymbolicExecutionTreeBuilder {
                ((AbstractExecutionBlockStartNode<?>) exNode).removeBlockCompletion(deleted);
             }
          }  
+         if (exNode instanceof ExecutionStart) {
+             Iterator<IExecutionTermination> iter = ((ExecutionStart) exNode).getTerminations().iterator();
+             LinkedList<IExecutionTermination> removed = new LinkedList<IExecutionTermination>();
+             while (iter.hasNext()) {
+            	 IExecutionTermination termination = iter.next();
+                if (exNodesToDelete.contains(termination)) {
+                   removed.add(termination);
+                }
+             }
+             for (IExecutionTermination deleted : removed) {
+                ((ExecutionStart) exNode).removeTermination(deleted);
+             }
+          }  
       }
+      return exNodesToDelete;
    }
    
    /**
