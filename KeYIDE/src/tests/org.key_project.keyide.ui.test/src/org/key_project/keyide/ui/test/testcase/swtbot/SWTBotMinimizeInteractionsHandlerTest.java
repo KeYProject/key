@@ -17,15 +17,11 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotWorkbenchPart;
-import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
-import org.eclipse.ui.IEditorReference;
 import org.junit.Test;
-import org.key_project.core.test.util.SuspendingStopCondition;
 import org.key_project.keyide.ui.editor.KeYEditor;
-import org.key_project.keyide.ui.handlers.StartAutoModeHandler;
+import org.key_project.keyide.ui.handlers.MinimizeInteractionsHandler;
 import org.key_project.ui.test.util.TestKeYUIUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -73,7 +69,7 @@ public class SWTBotMinimizeInteractionsHandlerTest extends AbstractSWTBotKeYEdit
                }
                boolean exists = canOpenRuleDialog(bot, editor, "&", rule, -3);
                
-               //consequently, since we toggled that, we should have seen it exactly once:
+               //the rule should be visible.
                assert(exists);
             } catch (Exception e) {
                assert(false);
@@ -121,7 +117,7 @@ public class SWTBotMinimizeInteractionsHandlerTest extends AbstractSWTBotKeYEdit
                }
                boolean exists = canOpenRuleDialog(bot, editor, "&", rule, -3);
                
-               //consequently, since we toggled that, we should have seen it exactly once:
+               //the rule should not be visible
                assertFalse(exists);
             } finally {
                //click the button if state differs from initial state.
@@ -156,7 +152,7 @@ public class SWTBotMinimizeInteractionsHandlerTest extends AbstractSWTBotKeYEdit
       
       TestUtilsUtil.setCursorLocation(styledText, point.x, point.y);
       
-      //Try to apply the specified rule, return null if not found. 
+      //Try to apply the specified rule, return false if not found. 
       //If not found, this should not timeout like SWT would.
       try {
          TestUtilsUtil.clickContextMenu(styledText, point.x, point.y, rule);

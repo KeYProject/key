@@ -16,7 +16,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 public class MinimizeInteractionsHandler extends AbstractHandler {
 
    /**
-    * command id
+    * The command id.
     */
    public static final String COMMAND_ID = "org.key_project.keyide.ui.commands.minimizeInteractions";
 
