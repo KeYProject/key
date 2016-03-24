@@ -80,6 +80,8 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
     * The KeY Environment.
     */
    private KeYEnvironment<DefaultUserInterfaceControl> environment = null;
+   private boolean checked_initial;
+   private boolean flipped = false;
 
    /**
     * Tests whether finishing the dialog works as expected.
@@ -241,8 +243,7 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
       assertEquals(filesInLoc.length, 1);
       File proofFolder = filesInLoc[0];
       
-      
-      // Load source code in KeY and get contract to proof which is the first contract of LogRecord#getBalance().
+      // Load proof file in KeY
       environment = KeYEnvironment.load(
             SymbolicExecutionJavaProfile.getDefaultInstance(false), 
             new File(proofFolder, filename),
@@ -271,8 +272,12 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
          throw run.getException();
       }
       
+      checked_initial = bot.toolbarToggleButtonWithTooltip("Minimize Interactions").isChecked();
       //Unminimize Interactions, so that we can use the required Taclets.
-      TestUtilsUtil.clickDirectly(bot.toolbarToggleButtonWithTooltip("Minimize Interactions"));
+      if(checked_initial){
+         flipped = true;
+         TestUtilsUtil.clickDirectly(bot.toolbarToggleButtonWithTooltip("Minimize Interactions"));
+      }
       
       editor = bot.activeEditor();
       assertNotNull(editor);
@@ -301,12 +306,15 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
     * restores the initial conditions.
     */
    private void restore() {
-      //re-minimize Interactions
-      TestUtilsUtil.clickDirectly(bot.toolbarToggleButtonWithTooltip("Minimize Interactions"));
       if (dialogShell != null) {
          dialogShell.close();
          dialogShell = null;
       }
+      //restore Interactions
+      if (flipped && bot.toolbarToggleButtonWithTooltip("Minimize Interactions").isChecked() != checked_initial) {
+         TestUtilsUtil.clickDirectly(bot.toolbarToggleButtonWithTooltip("Minimize Interactions"));
+      }
+      
       previousperspective.activate();
       StarterPreferenceUtil.setDontAskForProofStarter(prevDontAsk);
       StarterPreferenceUtil.setSelectedProofStarterID(prevProofStarter);
