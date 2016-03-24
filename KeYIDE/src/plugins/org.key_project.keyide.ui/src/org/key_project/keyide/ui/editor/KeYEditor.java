@@ -427,9 +427,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
             ProofUserManager.getInstance().addUser(currentProof, environment, this);
             getUI().getProofControl().setMinimizeInteraction(true);
-            if (selectionModel == null) {
-               selectionModel.setSelectedNode(currentProof.root());
-            }
             this.currentNode = selectionModel.getSelectedNode();
             configureProofForBreakpoints();
          }
