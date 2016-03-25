@@ -137,6 +137,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 */
 	private boolean showSubtree;
 	
+	/**
+	 * The root of the show subtree of node filtered prooftree.
+	 */
 	private Node newRoot;
 	
 	/**
@@ -201,10 +204,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 			   while (nonBranchingNode != newRoot && nonBranchingNode.parent().childrenCount() == 1 && nonBranchingNode.parent() != null) {
 			      nonBranchingNode = nonBranchingNode.parent();
 			   }
-			   if (nonBranchingNode == newRoot) {
-			      return proof;
-			   }
-			   if (nonBranchingNode == proof.root()) {
+			   if (nonBranchingNode == newRoot || nonBranchingNode == proof.root()) {
 			      return proof;
 			   }
 			}
@@ -729,6 +729,11 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	   return showSubtree;
 	}
 	
+	/**
+	 * sets the state of the show subtree filter.
+	 * @param state the boolean to set to
+	 * @param rootNode the new root node 
+	 */
 	public void setShowSubtreeState(boolean state, Node rootNode) {
 	   showSubtree = state;
 	   newRoot = rootNode;
