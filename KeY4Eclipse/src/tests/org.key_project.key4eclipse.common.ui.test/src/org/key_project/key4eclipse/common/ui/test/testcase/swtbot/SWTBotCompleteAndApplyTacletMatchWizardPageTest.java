@@ -110,7 +110,6 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
          Text wdgt = bot.widget(widgetOfType(Text.class), t.widget);
          SWTBotText txt = new SWTBotText(wdgt, null);
          txt.setText("1!=3");
-         txt.pressShortcut(KeyStroke.getInstance(SWT.CR));
          
          //finish the dialog
          dialogShell.bot().button("Finish").click();
@@ -141,7 +140,7 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
          Text wdgt = bot.widget(widgetOfType(Text.class), t.widget);
          SWTBotText txt = new SWTBotText(wdgt, null);
          txt.setText("1!=3");
-         txt.pressShortcut(KeyStroke.getInstance(SWT.CR));
+         
          //cancel
          dialogShell.bot().button("Cancel").click();
          
