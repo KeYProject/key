@@ -41,6 +41,7 @@ import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.RegistryToggleState;
 import org.key_project.key4eclipse.common.ui.breakpoints.KeYBreakpointManager;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
+import org.key_project.keyide.ui.handlers.BreakpointToggleHandler;
 import org.key_project.keyide.ui.handlers.HideIntermediateProofstepsHandler;
 import org.key_project.keyide.ui.handlers.ShowSymbolicExecutionTreeOnlyHandler;
 import org.key_project.keyide.ui.providers.BranchFolder;
@@ -48,6 +49,7 @@ import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
 import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
+import org.key_project.sed.key.ui.ShowSubtreeOfNodeHandler;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
 
@@ -116,7 +118,7 @@ public class ManualView extends AbstractViewBasedView {
    private ProofSourceViewerDecorator sourceViewerDecorator;
    
    /**
-    * 
+    * the currently loaded {@link IProject}.
     */
    private IProject currentProject;
    
@@ -144,6 +146,16 @@ public class ManualView extends AbstractViewBasedView {
 	 * The {@link State} for stopping at breakpoints while auto mode is running. 
 	 */
 	private State breakpointState;
+	
+	/**
+	 * the {@link State} for showing the subtree of a node.
+	 */
+	private State subtreeState;
+	
+	/**
+	 * The root of the tree, changes after use of the show subtree of node filter.
+	 */
+	private Node filterNode;
 	
    /**
     * the {@link ISelectionChangedListener} for the {@link IDebugView}.
@@ -222,6 +234,19 @@ public class ManualView extends AbstractViewBasedView {
 	};
 	
 	/**
+	 * the {@link IStateListener} to listen to changes on the subtreeState.
+	 */
+	private IStateListener subtreeStateListener = new IStateListener() {
+
+      @Override
+      public void handleStateChange(State state, Object oldValue) {
+         handleSubtreeStateChanged(state, oldValue);
+         
+      }
+	   
+	};
+	
+	/**
 	 * 
 	 */
 	private KeYBreakpointManager breakpointManager;
@@ -258,15 +283,21 @@ public class ManualView extends AbstractViewBasedView {
             }
          }
          
-         Command breakpointCmd = service.getCommand(ShowSymbolicExecutionTreeOnlyHandler.COMMAND_ID);
-         if (breakpointCmd != null) {
-            if (hideCmd != null) {
-               breakpointState = hideCmd.getState(RegistryToggleState.STATE_ID);
+         Command breakpointCmd = service.getCommand(BreakpointToggleHandler.COMMAND_ID);
+            if (breakpointCmd != null) {
+               breakpointState = breakpointCmd.getState(RegistryToggleState.STATE_ID);
                if (breakpointState != null) {
                   breakpointState.addListener(breakpointStateListener);
                }
             }
-         }
+         
+         Command subtreeCmd = service.getCommand(ShowSubtreeOfNodeHandler.COMMAND_ID);
+            if (subtreeCmd != null) {
+               subtreeState = subtreeCmd.getState(RegistryToggleState.STATE_ID);
+               if (subtreeState != null) {
+                  subtreeState.addListener(subtreeStateListener);
+               }
+            }
       }
       beforeBaseViewUpdate = false;
 	      
@@ -320,7 +351,9 @@ public class ManualView extends AbstractViewBasedView {
 	}
    
 	/**
-	 * 
+	 * handles a change in breakpointState
+	 * @param state
+	 * @param oldValue
 	 */
 	protected void handleBreakpointStateChanged(State state, Object oldValue) {
 	   if (state.getValue() instanceof Boolean) {
@@ -328,6 +361,29 @@ public class ManualView extends AbstractViewBasedView {
 	   } else {
 	      breakpointManager.setEnabled(false);
 	   }
+	}
+	
+	/**
+	 * handles the change in the subtreeState
+	 * @param state
+	 * @param oldValue
+	 */
+	protected void handleSubtreeStateChanged(State state, Object oldValue) {
+	  if (proof != null) {
+   	  if ((boolean)state.getValue()) {
+   	     filterNode = getSelectedNode();
+   	     contentProvider.setShowSubtreeState(true, filterNode);
+   	     getTreeViewer().setInput(filterNode.proof());
+   	  } else {
+   	     Node selectedNode = getSelectedNode();
+   	     contentProvider.setShowSubtreeState(false, proof.root());
+   	     getTreeViewer().setInput(proof);
+   	     if (!newProof && !(boolean) hideState.getValue()) {
+   	        selectNodeThreadSafe(selectedNode);
+   	     }
+   	     filterNode = proof.root();
+   	  }
+	  }
 	}
 	
    /**
@@ -343,6 +399,7 @@ public class ManualView extends AbstractViewBasedView {
       this.contentProvider = new LazyProofTreeContentProvider();
       contentProvider.setHideState((boolean) hideState.getValue());
       contentProvider.setSymbolicState((boolean) symbolicState.getValue());
+      subtreeState.setValue(false);
       getTreeViewer().setContentProvider(contentProvider);
       //create the source viewer
       this.sourceViewer = new SourceViewer(parentComposite, null, SWT.MULTI | SWT.BORDER
@@ -387,6 +444,10 @@ public class ManualView extends AbstractViewBasedView {
    	        	      newProof = true;
    	        	   }
                   this.proof = keyTarget.getProof();
+                  if (newProof) {
+                     subtreeState.setValue(false);
+                     contentProvider.setShowSubtreeState(false, proof.root());
+                  }
                   this.environment = keyTarget.getEnvironment();
                   if (keyTarget.getMethod() != null) {
                      this.currentProject = keyTarget.getMethod().getResource().getProject();
@@ -411,7 +472,11 @@ public class ManualView extends AbstractViewBasedView {
                      IKeYSENode<?> seNode = (IKeYSENode<?>) element;
                      if (getTreeViewer() != null && getSourceViewer() != null) {
                         Node keyNode = seNode.getExecutionNode().getProofNode();
-                        selectNodeThreadSafe(keyNode);
+                        if (!(boolean) subtreeState.getValue()) {
+                           selectNodeThreadSafe(keyNode);
+                        } else if (keyNode.serialNr() >= filterNode.serialNr()) {
+                           selectNodeThreadSafe(keyNode);
+                        }
                      }
                   }
                }
@@ -438,11 +503,18 @@ public class ManualView extends AbstractViewBasedView {
       this.labelProvider = new ProofTreeLabelProvider(getTreeViewer(), environment.getProofControl(), getProof());
       getTreeViewer().setLabelProvider(labelProvider);
       contentProvider.injectTopLevelElements();
-      
-      getTreeViewer().setSelection(SWTUtil.createSelection(getProof().root()), true);
+      if (!(boolean) subtreeState.getValue()) {
+         getTreeViewer().setSelection(SWTUtil.createSelection(getProof().root()), true);
+      } else {
+         getTreeViewer().setSelection(SWTUtil.createSelection(filterNode), true);
+      }
       createTreeViewerContextMenu();
       if (!(boolean) hideState.getValue() || newProof) {
-         sourceViewerDecorator.showNode(getProof().root(), SymbolicExecutionUtil.createNotationInfo(getProof()));
+         if (!(boolean) subtreeState.getValue()) {
+            selectNodeThreadSafe(proof.root());
+         } else {
+            selectNodeThreadSafe(filterNode);
+         }
          newProof = false;
       }
       getSourceViewer().getControl().setSize(1000,1000);
@@ -650,7 +722,7 @@ public class ManualView extends AbstractViewBasedView {
 		for (Object unknownElement : unknownParents) {
 			Object parent = contentProvider.getParent(unknownElement);
 			int viewIndex = contentProvider.getIndexOf(parent, unknownElement);
-			if (contentProvider.getHideState() == false && contentProvider.getSymbolicState() == false) {
+			if (contentProvider.getHideState() == false && contentProvider.getSymbolicState() == false && contentProvider.getShowSubtreeState() == false) {
 				Assert.isTrue(viewIndex >= 0, "Content provider returned wrong parents or child index computation is buggy.");
 				contentProvider.updateChildCount(parent, 0);
 				contentProvider.updateElement(parent, viewIndex);

@@ -184,6 +184,18 @@
             </class>
          </state>
       </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Shows the subtree with the selected node as the root."
+            id="org.key_project.sed.key.ui.showSubtreeCommand"
+            name="Show Subtree of this Node">
+         <state
+               id="org.eclipse.ui.commands.toggleState">
+            <class
+                  class="org.eclipse.ui.handlers.RegistryToggleState">
+            </class>
+         </state>
+      </command>
    </extension>
       <extension
             point="org.eclipse.ui.commandImages">
@@ -362,6 +374,20 @@
          <handler
                class="org.key_project.keyide.ui.handlers.BreakpointToggleHandler"
                commandId="org.key_project.sed.key.ui.stopAtBreakpoints">
+         </handler>
+         <handler
+               class="org.key_project.sed.key.ui.ShowSubtreeOfNodeHandler"
+               commandId="org.key_project.sed.key.ui.showSubtreeCommand">
+            <enabledWhen>
+               <with
+                     variable="selection">
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.sed.key.ui.isShowSubtreeSupported"
+                        value="true">
+                  </test>
+               </with>
+            </enabledWhen>
          </handler>
       </extension>
    <extension
@@ -709,6 +735,17 @@
                   style="toggle"
                   tooltip="Stop at breakpoints">
             </command>
+            <command
+                  commandId="org.key_project.sed.key.ui.showSubtreeCommand"
+                  icon="icons/down.gif"
+                  label="Show Subtree of this Node"
+                  style="toggle"
+                  tooltip="Show Subtree of Node">
+            </command>
+         </menuContribution>
+         <menuContribution
+               allPopups="false"
+               locationURI="popup:org.key_project.sed.key.ui.view.ManualView">
          </menuContribution>
       </extension>
       <extension
@@ -742,10 +779,10 @@
                type="java.lang.Object">
          </propertyTester>
          <propertyTester
-               class="org.key_project.keyide.ui.propertyTester.PruneProofPropertyTester"
-               id="org.key_project.keyide.ui.PruneProofTester"
-               namespace="org.key_project.keyide.ui"
-               properties="nodeSupportsPruning"
+               class="org.key_project.sed.key.ui.ShowSubtreePropertyTester"
+               id="org.key_project.sed.key.ui.showSubtreePropertyTester"
+               namespace="org.key_project.sed.key.ui"
+               properties="isShowSubtreeSupported"
                type="org.eclipse.jface.viewers.IStructuredSelection">
          </propertyTester>
       </extension>

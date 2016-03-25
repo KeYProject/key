@@ -66,7 +66,7 @@ public class RuleAppContextMenu extends ExtensionContributionFactory {
                item.setVisible(true);
                additions.addContributionItem(item,  null);
             }
-            view.setManualRule(true);
+            
             
          // Add macros
             MenuManager macroMenu = new MenuManager("Strategy macros");
@@ -83,6 +83,7 @@ public class RuleAppContextMenu extends ExtensionContributionFactory {
                }
             }
             additions.addContributionItem(macroMenu, null); 
+            view.setManualRule(true);
          }
       }
    }
