@@ -37,7 +37,6 @@
    <rule ref="rulesets/java/strictexception.xml/AvoidLosingExceptionInformation"/>
    <rule ref="rulesets/java/basic.xml/AvoidMultipleUnaryOperators"/>
    <rule ref="rulesets/java/controversial.xml/AvoidPrefixingMethodParameters"/>
-   <rule ref="rulesets/java/logging-java.xml/AvoidPrintStackTrace"/>
    <rule ref="rulesets/java/design.xml/AvoidProtectedFieldInFinalClass"/>
    <rule ref="rulesets/java/design.xml/AvoidProtectedMethodInFinalClassNotExtending"/>
    <rule ref="rulesets/java/design.xml/AvoidReassigningParameters"/>
