@@ -34,6 +34,8 @@ import javafx.util.StringConverter;
  *
  */
 @ControllerAnnotation(createMenu = true)
+@SuppressWarnings({ "PMD.TooManyFields", "PMD.AtLeastOneConstructor",
+        "PMD.AvoidDuplicateLiterals" })
 public class StrategyViewController extends NUIController implements Observer {
     /**
      * The constant 10.
@@ -42,24 +44,39 @@ public class StrategyViewController extends NUIController implements Observer {
     /**
      * [1, 6].
      */
-    private static final int[] INT_RANGE_ONE_TO_SIX = { 1, 2, 3, 4, 5, 6 };
+    private static final int[] RNG_ONE_TO_SIX = { 1, 2, 3, 4, 5, 6 };
     /**
      * The constant 9.
      */
     private static final int NINE = 9;
+    /**
+     * The constant 1000.
+     */
+    private static final int ONETHOUSAND = 1000;
+    /**
+     * The constant 10000.
+     */
+    private static final int TENTHOUSAND = 10000;
+    /**
+     * The constant 100000.
+     */
+    private static final int ONE_HUNDRED_THOUSAND = 100000; // NOPMD name is fine
+    /**
+     * The constant 1000000.
+     */
+    private static final int ONE_MILLION = 1000000; // NOPMD name is fine
 
     /**
      * The default value for the maximum number of rule applications.
      */
-    private static int defaultMaxRuleApplications = TEN;
+    private static int defaultMaxRuleApplications = TEN; //NOPMD name is fine... sort of
 
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired",
-            "PMD.AvoidDuplicateLiterals" })
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.LongVariable" })
     private ToggleGroup arithmeticTreatment;
 
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.LongVariable", "PMD.CommentRequired" })
     private ToggleGroup autoInduction;
 
     @FXML
@@ -70,18 +87,15 @@ public class StrategyViewController extends NUIController implements Observer {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup classAxiom;
 
-    /**
-     * The current value of the slider.
-     */
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private transient int currSliderVal = defaultMaxRuleApplications;
 
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired", "PMD.LongVariable" })
     private ToggleGroup dependencyContracts;
 
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired", "PMD.LongVariable" })
     private ToggleGroup expandLocalQueries;
 
     @FXML
@@ -110,7 +124,7 @@ public class StrategyViewController extends NUIController implements Observer {
     private ToggleGroup methodTreatment;
 
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired", "PMD.LongVariable" })
     private transient AnchorPane proofSearchStrategy;
 
     @FXML
@@ -118,7 +132,7 @@ public class StrategyViewController extends NUIController implements Observer {
     private ToggleGroup proofSplitting;
 
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired", "PMD.LongVariable" })
     private ToggleGroup quantifierTreatment;
 
     @FXML
@@ -177,16 +191,14 @@ public class StrategyViewController extends NUIController implements Observer {
      * @throws ControllerNotFoundException
      */
     public void handleOnAction(final ActionEvent actionEvent) throws ControllerNotFoundException {
-
-        final String filename;
-        final TreeViewState loadedTreeViewState = getDataModel().getLoadedTreeViewState();
-        if (loadedTreeViewState == null) {
+        if (getDataModel().getLoadedTreeViewState() == null) {
             getNui().updateStatusbar(getBundle().getString("errorProofFileMissing"));
 
         }
         else {
 
-            filename = getDataModel().getLoadedTreeViewState().getProof().getProofFile().getName();
+            final String filename = getDataModel().getLoadedTreeViewState().getProof()
+                    .getProofFile().getName();
 
             // retrieve proof file and init proofStarter
 
@@ -223,11 +235,9 @@ public class StrategyViewController extends NUIController implements Observer {
                 final ProofTreeItem fxtree = new ProofTreeConverter(updatedProof)
                         .createFXProofTree();
 
-                // Create new TreeViewState for updatedProof
-                final TreeViewState updatedTreeViewState = new TreeViewState(updatedProof, fxtree);
-
-                // update getDataModel()
-                getDataModel().saveTreeViewState(updatedTreeViewState, filename);
+                // Create new TreeViewState for updatedProof and update
+                // getDataModel()
+                getDataModel().saveTreeViewState(new TreeViewState(updatedProof, fxtree), filename);
 
             }
         }
@@ -296,7 +306,7 @@ public class StrategyViewController extends NUIController implements Observer {
         }
         else {
             final double sliderCoefficient = Math.pow(TEN, roundSliderValue);
-            if (Arrays.asList(INT_RANGE_ONE_TO_SIX).contains(sliderValue)) {
+            if (Arrays.asList(RNG_ONE_TO_SIX).contains(sliderValue)) {
                 currSliderVal = (int) sliderCoefficient;
             }
             else {
@@ -327,17 +337,16 @@ public class StrategyViewController extends NUIController implements Observer {
             public String toString(final Double number) {
                 final int val = (int) Math.pow(TEN, number);
 
-                if (val < TEN)
-                    return String.valueOf(val);
-                //CHECKSTYLE.OFF: MagicNumberCheck -- externalizing these constants makes no sense
-                if (val < 10000) {
+                if (val < TEN) {
                     return String.valueOf(val);
                 }
-                if (val < 1000000) {
-                    return (val / 1000) + "k";
+                if (val < TENTHOUSAND) {
+                    return String.valueOf(val);
                 }
-                return (val / 1000000) + "M";
-                //CHECKSTYLE.ON: MagicNumberCheck
+                if (val < ONE_MILLION) {
+                    return (val / ONETHOUSAND) + "k";
+                }
+                return (val / ONE_HUNDRED_THOUSAND) + "M";
             }
         });
 

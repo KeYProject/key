@@ -11,6 +11,8 @@ import de.uka.ilkd.key.nui.prooftree.NUINode;
  * @author Matthias Schultheis
  *
  */
+@SuppressWarnings("PMD.AtLeastOneConstructor")
+//PMD will also complain if adding the constructor, then saying "avoid useless constructors"
 @FilterAnnotation(isFilter = true)
 public class FilterHideNonSymbolicExecution implements ProofTreeFilter {
 
@@ -20,6 +22,7 @@ public class FilterHideNonSymbolicExecution implements ProofTreeFilter {
     }
 
     @Override
+    @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
     public boolean test(final NUINode node) {
         if (node instanceof NUIBranchNode || node instanceof NUILeafNode) {
             return true;

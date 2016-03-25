@@ -50,10 +50,10 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     /**
      * The change listener registered to this ProofTreeCell.
      */
-    private final ChangeListener<Boolean> searchResultListener = (observable, didMatchSearch,
+    private final ChangeListener<Boolean> srchRsltLstener = (observable, didMatchSearch,
             nowMatchesSearch) -> {
         final ObservableList<String> styles = getStyleClass();
-        final String cssClassHighlight = ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT;
+        final String cssClassHighlight = ProofTreeStyleConstants.CSS_NODE_HGHLGHT;
         if (nowMatchesSearch && !styles.contains(cssClassHighlight)) {
             styles.add(cssClassHighlight);
         }
@@ -62,10 +62,11 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         }
         ProofTreeCell.this.updateItem(ProofTreeCell.this.getItem(), false);
     };
+
     /**
      * The treeViewController used to handle the actions of the treeView.
      */
-    private final TreeViewController treeViewController;
+    private final TreeViewController treeViewCtrlr;
 
     /**
      * The constructor of the ProofTreeCell.
@@ -79,12 +80,12 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      */
 
     public ProofTreeCell(final IconFactory icf, final FilteringHandler filteringHandler,
-            final TreeViewController treeViewController) {
+            final TreeViewController treeViewCtrlr) {
 
         super();
         this.filteringHandler = filteringHandler;
         this.iconFactory = icf;
-        this.treeViewController = treeViewController;
+        this.treeViewCtrlr = treeViewCtrlr;
     }
 
     /**
@@ -126,17 +127,15 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      * Getter.
      * @return the {@link ChangeListener}&lt;{@link Boolean}&gt;
      */
-    public ChangeListener<Boolean> getSearchResultListener() {
-        return searchResultListener;
+    public ChangeListener<Boolean> getSrchRsltLstener() {
+        return srchRsltLstener;
     }
-
     /**
-     * Returns the TreeViewController associated with the ProofTreeCell.
-     * 
-     * @return the {@link TreeViewController}.
+     * Getter.
+     * @return the {@link TreeViewController}
      */
-    public TreeViewController getTreeViewController() {
-        return treeViewController;
+    public TreeViewController getTreeViewCtrlr() {
+        return treeViewCtrlr;
     }
 
     /**
@@ -166,10 +165,10 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     @Override
     protected final void updateItem(final NUINode item, final boolean empty) {
 
-        final String cssHighlighting = ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT;
+        final String cssHighlighting = ProofTreeStyleConstants.CSS_NODE_HGHLGHT;
 
         if (getItem() != null) {
-            getItem().removeSearchResultListener(searchResultListener);
+            getItem().removeSearchResultListener(srchRsltLstener);
         }
 
         super.updateItem(item, empty);
@@ -179,7 +178,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 
         }
         else {
-            item.addSearchResultListener(searchResultListener);
+            item.addSearchResultListener(srchRsltLstener);
             if (item.isSearchResult()) {
                 if (!getStyleClass().contains(cssHighlighting)) {
                     getStyleClass().add(cssHighlighting);
@@ -198,11 +197,11 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         }
 
         setContextMenu(new ProofTreeContextMenu(getTreeItem(), getTreeView(), iconFactory,
-                filteringHandler, treeViewController));
+                filteringHandler, treeViewCtrlr));
 
         // reset label and icon
         label = new Label(item.getLabel() + " ");
-        icon = null;
+        setIcon(null);
 
         // set decoration (style, icon)
         final ProofTreeStyler pts = new ProofTreeStyler(this);

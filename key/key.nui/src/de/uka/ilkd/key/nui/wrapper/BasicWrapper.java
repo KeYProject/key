@@ -11,6 +11,8 @@ import javafx.embed.swing.SwingNode;
  * @author Patrick Jattke
  *
  */
+@SuppressWarnings("PMD.AtLeastOneConstructor")
+//PMD will also complain if adding the constructor, then saying "avoid useless constructors"
 public abstract class BasicWrapper {
 
     /**

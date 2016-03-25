@@ -119,7 +119,7 @@ public class ProofTreeConverter {
      */
     private void addProofTreeToNUITree(final Node proofNode, final NUIBranchNode parent) {
         final Proof proof = proofNode.proof();
-        final NUINode newNode;
+        final NUINode newNode; // NOPMD we must use a final local variable here
         // Create NUI node -----------------------------------------------------
         if (proofNode.leaf()) {
             newNode = new NUILeafNode(proofNode);
@@ -138,10 +138,10 @@ public class ProofTreeConverter {
 
         // Add children of current node proofNode to parent --------------------
         final int numChildren = proofNode.childrenCount();
-        if (numChildren == 1) {
+        if (numChildren == 1) { // NOPMD literal is fine
             addProofTreeToNUITree(proofNode.child(0), parent);
         }
-        else if (numChildren > 1) {
+        else if (numChildren > 1) { // NOPMD literal is fine
 
             // for each child create a branch node and add it to parent
             for (final Iterator<Node> childrenIterator = proofNode
@@ -150,7 +150,8 @@ public class ProofTreeConverter {
                 final Node child = childrenIterator.next();
 
                 // create NUIBranch and set fields
-                final NUIBranchNode branchNode = new NUIBranchNode(proofNode);
+                // NOPMD justification: There is no other way than to instantiate inside this loop
+                final NUIBranchNode branchNode = new NUIBranchNode(proofNode); // NOPMD 
                 String branchLabel = child.getNodeInfo().getBranchLabel();
                 if (branchLabel == null) {
                     final int caseNumber = (child.parent().getChildNr(child) + 1);
@@ -258,7 +259,7 @@ public class ProofTreeConverter {
         // Convert child nodes recursively into TreeItem<Label> objects
         for (final NUINode child : nuiNode.getChildren()) {
 
-            final ProofTreeItem fxNode = new ProofTreeItem(child);
+            final ProofTreeItem fxNode = new ProofTreeItem(child); // NOPMD must instantiate
             fxTreeNode.addChild(fxNode);
 
             // if child is of type branch node -> add children recursively
@@ -283,12 +284,42 @@ public class ProofTreeConverter {
 
         // propagate linked information to parent
         final NUINode parent = newNode.getParent();
-        if (parent != null && parent instanceof NUIBranchNode) {
-            final NUIBranchNode parentBranch = (NUIBranchNode) parent;
-            if (parentBranch.hasOnlyLinkedBranchChildren()) {
-                // if parent has only linked branch children, mark as linked.
-                setNUINodeLinkedTrue(parentBranch);
-            }
+        final NUIBranchNode parentBranch = (NUIBranchNode) parent;
+        if (parent instanceof NUIBranchNode
+                && parentBranch.hasOnlyLinkedBranchChildren()) {
+
+            // if parent has only linked branch children, mark as linked.
+            setNUINodeLinkedTrue(parentBranch);
+
         }
+    }
+
+    /**
+     * Getter.
+     * @return the {@link List}&lt;{@link NUINode}&gt;
+     */
+    public List<NUINode> getLinkedLeafs() {
+        return linkedLeafs;
+    }
+    /**
+     * Setter.
+     * @param linkedLeafs a {@link List}&lt;{@link NUINode}&gt; you want to set.
+     */
+    public void setLinkedLeafs(final List<NUINode> linkedLeafs) {
+        this.linkedLeafs = linkedLeafs;
+    }
+    /**
+     * Getter.
+     * @return the {@link NUIBranchNode}
+     */
+    public NUIBranchNode getNuiRoot() {
+        return nuiRoot;
+    }
+    /**
+     * Setter.
+     * @param nuiRoot the {@link NUIBranchNode} you want to set as root.
+     */
+    public void setNuiRoot(final NUIBranchNode nuiRoot) {
+        this.nuiRoot = nuiRoot;
     }
 }

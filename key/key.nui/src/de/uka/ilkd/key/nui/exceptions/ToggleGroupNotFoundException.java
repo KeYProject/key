@@ -25,6 +25,7 @@ public class ToggleGroupNotFoundException extends NUIException {
      *            The fx:id of the toggle group which could not be found.
      */
     public ToggleGroupNotFoundException(final String fxId) {
+        super();
         this.toggleGroup = fxId;
     }
 

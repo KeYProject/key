@@ -34,7 +34,7 @@ public final class ProofTreeStyleConstants {
     public static final String CSS_NODE_LINKED = "linked_node";
 
     /** CSS class for an interactive node. */
-    public static final String CSS_NODE_INTERACTIVE = "interactive_node";
+    public static final String CSS_NODE_NTRACTV = "interactive_node";
 
     /** CSS class for a node that has notes. */
     public static final String CSS_NODE_NOTES = "notes_node";
@@ -43,7 +43,7 @@ public final class ProofTreeStyleConstants {
     public static final String CSS_NODE_ACTIVE = "active_node";
 
     /** CSS class for an highlighted node. */
-    public static final String CSS_NODE_HIGHLIGHT = "highlighted_node";
+    public static final String CSS_NODE_HGHLGHT = "highlighted_node";
 
     /**
      * The private constructor is not called as it is only a utility class.

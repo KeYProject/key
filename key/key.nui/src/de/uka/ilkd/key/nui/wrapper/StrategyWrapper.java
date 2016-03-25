@@ -18,33 +18,29 @@ import javafx.embed.swing.SwingNode;
  * @author Patrick Jattke
  * @author Florian Breitfelder
  */
+@SuppressWarnings("PMD.AtLeastOneConstructor")
+//PMD will also complain if adding the constructor, then saying "avoid useless constructors"
 public class StrategyWrapper extends BasicWrapper {
 
     /**
      * Stores the StrategySelectionView.
      */
     private StrategySelectionView ssv;
+
     /**
      * Stores the AutoModeAction associated to the StrategySelectionView.
      */
     private AutoModeAction ama;
 
     /**
-     * Creates a new Strategy Wrapper object.
-     */
-    public StrategyWrapper() {
-
-    }
-
-    /**
      * Refreshes the components on the StrategySelectionView after a new proof
      * file was loaded.
      * 
-     * @param p
+     * @param proof
      *            The loaded proof file.
      */
-    public void refreshComponents(final Proof p) {
-        ssv.refresh(p);
+    public void refreshComponents(final Proof proof) {
+        ssv.refresh(proof);
         ama.enable();
     }
 
@@ -87,8 +83,7 @@ public class StrategyWrapper extends BasicWrapper {
         ssv.removeAll();
         ssv.add(scrollPane);
 
-        final SwingNode node = super.addSwingComponent(ssv);
-        return node;
+        return super.addSwingComponent(ssv);
     }
 
     /**
@@ -100,6 +95,35 @@ public class StrategyWrapper extends BasicWrapper {
         final MainWindow mainWindow = MainWindow.getInstance();
         return mainWindow.getMediator().getSelectionModel().getSelectedProof()
                 .getActiveStrategy();
+    }
+
+    /**
+     * Getter.
+     * @return the {@link StrategySelectionView}.
+     */
+    public StrategySelectionView getSsv() {
+        return ssv;
+    }
+    /**
+     * Setter.
+     * @param ssv the {@link StrategySelectionView} you want to set.
+     */
+    public void setSsv(final StrategySelectionView ssv) {
+        this.ssv = ssv;
+    }
+    /**
+     * Getter.
+     * @return the {@link AutoModeAction}.
+     */
+    public AutoModeAction getAma() {
+        return ama;
+    }
+    /**
+     * Setter.
+     * @param ama the {@link AutoModeAction} you want to set.
+     */
+    public void setAma(final AutoModeAction ama) {
+        this.ama = ama;
     }
 
 }

@@ -99,7 +99,8 @@ public class NUI extends Application {
      * <li>ToggleGroup is the reference to the loaded toggle group.
      * </ul>
      */
-    private final Map<String, ToggleGroup> toggleGroups = new HashMap<>();
+    //NOPMD justification: no thread safety needed
+    private final Map<String, ToggleGroup> toggleGroups = new HashMap<>(); //NOPMD
 
     /**
      * The menu "View" of the menu bar.
@@ -302,11 +303,11 @@ public class NUI extends Application {
         // Load all components
         loadComponents();
 
-        final TreeViewController treeViewController = ((TreeViewController) getController(
+        final TreeViewController triVwCtlr = ((TreeViewController) getController(
                 "treeViewPane"));
-        treeViewController.addSearchView(getComponent("searchViewPane"),
+        triVwCtlr.addSearchView(getComponent("searchViewPane"),
                 getController("searchViewPane"));
-        treeViewController.addFilterView(getComponent("filterViewHBox"),
+        triVwCtlr.addFilterView(getComponent("filterViewHBox"),
                 getController("filterViewHBox"));
 
         // create file menu for MainView
@@ -505,7 +506,9 @@ public class NUI extends Application {
             for (final Annotation annotation : annotations) {
                 if (annotation instanceof ControllerAnnotation
                         && ((ControllerAnnotation) annotation).createMenu()) {
-                    final ToggleGroup toggleGroup = new ToggleGroup();
+                    // NOPMD justification:
+                    // we must instantiate an object inside a loop to perform this task
+                    final ToggleGroup toggleGroup = new ToggleGroup(); // NOPMD
                     toggleGroups.put(component.getId(), toggleGroup);
                     viewPositionMenu.getItems().add(createSubMenu(component.getId(), toggleGroup));
                     break;

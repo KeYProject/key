@@ -12,7 +12,6 @@ import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
 import de.uka.ilkd.key.nui.prooftree.FilteringHandler;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
-import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeStyleConstants;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -40,6 +39,16 @@ public class TreeViewController extends NUIController implements Observer {
     private FilteringHandler filteringHandler;
 
     /**
+     * The box where the text filter component is being put.
+     */
+    private Pane filterViewHBox;
+
+    /**
+     * A reference to the text filter view controller.
+     */
+    private FilterViewController fltrVwCtrlr;
+
+    /**
      * The IconFactory used to create icons for the proof tree nodes.
      */
     private IconFactory icf;
@@ -49,7 +58,6 @@ public class TreeViewController extends NUIController implements Observer {
      */
     private final Set<ProofTreeCell> proofTreeCells = Collections
             .newSetFromMap(new WeakHashMap<>());
-
     /**
      * The proofTree view of the GUI.
      */
@@ -59,7 +67,8 @@ public class TreeViewController extends NUIController implements Observer {
     /**
      * A reference to the controller associated with the searchView.
      */
-    private SearchViewController searchViewController;
+    private SearchViewController searchViewCtrlr;
+
     /**
      * Includes the Sub-Window for search.
      */
@@ -71,6 +80,13 @@ public class TreeViewController extends NUIController implements Observer {
      */
     @FXML
     private VBox treeViewPane;
+
+    public void addFilterView(final Pane filterViewHBox, final NUIController nuiController) {
+        this.filterViewHBox = filterViewHBox;
+        if (nuiController instanceof FilterViewController) {
+            this.fltrVwCtrlr = (FilterViewController) nuiController;
+        }
+    }
 
     /**
      * Adds the given searchViewPane to the TreeViewController and stores a
@@ -84,7 +100,7 @@ public class TreeViewController extends NUIController implements Observer {
     public void addSearchView(final Pane searchViewPane, final NUIController nuiController) {
         this.searchViewPane = searchViewPane;
         if (nuiController instanceof SearchViewController) {
-            this.searchViewController = (SearchViewController) nuiController;
+            this.searchViewCtrlr = (SearchViewController) nuiController;
         }
     }
 
@@ -95,6 +111,22 @@ public class TreeViewController extends NUIController implements Observer {
      */
     public FilteringHandler getFilteringHandler() {
         return filteringHandler;
+    }
+
+    /**
+     * Getter.
+     * @return the filter view {@link HBox}
+     */
+    public Pane getFilterViewHBox() {
+        return filterViewHBox;
+    }
+
+    /**
+     * Getter.
+     * @return the {@link FilterViewController}
+     */
+    public FilterViewController getFltrVwCtrlr() {
+        return fltrVwCtrlr;
     }
 
     /**
@@ -131,10 +163,9 @@ public class TreeViewController extends NUIController implements Observer {
      * 
      * @return the {@link SearchViewController}.
      */
-    public SearchViewController getSearchViewController() {
-        return searchViewController;
+    public SearchViewController getSearchViewCtrlr() {
+        return searchViewCtrlr;
     }
-
     /**
      * Getter.
      * 
@@ -143,7 +174,6 @@ public class TreeViewController extends NUIController implements Observer {
     public Pane getSearchViewPane() {
         return searchViewPane;
     }
-
     /**
      * Getter.
      * 
@@ -152,7 +182,14 @@ public class TreeViewController extends NUIController implements Observer {
     public VBox getTreeViewPane() {
         return treeViewPane;
     }
-
+    public final void openFilterView() {
+        if (filterViewHBox != null || fltrVwCtrlr != null) {
+            fltrVwCtrlr.initializeFiltering(filteringHandler, treeViewPane);
+            if (!treeViewPane.getChildren().contains(filterViewHBox)) {
+                treeViewPane.getChildren().add(filterViewHBox);
+            }
+        }
+    }
     /**
      * Opens the search View or moves the focus to the search views text field
      * if a search view already exists.
@@ -161,32 +198,13 @@ public class TreeViewController extends NUIController implements Observer {
      */
     public final void openSearchView() {
 
-        if (searchViewPane != null || searchViewController != null) {
+        if (searchViewPane != null || searchViewCtrlr != null) {
 
-            searchViewController.initSearch(proofTreeView, proofTreeCells, treeViewPane);
+            searchViewCtrlr.initSearch(proofTreeView, proofTreeCells, treeViewPane);
 
             if (!treeViewPane.getChildren().contains(searchViewPane)) {
                 treeViewPane.getChildren().add(searchViewPane);
             }
-        }
-    }
-
-    private Pane filterViewHBox;
-    private FilterViewController filterViewController;
-
-    public final void openFilterView() {
-        if (filterViewHBox != null || filterViewController != null) {
-            filterViewController.initializeFiltering(filteringHandler, treeViewPane);
-            if (!treeViewPane.getChildren().contains(filterViewHBox)) {
-                treeViewPane.getChildren().add(filterViewHBox);
-            }
-        }
-    }
-
-    public void addFilterView(final Pane filterViewHBox, final NUIController nuiController) {
-        this.filterViewHBox = filterViewHBox;
-        if (nuiController instanceof FilterViewController) {
-            this.filterViewController = (FilterViewController) nuiController;
         }
     }
 
@@ -198,6 +216,22 @@ public class TreeViewController extends NUIController implements Observer {
      */
     public void setFilteringHandler(final FilteringHandler filteringHandler) {
         this.filteringHandler = filteringHandler;
+    }
+
+    /**
+     * Setter.
+     * @param filterViewHBox the filter view {@link HBox} you want to set.
+     */
+    public void setFilterViewHBox(final Pane filterViewHBox) {
+        this.filterViewHBox = filterViewHBox;
+    }
+
+    /**
+     * Setter.
+     * @param fltrVwCtrlr the {@link FilterViewController} you want to set.
+     */
+    public void setFltrVwCtrlr(final FilterViewController fltrVwCtrlr) {
+        this.fltrVwCtrlr = fltrVwCtrlr;
     }
 
     /**
@@ -223,11 +257,11 @@ public class TreeViewController extends NUIController implements Observer {
     /**
      * Setter.
      * 
-     * @param searchViewController
+     * @param srchVwCtrlr
      *            the {@link SearchViewController} you want to set.
      */
-    public void setSearchViewController(final SearchViewController searchViewController) {
-        this.searchViewController = searchViewController;
+    public void setSearchViewCtrlr(final SearchViewController srchVwCtrlr) {
+        this.searchViewCtrlr = srchVwCtrlr;
     }
 
     /**
@@ -254,16 +288,13 @@ public class TreeViewController extends NUIController implements Observer {
     public void update(final Observable obs, final Object arg) {
         if (obs instanceof DataModel) {
             final TreeViewState treeViewState = ((DataModel) obs).getTreeViewState((String) arg);
-            final ProofTreeItem treeItem;
+            // update the proofTreeView component in the treeView
             if (treeViewState == null) {
-                treeItem = null;
+                proofTreeView.setRoot(null);
             }
             else {
-                treeItem = treeViewState.getTreeItem();
+                proofTreeView.setRoot(treeViewState.getTreeItem());
             }
-
-            // update the proofTreeView component in the treeView
-            proofTreeView.setRoot(treeItem);
         }
     }
 

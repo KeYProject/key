@@ -59,6 +59,7 @@ public class FilterCombineAND implements ProofTreeFilter {
     }
 
     @Override
+    @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
     public boolean test(final NUINode node) {
         return filter1.test(node) && filter2.test(node);
     }

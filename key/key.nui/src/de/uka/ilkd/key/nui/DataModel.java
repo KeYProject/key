@@ -138,7 +138,7 @@ public class DataModel extends Observable {
      */
     public void removeProof(final String proofName) {
         if (loaddTriVwStat.equals(treeViewStates.get(proofName))) {
-            loaddTriVwStat = null;
+            setLoaddTriVwStat(null);
         }
         treeViewStates.remove(proofName);
         this.setChanged();

@@ -235,7 +235,7 @@ public class FilteringHandler {
          * @throws IOException
          *             Rethrow this as a runtime exception.
          */
-        @SuppressWarnings("PMD.AvoidInstantiatingObjectsInsideLoops")
+        @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
         private SimpleImmutableEntry<List<URL>, List<String>> getFilterFilesInJar(
                 final File jarFile) throws IOException {
             final JarFile jar = new JarFile(jarFile);

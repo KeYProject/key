@@ -7,6 +7,8 @@ import javafx.scene.control.Alert.AlertType;
  * @author Florian Breitfelder
  *
  */
+@SuppressWarnings("PMD.AtLeastOneConstructor")
+//PMD will also complain if adding the constructor, then saying "avoid useless constructors"
 public class NUIException extends Exception {
 
     /**

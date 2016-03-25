@@ -101,13 +101,13 @@ public class NUIBranchNode extends NUINode {
 
         // case: Non-Empty search term given
 
-        final boolean thisIsASearchResult = getLabel().toLowerCase().contains(term.toLowerCase());
+        final boolean iAmASrchRslt = getLabel().toLowerCase().contains(term.toLowerCase());
 
-        setSearchResult(thisIsASearchResult);
+        setSearchResult(iAmASrchRslt);
         return children.stream()/*.parallel()*/.mapToInt((child) -> child.search(term)).sum()
                 // CHECKSTYLE.OFF: AvoidInlineConditionalsCheck
                 // -- this is much more readable than any alternative.
-                + (thisIsASearchResult ? 1 : 0);
+                + (iAmASrchRslt ? 1 : 0);
                 // CHECKSTYLE.ON: AvoidInlineConditionalsCheck
     }
 

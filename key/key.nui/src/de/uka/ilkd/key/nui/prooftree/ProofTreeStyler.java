@@ -335,7 +335,7 @@ public final class ProofTreeStyler {
 
         // initialize default styles for interactive leaf nodes
         leafNodeInteractv = new StyleConfiguration();
-        leafNodeInteractv.addCssClass(ProofTreeStyleConstants.CSS_NODE_INTERACTIVE);
+        leafNodeInteractv.addCssClass(ProofTreeStyleConstants.CSS_NODE_NTRACTV);
         leafNodeInteractv.addCssClass(ProofTreeStyleConstants.CSS_NODE_LEAF);
         leafNodeInteractv.setIconImage(IconFactory.LEAF_INTERACTIVE);
 

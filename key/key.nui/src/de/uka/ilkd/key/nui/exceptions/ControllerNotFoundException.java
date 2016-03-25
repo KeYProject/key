@@ -25,6 +25,7 @@ public class ControllerNotFoundException extends NUIException {
      *            The file causing this exception.
      */
     public ControllerNotFoundException(final String file) {
+        super();
         this.file = file;
     }
     /**

@@ -10,6 +10,8 @@ import de.uka.ilkd.key.nui.prooftree.NUINode;
  * 
  * @author Matthias Schultheis
  */
+@SuppressWarnings("PMD.AtLeastOneConstructor")
+//PMD will also complain if adding the constructor, then saying "avoid useless constructors"
 public class FilterMultiple implements ProofTreeFilter {
 
     /**
@@ -53,11 +55,12 @@ public class FilterMultiple implements ProofTreeFilter {
      * @param filters
      *            The list of filters.
      */
-    public void setAllFilters(final List<ProofTreeFilter> filters) {
+    public void setFilters(final List<ProofTreeFilter> filters) {
         this.filters = filters;
     }
 
     @Override
+    @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
     public boolean test(final NUINode node) {
         for (final Predicate<NUINode> filter : filters) {
             if (!filter.test(node)) {

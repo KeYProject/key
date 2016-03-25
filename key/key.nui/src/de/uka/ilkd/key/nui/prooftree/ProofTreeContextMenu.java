@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.nui.prooftree;
 
-import java.util.Map;
 import java.util.Map.Entry;
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.controller.TreeViewController;
@@ -30,7 +29,7 @@ public class ProofTreeContextMenu extends ContextMenu {
     /**
      * The label of the context menu "collapse below" label.
      */
-    private static final String LBL_COLLAPSE_BELOW = "Collapse Below";
+    private static final String LBL_COLLAPSE_BELOW = "Collapse Below"; //NOPMD naming is fine
 
     /**
      * The label of the context menu "expand all" label.
@@ -71,7 +70,7 @@ public class ProofTreeContextMenu extends ContextMenu {
     /**
      * The reference to the TreeViewController associated with the TreeView.
      */
-    private TreeViewController treeViewController;
+    private TreeViewController triVwCtrlr;
 
     /**
      * The constructor.
@@ -96,7 +95,7 @@ public class ProofTreeContextMenu extends ContextMenu {
 
         this.icf = icf;
         this.filteringHandler = filteringHandler;
-        this.treeViewController = tvc;
+        this.triVwCtrlr = tvc;
 
         // Add dummy so that the context menu can be displayed.
         // It is put in in the method "show".
@@ -144,8 +143,8 @@ public class ProofTreeContextMenu extends ContextMenu {
      * 
      * @return the {@link TreeViewController}
      */
-    public TreeViewController getTreeViewController() {
-        return treeViewController;
+    public TreeViewController getTriVwCtrlr() {
+        return triVwCtrlr;
     }
 
     /**
@@ -154,8 +153,8 @@ public class ProofTreeContextMenu extends ContextMenu {
      * @param treeVC
      *            the {@link TreeViewController} you want to set.
      */
-    public void setTreeViewController(final TreeViewController treeVC) {
-        this.treeViewController = treeVC;
+    public void setTriVwCtrlr(final TreeViewController treeVC) {
+        this.triVwCtrlr = treeVC;
     }
 
     /**
@@ -251,7 +250,7 @@ public class ProofTreeContextMenu extends ContextMenu {
         getItems().add(mISearch);
         mISearch.setGraphic(icf.getImage(IconFactory.SEARCH));
         mISearch.setAccelerator(KeyCombination.keyCombination("Ctrl+F"));
-        mISearch.setOnAction(aEvt -> treeViewController.openSearchView());
+        mISearch.setOnAction(aEvt -> triVwCtrlr.openSearchView());
     }
 
     /**
@@ -277,7 +276,15 @@ public class ProofTreeContextMenu extends ContextMenu {
         final MenuItem mIFilter = new MenuItem(LBL_FILTER);
         getItems().add(mIFilter);
         mIFilter.setAccelerator(KeyCombination.keyCombination("Ctrl+G"));
-        mIFilter.setOnAction(event -> treeViewController.openFilterView());
+        mIFilter.setOnAction(event -> triVwCtrlr.openFilterView());
+    }
+
+    /**
+     * Getter.
+     * @return the {@link FilteringHandler}
+     */
+    public FilteringHandler getFilteringHandler() {
+        return filteringHandler;
     }
 
 }

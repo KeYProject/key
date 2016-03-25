@@ -100,7 +100,7 @@ public class ProofTreeItem extends TreeItem<NUINode> {
 
             // check recursively if any child in this subtree is supposed to be
             // displayed after filtering
-            for (ProofTreeItem child : internalChildren) {
+            for (final ProofTreeItem child : internalChildren) {
                 if (child.filter(filter)) {
                     allChildrenHidden = false;
                 }

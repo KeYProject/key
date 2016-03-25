@@ -8,6 +8,8 @@ import de.uka.ilkd.key.nui.prooftree.NUINode;
  * @author Matthias Schultheis
  *
  */
+@SuppressWarnings("PMD.AtLeastOneConstructor")
+//PMD will also complain if adding the constructor, then saying "avoid useless constructors"
 public class FilterShowAll implements ProofTreeFilter {
 
     @Override
@@ -16,6 +18,7 @@ public class FilterShowAll implements ProofTreeFilter {
     }
 
     @Override
+    @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
     public boolean test(final NUINode node) {
         return true;
     }

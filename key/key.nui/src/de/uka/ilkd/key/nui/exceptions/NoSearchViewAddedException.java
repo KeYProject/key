@@ -8,6 +8,8 @@ package de.uka.ilkd.key.nui.exceptions;
  * @author Florian Breitfelder
  *
  */
+@SuppressWarnings("PMD.AtLeastOneConstructor")
+// PMD will also complain if adding the constructor, then saying "avoid useless constructors"
 public class NoSearchViewAddedException extends NUIException {
 
     /**

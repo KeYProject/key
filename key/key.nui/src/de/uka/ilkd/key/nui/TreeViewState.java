@@ -16,7 +16,7 @@ public class TreeViewState {
      * Indicates whether the proof was modified after loading it into the
      * treeView.
      */
-    private boolean isModified;
+    private transient boolean hasBeenModified;
 
     /**
      * The proof file of the state.
@@ -67,7 +67,7 @@ public class TreeViewState {
      * @return the status of the changes at the proof file.
      */
     public boolean isModified() {
-        return this.isModified;
+        return this.hasBeenModified;
     }
 
     /**
@@ -81,7 +81,7 @@ public class TreeViewState {
      *            the file as changed and FALSE as unchanged.
      */
     protected void setModified(final boolean bool) {
-        this.isModified = bool;
+        this.hasBeenModified = bool;
     }
 
     /**

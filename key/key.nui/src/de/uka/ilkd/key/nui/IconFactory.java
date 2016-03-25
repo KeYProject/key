@@ -66,7 +66,7 @@ public class IconFactory {
     /**
      * An HashMap for storing loaded icon images.
      */
-    private final Map<String, Image> icons = new HashMap<>();
+    private final Map<String, Image> icons = new HashMap<>(); //NOPMD -- thread safety unneeded
 
     /**
      * The height of produced icons in pixels.

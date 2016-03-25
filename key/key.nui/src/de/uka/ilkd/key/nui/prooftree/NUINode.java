@@ -26,6 +26,8 @@ import javafx.beans.value.ChangeListener;
  * @author Patrick Jattke
  *
  */
+@SuppressWarnings("PMD.AtLeastOneConstructor")
+//PMD will also complain if adding the constructor, then saying "avoid useless constructors"
 public abstract class NUINode {
     /**
      * Marks if the node has the active property.
