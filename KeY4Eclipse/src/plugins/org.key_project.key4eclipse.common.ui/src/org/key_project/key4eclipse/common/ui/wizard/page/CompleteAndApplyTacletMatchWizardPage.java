@@ -244,7 +244,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       assumptionViewGrp.setText("Assumption instantiation");
       assumptionsStackLayout = new StackLayout();
       assumptionViewGrp.setLayout(assumptionsStackLayout);
-      for(int i = 0; i< models.length; i++) {
+      for (int i = 0; i < models.length; i++) {
          mkAssumptionsSpec(0);
       }
    }
