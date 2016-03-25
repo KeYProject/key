@@ -80,7 +80,15 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
     * The KeY Environment.
     */
    private KeYEnvironment<DefaultUserInterfaceControl> environment = null;
-   private boolean checked_initial;
+   
+   /**
+    * Indicates whether minimize Interactions was checked initially.
+    */
+   private boolean checkedInitial;
+   
+   /**
+    * Indicates whether the minimize interactions had to be toggled.
+    */
    private boolean flipped = false;
 
    /**
@@ -272,9 +280,9 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
          throw run.getException();
       }
       
-      checked_initial = bot.toolbarToggleButtonWithTooltip("Minimize Interactions").isChecked();
+      checkedInitial = bot.toolbarToggleButtonWithTooltip("Minimize Interactions").isChecked();
       //Unminimize Interactions, so that we can use the required Taclets.
-      if(checked_initial){
+      if (checkedInitial) {
          flipped = true;
          TestUtilsUtil.clickDirectly(bot.toolbarToggleButtonWithTooltip("Minimize Interactions"));
       }
@@ -311,7 +319,7 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
          dialogShell = null;
       }
       //restore Interactions
-      if (flipped && bot.toolbarToggleButtonWithTooltip("Minimize Interactions").isChecked() != checked_initial) {
+      if (flipped && bot.toolbarToggleButtonWithTooltip("Minimize Interactions").isChecked() != checkedInitial) {
          TestUtilsUtil.clickDirectly(bot.toolbarToggleButtonWithTooltip("Minimize Interactions"));
       }
       
