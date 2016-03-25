@@ -13,6 +13,7 @@
 
 package org.key_project.keyide.ui.editor;
 
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.eclipse.jface.action.MenuManager;
@@ -76,15 +77,30 @@ public class TacletContextMenu extends ExtensionContributionFactory {
             }
             // Add macros
             MenuManager macroMenu = new MenuManager("Strategy macros");
+            HashMap<String, MenuManager> subMenus = new HashMap<String, MenuManager>();
             Iterable<ProofMacro> allMacros = ProofMacroMenu.REGISTERED_MACROS;
             for (ProofMacro macro : allMacros) {
-               if (macro.canApplyTo(goal.node(), pos.getPosInOccurrence())) {
-                  CommandContributionItemParameter p = new CommandContributionItemParameter(serviceLocator, "", "org.key_project.keyide.ui.commands.applyrule", SWT.PUSH);
-                  p.label = macro.getName();
-                  MacroCommandContributionItem item = new MacroCommandContributionItem(p, goal.node(), macro, keyEditor.getUI(), pos);
-                  item.setVisible(true);
-                  macroMenu.add(item);
-               }
+            	if (pos != null) {
+                    if (macro.canApplyTo(goal.node(), pos.getPosInOccurrence())) {
+                        CommandContributionItemParameter p = new CommandContributionItemParameter(serviceLocator, "", "org.key_project.keyide.ui.commands.applyrule", SWT.PUSH);
+                        p.label = macro.getName();
+                        MacroCommandContributionItem item = new MacroCommandContributionItem(p, goal.node(), macro, keyEditor.getUI(), pos);
+                        item.setVisible(true);
+                        String cat = macro.getCategory();
+                        if (cat == null) {
+                      	  macroMenu.add(item);
+                        } else if (subMenus.containsKey(cat)) {
+                      	  subMenus.get(cat).add(item);
+                        } else {
+                      	  MenuManager subMenu = new MenuManager(cat);
+                      	  subMenu.add(item);
+                      	  subMenus.put(cat, subMenu);
+                        }
+                     }
+            	}
+            }
+            for (String category : subMenus.keySet())  {
+            	macroMenu.add(subMenus.get(category));
             }
             additions.addContributionItem(macroMenu, null); 
          }

@@ -244,7 +244,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       assumptionViewGrp.setText("Assumption instantiation");
       assumptionsStackLayout = new StackLayout();
       assumptionViewGrp.setLayout(assumptionsStackLayout);
-      for(int i = 0; i< models.length; i++) {
+      for (int i = 0; i < models.length; i++) {
          mkAssumptionsSpec(0);
       }
    }
@@ -381,10 +381,14 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       table.setLinesVisible(true);
    }
    
-   private void mkAssumptionsSpec(final int id){
+   /**
+    * Constructs a assumptions specification specification composite - one combo per assumption.
+    * @param id the id of the model to use.
+    */
+   private void mkAssumptionsSpec(final int id) {
       final TacletInstantiationModel model = models[id];
       Composite ifSelectionViewComposite = new Composite(assumptionViewGrp, SWT.NONE);
-      ifSelectionViewComposite.setLayout(new GridLayout(2, false));
+      ifSelectionViewComposite.setLayout(new GridLayout(2, true));
       final Services svc = model.proof().getServices();
       
       //For each required Assumption:
@@ -397,12 +401,13 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
          final TacletAssumesModel tam = model.ifChoiceModel(i);
          //combo box
          final Combo c = new Combo(ifSelectionViewComposite, SWT.DROP_DOWN);
+         c.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
          final int ifChoiceModelID = i;
          int manualInputIDTemp = -1;
          //combo box contents:
          for (int j = 0; j < tam.getSize(); j++) {
-            String ifSelection =tam.getElementAt(j).toString(svc);
-            if(! ifSelection.equals("Manual Input")) {
+            String ifSelection = tam.getElementAt(j).toString(svc);
+            if (!ifSelection.equals("Manual Input")) {
                c.add(ifSelection);
             } else {
                //Do not use Manual Input items, instead keep their position for later use.
@@ -435,6 +440,8 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
                   //Existing Selection
                   tam.setSelectedItem(tam.getElementAt(index));
                }
+               validationViewUpdate();
+               
             }
          });
       }

@@ -74,13 +74,12 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
    }
    
    /**
-    * Removes the given method return.
-    * @param methodReturn The method return to be deleted.
+    * Removes the given {@link IExecutionBaseMethodReturn}.
+    * @param methodReturn The {@link IExecutionBaseMethodReturn} to be deleted.
     * @author Anna Filighera
     */
    public void removeMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
-      System.out.println("it's removing");
-      methodReturns.removeAll(methodReturn);
+      methodReturns = methodReturns.removeAll(methodReturn);
    }
    
    /**

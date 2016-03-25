@@ -63,7 +63,7 @@ public abstract class AbstractExecutionBlockStartNode<S extends SourceElement> e
     * @author Anna Filighera
     */
    public void removeBlockCompletion(IExecutionNode<?> completion) {
-      blockCompletions.removeAll(completion);
+      blockCompletions = blockCompletions.removeAll(completion);
    }
    
    /**

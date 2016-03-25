@@ -191,6 +191,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		if (element instanceof Node) {
 			// Iterate back in parent hierarchy until a branching node is found
 			Node nonBranchingNode = (Node) element;
+
 			if (!showSubtree) {
    			while (nonBranchingNode.parent() != null
    					&& nonBranchingNode.parent().childrenCount() == 1) {
@@ -428,6 +429,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 *         in its branch.
 	 */
 	protected Node getBranchNode(Node node) {
+		
 	   if (!showSubtree) {
    		while (true) {
    			if (node.equals(node.proof().root())
@@ -470,8 +472,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 			childCount = getBranchFolderChildCount(node);
 		}
 		if (parent instanceof Proof) {
-			Proof proof = (Proof) parent;
-			node = proof.root();
+
+			Proof currentProof = (Proof) parent;
+			node = currentProof.root();
 			if (showSubtree) {
 			   node = newRoot;
 			}
