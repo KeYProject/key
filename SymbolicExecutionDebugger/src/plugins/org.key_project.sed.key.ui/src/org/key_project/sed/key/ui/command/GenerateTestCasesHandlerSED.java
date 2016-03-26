@@ -14,8 +14,16 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
 
+/**
+ * Class to handle the generate test cases command on {@link ManualView}.
+ * @author Seena Vellaramkalayil
+ *
+ */
 public class GenerateTestCasesHandlerSED extends AbstractSaveExecutionHandler {
 
+   /**
+    * {@inheritDoc}
+    */
    @Override
    protected Object doExecute(ExecutionEvent event) throws Exception {
       if (AbstractTestGenerator.isSolverAvailable()) {
@@ -30,9 +38,9 @@ public class GenerateTestCasesHandlerSED extends AbstractSaveExecutionHandler {
                }
             }
          }
-      }
-      else {
-         MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error", "SMT Solver '" + SolverType.Z3_CE_SOLVER + "' is not available.\nPlease configure the SMT Solver Options in the main window of KeY.");
+      } else {
+         MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error", "SMT Solver '" + SolverType.Z3_CE_SOLVER 
+                                 + "' is not available.\nPlease configure the SMT Solver Options in the main window of KeY.");
       }
       return null;
    }
