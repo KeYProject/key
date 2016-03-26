@@ -201,7 +201,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
    				nonBranchingNode = nonBranchingNode.parent();
    			}
 			} else {
-			   while (nonBranchingNode != newRoot && nonBranchingNode.parent().childrenCount() == 1 && nonBranchingNode.parent() != null) {
+			   while (nonBranchingNode != newRoot && nonBranchingNode.parent() != null && nonBranchingNode.parent().childrenCount() == 1) {
 			      nonBranchingNode = nonBranchingNode.parent();
 			   }
 			   if (nonBranchingNode == newRoot || nonBranchingNode == proof.root()) {
@@ -373,6 +373,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 					termination = true;
 				}
 			}
+			if (showSubtree && branchNode == newRoot) {
+			   count = 1;
+			}
 			
 			while (branchNode.childrenCount() == 1) {
 				branchNode = branchNode.child(0);
@@ -389,7 +392,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 			
 			// if no execution node was found
 			if (count == 0) {
-				while (startNode.parent() != null) {
+				while (startNode.parent() != null && !showSubtree || branchNode != newRoot && showSubtree) {
 					startNode = startNode.parent();
 					if (isExecutionNode(startNode)) {
 						if (SymbolicExecutionUtil.isTerminationNode(startNode, startNode.getAppliedRuleApp())) {
@@ -517,7 +520,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 				// if not was not found in subtree
 				Node parentNode = startNode;
 				if (count < index) {
-					while (parentNode.parent() != null) {
+					while (parentNode.parent() != null && !showSubtree || parentNode != newRoot && showSubtree) {
 						parentNode = parentNode.parent(); 
 						if (SymbolicExecutionUtil.isTerminationNode(parentNode, parentNode.getAppliedRuleApp())) {
 							node = startNode;
@@ -597,7 +600,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 				Node node = (Node) element;
 				if (!isExecutionNode(node)) {
 					Node parentNode = node;
-					while (parentNode.parent() != null) {
+					while (parentNode.parent() != null && !showSubtree || parentNode != newRoot && showSubtree) {
 						parentNode = parentNode.parent();
 						if (SymbolicExecutionUtil.isTerminationNode(parentNode, parentNode.getAppliedRuleApp())) {
 							if (getParent(parentNode) != getParent(node)) {

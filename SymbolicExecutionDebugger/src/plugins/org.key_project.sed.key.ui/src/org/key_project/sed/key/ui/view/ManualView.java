@@ -361,7 +361,9 @@ public class ManualView extends AbstractViewBasedView {
 		Node selectedNode = getSelectedNode();
 		contentProvider.setHideState((boolean) state.getValue());
 		getTreeViewer().setInput(proof);
-		selectNodeThreadSafe(selectedNode);
+		if (selectedNode != null) {
+		   selectNodeThreadSafe(selectedNode);
+		}
 	}
 	
 	/**
@@ -373,7 +375,9 @@ public class ManualView extends AbstractViewBasedView {
 		Node selectedNode = getSelectedNode();
 		contentProvider.setSymbolicState((boolean) state.getValue());
 		getTreeViewer().setInput(proof);
-		selectNodeThreadSafe(selectedNode);
+		if (selectedNode != null) {
+		   selectNodeThreadSafe(selectedNode);
+		}
 	}
    
 	/**
