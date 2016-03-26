@@ -31,6 +31,10 @@ import de.uka.ilkd.key.rule.TacletApp;
  */
 public class RuleAppContextMenu extends ExtensionContributionFactory {
 
+   
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public void createContributionItems(IServiceLocator serviceLocator,
          IContributionRoot additions) {
@@ -41,6 +45,7 @@ public class RuleAppContextMenu extends ExtensionContributionFactory {
          Goal goal = view.getProof().getGoal(node);
          if (goal != null) {
             PosInSequent position = view.getSelectedPosInSequent();
+            // Add taclet apps
             ImmutableList<TacletApp> appList = KeYIDEUtil.findTaclets(view.getEnvironment().getUi(),
                                                                       goal, position);
             if (appList != null) {
@@ -56,6 +61,7 @@ public class RuleAppContextMenu extends ExtensionContributionFactory {
                   additions.addContributionItem(item, null);
                }
             }
+            // Add built in rules
             ImmutableList<BuiltInRule> builtInRules = KeYIDEUtil.findBuiltInRules(view.getEnvironment().getUi(), goal, position);
             for (BuiltInRule rule: builtInRules) {
                CommandContributionItemParameter p = new CommandContributionItemParameter(serviceLocator, "", 
@@ -68,7 +74,7 @@ public class RuleAppContextMenu extends ExtensionContributionFactory {
             }
             
             
-         // Add macros
+            // Add macros
             MenuManager macroMenu = new MenuManager("Strategy macros");
             Iterable<ProofMacro> allMacros = ProofMacroMenu.REGISTERED_MACROS;
             for (ProofMacro macro : allMacros) {
