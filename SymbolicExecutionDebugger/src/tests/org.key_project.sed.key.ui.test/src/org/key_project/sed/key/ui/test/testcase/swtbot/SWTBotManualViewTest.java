@@ -152,6 +152,8 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
 				assertTrue(manualView.bot().tree().getTreeItem("8:result=self.equals(n)@Number;") != null);
 				assertTrue(manualView.bot().tree().getTreeItem("10:if (this.content==n.content) {                         return  true; }                 else  {                         return  false; }") != null);
 				assertTrue(manualView.bot().tree().rowCount() == 3);
+				// deactivate show symbolic execution tree filter
+				TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Show Symbolic Execution Tree Only");
 				// close the bot view
 				manualView.close();
 			}
