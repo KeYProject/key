@@ -6,10 +6,9 @@ import org.junit.Test;
 
 /**
  * Test for User Story.
- * (010) Laden von Beweisen #14664.
- * 
- * Using: example01.proof; example02.proof
- * 
+ * - #14664 Laden von Beweisen
+ * - #15076 Laden von .key-Dateien
+ *  
  * @author Florian Breitfelder
  *
  */

@@ -15,7 +15,8 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
- * Test for User Story (005). Laden von Beweisen #14469
+ * Test for User Story.
+ * - #14469 Suchen im Beweisbaum
  * 
  * @author Patrick Jattke
  *

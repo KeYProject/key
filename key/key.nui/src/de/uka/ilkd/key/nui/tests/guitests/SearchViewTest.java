@@ -1,22 +1,32 @@
 package de.uka.ilkd.key.nui.tests.guitests;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import de.uka.ilkd.key.nui.TreeViewState;
+import de.uka.ilkd.key.nui.controller.TreeViewController;
+import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
+import de.uka.ilkd.key.nui.prooftree.NUINode;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 
 /**
- * Test for User Story. (005) Suchen im Beweisbaum #14469
- * 
- * Basic tests for treeView Component.
+ * Test for User Story.
+ * - #14469 Suchen im Beweisbaum
+ * - #15081 Rückmeldung im Falle keiner Suchergebnisse
  * 
  * @author Florian Breitfelder
  *
  */
 public class SearchViewTest extends NUITest {
+
+    public int numberOfResults = 0;
 
     /**
      * Test for searching in the tree by invoking the search with CTRL+F.
@@ -78,6 +88,147 @@ public class SearchViewTest extends NUITest {
         final Label label = ((Label) find("#statustext"));
         // Loading process was canceled
         assertTrue(label.getText().equals(resultStatusBar));
+    }
+
+    /**
+     * Test for searching in the tree by invoking the search with the context
+     * menu.
+     */
+    @Test
+    public void checkTreeItems() throws InterruptedException {
+        TreeViewState treeViewState = null;
+        ProofTreeItem rootProofTreeItem = null;
+
+        // load prooffile example01.proof
+        this.loadProof("example01.proof", false);
+
+        // expand tree
+        this.rightClickOn("Proof Tree ");
+        this.clickOn("Expand All");
+
+        // open searchView via contextmenu
+        this.rightClickOn("Proof Tree ");
+        this.clickOn("Search");
+
+        this.checkSearchResult("no matches!", "Number of Search Results: 0");
+
+        // Load model
+        treeViewState = dataModel.getLoaddTriVwStat();
+        rootProofTreeItem = treeViewState.getTreeItem();
+
+        // walk through the tree
+        assertEquals(0,
+                checkTreeItemsSearchResult(rootProofTreeItem, "no matches!"));
+
+        this.checkSearchResult("and", "Number of Search Results: 22");
+
+        // Load model
+        treeViewState = dataModel.getLoaddTriVwStat();
+        rootProofTreeItem = treeViewState.getTreeItem();
+
+        // walk through the tree
+        assertEquals(22, checkTreeItemsSearchResult(rootProofTreeItem, "and"));
+
+        this.checkSearchResult("or", "Number of Search Results: 31");
+
+        // Load model
+        treeViewState = dataModel.getLoaddTriVwStat();
+        rootProofTreeItem = treeViewState.getTreeItem();
+
+        // walk through the tree
+        assertEquals(31, checkTreeItemsSearchResult(rootProofTreeItem, "or"));
+    }
+
+    /**
+     * Used to check if every tree item which contains the searchText is
+     * highlighted.
+     * 
+     * @param proofTreeItem
+     *            root of current subtree
+     * @param searchText
+     * @return number of search results
+     */
+    private int checkTreeItemsSearchResult(ProofTreeItem proofTreeItem,
+            final String searchText) {
+        this.numberOfResults = 0;
+
+        treeDown(proofTreeItem, searchText);
+
+        return this.numberOfResults;
+    }
+
+    /**
+     * Used to walk through the tree recursively. Only for
+     * checkTreeItemsSearchResult
+     * 
+     * @param proofTreeItem
+     */
+    private void treeDown(ProofTreeItem proofTreeItem,
+            final String searchText) {
+        for (int i = 0; i < proofTreeItem.getInternalChildren().size(); i++) {
+            NUINode nuiNode = proofTreeItem.getInternalChildren().get(i)
+                    .getValue();
+            if (nuiNode.getLabel().toString().contains(searchText)) {
+                assertTrue(nuiNode.isSearchResult());
+                numberOfResults++;
+            }
+            treeDown(proofTreeItem.getInternalChildren().get(i), searchText);
+        }
+    }
+
+    /**
+     * Tests if search text field is highlighted if there are no search results
+     * 
+     * @throws ControllerNotFoundException
+     */
+    @Test
+    public void checkHighlightedNoResults()
+            throws InterruptedException, ControllerNotFoundException {
+        TreeViewController treeViewController = (TreeViewController) nui
+                .getController("treeViewPane");
+
+        // load prooffile example01.proof
+        this.loadProof("example01.proof", false);
+
+        // expand tree
+        this.rightClickOn("Proof Tree ");
+        this.clickOn("Expand All");
+
+        // open searchView via contextmenu
+        this.rightClickOn("Proof Tree ");
+        this.clickOn("Search");
+
+        this.checkSearchResult("and", "Number of Search Results: 22");
+        assertFalse(this.highlightedNoResults(
+                treeViewController.getSearchViewPane().getChildren()));
+
+        this.checkSearchResult("no matches!", "Number of Search Results: 0");
+        assertTrue(this.highlightedNoResults(
+                treeViewController.getSearchViewPane().getChildren()));
+
+        this.checkSearchResult("or", "Number of Search Results: 31");
+        assertFalse(this.highlightedNoResults(
+                treeViewController.getSearchViewPane().getChildren()));
+    }
+
+    /**
+     * checks if search query text field is highlighted
+     * 
+     * @param children
+     *            list of nodes. Must contain text field tfSearchQuery
+     * 
+     * @return true if tfSearchQuery is highlighted
+     */
+    private boolean highlightedNoResults(ObservableList<Node> children) {
+        for (Node node : children) {
+            if (node.getId().equals("tfSearchQuery")
+                    && node instanceof TextField) {
+                TextField tfSearchQuery = (TextField) node;
+                return tfSearchQuery.getStyleClass()
+                        .contains("search-noResults");
+            }
+        }
+        return false;
     }
 
 }
