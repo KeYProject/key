@@ -406,7 +406,20 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
          completedBlocks = completedBlocks.append(completedBlock);
       }
    }
-
+   
+   /**
+    * Removes the given {@link IExecutionBlockStartNode} from registration.
+    * @param completedBlock The {@link IExecutionBlockStartNode} to be remove.
+    * @author Anna Filighera
+    */
+   public void removeCompletedBlock(IExecutionBlockStartNode<?> completedBlock) {
+      if (completedBlock != null && completedBlocks.contains(completedBlock)) {
+         completedBlocks = completedBlocks.removeAll(completedBlock);
+         blockCompletionConditions.remove(completedBlock);
+         formatedBlockCompletionConditions.remove(completedBlock);
+      }
+   }
+   
    /**
     * {@inheritDoc}
     */
@@ -477,14 +490,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
    /**
     * Removes the given child.
     * @param child The child to be removed.
+    * @author Anna Filighera
     */
    public void removeChild(IExecutionNode<?> child) {
       children.remove(child);
-   }
-   /**
-    * Removes all children.
-    */
-   public void removeAllChildren() {
-      children.clear();
    }
 }

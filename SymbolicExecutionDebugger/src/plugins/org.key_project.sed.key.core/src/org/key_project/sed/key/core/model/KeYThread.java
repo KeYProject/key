@@ -22,11 +22,13 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jdt.core.IMethod;
+import org.key_project.sed.core.model.ISEDebugElement;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISETermination;
 import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.model.impl.AbstractSEThread;
 import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
+import org.key_project.sed.core.util.SEPreorderIterator;
 import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
@@ -305,20 +307,28 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
     * @param e The event.
     */
    protected void handleProofPruned(ProofTreeEvent e) {
-	  HashSet<AbstractExecutionNode<?>> deletedExNodes = getBuilder().prune(e.getNode());
-      for (IKeYSENode<?> keyNode : children) {
-    	  if (keyNode instanceof KeYMethodCall) {
-    		  ArrayList<IExecutionBaseMethodReturn<?>> markedForDeletion = new ArrayList<IExecutionBaseMethodReturn<?>>();
-    		  for (IExecutionBaseMethodReturn<?> exReturn : ((KeYMethodCall) keyNode).getAllMethodReturns().keySet()) {
-    			  if (deletedExNodes.contains(exReturn)) {
-    				  markedForDeletion.add(exReturn);
-    			  }
-    		  }
-    		  for (IExecutionBaseMethodReturn<?> exReturn : markedForDeletion) {
-    			  ((KeYMethodCall) keyNode).removeMethodReturn(exReturn);
-    		  }
-    	  }
-      }
+	  HashSet<AbstractExecutionNode<?>> deletedExNodes = getBuilder().prune(e.getNode());	 
+	  SEPreorderIterator iter = new SEPreorderIterator(this);
+	  // iterate over key node tree and remove all pruned method returns
+	  try {
+      while (iter.hasNext()) {
+           ISEDebugElement keyNode = iter.next();
+           if (keyNode instanceof KeYMethodCall) {
+              ArrayList<IExecutionBaseMethodReturn<?>> markedForDeletion = new ArrayList<IExecutionBaseMethodReturn<?>>();
+              for (IExecutionBaseMethodReturn<?> exReturn : ((KeYMethodCall) keyNode).getAllMethodReturns().keySet()) {
+                  if (deletedExNodes.contains(exReturn)) {
+                      markedForDeletion.add(exReturn);
+                  }
+              }
+              for (IExecutionBaseMethodReturn<?> exReturn : markedForDeletion) {
+                  ((KeYMethodCall) keyNode).removeMethodReturn(exReturn);
+              }
+          }
+        }
+	  } catch (DebugException e1) {
+      LogUtil.getLogger().logError(e1);
+	  }
+	  // remove all pruned terminations
       ArrayList<IExecutionTermination> toBeDeleted = new ArrayList<IExecutionTermination>();
       for (IExecutionTermination termination : knownTerminations.keySet()) {
     	  if (deletedExNodes.contains(termination)) {
@@ -328,6 +338,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
       for (IExecutionTermination termination : toBeDeleted) {
     	  knownTerminations.remove(termination);
       }
+      // remove all pruned execution nodes from the debug target
       for (IExecutionNode<?> exNode : deletedExNodes) {
     	  getDebugTarget().removeExecutionNode(exNode);
       }
