@@ -58,6 +58,7 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
                throws Exception {
             SWTBotView view = getManualBotView(bot);
             ManualView manualView = getManualView(view);
+            debugView.bot().tree().select(0);
             assertNotNull(manualView.getProof());
             assertTrue(!manualView.getProof().closed());
             //make sure that both buttons are visible and correctly enabled
