@@ -512,6 +512,7 @@ public class SymbolicExecutionTreeBuilder {
       }
       // determine which nodes should be pruned
       ExecutionNodePreorderIterator subtreeToBePruned = new ExecutionNodePreorderIterator(firstFather);
+      // include the first execution node in the hierarchy only if it was pruned on 
       if (!pruneOnExNode) {
          subtreeToBePruned.next();
       }
@@ -540,7 +541,19 @@ public class SymbolicExecutionTreeBuilder {
       ExecutionNodePreorderIterator remainingExNodes = new ExecutionNodePreorderIterator(startNode);
       while (remainingExNodes.hasNext()) {
          AbstractExecutionNode<?> exNode = (AbstractExecutionNode<?>) remainingExNodes.next();
-         
+         LinkedList<IExecutionBlockStartNode<?>> deletedBlocks = new LinkedList<IExecutionBlockStartNode<?>>();
+         Iterator<IExecutionBlockStartNode<?>> blockIter = exNode.getCompletedBlocks().iterator();
+         // remove pruned completed blocks
+         while (blockIter.hasNext()) {
+            IExecutionBlockStartNode<?> block = blockIter.next();
+            if (exNodesToDelete.contains(block)) {
+               deletedBlocks.add(block);
+            }
+         }
+         for (IExecutionBlockStartNode<?> block : deletedBlocks) {
+            exNode.removeCompletedBlock(block);
+         }
+         // remove all pruned method returns
          if (exNode instanceof ExecutionMethodCall) {
             Iterator<IExecutionBaseMethodReturn<?>> iter = ((ExecutionMethodCall) exNode).getMethodReturns().iterator();
             LinkedList<IExecutionBaseMethodReturn<?>> removed = new LinkedList<IExecutionBaseMethodReturn<?>>();
@@ -554,6 +567,7 @@ public class SymbolicExecutionTreeBuilder {
                ((ExecutionMethodCall) exNode).removeMethodReturn(deleted);
             }
          }
+         // remove all pruned block completions 
          if (exNode instanceof AbstractExecutionBlockStartNode) {
             Iterator<IExecutionNode<?>> iter = ((AbstractExecutionBlockStartNode<?>) exNode).getBlockCompletions().iterator();
             LinkedList<IExecutionNode<?>> removed = new LinkedList<IExecutionNode<?>>();
@@ -567,6 +581,7 @@ public class SymbolicExecutionTreeBuilder {
                ((AbstractExecutionBlockStartNode<?>) exNode).removeBlockCompletion(deleted);
             }
          }  
+         // remove all pruned terminations
          if (exNode instanceof ExecutionStart) {
              Iterator<IExecutionTermination> iter = ((ExecutionStart) exNode).getTerminations().iterator();
              LinkedList<IExecutionTermination> removed = new LinkedList<IExecutionTermination>();
