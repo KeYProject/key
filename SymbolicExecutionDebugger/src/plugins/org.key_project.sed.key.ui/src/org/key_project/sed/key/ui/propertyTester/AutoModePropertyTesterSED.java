@@ -7,22 +7,36 @@ import org.key_project.util.eclipse.WorkbenchUtil;
 import de.uka.ilkd.key.control.ProofControl;
 
 /**
- * tests the properties that are needed for starting and stopping auto mode.
+ * tests the properties that are needed for starting and stopping auto mode on {@link ManualView}.
  * @author Seena Vellaramkalayil
  *
  */
 public class AutoModePropertyTesterSED extends PropertyTester {
 
+   /**
+    * the namespace of the property tester.
+    */
    public static final String PROPERTY_NAMESPACE = "org.key_project.sed.key.ui";
    
+   /**
+    * property "isAutoMode".
+    */
    public static final String PROPERTY_IS_AUTO_MODE = "isAutoMode";
    
+   /**
+    * property "isNotAutoMde".
+    */
    public static final String PROPERTY_IS_NOT_AUTOMODE = "isNotAutoMode";
    
+   /**
+    * property "proofIsNotClosed".
+    */
    public static final String PROPERTY_PROOF_NOT_CLOSED = "proofIsNotClosed";
    
    
-   
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public boolean test(Object receiver, String property, Object[] args,
          Object expectedValue) {

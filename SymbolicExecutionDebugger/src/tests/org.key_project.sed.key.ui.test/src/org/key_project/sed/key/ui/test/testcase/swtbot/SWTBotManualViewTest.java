@@ -152,6 +152,8 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
 				assertTrue(manualView.bot().tree().getTreeItem("8:result=self.equals(n)@Number;") != null);
 				assertTrue(manualView.bot().tree().getTreeItem("10:if (this.content==n.content) {                         return  true; }                 else  {                         return  false; }") != null);
 				assertTrue(manualView.bot().tree().rowCount() == 3);
+				// deactivate show symbolic execution tree filter
+				TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Show Symbolic Execution Tree Only");
 				// close the bot view
 				manualView.close();
 			}
@@ -394,6 +396,148 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
             10, 
             executor);
       
+   }
+   
+   /**
+    * Tests whether enabling the subtree filter works as expected.
+    * @throws Exception
+    */
+   @Test
+   public void testSubTreeFilterEnabled() throws Exception {
+      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+
+         @Override
+         public void configureDebugPerspective(SWTWorkbenchBot bot,
+               IPerspectiveDescriptor debugPerspective) throws Exception {
+            TestUtilsUtil.openView(ManualView.VIEW_ID);
+         }
+
+         @Override
+         public void test(SWTWorkbenchBot bot, IJavaProject project,
+               IMethod method, String targetName, SWTBotView debugView,
+               SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch)
+               throws Exception {
+            SWTBotView manualView = getManualBotView(bot);
+            //start auto mode.
+            TestUtilsUtil.clickDirectly(manualView.toolbarPushButton("Start Auto Mode"));
+            TestKeYUIUtil.waitWhileAutoMode(bot, getManualView(manualView).getEnvironment().getUi());
+            
+            //navigate to some location
+            SWTBotTreeItem subtree = manualView.bot().tree().getTreeItem("Normal Execution (n != null)").getNode("if x true").getNode("163:One Step Simplification: 7 rules");
+            subtree.select();
+            
+            //filter out the rest of the tree
+            TestUtilsUtil.clickDirectly(manualView.toolbarToggleButton("Show Subtree of Node"));
+            //subtree length should be 11
+            assert(manualView.bot().tree().getAllItems().length == 11);
+            
+            TestUtilsUtil.clickDirectly(manualView.toolbarToggleButton("Show Subtree of Node"));
+            
+            manualView.close();
+         }
+
+         @Override
+         public void cleanupDebugPerspective(SWTWorkbenchBot bot,
+               IPerspectiveDescriptor debugPerspective) throws Exception {
+            if (TestUtilsUtil.findView(ManualView.VIEW_ID) != null) {
+               TestUtilsUtil.closeView(ManualView.VIEW_ID);
+            }
+         }
+         
+      };
+      doKeYDebugTargetTest("SWTBotManualViewTest_testSourceViewer", 
+            Activator.PLUGIN_ID, 
+            "data/number/test", 
+            true, 
+            true, 
+            createMethodSelector("Number", "equals", "QNumber;"), 
+            null, 
+            null, 
+            Boolean.FALSE, 
+            Boolean.FALSE, 
+            Boolean.FALSE, 
+            Boolean.FALSE, 
+            Boolean.FALSE, 
+            Boolean.FALSE, 
+            Boolean.FALSE, 
+            Boolean.FALSE, 
+            Boolean.FALSE, 
+            Boolean.TRUE, 
+            10, 
+            executor);
+   }
+   
+   /**
+    * Tests whether enabling and then disabling the subtree filter works as expected.
+    * @throws Exception
+    */
+   @Test
+   //TODO
+   public void testSubTreeFilterDisabled() throws Exception{
+      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+
+         @Override
+         public void configureDebugPerspective(SWTWorkbenchBot bot,
+               IPerspectiveDescriptor debugPerspective) throws Exception {
+            TestUtilsUtil.openView(ManualView.VIEW_ID);
+         }
+
+         @Override
+         public void test(SWTWorkbenchBot bot, IJavaProject project,
+               IMethod method, String targetName, SWTBotView debugView,
+               SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch)
+               throws Exception {
+            SWTBotView manualView = getManualBotView(bot);
+            //start auto mode.
+            TestUtilsUtil.clickDirectly(manualView.toolbarPushButton("Start Auto Mode"));
+            TestKeYUIUtil.waitWhileAutoMode(bot, getManualView(manualView).getEnvironment().getUi());
+            
+            //navigate to some location
+            SWTBotTreeItem subtree = manualView.bot().tree().getTreeItem("Normal Execution (n != null)").getNode("if x true").getNode("163:One Step Simplification: 7 rules");
+            subtree.select();
+
+            //subtree length should be 21 - only counting one level of the tree
+            assert(manualView.bot().tree().getAllItems().length == 21);
+            
+            //briefly filter out the rest of the tree
+            TestUtilsUtil.clickDirectly(manualView.toolbarToggleButton("Show Subtree of Node"));
+            TestUtilsUtil.clickDirectly(manualView.toolbarToggleButton("Show Subtree of Node"));
+
+            //subtree length should be 21 again
+            assert(manualView.bot().tree().getAllItems().length == 21);
+            
+            manualView.close();
+         }
+
+         @Override
+         public void cleanupDebugPerspective(SWTWorkbenchBot bot,
+               IPerspectiveDescriptor debugPerspective) throws Exception {
+            if (TestUtilsUtil.findView(ManualView.VIEW_ID) != null) {
+               TestUtilsUtil.closeView(ManualView.VIEW_ID);
+            }
+         }
+         
+      };
+      doKeYDebugTargetTest("SWTBotManualViewTest_testSourceViewer", 
+            Activator.PLUGIN_ID, 
+            "data/number/test", 
+            true, 
+            true, 
+            createMethodSelector("Number", "equals", "QNumber;"), 
+            null, 
+            null, 
+            Boolean.FALSE, 
+            Boolean.FALSE, 
+            Boolean.FALSE, 
+            Boolean.FALSE, 
+            Boolean.FALSE, 
+            Boolean.FALSE, 
+            Boolean.FALSE, 
+            Boolean.FALSE, 
+            Boolean.FALSE, 
+            Boolean.TRUE, 
+            10, 
+            executor);
    }
    
    /**

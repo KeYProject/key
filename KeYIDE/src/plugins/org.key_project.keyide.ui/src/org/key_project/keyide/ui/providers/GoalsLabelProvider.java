@@ -26,7 +26,7 @@ public class GoalsLabelProvider extends LabelProvider {
    public String getText(Object element) {
       if (element instanceof Goal) {
          Goal goal = (Goal) element;
-         return "(#" + goal.node().serialNr() + ") " + goal.toString();
+         return getString(goal);
       }
       
       return ObjectUtil.toString(element);
@@ -44,5 +44,13 @@ public class GoalsLabelProvider extends LabelProvider {
       return super.getImage(element);
    }
    
+   /**
+    * static method to get the text to displayin the viewer.
+    * @param goal the {@link Goal} to be displayed
+    * @return the text to be displayed
+    */
+   public static String getString(Goal goal) {
+      return "(#" + goal.node().serialNr() + ") " + goal.toString();
+   }
 
 }

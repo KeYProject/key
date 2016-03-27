@@ -264,8 +264,18 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
 		Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pe);
 		if (bo instanceof ISENode) {
 			ISENode node = (ISENode) bo;
-			if (!node.hasChildren() && node.getParent() != null && !node.getParent().hasChildren()) {
-				return true;
+			if (!node.hasChildren() && node.getParent() != null) {
+				if (!node.getParent().hasChildren()) {
+					return true;
+				} else {
+					ISENode[] children = node.getParent().getChildren();
+					for (ISENode child: children) {
+						if (child == node) {
+							return false;
+						}
+					}
+					return true;
+				}
 			}
 		}
 		return false;

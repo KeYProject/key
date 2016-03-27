@@ -12,26 +12,30 @@ import org.key_project.util.eclipse.WorkbenchUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 
-public class StartAutoModeHandlerSED extends AbstractSaveExecutionHandler{
+/**
+ * Class to handle the start auto mode command in the {@link ManualView}.
+ * @author Seena Vellaramkalayil
+ *
+ */
+public class StartAutoModeHandlerSED extends AbstractSaveExecutionHandler {
 
    @Override
    protected Object doExecute(ExecutionEvent event) throws Exception {
-      // TODO Auto-generated method stub
     //initialize values for execution
     if (WorkbenchUtil.findView(ManualView.VIEW_ID) != null) {
        IViewPart viewPart = WorkbenchUtil.openView(ManualView.VIEW_ID);
        if (viewPart instanceof ManualView) {
-         final ManualView manualView = (ManualView)viewPart;
+         final ManualView manualView = (ManualView) viewPart;
          if (manualView.getProof() != null) {
-            if (!manualView.getEnvironment().getProofControl().isInAutoMode() &&
-                manualView.getProof() != null) {
+            if (!manualView.getEnvironment().getProofControl().isInAutoMode()
+                && manualView.getProof() != null) {
                new AbstractKeYEnvironmentJob("Auto Mode", manualView.getEnvironment()) {
                   // job that starts the automode in KeY
                   @Override
                   protected IStatus run(IProgressMonitor monitor) {
                      monitor.beginTask("Proving with KeY", IProgressMonitor.UNKNOWN);
                      Proof proof = manualView.getProof();
-                     proof.getActiveStrategy(); // Make sure that the strategy is initialized correctly, otherwise the used settings are different to the one defined by the strategysettings which are shown in the UI.
+                     proof.getActiveStrategy(); // Make sure that the strategy is initialized correctly
                      manualView.getEnvironment().getProofControl().startAndWaitForAutoMode(proof);
                      monitor.done();
                      return Status.OK_STATUS;
