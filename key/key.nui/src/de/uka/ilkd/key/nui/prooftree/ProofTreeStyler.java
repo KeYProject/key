@@ -257,6 +257,7 @@ public final class ProofTreeStyler {
      *            The node whose StyleConfiguration should be determined.
      * @return StyleConfiguration of the given node.
      */
+    @SuppressWarnings("PMD.CyclomaticComplexity") // this routine is actually quite simple
     public StyleConfiguration getStyleConfiguration(final NUINode node) {
         // if the node is branch node
         if (node instanceof NUIBranchNode) {

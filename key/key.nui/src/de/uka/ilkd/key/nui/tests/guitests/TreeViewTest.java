@@ -18,6 +18,9 @@ import javafx.scene.input.KeyCode;
  * @author Florian Breitfelder
  *
  */
+
+@SuppressWarnings("PMD.AtLeastOneConstructor")
+//PMD will also complain if adding the constructor, then saying "avoid useless constructors"
 public class TreeViewTest extends NUITest {
 
     @Test

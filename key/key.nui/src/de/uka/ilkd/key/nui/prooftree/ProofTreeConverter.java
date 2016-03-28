@@ -69,6 +69,7 @@ public class ProofTreeConverter {
     }
 
     /**
+     * Getter.
      * @return the root node of the converted tree.
      */
     public NUIBranchNode getRootNode() {

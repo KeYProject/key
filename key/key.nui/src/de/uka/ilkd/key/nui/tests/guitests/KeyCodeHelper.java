@@ -10,12 +10,14 @@ import javafx.scene.input.KeyCode;
  * @author Patrick Jattke
  *
  */
+@SuppressWarnings("PMD.BeanMembersShouldSerialize")
+// why would anyone ever serialize a Test class?
 public class KeyCodeHelper {
 
     /**
      * The {@link FxRobot} used to type in the {@link KeyCode KeyCodes}.
      */
-    private FxRobot robot;
+    private final FxRobot robot;
 
     /**
      * To use auto-type functionality the FxRobot {@link org.testfx.api.FxRobot}
@@ -42,35 +44,35 @@ public class KeyCodeHelper {
      * @return An array of KeyCodes representing the given word.
      */
     public KeyCode[] getKeyCode(final String term) {
-        final KeyCode[] c = new KeyCode[term.length()];
+        final KeyCode[] code = new KeyCode[term.length()];
         String current;
         for (int i = 0; i < term.length(); i++) {
             current = Character.toString(term.charAt(i));
             switch (current) {
             case ".":
-                c[i] = KeyCode.PERIOD;
+                code[i] = KeyCode.PERIOD;
                 break;
             case ",":
-                c[i] = KeyCode.COMMA;
+                code[i] = KeyCode.COMMA;
                 break;
             case " ":
-                c[i] = KeyCode.SPACE;
+                code[i] = KeyCode.SPACE;
                 break;
             case "/":
-                c[i] = KeyCode.SLASH;
+                code[i] = KeyCode.SLASH;
                 break;
             case "_":
-                c[i] = KeyCode.UNDERSCORE;
+                code[i] = KeyCode.UNDERSCORE;
                 break;
             case "-":
-                c[i] = KeyCode.MINUS;
+                code[i] = KeyCode.MINUS;
                 break;
             default:
-                c[i] = KeyCode.getKeyCode(current);
+                code[i] = KeyCode.getKeyCode(current);
                 break;
             }
         }
-        return c;
+        return code;
     }
 
     /**
@@ -79,7 +81,7 @@ public class KeyCodeHelper {
      * @param keys
      *            The array consisting of key codes.
      */
-    public void typeKeys(final KeyCode[] keys) {
+    public void typeKeys(final KeyCode... keys) {
         for (int i = 0; i < keys.length; i++) {
             if (keys[i] != null) {
                 robot.type(keys[i]);
