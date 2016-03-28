@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_9cca134a-c8fe-4542-9ea2-7fd9f8cabbf2" name="equals(Number)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_b0c9477b-5ee3-41c9-9692-76950656116e" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+         <sedMethodCall xml:id="_862e8183-4b09-4a8c-8a57-75cb6cb1bca4" name="&lt;call self.equals(n)&gt;" pathCondition="true" lineNumber="-1" charStart="64" charEnd="70" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java" groupable="true">
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>
