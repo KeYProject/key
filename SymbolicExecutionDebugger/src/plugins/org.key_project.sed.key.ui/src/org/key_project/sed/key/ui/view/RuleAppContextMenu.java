@@ -28,11 +28,9 @@ import de.uka.ilkd.key.rule.TacletApp;
 /**
  * provides the context menu entries for manual rule application on {@link ManualView}.
  * @author Seena Vellaramkalayil
- *
  */
 public class RuleAppContextMenu extends ExtensionContributionFactory {
 
-   
    /**
     * {@inheritDoc}
     */
@@ -111,5 +109,4 @@ public class RuleAppContextMenu extends ExtensionContributionFactory {
          }
       }
    }
-
 }
