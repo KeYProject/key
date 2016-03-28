@@ -75,7 +75,7 @@ public class ManualView extends AbstractViewBasedView {
    public static final String VIEW_ID = "org.key_project.sed.key.ui.view.ManualView";
    
    /**
-    * the {@link SashForm} to divide [@link TreeViewer} and {@link SourceViewer}.
+    * the {@link SashForm} to divide {@link TreeViewer} and {@link SourceViewer}.
     */
    private SashForm parentComposite;
 
@@ -130,7 +130,7 @@ public class ManualView extends AbstractViewBasedView {
    private Node selectedNode;
    
    /**
-    * the flag indicating whether there is a new prof loaded or not.
+    * the flag indicating whether there is a new proof loaded or not.
     */
    private boolean newProof;
    
@@ -219,7 +219,8 @@ public class ManualView extends AbstractViewBasedView {
 
 		@Override
 		public void handleStateChange(State state, Object oldValue) {
-			handleHideStateChanged(state, oldValue);
+		   contentProvider.setHideState((boolean) state.getValue());
+			handleHideSymbolicStateChanged(state, oldValue);
 		}
 	};
 	
@@ -227,10 +228,13 @@ public class ManualView extends AbstractViewBasedView {
 	 * the {@link IStateListener} to sync the show symbolic execution tree only toggleState with the outline page.
 	 */
 	private IStateListener symbolicStateListener = new IStateListener() {
-
+	   /**
+	    * {@inheritDoc}
+	    */
       @Override
       public void handleStateChange(State state, Object oldValue) {
-    	  handleSymbolicStateChanged(state, oldValue);
+         contentProvider.setSymbolicState((boolean) state.getValue());
+         handleHideSymbolicStateChanged(state, oldValue);
       }
 	};
 	
@@ -238,8 +242,10 @@ public class ManualView extends AbstractViewBasedView {
 	 * the {@link IStateListener} to listen to changes on the breakpointState.
 	 */
 	private IStateListener breakpointStateListener = new IStateListener() {
-
-      @Override
+	   /**
+	    * {@inheritDoc}
+	    */
+	   @Override
       public void handleStateChange(State state, Object oldValue) {
          handleBreakpointStateChanged(state, oldValue);
       }
@@ -250,13 +256,13 @@ public class ManualView extends AbstractViewBasedView {
 	 * the {@link IStateListener} to listen to changes on the subtreeState.
 	 */
 	private IStateListener subtreeStateListener = new IStateListener() {
-
+	   /**
+	    * {@inheritDoc}
+	    */
       @Override
       public void handleStateChange(State state, Object oldValue) {
          handleSubtreeStateChanged(state, oldValue);
-         
       }
-	   
 	};
 	
 
@@ -269,11 +275,12 @@ public class ManualView extends AbstractViewBasedView {
 	 * the {link RuleAppListener} listening to rule applications.
 	 */
 	private RuleAppListener ruleAppListener = new RuleAppListener() {
-		
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public void ruleApplied(ProofEvent e) {
 			handleRuleApplied(e);
-			
 		}
 	};
 
@@ -281,8 +288,7 @@ public class ManualView extends AbstractViewBasedView {
 	 * the constructor of the class.
 	 */
 	public ManualView() {
-	   
-		ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
+	   ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
       if (service != null) {
          Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
          if (hideCmd != null) {
@@ -291,7 +297,6 @@ public class ManualView extends AbstractViewBasedView {
             	hideState.addListener(hideStateListener);
             }
          }
-         
          Command symbolicCmd = service.getCommand(ShowSymbolicExecutionTreeOnlyHandler.COMMAND_ID);
          if (symbolicCmd != null) {
             symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
@@ -299,7 +304,6 @@ public class ManualView extends AbstractViewBasedView {
             	symbolicState.addListener(symbolicStateListener);
             }
          }
-         
          Command breakpointCmd = service.getCommand(BreakpointToggleHandler.COMMAND_ID);
             if (breakpointCmd != null) {
                breakpointState = breakpointCmd.getState(RegistryToggleState.STATE_ID);
@@ -307,7 +311,6 @@ public class ManualView extends AbstractViewBasedView {
                   breakpointState.addListener(breakpointStateListener);
                }
             }
-         
          Command subtreeCmd = service.getCommand(ShowSubtreeOfNodeHandler.COMMAND_ID);
             if (subtreeCmd != null) {
                subtreeState = subtreeCmd.getState(RegistryToggleState.STATE_ID);
@@ -353,33 +356,18 @@ public class ManualView extends AbstractViewBasedView {
 	}
 	
 	/**
-	 * Handles a change in the state of the hideIntermediateProofsteps outline filter.
+	 * Handles a change in the state of the hideIntermediateProofsteps and showSymbolicExecutionNodes filter.
 	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
 	 * @param oldValue The old value; may be anything.
 	 */
-	protected void handleHideStateChanged(State state, Object oldValue) {
-		Node selectedNode = getSelectedNode();
-		contentProvider.setHideState((boolean) state.getValue());
+	protected void handleHideSymbolicStateChanged(State state, Object oldValue) {
+		Node currentSelection = getSelectedNode();
 		getTreeViewer().setInput(proof);
-		if (selectedNode != null) {
-		   selectNodeThreadSafe(selectedNode);
+		if (currentSelection != null) {
+		   selectNodeThreadSafe(currentSelection);
 		}
 	}
-	
-	/**
-	 * Handles a change in the state of the showSymbolicExecutionTree outline filter.
-	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
-	 * @param oldValue The old value; may be anything.
-	 */
-	protected void handleSymbolicStateChanged(State state, Object oldValue) {
-		Node selectedNode = getSelectedNode();
-		contentProvider.setSymbolicState((boolean) state.getValue());
-		getTreeViewer().setInput(proof);
-		if (selectedNode != null) {
-		   selectNodeThreadSafe(selectedNode);
-		}
-	}
-   
+
 	/**
 	 * handles a change in breakpointState.
 	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
@@ -388,9 +376,7 @@ public class ManualView extends AbstractViewBasedView {
 	protected void handleBreakpointStateChanged(State state, Object oldValue) {
 	   if (state.getValue() instanceof Boolean) {
 	      breakpointManager.setEnabled((boolean) state.getValue());
-	   } else {
-	      breakpointManager.setEnabled(false);
-	   }
+	   } 
 	}
 	
 	/**
@@ -405,11 +391,11 @@ public class ManualView extends AbstractViewBasedView {
    	     contentProvider.setShowSubtreeState(true, filterNode);
    	     getTreeViewer().setInput(filterNode.proof());
    	  } else {
-   	     Node selectedNode = getSelectedNode();
+   	     Node currentSelection = getSelectedNode();
    	     contentProvider.setShowSubtreeState(false, proof.root());
    	     getTreeViewer().setInput(proof);
    	     if (!newProof && !(boolean) hideState.getValue()) {
-   	        selectNodeThreadSafe(selectedNode);
+   	        selectNodeThreadSafe(currentSelection);
    	     }
    	     filterNode = proof.root();
    	  }
@@ -540,12 +526,6 @@ public class ManualView extends AbstractViewBasedView {
       this.labelProvider = new ProofTreeLabelProvider(getTreeViewer(), environment.getProofControl(), getProof());
       getTreeViewer().setLabelProvider(labelProvider);
       contentProvider.injectTopLevelElements();
-      //set default selection to root
-//      if (!(boolean) subtreeState.getValue()) {
-//         getTreeViewer().setSelection(SWTUtil.createSelection(getProof().root()), true);
-//      } else {
-//         getTreeViewer().setSelection(SWTUtil.createSelection(filterNode), true);
-//      }
       createTreeViewerContextMenu();
       //set default selection to root
       if (!(boolean) hideState.getValue() || newProof) {
@@ -698,9 +678,7 @@ public class ManualView extends AbstractViewBasedView {
                sourceViewerDecorator.showNode(node, SymbolicExecutionUtil.createNotationInfo(getProof()));
             }
          } 
-         
       }
-      
    };
 
    /**
@@ -719,11 +697,8 @@ public class ManualView extends AbstractViewBasedView {
     * {@inheritDoc}
     */
    @Override
-   protected boolean shouldHandleBaseView(IViewPart baseView) {
-      if (IDebugUIConstants.ID_DEBUG_VIEW.equals(baseView.getSite().getId())) {
-         return true;
-      }
-      return false;
+   protected boolean shouldHandleBaseView(IViewPart view) {
+      return IDebugUIConstants.ID_DEBUG_VIEW.equals(view.getSite().getId());
    }
 
    /**
