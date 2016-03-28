@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.nui.tests.guitests;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
