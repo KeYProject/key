@@ -4,10 +4,8 @@
 package org.key_project.sed.key.ui.test.testcase.swtbot;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
@@ -26,7 +24,6 @@ import org.key_project.sed.key.ui.test.Activator;
 import org.key_project.sed.key.ui.view.ManualView;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.view.ExecutionTreeView;
-import org.key_project.ui.test.util.TestKeYUIUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.IOUtil;
@@ -51,6 +48,7 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
 				TestUtilsUtil.openView(ExecutionTreeView.VIEW_ID);
 				TestUtilsUtil.waitForJobs();
 
+				// path to the test files
 				String pathToOracleFiles = "data/number/oracle";
 				
 				// test diagram before prune
@@ -62,14 +60,14 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
 				// prune branch node
 				TestUtilsUtil.selectInTree(tree, "Null Reference (n = null)");
 				TestUtilsUtil.clickContextMenu(tree, "Prune Proof");
-				TestSedCoreUtil.waitForDebugTreeInterface();
+				TestUtilsUtil.sleep(10000); // TODO need a better solution
 				// test diagram after prune
 				assertDiagram(bot, project.getProject(), "NumberBranchNode.set", pathToOracleFiles, null);
 				
 				// prune node
 				TestUtilsUtil.selectInTree(tree, "10:if (this.content==n.content) {                         return  true; }                 else  {                         return  false; }");
 				TestUtilsUtil.clickContextMenu(tree, "Prune Proof");
-				TestSedCoreUtil.waitForDebugTreeInterface();
+				TestUtilsUtil.sleep(10000); // TODO need a better solution
 				// test diagram after prune
 				assertDiagram(bot, project.getProject(), "NumberNode.set", pathToOracleFiles, null);
 				
@@ -111,6 +109,7 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
 		TestUtilsUtil.clickDirectly(wizardShell.bot().button("Next >"));
 		TestUtilsUtil.clickDirectly(wizardShell.bot().button("Finish"));
 		bot.waitUntil(Conditions.shellCloses(wizardShell));
+		// set true to generate new test files in the oracle dir which is defined by pathToOracleFiles
 		if (false) {
 			// Save oracle files
 			File targetOracleDirectory = new File(pathToOracleFiles);
