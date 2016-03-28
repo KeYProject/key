@@ -317,9 +317,6 @@ public class TreeViewController extends NUIController implements Observer {
      */
     @Override
     protected void init() {
-        icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
-        filteringHandler = new FilteringHandler(getDataModel());
-
         Platform.runLater(() -> {
             // listener for opening search view
             try {
@@ -347,6 +344,9 @@ public class TreeViewController extends NUIController implements Observer {
             catch (ControllerNotFoundException exception) {
                 exception.showMessage();
             }
+
+            icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
+            filteringHandler = new FilteringHandler(getDataModel());
 
             // set cell factory for rendering cells
             proofTreeView.setCellFactory((treeItem) -> {

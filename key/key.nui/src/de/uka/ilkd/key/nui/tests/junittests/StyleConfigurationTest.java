@@ -129,7 +129,7 @@ public class StyleConfigurationTest {
      */
 
     private static int checkConfiguration() {
-        final ProofTreeStyler ptStyler = new ProofTreeStyler(null);
+        final ProofTreeStyler ptStyler = new ProofTreeStyler();
         final Stream<NUINode> nstream = ptVisualizer.getRootNode().asList().stream().filter(
                 (node) -> !node.getStyleConfiguration().equals(ptStyler.getStyleConfiguration(node)));
 

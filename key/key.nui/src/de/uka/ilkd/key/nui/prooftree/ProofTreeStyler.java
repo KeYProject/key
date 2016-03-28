@@ -61,10 +61,6 @@ public final class ProofTreeStyler {
      * The icon factory to be used to get the image icons.
      */
     private final IconFactory icf;
-    /**
-     * The {@link ProofTreeCell} assigned to the current ProofTreeStyler.
-     */
-    private ProofTreeCell ptc;
 
     /**
      * Bundles the name of the assigned CSS classes and the assigned icon image
@@ -183,7 +179,7 @@ public final class ProofTreeStyler {
      * thus {@link #applyStyle(NUINode)} should not be called.
      */
     public ProofTreeStyler() {
-        icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
+        this.icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
         initDefaultStyleConfigurations();
     }
 
@@ -193,11 +189,6 @@ public final class ProofTreeStyler {
      *            The {@link ProofTreeCell} associated with this
      *            ProofTreeStyler.
      */
-    public ProofTreeStyler(final ProofTreeCell ptc) {
-        this.ptc = ptc;
-        icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
-        initDefaultStyleConfigurations();
-    }
 
     /**
      * Applies the {@link StyleConfiguration} determined by
@@ -206,7 +197,7 @@ public final class ProofTreeStyler {
      * @param node
      *            The node where the StyleConfiguration should be applied to.
      */
-    public void applyStyle(final NUINode node) {
+    public static void applyStyle(final NUINode node, final ProofTreeCell ptc) {
         final Label label = ptc.getLabel();
 
         final StyleConfiguration scfg = node.getStyleConfiguration();
@@ -230,22 +221,6 @@ public final class ProofTreeStyler {
      */
     public IconFactory getIcf() {
         return icf;
-    }
-
-    /**
-     * Getter.
-     * @return the {@link ProofTreeCell}.
-     */
-    public ProofTreeCell getPtc() {
-        return ptc;
-    }
-
-    /**
-     * Setter.
-     * @param ptc The {@link ProofTreeCell} you want to set.
-     */
-    public void setPtc(final ProofTreeCell ptc) {
-        this.ptc = ptc;
     }
 
     /**

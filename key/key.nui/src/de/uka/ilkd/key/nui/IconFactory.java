@@ -77,7 +77,12 @@ public class IconFactory {
      * The width of produced icons in pixels.
      */
     private final int iconSizeWidth;
-    
+
+    /**
+     * A Field that indicates whether or not this IconFactory thinks it is run from a JAR file.
+     */
+    @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.BeanMembersShouldSerialize"})
+    // PMD Justification: a) Styleguide wants this b) We found a bug in PMD here
     private final boolean isRunFromJAR;
 
     /**
@@ -92,6 +97,7 @@ public class IconFactory {
      *            The desired height
      * @return an ImageView containing the scaled Image
      */
+    @Deprecated
     private static ImageView scaleIcon(final Image image, final int width,
             final int height) {
         final ImageView view = new ImageView(image);
@@ -145,6 +151,14 @@ public class IconFactory {
     }
 
     /**
+     * Getter.
+     * @return true if this IconFactory thinks it is being run from a JAR file.
+     */
+    public boolean isRunFromJAR() {
+        return isRunFromJAR;
+    }
+
+    /**
      * Returns an ImageView (scaled image) based on the given imageFilename in
      * the directory folderRoot. If the image was demanded once before a stored
      * image will be returned.
@@ -163,11 +177,11 @@ public class IconFactory {
                 img = new Image("/de/uka/ilkd/key/nui/" + imageConstant);
             }
             else {
-                img = new Image(getClass().getResourceAsStream(imageConstant));
+                img = new Image(getClass().getResourceAsStream(imageConstant), iconSizeWidth, iconSizeHeight, false, false);
             }
             icons.put(imageConstant, img);
         }
-        return scaleIcon(img, iconSizeWidth, iconSizeHeight);
+        return new ImageView(img);
     }
 
 }

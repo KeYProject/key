@@ -27,7 +27,8 @@ import javafx.beans.value.ChangeListener;
  *
  */
 @SuppressWarnings("PMD.AtLeastOneConstructor")
-//PMD will also complain if adding the constructor, then saying "avoid useless constructors"
+// PMD will also complain if adding the constructor, then saying "avoid useless
+// constructors"
 public abstract class NUINode {
     /**
      * Marks if the node has the active property.
@@ -440,10 +441,8 @@ public abstract class NUINode {
      * This 'caching' of the style configuration is required for testing
      * purposes.
      */
-    protected void setStyleConfiguration() {
-
-        this.style = new ProofTreeStyler().getStyleConfiguration(this);
-
+    protected void setStyleConfiguration(final ProofTreeStyler styler) {
+        this.style = styler.getStyleConfiguration(this);
     }
 
 }
