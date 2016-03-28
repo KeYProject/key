@@ -12,7 +12,7 @@ import javafx.scene.input.KeyCode;
 /**
  * Test for User Stroys. 
  * - #14298 Beweisbaumvisualisierung 
- * - #14299 Einrückung linearer Beweisbaumabschnitte
+ * - #14299 EinrÃ¼ckung linearer Beweisbaumabschnitte
  * - #15078 Automatisches Aufklappen der Wurzel im Beweisbaum
  * 
  * @author Florian Breitfelder

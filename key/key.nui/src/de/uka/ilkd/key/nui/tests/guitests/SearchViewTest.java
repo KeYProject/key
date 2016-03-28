@@ -19,7 +19,7 @@ import javafx.scene.input.KeyCombination;
 /**
  * Test for User Story.
  * - #14469 Suchen im Beweisbaum
- * - #15081 Rückmeldung im Falle keiner Suchergebnisse
+ * - #15081 RÃ¼ckmeldung im Falle keiner Suchergebnisse
  * 
  * @author Florian Breitfelder
  *
