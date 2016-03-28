@@ -11,6 +11,7 @@ import javafx.scene.image.ImageView;
  * 
  * @author Patrick Jattke
  * @author Matthias Schultheis
+ * @author Stefan Pilot
  */
 public class IconFactory {
     /**
@@ -66,7 +67,7 @@ public class IconFactory {
     /**
      * An HashMap for storing loaded icon images.
      */
-    private final Map<String, Image> icons = new HashMap<>(); //NOPMD -- thread safety unneeded
+    private final Map<String, Image> icons = new HashMap<>(); //NOPMD -- thread safety not needed
 
     /**
      * The height of produced icons in pixels.
@@ -76,6 +77,8 @@ public class IconFactory {
      * The width of produced icons in pixels.
      */
     private final int iconSizeWidth;
+    
+    private final boolean isRunFromJAR;
 
     /**
      * Scales an given image to a desired size indicated by x (width) and y
@@ -109,6 +112,9 @@ public class IconFactory {
     public IconFactory(final int width, final int height) {
         this.iconSizeWidth = width;
         this.iconSizeHeight = height;
+        final File jarFile = new File(getClass().getProtectionDomain()
+                .getCodeSource().getLocation().getPath());
+        this.isRunFromJAR = jarFile.isFile();
     }
 
     /**
@@ -153,9 +159,7 @@ public class IconFactory {
             img = icons.get(imageConstant);
         }
         else {
-            final File jarFile = new File(getClass().getProtectionDomain()
-                    .getCodeSource().getLocation().getPath());
-            if (jarFile.isFile()) {
+            if (isRunFromJAR) {
                 img = new Image("/de/uka/ilkd/key/nui/" + imageConstant);
             }
             else {
