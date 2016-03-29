@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.nui.tests.guitests;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests for User Stories. 
- * (001) Oberflaeche: Grundaufbau #14297
+ * Tests for User Stories. (001) Oberflaeche: Grundaufbau #14297
  * 
  * GUI test for main application window
  *
@@ -159,7 +159,7 @@ public class MoveViewTest extends NUITest {
         // place view on HIDE
         clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
                 .moveTo(hide).clickOn(hide);
-        assertTrue(!find(componentId).isVisible());
+        assertNull(find(componentId));
 
         // place view on LEFT pane
         clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
@@ -193,6 +193,6 @@ public class MoveViewTest extends NUITest {
         // place view on HIDE pane
         clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
                 .moveTo(hide).clickOn(hide);
-        assertTrue(!find(componentId).isVisible());
+        assertNull(find(componentId));
     }
 }
