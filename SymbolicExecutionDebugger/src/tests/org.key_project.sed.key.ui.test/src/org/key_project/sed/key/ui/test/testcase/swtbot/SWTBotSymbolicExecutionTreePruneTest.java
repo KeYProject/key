@@ -31,8 +31,17 @@ import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+/**
+ * Tests the update of the Symbolic Execution Tree caused by a proof prune.
+ * @author Leonard Goetz
+ *
+ */
 public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTargetTestCase {
 	
+	/**
+	 * Tests the update of the Symbolic Execution Tree caused by a prune.
+	 * @throws Exception
+	 */
 	@Test
 	public void testPruning() throws Exception {
 
@@ -104,6 +113,15 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
 		doKeYDebugTargetTest("SWTBotSymbolicExecutionTreePruneTest_testPruning", Activator.PLUGIN_ID, "data/number/test", false, false, createMethodSelector("Number", "equals", "QNumber;"), null, null, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, 8, executor);
 	}
 
+	/**
+	    * Ensures that the current diagram matches the oracle files.
+	    * @param bot The {@link SWTWorkbenchBot} to use.
+	    * @param project The {@link IProject} to which the diagram will be saved to.
+	    * @param pathToSetFile The path to the SET file in the created project.
+	    * @param pathToOracleFiles The path to the oracle files.
+	    * @param fileNameSuffix A file name suffix.
+	    * @throws Exception Occurred Exception
+	    */
 	public static void assertDiagram(SWTWorkbenchBot bot, IProject project, String pathToSetFile, String pathToOracleFiles, String fileNameSuffix) throws Exception {
 		// Open Save diagram wizard
 		SWTBotView executionTreeView = bot.viewById(ExecutionTreeView.VIEW_ID);
