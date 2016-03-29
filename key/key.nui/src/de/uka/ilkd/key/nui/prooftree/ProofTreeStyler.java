@@ -13,6 +13,7 @@ import javafx.scene.image.ImageView;
  * nodes etc.
  * 
  * @author Patrick Jattke
+ * @author Stefan Pilot
  *
  */
 public final class ProofTreeStyler {
@@ -68,6 +69,7 @@ public final class ProofTreeStyler {
      * configurations is a StyleConfiguration object.
      * 
      * @author Patrick Jattke
+     * @author Stefan Pilot
      *
      */
     public class StyleConfiguration {
@@ -76,9 +78,9 @@ public final class ProofTreeStyler {
          */
         private final List<String> cssClasses;
         /**
-         * The assigned iconImage.
+         * The name of the assigned iconImage.
          */
-        private ImageView iconImage;
+        private String iconImage;
 
         /**
          * Creates a new StyleConfiguration object.
@@ -132,7 +134,12 @@ public final class ProofTreeStyler {
          * @return {@link ImageView} containing the image.
          */
         public ImageView getIconImage() {
-            return iconImage;
+            if(this.iconImage == null){
+                return null;
+            }
+            ImageView img = icf.getImage(iconImage);
+            img.setId(iconImage);
+            return img;
         }
 
         @Override
@@ -157,8 +164,7 @@ public final class ProofTreeStyler {
          *            The file name of the iconImage to set.
          */
         public void setIconImage(final String iconFileName) {
-            iconImage = icf.getImage(iconFileName);
-            iconImage.setId(iconFileName);
+            this.iconImage = iconFileName;
         }
 
         /**
@@ -211,10 +217,8 @@ public final class ProofTreeStyler {
         cssClasses.forEach(cssClass -> label.getStyleClass().add(cssClass));
 
         // Apply icon image
-        final ImageView image = scfg.getIconImage();
-        if (image != null) {
-            ptc.setIcon(image);
-        }
+        ptc.setIcon(scfg.getIconImage());
+
     }
 
     /**
