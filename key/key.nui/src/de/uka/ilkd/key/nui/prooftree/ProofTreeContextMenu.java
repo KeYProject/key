@@ -87,7 +87,8 @@ public class ProofTreeContextMenu extends ContextMenu {
      *            the {@link TreeViewController} associated with the treeView
      */
     public ProofTreeContextMenu(final TreeItem<NUINode> treeItem, final TreeView<NUINode> treeView,
-            final IconFactory icf, final FilteringHandler filteringHandler, final TreeViewController tvc) {
+            final IconFactory icf, final FilteringHandler filteringHandler,
+            final TreeViewController tvc) {
         super();
 
         this.treeItem = treeItem;
@@ -257,7 +258,8 @@ public class ProofTreeContextMenu extends ContextMenu {
      * Adds the filter entries to the context menu.
      */
     private void addMenuItemsFilter() {
-        for (final Entry<ProofTreeFilter, Boolean> entry : filteringHandler.getFiltersMap().entrySet()) {
+        for (final Entry<ProofTreeFilter, Boolean> entry :
+                filteringHandler.getFiltersMap().entrySet()) {
             addMenuItemFilter(entry.getKey(), entry.getValue());
         }
     }

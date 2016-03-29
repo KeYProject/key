@@ -61,6 +61,10 @@ import javafx.stage.FileChooser;
  */
 @ControllerAnnotation(createMenu = false)
 public class MainViewController extends NUIController implements Observer {
+    /**
+     * The height and width of all the icons defined here.
+     */
+    public static final int MAIN_VIEW_ICON_SIZE = 13;
 
     /**
      * Provides an enum for the available places in the main window.
@@ -547,7 +551,7 @@ public class MainViewController extends NUIController implements Observer {
     @Override
     protected void init() {
         getDataModel().addObserver(this);
-        IconFactory icf = new IconFactory(13, 13);
+        final IconFactory icf = new IconFactory(MAIN_VIEW_ICON_SIZE, MAIN_VIEW_ICON_SIZE);
         this.cancelButtonImage
                 .setImage(icf.getImage(IconFactory.CANCEL_BUTTON).getImage());
     }
@@ -678,7 +682,7 @@ public class MainViewController extends NUIController implements Observer {
                     if (!e.getMessage().contains("java.lang.ThreadDeath")) {
                         Platform.runLater(() -> {
                             cancelLoadProof();
-                            Alert exceptionAlert = new Alert(AlertType.ERROR);
+                            final Alert exceptionAlert = new Alert(AlertType.ERROR);
                             exceptionAlert.setTitle(getBundle()
                                     .getString("errorLoadingFileTitle"));
                             exceptionAlert.setHeaderText(getBundle()
