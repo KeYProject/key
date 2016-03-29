@@ -21,7 +21,7 @@ public class IconFactory {
 
     // Main Window
     /**
-     * file name of the icon used in the cancel button of the MainViewController
+     * File name of the icon used in the cancel button of the MainViewController.
      */
     public static final String CANCEL_BUTTON = "images/cancelButton.png";
 
