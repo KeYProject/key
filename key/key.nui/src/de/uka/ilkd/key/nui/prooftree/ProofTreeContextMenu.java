@@ -258,8 +258,8 @@ public class ProofTreeContextMenu extends ContextMenu {
      * Adds the filter entries to the context menu.
      */
     private void addMenuItemsFilter() {
-        for (final Entry<ProofTreeFilter, Boolean> entry :
-                filteringHandler.getFiltersMap().entrySet()) {
+        for (final Entry<ProofTreeFilter, Boolean> entry
+                : filteringHandler.getFiltersMap().entrySet()) {
             addMenuItemFilter(entry.getKey(), entry.getValue());
         }
     }

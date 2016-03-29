@@ -44,7 +44,7 @@ public class ControllerNotFoundException extends NUIException {
 
     /**
      * Setter.
-     * @param a {@link String} representing the file name.
+     * @param file a {@link String} representing the file name.
      */
     public void setFile(final String file) {
         this.file = file;

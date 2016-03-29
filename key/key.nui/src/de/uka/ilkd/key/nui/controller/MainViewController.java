@@ -134,17 +134,17 @@ public class MainViewController extends NUIController implements Observer {
     @FXML
     private Menu viewMenu;
     /**
-     * The {@link MenuItem} labeled "Save Proof as..."
+     * The {@link MenuItem} labeled "Save Proof as...".
      */
     @FXML
     private MenuItem saveProofAs;
     /**
-     * The {@link MenuItem} labeled "Save Proof"
+     * The {@link MenuItem} labeled "Save Proof".
      */
     @FXML
     private MenuItem saveProof;
     /**
-     * The {@link MenuItem} labeled "Open Proof"
+     * The {@link MenuItem} labeled "Open Proof".
      */
     @FXML
     private MenuItem openProof;
@@ -212,6 +212,9 @@ public class MainViewController extends NUIController implements Observer {
         return placeComponent;
     }
 
+    /**
+     * This is executed when clicking the "Close" (or "X") Button.
+     */
     @FXML
     private static void closeButtonAction() {
         Platform.exit();

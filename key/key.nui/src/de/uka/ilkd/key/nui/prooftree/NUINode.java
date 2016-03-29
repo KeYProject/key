@@ -440,6 +440,8 @@ public abstract class NUINode {
      * 
      * This 'caching' of the style configuration is required for testing
      * purposes.
+     * 
+     * @param styler the ProofTreeStyler to get the configuration from.
      */
     protected void setStyleConfiguration(final ProofTreeStyler styler) {
         this.style = styler.getStyleConfiguration(this);

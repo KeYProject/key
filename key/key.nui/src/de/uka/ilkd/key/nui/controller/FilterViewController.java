@@ -200,7 +200,7 @@ public class FilterViewController extends NUIController {
     }
     /**
      * Setter.
-     * @param the treeView{@link Pane}.
+     * @param treeViewPane the treeView{@link Pane}.
      */
     public void setTreeViewPane(final Pane treeViewPane) {
         this.treeViewPane = treeViewPane;

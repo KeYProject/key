@@ -71,19 +71,19 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     /**
      * The constructor of the ProofTreeCell.
      * 
-     * @param icf
+     * @param iconFactory
      *            the {@link IconFactory} used to display node icons
-     * @param fh
+     * @param filteringHandler
      *            the {@link FilteringHandler} used to filter this ProofTreeCell
-     * @param tvc
+     * @param treeViewCtrlr
      *            the {@link TreeViewController} associated with the TreeView
      */
 
-    public ProofTreeCell(final IconFactory icf, final FilteringHandler filteringHandler,
+    public ProofTreeCell(final IconFactory iconFactory, final FilteringHandler filteringHandler,
             final TreeViewController treeViewCtrlr) {
         super();
         this.filteringHandler = filteringHandler;
-        this.iconFactory = icf;
+        this.iconFactory = iconFactory;
         this.treeViewCtrlr = treeViewCtrlr;
     }
 

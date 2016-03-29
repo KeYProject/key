@@ -134,10 +134,10 @@ public final class ProofTreeStyler {
          * @return {@link ImageView} containing the image.
          */
         public ImageView getIconImage() {
-            if(this.iconImage == null){
+            if (this.iconImage == null) {
                 return null;
             }
-            ImageView img = icf.getImage(iconImage);
+            final ImageView img = icf.getImage(iconImage);
             img.setId(iconImage);
             return img;
         }
