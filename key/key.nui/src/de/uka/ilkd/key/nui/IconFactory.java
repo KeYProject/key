@@ -81,7 +81,7 @@ public class IconFactory {
     /**
      * A Field that indicates whether or not this IconFactory thinks it is run from a JAR file.
      */
-    @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.BeanMembersShouldSerialize"})
+    @SuppressWarnings({ "PMD.AvoidFieldNameMatchingMethodName", "PMD.BeanMembersShouldSerialize" })
     // PMD Justification: a) Styleguide wants this b) We found a bug in PMD here
     private final boolean isRunFromJAR;
 
@@ -98,8 +98,7 @@ public class IconFactory {
      * @return an ImageView containing the scaled Image
      */
     @Deprecated
-    private static ImageView scaleIcon(final Image image, final int width,
-            final int height) {
+    private static ImageView scaleIcon(final Image image, final int width, final int height) {
         final ImageView view = new ImageView(image);
         view.setFitWidth(width);
         view.setFitHeight(height);
@@ -118,8 +117,8 @@ public class IconFactory {
     public IconFactory(final int width, final int height) {
         this.iconSizeWidth = width;
         this.iconSizeHeight = height;
-        final File jarFile = new File(getClass().getProtectionDomain()
-                .getCodeSource().getLocation().getPath());
+        final File jarFile = new File(
+                getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
         this.isRunFromJAR = jarFile.isFile();
     }
 
@@ -168,20 +167,21 @@ public class IconFactory {
      * @return ImageView object of JavaFX
      */
     public final ImageView getImage(final String imageConstant) {
-        Image img;
+        final Image img;
         if (icons.containsKey(imageConstant)) {
             img = icons.get(imageConstant);
         }
         else {
             if (isRunFromJAR) {
-                img = new Image("/de/uka/ilkd/key/nui/" + imageConstant);
+               img = new Image("/de/uka/ilkd/key/nui/" + imageConstant, iconSizeWidth,
+                        iconSizeHeight, false, false);
             }
             else {
-                img = new Image(getClass().getResourceAsStream(imageConstant), iconSizeWidth, iconSizeHeight, false, false);
+                img = new Image(getClass().getResourceAsStream(imageConstant), iconSizeWidth,
+                        iconSizeHeight, false, false);
             }
             icons.put(imageConstant, img);
         }
         return new ImageView(img);
     }
-
 }
