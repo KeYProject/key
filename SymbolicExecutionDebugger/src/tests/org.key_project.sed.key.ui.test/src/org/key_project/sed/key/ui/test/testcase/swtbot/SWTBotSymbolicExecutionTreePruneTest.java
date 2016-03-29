@@ -18,6 +18,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.test.util.DebugTargetResumeSuspendListener;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.test.testcase.swtbot.AbstractKeYDebugTargetTestCase;
 import org.key_project.sed.key.ui.test.Activator;
@@ -38,7 +39,7 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
 		IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
 
 			@Override
-			public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
+			public void test(final SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, final ISEDebugTarget target, ILaunch launch) throws Exception {
 				// resume on thread
 				TestUtilsUtil.closeView(ExecutionTreeView.VIEW_ID);
 				SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
@@ -60,6 +61,7 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
 				// prune branch node
 				TestUtilsUtil.selectInTree(tree, "Null Reference (n = null)");
 				TestUtilsUtil.clickContextMenu(tree, "Prune Proof");
+				TestSedCoreUtil.waitForDebugTreeInterface();
 				TestUtilsUtil.sleep(10000); // TODO need a better solution
 				// test diagram after prune
 				assertDiagram(bot, project.getProject(), "NumberBranchNode.set", pathToOracleFiles, null);
@@ -67,13 +69,19 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
 				// prune node
 				TestUtilsUtil.selectInTree(tree, "10:if (this.content==n.content) {                         return  true; }                 else  {                         return  false; }");
 				TestUtilsUtil.clickContextMenu(tree, "Prune Proof");
+				TestSedCoreUtil.waitForDebugTreeInterface();
 				TestUtilsUtil.sleep(10000); // TODO need a better solution
 				// test diagram after prune
 				assertDiagram(bot, project.getProject(), "NumberNode.set", pathToOracleFiles, null);
 				
 				// resume on thread
-				item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
-				resume(bot, item, target);
+				final SWTBotTreeItem item2 = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
+				DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
+					@Override
+					public void run() {
+						resume(bot, item2, target);
+					}
+				});
 				TestUtilsUtil.sleep(10000); // TODO need a better solution
 				// test diagram after resume
 				assertDiagram(bot, project.getProject(), "NumberResume.set", pathToOracleFiles, null);

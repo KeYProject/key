@@ -128,69 +128,48 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
 
 			@Override
 			public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
-				try {
-					SWTBotView manualView = getManualBotView(bot);
-					TestUtilsUtil.waitForJobs();
-					// activate show symbolic execution tree filter
-					TestUtilsUtil.selectInTree(manualView.bot().tree(), 0);
-					TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Show Symbolic Execution Tree Only");
-					// step into
-					performStep(debugView, bot, target, 0, 0, 0);
-					// check if show symbolic execution tree filter is working
-					assertTrue(manualView.bot().tree().getTreeItem("0:One Step Simplification: 1 rule") != null);
-					assertTrue(manualView.bot().tree().getTreeItem("8:result=self.equals(n)@Number;") != null);
-					assertTrue(manualView.bot().tree().rowCount() == 2);
-					// deactivate show symbolic execution tree filter
-					TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Show Symbolic Execution Tree Only");
-					// activate hide intermediate proof steps filter
-					TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Hide Intermediate Proofsteps");
-					// check if hide intermediate proof steps filter is working
-					assertTrue(manualView.bot().tree().getTreeItem("10:OPEN GOAL") != null);
-					assertTrue(manualView.bot().tree().rowCount() == 1);
-					// select open goal and apply manual rule
-					TestUtilsUtil.selectInTree(manualView.bot().tree(), "10:OPEN GOAL");
-					final SWTBotStyledText styledText = manualView.bot().styledText();
-					Point point = TestUtilsUtil.selectText(styledText, "{exc:=null}");
-					TestUtilsUtil.setCursorLocation(styledText, point.x + 1, point.y + 15);
-					TestUtilsUtil.clickContextMenu(styledText, point.x + 1, point.y + 15, "ifElseUnfold");
-					// check if hide intermediate proof steps filter is still working
-					assertTrue(manualView.bot().tree().getTreeItem("11:OPEN GOAL") != null);
-					assertTrue(manualView.bot().tree().rowCount() == 1);
-					// deactivate hide intermediate proof steps filter
-					TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Hide Intermediate Proofsteps");
-					// activate show symbolic execution tree filter
-					TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Show Symbolic Execution Tree Only");
-					// check if show symbolic execution tree filter is working
-					assertTrue(manualView.bot().tree().getTreeItem("0:One Step Simplification: 1 rule") != null);
-					assertTrue(manualView.bot().tree().getTreeItem("8:result=self.equals(n)@Number;") != null);
-					assertTrue(manualView.bot().tree().getTreeItem("10:if (this.content==n.content) {                         return  true; }                 else  {                         return  false; }") != null);
-					assertTrue(manualView.bot().tree().rowCount() == 3);
-					// deactivate show symbolic execution tree filter
-					TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Show Symbolic Execution Tree Only");
-					// close the bot view
-					manualView.close();
-				} finally {
-					ICommandService service = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
-					if (service != null) {
-						Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
-						if (hideCmd != null) {
-							State hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
-							if (hideState != null) {
-								System.out.println("hideState.setValue(false)");
-								hideState.setValue(false);
-							}
-						}
-
-						Command symbolicCmd = service.getCommand(ShowSymbolicExecutionTreeOnlyHandler.COMMAND_ID);
-						if (symbolicCmd != null) {
-							State symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
-							if (symbolicState != null) {
-								System.out.println("symbolicState.setValue(false)");
-								symbolicState.setValue(false);
-							}
-						}
-					}
-				}
+				SWTBotView manualView = getManualBotView(bot);
+				TestUtilsUtil.waitForJobs();
+				// activate show symbolic execution tree filter
+				TestUtilsUtil.sleep(1000);
+				TestUtilsUtil.selectInTree(manualView.bot().tree(), 0);
+				TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Show Symbolic Execution Tree Only");
+				// step into
+				performStep(debugView, bot, target, 0, 0, 0);
+				// check if show symbolic execution tree filter is working
+				assertTrue(manualView.bot().tree().getTreeItem("0:One Step Simplification: 1 rule") != null);
+				assertTrue(manualView.bot().tree().getTreeItem("8:result=self.equals(n)@Number;") != null);
+				assertTrue(manualView.bot().tree().rowCount() == 2);
+				// deactivate show symbolic execution tree filter
+				TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Show Symbolic Execution Tree Only");
+				// activate hide intermediate proof steps filter
+				TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Hide Intermediate Proofsteps");
+				// check if hide intermediate proof steps filter is working
+				assertTrue(manualView.bot().tree().getTreeItem("10:OPEN GOAL") != null);
+				assertTrue(manualView.bot().tree().rowCount() == 1);
+				// select open goal and apply manual rule
+				TestUtilsUtil.selectInTree(manualView.bot().tree(), "10:OPEN GOAL");
+				final SWTBotStyledText styledText = manualView.bot().styledText();
+				Point point = TestUtilsUtil.selectText(styledText, "{exc:=null}");
+				TestUtilsUtil.setCursorLocation(styledText, point.x + 1, point.y + 15);
+				TestUtilsUtil.clickContextMenu(styledText, point.x + 1, point.y + 15, "ifElseUnfold");
+				// check if hide intermediate proof steps filter is still
+				// working
+				assertTrue(manualView.bot().tree().getTreeItem("11:OPEN GOAL") != null);
+				assertTrue(manualView.bot().tree().rowCount() == 1);
+				// deactivate hide intermediate proof steps filter
+				TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Hide Intermediate Proofsteps");
+				// activate show symbolic execution tree filter
+				TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Show Symbolic Execution Tree Only");
+				// check if show symbolic execution tree filter is working
+				assertTrue(manualView.bot().tree().getTreeItem("0:One Step Simplification: 1 rule") != null);
+				assertTrue(manualView.bot().tree().getTreeItem("8:result=self.equals(n)@Number;") != null);
+				assertTrue(manualView.bot().tree().getTreeItem("10:if (this.content==n.content) {                         return  true; }                 else  {                         return  false; }") != null);
+				assertTrue(manualView.bot().tree().rowCount() == 3);
+				// deactivate show symbolic execution tree filter
+				TestUtilsUtil.clickContextMenu(manualView.bot().tree(), "Show Symbolic Execution Tree Only");
+				// close the bot view
+				manualView.close();
 			}
 
 			@Override
