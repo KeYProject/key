@@ -64,7 +64,7 @@ public class FilterViewController extends NUIController {
          */
         @Override
         public String getContextMenuItemText() {
-            return "THIS IS A BUG";
+            return "Text filter: '" + term + "'";
         }
 
         /**
@@ -126,7 +126,7 @@ public class FilterViewController extends NUIController {
      * Makes the {@link FilteringHandler} filter by the term given into the
      * {@link TextField}, but only if the {@link ToggleButton} is selected.
      */
-    private void performFiltering() {
+    public void performFiltering() {
         if (term.isEmpty() || !btnToggleFilter.isSelected()) {
             filteringHandler.stopFilteringBy(textFilter);
         }

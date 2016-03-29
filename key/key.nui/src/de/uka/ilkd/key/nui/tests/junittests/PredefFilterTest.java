@@ -26,7 +26,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
  * @author Patrick Jattke
  *
  */
-public class PreDefFilterTest {
+public class PredefFilterTest {
 
     /**
      * The proof file 1 used for this test.
