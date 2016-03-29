@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.nui.tests.guitests;
+
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests for User Stories. 
- * (001) Oberflaeche: Grundaufbau #14297
+ * Tests for User Stories. (001) Oberflaeche: Grundaufbau #14297
  * 
  * GUI test for main application window
  *
@@ -16,9 +16,11 @@ import org.junit.Test;
  *
  */
 
-@SuppressWarnings({"PMD.BeanMembersShouldSerialize", "PMD.AtLeastOneConstructor", "PMD"})
+@SuppressWarnings({ "PMD.BeanMembersShouldSerialize",
+        "PMD.AtLeastOneConstructor", "PMD" })
 // Why would anyone ever serialize a JUnit Test?
-//PMD will also complain after adding a constructor, then saying "avoid useless constructors"
+// PMD will also complain after adding a constructor, then saying "avoid useless
+// constructors"
 public class MoveViewTest extends NUITest {
 
     // IDs of the panes where the views can be placed on
@@ -34,7 +36,7 @@ public class MoveViewTest extends NUITest {
 
     // IDs of the views
     private static final String CONFIG_VIEWS = "#configViews";
-    
+
     private static final String PROOF_FILE_NAME = "example01.proof";
 
     private String hide;
@@ -166,7 +168,8 @@ public class MoveViewTest extends NUITest {
         // place view on HIDE
         clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
                 .moveTo(hide).clickOn(hide);
-        assertFalse(find(componentId).isVisible());
+
+        assertNull(find(componentId));
 
         // place view on LEFT pane
         clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
@@ -200,6 +203,7 @@ public class MoveViewTest extends NUITest {
         // place view on HIDE pane
         clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
                 .moveTo(hide).clickOn(hide);
-        assertFalse(find(componentId).isVisible());
+
+        assertNull(find(componentId));
     }
 }

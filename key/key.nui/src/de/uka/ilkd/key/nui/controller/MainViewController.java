@@ -454,7 +454,16 @@ public class MainViewController extends NUIController implements Observer {
         selectToggle(component.getId(), place);
         if (place == Place.HIDDEN) {
             component.setVisible(false);
-            getNui().getRoot().getChildren().remove(component);
+            //getNui().getRoot().getChildren().remove(component);
+            //getPane(place).getChildren().remove(component);
+            
+            if(component.getParent() instanceof Pane){
+                Pane parent = (Pane)component.getParent();
+                if(parent!=null){
+                    parent.getChildren().remove(component);
+                }
+            }
+            //((Pane)component.getParent()).getChildren().remove(component);
         }
         else {
             component.setVisible(true);

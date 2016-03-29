@@ -17,16 +17,16 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 
 /**
- * Test for User Story.
- * - #14469 Suchen im Beweisbaum
- * - #15081 Rückmeldung im Falle keiner Suchergebnisse
+ * Test for User Story. - #14469 Suchen im Beweisbaum - #15081 Rueckmeldung im
+ * Falle keiner Suchergebnisse
  * 
  * @author Florian Breitfelder
  *
  */
 
 @SuppressWarnings("PMD.AtLeastOneConstructor")
-//PMD will also complain if adding the constructor, then saying "avoid useless constructors"
+// PMD will also complain if adding the constructor, then saying "avoid useless
+// constructors"
 public class SearchViewTest extends NUITest {
 
     public int numberOfResults = 0;
