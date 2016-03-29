@@ -2,7 +2,10 @@ package de.uka.ilkd.key.symbolic_execution.testcase.slicing;
 
 import java.io.File;
 
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.SourceElement;
@@ -14,6 +17,11 @@ import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeSymbolicLayoutExtractor;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.slicing.ThinBackwardSlicer;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
@@ -23,11 +31,58 @@ import de.uka.ilkd.key.util.Pair;
  * Tests for {@link ThinBackwardSlicer}.
  * @author Martin Hentschel
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
    /**
     * Flag to print found slices in the console.
     */
    public static final boolean PRINT_SLICE = false;
+
+   /** 
+    * Tests slicing on the example {@code equivalenceClassesTest} with equivalence classes at index {@code 0}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testEquivalenceClasses_Index_1() throws Exception {
+      doSlicingTest("/slicing/equivalenceClassesTest/Example.proof", 
+                    new ReturnSelector(27),
+                    new EquivalenceClassByIndexSelector(1), // [Equivalence Class [a,b]]
+                    true,
+                    22);
+   }
+
+   /** 
+    * Tests slicing on the example {@code equivalenceClassesTest} with equivalence classes at index {@code 0}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testEquivalenceClasses_Index_0() throws Exception {
+      doSlicingTest("/slicing/equivalenceClassesTest/Example.proof", 
+                    new ReturnSelector(27),
+                    new EquivalenceClassByIndexSelector(0), // []
+                    true,
+                    17);
+   }
+
+   /** 
+    * Tests slicing on the example {@code aliasedByExecutionTest}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testAliasedByExecutionTest() throws Exception {
+      doSlicingTest("/slicing/aliasedByExecutionTest/AliasedByExecution.proof", 
+                    new ReturnSelector(41),
+                    true,
+                    31);
+   }
+
+   /** 
+    * Tests slicing on the example {@code aliasedByExecutionTest}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testNotAliasedByExecutionTest() throws Exception {
+      doSlicingTest("/slicing/aliasedByExecutionTest/AliasedByExecution.proof", 
+                    new ReturnSelector(72),
+                    true,
+                    17);
+   }
 
    /** 
     * Tests slicing on the example {@code loopInvariantNestedListFieldsTest}.
@@ -393,6 +448,26 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
                                 ISeedLocationSelector selector,
                                 boolean fullSlize,
                                 int... expectedSlice) throws Exception {
+      doSlicingTest(proofFileInRepository, 
+                    selector, 
+                    new NoEquivalenceClassSelector(), 
+                    fullSlize, 
+                    expectedSlice);
+   }
+   
+   /**
+    * Performs a slicing test.
+    * @param proofFileInRepository The path to the proof file.
+    * @param selector The {@link ISeedLocationSelector} to use.
+    * @param fullSlize {@code true} if the he full slice is given as expected slice and {@code false} if only a part of the slice is given as expected slice.
+    * @param expectedSlice The serial IDs of the expected slices.
+    * @throws Exception Occurred Exception
+    */
+   protected void doSlicingTest(String proofFileInRepository,
+                                ISeedLocationSelector selector,
+                                IEquivalenceClassSelector eqSelector,
+                                boolean fullSlize,
+                                int... expectedSlice) throws Exception {
       // Load proof
       File proofFile = new File(testCaseDirectory, proofFileInRepository);
       assertTrue(proofFile.exists());
@@ -403,9 +478,15 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
          assertNotNull(proof);
          // Find seed
          Pair<Node, ReferencePrefix> seed = selector.findSeed(proof);
+         // Select equivalence class
+         assertNotNull(eqSelector);
+         ImmutableList<ISymbolicEquivalenceClass> sec = eqSelector.selectEquivalenceClass(environment, proof, seed);
+         if (PRINT_SLICE) {
+            System.out.println("Equivalence Class: " + sec);
+         }
          // Perform slicing
          ThinBackwardSlicer slicer = new ThinBackwardSlicer();
-         ImmutableArray<Node> slices = slicer.slice(seed.first, seed.second);
+         ImmutableArray<Node> slices = slicer.slice(seed.first, seed.second, sec);
          // Print slice if requested
          if (PRINT_SLICE) {
             System.out.println("Found Slices: " + slices.size());
@@ -441,6 +522,71 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
       }
       finally {
          environment.dispose();
+      }
+   }
+   
+   /**
+    * Implementations are used to select an {@link ISymbolicEquivalenceClass}.
+    * @author Martin Hentschel
+    */
+   protected static interface IEquivalenceClassSelector {
+      /**
+       * Selects the {@link ISymbolicEquivalenceClass}.
+       * @param environment The current {@link KeYEnvironment}.
+       * @param proof The current {@link Proof}.
+       * @param seed The current seed.
+       * @return The {@link ISymbolicEquivalenceClass}es or {@code null} to select.
+       */
+      public ImmutableList<ISymbolicEquivalenceClass> selectEquivalenceClass(KeYEnvironment<?> environment, 
+                                                                             Proof proof, 
+                                                                             Pair<Node, ReferencePrefix> seed) throws Exception;
+   }
+   
+   /**
+    * An {@link IEquivalenceClassSelector} which selects no {@link ISymbolicEquivalenceClass}.
+    * @author Martin Hentschel
+    */
+   protected static class NoEquivalenceClassSelector implements IEquivalenceClassSelector {
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<ISymbolicEquivalenceClass> selectEquivalenceClass(KeYEnvironment<?> environment, Proof proof, Pair<Node, ReferencePrefix> seed) {
+         return null;
+      }
+   }
+   
+   /**
+    * An {@link IEquivalenceClassSelector} which selects an {@link ISymbolicEquivalenceClass} by index.
+    * @author Martin Hentschel
+    */
+   protected static class EquivalenceClassByIndexSelector implements IEquivalenceClassSelector {
+      /**
+       * The index of the {@link ISymbolicEquivalenceClass}es.
+       */
+      private final int index;
+      
+      /**
+       * Constructor.
+       * @param index The index of the {@link ISymbolicEquivalenceClass}es.
+       */
+      public EquivalenceClassByIndexSelector(int index) {
+         this.index = index;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<ISymbolicEquivalenceClass> selectEquivalenceClass(KeYEnvironment<?> environment, 
+                                                                             Proof proof, 
+                                                                             Pair<Node, ReferencePrefix> seed) throws Exception {
+         SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, false, false, false, false, false);
+         builder.analyse();
+         IExecutionNode<?> node = builder.getExecutionNode(seed.first);
+         assert node instanceof AbstractExecutionNode<?>;
+         ExecutionNodeSymbolicLayoutExtractor extractor = ((AbstractExecutionNode<?>) node).getLayoutExtractor();
+         return extractor.getEquivalenceClasses(index);
       }
    }
    

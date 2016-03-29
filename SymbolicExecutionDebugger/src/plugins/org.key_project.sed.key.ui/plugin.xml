@@ -750,4 +750,10 @@
             class="org.key_project.sed.key.ui.counterExample.VisualizeModelContextMenuAction">
       </action>
    </extension>
+   <extension
+         point="org.key_project.sed.ui.slicingSettingsControlFactories">
+      <factory
+            class="org.key_project.sed.key.ui.slicing.KeYSlicingSettingsControlFactory">
+      </factory>
+   </extension>
 </plugin>

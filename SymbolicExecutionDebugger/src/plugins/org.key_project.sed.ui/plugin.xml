@@ -6,6 +6,7 @@
    <extension-point id="org.key_project.sed.ui.annotationLinkActions" name="Annotation Link Actions" schema="schema/org.key_project.sed.ui.annotationLinkActions.exsd"/>
    <extension-point id="org.key_project.sed.ui.annotationLinkEditActions" name="Annotation Link Edit Actions" schema="schema/org.key_project.sed.ui.annotationLinkEditActions.exsd"/>
    <extension-point id="org.key_project.sed.ui.annotationTypeImages" name="Annotation Type Images" schema="schema/org.key_project.sed.ui.annotationTypeImages.exsd"/>
+   <extension-point id="org.key_project.sed.ui.slicingSettingsControlFactories" name="Slicing Settings Control Factories" schema="schema/org.key_project.sed.ui.slicingSettingsControlFactories.exsd"/>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -505,5 +506,11 @@
          <initializer
                class="org.key_project.sed.ui.util.SEDUIPreferenceUtilInitializer">
          </initializer>
+      </extension>
+      <extension
+            point="org.key_project.sed.ui.slicingSettingsControlFactories">
+         <factory
+               class="org.key_project.sed.ui.SlicingSettingsControlFactory1">
+         </factory>
       </extension>
 </plugin>
