@@ -19,6 +19,10 @@ import javafx.scene.input.KeyCode;
  * @author Florian Breitfelder
  *
  */
+
+@SuppressWarnings({"PMD.BeanMembersShouldSerialize", "PMD.AtLeastOneConstructor"})
+// Why would anyone ever serialize a JUnit Test?
+//PMD will also complain after adding a constructor, then saying "avoid useless constructors"
 public class NUITest extends GuiTest {
 
     /**

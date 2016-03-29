@@ -81,10 +81,15 @@ public class TreeViewController extends NUIController implements Observer {
     @FXML
     private VBox treeViewPane;
 
-    public void addFilterView(final Pane filterViewHBox, final NUIController nuiController) {
+    /**
+     * Use this to provide this TreeViewController with a reference to the filterView.
+     * @param filterViewHBox the HBox of the filter view
+     * @param filterViewController the Controller of the filter view
+     */
+    public void addFilterView(final Pane filterViewHBox, final NUIController filterViewController) {
         this.filterViewHBox = filterViewHBox;
-        if (nuiController instanceof FilterViewController) {
-            this.fltrVwCtrlr = (FilterViewController) nuiController;
+        if (filterViewController instanceof FilterViewController) {
+            this.fltrVwCtrlr = (FilterViewController) filterViewController;
         }
     }
 
@@ -182,6 +187,10 @@ public class TreeViewController extends NUIController implements Observer {
     public VBox getTreeViewPane() {
         return treeViewPane;
     }
+
+    /**
+     * Instructs the TreeViewController to open the filter view.
+     */
     public final void openFilterView() {
         if (filterViewHBox != null || fltrVwCtrlr != null) {
             fltrVwCtrlr.initializeFiltering(filteringHandler, treeViewPane);
@@ -317,9 +326,6 @@ public class TreeViewController extends NUIController implements Observer {
      */
     @Override
     protected void init() {
-        icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
-        filteringHandler = new FilteringHandler(getDataModel());
-
         Platform.runLater(() -> {
             // listener for opening search view
             try {
@@ -347,6 +353,9 @@ public class TreeViewController extends NUIController implements Observer {
             catch (ControllerNotFoundException exception) {
                 exception.showMessage();
             }
+
+            icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
+            filteringHandler = new FilteringHandler(getDataModel());
 
             // set cell factory for rendering cells
             proofTreeView.setCellFactory((treeItem) -> {

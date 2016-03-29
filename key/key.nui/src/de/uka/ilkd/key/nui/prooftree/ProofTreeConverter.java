@@ -37,8 +37,13 @@ public class ProofTreeConverter {
     private NUIBranchNode nuiRoot;
 
     /**
+     * The ProofTreeStyler used to style the new NUINodes.
+     */
+    private final ProofTreeStyler styler = new ProofTreeStyler();
+
+    /**
      * Constructor. Loads a proof into the converter.
-     * 
+     *
      * @param proof
      *            The proof to load.
      */
@@ -69,11 +74,21 @@ public class ProofTreeConverter {
     }
 
     /**
+     * Getter.
      * @return the root node of the converted tree.
      */
     public NUIBranchNode getRootNode() {
         return nuiRoot;
     }
+
+    /**
+     * Getter.
+     * @return the ProofTreeStyler used to style the new NUINodes.
+     */
+    public ProofTreeStyler getStyler() {
+        return styler;
+    }
+
 
     /**
      * Loads a proof tree by converting it to a NUITree which is used as an
@@ -151,7 +166,7 @@ public class ProofTreeConverter {
 
                 // create NUIBranch and set fields
                 // NOPMD justification: There is no other way than to instantiate inside this loop
-                final NUIBranchNode branchNode = new NUIBranchNode(proofNode); // NOPMD 
+                final NUIBranchNode branchNode = new NUIBranchNode(proofNode); // NOPMD
                 String branchLabel = child.getNodeInfo().getBranchLabel();
                 if (branchLabel == null) {
                     final int caseNumber = (child.parent().getChildNr(child) + 1);
@@ -161,7 +176,7 @@ public class ProofTreeConverter {
                 branchNode.setLabel(branchLabel);
                 branchNode.setClosed(child.isClosed());
                 // Determine style to be applied when ProofTreeCell is rendered
-                branchNode.setStyleConfiguration();
+                branchNode.setStyleConfiguration(styler);
 
                 // add node to parent
                 parent.addChild(branchNode);
@@ -232,7 +247,7 @@ public class ProofTreeConverter {
         newNode.setSymbolicExcecution(symbolicExecution);
 
         // Determine style to be applied when ProofTreeCell is rendered
-        newNode.setStyleConfiguration();
+        newNode.setStyleConfiguration(styler);
     }
 
     /**
@@ -280,7 +295,7 @@ public class ProofTreeConverter {
      */
     private void setNUINodeLinkedTrue(final NUINode newNode) {
         newNode.setLinked(true);
-        newNode.setStyleConfiguration();
+        newNode.setStyleConfiguration(styler);
 
         // propagate linked information to parent
         final NUINode parent = newNode.getParent();

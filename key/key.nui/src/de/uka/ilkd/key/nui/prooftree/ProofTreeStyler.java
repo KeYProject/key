@@ -13,6 +13,7 @@ import javafx.scene.image.ImageView;
  * nodes etc.
  * 
  * @author Patrick Jattke
+ * @author Stefan Pilot
  *
  */
 public final class ProofTreeStyler {
@@ -61,10 +62,6 @@ public final class ProofTreeStyler {
      * The icon factory to be used to get the image icons.
      */
     private final IconFactory icf;
-    /**
-     * The {@link ProofTreeCell} assigned to the current ProofTreeStyler.
-     */
-    private ProofTreeCell ptc;
 
     /**
      * Bundles the name of the assigned CSS classes and the assigned icon image
@@ -72,6 +69,7 @@ public final class ProofTreeStyler {
      * configurations is a StyleConfiguration object.
      * 
      * @author Patrick Jattke
+     * @author Stefan Pilot
      *
      */
     public class StyleConfiguration {
@@ -80,9 +78,9 @@ public final class ProofTreeStyler {
          */
         private final List<String> cssClasses;
         /**
-         * The assigned iconImage.
+         * The name of the assigned iconImage.
          */
-        private ImageView iconImage;
+        private String iconImage;
 
         /**
          * Creates a new StyleConfiguration object.
@@ -136,7 +134,12 @@ public final class ProofTreeStyler {
          * @return {@link ImageView} containing the image.
          */
         public ImageView getIconImage() {
-            return iconImage;
+            if (this.iconImage == null) {
+                return null;
+            }
+            final ImageView img = icf.getImage(iconImage);
+            img.setId(iconImage);
+            return img;
         }
 
         @Override
@@ -161,8 +164,7 @@ public final class ProofTreeStyler {
          *            The file name of the iconImage to set.
          */
         public void setIconImage(final String iconFileName) {
-            iconImage = icf.getImage(iconFileName);
-            iconImage.setId(iconFileName);
+            this.iconImage = iconFileName;
         }
 
         /**
@@ -183,7 +185,7 @@ public final class ProofTreeStyler {
      * thus {@link #applyStyle(NUINode)} should not be called.
      */
     public ProofTreeStyler() {
-        icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
+        this.icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
         initDefaultStyleConfigurations();
     }
 
@@ -193,11 +195,6 @@ public final class ProofTreeStyler {
      *            The {@link ProofTreeCell} associated with this
      *            ProofTreeStyler.
      */
-    public ProofTreeStyler(final ProofTreeCell ptc) {
-        this.ptc = ptc;
-        icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
-        initDefaultStyleConfigurations();
-    }
 
     /**
      * Applies the {@link StyleConfiguration} determined by
@@ -205,8 +202,10 @@ public final class ProofTreeStyler {
      * 
      * @param node
      *            The node where the StyleConfiguration should be applied to.
+     * @param ptc
+     *            The ProofTreeCell containing the node.
      */
-    public void applyStyle(final NUINode node) {
+    public static void applyStyle(final NUINode node, final ProofTreeCell ptc) {
         final Label label = ptc.getLabel();
 
         final StyleConfiguration scfg = node.getStyleConfiguration();
@@ -218,10 +217,8 @@ public final class ProofTreeStyler {
         cssClasses.forEach(cssClass -> label.getStyleClass().add(cssClass));
 
         // Apply icon image
-        final ImageView image = scfg.getIconImage();
-        if (image != null) {
-            ptc.setIcon(image);
-        }
+        ptc.setIcon(scfg.getIconImage());
+
     }
 
     /**
@@ -233,22 +230,6 @@ public final class ProofTreeStyler {
     }
 
     /**
-     * Getter.
-     * @return the {@link ProofTreeCell}.
-     */
-    public ProofTreeCell getPtc() {
-        return ptc;
-    }
-
-    /**
-     * Setter.
-     * @param ptc The {@link ProofTreeCell} you want to set.
-     */
-    public void setPtc(final ProofTreeCell ptc) {
-        this.ptc = ptc;
-    }
-
-    /**
      * Returns the matching {@link StyleConfiguration} for the given type of
      * {@link NUINode}. If no type matches, an empty StyleConfiguration is
      * returned.
@@ -257,6 +238,7 @@ public final class ProofTreeStyler {
      *            The node whose StyleConfiguration should be determined.
      * @return StyleConfiguration of the given node.
      */
+    @SuppressWarnings("PMD.CyclomaticComplexity") // this routine is actually quite simple
     public StyleConfiguration getStyleConfiguration(final NUINode node) {
         // if the node is branch node
         if (node instanceof NUIBranchNode) {

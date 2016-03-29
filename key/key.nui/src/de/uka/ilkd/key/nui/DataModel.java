@@ -37,8 +37,8 @@ public class DataModel extends Observable {
     private final NUI nui;
 
     /**
-     * Map storing the pairs of (String, {@link TreeViewState}), where
-     * String represents the filename of the proof file.
+     * Map storing the pairs of (String, {@link TreeViewState}), where String
+     * represents the filename of the proof file.
      */
     private final Map<String, TreeViewState> treeViewStates = new ConcurrentHashMap<>();
 
@@ -57,7 +57,19 @@ public class DataModel extends Observable {
     }
 
     /**
+     * Creates a new data model for the JUnit Tests without any reference to the
+     * NUI or the resource bundle.
+     */
+    public DataModel() {
+        super();
+        this.nui = null;
+        this.bundle = null;
+
+    }
+
+    /**
      * Getter.
+     * 
      * @return the {@link ResourceBundle}.
      */
     public ResourceBundle getBundle() {
@@ -71,7 +83,8 @@ public class DataModel extends Observable {
      *         loaded proofs.
      */
     public ObservableList<String> getListOfProofs() {
-        final ObservableList<String> listOfProofs = FXCollections.observableArrayList();
+        final ObservableList<String> listOfProofs = FXCollections
+                .observableArrayList();
         for (final String proofName : treeViewStates.keySet()) {
             listOfProofs.add(proofName);
         }
@@ -89,6 +102,7 @@ public class DataModel extends Observable {
 
     /**
      * Getter.
+     * 
      * @return the {@link NUI}
      */
     public NUI getNui() {
@@ -109,8 +123,9 @@ public class DataModel extends Observable {
 
     /**
      * Getter.
-     * @return a Map&lt;String, {@link TreeViewState}&gt;, where the
-     * String represents the filename of the proof file.
+     * 
+     * @return a Map&lt;String, {@link TreeViewState}&gt;, where the String
+     *         represents the filename of the proof file.
      */
     public Map<String, TreeViewState> getTreeViewStates() {
         return treeViewStates;
@@ -179,7 +194,8 @@ public class DataModel extends Observable {
      *            The name of the key associated with the state (filename of
      *            proof file).
      */
-    public void saveTreeViewState(final TreeViewState treeViewState, final String name) {
+    public void saveTreeViewState(final TreeViewState treeViewState,
+            final String name) {
         if (treeViewStates.containsKey(name)) {
             treeViewState.setModified(true);
         }
@@ -191,7 +207,9 @@ public class DataModel extends Observable {
 
     /**
      * Setter.
-     * @param loadedTVS the {@link TreeViewState} you want to set.
+     * 
+     * @param loadedTVS
+     *            the {@link TreeViewState} you want to set.
      */
     public void setLoaddTriVwStat(final TreeViewState loadedTVS) {
         this.loaddTriVwStat = loadedTVS;
@@ -199,6 +217,7 @@ public class DataModel extends Observable {
 
     /**
      * Getter.
+     * 
      * @return the {@link TreeViewState}
      */
     public TreeViewState getLoaddTriVwStat() {

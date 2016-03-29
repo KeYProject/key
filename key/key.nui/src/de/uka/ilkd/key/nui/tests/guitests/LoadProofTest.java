@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.nui.tests.guitests;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
@@ -12,6 +12,9 @@ import org.junit.Test;
  * @author Florian Breitfelder
  *
  */
+
+@SuppressWarnings("PMD.AtLeastOneConstructor")
+//PMD will also complain if adding the constructor, then saying "avoid useless constructors"
 public class LoadProofTest extends NUITest {
 
     /**
@@ -77,7 +80,7 @@ public class LoadProofTest extends NUITest {
         // test load proof
         loadProof(proofFile, true);
 
-        assertTrue(dataModel.getTreeViewState("proofFile") == null);
+        assertNull(dataModel.getTreeViewState("proofFile"));
     }
 
 }

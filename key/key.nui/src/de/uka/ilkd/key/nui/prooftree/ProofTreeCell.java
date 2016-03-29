@@ -71,20 +71,19 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     /**
      * The constructor of the ProofTreeCell.
      * 
-     * @param icf
+     * @param iconFactory
      *            the {@link IconFactory} used to display node icons
-     * @param fh
+     * @param filteringHandler
      *            the {@link FilteringHandler} used to filter this ProofTreeCell
-     * @param tvc
+     * @param treeViewCtrlr
      *            the {@link TreeViewController} associated with the TreeView
      */
 
-    public ProofTreeCell(final IconFactory icf, final FilteringHandler filteringHandler,
+    public ProofTreeCell(final IconFactory iconFactory, final FilteringHandler filteringHandler,
             final TreeViewController treeViewCtrlr) {
-
         super();
         this.filteringHandler = filteringHandler;
-        this.iconFactory = icf;
+        this.iconFactory = iconFactory;
         this.treeViewCtrlr = treeViewCtrlr;
     }
 
@@ -203,11 +202,8 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         label = new Label(item.getLabel() + " ");
         setIcon(null);
 
-        // set decoration (style, icon)
-        final ProofTreeStyler pts = new ProofTreeStyler(this);
-        // applies the style assigned in ProofTreeConverter to the
-        // current ProofTreeCell
-        pts.applyStyle(getItem());
+        // applies the style assigned in ProofTreeConverter to the current ProofTreeCell
+        ProofTreeStyler.applyStyle(getItem(), this);
 
         // workaround to display an icon next to a label
         setText(null);

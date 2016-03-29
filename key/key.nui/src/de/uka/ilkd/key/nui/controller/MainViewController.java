@@ -61,6 +61,10 @@ import javafx.stage.FileChooser;
  */
 @ControllerAnnotation(createMenu = false)
 public class MainViewController extends NUIController implements Observer {
+    /**
+     * The height and width of all the icons defined here.
+     */
+    public static final int MAIN_VIEW_ICON_SIZE = 13;
 
     /**
      * Provides an enum for the available places in the main window.
@@ -89,32 +93,74 @@ public class MainViewController extends NUIController implements Observer {
     }
 
     // Definition of GUI fields
+    /**
+     * The landscape {@link HBox} at the bottom.
+     */
     @FXML
     private HBox bottom;
+    /**
+     * TODO what is this?
+     */
     @FXML
     private ContextMenu contextMenu;
+    /**
+     * The portrait {@link VBox} at the left side.
+     */
     @FXML
     private VBox left;
+    /**
+     * The portait {@link VBox} in the middle.
+     */
     @FXML
     private VBox middle;
+    /**
+     * The portrait {@link VBox} at the right side.
+     */
     @FXML
     private VBox right;
+    /**
+     * The {@link BorderPane} containing everything.
+     */
     @FXML
     private Parent root;
+    /**
+     * The statusbar at the bottom.
+     */
     @FXML
     private Label statustext;
+    /**
+     * The {@link Menu} labeled "View" at the top.
+     */
     @FXML
     private Menu viewMenu;
+    /**
+     * The {@link MenuItem} labeled "Save Proof as...".
+     */
     @FXML
     private MenuItem saveProofAs;
+    /**
+     * The {@link MenuItem} labeled "Save Proof".
+     */
     @FXML
     private MenuItem saveProof;
+    /**
+     * The {@link MenuItem} labeled "Open Proof".
+     */
     @FXML
     private MenuItem openProof;
+    /**
+     * The {@link ProgressIndicator} shown when loading proofs.
+     */
     @FXML
     private ProgressIndicator progressIndicator;
+    /**
+     * The {@link Button} labeled "cancel" used to cancel loading a proof.
+     */
     @FXML
     private Button cancelButton;
+    /**
+     * The image on the {@link Button} labeled "cancel" used to cancel loading a proof.
+     */
     @FXML
     private ImageView cancelButtonImage;
 
@@ -166,6 +212,9 @@ public class MainViewController extends NUIController implements Observer {
         return placeComponent;
     }
 
+    /**
+     * This is executed when clicking the "Close" (or "X") Button.
+     */
     @FXML
     private static void closeButtonAction() {
         Platform.exit();
@@ -514,7 +563,7 @@ public class MainViewController extends NUIController implements Observer {
     @Override
     protected void init() {
         getDataModel().addObserver(this);
-        IconFactory icf = new IconFactory(13, 13);
+        final IconFactory icf = new IconFactory(MAIN_VIEW_ICON_SIZE, MAIN_VIEW_ICON_SIZE);
         this.cancelButtonImage
                 .setImage(icf.getImage(IconFactory.CANCEL_BUTTON).getImage());
     }
@@ -645,7 +694,7 @@ public class MainViewController extends NUIController implements Observer {
                     if (!e.getMessage().contains("java.lang.ThreadDeath")) {
                         Platform.runLater(() -> {
                             cancelLoadProof();
-                            Alert exceptionAlert = new Alert(AlertType.ERROR);
+                            final Alert exceptionAlert = new Alert(AlertType.ERROR);
                             exceptionAlert.setTitle(getBundle()
                                     .getString("errorLoadingFileTitle"));
                             exceptionAlert.setHeaderText(getBundle()

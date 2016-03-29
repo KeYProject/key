@@ -21,7 +21,43 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
  * @author Patrick Jattke
  *
  */
+@SuppressWarnings({"PMD.BeanMembersShouldSerialize", "PMD.AtLeastOneConstructor"})
+// Why would anyone ever serialize a JUnit Test?
+//PMD will also complain after adding a constructor, then saying "avoid useless constructors"
 public class SearchTest {
+    /**
+     * A few pairs of a search term and the expected number of results.
+     */
+    private static final String SEARCH_TERM_01 = "polySimp_pullOutFactor0b";
+    private static final int NUM_RESULTS_01 = 6;
+    private static final String SEARCH_TERM_02 = "neg_literal";
+    private static final int NUM_RESULTS_02 = 9;
+    private static final String SEARCH_TERM_03 = "polySimp_";
+    private static final int NUM_RESULTS_03 = 142;
+    private static final String SEARCH_TERM_04 = "inEqSimp_contradInEq0";
+    private static final int NUM_RESULTS_04 = 4;
+    private static final String SEARCH_TERM_05 = "qeq";
+    private static final int NUM_RESULTS_05 = 49;
+    private static final String SEARCH_TERM_06 = "CUT: a <= -1 | a >= 1 FALSE";
+    private static final int NUM_RESULTS_06 = 2;
+    private static final String SEARCH_TERM_11 = "CUT: a >= 1 TRUE";
+    private static final int NUM_RESULTS_11 = 1;
+    private static final String SEARCH_TERM_12 = "CUT: a <= -2 | a >= 2 FALSE";
+    private static final int NUM_RESULTS_12 = 1;
+    private static final String SEARCH_TERM_13 = "$leq";
+    private static final int NUM_RESULTS_13 = 0;
+    private static final String SEARCH_TERM_21 = "NO_SUCH";
+    private static final int NUM_RESULTS_21 = 0;
+    private static final String SEARCH_TERM_22 = "polySimp_addAssoc2";
+    private static final int NUM_RESULTS_22 = 0;
+    private static final String SEARCH_TERM_23 = "concrete_impl_2";
+    private static final int NUM_RESULTS_23 = 0;
+    private static final String SEARCH_TERM_24 = "EQU$Simp";
+    private static final int NUM_RESULTS_24 = 0;
+    private static final String SEARCH_TERM_25 = "polyS%imp-";
+    private static final int NUM_RESULTS_25 = 0;
+    private static final String SEARCH_TERM_26 = "";
+    private static final int NUM_RESULTS_26 = 0;
 
     /**
      * The proof file used for this test.
@@ -30,7 +66,7 @@ public class SearchTest {
         = "resources//de/uka//ilkd//key//examples//example01.proof";
 
     /**
-     * The ProofTreeVis. ualizer used to load the test file.
+     * The ProofTreeVisualizer used to load the test file.
      */
     private ProofTreeConverter ptVisualizer;
 
@@ -39,9 +75,9 @@ public class SearchTest {
      */
     @Before
     public void setUp() {
-        final File proofFile = new File(TESTFILE_01);
         KeYEnvironment<?> environment = null;
         try {
+            final File proofFile = new File(TESTFILE_01);
             environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null,
                     null, null, true);
         }
@@ -65,43 +101,28 @@ public class SearchTest {
     @Test
     public void testSearchNumberOfFindings() {
         // 01_CommonSearch
-        final String searchTerm01 = "polySimp_pullOutFactor0b";
-        final int numResults01 = 6;
-        assertTrue(searchAndCompareSize(searchTerm01, numResults01));
+        assertTrue(searchAndCompareSize(SEARCH_TERM_01, NUM_RESULTS_01));
 
         // 02_CommonSearch
-        final String searchTerm02 = "neg_literal";
-        final int numResults02 = 9;
-        assertTrue(searchAndCompareSize(searchTerm02, numResults02));
-
+        assertTrue(searchAndCompareSize(SEARCH_TERM_02, NUM_RESULTS_02));
         // 02_CommonSearch - test upper case
-        assertTrue(searchAndCompareSize(searchTerm02.toUpperCase(), numResults02));
+        assertTrue(searchAndCompareSize(SEARCH_TERM_02.toUpperCase(), NUM_RESULTS_02));
 
         // 03_CommonSearch
-        final String searchTerm03 = "polySimp_";
-        final int numResults03 = 142;
-        assertTrue(searchAndCompareSize(searchTerm03, numResults03));
+        assertTrue(searchAndCompareSize(SEARCH_TERM_03, NUM_RESULTS_03));
 
         // 04_CommonSearch
-        final String searchTerm04 = "inEqSimp_contradInEq0";
-        final int numResults04 = 4;
-        assertTrue(searchAndCompareSize(searchTerm04, numResults04));
-
+        assertTrue(searchAndCompareSize(SEARCH_TERM_04, NUM_RESULTS_04));
         // 04_CommonSearch - test upper case
-        assertTrue(searchAndCompareSize(searchTerm04.toUpperCase(), numResults04));
+        assertTrue(searchAndCompareSize(SEARCH_TERM_04.toUpperCase(), NUM_RESULTS_04));
 
         // 05_CommonSearch - test if beginning of term is found
-        final String searchTerm05 = "qeq";
-        final int numResults05 = 49;
-        assertTrue(searchAndCompareSize(searchTerm05, numResults05));
-
+        assertTrue(searchAndCompareSize(SEARCH_TERM_05, NUM_RESULTS_05));
         // 05_CommonSearch - test upper case
-        assertTrue(searchAndCompareSize(searchTerm05.toUpperCase(), numResults05));
+        assertTrue(searchAndCompareSize(SEARCH_TERM_05.toUpperCase(), NUM_RESULTS_05));
 
         // 06_CommonSearch
-        final String searchTerm06 = "CUT: a <= -1 | a >= 1 FALSE";
-        final int numResults06 = 2;
-        assertTrue(searchAndCompareSize(searchTerm06, numResults06));
+       assertTrue(searchAndCompareSize(SEARCH_TERM_06, NUM_RESULTS_06));
 
     }
 
@@ -111,28 +132,22 @@ public class SearchTest {
     @Test
     public void testSearchNoMatches() {
         // 01_NoMatchSearch
-        final String searchTerm01 = "NO_SUCH";
-        assertTrue(searchAndCompareSize(searchTerm01, 0));
+       assertTrue(searchAndCompareSize(SEARCH_TERM_21, NUM_RESULTS_21));
 
         // 02_NoMatchSearch
-        final String searchTerm02 = "polySimp_addAssoc2";
-        assertTrue(searchAndCompareSize(searchTerm02, 0));
+        assertTrue(searchAndCompareSize(SEARCH_TERM_22, NUM_RESULTS_22));
 
         // 03_NoMatchSearch
-        final String searchTerm03 = "concrete_impl_2";
-        assertTrue(searchAndCompareSize(searchTerm03, 0));
+        assertTrue(searchAndCompareSize(SEARCH_TERM_23, NUM_RESULTS_23));
 
         // 04_NoMatchSearch
-        final String searchTerm04 = "EQU$Simp";
-        assertTrue(searchAndCompareSize(searchTerm04, 0));
+        assertTrue(searchAndCompareSize(SEARCH_TERM_24, NUM_RESULTS_24));
 
         // 05_NoMatchSearch
-        final String searchTerm05 = "polyS%imp-";
-        assertTrue(searchAndCompareSize(searchTerm05, 0));
+        assertTrue(searchAndCompareSize(SEARCH_TERM_25, NUM_RESULTS_25));
 
         // 06_NoMatchSearch
-        final String searchTerm06 = "";
-        assertTrue(searchAndCompareSize(searchTerm06, 0));
+        assertTrue(searchAndCompareSize(SEARCH_TERM_26, NUM_RESULTS_26));
 
     }
 
@@ -143,16 +158,13 @@ public class SearchTest {
     @Test
     public void testSearchSpecialTerms() {
         // 01_NoMatchSearch
-        final String searchTerm01 = "CUT: a >= 1 TRUE";
-        assertTrue(searchAndCompareSize(searchTerm01, 1));
+        assertTrue(searchAndCompareSize(SEARCH_TERM_11, NUM_RESULTS_11));
 
         // 02_NoMatchSearch
-        final String searchTerm02 = "CUT: a <= -2 | a >= 2 FALSE";
-        assertTrue(searchAndCompareSize(searchTerm02, 1));
+        assertTrue(searchAndCompareSize(SEARCH_TERM_12, NUM_RESULTS_12));
 
         // 03_NoMatchSearch
-        final String searchTerm03 = "$leq";
-        assertTrue(searchAndCompareSize(searchTerm03, 0));
+        assertTrue(searchAndCompareSize(SEARCH_TERM_13, NUM_RESULTS_13));
 
     }
 

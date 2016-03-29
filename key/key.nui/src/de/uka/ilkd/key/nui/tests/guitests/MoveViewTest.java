@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui.tests.guitests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +15,12 @@ import org.junit.Test;
  * @author Patrick Jattke
  *
  */
+
+@SuppressWarnings({ "PMD.BeanMembersShouldSerialize",
+        "PMD.AtLeastOneConstructor", "PMD" })
+// Why would anyone ever serialize a JUnit Test?
+// PMD will also complain after adding a constructor, then saying "avoid useless
+// constructors"
 public class MoveViewTest extends NUITest {
 
     // IDs of the panes where the views can be placed on
@@ -30,11 +37,13 @@ public class MoveViewTest extends NUITest {
     // IDs of the views
     private static final String CONFIG_VIEWS = "#configViews";
 
-    private String hide = null;
-    private String left = null;
-    private String middle = null;
-    private String right = null;
-    private String bottom = null;
+    private static final String PROOF_FILE_NAME = "example01.proof";
+
+    private String hide;
+    private String left;
+    private String middle;
+    private String right;
+    private String bottom;
 
     /**
      * @throws Throwable
@@ -92,7 +101,7 @@ public class MoveViewTest extends NUITest {
         final String componendId = "#openProofsViewPane";
         final String subMenuName = nui.getText("openProofsViewPane");
 
-        loadProof("example01.proof", false);
+        loadProof(PROOF_FILE_NAME, false);
         moveViewTester(componendId, subMenuName);
     }
 
@@ -102,13 +111,13 @@ public class MoveViewTest extends NUITest {
     @Test
     public void testMoveTreeView() {
         /*
-         * componendId must starts with # hence testfx interprets componedId as
+         * componentId must starts with # hence testfx interprets componentId as
          * JavaFX fxid
          */
         final String componendId = "#treeViewPane";
         final String subMenuName = nui.getText("treeViewPane");
 
-        loadProof("example01.proof", false);
+        loadProof(PROOF_FILE_NAME, false);
         moveViewTester(componendId, subMenuName);
     }
 
@@ -124,7 +133,7 @@ public class MoveViewTest extends NUITest {
         final String componendId = "#strategyViewPane";
         final String subMenuName = nui.getText("strategyViewPane");
 
-        loadProof("example01.proof", false);
+        loadProof(PROOF_FILE_NAME, false);
         moveViewTester(componendId, subMenuName);
     }
 
@@ -140,7 +149,7 @@ public class MoveViewTest extends NUITest {
         final String componendId = "#proofViewPane";
         final String subMenuName = nui.getText("proofViewPane");
 
-        loadProof("example01.proof", false);
+        loadProof(PROOF_FILE_NAME, false);
         moveViewTester(componendId, subMenuName);
     }
 
@@ -159,6 +168,7 @@ public class MoveViewTest extends NUITest {
         // place view on HIDE
         clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
                 .moveTo(hide).clickOn(hide);
+
         assertNull(find(componentId));
 
         // place view on LEFT pane
@@ -193,6 +203,7 @@ public class MoveViewTest extends NUITest {
         // place view on HIDE pane
         clickOn(MENUBAR_VIEW).moveTo(CONFIG_VIEWS).moveTo(subMenuName)
                 .moveTo(hide).clickOn(hide);
+
         assertNull(find(componentId));
     }
 }

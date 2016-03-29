@@ -22,16 +22,20 @@ import javafx.scene.layout.Pane;
  * @author Florian Breitfelder
  */
 @ControllerAnnotation(createMenu = true)
-public class OpenProofsViewController extends NUIController
-        implements Observer {
+public class OpenProofsViewController extends NUIController implements Observer {
 
     /**
      * The context menu shown when the user right-clicks on an loaded proof.
      */
     private ContextMenu contextMenu;
+    /**
+     * The {@link ListView} containing all the loaded proofs.
+     */
     @FXML
     private transient ListView<String> listView;
-
+    /**
+     * The {@link Pane} containing the ListView.
+     */
     @FXML
     private Pane openProofsViewPane;
 
@@ -56,8 +60,7 @@ public class OpenProofsViewController extends NUIController
 
     @Override
     public void update(final Observable observable, final Object arg) {
-        final ObservableList<String> loadedProofs = getDataModel()
-                .getListOfProofs();
+        final ObservableList<String> loadedProofs = getDataModel().getListOfProofs();
         if (loadedProofs.size() >= 1) {
             listView.setContextMenu(contextMenu);
         }
@@ -73,9 +76,8 @@ public class OpenProofsViewController extends NUIController
      * {@link #contextMenu}. The caller must check if the file was modified at
      * all, e.g. {@code getDataModel().getLoadedTreeViewState().isModified()}.
      * 
-     * @param returns
-     *            true iff the open proof was saved successful or the user
-     *            aborted ("cancel") the "save as" file chooser window
+     * @return true if the open proof was saved successful or the user
+     *         aborted ("cancel") the "save as" file chooser window
      */
     private boolean showSaveDialog() {
         // File was changed: ask user if he wants to save changes
@@ -84,19 +86,16 @@ public class OpenProofsViewController extends NUIController
         alert.setTitle(getBundle().getString("dialogTitle"));
 
         // define text for header and content area
-        final String filename = getDataModel().getLoadedTreeViewState()
-                .getProof().getProofFile().getName();
-        alert.setHeaderText(MessageFormat.format(
-                getBundle().getString("dialogHeader"), "'" + filename + "'"));
+        final String filename = getDataModel().getLoadedTreeViewState().getProof().getProofFile()
+                .getName();
+        alert.setHeaderText(
+                MessageFormat.format(getBundle().getString("dialogHeader"), "'" + filename + "'"));
         alert.setContentText(getBundle().getString("dialogQuestion"));
 
         // define button types
-        final ButtonType buttonSaveAs = new ButtonType(
-                getBundle().getString("dialogSaveAs"));
-        final ButtonType buttonClose = new ButtonType(
-                getBundle().getString("dialogExit"));
-        final ButtonType buttonAbort = new ButtonType(
-                getBundle().getString("dialogAbort"));
+        final ButtonType buttonSaveAs = new ButtonType(getBundle().getString("dialogSaveAs"));
+        final ButtonType buttonClose = new ButtonType(getBundle().getString("dialogExit"));
+        final ButtonType buttonAbort = new ButtonType(getBundle().getString("dialogAbort"));
         alert.getButtonTypes().setAll(buttonSaveAs, buttonClose, buttonAbort);
 
         // evaluate button user clicked
@@ -104,8 +103,8 @@ public class OpenProofsViewController extends NUIController
         boolean returnValue = false;
         if (result.get() == buttonSaveAs) {
             try {
-                returnValue = ((MainViewController) getNui()
-                        .getController("MainView")).saveProofAsDialog();
+                returnValue = ((MainViewController) getNui().getController("MainView"))
+                        .saveProofAsDialog();
             }
             catch (ControllerNotFoundException e) {
                 e.showMessage();
@@ -127,15 +126,13 @@ public class OpenProofsViewController extends NUIController
         getDataModel().addObserver(this);
         // Action to be performed if user clicks (left) on a proof entry
         listView.setOnMouseClicked((event) -> {
-            final String selectedItem = listView.getSelectionModel()
-                    .getSelectedItem();
+            final String selectedItem = listView.getSelectionModel().getSelectedItem();
             if (selectedItem != null) {
                 getDataModel().loadProofFormMemory(selectedItem);
             }
         });
 
-        final MenuItem deleteProof = new MenuItem(
-                getBundle().getString("closeProof"));
+        final MenuItem deleteProof = new MenuItem(getBundle().getString("closeProof"));
         contextMenu = new ContextMenu(deleteProof);
 
         // Action to be performed if user clicks on 'Close Proof' (contextMenu)
@@ -147,10 +144,8 @@ public class OpenProofsViewController extends NUIController
             }
             // if proof was modified and saved OR if proof was not modified at
             // all, then remove proof from openProofsView
-            if (canBeClosed
-                    || !getDataModel().getLoadedTreeViewState().isModified()) {
-                getDataModel().removeProof(
-                        listView.getSelectionModel().getSelectedItem());
+            if (canBeClosed || !getDataModel().getLoadedTreeViewState().isModified()) {
+                getDataModel().removeProof(listView.getSelectionModel().getSelectedItem());
             }
         });
     }

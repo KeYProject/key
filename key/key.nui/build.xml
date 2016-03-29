@@ -156,7 +156,11 @@
 	<!-- Definition of target CHECKSTYLE -->
 	<target name="checkstyle" description="Generates Checkstyle Report.">
 		<checkstyle config="${basedir}/reports-config/checkstyle/checkstyle_bp_key_160130.xml" classpath="${basedir}/ant-lib/checkstyle/checkstyle-6.14.1-all.jar">
-			<fileset dir="${basedir}/src" includes="**/*.java" />
+			<fileset dir="${basedir}/src"> 
+				<include name="**/*.java" />
+				<exclude name="de/uka/ilkd/key/nui/tests/guitests/*.java"/>
+				<exclude name="de/uka/ilkd/key/nui/tests/junittests/*.java"/>
+			</fileset>
 			<formatter type="xml" tofile="${basedir}/reports/checkstyle.xml" />
 		</checkstyle>
 		<xslt in="${basedir}/reports/checkstyle.xml" out="${basedir}/reports/checkstyle.html" style="${basedir}/reports-templates/checkstyle/checkstyle-noframes.xsl" />

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui.tests.guitests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -19,6 +20,10 @@ import javafx.scene.input.KeyCode;
  * @author Florian Breitfelder
  *
  */
+
+@SuppressWarnings("PMD.AtLeastOneConstructor")
+// PMD will also complain if adding the constructor, then saying "avoid useless
+// constructors"
 public class TreeViewTest extends NUITest {
 
     IconFactory iconFactory = new IconFactory(ProofTreeCell.ICON_SIZE,
@@ -207,7 +212,7 @@ public class TreeViewTest extends NUITest {
         type(KeyCode.ENTER);
 
         waitUntilStatusIs("Ready.");
-        
+
         // Expand All
         clickOn("Proof Tree ");
         rightClickOn().clickOn("Expand All");
@@ -228,8 +233,10 @@ public class TreeViewTest extends NUITest {
         for (int i = 0; i < proofTreeItem.getInternalChildren().size(); i++) {
             ProofTreeItem currentItem = (ProofTreeItem) proofTreeItem
                     .getChildren().get(i);
-            
-            System.out.println(currentItem.getValue().toString() + " | " + currentItem.getGraphic()+ " | " + currentItem.getValue().isClosed());
+
+            System.out.println(currentItem.getValue().toString() + " | "
+                    + currentItem.getGraphic() + " | "
+                    + currentItem.getValue().isClosed());
 
             // leaf
             if (currentItem.isLeaf()) {
@@ -239,7 +246,7 @@ public class TreeViewTest extends NUITest {
                             iconFactory.getImage(IconFactory.LEAF_CLOSED)));
                 }
                 // open
-                else if (currentItem.getGraphic()!=null){
+                else if (currentItem.getGraphic() != null) {
                     assertTrue(currentItem.getGraphic().equals(
                             iconFactory.getImage(IconFactory.LEAF_OPEN)));
                 }
@@ -263,9 +270,9 @@ public class TreeViewTest extends NUITest {
                 }
                 // open
                 else if (!currentItem.getValue().isClosed()) {
-                    
-                    //assertTrue(currentItem.getGraphic().equals(
-                    //        iconFactory.getImage(IconFactory.BRANCH_OPEN)));
+
+                    // assertTrue(currentItem.getGraphic().equals(
+                    // iconFactory.getImage(IconFactory.BRANCH_OPEN)));
                 }
 
             }

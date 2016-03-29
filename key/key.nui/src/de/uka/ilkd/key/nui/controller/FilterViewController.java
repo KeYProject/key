@@ -23,12 +23,24 @@ import javafx.scene.layout.Pane;
 @SuppressWarnings("PMD.AtLeastOneConstructor")
 public class FilterViewController extends NUIController {
 
+    /**
+     * The {@link Button} to close the view.
+     */
     @FXML
     private transient Button btnCloseView;
+    /**
+     * The {@link Button} to toggle the filtering.
+     */
     @FXML
     private transient ToggleButton btnToggleFilter;
+    /**
+     * The HBox containing the whole view.
+     */
     @FXML
     private transient HBox filterViewHBox;
+    /**
+     * The text field for putting in the filter query.
+     */
     @FXML
     private transient TextField tfFilterQuery;
 
@@ -52,7 +64,7 @@ public class FilterViewController extends NUIController {
          */
         @Override
         public String getContextMenuItemText() {
-            return "THIS IS A BUG";
+            return "Text filter: '" + term + "'";
         }
 
         /**
@@ -114,7 +126,7 @@ public class FilterViewController extends NUIController {
      * Makes the {@link FilteringHandler} filter by the term given into the
      * {@link TextField}, but only if the {@link ToggleButton} is selected.
      */
-    private void performFiltering() {
+    public void performFiltering() {
         if (term.isEmpty() || !btnToggleFilter.isSelected()) {
             filteringHandler.stopFilteringBy(textFilter);
         }
@@ -188,7 +200,7 @@ public class FilterViewController extends NUIController {
     }
     /**
      * Setter.
-     * @param the treeView{@link Pane}.
+     * @param treeViewPane the treeView{@link Pane}.
      */
     public void setTreeViewPane(final Pane treeViewPane) {
         this.treeViewPane = treeViewPane;
