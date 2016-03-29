@@ -196,6 +196,8 @@ public final class ProofTreeStyler {
      * 
      * @param node
      *            The node where the StyleConfiguration should be applied to.
+     * @param ptc
+     *            The ProofTreeCell containing the node.
      */
     public static void applyStyle(final NUINode node, final ProofTreeCell ptc) {
         final Label label = ptc.getLabel();

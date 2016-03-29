@@ -23,12 +23,24 @@ import javafx.scene.layout.Pane;
 @SuppressWarnings("PMD.AtLeastOneConstructor")
 public class FilterViewController extends NUIController {
 
+    /**
+     * The {@link Button} to close the view.
+     */
     @FXML
     private transient Button btnCloseView;
+    /**
+     * The {@link Button} to toggle the filtering.
+     */
     @FXML
     private transient ToggleButton btnToggleFilter;
+    /**
+     * The HBox containing the whole view.
+     */
     @FXML
     private transient HBox filterViewHBox;
+    /**
+     * The text field for putting in the filter query.
+     */
     @FXML
     private transient TextField tfFilterQuery;
 

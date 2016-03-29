@@ -29,9 +29,14 @@ public class OpenProofsViewController extends NUIController
      * The context menu shown when the user right-clicks on an loaded proof.
      */
     private ContextMenu contextMenu;
+    /**
+     * The {@link ListView} containing all the loaded proofs.
+     */
     @FXML
     private transient ListView<String> listView;
-
+    /**
+     * The {@link Pane} containing the ListView.
+     */
     @FXML
     private Pane openProofsViewPane;
 

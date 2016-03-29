@@ -71,99 +71,164 @@ public class StrategyViewController extends NUIController implements Observer {
      */
     private static int defaultMaxRuleApplications = TEN; //NOPMD name is fine... sort of
 
+    /**
+     * The "Arithmetic Treatment" {@link ToggleGroup}.
+     */
     @FXML
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.LongVariable" })
     private ToggleGroup arithmeticTreatment;
 
+    /**
+     * The "Auto Induction" {@link ToggleGroup}.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.LongVariable", "PMD.CommentRequired" })
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.LongVariable"})
     private ToggleGroup autoInduction;
 
+    /**
+     * The "Block Treatment" {@link ToggleGroup}.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private ToggleGroup blockTreatment;
 
+    /**
+     * The "Class Axiom" {@link ToggleGroup}.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private ToggleGroup classAxiom;
 
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    /**
+     * The current slider value.
+     */
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private transient int currSliderVal = defaultMaxRuleApplications;
 
+    /**
+     * The "Dependency Contracts" {@link ToggleGroup}.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired", "PMD.LongVariable" })
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.LongVariable" })
     private ToggleGroup dependencyContracts;
 
+    /**
+     * The "Expand Local Queries" {@link ToggleGroup}.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired", "PMD.LongVariable" })
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.LongVariable" })
     private ToggleGroup expandLocalQueries;
 
+    /**
+     * The "Start" {@link Button}.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired",
-            "PMD.AvoidDuplicateLiterals" })
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.AvoidDuplicateLiterals" })
     private Button goButton;
 
+    /**
+     * The green arrowhead on the "Start" Button.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private ImageView goButtonImage;
 
+    /**
+     * The "Loop Treatment" {@link ToggleGroup}.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private ToggleGroup loopTreatment;
 
+    /**
+     * The label saying "Max. Rule Applications"
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private transient Label maxRuleAppLabel;
 
+    /**
+     * The Slider to set the max. rule applications.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private transient Slider maxRuleAppSlider;
 
+    /**
+     * The "Method Treatment" {@link ToggleGroup}.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private ToggleGroup methodTreatment;
 
+    /**
+     * An anchor Pane, currently unused. TODO verify
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired", "PMD.LongVariable" })
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.LongVariable" })
     private transient AnchorPane proofSearchStrategy;
 
+    /**
+     * The "Proof Splitting" {@link ToggleGroup}.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private ToggleGroup proofSplitting;
 
+    /**
+     * The "Quantifier Treatment" {@link ToggleGroup}.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired", "PMD.LongVariable" })
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.LongVariable" })
     private ToggleGroup quantifierTreatment;
 
+    /**
+     * The "Query Treatment" {@link ToggleGroup}.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private ToggleGroup queryTreatment;
 
+    /**
+     * The "Stop at" {@link ToggleGroup}.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private ToggleGroup stopAt;
 
+    /**
+     * The Anchor Pane containing the whole view.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private AnchorPane strategyViewPane;
 
     /**
      * The instance of the strategyWrapper containing the radio buttons of the
      * StrategyView.
      */
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private StrategyWrapper strategyWrapper;
 
+    /**
+     * The first "User Specific Taclet Sets" {@link ToggleGroup}.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private ToggleGroup userOptions1;
 
+    /**
+     * The second "User Specific Taclet Sets" {@link ToggleGroup}.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private ToggleGroup userOptions2;
 
+    /**
+     * The third "User Specific Taclet Sets" {@link ToggleGroup}.
+     */
     @FXML
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private ToggleGroup userOptions3;
 
     /**

@@ -166,7 +166,7 @@ public class ProofTreeConverter {
 
                 // create NUIBranch and set fields
                 // NOPMD justification: There is no other way than to instantiate inside this loop
-                final NUIBranchNode branchNode = new NUIBranchNode(proofNode); // NOPMD 
+                final NUIBranchNode branchNode = new NUIBranchNode(proofNode); // NOPMD
                 String branchLabel = child.getNodeInfo().getBranchLabel();
                 if (branchLabel == null) {
                     final int caseNumber = (child.parent().getChildNr(child) + 1);

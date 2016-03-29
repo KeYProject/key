@@ -15,10 +15,12 @@ import javafx.scene.control.TextArea;
  *
  */
 @ControllerAnnotation(createMenu = true)
-@SuppressWarnings("PMD.AtLeastOneConstructor") // makes no sense in classes
-                                               // marshaled from fxml
+@SuppressWarnings("PMD.AtLeastOneConstructor") // makes no sense in classes marshaled from fxml
 public class ProofViewController extends NUIController implements Observer {
 
+    /**
+     * The {@link TextArea} where Proof details are displayed.
+     */
     @FXML
     private transient TextArea textAreaProof;
 

@@ -89,32 +89,74 @@ public class MainViewController extends NUIController implements Observer {
     }
 
     // Definition of GUI fields
+    /**
+     * The landscape {@link HBox} at the bottom.
+     */
     @FXML
     private HBox bottom;
+    /**
+     * TODO what is this?
+     */
     @FXML
     private ContextMenu contextMenu;
+    /**
+     * The portrait {@link VBox} at the left side.
+     */
     @FXML
     private VBox left;
+    /**
+     * The portait {@link VBox} in the middle.
+     */
     @FXML
     private VBox middle;
+    /**
+     * The portrait {@link VBox} at the right side.
+     */
     @FXML
     private VBox right;
+    /**
+     * The {@link BorderPane} containing everything.
+     */
     @FXML
     private Parent root;
+    /**
+     * The statusbar at the bottom.
+     */
     @FXML
     private Label statustext;
+    /**
+     * The {@link Menu} labeled "View" at the top.
+     */
     @FXML
     private Menu viewMenu;
+    /**
+     * The {@link MenuItem} labeled "Save Proof as..."
+     */
     @FXML
     private MenuItem saveProofAs;
+    /**
+     * The {@link MenuItem} labeled "Save Proof"
+     */
     @FXML
     private MenuItem saveProof;
+    /**
+     * The {@link MenuItem} labeled "Open Proof"
+     */
     @FXML
     private MenuItem openProof;
+    /**
+     * The {@link ProgressIndicator} shown when loading proofs.
+     */
     @FXML
     private ProgressIndicator progressIndicator;
+    /**
+     * The {@link Button} labeled "cancel" used to cancel loading a proof.
+     */
     @FXML
     private Button cancelButton;
+    /**
+     * The image on the {@link Button} labeled "cancel" used to cancel loading a proof.
+     */
     @FXML
     private ImageView cancelButtonImage;
 
