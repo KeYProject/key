@@ -71,14 +71,13 @@ public class ProofTreeItem extends TreeItem<NUINode> {
         // HINT: DO NOT TRY TO USE JAVA 8 FOR THIS! (or do it and find out why
         // it does not work)
 
-        final Predicate<? super ProofTreeItem> pred = new Predicate<ProofTreeItem>() {
+        filteredChildren.setPredicate(new Predicate<ProofTreeItem>() {
             @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
             @Override
             public boolean test(final ProofTreeItem pti) {
                 return pti.isVisible();
             }
-        };
-        filteredChildren.setPredicate(pred);
+        });
     }
 
     /**
@@ -86,7 +85,7 @@ public class ProofTreeItem extends TreeItem<NUINode> {
      * 
      * @param filter
      *            The filter to apply.
-     * @return true iff the item is supposed to be displayed after filtering
+     * @return true if the item is supposed to be displayed after filtering
      */
     public boolean filter(final ProofTreeFilter filter) {
 

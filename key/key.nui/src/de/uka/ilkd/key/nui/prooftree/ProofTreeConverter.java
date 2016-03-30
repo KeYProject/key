@@ -204,8 +204,8 @@ public class ProofTreeConverter {
      */
     private void assignNUIFieldsAndStyle(final Node proofNode, final Proof proof,
             final NUINode newNode) {
-        final Goal goal = proof.getGoal(proofNode);
         if (proofNode.leaf()) {
+            final Goal goal = proof.getGoal(proofNode);
             if (goal == null) {
                 // node has no open goal -> node must be closed
                 newNode.setClosed(true);
