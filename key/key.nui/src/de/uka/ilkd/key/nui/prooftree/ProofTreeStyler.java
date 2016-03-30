@@ -79,6 +79,10 @@ public final class ProofTreeStyler {
          */
         private final List<String> cssClasses;
         /**
+         * See hashCode().
+         */
+        private final int HASH_CODE = 5;
+        /**
          * The name of the assigned iconImage.
          */
         private String iconImage;
@@ -125,7 +129,7 @@ public final class ProofTreeStyler {
          */
         @Override
         public int hashCode() {
-            return 5; // Guaranteed to be a collision-free hash, see
+            return HASH_CODE; // Guaranteed to be a collision-free hash, see
                       // https://xkcd.com/221/
         }
 

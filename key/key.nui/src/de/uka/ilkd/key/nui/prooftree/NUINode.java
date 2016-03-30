@@ -273,6 +273,7 @@ public abstract class NUINode {
      *            the term to search for
      * @return true iff there are any search results
      */
+    @SuppressWarnings("checkstyle:avoidinlineconditionals")
     public int search(final String term) {
         if (term.isEmpty()) {
             return 0;

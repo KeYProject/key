@@ -93,6 +93,7 @@ public class NUIBranchNode extends NUINode {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:avoidinlineconditionals")
     public int search(final String term) {
         // case: Empty search term given
         if (term.isEmpty()) {
