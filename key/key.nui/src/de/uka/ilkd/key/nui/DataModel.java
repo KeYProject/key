@@ -57,17 +57,6 @@ public class DataModel extends Observable {
     }
 
     /**
-     * Creates a new data model for the JUnit Tests without any reference to the
-     * NUI or the resource bundle.
-     */
-    public DataModel() {
-        super();
-        this.nui = null;
-        this.bundle = null;
-
-    }
-
-    /**
      * Getter.
      * 
      * @return the {@link ResourceBundle}.

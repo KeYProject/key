@@ -75,17 +75,4 @@ public final class ProofTreeActions {
             }
         }
     }
-
-    /**
-     * Repaints a tree item in its treeView. This is a workaround as JavaFX
-     * doesn't support this function. It works by triggering the internal
-     * treeCell update method such that the treeCell is rendered again.
-     * 
-     * @param treeItem
-     *            the treeItem to refresh
-     */
-    public static void refreshTreeItem(final TreeItem<NUINode> treeItem) {
-        final int index = treeItem.getParent().getChildren().indexOf(treeItem);
-        treeItem.getParent().getChildren().set(index, treeItem);
-    }
 }

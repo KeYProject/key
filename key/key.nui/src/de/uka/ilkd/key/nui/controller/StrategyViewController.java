@@ -363,18 +363,19 @@ public class StrategyViewController extends NUIController implements Observer {
      */
     private void calculateCurrentSliderValue(final Number newVal) {
         final double sliderValue = newVal.doubleValue();
-        final double roundSliderValue = Math.floor(sliderValue);
-        final double vWNOAN = sliderValue % NINE;
 
         if (sliderValue > 0 && sliderValue < 1) {
+            final double vWNOAN = sliderValue % NINE;
             currSliderVal = (int) Math.floor(vWNOAN * TEN) + 1;
         }
         else {
+            final double roundSliderValue = Math.floor(sliderValue);
             final double sliderCoefficient = Math.pow(TEN, roundSliderValue);
             if (Arrays.asList(RNG_ONE_TO_SIX).contains(sliderValue)) {
                 currSliderVal = (int) sliderCoefficient;
             }
             else {
+                final double vWNOAN = sliderValue % NINE;
                 currSliderVal = (int) (Math.floor((vWNOAN - roundSliderValue) * TEN)
                         * sliderCoefficient + sliderCoefficient);
             }

@@ -84,12 +84,12 @@ public class TreeViewController extends NUIController implements Observer {
     /**
      * Use this to provide this TreeViewController with a reference to the filterView.
      * @param filterViewHBox the HBox of the filter view
-     * @param filterViewController the Controller of the filter view
+     * @param fltrVwCtrlr the Controller of the filter view
      */
-    public void addFilterView(final Pane filterViewHBox, final NUIController filterViewController) {
+    public void addFilterView(final Pane filterViewHBox, final NUIController fltrVwCtrlr) {
         this.filterViewHBox = filterViewHBox;
-        if (filterViewController instanceof FilterViewController) {
-            this.fltrVwCtrlr = (FilterViewController) filterViewController;
+        if (fltrVwCtrlr instanceof FilterViewController) {
+            this.fltrVwCtrlr = (FilterViewController) fltrVwCtrlr;
         }
     }
 
