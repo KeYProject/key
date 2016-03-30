@@ -567,7 +567,7 @@ public class SymbolicExecutionTreeBuilder {
                ((ExecutionMethodCall) exNode).removeMethodReturn(deleted);
             }
          }
-         // remove all pruned block completions 
+         // remove all pruned execution nodes that complete a still existing block
          if (exNode instanceof AbstractExecutionBlockStartNode) {
             Iterator<IExecutionNode<?>> iter = ((AbstractExecutionBlockStartNode<?>) exNode).getBlockCompletions().iterator();
             LinkedList<IExecutionNode<?>> removed = new LinkedList<IExecutionNode<?>>();
@@ -953,8 +953,7 @@ public class SymbolicExecutionTreeBuilder {
          if (keyNodeMapping.get(node) != null) {
             if (multipleExecutionNodes.containsKey(node)) {
                multipleExecutionNodes.get(node).add(executionNode);
-            }
-            else {
+            } else {
                LinkedList<AbstractExecutionNode<?>> list = new LinkedList<AbstractExecutionNode<?>>();
                list.add(keyNodeMapping.get(node));
                list.add(executionNode);
