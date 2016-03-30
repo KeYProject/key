@@ -278,13 +278,10 @@ public abstract class NUINode {
         if (term.isEmpty()) {
             return 0;
         }
-
         final boolean match = getLabel().toLowerCase().contains(term.toLowerCase());
         setSearchResult(match);
-        // CHECKSTYLE.OFF: AvoidInlineConditionalsCheck
-        // -- this is much more readable than any alternative.
+
         return match ? 1 : 0;
-        // CHECKSTYLE.ON: AvoidInlineConditionalsCheck
     }
 
     /**

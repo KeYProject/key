@@ -63,7 +63,7 @@ Slightly modified version of Sun Checks that better matches the default code for
       <property name="severity" value="ignore"/>
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
-    <module name="AvoidInlineConditionals"/>
+    <!-- <module name="AvoidInlineConditionals"/> -->
     <module name="EmptyStatement"/>
     <module name="EqualsHashCode"/>
     <module name="HiddenField">
@@ -110,10 +110,4 @@ Slightly modified version of Sun Checks that better matches the default code for
     <property name="message" value="Line has trailing spaces."/>
     <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
   </module>
-  <!-- The next module makes it possible to turn off Checkstyle for certain rules in certain parts of code.-->
-  <module name="SuppressionCommentFilter">
-    <!-- <property name="offCommentFormat" value="CHECKSTYLE.OFF\: ([\w\|]+)"/> -->
-    <!-- <property name="onCommentFormat" value="CHECKSTYLE.ON\: ([\w\|]+)"/> -->
-    <!-- <property name="checkFormat" value="$1"/> -->
-</module>
 </module>
