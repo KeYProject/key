@@ -75,7 +75,7 @@ public class FreeTextFilterTest {
         ptVisualizer = new ProofTreeConverter(proof);
 
         ProofTreeItem tree = ptVisualizer.createFXProofTree();
-        DataModel dm = new DataModel();
+        DataModel dm = new DataModel(null, null);
         dm.setLoaddTriVwStat(new TreeViewState(proof, tree));
 
         fvc = new FilterViewController();
