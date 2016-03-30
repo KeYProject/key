@@ -86,27 +86,6 @@ public class IconFactory {
     private final boolean isRunFromJAR;
 
     /**
-     * Scales an given image to a desired size indicated by x (width) and y
-     * (height) and returns a ImageView with the scaled image in it.
-     * 
-     * @param image
-     *            The image which should be scaled
-     * @param width
-     *            The desired width
-     * @param height
-     *            The desired height
-     * @return an ImageView containing the scaled Image
-     */
-    @Deprecated
-    private static ImageView scaleIcon(final Image image, final int width, final int height) {
-        final ImageView view = new ImageView(image);
-        view.setFitWidth(width);
-        view.setFitHeight(height);
-        view.setSmooth(true);
-        return view;
-    }
-
-    /**
      * The constructor.
      *
      * @param width
@@ -167,7 +146,7 @@ public class IconFactory {
      * @return ImageView object of JavaFX
      */
     public final ImageView getImage(final String imageConstant) {
-        final Image img;
+        final Image img; //NOPMD this makes no sense as a field.
         if (icons.containsKey(imageConstant)) {
             img = icons.get(imageConstant);
         }

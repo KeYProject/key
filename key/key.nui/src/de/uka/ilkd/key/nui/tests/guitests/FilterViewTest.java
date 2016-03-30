@@ -3,7 +3,6 @@ package de.uka.ilkd.key.nui.tests.guitests;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -40,26 +39,26 @@ public class FilterViewTest extends NUITest {
 
         // close filter view with ESC
         this.press(KeyCode.ESCAPE);
-        
+
         // check if filter view is closed
         assertTrue((HBox) find("#filterViewHBox") == null);
-        
+
         // open filterView by pressing ctrl+g again
         this.push((KeyCodeCombination) KeyCombination.keyCombination("Ctrl+G"));
-        
+
         // check if filter view is open again
         assertTrue(((HBox) find("#filterViewHBox")).isVisible());
-        
+
         // filter
         enterFilterText("and");
-          
+
         // disable filter
         clickOn("F");
-        
+
         // enable filter
         clickOn("F");
     }
-    
+
     @Test
     public void usingFilterByContextmenu() {
         // load prooffile example01.proof
@@ -91,23 +90,23 @@ public class FilterViewTest extends NUITest {
 
         // close filter view with ESC
         this.press(KeyCode.ESCAPE);
-        
+
         // check if filter view is closed
         assertTrue((HBox) find("#filterViewHBox") == null);
-        
+
         // open filter view via contextmenu
         this.rightClickOn("Proof Tree ");
         this.clickOn("Filter by text");
-        
+
         // check if filter view is open again
         assertTrue(((HBox) find("#filterViewHBox")).isVisible());
-        
+
         // filter
         enterFilterText("and");
-          
+
         // disable filter
         clickOn("F");
-        
+
         // enable filter
         clickOn("F");
     }
