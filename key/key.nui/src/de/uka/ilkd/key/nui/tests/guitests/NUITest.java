@@ -96,6 +96,8 @@ public class NUITest extends GuiTest {
 
         // open load file dialog
         clickOn("File").clickOn("Open Proof...");
+        
+        sleep(2000);
 
         // Enter file name: example01.proof
         final KeyCodeHelper key = new KeyCodeHelper(this);
