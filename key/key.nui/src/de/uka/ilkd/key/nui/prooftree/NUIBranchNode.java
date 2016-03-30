@@ -106,10 +106,12 @@ public class NUIBranchNode extends NUINode {
 
         setSearchResult(iAmASrchRslt);
         return children.stream()/*.parallel()*/.mapToInt((child) -> child.search(term)).sum()
-                // CHECKSTYLE.OFF: AvoidInlineConditionalsCheck
+                // CHECKSTYLE:OFF
+                // : AvoidInlineConditionalsCheck
                 // -- this is much more readable than any alternative.
                 + (iAmASrchRslt ? 1 : 0);
-                // CHECKSTYLE.ON: AvoidInlineConditionalsCheck
+                // CHECKSTYLE:ON
+        // : AvoidInlineConditionalsCheck
     }
 
     /**
