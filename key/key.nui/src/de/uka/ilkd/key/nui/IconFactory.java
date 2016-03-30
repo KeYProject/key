@@ -156,7 +156,7 @@ public class IconFactory {
                         iconSizeHeight, false, false);
             }
             else {
-                img = new Image(IconFactory.class.getResourceAsStream(imageConstant), iconSizeWidth,
+                img = new Image(getClass().getResourceAsStream(imageConstant), iconSizeWidth,
                         iconSizeHeight, false, false);
             }
             icons.put(imageConstant, img);
