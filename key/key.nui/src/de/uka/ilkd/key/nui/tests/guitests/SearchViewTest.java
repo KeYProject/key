@@ -56,7 +56,7 @@ public class SearchViewTest extends NUITest {
      * menu.
      */
     @Test
-    public void usingSearchByContextMenu() throws InterruptedException {
+    public void usingSearchByContextMenu() {
         // load prooffile example01.proof
         this.loadProof("example01.proof", false);
 
@@ -98,7 +98,7 @@ public class SearchViewTest extends NUITest {
      * menu.
      */
     @Test
-    public void checkTreeItems() throws InterruptedException {
+    public void checkTreeItems() {
         TreeViewState treeViewState = null;
         ProofTreeItem rootProofTreeItem = null;
 
@@ -185,8 +185,7 @@ public class SearchViewTest extends NUITest {
      * @throws ControllerNotFoundException
      */
     @Test
-    public void checkHighlightedNoResults()
-            throws InterruptedException, ControllerNotFoundException {
+    public void checkHighlightedNoResults() throws ControllerNotFoundException {
         TreeViewController treeViewController = (TreeViewController) nui
                 .getController("treeViewPane");
 

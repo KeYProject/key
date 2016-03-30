@@ -17,10 +17,10 @@ import de.uka.ilkd.key.nui.exceptions.ComponentNotFoundException;
 
 public class AddNewViewTest extends NUITest {
     // IDs of the panes where the views can be placed on
-    private final String DIRECTION_BOTTOM = "bottom";
-    private final String DIRECTION_RIGHT = "right";
-    private final String DIRECTION_LEFT = "left";
-    private final String DIRECTION_MIDDLE = "middle";
+    private static final String DIRECTION_BOTTOM = "bottom";
+    private static final String DIRECTION_RIGHT = "right";
+    private static final String DIRECTION_LEFT = "left";
+    private static final String DIRECTION_MIDDLE = "middle";
 
     private String hide = null;
     private String left = null;
@@ -29,9 +29,9 @@ public class AddNewViewTest extends NUITest {
     private String bottom = null;
 
     // Text of the items in the menu bar
-    private final String MENUBAR_VIEW = "View";
+    private static final String MENUBAR_VIEW = "View";
     // IDs of the views
-    private final String CONFIG_VIEWS = "#configViews";
+    private static final String CONFIG_VIEWS = "#configViews";
 
     private static File controllerS = new File(
             "bin//de/uka//ilkd//key//nui//tests//guitests//GUITestController.class");

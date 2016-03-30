@@ -19,8 +19,8 @@
 				<Font size="15.0" />
 			</font>
 			<graphic>
-				<ImageView fx:id="goButtonImage" fitHeight="23.0"
-					fitWidth="29.0" pickOnBounds="true" preserveRatio="true" />
+				<ImageView fx:id="goButtonImage" fitHeight="25.0"
+					fitWidth="25.0" pickOnBounds="true" preserveRatio="true" />
 			</graphic>
 		</Button>
 		<Slider fx:id="maxRuleAppSlider" blockIncrement="1.0" layoutX="18.0"

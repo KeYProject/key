@@ -386,7 +386,7 @@ public class StrategyViewController extends NUIController implements Observer {
         getDataModel().addObserver(this);
         strategyWrapper = new StrategyWrapper();
         addStrategyViewSwing(null);
-        final IconFactory iconFactory = new IconFactory(15, 15);
+        final IconFactory iconFactory = new IconFactory(30, 30);
 
         goButtonImage.setImage(iconFactory.getImage(IconFactory.GO_BUTTON).getImage());
 
