@@ -1,20 +1,28 @@
 package de.uka.ilkd.key.nui.tests.guitests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.input.KeyCode;
+
 /**
- * Test for User Story.
- * - #14664 Laden von Beweisen
- * - #15076 Laden von .key-Dateien
- *  
+ * Test for User Story. - #14664 Laden von Beweisen - #15076 Laden von
+ * .key-Dateien
+ * 
  * @author Florian Breitfelder
  *
  */
 
 @SuppressWarnings("PMD.AtLeastOneConstructor")
-//PMD will also complain if adding the constructor, then saying "avoid useless constructors"
+// PMD will also complain if adding the constructor, then saying "avoid useless
+// constructors"
 public class LoadProofTest extends NUITest {
 
     /**
@@ -81,6 +89,53 @@ public class LoadProofTest extends NUITest {
         loadProof(proofFile, true);
 
         assertNull(dataModel.getTreeViewState("proofFile"));
+    }
+
+    /**
+     * Test for navigating through a proof tree.
+     * 
+     * @throws InterruptedException
+     */
+    @Test
+    public void testFeedbackWhileLoading() {
+        // test load proof
+        String filename = "gcd.twoJoins.proof";
+
+        // open load file dialog
+        clickOn("File").clickOn("Open Proof...");
+
+        // Enter file name: example01.proof
+        final KeyCodeHelper key = new KeyCodeHelper(this);
+        key.typeKeys(key.getKeyCode(filename.toUpperCase()));
+
+        // press enter to load file
+        type(KeyCode.ENTER);
+
+        final Label label = ((Label) find("#statustext"));
+        final ProgressIndicator progressIndicator = ((ProgressIndicator) find(
+                "#progressIndicator"));
+        final Button cancelButton = ((Button) find("#cancelButton"));
+
+        String statusText = label.getText();
+        boolean progressIndicatorVisible = progressIndicator.isVisible();
+        boolean cancelButtonVisible = cancelButton.isVisible();
+
+        while (!statusText.equals("Ready.")) {
+            assertEquals("Loading file " + filename
+                    + ", to stop loading click on cancel.", statusText);
+            assertTrue(progressIndicatorVisible);
+            assertTrue(cancelButtonVisible);
+
+            statusText = label.getText();
+            progressIndicatorVisible = progressIndicator.isVisible();
+            cancelButtonVisible = cancelButton.isVisible();
+        }
+        sleep(500); // wait after changing statustext to Ready.
+                    // to change progressIndicators and cancelButtons visibility
+                    // to false
+        assertEquals("Ready.", label.getText());
+        assertFalse(progressIndicator.isVisible());
+        assertFalse(cancelButton.isVisible());
     }
 
 }
