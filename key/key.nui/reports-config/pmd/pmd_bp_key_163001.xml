@@ -268,8 +268,9 @@
    <rule ref="rulesets/java/strings.xml/UselessStringValueOf"/>
    <rule ref="rulesets/java/naming.xml/VariableNamingConventions"/>
    <rule ref="rulesets/java/braces.xml/WhileLoopsMustUseBraces"/>
-   <rule ref="rulesets/java/controversial.xml/DataflowAnomalyAnalysis"/>
+   <rule ref="rulesets/java/controversial.xml/DataflowAnomalyAnalysis">
     <properties>
         <property name="violationSuppressRegex" value="^Found 'UR'-anomaly.*"/>
     </properties>
+   </rule>
    </ruleset>
