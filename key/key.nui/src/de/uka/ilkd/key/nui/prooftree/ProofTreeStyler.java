@@ -72,6 +72,7 @@ public final class ProofTreeStyler {
      * @author Stefan Pilot
      *
      */
+    @SuppressWarnings("PMD.OverrideBothEqualsAndHashcode") // it's useless. It really is.
     public class StyleConfiguration {
         /**
          * A list of Strings, each one representing one CSS class name.
@@ -142,20 +143,6 @@ public final class ProofTreeStyler {
             return img;
         }
 
-        @Override
-        public int hashCode() {
-            final int prime = 31; //NOPMD externalization is useless
-            int result = 1;
-            result = prime * result + getOuterType().hashCode();
-            //CHECKSTYLE.OFF: AvoidInlineConditionalsCheck
-            // -- this is much more readable than two if statements
-            result = prime * result + ((cssClasses == null) ? 0 : cssClasses.hashCode());
-            result = prime * result + ((iconImage  == null) ? 0 :  iconImage.hashCode());
-            //CHECKSTYLE.ON: AvoidInlineConditionalsCheck
-            return result;
-        }
-
-
         /**
          * Defines the iconImage to be set to the StyleConfiguration, overwrites
          * if any iconImage was set before.
@@ -166,18 +153,6 @@ public final class ProofTreeStyler {
         public void setIconImage(final String iconFileName) {
             this.iconImage = iconFileName;
         }
-
-        /**
-         * Returns the outer, enclosing instance if the class is an inner class
-         * (non-static nested class).
-         * 
-         * @return The outer, enclosing instance, iff the class is an non-static
-         *         nested class.
-         */
-        private ProofTreeStyler getOuterType() {
-            return ProofTreeStyler.this;
-        }
-
     } // end of class StyleConfiguration
 
     /**
