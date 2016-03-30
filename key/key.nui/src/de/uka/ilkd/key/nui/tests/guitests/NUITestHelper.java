@@ -7,7 +7,6 @@ import org.loadui.testfx.GuiTest;
 import de.uka.ilkd.key.nui.DataModel;
 import de.uka.ilkd.key.nui.NUI;
 import de.uka.ilkd.key.nui.TreeViewState;
-import javafx.geometry.Point2D;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

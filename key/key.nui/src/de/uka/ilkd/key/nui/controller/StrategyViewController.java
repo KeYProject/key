@@ -252,7 +252,7 @@ public class StrategyViewController extends NUIController implements Observer {
     /**
      * Action handler for the 'Start' (auto proving) button.
      * 
-     * @param actionEvent
+     * @param actionEvent the event to be processed.
      * @throws ControllerNotFoundException
      */
     public void handleOnAction(final ActionEvent actionEvent) throws ControllerNotFoundException {

@@ -203,11 +203,8 @@ public class SearchViewController extends NUIController {
                  * Converts the given {@link TreeItem} into a list containing
                  * all elements of the tree.
                  * 
-                 * @param root
-                 *            The root of the (sub)tree whose nodes should be
-                 *            collected.
-                 * @param list
-                 *            The accumulator used to collect the nodes.
+                 * @param root The root of the (sub)tree whose nodes should be collected.
+                 * @param list The accumulator used to collect the nodes.
                  * @return A {@link List} of TreeItems.
                  */
                 private <T> List<TreeItem<T>> treeToList(final TreeItem<T> root,

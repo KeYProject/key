@@ -87,6 +87,7 @@ public class ProofTreeItem extends TreeItem<NUINode> {
      *            The filter to apply.
      * @return true if the item is supposed to be displayed after filtering
      */
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis") // there really is no bug™
     public boolean filter(final ProofTreeFilter filter) {
 
         // test this item itself
