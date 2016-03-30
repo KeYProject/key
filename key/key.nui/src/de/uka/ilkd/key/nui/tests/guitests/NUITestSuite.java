@@ -10,10 +10,13 @@ import org.junit.runners.Suite;
  *
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ MoveViewTest.class, TreeViewTest.class, LoadProofTest.class,
-        SearchViewTest.class })
+@Suite.SuiteClasses({ AddNewFilterTest.class, AddNewViewTest.class,
+        FilterViewTest.class, LoadProofTest.class, MoveViewTest.class,
+        NUITest.class, SearchViewTest.class, StandardFilterTest.class,
+        StrategyViewTest.class, TreeViewTest.class })
 
 @SuppressWarnings("PMD.AtLeastOneConstructor")
-//PMD will also complain if adding the constructor, then saying "avoid useless constructors"
+// PMD will also complain if adding the constructor, then saying "avoid useless
+// constructors"
 public class NUITestSuite {
 }
