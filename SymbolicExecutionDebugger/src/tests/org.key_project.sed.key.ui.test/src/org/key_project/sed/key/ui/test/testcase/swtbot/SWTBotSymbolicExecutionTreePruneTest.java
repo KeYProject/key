@@ -64,7 +64,7 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
             String pathToOracleFiles = "data/number/oracle";
 
             // test diagram before prune
-            assertDiagram(bot, project.getProject(), "Number.set", "data/number/oracle", null);
+            assertDiagram(bot, project.getProject(), "Number.set", pathToOracleFiles, null);
 
             SWTBotView manualView = bot.viewById(ManualView.VIEW_ID);
             SWTBotTree tree = manualView.bot().tree();
@@ -72,16 +72,14 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
             // prune branch node
             TestUtilsUtil.selectInTree(tree, "Null Reference (n = null)");
             TestUtilsUtil.clickContextMenu(tree, "Prune Proof");
-            TestSedCoreUtil.waitForDebugTreeInterface();
-            TestUtilsUtil.sleep(10000); // TODO need a better solution
+            TestUtilsUtil.sleep(10000);
             // test diagram after prune
             assertDiagram(bot, project.getProject(), "NumberBranchNode.set", pathToOracleFiles, null);
 
             // prune node
             TestUtilsUtil.selectInTree(tree, "10:if (this.content==n.content) {                         return  true; }                 else  {                         return  false; }");
             TestUtilsUtil.clickContextMenu(tree, "Prune Proof");
-            TestSedCoreUtil.waitForDebugTreeInterface();
-            TestUtilsUtil.sleep(10000); // TODO need a better solution
+            TestUtilsUtil.sleep(10000);
             // test diagram after prune
             assertDiagram(bot, project.getProject(), "NumberNode.set", pathToOracleFiles, null);
 
@@ -93,7 +91,7 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
                   resume(bot, item2, target);
                }
             });
-            TestUtilsUtil.sleep(10000); // TODO need a better solution
+            TestUtilsUtil.sleep(10000);
             // test diagram after resume
             assertDiagram(bot, project.getProject(), "NumberResume.set", pathToOracleFiles, null);
 

@@ -86,6 +86,7 @@ public class TacletContextMenu extends ExtensionContributionFactory {
                         p.label = macro.getName();
                         MacroCommandContributionItem item = new MacroCommandContributionItem(p, goal.node(), macro, keyEditor.getUI(), pos);
                         item.setVisible(true);
+                        // sort macros into submenus depending on their category
                         String cat = macro.getCategory();
                         if (cat == null) {
                       	  macroMenu.add(item);
@@ -99,6 +100,7 @@ public class TacletContextMenu extends ExtensionContributionFactory {
                      }
             	}
             }
+            // add all submenus to the main menu
             for (String category : subMenus.keySet())  {
             	macroMenu.add(subMenus.get(category));
             }

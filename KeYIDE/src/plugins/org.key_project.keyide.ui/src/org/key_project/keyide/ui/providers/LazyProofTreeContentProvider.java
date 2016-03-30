@@ -196,17 +196,16 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 			Node nonBranchingNode = (Node) element;
 
 			if (!showSubtree) {
-   			while (nonBranchingNode.parent() != null
-   					&& nonBranchingNode.parent().childrenCount() == 1) {
-   				nonBranchingNode = nonBranchingNode.parent();
+				while (nonBranchingNode.parent() != null && nonBranchingNode.parent().childrenCount() == 1) {
+					nonBranchingNode = nonBranchingNode.parent();
    			}
 			} else {
-			   while (nonBranchingNode != newRoot && nonBranchingNode.parent() != null && nonBranchingNode.parent().childrenCount() == 1) {
-			      nonBranchingNode = nonBranchingNode.parent();
-			   }
-			   if (nonBranchingNode == newRoot || nonBranchingNode == proof.root()) {
-			      return proof;
-			   }
+				while (nonBranchingNode != newRoot && nonBranchingNode.parent() != null && nonBranchingNode.parent().childrenCount() == 1) {
+					nonBranchingNode = nonBranchingNode.parent();
+				}
+				if (nonBranchingNode == newRoot || nonBranchingNode == proof.root()) {
+					return proof;
+				}
 			}
 			// Check if the root of the proof was found
 			if (nonBranchingNode.parent() == null) {
@@ -422,7 +421,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		return count;
 	}
 
-	/**<yx
+	/**
 	 * Returns the branch{@link Node} respectively the first child {@link Node}
 	 * in its branch.
 	 * 
@@ -435,8 +434,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		
 	   if (!showSubtree) {
    		while (true) {
-   			if (node.equals(node.proof().root())
-   					|| node.parent().childrenCount() > 1) {
+   			if (node.equals(node.proof().root()) || node.parent().childrenCount() > 1) {
    				return node;
    			} else {
    				node = node.parent();
@@ -728,6 +726,10 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		symbolicState = state;
 	}
 	
+	/**
+	 * {@code true} if show subtree of node filter is turned on, {@code false} otherwise.
+	 * @return {@code true} or {@code false}
+	 */
 	public boolean getShowSubtreeState() {
 	   return showSubtree;
 	}
