@@ -27,7 +27,7 @@ import javafx.scene.input.KeyCombination;
 @SuppressWarnings("PMD.AtLeastOneConstructor")
 // PMD will also complain if adding the constructor, then saying "avoid useless
 // constructors"
-public class SearchViewTest extends NUITest {
+public class SearchViewTest extends NUITestHelper {
 
     public int numberOfResults = 0;
 

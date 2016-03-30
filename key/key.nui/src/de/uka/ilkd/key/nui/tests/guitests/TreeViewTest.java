@@ -24,7 +24,7 @@ import javafx.scene.input.KeyCode;
 @SuppressWarnings("PMD.AtLeastOneConstructor")
 // PMD will also complain if adding the constructor, then saying "avoid useless
 // constructors"
-public class TreeViewTest extends NUITest {
+public class TreeViewTest extends NUITestHelper {
 
     IconFactory iconFactory = new IconFactory(ProofTreeCell.ICON_SIZE,
             ProofTreeCell.ICON_SIZE);
@@ -197,87 +197,5 @@ public class TreeViewTest extends NUITest {
         doubleClickOn("Proof Tree ");
 
         assertFalse(rootProofTreeItem.isExpanded());
-    }
-
-    @Test
-    public void testIcons() {
-        // open load file dialog
-        clickOn("File").clickOn("Open Proof...");
-
-        // Enter file name: gcd.twoJoins.proof
-        final KeyCodeHelper key = new KeyCodeHelper(this);
-        key.typeKeys(key.getKeyCode("GCD.TWOJOINS.PROOF"));
-
-        // press enter to load file
-        type(KeyCode.ENTER);
-
-        waitUntilStatusIs("Ready.");
-
-        // Expand All
-        clickOn("Proof Tree ");
-        rightClickOn().clickOn("Expand All");
-
-        // Load model
-        TreeViewState treeViewState = dataModel.getLoaddTriVwStat();
-        ProofTreeItem rootProofTreeItem = treeViewState.getTreeItem();
-
-        checkIcons(rootProofTreeItem);
-    }
-
-    /**
-     * Used to walk through the tree recursively. Only for testIcons
-     * 
-     * @param proofTreeItem
-     */
-    private void checkIcons(ProofTreeItem proofTreeItem) {
-        for (int i = 0; i < proofTreeItem.getInternalChildren().size(); i++) {
-            ProofTreeItem currentItem = (ProofTreeItem) proofTreeItem
-                    .getChildren().get(i);
-
-            System.out.println(currentItem.getValue().toString() + " | "
-                    + currentItem.getGraphic() + " | "
-                    + currentItem.getValue().isClosed());
-
-            // leaf
-            if (currentItem.isLeaf()) {
-                // closed
-                if (currentItem.getValue().isClosed()) {
-                    assertTrue(currentItem.getGraphic().equals(
-                            iconFactory.getImage(IconFactory.LEAF_CLOSED)));
-                }
-                // open
-                else if (currentItem.getGraphic() != null) {
-                    assertTrue(currentItem.getGraphic().equals(
-                            iconFactory.getImage(IconFactory.LEAF_OPEN)));
-                }
-            }
-            // no leaf
-            else {
-                // closed
-                if (currentItem.getValue().isClosed()) {
-                    assertTrue(currentItem.getGraphic().equals(
-                            iconFactory.getImage(IconFactory.BRANCH_CLOSED)));
-                }
-                // interactive
-                else if (currentItem.getValue().isInteractive()) {
-                    assertTrue(currentItem.getGraphic().equals(iconFactory
-                            .getImage(IconFactory.INNER_INTERACTIVE)));
-                }
-                // linked
-                else if (currentItem.getValue().isLinked()) {
-                    assertTrue(currentItem.getGraphic().equals(
-                            iconFactory.getImage(IconFactory.BRANCH_LINKED)));
-                }
-                // open
-                else if (!currentItem.getValue().isClosed()) {
-
-                    // assertTrue(currentItem.getGraphic().equals(
-                    // iconFactory.getImage(IconFactory.BRANCH_OPEN)));
-                }
-
-            }
-
-            treeDown(proofTreeItem.getInternalChildren().get(i));
-        }
     }
 }

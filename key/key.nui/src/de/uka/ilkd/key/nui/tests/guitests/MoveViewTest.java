@@ -21,7 +21,7 @@ import org.junit.Test;
 // Why would anyone ever serialize a JUnit Test?
 // PMD will also complain after adding a constructor, then saying "avoid useless
 // constructors"
-public class MoveViewTest extends NUITest {
+public class MoveViewTest extends NUITestHelper {
 
     // IDs of the panes where the views can be placed on
     private static final String DIRECTION_BOTTOM = "bottom";

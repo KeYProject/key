@@ -12,7 +12,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ AddNewFilterTest.class, AddNewViewTest.class,
         FilterViewTest.class, LoadProofTest.class, MoveViewTest.class,
-        NUITest.class, SearchViewTest.class, StrategyViewTest.class,
+        SearchViewTest.class, StrategyViewTest.class,
         TreeViewTest.class, ContextMenuTest.class, SaveFunctionTest.class })
 
 @SuppressWarnings("PMD.AtLeastOneConstructor")

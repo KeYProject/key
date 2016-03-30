@@ -8,7 +8,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 
-public class FilterViewTest extends NUITest {
+public class FilterViewTest extends NUITestHelper {
 
     @Test
     public void usingFilterByControlG() {

@@ -2,7 +2,7 @@ package de.uka.ilkd.key.nui.tests.guitests;
 
 import org.junit.Test;
 
-public class ContextMenuTest extends NUITest {
+public class ContextMenuTest extends NUITestHelper {
 
     @Test
     public void testContextMenuFilters() {

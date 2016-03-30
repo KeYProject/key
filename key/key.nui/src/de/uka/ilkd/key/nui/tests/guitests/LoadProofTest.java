@@ -23,7 +23,7 @@ import javafx.scene.input.KeyCode;
 @SuppressWarnings("PMD.AtLeastOneConstructor")
 // PMD will also complain if adding the constructor, then saying "avoid useless
 // constructors"
-public class LoadProofTest extends NUITest {
+public class LoadProofTest extends NUITestHelper {
 
     /**
      * Test for navigating through a proof tree.
@@ -88,7 +88,7 @@ public class LoadProofTest extends NUITest {
         // test load proof
         loadProof(proofFile, true);
 
-        assertNull(dataModel.getTreeViewState("proofFile"));
+        assertNull(dataModel.getTreeViewState(proofFile));
     }
 
     /**

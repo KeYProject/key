@@ -159,7 +159,8 @@ public class MainViewController extends NUIController implements Observer {
     @FXML
     private Button cancelButton;
     /**
-     * The image on the {@link Button} labeled "cancel" used to cancel loading a proof.
+     * The image on the {@link Button} labeled "cancel" used to cancel loading a
+     * proof.
      */
     @FXML
     private ImageView cancelButtonImage;
@@ -454,16 +455,16 @@ public class MainViewController extends NUIController implements Observer {
         selectToggle(component.getId(), place);
         if (place == Place.HIDDEN) {
             component.setVisible(false);
-            //getNui().getRoot().getChildren().remove(component);
-            //getPane(place).getChildren().remove(component);
-            
-            if(component.getParent() instanceof Pane){
-                Pane parent = (Pane)component.getParent();
-                if(parent!=null){
+            // getNui().getRoot().getChildren().remove(component);
+            // getPane(place).getChildren().remove(component);
+
+            if (component.getParent() instanceof Pane) {
+                Pane parent = (Pane) component.getParent();
+                if (parent != null) {
                     parent.getChildren().remove(component);
                 }
             }
-            //((Pane)component.getParent()).getChildren().remove(component);
+            // ((Pane)component.getParent()).getChildren().remove(component);
         }
         else {
             component.setVisible(true);
@@ -563,7 +564,8 @@ public class MainViewController extends NUIController implements Observer {
     @Override
     protected void init() {
         getDataModel().addObserver(this);
-        final IconFactory icf = new IconFactory(MAIN_VIEW_ICON_SIZE, MAIN_VIEW_ICON_SIZE);
+        final IconFactory icf = new IconFactory(MAIN_VIEW_ICON_SIZE,
+                MAIN_VIEW_ICON_SIZE);
         this.cancelButtonImage
                 .setImage(icf.getImage(IconFactory.CANCEL_BUTTON).getImage());
     }
@@ -694,7 +696,8 @@ public class MainViewController extends NUIController implements Observer {
                     if (!e.getMessage().contains("java.lang.ThreadDeath")) {
                         Platform.runLater(() -> {
                             cancelLoadProof();
-                            final Alert exceptionAlert = new Alert(AlertType.ERROR);
+                            final Alert exceptionAlert = new Alert(
+                                    AlertType.ERROR);
                             exceptionAlert.setTitle(getBundle()
                                     .getString("errorLoadingFileTitle"));
                             exceptionAlert.setHeaderText(getBundle()
@@ -705,7 +708,6 @@ public class MainViewController extends NUIController implements Observer {
                                     proofFileName, e.getCause()));
                             exceptionAlert.show();
                         });
-
                     }
                 }
 

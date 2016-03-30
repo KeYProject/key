@@ -6,6 +6,12 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Arrays;
+
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -15,7 +21,7 @@ import org.junit.Test;
 import de.uka.ilkd.key.nui.controller.MainViewController.Place;
 import de.uka.ilkd.key.nui.exceptions.ComponentNotFoundException;
 
-public class AddNewViewTest extends NUITest {
+public class AddNewViewTest extends NUITestHelper {
     // IDs of the panes where the views can be placed on
     private static final String DIRECTION_BOTTOM = "bottom";
     private static final String DIRECTION_RIGHT = "right";
@@ -33,8 +39,9 @@ public class AddNewViewTest extends NUITest {
     // IDs of the views
     private static final String CONFIG_VIEWS = "#configViews";
 
-    private static File controllerS = new File(
-            "bin//de/uka//ilkd//key//nui//tests//guitests//GUITestController.class");
+    private static String controllerS = "bin//de/uka//ilkd//key//nui//tests//guitests//GUITestController";
+    private static File controllerS_class = new File(controllerS + ".class");
+    private static File controllerS_java = new File(controllerS + ".java");
     private static File controllerD = new File(
             "bin//de/uka//ilkd//key//nui//controller//GUITestController.class");
 
@@ -45,7 +52,17 @@ public class AddNewViewTest extends NUITest {
 
     @BeforeClass
     public static void initTest() throws IOException {
-        com.google.common.io.Files.copy(controllerS, controllerD);
+        // Compile the .java controller class
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        StandardJavaFileManager fileManager = compiler
+                .getStandardFileManager(null, null, null);
+        Iterable<? extends JavaFileObject> compilationUnits1 = fileManager
+                .getJavaFileObjectsFromFiles(Arrays.asList(controllerS_java));
+        compiler.getTask(null, fileManager, null, null, null, compilationUnits1)
+                .call();
+
+        com.google.common.io.Files.copy(controllerS_class, controllerD);
+
         com.google.common.io.Files.copy(fxmlS, fxmlD);
     }
 

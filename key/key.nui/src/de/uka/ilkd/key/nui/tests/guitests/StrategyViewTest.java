@@ -20,7 +20,7 @@ import javafx.scene.control.Slider;
 @SuppressWarnings("PMD.AtLeastOneConstructor")
 // PMD will also complain if adding the constructor, then saying "avoid useless
 // constructors"
-public class StrategyViewTest extends NUITest {
+public class StrategyViewTest extends NUITestHelper {
 
     /**
      * Checks whether the 'GO' button in the slider works properly.

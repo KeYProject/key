@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 
-public class SaveFunctionTest extends NUITest {
+public class SaveFunctionTest extends NUITestHelper {
 
     @Test
     public void testSaveDialogOnChange() {
