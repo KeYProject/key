@@ -53,7 +53,13 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     @SuppressWarnings("PMD.BeanMembersShouldSerialize") // accessors do exist.
     private final ChangeListener<Boolean> srchRsltLstener = (observable, didMatchSearch,
             nowMatchesSearch) -> {
+        /**
+         * Only here to silence CheckStyle.
+         */
         final ObservableList<String> styles = getStyleClass();
+        /**
+         * Only here to silence CheckStyle.
+         */
         final String cssClassHighlight = ProofTreeStyleConstants.CSS_NODE_HGHLGHT;
         if (nowMatchesSearch && !styles.contains(cssClassHighlight)) {
             styles.add(cssClassHighlight);

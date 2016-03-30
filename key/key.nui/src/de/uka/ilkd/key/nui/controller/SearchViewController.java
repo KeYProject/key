@@ -205,6 +205,7 @@ public class SearchViewController extends NUIController {
                  * 
                  * @param root The root of the (sub)tree whose nodes should be collected.
                  * @param list The accumulator used to collect the nodes.
+                 * @param <T> the Type you want to receive.
                  * @return A {@link List} of TreeItems.
                  */
                 private <T> List<TreeItem<T>> treeToList(final TreeItem<T> root,
