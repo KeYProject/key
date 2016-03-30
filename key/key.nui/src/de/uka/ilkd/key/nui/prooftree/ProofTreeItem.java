@@ -169,7 +169,7 @@ public class ProofTreeItem extends TreeItem<NUINode> {
             final Field declaredField = TreeItem.class.getDeclaredField("childrenListener");
             declaredField.setAccessible(true);
 
-            list.addListener((ListChangeListener< ? super ProofTreeItem>) declaredField.get(this));
+            list.addListener((ListChangeListener<? super ProofTreeItem>) declaredField.get(this));
         }
         catch (NoSuchFieldException | SecurityException | IllegalArgumentException
                 | IllegalAccessException e) {

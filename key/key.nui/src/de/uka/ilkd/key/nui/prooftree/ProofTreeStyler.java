@@ -81,7 +81,8 @@ public final class ProofTreeStyler {
         /**
          * See hashCode().
          */
-        private final int HASH_CODE = 5;
+        public static final int HASH_CODE = 5;
+
         /**
          * The name of the assigned iconImage.
          */

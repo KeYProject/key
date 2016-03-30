@@ -339,7 +339,7 @@ public class FilteringHandler {
 
             // Load possible filter class
             try {
-                final Class< ? > myClass = classLoader.loadClass(binaryClassName);
+                final Class<?> myClass = classLoader.loadClass(binaryClassName);
 
                 // Load annotations of the class
                 final Annotation[] annotations = myClass
