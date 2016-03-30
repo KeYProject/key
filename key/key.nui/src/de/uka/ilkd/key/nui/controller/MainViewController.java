@@ -452,7 +452,7 @@ public class MainViewController extends NUIController implements Observer {
             // getPane(place).getChildren().remove(component);
 
             if (component.getParent() instanceof Pane) {
-                Pane parent = (Pane) component.getParent();
+                final Pane parent = (Pane) component.getParent();
                 if (parent != null) {
                     parent.getChildren().remove(component);
                 }

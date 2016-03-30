@@ -50,7 +50,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     /**
      * The change listener registered to this ProofTreeCell.
      */
-    @SuppressWarnings("PMD.BeanMembersShouldSerialize") // accessors exist.
+    @SuppressWarnings("PMD.BeanMembersShouldSerialize") // accessors do exist.
     private final ChangeListener<Boolean> srchRsltLstener = (observable, didMatchSearch,
             nowMatchesSearch) -> {
         final ObservableList<String> styles = getStyleClass();
