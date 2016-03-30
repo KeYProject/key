@@ -42,6 +42,30 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * Tests slicing on the example {@code equivalenceClassesTest} with equivalence classes at index {@code 0}.
     * @throws Exception Occurred Exception.
     */
+   public void testEquivalenceClasses_Index_1_no_OSS() throws Exception {
+      doSlicingTest("/slicing/equivalenceClassesTest/Example_NoOSS.proof", 
+                    new ReturnSelector(55),
+                    new EquivalenceClassByIndexSelector(1), // [Equivalence Class [a,b]]
+                    true,
+                    38);
+   }
+
+   /** 
+    * Tests slicing on the example {@code equivalenceClassesTest} with equivalence classes at index {@code 0}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testEquivalenceClasses_Index_0_no_OSS() throws Exception {
+      doSlicingTest("/slicing/equivalenceClassesTest/Example_NoOSS.proof", 
+                    new ReturnSelector(55 ),
+                    new EquivalenceClassByIndexSelector(0), // []
+                    true,
+                    24);
+   }
+
+   /** 
+    * Tests slicing on the example {@code equivalenceClassesTest} with equivalence classes at index {@code 0}.
+    * @throws Exception Occurred Exception.
+    */
    public void testEquivalenceClasses_Index_1() throws Exception {
       doSlicingTest("/slicing/equivalenceClassesTest/Example.proof", 
                     new ReturnSelector(27),

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 
@@ -39,35 +40,37 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
       Map<Location, SortedSet<Location>> oldAliases = null;
       Node previousChild = null;
       while (seedNode != null && (relevantLocations == null || !relevantLocations.isEmpty())) {
-         SequentInfo info = analyzeSequent(seedNode, sec);
-         if (info != null) { // Modality of interest
-            SourceElement activeStatement = seedNode.getNodeInfo().getActiveStatement();
-            Map<Location, SortedSet<Location>> aliases = info.getAliases();
-            ReferencePrefix thisReference = info.getThisReference();
-            if (relevantLocations == null) {
-               // Initialize relevant locations if required
-               relevantLocations = new HashSet<Location>();
-               relevantLocations.add(normalizeAlias(services, seedLocation, info));
-            }
-            // Check if current node is part of the slice or not
-            if (accept(seedNode, previousChild, services, relevantLocations, info, activeStatement)) {
-               result.add(seedNode);
-            }
-            if (oldAliases != null) {
-               try {
-                  // Update relevant locations if required
-                  if (activeStatement instanceof CopyAssignment) {
-                     SourceElement originalTarget = ((CopyAssignment) activeStatement).getArguments().get(0);
-                     ReferencePrefix relevantTarget = toReferencePrefix(originalTarget);
-                     Location normalizedPrefix = normalizeAlias(services, relevantTarget, info);
-                     relevantLocations = updateOutdatedLocations(services, relevantLocations, aliases, oldAliases, normalizedPrefix, thisReference);
+         if (NodeInfo.isSymbolicExecutionRuleApplied(seedNode)) {
+            SequentInfo info = analyzeSequent(seedNode, sec);
+            if (info != null) { // Modality of interest
+               SourceElement activeStatement = seedNode.getNodeInfo().getActiveStatement();
+               Map<Location, SortedSet<Location>> aliases = info.getAliases();
+               ReferencePrefix thisReference = info.getThisReference();
+               if (relevantLocations == null) {
+                  // Initialize relevant locations if required
+                  relevantLocations = new HashSet<Location>();
+                  relevantLocations.add(normalizeAlias(services, seedLocation, info));
+               }
+               // Check if current node is part of the slice or not
+               if (accept(seedNode, previousChild, services, relevantLocations, info, activeStatement)) {
+                  result.add(seedNode);
+               }
+               if (oldAliases != null) {
+                  try {
+                     // Update relevant locations if required
+                     if (activeStatement instanceof CopyAssignment) {
+                        SourceElement originalTarget = ((CopyAssignment) activeStatement).getArguments().get(0);
+                        ReferencePrefix relevantTarget = toReferencePrefix(originalTarget);
+                        Location normalizedPrefix = normalizeAlias(services, relevantTarget, info);
+                        relevantLocations = updateOutdatedLocations(services, relevantLocations, aliases, oldAliases, normalizedPrefix, thisReference);
+                     }
+                  }
+                  catch (IllegalArgumentException e) {
+                     // Nothing to do, expression with side effects is evaluated
                   }
                }
-               catch (IllegalArgumentException e) {
-                  // Nothing to do, expression with side effects is evaluated
-               }
+               oldAliases = aliases;
             }
-            oldAliases = aliases;
          }
          previousChild = seedNode;
          seedNode = seedNode.parent();
