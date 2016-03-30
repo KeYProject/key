@@ -195,7 +195,7 @@ public class FreeTextFilterTest {
      *            see {@link FilteringHandler#filterBy(ProofTreeFilter).
      * 
      */
-    private void filterTree(FilterViewController fvc, String searchTerm) {
+    private static void filterTree(FilterViewController fvc, String searchTerm) {
         fvc.setTerm(searchTerm);
         fvc.getFilteringHandler().filterBy(fvc.getTextFilter());
     }
@@ -214,15 +214,16 @@ public class FreeTextFilterTest {
      *            filtered nodes.
      * @return the number of nodes after applying the filter.
      */
-    private int countFilteredItems(ProofTreeItem tree,
-            ProofTreeFilter filterType, int accumulator) {
+    private int countFilteredItems(final ProofTreeItem tree,
+            final ProofTreeFilter filterType, final int accumulator) {
+        int returnvalue = accumulator;
         if (tree.filter(filterType)) {
-            accumulator++;
+            returnvalue++;
             for (ProofTreeItem child : tree.getFilteredChildren()) {
-                accumulator += countFilteredItems(child, filterType, 0);
+                returnvalue += countFilteredItems(child, filterType, 0);
             }
         }
-        return accumulator;
+        return returnvalue;
     }
 
 }

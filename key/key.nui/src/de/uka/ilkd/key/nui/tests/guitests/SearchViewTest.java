@@ -201,15 +201,15 @@ public class SearchViewTest extends NUITest {
         this.clickOn("Search");
 
         this.checkSearchResult("and", "Number of Search Results: 22");
-        assertFalse(this.highlightedNoResults(
+        assertFalse(SearchViewTest.highlightedNoResults(
                 treeViewController.getSearchViewPane().getChildren()));
 
         this.checkSearchResult("no matches!", "Number of Search Results: 0");
-        assertTrue(this.highlightedNoResults(
+        assertTrue(SearchViewTest.highlightedNoResults(
                 treeViewController.getSearchViewPane().getChildren()));
 
         this.checkSearchResult("or", "Number of Search Results: 31");
-        assertFalse(this.highlightedNoResults(
+        assertFalse(SearchViewTest.highlightedNoResults(
                 treeViewController.getSearchViewPane().getChildren()));
     }
 
@@ -221,7 +221,7 @@ public class SearchViewTest extends NUITest {
      * 
      * @return true if tfSearchQuery is highlighted
      */
-    private boolean highlightedNoResults(ObservableList<Node> children) {
+    private static boolean highlightedNoResults(ObservableList<Node> children) {
         for (Node node : children) {
             if (node.getId().equals("tfSearchQuery")
                     && node instanceof TextField) {
