@@ -60,6 +60,7 @@ import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
 import org.key_project.keyide.ui.handlers.BreakpointToggleHandler;
+import org.key_project.keyide.ui.handlers.MinimizeInteractionsHandler;
 import org.key_project.keyide.ui.propertyTester.AutoModePropertyTester;
 import org.key_project.keyide.ui.propertyTester.ProofPropertyTester;
 import org.key_project.keyide.ui.util.LogUtil;
@@ -103,7 +104,7 @@ import de.uka.ilkd.key.util.ProofUserManager;
 /**
  * This class represents the Editor for viewing KeY-Proofs
  * 
- * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
+ * @author Christoph Schneider, Niklas Bunzel, Stefan Kï¿½sdorf, Marco Drebing
  */
 public class KeYEditor extends TextEditor implements IProofProvider, ITabbedPropertySheetPageContributor, IBean {
    /**
@@ -310,6 +311,21 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
          configureProofForBreakpoints();
       }
    };
+
+   /**
+    * The state of the minimize interactions button.
+    */
+   private State minimizeInteractionState;
+
+   /**
+    * Listens for changes on minimizeInteractionState.
+    */
+   private final IStateListener minimizeInteractionsListener = new IStateListener() {
+      @Override
+      public void handleStateChange(State state, Object oldValue) {
+         handleMinimizeInteractionStateChanged();
+      }
+   };
    
    
    
@@ -326,6 +342,10 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    @Override
    public void dispose() {
+      if (minimizeInteractionState != null) {
+         minimizeInteractionState.removeListener(minimizeInteractionsListener);
+         minimizeInteractionState = null;
+      }
       if (breakpointsActivatedState != null) {
          breakpointsActivatedState.removeListener(stateListener);
          breakpointsActivatedState = null;
@@ -370,6 +390,14 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             breakpointsActivatedState = hideCmd.getState(RegistryToggleState.STATE_ID);
             if (breakpointsActivatedState != null) {
                breakpointsActivatedState.addListener(stateListener);
+            }
+         }
+         
+         Command minimizeInteractionsCommand = service.getCommand(MinimizeInteractionsHandler.COMMAND_ID);
+         if (minimizeInteractionsCommand != null) {
+            minimizeInteractionState = minimizeInteractionsCommand.getState(RegistryToggleState.STATE_ID);
+            if (minimizeInteractionState != null) {
+               minimizeInteractionState.addListener(minimizeInteractionsListener);
             }
          }
       }
@@ -439,7 +467,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             breakpointManager = new KeYBreakpointManager(currentProof);
             DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
             ProofUserManager.getInstance().addUser(currentProof, environment, this);
-            getUI().getProofControl().setMinimizeInteraction(true);
+            getUI().getProofControl().setMinimizeInteraction(isMinimizeInteractions());
             if (selectionModel == null) {
                selectionModel.setSelectedNode(currentProof.root());
             }
@@ -693,6 +721,15 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    }
 
    /**
+    * Handles a change in the state of the Minimize Interactions context menu filter.
+    * @author Viktor Pfanschilling
+    */
+   protected void handleMinimizeInteractionStateChanged() {
+      boolean minimized = isMinimizeInteractions();
+      getUI().getProofControl().setMinimizeInteraction(minimized);
+   }
+
+   /**
     * When the auto mode is started.
     * @param e The {@link ProofEvent}.
     */
@@ -732,8 +769,18 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    public void setCurrentNode(Node currentNode) {
       this.currentNode = currentNode;
-      getUI().getProofControl().setMinimizeInteraction(true);
+      getUI().getProofControl().setMinimizeInteraction(isMinimizeInteractions());
       viewerDecorator.showNode(currentNode, SymbolicExecutionUtil.createNotationInfo(currentProof));
+   }
+
+   /**
+    * Returns whether interactions are minimized.
+    * @return whether interactions are minimized
+    */
+   public boolean isMinimizeInteractions() {
+      Object value = minimizeInteractionState.getValue();
+      boolean minimized = (value instanceof Boolean && ((Boolean) value).booleanValue());
+      return minimized;
    }
    
    /**

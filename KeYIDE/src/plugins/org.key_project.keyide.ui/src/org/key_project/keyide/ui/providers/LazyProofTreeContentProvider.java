@@ -27,10 +27,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
-import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -137,11 +133,22 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	private boolean symbolicState;
 	
 	/**
+	 * The boolean flag for the show subtree of node filter.
+	 */
+	private boolean showSubtree;
+	
+	/**
+	 * The root of the show subtree of node filtered prooftree.
+	 */
+	private Node newRoot;
+	
+	/**
 	 * The Constructor
 	 */
 	public LazyProofTreeContentProvider() {
 		hideState = false;
 		symbolicState = false;
+		showSubtree = false;
 	}
 	
 	/**
@@ -156,7 +163,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		}
 		if (newInput instanceof Proof) {
 			this.proof = (Proof) newInput;
-			proof.addProofTreeListener(proofTreeListener);
+			if (!proof.isDisposed()) {
+			   proof.addProofTreeListener(proofTreeListener);
+			}
 		} else {
 			this.proof = null;
 		}
@@ -185,9 +194,19 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		if (element instanceof Node) {
 			// Iterate back in parent hierarchy until a branching node is found
 			Node nonBranchingNode = (Node) element;
-			while (nonBranchingNode.parent() != null
-					&& nonBranchingNode.parent().childrenCount() == 1) {
-				nonBranchingNode = nonBranchingNode.parent();
+
+			if (!showSubtree) {
+   			while (nonBranchingNode.parent() != null
+   					&& nonBranchingNode.parent().childrenCount() == 1) {
+   				nonBranchingNode = nonBranchingNode.parent();
+   			}
+			} else {
+			   while (nonBranchingNode != newRoot && nonBranchingNode.parent() != null && nonBranchingNode.parent().childrenCount() == 1) {
+			      nonBranchingNode = nonBranchingNode.parent();
+			   }
+			   if (nonBranchingNode == newRoot || nonBranchingNode == proof.root()) {
+			      return proof;
+			   }
 			}
 			// Check if the root of the proof was found
 			if (nonBranchingNode.parent() == null) {
@@ -228,6 +247,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		if (element instanceof Proof) {
 			Proof currentProof = (Proof) element;
 			Node branchNode = currentProof.root();
+			if (showSubtree) {
+			   branchNode = newRoot;
+			}
 			int childCount = getBranchFolderChildCount(branchNode);
 			int folderCount = getFolderCountInBranch(currentProof);
 			viewer.setChildCount(element, childCount + folderCount);
@@ -351,6 +373,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 					termination = true;
 				}
 			}
+			if (showSubtree && branchNode == newRoot) {
+			   count = 1;
+			}
 			
 			while (branchNode.childrenCount() == 1) {
 				branchNode = branchNode.child(0);
@@ -367,7 +392,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 			
 			// if no execution node was found
 			if (count == 0) {
-				while (startNode.parent() != null) {
+				while (startNode.parent() != null && !showSubtree || branchNode != newRoot && showSubtree) {
 					startNode = startNode.parent();
 					if (isExecutionNode(startNode)) {
 						if (SymbolicExecutionUtil.isTerminationNode(startNode, startNode.getAppliedRuleApp())) {
@@ -397,7 +422,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		return count;
 	}
 
-	/**
+	/**<yx
 	 * Returns the branch{@link Node} respectively the first child {@link Node}
 	 * in its branch.
 	 * 
@@ -407,14 +432,26 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 *         in its branch.
 	 */
 	protected Node getBranchNode(Node node) {
-		while (true) {
-			if (node.equals(node.proof().root())
-					|| node.parent().childrenCount() > 1) {
-				return node;
-			} else {
-				node = node.parent();
-			}
-		}
+		
+	   if (!showSubtree) {
+   		while (true) {
+   			if (node.equals(node.proof().root())
+   					|| node.parent().childrenCount() > 1) {
+   				return node;
+   			} else {
+   				node = node.parent();
+   			}
+   		}
+	   } else {
+	      while (true) {
+            if (node.equals(newRoot)
+                  || node.parent().childrenCount() > 1) {
+               return node;
+            } else {
+               node = node.parent();
+            }
+         }
+	   }
 	}
 
 	/**
@@ -432,11 +469,18 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		int childCount = 0;
 		if (parent instanceof ContributionInfo) {
 			node = proof.root();
+			if (showSubtree) {
+			   node = newRoot;
+			}
 			childCount = getBranchFolderChildCount(node);
 		}
 		if (parent instanceof Proof) {
-			Proof proof = (Proof) parent;
-			node = proof.root();
+
+			Proof currentProof = (Proof) parent;
+			node = currentProof.root();
+			if (showSubtree) {
+			   node = newRoot;
+			}
 			childCount = getBranchFolderChildCount(node);
 		} else if (parent instanceof BranchFolder) {
 			BranchFolder branchFolder = (BranchFolder) parent;
@@ -476,7 +520,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 				// if not was not found in subtree
 				Node parentNode = startNode;
 				if (count < index) {
-					while (parentNode.parent() != null) {
+					while (parentNode.parent() != null && !showSubtree || parentNode != newRoot && showSubtree) {
 						parentNode = parentNode.parent(); 
 						if (SymbolicExecutionUtil.isTerminationNode(parentNode, parentNode.getAppliedRuleApp())) {
 							node = startNode;
@@ -532,6 +576,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		Node current = null;
 		if (parent instanceof Proof) {
 			current = ((Proof) parent).root();
+			if (showSubtree) {
+			   current = newRoot;
+			}
 		} else if (parent instanceof BranchFolder) {
 			current = ((BranchFolder) parent).getChild();
 		}
@@ -553,7 +600,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 				Node node = (Node) element;
 				if (!isExecutionNode(node)) {
 					Node parentNode = node;
-					while (parentNode.parent() != null) {
+					while (parentNode.parent() != null && !showSubtree || parentNode != newRoot && showSubtree) {
 						parentNode = parentNode.parent();
 						if (SymbolicExecutionUtil.isTerminationNode(parentNode, parentNode.getAppliedRuleApp())) {
 							if (getParent(parentNode) != getParent(node)) {
@@ -577,6 +624,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		boolean found = false;
 		while (!found && current != null) {
 			BranchFolder bf = branchFolders.get(current);
+			if (showSubtree && current == newRoot) {
+			   bf = null;
+			}
 			if (bf != null && bf != parent) {
 				if (element == bf) {
 					found = true;
@@ -633,6 +683,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		if (parent instanceof Proof) {
 			Proof proof = (Proof) parent;
 			Node node = proof.root();
+			if (showSubtree) {
+			   node = newRoot;
+			}
 			while (node.childrenCount() == 1) {
 				node = node.child(0);
 			}
@@ -673,6 +726,20 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	
 	public void setSymbolicState(boolean state){
 		symbolicState = state;
+	}
+	
+	public boolean getShowSubtreeState() {
+	   return showSubtree;
+	}
+	
+	/**
+	 * sets the state of the show subtree filter.
+	 * @param state the boolean to set to
+	 * @param rootNode the new root node 
+	 */
+	public void setShowSubtreeState(boolean state, Node rootNode) {
+	   showSubtree = state;
+	   newRoot = rootNode;
 	}
 	
 	public boolean isExecutionNode(Node node) {

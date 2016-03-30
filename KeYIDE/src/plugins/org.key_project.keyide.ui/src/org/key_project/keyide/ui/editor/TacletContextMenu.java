@@ -77,33 +77,30 @@ public class TacletContextMenu extends ExtensionContributionFactory {
             }
             // Add macros
             MenuManager macroMenu = new MenuManager("Strategy macros");
+            HashMap<String, MenuManager> subMenus = new HashMap<String, MenuManager>();
             Iterable<ProofMacro> allMacros = ProofMacroMenu.REGISTERED_MACROS;
-            HashMap<String, MenuManager> menus = new HashMap<String, MenuManager>();
             for (ProofMacro macro : allMacros) {
-               if (macro.canApplyTo(goal.node(), pos.getPosInOccurrence())) {
-                  CommandContributionItemParameter p = new CommandContributionItemParameter(serviceLocator, "", "org.key_project.keyide.ui.commands.applyrule", SWT.PUSH);
-                  p.label = macro.getName();
-                  MacroCommandContributionItem item = new MacroCommandContributionItem(p, goal.node(), macro, keyEditor.getUI(), pos);
-                  item.setVisible(true);
-                  
-                  // sort macros into submenus by their category
-                  String category = macro.getCategory();
-                  MenuManager menu = menus.get(category);
-                  if (category == null) {
-                     macroMenu.add(item);
-                  } else {
-                     if (menu != null) {
-                        menu.add(item);
-                     } else {
-                        MenuManager newMenu = new MenuManager(category);
-                        newMenu.add(item);
-                        menus.put(category, newMenu);
+            	if (pos != null) {
+                    if (macro.canApplyTo(goal.node(), pos.getPosInOccurrence())) {
+                        CommandContributionItemParameter p = new CommandContributionItemParameter(serviceLocator, "", "org.key_project.keyide.ui.commands.applyrule", SWT.PUSH);
+                        p.label = macro.getName();
+                        MacroCommandContributionItem item = new MacroCommandContributionItem(p, goal.node(), macro, keyEditor.getUI(), pos);
+                        item.setVisible(true);
+                        String cat = macro.getCategory();
+                        if (cat == null) {
+                      	  macroMenu.add(item);
+                        } else if (subMenus.containsKey(cat)) {
+                      	  subMenus.get(cat).add(item);
+                        } else {
+                      	  MenuManager subMenu = new MenuManager(cat);
+                      	  subMenu.add(item);
+                      	  subMenus.put(cat, subMenu);
+                        }
                      }
-                  }
-               }
+            	}
             }
-            for (MenuManager subMenu : menus.values()) {
-               macroMenu.add(subMenu);
+            for (String category : subMenus.keySet())  {
+            	macroMenu.add(subMenus.get(category));
             }
             additions.addContributionItem(macroMenu, null); 
          }

@@ -14,17 +14,21 @@
 package org.key_project.sed.key.core.model;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jdt.core.IMethod;
+import org.key_project.sed.core.model.ISEDebugElement;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISETermination;
 import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.model.impl.AbstractSEThread;
 import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
+import org.key_project.sed.core.util.SEPreorderIterator;
 import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
@@ -48,9 +52,11 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
@@ -301,11 +307,44 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
     * @param e The event.
     */
    protected void handleProofPruned(ProofTreeEvent e) {
-      getBuilder().prune(e.getNode());
+	  HashSet<AbstractExecutionNode<?>> deletedExNodes = getBuilder().prune(e.getNode());	 
+	  SEPreorderIterator iter = new SEPreorderIterator(this);
+	  // iterate over key node tree and remove all pruned method returns
+	  try {
+      while (iter.hasNext()) {
+           ISEDebugElement keyNode = iter.next();
+           if (keyNode instanceof KeYMethodCall) {
+              ArrayList<IExecutionBaseMethodReturn<?>> markedForDeletion = new ArrayList<IExecutionBaseMethodReturn<?>>();
+              for (IExecutionBaseMethodReturn<?> exReturn : ((KeYMethodCall) keyNode).getAllMethodReturns().keySet()) {
+                  if (deletedExNodes.contains(exReturn)) {
+                      markedForDeletion.add(exReturn);
+                  }
+              }
+              for (IExecutionBaseMethodReturn<?> exReturn : markedForDeletion) {
+                  ((KeYMethodCall) keyNode).removeMethodReturn(exReturn);
+              }
+          }
+        }
+	  } catch (DebugException e1) {
+      LogUtil.getLogger().logError(e1);
+	  }
+	  // remove all pruned terminations
+      ArrayList<IExecutionTermination> toBeDeleted = new ArrayList<IExecutionTermination>();
+      for (IExecutionTermination termination : knownTerminations.keySet()) {
+    	  if (deletedExNodes.contains(termination)) {
+    		  toBeDeleted.add(termination);
+    	  }
+      }
+      for (IExecutionTermination termination : toBeDeleted) {
+    	  knownTerminations.remove(termination);
+      }
+      // remove all pruned execution nodes from the debug target
+      for (IExecutionNode<?> exNode : deletedExNodes) {
+    	  getDebugTarget().removeExecutionNode(exNode);
+      }
       try {
          super.suspend();
-      }
-      catch (DebugException exception) {
+      } catch (DebugException exception) {
          LogUtil.getLogger().logError(exception);
       }
    }

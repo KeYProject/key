@@ -63,6 +63,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.AbstractKeYlessExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
@@ -70,6 +71,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionBlockStartNode;
@@ -488,25 +490,29 @@ public class SymbolicExecutionTreeBuilder {
       return completions;
    }
    /**
-    * Prunes the symbolic execution tree to match the beforehand pruned proof.
-    * @param node Node to be pruned.
+    * Prunes the symbolic execution tree at the first {@link IExecutionNode} in the parent hierarchy of the given 
+    * {@link Node} (including the Node itself).
+    * @param node {@link Node} to be pruned.
     * @author Anna Filighera
+    * @return The {@link AbstractExecutionNode}'s which where deleted.
     */
-   public void prune(Node node) { 
+   public HashSet<AbstractExecutionNode<?>> prune(Node node) { 
       HashSet<AbstractExecutionNode<?>> exNodesToDelete = new HashSet<AbstractExecutionNode<?>>(proof.countNodes());
-      IExecutionNode<?> firstExNode = getExecutionNode(node);
+      IExecutionNode<?> firstFather = getExecutionNode(node);
       boolean pruneOnExNode = false;
       
       // search for the first node in the parent hierarchy (including the node itself) who is an AbstractExecutionNode
-      if (firstExNode != null && firstExNode != startNode) {
+      if (firstFather != null && firstFather != startNode) {
          pruneOnExNode = true;
-      }
-      else while (firstExNode == null) {
-         node = node.parent();
-         firstExNode = getExecutionNode(node);
+      } else {
+    	  while (firstFather == null) {
+    		  node = node.parent();
+    	      firstFather = getExecutionNode(node);
+    	  }
       }
       // determine which nodes should be pruned
-      ExecutionNodePreorderIterator subtreeToBePruned = new ExecutionNodePreorderIterator(firstExNode);
+      ExecutionNodePreorderIterator subtreeToBePruned = new ExecutionNodePreorderIterator(firstFather);
+      // include the first execution node in the hierarchy only if it was pruned on 
       if (!pruneOnExNode) {
          subtreeToBePruned.next();
       }
@@ -535,7 +541,19 @@ public class SymbolicExecutionTreeBuilder {
       ExecutionNodePreorderIterator remainingExNodes = new ExecutionNodePreorderIterator(startNode);
       while (remainingExNodes.hasNext()) {
          AbstractExecutionNode<?> exNode = (AbstractExecutionNode<?>) remainingExNodes.next();
-         
+         LinkedList<IExecutionBlockStartNode<?>> deletedBlocks = new LinkedList<IExecutionBlockStartNode<?>>();
+         Iterator<IExecutionBlockStartNode<?>> blockIter = exNode.getCompletedBlocks().iterator();
+         // remove pruned completed blocks
+         while (blockIter.hasNext()) {
+            IExecutionBlockStartNode<?> block = blockIter.next();
+            if (exNodesToDelete.contains(block)) {
+               deletedBlocks.add(block);
+            }
+         }
+         for (IExecutionBlockStartNode<?> block : deletedBlocks) {
+            exNode.removeCompletedBlock(block);
+         }
+         // remove all pruned method returns
          if (exNode instanceof ExecutionMethodCall) {
             Iterator<IExecutionBaseMethodReturn<?>> iter = ((ExecutionMethodCall) exNode).getMethodReturns().iterator();
             LinkedList<IExecutionBaseMethodReturn<?>> removed = new LinkedList<IExecutionBaseMethodReturn<?>>();
@@ -549,6 +567,7 @@ public class SymbolicExecutionTreeBuilder {
                ((ExecutionMethodCall) exNode).removeMethodReturn(deleted);
             }
          }
+         // remove all pruned block completions 
          if (exNode instanceof AbstractExecutionBlockStartNode) {
             Iterator<IExecutionNode<?>> iter = ((AbstractExecutionBlockStartNode<?>) exNode).getBlockCompletions().iterator();
             LinkedList<IExecutionNode<?>> removed = new LinkedList<IExecutionNode<?>>();
@@ -562,7 +581,22 @@ public class SymbolicExecutionTreeBuilder {
                ((AbstractExecutionBlockStartNode<?>) exNode).removeBlockCompletion(deleted);
             }
          }  
+         // remove all pruned terminations
+         if (exNode instanceof ExecutionStart) {
+             Iterator<IExecutionTermination> iter = ((ExecutionStart) exNode).getTerminations().iterator();
+             LinkedList<IExecutionTermination> removed = new LinkedList<IExecutionTermination>();
+             while (iter.hasNext()) {
+            	 IExecutionTermination termination = iter.next();
+                if (exNodesToDelete.contains(termination)) {
+                   removed.add(termination);
+                }
+             }
+             for (IExecutionTermination deleted : removed) {
+                ((ExecutionStart) exNode).removeTermination(deleted);
+             }
+          }  
       }
+      return exNodesToDelete;
    }
    
    /**
