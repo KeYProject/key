@@ -5,9 +5,7 @@
          xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
    <description>PMD Plugin preferences rule set BP KeY</description>
    <exclude-pattern>.*/tests/.*</exclude-pattern>
-   <rule ref="rulesets/java/design.xml/AbstractClassWithoutAbstractMethod"/>
    <rule ref="rulesets/java/design.xml/AbstractClassWithoutAnyMethod"/>
-   <rule ref="rulesets/java/naming.xml/AbstractNaming"/>
    <rule ref="rulesets/java/design.xml/AccessorClassGeneration"/>
    <rule ref="rulesets/java/optimizations.xml/AddEmptyString"/>
    <rule ref="rulesets/java/strings.xml/AppendCharacterWithChar"/>
