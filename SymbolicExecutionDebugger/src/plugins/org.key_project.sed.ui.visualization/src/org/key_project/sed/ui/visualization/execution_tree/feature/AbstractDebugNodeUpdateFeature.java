@@ -254,32 +254,35 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       }
    }
    
-	/**
-	 * Checks if the business object of the given {@link PictogramElement} got pruned.
-	 * @param pe the {@link PictogramElement}.
-	 * @return true if the business object got pruned; otherwise false.
-	 * @throws DebugException
-	 */
-	protected boolean isPruneUpdateNeeded(PictogramElement pe) throws DebugException {
-		Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pe);
-		if (bo instanceof ISENode) {
-			ISENode node = (ISENode) bo;
-			if (!node.hasChildren() && node.getParent() != null) {
-				if (!node.getParent().hasChildren()) {
-					return true;
-				} else {
-					ISENode[] children = node.getParent().getChildren();
-					for (ISENode child: children) {
-						if (child == node) {
-							return false;
-						}
-					}
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+   /**
+    * Checks if the business object of the given {@link PictogramElement} got
+    * pruned.
+    * 
+    * @param pe
+    *           the {@link PictogramElement}.
+    * @return true if the business object got pruned; otherwise false.
+    * @throws DebugException
+    */
+   protected boolean isPruneUpdateNeeded(PictogramElement pe) throws DebugException {
+      Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pe);
+      if (bo instanceof ISENode) {
+         ISENode node = (ISENode) bo;
+         if (!node.hasChildren() && node.getParent() != null) {
+            if (!node.getParent().hasChildren()) {
+               return true;
+            } else {
+               ISENode[] children = node.getParent().getChildren();
+               for (ISENode child : children) {
+                  if (child == node) {
+                     return false;
+                  }
+               }
+               return true;
+            }
+         }
+      }
+      return false;
+   }
    
    /**
     * Checks if the shown name in the given {@link PictogramElement}
@@ -428,10 +431,10 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          try {
         	// remove pruned nodes
         	if (isPruneUpdateNeeded(context.getPictogramElement())) {
-        		IRemoveContext removeContext = new RemoveContext(context.getPictogramElement());
-				IRemoveFeature feature = new DefaultRemoveFeature(getFeatureProvider());
-				feature.execute(removeContext);
-				return true;
+        	   IRemoveContext removeContext = new RemoveContext(context.getPictogramElement());
+        	   IRemoveFeature feature = new DefaultRemoveFeature(getFeatureProvider());
+        	   feature.execute(removeContext);
+        	   return true;
         	}
         	
             // Define monitor to use
