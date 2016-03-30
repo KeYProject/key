@@ -3573,6 +3573,16 @@ public final class SymbolicExecutionUtil {
          return false;
       }
    }
+
+   /**
+    * Checks if the given {@link Operator} is the base heap.
+    * @param op The {@link Operator} to check.
+    * @param heapLDT The {@link HeapLDT} which provides the available heaps.
+    * @return {@code true} {@link Operator} is the base heap, {@code false} {@link Operator} is something else.
+    */
+   public static boolean isBaseHeap(Operator op, HeapLDT heapLDT) {
+      return op == heapLDT.getHeapForName(HeapLDT.BASE_HEAP_NAME);
+   }
    
    /**
     * Returns the path to the source file defined by the given {@link PositionInfo}.
