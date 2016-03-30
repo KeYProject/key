@@ -328,7 +328,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
 	  } catch (DebugException e1) {
       LogUtil.getLogger().logError(e1);
 	  }
-	  // remove all pruned terminations
+	  // remove all pruned execution nodes that terminate the start node
       ArrayList<IExecutionTermination> toBeDeleted = new ArrayList<IExecutionTermination>();
       for (IExecutionTermination termination : knownTerminations.keySet()) {
     	  if (deletedExNodes.contains(termination)) {

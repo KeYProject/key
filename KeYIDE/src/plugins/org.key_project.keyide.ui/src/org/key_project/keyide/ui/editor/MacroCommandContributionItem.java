@@ -38,17 +38,18 @@ public class MacroCommandContributionItem extends CommandContributionItem {
    /**
     * The constructor with the additional parameters.
     * @param contributionParameters - the {@link CommandContributionItemParameter}.
-    * @param macro - the {@link ProofMacro}.
-    * @param node - the {@link Node}.
-    * @param ui - the {@link UserInterfaceControl}.
-    * @param pos - the {@link PosInSequent}.
+    * @param proofMacro - the {@link ProofMacro}.
+    * @param targetNode - the {@link Node}.
+    * @param uI - the {@link UserInterfaceControl}.
+    * @param position - the {@link PosInSequent}.
     */
-   public MacroCommandContributionItem(CommandContributionItemParameter contributionParameters, Node node, ProofMacro macro, UserInterfaceControl ui, PosInSequent pos) {
+   public MacroCommandContributionItem(CommandContributionItemParameter contributionParameters, Node targetNode, 
+                                       ProofMacro proofMacro, UserInterfaceControl uI, PosInSequent position) {
       super(contributionParameters);
-      this.node = node;
-      this.macro = macro;
-      this.ui = ui;
-      this.pos = pos;
+      node = targetNode;
+      macro = proofMacro;
+      ui = uI;
+      pos = position;
    }
    
    /**

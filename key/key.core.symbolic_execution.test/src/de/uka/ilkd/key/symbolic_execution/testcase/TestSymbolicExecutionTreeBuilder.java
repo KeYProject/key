@@ -238,7 +238,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
-    * Tests simple pruning on the example /set/complexIf
+    * Tests simple pruning on the example /set/complexIf.
+    * @throws Exception
     * @author Anna Filighera
     */
    public void testSimplePruning() throws Exception {
@@ -266,8 +267,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                true);
          env.getBuilder().prune(env.getProof().root().child(0).child(0));
          assertSetTreeAfterStep(env.getBuilder(), "/set/complexIf/oracle/PrunedIf.xml", testCaseDirectory);
-      }
-      finally {
+      } finally {
          if (env.getProof() != null) {
             env.getProof().dispose();
          }
@@ -278,7 +278,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
-    * Tests pruning on a branch of the first split in the example /set/complexIf
+    * Tests pruning on a branch of the first split in the example /set/complexIf.
+    * @throws Exception
     * @author Anna Filighera
     */
    public void testBranchPruning() throws Exception {
@@ -316,8 +317,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
          assertTrue("They prooftree does not contain nodes it should.", node.childrenCount() == 2);
          env.getBuilder().prune(node.child(0));
          assertSetTreeAfterStep(env.getBuilder(), "/set/complexIf/oracle/BranchPrunedIf.xml", testCaseDirectory);
-      }
-      finally {
+      } finally {
          if (env.getProof() != null) {
             env.getProof().dispose();
          }
@@ -329,7 +329,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    
 
    /**
-    * Tests pruning on both branches of a split in a branch of the first split in the example /set/complexIf
+    * Tests pruning on both branches of a split in a branch of the first split in the example /set/complexIf.
+    * @throws Exception
     * @author Anna Filighera
     */
    public void testComplexPruning() throws Exception {
@@ -364,7 +365,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
             if (node.childrenCount() == 2) {
                branchesCount++;
             }
-            if (branchesCount ==2) {
+            if (branchesCount == 2) {
                break;
             }
          }
@@ -373,8 +374,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
          assertSetTreeAfterStep(env.getBuilder(), "/set/complexIf/oracle/Branch0InBranchPrunedIf.xml", testCaseDirectory);
          env.getBuilder().prune(node.child(1));
          assertSetTreeAfterStep(env.getBuilder(), "/set/complexIf/oracle/Branch1InBranchPrunedIf.xml", testCaseDirectory);
-      }
-      finally {
+      } finally {
          if (env.getProof() != null) {
             env.getProof().dispose();
          }
@@ -383,6 +383,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
          }
       }
    }
+   
    /**
     * Tests example: /set/symbolicExecutionCompletionsTest
     */
