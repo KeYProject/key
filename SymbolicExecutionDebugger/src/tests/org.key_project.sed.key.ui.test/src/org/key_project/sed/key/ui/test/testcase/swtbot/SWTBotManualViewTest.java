@@ -443,7 +443,7 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
             //filter out the rest of the tree
             TestUtilsUtil.clickDirectly(manualView.toolbarToggleButton("Show Subtree of Node"));
             //subtree length should be 11
-            assert(manualView.bot().tree().getAllItems().length == 11);
+            assert(manualView.bot().tree().rowCount() == 12);
             
             TestUtilsUtil.clickDirectly(manualView.toolbarToggleButton("Show Subtree of Node"));
             
@@ -511,14 +511,14 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
             subtree.select();
 
             //subtree length should be 21 - only counting one level of the tree
-            assert(manualView.bot().tree().getAllItems().length == 21);
+            assert(manualView.bot().tree().rowCount() == 22);
             
             //briefly filter out the rest of the tree
             TestUtilsUtil.clickDirectly(manualView.toolbarToggleButton("Show Subtree of Node"));
             TestUtilsUtil.clickDirectly(manualView.toolbarToggleButton("Show Subtree of Node"));
 
             //subtree length should be 21 again
-            assert(manualView.bot().tree().getAllItems().length == 21);
+            assert(manualView.bot().tree().rowCount() == 22);
             
             manualView.close();
          }
