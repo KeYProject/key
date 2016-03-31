@@ -652,9 +652,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
 	                SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor,
 	                Node nodeOnWhichRuleIsApplied) {
 	             // wait for the macro to finish applying.
-	             // Using sleep here is certainly less than ideal,
-	             // waiting for actual termination of the macro would be better.
-	             TestUtilsUtil.sleep(8000);
+	             TestKeYUIUtil.waitWhileAutoMode(bot, environment.getUi());
 	             
 	             //make sure that the macro was applied.
 	             assertEquals(proof.root().childrenCount(), 1);
