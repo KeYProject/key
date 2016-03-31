@@ -176,8 +176,8 @@ public class FilteringHandler {
      */
     private void applyFilters() {
 
-        if (dataModel.getLoadedTreeViewState() != null) {
-            dataModel.getLoadedTreeViewState().getTreeItem().filter(
+        if (dataModel.getLoaddTriVwStat() != null) {
+            dataModel.getLoaddTriVwStat().getTreeItem().filter(
                     // reduces all active filters to one
                     getActiveFilters().stream().reduce(new FilterShowAll(),
                             (firstFilter, secondFilter) -> new FilterCombineAND(

@@ -332,12 +332,12 @@ public class TreeViewController extends NUIController implements Observer {
                 ((MainViewController) getNui().getController("MainView"))
                         .registerKeyListener((event) -> {
                     if (event.getCode().equals(KeyCode.F) && event.isShortcutDown()
-                            && getDataModel().getLoadedTreeViewState() != null) {
+                            && getDataModel().getLoaddTriVwStat() != null) {
                         openSearchView();
                     }
 
                     if (event.getCode().equals(KeyCode.G) && event.isShortcutDown()
-                            && getDataModel().getLoadedTreeViewState() != null) {
+                            && getDataModel().getLoaddTriVwStat() != null) {
                         openFilterView();
                     }
                     /*

@@ -93,6 +93,7 @@ public class NUIBranchNode extends NUINode {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:avoidinlineconditionals")
     public int search(final String term) {
         // case: Empty search term given
         if (term.isEmpty()) {
@@ -100,15 +101,11 @@ public class NUIBranchNode extends NUINode {
         }
 
         // case: Non-Empty search term given
-
         final boolean iAmASrchRslt = getLabel().toLowerCase().contains(term.toLowerCase());
 
         setSearchResult(iAmASrchRslt);
         return children.stream()/*.parallel()*/.mapToInt((child) -> child.search(term)).sum()
-                // CHECKSTYLE.OFF: AvoidInlineConditionalsCheck
-                // -- this is much more readable than any alternative.
                 + (iAmASrchRslt ? 1 : 0);
-                // CHECKSTYLE.ON: AvoidInlineConditionalsCheck
     }
 
     /**

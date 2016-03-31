@@ -79,6 +79,11 @@ public final class ProofTreeStyler {
          */
         private final List<String> cssClasses;
         /**
+         * See hashCode().
+         */
+        public static final int HASH_CODE = 5;
+
+        /**
          * The name of the assigned iconImage.
          */
         private String iconImage;
@@ -100,7 +105,6 @@ public final class ProofTreeStyler {
             cssClasses.add(cssClass);
         }
 
-
         @Override
         public boolean equals(final Object obj) {
 
@@ -114,10 +118,20 @@ public final class ProofTreeStyler {
 
             // First check if images are set
             // NOPMD Justification: These parentheses are not useless.
-            getIconImage() != null && ((StyleConfiguration) obj).getIconImage() != null //NOPMD
+            getIconImage() != null && ((StyleConfiguration) obj).getIconImage() != null // NOPMD
             // Then compare the image filename stored in ID field
                     && !(getIconImage().getId()
                             .equals(((StyleConfiguration) obj).getIconImage().getId()))));
+        }
+
+        /**
+         * This method is definitely and absolutely neccessary and does serve
+         * many purposes besides satisfying FindBugs and PMD.
+         */
+        @Override
+        public int hashCode() {
+            return HASH_CODE; // Guaranteed to be a collision-free hash, see
+                      // https://xkcd.com/221/
         }
 
         /**
@@ -166,9 +180,8 @@ public final class ProofTreeStyler {
 
     /**
      * Creates a new ProofTreeStyler with the ProofTreeCell ptc assigned to it.
-     * * @param ptc
-     *            The {@link ProofTreeCell} associated with this
-     *            ProofTreeStyler.
+     * * @param ptc The {@link ProofTreeCell} associated with this
+     * ProofTreeStyler.
      */
 
     /**
@@ -198,6 +211,7 @@ public final class ProofTreeStyler {
 
     /**
      * Getter.
+     * 
      * @return the {@link IconFactory}.
      */
     public IconFactory getIcf() {

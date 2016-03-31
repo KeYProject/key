@@ -5,9 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.TreeViewState;
-import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
@@ -25,10 +23,6 @@ import javafx.scene.input.KeyCode;
 // PMD will also complain if adding the constructor, then saying "avoid useless
 // constructors"
 public class TreeViewTest extends NUITestHelper {
-
-    IconFactory iconFactory = new IconFactory(ProofTreeCell.ICON_SIZE,
-            ProofTreeCell.ICON_SIZE);
-
     @Test
     public void testTreeOne() {
         // open load file dialog

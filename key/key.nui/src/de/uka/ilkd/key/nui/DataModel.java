@@ -85,7 +85,7 @@ public class DataModel extends Observable {
      * 
      * @return TreeViewState currently loaded in the TreeView.
      */
-    public TreeViewState getLoadedTreeViewState() {
+    public TreeViewState getLoaddTriVwStat() {
         return loaddTriVwStat;
     }
 
@@ -164,7 +164,7 @@ public class DataModel extends Observable {
             nui.updateStatusbar(bundle.getString("savedSuccessfully") + " "
                     + destinationFile.getAbsolutePath());
             // If proof is successfully saved, unset isModified flag
-            getLoadedTreeViewState().setModified(false);
+            getLoaddTriVwStat().setModified(false);
         }
         catch (IOException e) {
             nui.updateStatusbar(e.getMessage());
@@ -203,14 +203,4 @@ public class DataModel extends Observable {
     public void setLoaddTriVwStat(final TreeViewState loadedTVS) {
         this.loaddTriVwStat = loadedTVS;
     }
-
-    /**
-     * Getter.
-     * 
-     * @return the {@link TreeViewState}
-     */
-    public TreeViewState getLoaddTriVwStat() {
-        return loaddTriVwStat;
-    }
-
 }

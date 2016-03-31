@@ -158,6 +158,7 @@
 		<checkstyle config="${basedir}/reports-config/checkstyle/checkstyle_bp_key_160130.xml" classpath="${basedir}/ant-lib/checkstyle/checkstyle-6.14.1-all.jar">
 			<fileset dir="${basedir}/src"> 
 				<include name="**/*.java" />
+				<exclude name="de/uka/ilkd/key/nui/tests/*"/>
 				<exclude name="de/uka/ilkd/key/nui/tests/guitests/*.java"/>
 				<exclude name="de/uka/ilkd/key/nui/tests/junittests/*.java"/>
 			</fileset>
