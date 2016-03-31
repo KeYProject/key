@@ -26,6 +26,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 
 /**
@@ -112,8 +113,14 @@ public class SWTBotLoopInvariantRuleCompletionTest extends TestCase {
          openLIDialog("Loop Invariant");
          dialogShell.bot().button("Finish").click();
          dialogShell = null;
-         assertTrue(proof.openGoals().head().toString().contains("i >= 0 & i <= _array.length"));
-         assertFalse(proof.openGoals().head().toString().contains("bogus, this isn't actually in the text."));
+         boolean contained = false;
+         for(Goal g : proof.openGoals()){
+            if (g.toString().contains("i >= 0 & i <= _array.length")){
+               contained = true;
+            }
+            assertFalse(proof.openGoals().head().toString().contains("bogus, this isn't actually in the text."));
+         }
+         assertTrue(contained);
       } finally {
          restore();
       }
