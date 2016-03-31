@@ -12,6 +12,7 @@ import com.sun.javafx.scene.control.skin.VirtualFlow.ArrayLinkedList;
 
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -98,7 +99,7 @@ public class SearchViewController extends NUIController {
     /**
      * A List representation of the all the TreeItems.
      */
-    private List<TreeItem<NUINode>> treeItems;
+    private List<ProofTreeItem> treeItems;
 
     /**
      * Reference of Parent Connection between TreeView and SearchView.
@@ -175,7 +176,7 @@ public class SearchViewController extends NUIController {
      * 
      * @return a List of all the TreeItems in the underlying ProofTreeView
      */
-    private List<TreeItem<NUINode>> getTreeItems() {
+    private List<ProofTreeItem> getTreeItems() {
 
         if (treeItems == null) {
             /**
@@ -200,7 +201,7 @@ public class SearchViewController extends NUIController {
                 }
 
                 /**
-                 * Converts the given {@link TreeItem} into a list containing
+                 * Converts the given {@link ProofTreeItem} into a list containing
                  * all elements of the tree.
                  * 
                  * @param root
@@ -210,22 +211,26 @@ public class SearchViewController extends NUIController {
                  *            The accumulator used to collect the nodes.
                  * @return A {@link List} of TreeItems.
                  */
-                private <T> List<TreeItem<T>> treeToList(final TreeItem<T> root,
-                        final List<TreeItem<T>> list) {
+                private List<ProofTreeItem> treeToList(final ProofTreeItem root,
+                        final List<ProofTreeItem> list) {
                     if (root == null || list == null) {
                         throw new IllegalArgumentException();
                     }
                     list.add(root);
                     if (!root.getChildren().isEmpty()) {
-                        for (TreeItem<T> ti : root.getChildren()) {
-                            list.addAll(treeToList(ti, new LinkedList<TreeItem<T>>()));
+                        for (TreeItem<NUINode> ti : root.getChildren()) {
+                            if (ti instanceof ProofTreeItem) {
+                                final ProofTreeItem pti = (ProofTreeItem) ti;
+                                list.addAll(treeToList(pti, new LinkedList<ProofTreeItem>()));
+                            }
                         }
                     }
                     return list;
                 }
             }
-            treeItems = (new TreeToListHelper()).treeToList(proofTreeView.getRoot(),
-                    new LinkedList<TreeItem<NUINode>>());
+            treeItems = (new TreeToListHelper()).treeToList(
+                    (ProofTreeItem) proofTreeView.getRoot(),
+                    new LinkedList<ProofTreeItem>());
         }
 
         return treeItems;
@@ -245,10 +250,10 @@ public class SearchViewController extends NUIController {
             return;
         }
 
-        final List<TreeItem<NUINode>> treeItems = getTreeItems();
-        final TreeItem<NUINode> currentlySelectedItem = proofTreeView.getSelectionModel()
-                .getSelectedItem();
-        TreeItem<NUINode> itemToSelect = null;
+        final List<ProofTreeItem> treeItems = getTreeItems();
+        final ProofTreeItem currentlySelectedItem = (ProofTreeItem) proofTreeView
+                .getSelectionModel().getSelectedItem();
+        ProofTreeItem itemToSelect = null;
 
         // Basically does: itemToSelect = currentlySelectedItem + 1
         if (currentlySelectedItem == null
@@ -391,11 +396,6 @@ public class SearchViewController extends NUIController {
         });
 
         // Assign stylesheet
-        // TODO check if command is equivalent
-        /*
-         * searchViewPane.getStylesheets().add(getClass()
-         * .getResource("../components/searchView.css").toExternalForm());
-         */
         searchViewPane.getStylesheets().add("/de/uka/ilkd/key/nui/components/searchView.css");
     }
 }
