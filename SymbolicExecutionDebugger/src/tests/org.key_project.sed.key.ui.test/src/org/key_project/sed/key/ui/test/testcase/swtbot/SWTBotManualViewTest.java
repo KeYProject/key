@@ -1,8 +1,6 @@
 package org.key_project.sed.key.ui.test.testcase.swtbot;
 
 
-import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.State;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jdt.core.IJavaProject;
@@ -16,13 +14,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.handlers.RegistryToggleState;
 import org.junit.Test;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
-import org.key_project.keyide.ui.handlers.HideIntermediateProofstepsHandler;
-import org.key_project.keyide.ui.handlers.ShowSymbolicExecutionTreeOnlyHandler;
 import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
@@ -413,148 +406,6 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
    }
    
    /**
-    * Tests whether enabling the subtree filter works as expected.
-    * @throws Exception
-    */
-   @Test
-   public void testSubTreeFilterEnabled() throws Exception {
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
-
-         @Override
-         public void configureDebugPerspective(SWTWorkbenchBot bot,
-               IPerspectiveDescriptor debugPerspective) throws Exception {
-            TestUtilsUtil.openView(ManualView.VIEW_ID);
-         }
-
-         @Override
-         public void test(SWTWorkbenchBot bot, IJavaProject project,
-               IMethod method, String targetName, SWTBotView debugView,
-               SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch)
-               throws Exception {
-            SWTBotView manualView = getManualBotView(bot);
-            //start auto mode.
-            TestUtilsUtil.clickDirectly(manualView.toolbarPushButton("Start Auto Mode"));
-            TestKeYUIUtil.waitWhileAutoMode(bot, getManualView(manualView).getEnvironment().getUi());
-            
-            //navigate to some location
-            SWTBotTreeItem subtree = manualView.bot().tree().getTreeItem("Normal Execution (n != null)").getNode("if x true").getNode("163:One Step Simplification: 7 rules");
-            subtree.select();
-            
-            //filter out the rest of the tree
-            TestUtilsUtil.clickDirectly(manualView.toolbarToggleButton("Show Subtree of Node"));
-            //subtree length should be 11
-            assert(manualView.bot().tree().rowCount() == 12);
-            
-            TestUtilsUtil.clickDirectly(manualView.toolbarToggleButton("Show Subtree of Node"));
-            
-            manualView.close();
-         }
-
-         @Override
-         public void cleanupDebugPerspective(SWTWorkbenchBot bot,
-               IPerspectiveDescriptor debugPerspective) throws Exception {
-            if (TestUtilsUtil.findView(ManualView.VIEW_ID) != null) {
-               TestUtilsUtil.closeView(ManualView.VIEW_ID);
-            }
-         }
-         
-      };
-      doKeYDebugTargetTest("SWTBotManualViewTest_testSourceViewer", 
-            Activator.PLUGIN_ID, 
-            "data/number/test", 
-            true, 
-            true, 
-            createMethodSelector("Number", "equals", "QNumber;"), 
-            null, 
-            null, 
-            Boolean.FALSE, 
-            Boolean.FALSE, 
-            Boolean.FALSE, 
-            Boolean.FALSE, 
-            Boolean.FALSE, 
-            Boolean.FALSE, 
-            Boolean.FALSE, 
-            Boolean.FALSE, 
-            Boolean.FALSE, 
-            Boolean.TRUE, 
-            10, 
-            executor);
-   }
-   
-   /**
-    * Tests whether enabling and then disabling the subtree filter works as expected.
-    * @throws Exception
-    */
-   @Test
-   //TODO
-   public void testSubTreeFilterDisabled() throws Exception{
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
-
-         @Override
-         public void configureDebugPerspective(SWTWorkbenchBot bot,
-               IPerspectiveDescriptor debugPerspective) throws Exception {
-            TestUtilsUtil.openView(ManualView.VIEW_ID);
-         }
-
-         @Override
-         public void test(SWTWorkbenchBot bot, IJavaProject project,
-               IMethod method, String targetName, SWTBotView debugView,
-               SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch)
-               throws Exception {
-            SWTBotView manualView = getManualBotView(bot);
-            //start auto mode.
-            TestUtilsUtil.clickDirectly(manualView.toolbarPushButton("Start Auto Mode"));
-            TestKeYUIUtil.waitWhileAutoMode(bot, getManualView(manualView).getEnvironment().getUi());
-            
-            //navigate to some location
-            SWTBotTreeItem subtree = manualView.bot().tree().getTreeItem("Normal Execution (n != null)").getNode("if x true").getNode("163:One Step Simplification: 7 rules");
-            subtree.select();
-
-            //subtree length should be 21 - only counting one level of the tree
-            assert(manualView.bot().tree().rowCount() == 22);
-            
-            //briefly filter out the rest of the tree
-            TestUtilsUtil.clickDirectly(manualView.toolbarToggleButton("Show Subtree of Node"));
-            TestUtilsUtil.clickDirectly(manualView.toolbarToggleButton("Show Subtree of Node"));
-
-            //subtree length should be 21 again
-            assert(manualView.bot().tree().rowCount() == 22);
-            
-            manualView.close();
-         }
-
-         @Override
-         public void cleanupDebugPerspective(SWTWorkbenchBot bot,
-               IPerspectiveDescriptor debugPerspective) throws Exception {
-            if (TestUtilsUtil.findView(ManualView.VIEW_ID) != null) {
-               TestUtilsUtil.closeView(ManualView.VIEW_ID);
-            }
-         }
-         
-      };
-      doKeYDebugTargetTest("SWTBotManualViewTest_testSourceViewer", 
-            Activator.PLUGIN_ID, 
-            "data/number/test", 
-            true, 
-            true, 
-            createMethodSelector("Number", "equals", "QNumber;"), 
-            null, 
-            null, 
-            Boolean.FALSE, 
-            Boolean.FALSE, 
-            Boolean.FALSE, 
-            Boolean.FALSE, 
-            Boolean.FALSE, 
-            Boolean.FALSE, 
-            Boolean.FALSE, 
-            Boolean.FALSE, 
-            Boolean.FALSE, 
-            Boolean.TRUE, 
-            10, 
-            executor);
-   }
-   
-   /**
     * tests of the loaded proof in the {@link ISEDebugTarget} is the same as the one in the {@link ManualView}.
     * @param target the {@link ISEDebugTarget} to check
     * @param view the {@link ManualView} to check
@@ -598,6 +449,4 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
       assertTrue(newView instanceof ManualView);
       return (ManualView) newView;
    }
-   
-
 }

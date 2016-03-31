@@ -324,6 +324,90 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
    }
    
    /**
+    * Creates a viewer for the proof and checks if the show subtree filer is working correctly.
+    * @throws Exception The exception thrown
+    */
+   @Test
+   public void testShowSubTreeFilter() throws Exception {
+      KeYEnvironment<DefaultUserInterfaceControl> environment = getEnvironment(
+            "OutlineContentAndLabelProviderTest_testShowSubTreeFilter", "src",
+            "data/paycard");
+      Proof proof = getProof(environment, "PayCard", "isValid");
+      assertNotNull(proof);
+      // create viewer to show proof in
+      Shell shell = new Shell();
+      try {
+         shell.setText("OutlineContentAndLabelProviderTest");
+         shell.setSize(600, 400);
+         shell.setLayout(new FillLayout());
+         TreeViewer viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL
+               | SWT.V_SCROLL | SWT.VIRTUAL);
+         viewer.setUseHashlookup(true);
+         LazyProofTreeContentProvider lazyContentProvider = new LazyProofTreeContentProvider();
+         // deactivate hiding intermediate proofsteps filter and show symbolic
+         // execution tree filter
+         lazyContentProvider.setHideState(false);
+         lazyContentProvider.setSymbolicState(false);
+         lazyContentProvider.setShowSubtreeState(false, null);
+         viewer.setContentProvider(lazyContentProvider);
+         viewer.setLabelProvider(new ProofTreeLabelProvider(viewer, environment
+               .getProofControl(), proof));
+         viewer.setInput(proof);
+         shell.setVisible(true);
+         viewer.expandAll();
+         // check if initial toggle States are false
+         assertFalse(lazyContentProvider.getHideState());
+         assertFalse(lazyContentProvider.getSymbolicState());
+         assertFalse(lazyContentProvider.getShowSubtreeState());
+
+         // start auto mode
+         environment.getProofControl().startAndWaitForAutoMode(proof);
+         viewer.setInput(proof);
+         viewer.expandAll();
+
+         // check if proof tree is correct before activating the filter
+         TreeViewerIterator viewerIter = new TreeViewerIterator(viewer);
+         NodePreorderIterator nodeIter = new NodePreorderIterator(proof.root());
+         while (nodeIter.hasNext()) {
+            assertTree(nodeIter, viewerIter);
+         }
+
+         // subtree start node
+         Node filterNode = proof.root().child(0).child(0);
+
+         // activate show sub tree filter
+         lazyContentProvider.setShowSubtreeState(true, filterNode);
+         viewer.setInput(proof);
+         viewer.expandAll();
+
+         // test proof tree when filter is active
+         viewerIter = new TreeViewerIterator(viewer);
+         nodeIter = new NodePreorderIterator(filterNode);
+         while (nodeIter.hasNext()) {
+            assertTree(nodeIter, viewerIter);
+         }
+
+         // deactivate show sub tree filter
+         lazyContentProvider.setShowSubtreeState(false, null);
+         viewer.setInput(proof);
+         viewer.expandAll();
+
+         // check if the complete proof tree is shown correctly again
+         viewerIter = new TreeViewerIterator(viewer);
+         nodeIter = new NodePreorderIterator(proof.root());
+         while (nodeIter.hasNext()) {
+            assertTree(nodeIter, viewerIter);
+         }
+      } finally {
+         shell.setVisible(false);
+         shell.dispose();
+         proof.dispose();
+         environment.dispose();
+      }
+   }
+   
+   
+   /**
     * checks whether a filtered TreeViewer contains the correct symbolic execution tree.
     * @param exeNodeIter execution node iterator over the execution tree
  	* @param viewerIter an iterator over the filtered tree viewer
