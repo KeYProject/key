@@ -268,7 +268,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
    private void specSwitchTo(int id) {
       stackLayout.topControl = (Composite) specSwitchComposite.getChildren()[id];
       specSwitchComposite.layout();
-      if(assumptionsStackLayout != null && assumptionViewGrp != null) {
+      if (assumptionsStackLayout != null && assumptionViewGrp != null) {
          assumptionsStackLayout.topControl = (Composite) assumptionViewGrp.getChildren()[id];
          assumptionViewGrp.layout();
       }
