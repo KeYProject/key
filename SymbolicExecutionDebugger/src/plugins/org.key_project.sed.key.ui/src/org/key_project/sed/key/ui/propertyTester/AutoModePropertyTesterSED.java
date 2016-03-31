@@ -1,6 +1,7 @@
 package org.key_project.sed.key.ui.propertyTester;
 
 import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.ui.IViewPart;
 import org.key_project.sed.key.ui.view.ManualView;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
@@ -40,28 +41,31 @@ public class AutoModePropertyTesterSED extends PropertyTester {
    @Override
    public boolean test(Object receiver, String property, Object[] args,
          Object expectedValue) {
-      if (WorkbenchUtil.findView(ManualView.VIEW_ID) != null) {
-         ManualView view = (ManualView) WorkbenchUtil.findView(ManualView.VIEW_ID);
-         if (view.getProof() != null) {
-            if (view.getProof().isDisposed()) {
-               return false;
+         IViewPart tempView = WorkbenchUtil.findView(ManualView.VIEW_ID);
+         if (tempView != null) {
+            if (tempView instanceof ManualView) {
+               ManualView view = (ManualView) tempView;
+               if (view.getProof() != null) {
+                  if (view.getProof().isDisposed()) {
+                     return false;
+                  }
+               }
+               if (view.getEnvironment() != null) {
+                  ProofControl proofControl = view.getEnvironment().getProofControl();
+                  if (proofControl != null) {
+                     if (property.equals(PROPERTY_IS_AUTO_MODE)) {
+                        return proofControl.isInAutoMode();
+                     }
+                     if (property.equals(PROPERTY_IS_NOT_AUTOMODE)) {
+                        return !proofControl.isInAutoMode();
+                     }
+                     if (property.equals(PROPERTY_PROOF_NOT_CLOSED)) {
+                        return !view.getProof().closed();
+                     }
+                  }
+               }
             }
          }
-         if (view.getEnvironment() != null) {
-            ProofControl proofControl = view.getEnvironment().getProofControl();
-            if (proofControl != null) {
-               if (property.equals(PROPERTY_IS_AUTO_MODE)) {
-                  return proofControl.isInAutoMode();
-               }
-               if (property.equals(PROPERTY_IS_NOT_AUTOMODE)) {
-                  return !proofControl.isInAutoMode();
-               }
-               if (property.equals(PROPERTY_PROOF_NOT_CLOSED)) {
-                  return !view.getProof().closed();
-               }
-            }
-         }
-      }
       return false;
    }
    

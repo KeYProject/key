@@ -389,7 +389,8 @@ public class ManualView extends AbstractViewBasedView {
    	  if ((boolean) state.getValue()) {
    	     filterNode = getSelectedNode();
    	     contentProvider.setShowSubtreeState(true, filterNode);
-   	     getTreeViewer().setInput(filterNode.proof());
+	        getTreeViewer().setInput(filterNode.proof());
+   	     
    	  } else {
    	     Node currentSelection = getSelectedNode();
    	     contentProvider.setShowSubtreeState(false, proof.root());
@@ -463,7 +464,7 @@ public class ManualView extends AbstractViewBasedView {
       	        	      newProof = true;
       	        	   }
                      this.proof = keyTarget.getProof();
-                     if (newProof) {
+                     if (newProof && contentProvider != null) {
                         subtreeState.setValue(false);
                         contentProvider.setShowSubtreeState(false, proof.root());
                      }
