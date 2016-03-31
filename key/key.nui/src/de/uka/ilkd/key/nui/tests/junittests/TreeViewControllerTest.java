@@ -57,14 +57,6 @@ public class TreeViewControllerTest extends Application {
     }
 
     @Test
-    public void testProofTreeView() {
-        Application.launch();
-        TreeView<NUINode> testvalue = new TreeView<>();
-        treeViewController.setProofTreeView(testvalue);
-        assertEquals(testvalue, treeViewController.getProofTreeView());
-    }
-
-    @Test
     public void testSearchViewCtrlr() {
         SearchViewController testvalue = new SearchViewController();
         treeViewController.setSearchViewCtrlr(testvalue);
