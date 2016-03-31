@@ -233,11 +233,11 @@ public class MainViewController extends NUIController implements Observer {
     public final void handleOpenProof(final ActionEvent e) {
         final FileChooser fileChooser = new FileChooser();
 
-        final TreeViewState loadedTVS = getDataModel().getLoadedTreeViewState();
+        final TreeViewState loadedTVS = getDataModel().getLoaddTriVwStat();
         // set default directory to location where currently loaded proof is
         // located
         File parentDirectory = null;
-        if (getDataModel().getLoadedTreeViewState() != null) {
+        if (getDataModel().getLoaddTriVwStat() != null) {
             parentDirectory = loadedTVS.getProof().getProofFile().getParentFile();
         }
         if (parentDirectory != null) {
@@ -315,8 +315,8 @@ public class MainViewController extends NUIController implements Observer {
     public final void handleCloseWindow(final Event e) {
         // If no proof file was loaded OR file was not changed: close
         // application immediately
-        if (getDataModel().getLoadedTreeViewState() == null
-                || !(getDataModel().getLoadedTreeViewState().isModified())) {
+        if (getDataModel().getLoaddTriVwStat() == null
+                || !(getDataModel().getLoaddTriVwStat().isModified())) {
             Platform.exit();
             MainWindow.getInstance().dispose();
             return;
@@ -328,7 +328,7 @@ public class MainViewController extends NUIController implements Observer {
         alert.setTitle(getBundle().getString("dialogTitle"));
 
         // --- define text for header and content area
-        final String filename = getDataModel().getLoadedTreeViewState().getProof().getProofFile()
+        final String filename = getDataModel().getLoaddTriVwStat().getProof().getProofFile()
                 .getName();
         alert.setHeaderText(
                 MessageFormat.format(getBundle().getString("dialogHeader"), "'" + filename + "'"));
@@ -366,7 +366,7 @@ public class MainViewController extends NUIController implements Observer {
     @FXML
     protected final void handleSaveProof(final ActionEvent e) {
         // retrieve last saved location from proof file
-        final Proof loadedProof = getDataModel().getLoadedTreeViewState().getProof();
+        final Proof loadedProof = getDataModel().getLoaddTriVwStat().getProof();
 
         if (loadedProof != null && loadedProof.getProofFile() != null) {
             // call saveProof with proof file
@@ -397,7 +397,7 @@ public class MainViewController extends NUIController implements Observer {
      */
     public boolean saveProofAsDialog() {
         // Get loaded proof
-        final Proof loadedProof = getDataModel().getLoadedTreeViewState().getProof();
+        final Proof loadedProof = getDataModel().getLoaddTriVwStat().getProof();
 
         // Open file picker window
         final FileChooser fileChooser = new FileChooser();
@@ -581,7 +581,7 @@ public class MainViewController extends NUIController implements Observer {
      */
     @Override
     public void update(final Observable o, final Object arg) {
-        if (getDataModel().getLoadedTreeViewState() == null) {
+        if (getDataModel().getLoaddTriVwStat() == null) {
             saveProof.setVisible(false);
             saveProofAs.setVisible(false);
         }

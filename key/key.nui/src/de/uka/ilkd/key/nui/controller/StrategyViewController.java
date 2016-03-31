@@ -256,13 +256,13 @@ public class StrategyViewController extends NUIController implements Observer {
      * @throws ControllerNotFoundException
      */
     public void handleOnAction(final ActionEvent actionEvent) throws ControllerNotFoundException {
-        if (getDataModel().getLoadedTreeViewState() == null) {
+        if (getDataModel().getLoaddTriVwStat() == null) {
             getNui().updateStatusbar(getBundle().getString("errorProofFileMissing"));
 
         }
         else {
 
-            final String filename = getDataModel().getLoadedTreeViewState().getProof()
+            final String filename = getDataModel().getLoaddTriVwStat().getProof()
                     .getProofFile().getName();
 
             // retrieve proof file and init proofStarter

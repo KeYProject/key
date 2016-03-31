@@ -86,7 +86,7 @@ public class OpenProofsViewController extends NUIController implements Observer 
         alert.setTitle(getBundle().getString("dialogTitle"));
 
         // define text for header and content area
-        final String filename = getDataModel().getLoadedTreeViewState().getProof().getProofFile()
+        final String filename = getDataModel().getLoaddTriVwStat().getProof().getProofFile()
                 .getName();
         alert.setHeaderText(
                 MessageFormat.format(getBundle().getString("dialogHeader"), "'" + filename + "'"));
@@ -139,12 +139,12 @@ public class OpenProofsViewController extends NUIController implements Observer 
         deleteProof.setOnAction((event) -> {
             boolean canBeClosed = false;
             // only show save dialog if proof was modified
-            if (getDataModel().getLoadedTreeViewState().isModified()) {
+            if (getDataModel().getLoaddTriVwStat().isModified()) {
                 canBeClosed = showSaveDialog();
             }
             // if proof was modified and saved OR if proof was not modified at
             // all, then remove proof from openProofsView
-            if (canBeClosed || !getDataModel().getLoadedTreeViewState().isModified()) {
+            if (canBeClosed || !getDataModel().getLoaddTriVwStat().isModified()) {
                 getDataModel().removeProof(listView.getSelectionModel().getSelectedItem());
             }
         });

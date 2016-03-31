@@ -1,6 +1,10 @@
 package de.uka.ilkd.key.nui.tests.guitests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 
@@ -15,6 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.HBox;
 
 /**
  * Test for User Story. - #14469 Suchen im Beweisbaum - #15081 Rueckmeldung im
@@ -211,6 +216,102 @@ public class SearchViewTest extends NUITestHelper {
         this.checkSearchResult("or", "Number of Search Results: 31");
         assertFalse(SearchViewTest.highlightedNoResults(
                 treeViewController.getSearchViewPane().getChildren()));
+    }
+
+    /**
+     * Tests scrolling through search results
+     * 
+     * @throws ControllerNotFoundException
+     * 
+     */
+    @Test
+    public void testScrollingThroughResults()
+            throws ControllerNotFoundException {
+        TreeViewController treeViewController = (TreeViewController) nui
+                .getController("treeViewPane");
+
+        String[] cells = { "0: andRight", "1: andRight", "3: andRight",
+                "10: concrete_and_3", "43: concrete_and_2",
+                "11: concrete_and_4", "62: concrete_and_2", "8: andLeft",
+                "79: concrete_and_2", "83: concrete_and_2",
+                "112: concrete_and_2", "141: concrete_and_2",
+                "210: concrete_and_2", "256: concrete_and_1",
+                "298: concrete_and_2", "327: concrete_and_2",
+                "385: concrete_and_2", "412: concrete_and_1",
+                "491: concrete_and_1", "514: concrete_and_1",
+                "601: concrete_and_2", "666: concrete_and_2" };
+        // load prooffile example01.proof
+        this.loadProof("example01.proof", false);
+
+        // expand tree
+        this.rightClickOn("Proof Tree ");
+        this.clickOn("Expand All");
+
+        // open searchView via contextmenu
+        this.rightClickOn("Proof Tree ");
+        this.clickOn("Search");
+
+        // check statusbar
+        this.checkSearchResult("and", "Number of Search Results: 22");
+        assertFalse(SearchViewTest.highlightedNoResults(
+                treeViewController.getSearchViewPane().getChildren()));
+
+        // scroll through search results forward
+        for (int i = 0; i < 22; i++) {
+            clickOn(">");
+            assertEquals(cells[i], treeViewController.getProofTreeCells()
+                    .stream().filter((cell) -> cell.isSelected())
+                    .collect(Collectors.toList()).get(0).getItem().getLabel());
+        }
+
+        // scroll through search results backwards
+        for (int i = 20; i >= 0; i--) {
+            clickOn("<");
+            assertEquals(cells[i], treeViewController.getProofTreeCells()
+                    .stream().filter((cell) -> cell.isSelected())
+                    .collect(Collectors.toList()).get(0).getItem().getLabel());
+        }
+    }
+
+    /**
+     * Test to close the search view via button "X"
+     */
+    @Test
+    public void testCloseSearchViewButtonX() {
+        // load prooffile example01.proof
+        this.loadProof("example01.proof", false);
+
+        // expand tree
+        this.rightClickOn("Proof Tree ");
+        this.clickOn("Expand All");
+
+        // check if search view is not loaded
+        assertTrue((HBox) find("#searchViewPane") == null);
+
+        // open searchView via contextmenu
+        this.rightClickOn("Proof Tree ");
+        this.clickOn("Search");
+
+        // check if search view is open
+        assertTrue(((HBox) find("#searchViewPane")).isVisible());
+
+        // close search view
+        clickOn("X");
+
+        // check if search view is closed
+        assertTrue((HBox) find("#searchViewPane") == null);
+
+        // open search view by pressing ctrl+f
+        this.push((KeyCodeCombination) KeyCombination.keyCombination("Ctrl+F"));
+
+        // check if search view is open
+        assertTrue(((HBox) find("#searchViewPane")).isVisible());
+
+        // close search view
+        clickOn("X");
+
+        // check if search view is closed
+        assertTrue((HBox) find("#searchViewPane") == null);
     }
 
     /**
