@@ -72,14 +72,14 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
             // prune branch node
             TestUtilsUtil.selectInTree(tree, "Null Reference (n = null)");
             TestUtilsUtil.clickContextMenu(tree, "Prune Proof");
-            TestUtilsUtil.sleep(10000);
+            TestUtilsUtil.sleep(10000); // TODO wait for diagram
             // test diagram after prune
             assertDiagram(bot, project.getProject(), "NumberBranchNode.set", pathToOracleFiles, null);
 
             // prune node
             TestUtilsUtil.selectInTree(tree, "10:if (this.content==n.content) {                         return  true; }                 else  {                         return  false; }");
             TestUtilsUtil.clickContextMenu(tree, "Prune Proof");
-            TestUtilsUtil.sleep(10000);
+            TestUtilsUtil.sleep(10000); // TODO wait for diagram
             // test diagram after prune
             assertDiagram(bot, project.getProject(), "NumberNode.set", pathToOracleFiles, null);
 
@@ -91,7 +91,7 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
                   resume(bot, item2, target);
                }
             });
-            TestUtilsUtil.sleep(10000);
+            TestUtilsUtil.sleep(10000); // TODO wait for diagram
             // test diagram after resume
             assertDiagram(bot, project.getProject(), "NumberResume.set", pathToOracleFiles, null);
 
@@ -110,8 +110,7 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
          }
       };
 
-      doKeYDebugTargetTest("SWTBotSymbolicExecutionTreePruneTest_testPruning", Activator.PLUGIN_ID, "data/number/test", false, false, createMethodSelector("Number", "equals", "QNumber;"), null, null, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE,
-            Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, 8, executor);
+      doKeYDebugTargetTest("SWTBotSymbolicExecutionTreePruneTest_testPruning", Activator.PLUGIN_ID, "data/number/test", false, false, createMethodSelector("Number", "equals", "QNumber;"), null, null, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, 8, executor);
    }
 
    /**

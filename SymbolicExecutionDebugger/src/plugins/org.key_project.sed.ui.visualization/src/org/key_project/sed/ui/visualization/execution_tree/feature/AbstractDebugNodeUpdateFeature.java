@@ -429,14 +429,14 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       }
       else {
          try {
-        	// remove pruned nodes
-        	if (isPruneUpdateNeeded(context.getPictogramElement())) {
-        	   IRemoveContext removeContext = new RemoveContext(context.getPictogramElement());
-        	   IRemoveFeature feature = new DefaultRemoveFeature(getFeatureProvider());
-        	   feature.execute(removeContext);
-        	   return true;
-        	}
-        	
+            // remove pruned nodes
+            if (isPruneUpdateNeeded(context.getPictogramElement())) {
+               IRemoveContext removeContext = new RemoveContext(context.getPictogramElement());
+               IRemoveFeature feature = new DefaultRemoveFeature(getFeatureProvider());
+               feature.execute(removeContext);
+               return true;
+            }
+        
             // Define monitor to use
             IProgressMonitor monitor = GraphitiUtil.getProgressMonitor(context);
             // Update name

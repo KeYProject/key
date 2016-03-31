@@ -262,8 +262,10 @@ public class ExecutionTreeDiagramBehavior extends DiagramBehavior {
    }
    
    /**
-    * Handles the detected debug events. 
-    * @param events The detected debug events.
+    * Handles the detected debug events.
+    * 
+    * @param events
+    *           The detected debug events.
     */
    protected void handleDebugEvents(DebugEvent[] events) {
       // Check if an update of the diagram is required.
@@ -271,10 +273,9 @@ public class ExecutionTreeDiagramBehavior extends DiagramBehavior {
       boolean updateRequired = false;
       int i = 0;
       while (!updateRequired && i < events.length) {
-         if (DebugEvent.SUSPEND == events[i].getKind() ||
-             DebugEvent.SUSPEND == events[i].getKind()) {
+         if (DebugEvent.SUSPEND == events[i].getKind() || DebugEvent.SUSPEND == events[i].getKind()) {
             if (events[i].getSource() instanceof IDebugElement) {
-               IDebugTarget target = ((IDebugElement)events[i].getSource()).getDebugTarget();
+               IDebugTarget target = ((IDebugElement) events[i].getSource()).getDebugTarget();
                if (target instanceof ISEDebugTarget) {
                   updateRequired = ArrayUtil.contains(targets, target);
                }
@@ -284,11 +285,11 @@ public class ExecutionTreeDiagramBehavior extends DiagramBehavior {
       }
       // Update diagram content if required.
       if (updateRequired) {
-    	  
-    	 // TODO implement a better way to check if the proof got pruned and an update is needed
-    	 boolean isPruneUpdateNeeded = isPruneUpdateNeeded(GraphitiUtil.getAllPictogramElements(getDiagram()));
-         
-    	 // Do an asynchronous update in the UI thread (same behavior as DomainModelChangeListener which is responsible for changes in EMF objects)
+
+         // TODO implement a better way to check if the proof got pruned and an update is needed
+         boolean isPruneUpdateNeeded = isPruneUpdateNeeded(GraphitiUtil.getAllPictogramElements(getDiagram()));
+
+         // Do an asynchronous update in the UI thread (same behavior as DomainModelChangeListener which is responsible for changes in EMF objects)
          AbstractDependingOnObjectsJob.cancelJobs(diagramEditor);
          new AbstractDependingOnObjectsJob("Updating Symbolic Execution Tree", diagramEditor) {
             @Override
@@ -296,44 +297,46 @@ public class ExecutionTreeDiagramBehavior extends DiagramBehavior {
                return updateDiagramInJob(monitor);
             }
          }.schedule();
-         
+
          // TODO implement a better way to update the diagram if the proof got pruned
          // the solution beneath may be inefficient because it removes the entire diagram and recreates it instead of updating
          if (isPruneUpdateNeeded) {
-        	 final IDiagramTypeProvider typeProvider = diagramEditor.getDiagramTypeProvider();
-        	 Assert.isNotNull(typeProvider);
-        	 final IFeatureProvider featureProvider = typeProvider.getFeatureProvider();
-        	 Assert.isTrue(featureProvider instanceof ExecutionTreeFeatureProvider);
-        	 ICustomFeature feature = new DebugTargetConnectFeature((ExecutionTreeFeatureProvider) featureProvider);
-        	 ICustomContext context = new CustomContext(new PictogramElement[] { typeProvider.getDiagram() });
-        	 context.putProperty(DebugTargetConnectFeature.PROPERTY_DEBUG_TARGETS, targets);
-        	 diagramEditor.executeFeatureInJob("Changing Symbolic Execution Tree", feature, context);
+            final IDiagramTypeProvider typeProvider = diagramEditor.getDiagramTypeProvider();
+            Assert.isNotNull(typeProvider);
+            final IFeatureProvider featureProvider = typeProvider.getFeatureProvider();
+            Assert.isTrue(featureProvider instanceof ExecutionTreeFeatureProvider);
+            ICustomFeature feature = new DebugTargetConnectFeature((ExecutionTreeFeatureProvider) featureProvider);
+            ICustomContext context = new CustomContext(new PictogramElement[] { typeProvider.getDiagram() });
+            context.putProperty(DebugTargetConnectFeature.PROPERTY_DEBUG_TARGETS, targets);
+            diagramEditor.executeFeatureInJob("Changing Symbolic Execution Tree", feature, context);
          }
       }
    }
    
    /**
-	 * Checks if a proof update is needed and some {@link PictogramElement}s need to be removed.
-	 * @param pes the {@link PictogramElement}s to check.
-	 * @return true if some {@link PictogramElement}s need to be removed; otherwise false.
-	 */
-	private boolean isPruneUpdateNeeded(PictogramElement[] pes) {
-		// only a quick solution to check if the proof got pruned and an update is needed
-		for (PictogramElement pe : pes) {
-			Object bo = diagramEditor.getDiagramTypeProvider().getFeatureProvider().getBusinessObjectForPictogramElement(pe);
-			if (bo instanceof ISENode) {
-				ISENode node = (ISENode) bo;
-				try {
-					if (!node.hasChildren() && node.getParent() != null && !node.getParent().hasChildren()) {
-						return true;
-					}
-				} catch (DebugException e) {
-					LogUtil.getLogger().logError(e);
-				}
-			}
-		}
-		return false;
-	}
+    * Checks if a proof update is needed and some {@link PictogramElement}s need to be removed.
+    * 
+    * @param pes
+    *           the {@link PictogramElement}s to check.
+    * @return true if some {@link PictogramElement}s need to be removed; otherwise false.
+    */
+   private boolean isPruneUpdateNeeded(PictogramElement[] pes) {
+      // only a quick solution to check if the proof got pruned and an update is needed
+      for (PictogramElement pe : pes) {
+         Object bo = diagramEditor.getDiagramTypeProvider().getFeatureProvider().getBusinessObjectForPictogramElement(pe);
+         if (bo instanceof ISENode) {
+            ISENode node = (ISENode) bo;
+            try {
+               if (!node.hasChildren() && node.getParent() != null && !node.getParent().hasChildren()) {
+                  return true;
+               }
+            } catch (DebugException e) {
+               LogUtil.getLogger().logError(e);
+            }
+         }
+      }
+      return false;
+   }
    
    /**
     * Changes the content of the shown {@link Diagram}.
