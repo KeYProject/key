@@ -7,11 +7,11 @@ import org.key_project.sed.example.ui.util.ExampleLaunchUtil;
  * Implementation of the "SED Examples" menu.
  * @author Martin Hentschel
  */
-public class CoverageAsAction extends LaunchShortcutsAction {
+public class SEDExamplesAsAction extends LaunchShortcutsAction {
    /**
     * Constructor.
     */
-   public CoverageAsAction() {
+   public SEDExamplesAsAction() {
       super(ExampleLaunchUtil.SED_EXAMPLES_LAUNCH_GROUP_ID);
    }
 }

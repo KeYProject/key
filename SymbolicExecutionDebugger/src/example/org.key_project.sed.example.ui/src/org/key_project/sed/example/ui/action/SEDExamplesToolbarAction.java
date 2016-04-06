@@ -7,11 +7,11 @@ import org.key_project.sed.example.ui.util.ExampleLaunchUtil;
  * The action for the "SED Examples" mode in the toolbar.
  * @author Martin Hentschel
  */
-public class CoverageToolbarAction extends AbstractLaunchToolbarAction {
+public class SEDExamplesToolbarAction extends AbstractLaunchToolbarAction {
    /**
     * Constructor.
     */
-   public CoverageToolbarAction() {
+   public SEDExamplesToolbarAction() {
       super(ExampleLaunchUtil.SED_EXAMPLES_LAUNCH_GROUP_ID);
    }
 }

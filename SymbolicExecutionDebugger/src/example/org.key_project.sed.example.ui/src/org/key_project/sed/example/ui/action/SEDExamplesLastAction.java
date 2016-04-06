@@ -7,7 +7,7 @@ import org.key_project.sed.example.ui.util.ExampleLaunchUtil;
  * The action to re-launch the last launch in "SED Examples" mode.
  * @author Martin Hentschel
  */
-public class CoverageLastAction extends RelaunchLastAction {
+public class SEDExamplesLastAction extends RelaunchLastAction {
    /**
     * {@inheritDoc}
     */

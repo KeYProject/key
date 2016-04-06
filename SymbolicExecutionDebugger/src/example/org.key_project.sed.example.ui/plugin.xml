@@ -118,7 +118,7 @@
             <separator name="emptyLaunchGroup"/>
          </menu>
          <action
-               class="org.key_project.sed.example.ui.action.CoverageToolbarAction"
+               class="org.key_project.sed.example.ui.action.SEDExamplesToolbarAction"
                disabledIcon="icons/sample.gif"
                hoverIcon="icons/sample.gif"
                icon="icons/sample.gif"
@@ -127,25 +127,25 @@
                style="pulldown"
                toolbarPath="org.eclipse.debug.ui.launchActionSet/debug"/>
          <action
-               class="org.key_project.sed.example.ui.action.OpenCoverageConfigurations"
+               class="org.key_project.sed.example.ui.action.OpenSEDExamplesConfigurations"
                definitionId="org.key_project.sed.example.ui.commands.OpenCoverageConfiguration"
                id="org.key_project.sed.example.ui.actions.OpenCoverageConfiguration"
                label="SED Examples..."
                menubarPath="org.eclipse.ui.run/emptyLaunchGroup"/>
          <action
-               class="org.key_project.sed.example.ui.action.CoverageAsAction"
+               class="org.key_project.sed.example.ui.action.SEDExamplesAsAction"
                id="org.key_project.sed.example.ui.actions.CoverageAsAction"
                label="SED Example As"
                menubarPath="org.eclipse.ui.run/emptyLaunchGroup"
                style="pulldown"/>
          <action
-               class="org.key_project.sed.example.ui.action.CoverageHistoryAction"
+               class="org.key_project.sed.example.ui.action.SEDExamplesHistoryAction"
                id="org.key_project.sed.example.ui.actions.CoverageHistoryAction"
                label="SED Examples History"
                menubarPath="org.eclipse.ui.run/emptyLaunchGroup"
                style="pulldown"/>
          <action
-               class="org.key_project.sed.example.ui.action.CoverageLastAction"
+               class="org.key_project.sed.example.ui.action.SEDExamplesLastAction"
                definitionId="org.key_project.sed.example.ui.commands.CoverageLast"
                disabledIcon="icons/sample.gif"
                hoverIcon="icons/sample.gif"

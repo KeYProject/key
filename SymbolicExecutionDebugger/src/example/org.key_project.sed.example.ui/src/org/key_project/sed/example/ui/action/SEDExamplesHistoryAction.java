@@ -7,11 +7,11 @@ import org.key_project.sed.example.ui.util.ExampleLaunchUtil;
  * The history pull-down menu for recent "SED Examples" launches.
  * @author Martin Hentschel
  */
-public class CoverageHistoryAction extends AbstractLaunchHistoryAction {
+public class SEDExamplesHistoryAction extends AbstractLaunchHistoryAction {
    /**
     * Constructor.
     */
-   public CoverageHistoryAction() {
+   public SEDExamplesHistoryAction() {
       super(ExampleLaunchUtil.SED_EXAMPLES_LAUNCH_GROUP_ID);
    }
 }
