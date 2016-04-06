@@ -47,6 +47,7 @@ public class Activator extends AbstractUIPlugin {
 		plugin = this;
       // Make sure that the symbolic debug perspective is opened instead of the regular debug perspective when an example launch type is launched
       DebugUITools.setLaunchPerspective(ExampleTypeUtil.getLaunchConfigurationType(), ExampleLaunchUtil.MODE, SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID);
+      DebugUITools.setLaunchPerspective(ExampleTypeUtil.getLaunchConfigurationType(), ExampleLaunchUtil.SED_EXAMPLES_MODE, SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID);
 	}
 
 	/*
