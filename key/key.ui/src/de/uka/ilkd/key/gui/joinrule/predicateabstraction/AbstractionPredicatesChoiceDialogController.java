@@ -13,13 +13,15 @@
 
 package de.uka.ilkd.key.gui.joinrule.predicateabstraction;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -258,7 +260,7 @@ public class AbstractionPredicatesChoiceDialogController {
         final URL infoTextResource =
                 getURLForResourceFile(AbstractionPredicatesChoiceDialog.class,
                         resourcePath + "help/abstrPredsJoinDialogInfo.html");
-
+        
         assert bootstrapCssResource != null
                 && bootstrapThemeCssResource != null
                 && infoTextResource != null : "Could not find css/html resources for the abstraction predicates choice dialog.";
@@ -280,11 +282,11 @@ public class AbstractionPredicatesChoiceDialogController {
 
             sb.append("</head><body>");
             try {
-                sb.append(new String(Files.readAllBytes(Paths
-                        .get(infoTextResource.getFile()))));
+               InputStream is = infoTextResource.openStream();
+               sb.append(new BufferedReader(new InputStreamReader(is)).lines().collect(Collectors.joining("\n")));
+               is.close();
             }
-            catch (IOException e) {
-            }
+            catch (IOException e) {}
             sb.append("</body></html>");
             webEngine.loadContent(sb.toString());
         }
