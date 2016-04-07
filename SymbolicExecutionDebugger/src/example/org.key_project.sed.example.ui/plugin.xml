@@ -107,7 +107,7 @@
       <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
-            id="org.key_project.sed.example.ui.CoverageActionSet"
+            id="org.key_project.sed.example.ui.SEDExampleActionSet"
             label="SED Examples"
             visible="false">
          <menu
@@ -122,35 +122,35 @@
                disabledIcon="icons/sample.gif"
                hoverIcon="icons/sample.gif"
                icon="icons/sample.gif"
-               id="org.key_project.sed.example.ui.actions.CoverageDropDownAction"
+               id="org.key_project.sed.example.ui.actions.SEDExampleDropDownAction"
                label="SED Examples"
                style="pulldown"
                toolbarPath="org.eclipse.debug.ui.launchActionSet/debug"/>
          <action
                class="org.key_project.sed.example.ui.action.OpenSEDExamplesConfigurations"
-               definitionId="org.key_project.sed.example.ui.commands.OpenCoverageConfiguration"
-               id="org.key_project.sed.example.ui.actions.OpenCoverageConfiguration"
+               definitionId="org.key_project.sed.example.ui.commands.OpenSEDExampleConfiguration"
+               id="org.key_project.sed.example.ui.actions.OpenSEDExampleConfiguration"
                label="SED Examples..."
                menubarPath="org.eclipse.ui.run/emptyLaunchGroup"/>
          <action
                class="org.key_project.sed.example.ui.action.SEDExamplesAsAction"
-               id="org.key_project.sed.example.ui.actions.CoverageAsAction"
+               id="org.key_project.sed.example.ui.actions.SEDExampleAsAction"
                label="SED Example As"
                menubarPath="org.eclipse.ui.run/emptyLaunchGroup"
                style="pulldown"/>
          <action
                class="org.key_project.sed.example.ui.action.SEDExamplesHistoryAction"
-               id="org.key_project.sed.example.ui.actions.CoverageHistoryAction"
+               id="org.key_project.sed.example.ui.actions.SEDExampleHistoryAction"
                label="SED Examples History"
                menubarPath="org.eclipse.ui.run/emptyLaunchGroup"
                style="pulldown"/>
          <action
                class="org.key_project.sed.example.ui.action.SEDExamplesLastAction"
-               definitionId="org.key_project.sed.example.ui.commands.CoverageLast"
+               definitionId="org.key_project.sed.example.ui.commands.SEDExampleLast"
                disabledIcon="icons/sample.gif"
                hoverIcon="icons/sample.gif"
                icon="icons/sample.gif"
-               id="org.key_project.sed.example.ui.actions.CoverageLast"
+               id="org.key_project.sed.example.ui.actions.SEDExampleLast"
                label="SED Example Last Launched"
                menubarPath="org.eclipse.ui.run/relaunchGroup"/>
       </actionSet>
@@ -158,24 +158,19 @@
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension targetID="org.eclipse.jdt.ui.JavaPerspective">
-         <actionSet id="org.key_project.sed.example.ui.CoverageActionSet"/>
+         <actionSet id="org.key_project.sed.example.ui.SEDExampleActionSet"/>
       </perspectiveExtension>
       <perspectiveExtension targetID="org.eclipse.debug.ui.DebugPerspective">
-         <actionSet id="org.key_project.sed.example.ui.CoverageActionSet"/>
+         <actionSet id="org.key_project.sed.example.ui.SEDExampleActionSet"/>
       </perspectiveExtension>
       <perspectiveExtension targetID="org.eclipse.pde.ui.PDEPerspective">
-         <actionSet id="org.key_project.sed.example.ui.CoverageActionSet"/>
+         <actionSet id="org.key_project.sed.example.ui.SEDExampleActionSet"/>
       </perspectiveExtension>
       <perspectiveExtension targetID="org.eclipse.jst.j2ee.J2EEPerspective">
-         <actionSet id="org.key_project.sed.example.ui.CoverageActionSet"/>
+         <actionSet id="org.key_project.sed.example.ui.SEDExampleActionSet"/>
       </perspectiveExtension>
-      <perspectiveExtension targetID="org.scala-ide.sdt.core.perspective">
-         <actionSet id="org.key_project.sed.example.ui.CoverageActionSet"/>
-      </perspectiveExtension>
-      <perspectiveExtension
-            targetID="org.key_project.sed.ui.perspective">
-         <actionSet
-               id="org.key_project.sed.example.ui.CoverageActionSet">
+      <perspectiveExtension targetID="org.key_project.sed.ui.perspective">
+         <actionSet id="org.key_project.sed.example.ui.SEDExampleActionSet">
          </actionSet>
       </perspectiveExtension>
    </extension>   
