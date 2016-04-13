@@ -15,7 +15,6 @@ package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
@@ -36,7 +35,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -993,12 +991,11 @@ public class LogicPrinter {
     public void printFunctionTerm(Term t) throws IOException {
        boolean isKeyword = false;
        if (services != null) {
-           Sort wellFormedSort = (Sort) services.getNamespaces().sorts().lookup(new Name("Heap"));
            Function measuredByEmpty =  services.getTermBuilder().getMeasuredByEmpty();
            BooleanLDT bool = services.getTypeConverter().getBooleanLDT();
            IntegerLDT integer = services.getTypeConverter().getIntegerLDT();
            
-           isKeyword = (t.op() == getHeapLDT().getWellFormed(wellFormedSort) || t.op() == measuredByEmpty 
+           isKeyword = (t.op() == getHeapLDT().getWellFormed() || t.op() == measuredByEmpty 
                  || t.op() == bool.getFalseConst() || t.op() == bool.getTrueConst()
                  || t.op() == integer.getBsum());
         }

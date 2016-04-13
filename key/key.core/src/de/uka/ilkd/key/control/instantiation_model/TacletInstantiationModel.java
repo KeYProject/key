@@ -48,7 +48,7 @@ public class TacletInstantiationModel {
     private TacletAssumesModel[] ifChoiceModel;
     private static final TacletAssumesModel[] EMPTY_IF_CHOICES = new TacletAssumesModel [ 0 ];
     /** the model used for the instantiation of the schemavariables */
-    private TacletFindModel tableModel;
+    private final TacletFindModel tableModel;
 
     /** 
      * the application of the Taclet of which this model is used to
@@ -58,34 +58,33 @@ public class TacletInstantiationModel {
     private TacletApp app;
     
     /** the sequent the application above is applied */
-    private Sequent seq;
+    private final Sequent seq;
 
     /** listeners of this model */
-    private Vector<ModelChangeListener> listeners = new Vector<ModelChangeListener>();
+    private final Vector<ModelChangeListener> listeners = new Vector<ModelChangeListener>();
     /** the change event that is sent */
     private final ModelEvent changeEvent = new ModelEvent(this);
 
     /** namespace of variables */
-    private NamespaceSet nss;
-    private Services services ;
+    private final NamespaceSet nss;
+    private final Services services ;
  
-    private AbbrevMap scm;
-    private Proof proof;
+    private final AbbrevMap scm;
+    private final Proof proof;
   
     /**
      * create new data model for the apply Taclet dialog wrapping a combo box
      * model and a table model
      */
     public TacletInstantiationModel(TacletApp app, Sequent seq,
-				  Services services,
 				  NamespaceSet nss,
 				  AbbrevMap scm, Goal goal) {
 	this.app = app;
 	this.seq = seq;
-	this.services = services;
+   this.proof = goal.proof();
+	this.services = proof.getServices();
 	this.nss = nss;
 	this.scm = scm;
-	this.proof = goal.proof();
 	initIfChoiceModels();
 
 	tableModel =
