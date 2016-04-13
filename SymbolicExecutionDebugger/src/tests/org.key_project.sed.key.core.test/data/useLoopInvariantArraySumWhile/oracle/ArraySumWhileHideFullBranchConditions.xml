@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_c7d54b12-7ceb-4b74-918d-84c1ef90f3a0" name="sum(int[])" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_f49f5a7b-3451-4b39-bdb8-1b95b6173355" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java">
+         <sedMethodCall xml:id="_d069a953-9894-4afc-a04b-3e793f53681f" name="&lt;call ArraySumWhile.sum(array)&gt;" pathCondition="true" lineNumber="-1" charStart="166" charEnd="169" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java" groupable="true">
+            <sedStatement xml:id="_4d8973b9-ec73-48af-9eab-d9ed417f974f" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="188" charEnd="203" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java">
+               <sedStatement xml:id="_a7674832-738b-4ca7-b1b7-800c9dd39aec" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="207" charEnd="217" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java">
+                  <sedLoopInvariant xml:id="_df63ef93-6ecc-4860-8f3b-d4f4972d7694" name="invariant: i &gt;= 0
+&amp; i &lt;= array.length
+&amp; result_1 = javaCastInt(bsum{int j;}(0, i, array[j]));
+variant: javaSubInt(array.length, i)
+mod: false" pathCondition="true" lineNumber="-1" charStart="407" charEnd="471" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java" initiallyValid="true">
+                     <sedBranchCondition xml:id="_49fc57cf-6971-4e6b-8dc0-2ece00759ae3" name="Body Preserves Invariant" pathCondition="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),elem-update(result_1Before_LOOP)(result_1)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1)))))))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java">
+                        <sedBranchCondition xml:id="_22fb13d4-df9b-4ce7-87c1-aeeb16a3cc90" name="not(update-application(elem-update(x_2)(i_0),equals(array,null)))" pathCondition="and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),elem-update(result_1Before_LOOP)(result_1)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1))))))))),not(update-application(elem-update(x_2)(i_0),equals(array,null))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java">
+                           <sedLoopCondition xml:id="_7c411c59-eede-402f-a441-b0eb0d695123" name="i&lt;array.length" pathCondition="and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),elem-update(result_1Before_LOOP)(result_1)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1))))))))),not(update-application(elem-update(x_2)(i_0),equals(array,null))))" lineNumber="-1" charStart="414" charEnd="430" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java" groupable="false">
+                              <sedStatement xml:id="_44c0cf7e-3cfa-43ae-93d5-f38f19791041" name="result_1+=array[i];" pathCondition="and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),elem-update(result_1Before_LOOP)(result_1)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1))))))))),not(update-application(elem-update(x_2)(i_0),equals(array,null))))" lineNumber="-1" charStart="438" charEnd="457" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java">
+                                 <sedStatement xml:id="_002c0e14-c16a-48e6-a80d-d600b23bc77b" name="i++;" pathCondition="and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),elem-update(result_1Before_LOOP)(result_1)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1))))))))),not(update-application(elem-update(x_2)(i_0),equals(array,null))))" lineNumber="-1" charStart="462" charEnd="466" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java">
+                                    <sedLoopBodyTermination xml:id="_27102d41-a110-4318-84ca-4098855a6d69" name="&lt;loop body end&gt;" pathCondition="and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),elem-update(result_1Before_LOOP)(result_1)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1))))))))),not(update-application(elem-update(x_2)(i_0),equals(array,null))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java" verified="true">
+                                    </sedLoopBodyTermination>
+                                 </sedStatement>
+                              </sedStatement>
+                           </sedLoopCondition>
+                        </sedBranchCondition>
+                        <sedBranchCondition xml:id="_1a24fcb2-fb3e-45cc-a1b9-c29cbe1c4569" name="update-application(elem-update(x_2)(i_0),equals(array,null))" pathCondition="and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),elem-update(result_1Before_LOOP)(result_1)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1))))))))),update-application(elem-update(x_2)(i_0),equals(array,null)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java">
+                           <sedLoopCondition xml:id="_b6b8a57a-cfa4-4958-92f9-18f3fee179fc" name="i&lt;array.length" pathCondition="and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),elem-update(result_1Before_LOOP)(result_1)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1))))))))),update-application(elem-update(x_2)(i_0),equals(array,null)))" lineNumber="-1" charStart="414" charEnd="430" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java" groupable="false">
+                              <sedExceptionalMethodReturn xml:id="_171b22a5-7431-4dc4-b8b9-ab56a306f226" name="&lt;throw java.lang.Throwable&gt;" pathCondition="and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),elem-update(result_1Before_LOOP)(result_1)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1))))))))),update-application(elem-update(x_2)(i_0),equals(array,null)))" lineNumber="-1" charStart="166" charEnd="169" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java" methodReturnConditionRef="_7b817770-b6c5-4348-b7c1-af739fcc3e86">
+                                 <sedExceptionalTermination xml:id="_3b686f9b-aa33-4872-af53-8b705d832a72" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),elem-update(result_1Before_LOOP)(result_1)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1))))))))),update-application(elem-update(x_2)(i_0),equals(array,null)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java" verified="true">
+                                 </sedExceptionalTermination>
+                                 <sedGroupEndConditionReference nodeIdRef="_7b817770-b6c5-4348-b7c1-af739fcc3e86"/>
+                              </sedExceptionalMethodReturn>
+                           </sedLoopCondition>
+                        </sedBranchCondition>
+                     </sedBranchCondition>
+                     <sedBranchCondition xml:id="_05baf8a5-d0c9-4765-bd02-d11560d4c69a" name="Use Case" pathCondition="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\&gt; (and(equals(b,FALSE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1)))))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java">
+                        <sedStatement xml:id="_378d9304-3afd-4c66-971b-1678c3f1caca" name="return result_1;" pathCondition="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\&gt; (and(equals(b,FALSE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1)))))))" lineNumber="-1" charStart="475" charEnd="489" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java">
+                           <sedMethodReturn xml:id="_d297c39e-cc6a-4171-a676-c70eae0440a3" name="&lt;return of sum&gt;" pathCondition="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\&gt; (and(equals(b,FALSE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1)))))))" lineNumber="-1" charStart="166" charEnd="169" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java" methodReturnConditionRef="_fe5bc61a-2df5-4897-8f6e-6c615834e91c">
+                              <sedTermination xml:id="_1bab6fcb-9ffe-43c8-90c1-3ee5daf4370e" name="&lt;end&gt;" pathCondition="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\&gt; (and(equals(b,FALSE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1)))))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java" verified="true">
+                              </sedTermination>
+                              <sedGroupEndConditionReference nodeIdRef="_fe5bc61a-2df5-4897-8f6e-6c615834e91c"/>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedBranchCondition>
+                  </sedLoopInvariant>
+               </sedStatement>
+            </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_7b817770-b6c5-4348-b7c1-af739fcc3e86" name="and(update-application(elem-update(x_2)(i_0),equals(array,null)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),elem-update(result_1Before_LOOP)(result_1)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1))))))))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java">
+               <sedChildReference nodeIdRef="_171b22a5-7431-4dc4-b8b9-ab56a306f226"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_fe5bc61a-2df5-4897-8f6e-6c615834e91c" name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\&gt; (and(equals(b,FALSE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1)))))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java">
+               <sedChildReference nodeIdRef="_d297c39e-cc6a-4171-a676-c70eae0440a3"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_7b817770-b6c5-4348-b7c1-af739fcc3e86" name="and(update-application(elem-update(x_2)(i_0),equals(array,null)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),elem-update(result_1Before_LOOP)(result_1)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1))))))))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java">
+               <sedChildReference nodeIdRef="_171b22a5-7431-4dc4-b8b9-ab56a306f226"/>
+            </sedGroupEndCondition>
+            <sedGroupEndCondition xml:id="_fe5bc61a-2df5-4897-8f6e-6c615834e91c" name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(result_1)(Z(0(#)))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=sum(int[])@ArraySumWhile): {
+    boolean b = i&lt;array.length;
+  }
+}\&gt; (and(equals(b,FALSE),and(and(and(geq(i,Z(0(#))),leq(i,length(array))),equals(result_1,javaCastInt(bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))),and(inInt(i),inInt(result_1)))))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions\src\ArraySumWhile.java">
+               <sedChildReference nodeIdRef="_d297c39e-cc6a-4171-a676-c70eae0440a3"/>
+            </sedGroupEndCondition>
+         </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_27102d41-a110-4318-84ca-4098855a6d69"/>
+         <sedTerminationEntry nodeIdRef="_3b686f9b-aa33-4872-af53-8b705d832a72"/>
+         <sedTerminationEntry nodeIdRef="_1bab6fcb-9ffe-43c8-90c1-3ee5daf4370e"/>
+      </sedThread>
+   </sedTarget>
+</launch>

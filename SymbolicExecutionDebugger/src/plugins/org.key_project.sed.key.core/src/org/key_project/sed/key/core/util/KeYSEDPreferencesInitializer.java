@@ -14,6 +14,7 @@
 package org.key_project.sed.key.core.util;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.swt.graphics.RGB;
 
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 
@@ -39,9 +40,13 @@ public class KeYSEDPreferencesInitializer extends AbstractPreferenceInitializer 
       KeYSEDPreferences.setDefaultUsePrettyPrinting(true);
       KeYSEDPreferences.setDefaultShowSignatureOnMethodReturnNodes(false);
       KeYSEDPreferences.setDefaultVariablesAreOnlyComputedFromUpdates(false);
-      KeYSEDPreferences.setDefaultTruthValueEvaluationEnabled(false);
+      KeYSEDPreferences.setDefaultTruthValueTracingEnabled(false);
       KeYSEDPreferences.setDefaultHighlightReachedSourceCode(true);
       KeYSEDPreferences.setDefaultGroupingEnabled(true);
       KeYSEDPreferences.setDefaultSimplifyConditions(true);
+      KeYSEDPreferences.setDefaultTruthValueTracingTrue(new RGB(0, 117, 0));
+      KeYSEDPreferences.setDefaultTruthValueTracingFalse(new RGB(170, 0, 0));
+      KeYSEDPreferences.setDefaultTruthValueTracingUnknown(new RGB(217, 108, 0));
+      KeYSEDPreferences.setDefaultHideFullBranchConditionIfAdditionalLabelIsAvailable(false);
    }
 }

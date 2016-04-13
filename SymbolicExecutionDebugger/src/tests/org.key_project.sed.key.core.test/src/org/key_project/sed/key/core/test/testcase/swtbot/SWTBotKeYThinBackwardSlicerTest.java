@@ -50,7 +50,7 @@ public class SWTBotKeYThinBackwardSlicerTest extends AbstractKeYDebugTargetTestC
             // Perform slicing
             ISESlicer slicer = target.getSlicer(resultReturn, seedVariable, KeYThinBackwardSlicer.NAME);
             assertNotNull(slicer);
-            SliceAnnotation annotation = slicer.slice(resultReturn, seedVariable, null, new NullProgressMonitor());
+            SliceAnnotation annotation = slicer.slice(resultReturn, seedVariable, null, null, new NullProgressMonitor());
             // Check slicing result
             assertEquals(1, target.getRegisteredAnnotations().length);
             assertSame(annotation, target.getRegisteredAnnotations()[0]);
@@ -86,6 +86,7 @@ public class SWTBotKeYThinBackwardSlicerTest extends AbstractKeYDebugTargetTestC
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE,
+                           Boolean.FALSE,
                            14, 
                            executor);
    }

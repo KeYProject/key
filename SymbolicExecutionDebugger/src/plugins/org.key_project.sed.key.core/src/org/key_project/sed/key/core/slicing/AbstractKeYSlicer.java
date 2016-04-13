@@ -18,10 +18,12 @@ import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.model.KeYVariable;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.slicing.AbstractSlicer;
 
 /**
@@ -36,6 +38,7 @@ public abstract class AbstractKeYSlicer implements ISESlicer {
    @Override
    public SliceAnnotation slice(ISENode seedNode, 
                                 IVariable seedVariable, 
+                                Object settings,
                                 ISEAnnotationAppearance appearance,
                                 IProgressMonitor monitor) throws DebugException {
       try {
@@ -49,7 +52,8 @@ public abstract class AbstractKeYSlicer implements ISESlicer {
                Term seedLocation = ((KeYVariable) seedVariable).getExecutionVariable().createSelectTerm();
                // Perform slicing
                AbstractSlicer slicer = createSlicer();
-               ImmutableArray<Node> slices = slicer.slice(proofSeedNode, seedLocation);
+               @SuppressWarnings("unchecked")
+               ImmutableArray<Node> slices = slicer.slice(proofSeedNode, seedLocation, (ImmutableList<ISymbolicEquivalenceClass>) settings);
                // Show slice
                SliceAnnotationType annotationType = (SliceAnnotationType)SEAnnotationUtil.getAnnotationtype(SliceAnnotationType.TYPE_ID);
                SliceAnnotation annotation = annotationType.createAnnotation();

@@ -57,6 +57,7 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
@@ -1049,6 +1050,14 @@ public class ExecutionNodeReader {
        */
       @Override
       public Proof getProof() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public RuleApp getAppliedRuleApp() {
          return null;
       }
 

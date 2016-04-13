@@ -22,6 +22,7 @@ import org.key_project.sed.core.model.impl.AbstractSEBranchCondition;
 import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
@@ -140,8 +141,13 @@ public class KeYBranchCondition extends AbstractSEBranchCondition implements IKe
       try {
          if (executionNode.isBranchConditionComputed() || !executionNode.isDisposed()) {
             String additionalBranchLabel = executionNode.getAdditionalBranchLabel();
-            if (additionalBranchLabel != null) {
-               return additionalBranchLabel + ": " + executionNode.getName();
+            if (!StringUtil.isTrimmedEmpty(additionalBranchLabel)) {
+               if (getDebugTarget().getLaunchSettings().isHideFullBranchConditionIfAdditionalLabelIsAvailable()) {
+                  return additionalBranchLabel;
+               }
+               else {
+                  return additionalBranchLabel + ": " + executionNode.getName();
+               }
             }
             else {
                return executionNode.getName();
@@ -304,7 +310,7 @@ public class KeYBranchCondition extends AbstractSEBranchCondition implements IKe
     * {@inheritDoc}
     */
    @Override
-   public boolean isTruthValueEvaluationEnabled() {
-      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
+   public boolean isTruthValueTracingEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueTracingEnabled(getExecutionNode().getProof());
    }
 }

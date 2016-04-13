@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 
 /**
  * Provides a basic implementation of backward slicing algorithms.
@@ -31,14 +32,14 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
     * {@inheritDoc}
     */
    @Override
-   public ImmutableArray<Node> doSlicing(Node seedNode, Location seedLocation) throws ProofInputException {
+   public ImmutableArray<Node> doSlicing(Node seedNode, Location seedLocation, ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
       final Services services = seedNode.proof().getServices();
       Set<Location> relevantLocations = null;
       List<Node> result = new LinkedList<Node>();
       Map<Location, SortedSet<Location>> oldAliases = null;
       Node previousChild = null;
       while (seedNode != null && (relevantLocations == null || !relevantLocations.isEmpty())) {
-         SequentInfo info = analyzeSequent(seedNode);
+         SequentInfo info = analyzeSequent(seedNode, sec);
          if (info != null) { // Modality of interest
             SourceElement activeStatement = seedNode.getNodeInfo().getActiveStatement();
             Map<Location, SortedSet<Location>> aliases = info.getAliases();

@@ -39,16 +39,17 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
         assert pos != null : "Feature is only applicable to rules with find";
         
         ImmutableList<IfFormulaInstantiation> list = app.ifFormulaInstantiations();
+        final SequentFormula findFormula = pos.sequentFormula();
+        final boolean findIsInAntec = pos.isInAntec();
         
         assert list != null;
 
-        for (IfFormulaInstantiation aList : list) {
+        for (final IfFormulaInstantiation aList : list) {
             final IfFormulaInstSeq iffi = (IfFormulaInstSeq) aList;
             assert iffi != null;
-            final SequentFormula findFormula = pos.constrainedFormula();
             final SequentFormula ifFormula = iffi.getConstrainedFormula();
 
-            final boolean result = pos.isInAntec() != iffi.inAntec()
+            final boolean result = findIsInAntec != iffi.inAntec()
                     || !findFormula.equals(ifFormula);
             if (!result) {
                 return false;

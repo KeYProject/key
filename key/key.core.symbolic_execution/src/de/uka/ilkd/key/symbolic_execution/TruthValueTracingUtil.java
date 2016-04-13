@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
@@ -45,11 +46,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * (predicates and junctors).
  * @author Martin Hentschel
  */
-public final class TruthValueEvaluationUtil {
+public final class TruthValueTracingUtil {
    /**
     * Forbid instances.
     */
-   private TruthValueEvaluationUtil() {
+   private TruthValueTracingUtil() {
    }
    
    /**
@@ -176,11 +177,11 @@ public final class TruthValueEvaluationUtil {
     * @return The result.
     * @throws ProofInputException Occurred Exception
     */
-   public static TruthValueEvaluationResult evaluate(Node node, 
-                                                    Name termLabelName,
-                                                    boolean useUnicode,
-                                                    boolean usePrettyPrinting) throws ProofInputException {
-      TruthValueEvaluationResult result = new TruthValueEvaluationResult();
+   public static TruthValueTracingResult evaluate(Node node, 
+                                                  Name termLabelName,
+                                                  boolean useUnicode,
+                                                  boolean usePrettyPrinting) throws ProofInputException {
+      TruthValueTracingResult result = new TruthValueTracingResult();
       Deque<Map<String, MultiEvaluationResult>> evaluationStack = new LinkedList<Map<String, MultiEvaluationResult>>();
       evaluationStack.addFirst(new HashMap<String, MultiEvaluationResult>());
       evaluateNode(node, useUnicode, usePrettyPrinting, node, termLabelName, evaluationStack, result, node.proof().getServices());
@@ -194,7 +195,7 @@ public final class TruthValueEvaluationUtil {
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
     * @param evaluationStack The not empty stack with evaluation results.
-    * @param result The {@link TruthValueEvaluationResult} to fill with leaf nodes.
+    * @param result The {@link TruthValueTracingResult} to fill with leaf nodes.
     * @param services The {@link Services} to use.
     * @throws ProofInputException Occurred Exception
     */
@@ -204,15 +205,13 @@ public final class TruthValueEvaluationUtil {
                                       final Node node, 
                                       final Name termLabelName, 
                                       final Deque<Map<String, MultiEvaluationResult>> evaluationStack, 
-                                      final TruthValueEvaluationResult result,
+                                      final TruthValueTracingResult result,
                                       final Services services) throws ProofInputException {
       // Create new stack entry
       final Map<String, MultiEvaluationResult> currentResults = evaluationStack.getFirst();
       // Analyze applied rule
       boolean childrenAlreadyTreated = false;
       if (node.getAppliedRuleApp() instanceof TacletApp) {
-         // Check for new minor ids created by parent rule application
-         updatePredicateResultBasedOnNewMinorIds(node, termLabelName, services.getTermBuilder(), currentResults);
          TacletApp tacletApp = (TacletApp) node.getAppliedRuleApp();
          List<LabelOccurrence> labels = findInvolvedLabels(node.sequent(), tacletApp, termLabelName);
          if (!labels.isEmpty()) {
@@ -222,6 +221,8 @@ public final class TruthValueEvaluationUtil {
                int i = 0;
                for (TacletGoalTemplate tacletGoal : taclet.goalTemplates().reverse()) {
                   Map<String, MultiEvaluationResult> childResults = new HashMap<String, MultiEvaluationResult>(currentResults);
+                  // Check for new minor ids created by parent rule application
+                  updatePredicateResultBasedOnNewMinorIds(node.child(i), termLabelName, services.getTermBuilder(), childResults);
                   analyzeTacletGoal(node, tacletApp, tacletGoal, labels, services, childResults);
                   // Evaluate children with branch specific Taclet result
                   evaluationStack.addFirst(childResults);
@@ -254,6 +255,12 @@ public final class TruthValueEvaluationUtil {
             }
             parentPio = protocolApp.posInOccurrence();
          }
+         // Compare last PIO with PIO in child sequent (Attention: Child PIO is computed with help of the PIO of the OSS)
+         if (parentPio != null) {
+            assert 1 == node.childrenCount() : "Implementaton of the OneStepSimplifierRule has changed.";
+            PosInOccurrence childPio = SymbolicExecutionUtil.posInOccurrenceToOtherSequent(node, node.getAppliedRuleApp().posInOccurrence(), node.child(0));
+            updatePredicateResultBasedOnNewMinorIdsOSS(childPio, parentPio, termLabelName, services.getTermBuilder(), currentResults);
+         }
       }
       // Analyze children
       int childCount = node.childrenCount();
@@ -265,7 +272,10 @@ public final class TruthValueEvaluationUtil {
       else if (!childrenAlreadyTreated) {
          // Evaluate children in case that branch specific Taclet results are not available and thus not evaluated yet.
          for (int i = 0; i < childCount; i++) {
-            evaluationStack.addFirst(new HashMap<String, MultiEvaluationResult>(currentResults));
+            Map<String, MultiEvaluationResult> childResults = new HashMap<String, MultiEvaluationResult>(currentResults);
+            // Check for new minor ids created by parent rule application
+            updatePredicateResultBasedOnNewMinorIds(node.child(i), termLabelName, services.getTermBuilder(), childResults);
+            evaluationStack.addFirst(childResults);
             evaluateNode(evaluationNode, useUnicode, usePrettyPrinting, node.child(i), termLabelName, evaluationStack, result, services);
             evaluationStack.removeFirst();
          }
@@ -400,14 +410,14 @@ public final class TruthValueEvaluationUtil {
          parentPio.subTerm().execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(Term visited) {
-               checkForNewMinorIdsOSS(childPio.constrainedFormula(), visited, termLabelName, parentPio, tb, results);
+               checkForNewMinorIdsOSS(childPio.sequentFormula(), visited, termLabelName, parentPio, tb, results);
             }
          });
          // Check application term parents
          PosInOccurrence currentPio = parentPio;
          while (!currentPio.isTopLevel()) {
             currentPio = currentPio.up();
-            checkForNewMinorIdsOSS(childPio.constrainedFormula(), currentPio.subTerm(), termLabelName, parentPio, tb, results);
+            checkForNewMinorIdsOSS(childPio.sequentFormula(), currentPio.subTerm(), termLabelName, parentPio, tb, results);
          }
       }
    }
@@ -490,7 +500,7 @@ public final class TruthValueEvaluationUtil {
                currentPio = currentPio.up();
                checkForNewMinorIds(childNode, currentPio.subTerm(), termLabelName, parentPio, tb, results);
             }
-            // Check if instations
+            // Check if instantiations
             if (parentRuleApp instanceof TacletApp) {
                TacletApp ta = (TacletApp) parentRuleApp;
                if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
@@ -565,14 +575,26 @@ public final class TruthValueEvaluationUtil {
                                                final List<Term> resultToFill) {
       sf.formula().execPreOrder(new DefaultVisitor() {
          @Override
+         public boolean visitSubtree(Term visited) {
+            return !hasLabelOfInterest(visited);
+         }
+         
+         @Override
          public void visit(Term visited) {
+            if (hasLabelOfInterest(visited)) {
+               resultToFill.add(visited);
+            }
+         }
+         
+         protected boolean hasLabelOfInterest(Term visited) {
             TermLabel visitedLabel = visited.getLabel(labelName);
             if (visitedLabel instanceof FormulaTermLabel) {
                FormulaTermLabel pLabel = (FormulaTermLabel) visitedLabel;
                String[] beforeIds = pLabel.getBeforeIds();
-               if (ArrayUtil.contains(beforeIds, labelId)) {
-                  resultToFill.add(visited);
-               }
+               return ArrayUtil.contains(beforeIds, labelId);
+            }
+            else {
+               return false;
             }
          }
       });
@@ -773,6 +795,17 @@ public final class TruthValueEvaluationUtil {
                 ", false=" + evaluatesToFalse +
                 ", instruction=" + instructionTerm;
       }
+      
+      /**
+       * Creates a pretty printed {@link String}.
+       * @param services The {@link Services} to use.
+       * @return The pretty printed {@link String}.
+       */
+      public String toPrettyString(Services services) {
+         return "true=" + evaluatesToTrue +
+                ", false=" + evaluatesToFalse +
+                (instructionTerm != null ? ", instruction:\n" + ProofSaver.printTerm(instructionTerm, services) : "");
+      }
 
       /**
        * Computes the final truth value.
@@ -886,7 +919,7 @@ public final class TruthValueEvaluationUtil {
     * {@link TruthValueEvaluationUtil#evaluate(Node, Name, boolean, boolean).
     * @author Martin Hentschel
     */
-   public static class TruthValueEvaluationResult {
+   public static class TruthValueTracingResult {
       /**
        * The {@link BranchResult}s.
        */
@@ -1001,6 +1034,19 @@ public final class TruthValueEvaluationUtil {
       }
       
       /**
+       * Updates a result.
+       * <p>
+       * <b>Warning: </b> {@link BranchResult}s are considered to be unmodifiable. This means that an update of the result needs to be done before results are shown to the user by the UI.
+       * @param termLabel The {@link FormulaTermLabel} to update.
+       * @param result The new result of the given {@link FormulaTermLabel}.
+       */
+      public void updateResult(FormulaTermLabel termLabel, MultiEvaluationResult result) {
+         if (termLabel != null) {
+            results.put(termLabel.getId(), result);
+         }
+      }
+      
+      /**
        * Returns the condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        * @return The condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        */
@@ -1073,6 +1119,32 @@ public final class TruthValueEvaluationUtil {
             sb.append(entry.getValue().evaluate(termLabelName, results));
             sb.append(" :: ");
             sb.append(entry.getValue());
+         }
+         return sb.toString();
+      }
+      
+      /**
+       * Creates a pretty printed {@link String}.
+       * @return The pretty printed {@link String}.
+       */
+      public String toPrettyString() {
+         StringBuffer sb = new StringBuffer();
+         sb.append("Goal ");
+         sb.append(leafNode.serialNr());
+         sb.append("\n");
+         boolean afterFirst = false;
+         for (Entry<String, MultiEvaluationResult> entry : results.entrySet()) {
+            if (afterFirst) {
+               sb.append("\n");
+            }
+            else {
+               afterFirst = true;
+            }
+            sb.append(entry.getKey());
+            sb.append(" = ");
+            sb.append(entry.getValue().evaluate(termLabelName, results));
+            sb.append(" :: ");
+            sb.append(entry.getValue().toPrettyString(leafNode.proof().getServices()));
          }
          return sb.toString();
       }

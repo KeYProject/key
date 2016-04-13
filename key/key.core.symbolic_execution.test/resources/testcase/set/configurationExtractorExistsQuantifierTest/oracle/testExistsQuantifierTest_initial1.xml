@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <equivalenceClass representativeTerm="self">
+      <term term="p_0"/>
+      <term term="self"/>
+   </equivalenceClass>
+   <state name="One Step Simplification resulting in {}">
+      <value name="exc" programVariable="exc" isArrayIndex="false" value="exc" type="java.lang.Throwable" condition="true"/>
+      <association name="self" programVariable="self" isArrayIndex="false" target="o2" condition="true"/>
+   </state>
+   <object xml:id="o1" name="p" type="ExistsQuantifierTest">
+      <value name="id" programVariable="id" isArrayIndex="false" value="int::select(heap,p,ExistsQuantifierTest::$id)" type="int" condition="true"/>
+   </object>
+   <object xml:id="o2" name="self" type="ExistsQuantifierTest">
+      <value name="id" programVariable="id" isArrayIndex="false" value="int::select(heap,self,ExistsQuantifierTest::$id)" type="int" condition="true"/>
+   </object>
+</model>

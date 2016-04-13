@@ -175,7 +175,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                     (ApplyStrategyInfo) info.getResult();
 
             Proof proof = info.getProof();
-            if (!proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
+            if (proof != null && !proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
                 Goal g = result.nonCloseableGoal();
                 if (g == null) {
                     g = proof.openGoals().head();
@@ -196,7 +196,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 resetStatus(this);
                 assert info instanceof ProofMacroFinishedInfo;
                 Proof proof = info.getProof();
-                if (!proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
+                if (proof != null && !proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
                     Goal g = proof.openGoals().head();
                     mainWindow.getMediator().goalChosen(g);
                     if (inStopAtFirstUncloseableGoalMode(info.getProof())) {

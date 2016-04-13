@@ -18,11 +18,11 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.KeYLoopBodyTermination;
 import org.key_project.sed.key.core.model.KeYLoopInvariant;
-import org.key_project.sed.key.ui.property.AbstractTruthValueComposite.ILayoutListener;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -32,7 +32,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * This composite provides the content shown in {@link LoopInvariantPropertySection}
@@ -71,9 +71,9 @@ public class LoopInvariantComposite extends AbstractTruthValueComposite {
     * {@inheritDoc}
     */
    @Override
-   protected Pair<Term, Term> computeTermToShow(IKeYSENode<?> node, 
-                                                IExecutionNode<?> executionNode, 
-                                                final Node keyNode) {
+   protected Triple<Term, PosInTerm, Term> computeTermToShow(IKeYSENode<?> node, 
+                                                             IExecutionNode<?> executionNode, 
+                                                             final Node keyNode) {
       if (node instanceof KeYLoopBodyTermination) {
          Term term;
          if (keyNode.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
@@ -92,28 +92,28 @@ public class LoopInvariantComposite extends AbstractTruthValueComposite {
          if (term.op() == Junctor.IMP) {
             term = term.sub(1);
          }
-         Term predicate = findUninterpretedPredicateTerm(term, AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof()));
-         term = removeUninterpretedPredicate(keyNode, term);
+         PosInTerm predicatePosition = findUninterpretedPredicateTerm(term, AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof()));
+         Term termWithoutPredicate = removeUninterpretedPredicate(keyNode, term);
          if (!INCLUDE_UPDATES) {
-            term = TermBuilder.goBelowUpdates(term);
+            termWithoutPredicate = TermBuilder.goBelowUpdates(termWithoutPredicate);
          }
-         return new Pair<Term, Term>(term, predicate);
+         return new Triple<Term, PosInTerm, Term>(termWithoutPredicate, predicatePosition, term);
       }
       else if (node instanceof KeYLoopInvariant) {
          PosInOccurrence pio = executionNode.getModalityPIO();
          Term term;
          if (pio.isInAntec()) {
-            int index = executionNode.getProofNode().sequent().antecedent().indexOf(pio.constrainedFormula());
+            int index = executionNode.getProofNode().sequent().antecedent().indexOf(pio.sequentFormula());
             term = keyNode.sequent().antecedent().get(index).formula();
          }
          else {
-            int index = executionNode.getProofNode().sequent().succedent().indexOf(pio.constrainedFormula());
+            int index = executionNode.getProofNode().sequent().succedent().indexOf(pio.sequentFormula());
             term = keyNode.sequent().succedent().get(index).formula();
          }
          if (!INCLUDE_UPDATES) {
             term = TermBuilder.goBelowUpdates(term);
          }
-         return new Pair<Term, Term>(term, null);
+         return new Triple<Term, PosInTerm, Term>(term, null, null);
       }
       else {
          throw new IllegalArgumentException("Unsupported node.");

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <state name="{}">
+      <value name="exc" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="true"/>
+      <association name="self" programVariable="self" isArrayIndex="false" target="o2" condition="true"/>
+   </state>
+   <object xml:id="o1" name="p" type="ExistsQuantifierTest">
+      <value name="id" programVariable="id" isArrayIndex="false" value="int::select(heap,p,ExistsQuantifierTest::$id)" type="int" condition="true"/>
+   </object>
+   <object xml:id="o2" name="self" type="ExistsQuantifierTest">
+      <value name="id" programVariable="id" isArrayIndex="false" value="int::select(heap,self,ExistsQuantifierTest::$id)" type="int" condition="true"/>
+   </object>
+   <object xml:id="o3" name="p_0" type="ExistsQuantifierTest">
+      <value name="id" programVariable="id" isArrayIndex="false" value="int::select(heap,p_0,ExistsQuantifierTest::$id)" type="int" condition="true"/>
+   </object>
+</model>

@@ -282,6 +282,8 @@ public final class IntegerLDT extends LDT {
     //internal methods
     //-------------------------------------------------------------------------
     
+
+
     private boolean isNumberLiteral(Function f) {
         char c = f.name().toString().charAt(0);
         return (c-'0'>=0) && (c-'0'<=9);
@@ -735,7 +737,32 @@ public final class IntegerLDT extends LDT {
     public Function getModuloLong() {       
         return modJlong;
     }
-    
+
+    /** maps an integer back into long range */
+    public Function getArithModuloLong() {       
+        return modJlong;
+    }
+
+    /** maps an integer back into int range */
+    public Function getArithModuloInt() {
+        return moduloInt;
+    }
+
+    /** maps an integer back into long range */
+    public Function getArithModuloShort() {
+        return moduloShort;
+    }
+
+    /** maps an integer back into byte range */
+    public Function getArithModuloByte() {
+        return moduloByte;
+    }
+
+    /** maps an integer back into char range */
+    public Function getArithModuloChar() {
+        return moduloChar;
+    }
+
     /**
      * returns the function symbol interpreted as the Java addition on 
      * int (or promotabel to int) operators, i.e. this addition performs a modulo 

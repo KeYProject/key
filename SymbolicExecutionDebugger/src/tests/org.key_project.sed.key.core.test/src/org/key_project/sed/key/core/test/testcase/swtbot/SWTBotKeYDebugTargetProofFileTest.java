@@ -61,6 +61,7 @@ public class SWTBotKeYDebugTargetProofFileTest extends AbstractKeYDebugTargetTes
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE,
+                           Boolean.FALSE,
                            14, 
                            executor);
    }
@@ -95,6 +96,7 @@ public class SWTBotKeYDebugTargetProofFileTest extends AbstractKeYDebugTargetTes
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE,
+                           Boolean.FALSE,
                            14, 
                            executor);
    }

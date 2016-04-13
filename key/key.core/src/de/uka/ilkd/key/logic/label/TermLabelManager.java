@@ -23,6 +23,8 @@ import java.util.Set;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.DefaultVisitor;
@@ -32,6 +34,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -45,6 +48,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
+import de.uka.ilkd.key.rule.label.TermLabelMerger;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
@@ -141,6 +145,11 @@ public class TermLabelManager {
    private ImmutableList<Name> supportedTermLabelnames = ImmutableSLList.<Name>nil();
 
    /**
+    * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelMerger}.
+    */
+   private final Map<Name, TermLabelMerger> mergerMap = new LinkedHashMap<Name, TermLabelMerger>();
+
+   /**
     * Constructor.
     * @param configurations The {@link TermLabelConfiguration} which defines how to support each {@link TermLabel}.
     */
@@ -155,7 +164,19 @@ public class TermLabelManager {
             analyzeChildTermPolicies(conf.getTermLabelName(), conf.getChildAndGrandchildTermLabelPolicies(), allRulesChildAndGrandchildTermLabelPolicies, ruleSpecificChildAndGrandchildTermLabelPolicies);
             analyzeUpdates(conf.getTermLabelUpdates());
             analyzeRefactorings(conf.getTermLabelRefactorings());
+            analyzeMerger(conf.getTermLabelName(), conf.getTermLabelMerger());
          }
+      }
+   }
+
+   /**
+    * Analyzes the given {@link TermLabelMerger} and adds it to {@link #mergerMap}.
+    * @param termLabelName The name of the supported {@link TermLabel}.
+    * @param termLabelMerger The {@link TermLabelMerger} to use.
+    */
+   private void analyzeMerger(Name termLabelName, TermLabelMerger termLabelMerger) {
+      if (termLabelMerger != null) {
+         mergerMap.put(termLabelName, termLabelMerger);
       }
    }
 
@@ -892,8 +913,8 @@ public class TermLabelManager {
                                       Object hint,
                                       Rule rule,
                                       Term tacletTerm) {
-      PosInTerm pos = applicationPosInOccurrence.posInTerm();
-      Term oldTerm = sequentFormula.subAt(pos);
+      final PosInTerm pos = applicationPosInOccurrence.posInTerm();
+      final Term oldTerm = pos.getSubTerm(sequentFormula);
       // Compute active refactorings
       RefactoringsContainer refactorings = computeRefactorings(state, services, applicationPosInOccurrence, oldTerm, rule, goal, hint, tacletTerm);
       // Perform refactoring
@@ -1568,6 +1589,11 @@ public class TermLabelManager {
        * The {@link TermLabelRefactoring} instances.
        */
       private final ImmutableList<TermLabelRefactoring> termLabelRefactorings;
+      
+      /**
+       * The {@link TermLabelMerger} instance.
+       */
+      private final TermLabelMerger termLabelMerger;
 
       /**
        * Constructor.
@@ -1575,7 +1601,7 @@ public class TermLabelManager {
        * @param factory The {@link TermLabelFactory} to use.
        */
       public TermLabelConfiguration(Name termLabelName, TermLabelFactory<?> factory) {
-         this(termLabelName, factory, null, null, null, null, null, null);
+         this(termLabelName, factory, null, null, null, null, null, null, null);
       }
 
       /**
@@ -1588,6 +1614,7 @@ public class TermLabelManager {
        * @param childAndGrandchildTermLabelPolicies The child and grandchild {@link ChildTermLabelPolicy} instances to use.
        * @param termLabelUpdates The {@link TermLabelUpdate} instances.
        * @param termLabelRefactorings The {@link TermLabelRefactoring} instances.
+       * @param termLabelMerger The {@link TermLabelMerger} instance.
        */
       public TermLabelConfiguration(Name termLabelName,
                                     TermLabelFactory<?> factory,
@@ -1596,7 +1623,8 @@ public class TermLabelManager {
                                     ImmutableList<ChildTermLabelPolicy> directChildTermLabelPolicies,
                                     ImmutableList<ChildTermLabelPolicy> childAndGrandchildTermLabelPolicies,
                                     ImmutableList<TermLabelUpdate> termLabelUpdates,
-                                    ImmutableList<TermLabelRefactoring> termLabelRefactorings) {
+                                    ImmutableList<TermLabelRefactoring> termLabelRefactorings,
+                                    TermLabelMerger termLabelMerger) {
          assert termLabelName != null;
          assert factory != null;
          this.termLabelName = termLabelName;
@@ -1607,6 +1635,7 @@ public class TermLabelManager {
          this.childAndGrandchildTermLabelPolicies = childAndGrandchildTermLabelPolicies;
          this.termLabelUpdates = termLabelUpdates;
          this.termLabelRefactorings = termLabelRefactorings;
+         this.termLabelMerger = termLabelMerger;
       }
 
       /**
@@ -1672,6 +1701,14 @@ public class TermLabelManager {
       public ImmutableList<TermLabelRefactoring> getTermLabelRefactorings() {
          return termLabelRefactorings;
       }
+
+      /**
+       * Returns the {@link TermLabelMerger} instance.
+       * @return The {@link TermLabelMerger} instance.
+       */
+      public TermLabelMerger getTermLabelMerger() {
+         return termLabelMerger;
+      }
    }
    
    /**
@@ -1688,5 +1725,79 @@ public class TermLabelManager {
          pio = pio.isTopLevel() ? null : pio.up();
       }
       return label;
+   }
+   
+   /**
+    * Merges the {@link TermLabel}s of the rejected {@link SequentFormula}s into the resulting {@link Sequent}.
+    * @param currentSequent The {@link SequentChangeInfo} which lists the rejected {@link SequentFormula}s.
+    * @param services The {@link Services} to use.
+    */
+   public static void mergeLabels(SequentChangeInfo currentSequent, Services services) {
+      TermLabelManager manager = getTermLabelManager(services);
+      if (manager != null) {
+         manager.mergeLabels(services, currentSequent);
+      }
+   }
+   
+   /**
+    * Merges the {@link TermLabel}s of the rejected {@link SequentFormula}s into the resulting {@link Sequent}.
+    * @param services The {@link Services} to use.
+    * @param currentSequent The {@link SequentChangeInfo} which lists the rejected {@link SequentFormula}s.
+    */
+   public void mergeLabels(Services services, SequentChangeInfo currentSequent) {
+      for (SequentFormula rejectedSF : currentSequent.getSemisequentChangeInfo(true).rejectedFormulas()) {
+         mergeLabels(currentSequent, services, rejectedSF, true);
+      }
+      for (final SequentFormula rejectedSF : currentSequent.getSemisequentChangeInfo(false).rejectedFormulas()) {
+         mergeLabels(currentSequent, services, rejectedSF, false);
+      }
+   }
+   
+   /**
+    * Merges the {@link TermLabel}s of the given {@link SequentFormula} into the resulting {@link Sequent}.
+    * @param currentSequent The {@link SequentChangeInfo} which lists the rejected {@link SequentFormula}s.
+    * @param services The {@link Services} to use.
+    * @param rejectedSF The rejected {@link SequentFormula} to work with.
+    * @param inAntecedent {@code true} rejected {@link SequentFormula} is in antecedent, {@code false} it is in succedent.
+    */
+   protected void mergeLabels(SequentChangeInfo currentSequent, 
+                              Services services, 
+                              SequentFormula rejectedSF, 
+                              boolean inAntecedent) {
+      final Term rejectedTerm = rejectedSF.formula();
+      if (rejectedTerm.hasLabels()) {
+         // Search existing SequentFormula
+         Semisequent s = currentSequent.getSemisequentChangeInfo(inAntecedent).semisequent();
+         SequentFormula existingSF = CollectionUtil.search(s, new IFilter<SequentFormula>() {
+            @Override
+            public boolean select(SequentFormula element) {
+               return element.formula().equalsModRenaming(rejectedTerm);
+            }
+         });
+         if (existingSF != null) {
+            // Create list of new labels
+            Term existingTerm = existingSF.formula();
+            List<TermLabel> mergedLabels = new LinkedList<TermLabel>();
+            CollectionUtil.addAll(mergedLabels, existingTerm.getLabels());
+            boolean labelsChanged = false;
+            // Merge all labels of the rejected term with those of the existing one
+            for (TermLabel rejectedLabel : rejectedTerm.getLabels()) {
+               TermLabel existingLabel = existingTerm.getLabel(rejectedLabel.name());
+               // Label is present, solve conflict with help of the TermLabelMerger.
+               TermLabelMerger merger = mergerMap.get(rejectedLabel.name());
+               if (merger != null) {
+                  if (merger.mergeLabels(existingSF, existingTerm, existingLabel, rejectedSF, rejectedTerm, rejectedLabel, mergedLabels)) {
+                     labelsChanged = true;
+                  }
+               }
+            }
+            // Replace sequent formula
+            if (labelsChanged) {
+               Term newTerm = services.getTermFactory().createTerm(existingTerm.op(), existingTerm.subs(), existingTerm.boundVars(), existingTerm.javaBlock(), new ImmutableArray<TermLabel>(mergedLabels));
+               SequentChangeInfo sci = currentSequent.sequent().changeFormula(new SequentFormula(newTerm), new PosInOccurrence(existingSF, PosInTerm.getTopLevel(), inAntecedent));
+               currentSequent.combine(sci);
+            }
+         }
+      }
    }
 }

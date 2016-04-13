@@ -16,6 +16,7 @@ package de.uka.ilkd.key.logic.label;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -23,6 +24,7 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
+import de.uka.ilkd.key.rule.label.TermLabelMerger;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
@@ -62,6 +64,15 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
  * {@link TermLabelManager#refactorGoal(de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.PosInOccurrence, Term, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Term)}.
  * </p>
  * <p>
+ * Antecedent and succedent of a {@link Sequent} are sets. The equality check
+ * if a {@link SequentFormula} is already contained ignores {@link TermLabel}s.
+ * To ensure that {@link TermLabel}s are not lost,
+ * {@link TermLabelManager#mergeLabels(de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.SequentChangeInfo)}
+ * merges the labels of the existing {@link SequentFormula} with those of the rejected {@link SequentFormula}.
+ * How this is done in detail is implemented by a {@link TermLabelMerger}.
+ * If no {@link TermLabelMerger} is available, the {@link TermLabel} of the rejected {@link SequentFormula} are lost.
+ * </p>
+ * <p>
  * To implement a new {@link TermLabel} follow the following steps:
  * <ol>
  *    <li>
@@ -96,6 +107,7 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
  *          <li>{@code 2<<a>> + 3<<b>> ~~> 2<<a>> - 3}: Implement a {@link TermLabelRefactoring} which works on {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN} to freely add or remove {@link TermLabel}s on direct children of the application {@link Term}.</li>
  *          <li>{@code 2 + (3<<a>> - 1<<b>>) ~~> 2 * (3<<a>> - 1)}: Implement a {@link TermLabelRefactoring} which works on {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE} to freely add or remove {@link TermLabel}s on children and grandchildren of the application {@link Term}.</li>
  *          <li>Change labels on the whole {@link Sequent}: Implement a {@link TermLabelRefactoring} which works on {@link RefactoringScope#SEQUENT} to freely add or remove {@link TermLabel}s on any {@link Term} of the {@link Sequent}.</li>
+ *          <li>Implement a {@link TermLabelMerger} to ensure that {@link TermLabel}s are maintained in case of rejected {@link SequentFormula}s.</li>
  *       </ul>
  *    </li>
  *    <li>

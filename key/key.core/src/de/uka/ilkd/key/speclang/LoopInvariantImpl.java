@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
@@ -30,9 +31,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
@@ -423,13 +426,18 @@ public final class LoopInvariantImpl implements LoopInvariant {
                 + localOuts;
     }
 
-    @Override
     public String getPlainText(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+       final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+       return getPlainText(services, heapLDT.getAllHeaps(), usePrettyPrinting, useUnicodeSymbols);
+    }
+
+    @Override
+    public String getPlainText(Services services, Iterable<LocationVariable> heapContext, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
        final LocationVariable baseHeap = heapLDT.getHeap();
        
        String mods = "";
-       for (LocationVariable h : heapLDT.getAllHeaps()) {
+       for (LocationVariable h : heapContext) {
            if (originalModifies.get(h) != null) {
                String printMods = LogicPrinter.quickPrintTerm(originalModifies.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                mods = mods
@@ -442,7 +450,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
        }
        
        String invariants = "";
-       for (LocationVariable h : heapLDT.getAllHeaps()) {
+       for (LocationVariable h : heapContext) {
            if (originalInvariants.get(h) != null) {
                String printPosts = LogicPrinter.quickPrintTerm(originalInvariants.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                invariants = invariants
@@ -455,9 +463,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
        }
        
        return invariants
-             + ";\nvariant: "
-             + LogicPrinter.quickPrintTerm(originalVariant, services, usePrettyPrinting, useUnicodeSymbols).trim() +
-             mods;
+              + (originalVariant != null ? 
+                 ";\nvariant: " + LogicPrinter.quickPrintTerm(originalVariant, services, usePrettyPrinting, useUnicodeSymbols).trim() : 
+                 ";") +
+              mods;
     }
 
 

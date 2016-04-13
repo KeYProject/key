@@ -146,9 +146,9 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
             ExceptionDialog.showDialog(MainWindow.getInstance(), ex);
         }
 
+        mediator.removeInterruptedListener(this);
         mediator.setInteractive(true);
         mediator.startInterface(true);
-        mediator.removeInterruptedListener(this);
     }
 
     @Override

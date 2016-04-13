@@ -76,11 +76,6 @@ public interface Term extends SVSubstitute, Sorted {
      */
     public Term sub(int n);
         
-    /**
-     * The (possibly indirect) subterm specified by a PosInTerm.
-     */
-    public Term subAt(PosInTerm pos);
-        
      /**
      * The logical variables bound by the top level operator.
      */

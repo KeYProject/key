@@ -120,7 +120,7 @@ public class JoinIsApplicable {
             }
             if (formula.equalsModRenaming(referenceFormula)) {
                 return new ProspectivePartner(referenceFormula, g1.node(),
-                        pio.constrainedFormula(), update1, g2.node(), sf,
+                        pio.sequentFormula(), update1, g2.node(), sf,
                         update2);
             }
         }

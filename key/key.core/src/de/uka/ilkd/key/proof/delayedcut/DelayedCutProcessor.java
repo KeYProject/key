@@ -439,7 +439,7 @@ public class DelayedCutProcessor implements Runnable {
         }
         int formulaNumber = pair.node.sequent().formulaNumberInSequent(
                 oldRuleApp.posInOccurrence().isInAntec(),
-                oldRuleApp.posInOccurrence().constrainedFormula());
+                oldRuleApp.posInOccurrence().sequentFormula());
         return PosInOccurrence.findInSequent(pair.goal.sequent(),
                 formulaNumber, oldRuleApp.posInOccurrence().posInTerm());
     }

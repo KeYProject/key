@@ -16,17 +16,16 @@ package org.key_project.sed.key.ui.property;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.key.core.model.IKeYSENode;
-import org.key_project.sed.key.ui.property.AbstractTruthValueComposite.ILayoutListener;
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
-import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * This composite provides the content shown in {@link PostconditionPropertySection}
@@ -48,25 +47,27 @@ public class PostconditionComposite extends AbstractTruthValueComposite {
     * {@inheritDoc}
     */
    @Override
-   protected Pair<Term, Term> computeTermToShow(IKeYSENode<?> node,
-                                                IExecutionNode<?> executionNode, 
-                                                Node keyNode) {
+   protected Triple<Term, PosInTerm, Term> computeTermToShow(IKeYSENode<?> node,
+                                                     IExecutionNode<?> executionNode, 
+                                                     Node keyNode) {
       Term term = keyNode.getAppliedRuleApp().posInOccurrence().subTerm();
       if (term.op() instanceof Modality) {
          term = term.sub(0);
       }
       Term uninterpretedPredicate = AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof());
-      Term sfTerm = keyNode.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+      Term sfTerm = keyNode.getAppliedRuleApp().posInOccurrence().sequentFormula().formula();
       ImmutableList<Term> updates = TermBuilder.goBelowUpdates2(sfTerm).first;
       if (uninterpretedPredicate != null) {
-         Term predicate = findUninterpretedPredicateTerm(term, uninterpretedPredicate);
-         term = removeUninterpretedPredicate(keyNode, term);
-         return new Pair<Term, Term>(INCLUDE_UPDATES ? keyNode.proof().getServices().getTermBuilder().applySequential(updates, term) : term, 
-                                     predicate);
+         PosInTerm predicatePosition = findUninterpretedPredicateTerm(term, uninterpretedPredicate);
+         Term termWithoutPredicate = removeUninterpretedPredicate(keyNode, term);
+         return new Triple<Term, PosInTerm, Term>(INCLUDE_UPDATES ? keyNode.proof().getServices().getTermBuilder().applySequential(updates, termWithoutPredicate) : termWithoutPredicate, 
+                                                  predicatePosition,
+                                                  term);
       }
       else {
-         return new Pair<Term, Term>(INCLUDE_UPDATES ? keyNode.proof().getServices().getTermBuilder().applySequential(updates, term) : term, 
-                                     null);
+         return new Triple<Term, PosInTerm, Term>(INCLUDE_UPDATES ? keyNode.proof().getServices().getTermBuilder().applySequential(updates, term) : term, 
+                                                  null,
+                                                  null);
       }
    }
 }

@@ -89,6 +89,11 @@ public class ContainsTermFeature implements Feature {
         }
 
         @Override
+        public boolean visitSubtree(Term visited) {
+            return true;
+        }
+
+        @Override
         public void visit(Term visited) {
             found = found || visited.equalsModRenaming(term);
         }

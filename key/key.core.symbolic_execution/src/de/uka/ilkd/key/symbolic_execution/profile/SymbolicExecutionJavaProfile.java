@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.label.FormulaTermLabelMerger;
 import de.uka.ilkd.key.rule.label.FormulaTermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.FormulaTermLabelUpdate;
 import de.uka.ilkd.key.rule.label.LoopBodyTermLabelUpdate;
@@ -156,7 +157,8 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
                                                          null,
                                                          null,
                                                          lbUps,
-                                                         lbRefs));
+                                                         lbRefs,
+                                                         null));
       result = result.prepend(new TermLabelConfiguration(SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME,
                                                          new SingletonLabelFactory<TermLabel>(SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL),
                                                          null,
@@ -164,7 +166,8 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
                                                          null,
                                                          null,
                                                          nbUps,
-                                                         nbRefs));
+                                                         nbRefs,
+                                                         null));
       result = result.prepend(new TermLabelConfiguration(SymbolicExecutionTermLabel.NAME,
                                                          new SymbolicExecutionTermLabelFactory(),
                                                          null,
@@ -172,7 +175,8 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
                                                          null,
                                                          null,
                                                          seUps,
-                                                         seRefs));
+                                                         seRefs,
+                                                         null));
       if (predicateEvaluationEnabled) {
          ImmutableList<TermLabelPolicy> predPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayOnFormulaTermLabelPolicy());
          ImmutableList<TermLabelUpdate> predUpdates = ImmutableSLList.<TermLabelUpdate>nil().prepend(new FormulaTermLabelUpdate());
@@ -184,7 +188,8 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
                                                             null,
                                                             null,
                                                             predUpdates,
-                                                            predRefs));
+                                                            predRefs,
+                                                            new FormulaTermLabelMerger()));
       }
       return result;
    }
@@ -273,7 +278,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     * @param proof The {@link Proof} to check.
     * @return {@code true} truth value evaluation is enabled, {@code false} truth value evaluation is disabled.
     */
-   public static boolean isTruthValueEvaluationEnabled(Proof proof) {
+   public static boolean isTruthValueTracingEnabled(Proof proof) {
       if (proof != null && !proof.isDisposed()) {
          return isTruthValueEvaluationEnabled(proof.getInitConfig());
       }

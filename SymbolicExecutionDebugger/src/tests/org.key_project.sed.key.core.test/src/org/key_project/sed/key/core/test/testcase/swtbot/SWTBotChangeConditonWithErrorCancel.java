@@ -72,6 +72,7 @@ public class SWTBotChangeConditonWithErrorCancel extends AbstractKeYDebugTargetT
             Boolean.FALSE,
             Boolean.FALSE,
             Boolean.TRUE,
+            Boolean.FALSE,
             8, 
             executor);   
    } 

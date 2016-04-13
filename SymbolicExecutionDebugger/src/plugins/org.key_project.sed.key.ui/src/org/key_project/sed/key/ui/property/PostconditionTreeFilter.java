@@ -28,6 +28,6 @@ public class PostconditionTreeFilter implements IFilter {
    @Override
    public boolean select(Object toTest) {
       IKeYTerminationNode<?> node = PostconditionPropertySection.getDebugNode(toTest);
-      return node != null && node.isTruthValueEvaluationEnabled();
+      return node != null && node.isTruthValueTracingEnabled();
    }
 }

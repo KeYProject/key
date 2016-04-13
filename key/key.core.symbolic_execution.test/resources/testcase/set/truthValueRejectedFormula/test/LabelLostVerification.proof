@@ -1,0 +1,98 @@
+\profile "Java Profile";
+
+\settings {
+"#Proof-Settings-Config-File
+#Wed Mar 23 17:07:21 CET 2016
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_INSTANTIATE
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_EXPAND
+[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_RESTRICTED
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=1
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=assertions-assertions\\:on , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:allow , JavaCard-JavaCard\\:off , Strings-Strings\\:on , modelFields-modelFields\\:showSatisfiability , bigint-bigint\\:on , sequences-sequences\\:on , moreSeqRules-moreSeqRules\\:off , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , permissions-permissions\\:off , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , joinGenerateIsWeakeningGoal-joinGenerateIsWeakeningGoal\\:off
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]invariantForall=false
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\javaSource "";
+
+\proofObligation "#Proof Obligation Settings
+#Wed Mar 23 17:07:21 CET 2016
+name=LabelLost[LabelLost\\:\\:magic(boolean,boolean)].JML normal_behavior operation contract.0
+contract=LabelLost[LabelLost\\:\\:magic(boolean,boolean)].JML normal_behavior operation contract.0
+class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
+";
+
+\proof {
+(keyLog "0" (keyUser "marti" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+(keyLog "1" (keyUser "marti" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+(keyLog "2" (keyUser "marti" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+(keyLog "3" (keyUser "marti" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+
+(autoModeTime "380")
+
+(branch "dummy ID"
+(rule "impRight" (formula "1") (newnames "p,q,exc,heapAtPre,o,f") (userinteraction))
+(rule "andLeft" (formula "1") (userinteraction))
+(rule "andLeft" (formula "1") (userinteraction))
+(rule "andLeft" (formula "3") (userinteraction))
+(rule "assignment" (formula "5") (term "1") (userinteraction))
+(rule "methodBodyExpand" (formula "5") (term "1,1") (newnames "heapBefore_magic,savedHeapBefore_magic") (userinteraction))
+(rule "methodCallEmpty" (formula "5") (term "1,1,1") (userinteraction))
+(rule "tryEmpty" (formula "5") (term "1,1,1") (userinteraction))
+(rule "emptyModality" (formula "5") (term "1,1,1") (userinteraction))
+(rule "elementOfAllLocs" (formula "5") (term "0,0,0,0,1,1,1,1"))
+(rule "concrete_or_1" (formula "5") (term "0,0,0,1,1,1,1"))
+(rule "concrete_or_1" (formula "5") (term "0,0,1,1,1,1"))
+(rule "simplifyUpdate2" (formula "5"))
+(rule "simplifyUpdate2" (formula "5") (term "1"))
+(rule "applyOnRigidFormula" (formula "5"))
+(rule "simplifyUpdate2" (formula "5") (term "1"))
+(rule "applyOnRigidFormula" (formula "5") (term "0"))
+(rule "simplifyUpdate2" (formula "5") (term "0,0"))
+(rule "applyOnRigidFormula" (formula "5") (term "1,0") (userinteraction))
+(rule "simplifyUpdate1" (formula "5") (term "1,1,0") (userinteraction))
+(rule "applyOnPV" (formula "5") (term "0,1,0") (userinteraction))
+(rule "eqClose" (formula "5") (term "1,0") (userinteraction))
+(rule "concrete_and_3" (formula "5") (term "0") (userinteraction))
+(rule "all_unused" (formula "5") (term "0,1") (userinteraction))
+(rule "all_unused" (formula "5") (term "1") (userinteraction))
+(rule "concrete_and_3" (formula "5") (userinteraction))
+(rule "orRight" (formula "5") (userinteraction))
+(rule "andRight" (formula "6") (userinteraction))
+(branch "Case 1"
+   (rule "replace_known_left" (formula "6") (ifseqformula "3") (userinteraction))
+   (rule "closeTrue" (formula "6") (userinteraction))
+)
+(branch "Case 2"
+   (rule "replace_known_left" (formula "5") (ifseqformula "4") (userinteraction))
+   (rule "closeTrue" (formula "5") (userinteraction))
+)
+)
+
+}

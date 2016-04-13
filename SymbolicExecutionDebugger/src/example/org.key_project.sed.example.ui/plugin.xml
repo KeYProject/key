@@ -12,11 +12,20 @@
             categoryId="org.key_project.sed.example.ui.commands.category"
             id="org.key_project.sed.example.ui.commands.launchCommand">
       </command>
+      <command
+            categoryId="org.key_project.sed.example.ui.commands.category"
+            id="org.key_project.sed.example.ui.commands.launchLastCommand"
+            name="SED Example Last Launched">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
       <image
             commandId="org.key_project.sed.example.ui.commands.launchCommand"
+            icon="icons/sample.gif">
+      </image>
+      <image
+            commandId="org.key_project.sed.example.ui.commands.launchLastCommand"
             icon="icons/sample.gif">
       </image>
    </extension>
@@ -25,6 +34,9 @@
       <handler
             commandId="org.key_project.sed.example.ui.commands.launchCommand"
             class="org.key_project.sed.example.ui.handlers.LaunchExampleHandler">
+      </handler>
+      <handler
+            commandId="org.key_project.sed.example.ui.commands.launchLastCommand">
       </handler>
    </extension>
    <extension
@@ -81,4 +93,85 @@
             type="org.key_project.sed.example.core.exampleLaunchType">
       </launchConfigurationTabGroup>
    </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchGroups">
+      <launchGroup
+            bannerImage="icons/sample.gif"
+            id="org.key_project.sed.example.ui.sedExamplesLaunchGroup"
+            image="icons/sample.gif"
+            label="SED Examples"
+            mode="sedExamples"
+            title="SED Examples">
+      </launchGroup>
+   </extension>
+      <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="org.key_project.sed.example.ui.SEDExampleActionSet"
+            label="SED Examples"
+            visible="false">
+         <menu
+               id="org.eclipse.ui.run"
+               label="&amp;Run"
+               path="additions">
+            <separator name="relaunchGroup"/>
+            <separator name="emptyLaunchGroup"/>
+         </menu>
+         <action
+               class="org.key_project.sed.example.ui.action.SEDExamplesToolbarAction"
+               disabledIcon="icons/sample.gif"
+               hoverIcon="icons/sample.gif"
+               icon="icons/sample.gif"
+               id="org.key_project.sed.example.ui.actions.SEDExampleDropDownAction"
+               label="SED Examples"
+               style="pulldown"
+               toolbarPath="org.eclipse.debug.ui.launchActionSet/debug"/>
+         <action
+               class="org.key_project.sed.example.ui.action.OpenSEDExamplesConfigurations"
+               definitionId="org.key_project.sed.example.ui.commands.OpenSEDExampleConfiguration"
+               id="org.key_project.sed.example.ui.actions.OpenSEDExampleConfiguration"
+               label="SED Examples..."
+               menubarPath="org.eclipse.ui.run/emptyLaunchGroup"/>
+         <action
+               class="org.key_project.sed.example.ui.action.SEDExamplesAsAction"
+               id="org.key_project.sed.example.ui.actions.SEDExampleAsAction"
+               label="SED Example As"
+               menubarPath="org.eclipse.ui.run/emptyLaunchGroup"
+               style="pulldown"/>
+         <action
+               class="org.key_project.sed.example.ui.action.SEDExamplesHistoryAction"
+               id="org.key_project.sed.example.ui.actions.SEDExampleHistoryAction"
+               label="SED Examples History"
+               menubarPath="org.eclipse.ui.run/emptyLaunchGroup"
+               style="pulldown"/>
+         <action
+               class="org.key_project.sed.example.ui.action.SEDExamplesLastAction"
+               definitionId="org.key_project.sed.example.ui.commands.SEDExampleLast"
+               disabledIcon="icons/sample.gif"
+               hoverIcon="icons/sample.gif"
+               icon="icons/sample.gif"
+               id="org.key_project.sed.example.ui.actions.SEDExampleLast"
+               label="SED Example Last Launched"
+               menubarPath="org.eclipse.ui.run/relaunchGroup"/>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <actionSet id="org.key_project.sed.example.ui.SEDExampleActionSet"/>
+      </perspectiveExtension>
+      <perspectiveExtension targetID="org.eclipse.debug.ui.DebugPerspective">
+         <actionSet id="org.key_project.sed.example.ui.SEDExampleActionSet"/>
+      </perspectiveExtension>
+      <perspectiveExtension targetID="org.eclipse.pde.ui.PDEPerspective">
+         <actionSet id="org.key_project.sed.example.ui.SEDExampleActionSet"/>
+      </perspectiveExtension>
+      <perspectiveExtension targetID="org.eclipse.jst.j2ee.J2EEPerspective">
+         <actionSet id="org.key_project.sed.example.ui.SEDExampleActionSet"/>
+      </perspectiveExtension>
+      <perspectiveExtension targetID="org.key_project.sed.ui.perspective">
+         <actionSet id="org.key_project.sed.example.ui.SEDExampleActionSet">
+         </actionSet>
+      </perspectiveExtension>
+   </extension>   
 </plugin>

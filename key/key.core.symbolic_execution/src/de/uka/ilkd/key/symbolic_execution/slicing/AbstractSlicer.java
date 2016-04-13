@@ -31,12 +31,15 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -49,6 +52,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
@@ -64,37 +68,40 @@ public abstract class AbstractSlicer {
     * Computes the slice.
     * @param seedNode The seed {@link Node} to start slicing at.
     * @param term The seed {@link Term}.
+    * @param sec The optional {@link ISymbolicEquivalenceClass}es to consider.
     * @return The computed slice.
     */
-   public ImmutableArray<Node> slice(Node seedNode, Term term) throws ProofInputException {
-      return slice(seedNode, toLocation(seedNode.proof().getServices(), term));
+   public ImmutableArray<Node> slice(Node seedNode, Term term, ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
+      return slice(seedNode, toLocation(seedNode.proof().getServices(), term), sec);
    }
 
    /**
     * Computes the slice.
     * @param seedNode The seed {@link Node} to start slicing at.
     * @param seedLocation The seed {@link ReferencePrefix}.
+    * @param sec The optional {@link ISymbolicEquivalenceClass}es to consider.
     * @return The computed slice.
     */
-   public ImmutableArray<Node> slice(Node seedNode, ReferencePrefix seedLocation) throws ProofInputException {
+   public ImmutableArray<Node> slice(Node seedNode, ReferencePrefix seedLocation, ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
       // Solve this reference
       PosInOccurrence pio = seedNode.getAppliedRuleApp().posInOccurrence();
-      Term topLevel = pio.constrainedFormula().formula();
+      Term topLevel = pio.sequentFormula().formula();
       Term modalityTerm = TermBuilder.goBelowUpdates(topLevel);
       Services services = seedNode.proof().getServices();
       ExecutionContext ec = JavaTools.getInnermostExecutionContext(modalityTerm.javaBlock(), services);
       ReferencePrefix thisReference = ec != null ? ec.getRuntimeInstance() : null;
       // Perform slicing
-      return slice(seedNode, toLocation(services, seedLocation, ec, thisReference));
+      return slice(seedNode, toLocation(services, seedLocation, ec, thisReference), sec);
    }
 
    /**
     * Computes the slice.
     * @param seedNode The seed {@link Node} to start slicing at.
     * @param seedLocation The seed {@link ReferencePrefix}.
+    * @param sec The optional {@link ISymbolicEquivalenceClass}es to consider.
     * @return The computed slice.
     */
-   public ImmutableArray<Node> slice(Node seedNode, Location seedLocation) throws ProofInputException {
+   public ImmutableArray<Node> slice(Node seedNode, Location seedLocation, ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
       // Ensure that seed node is valid
       if (seedNode.getAppliedRuleApp() == null) {
          throw new IllegalStateException("No rule applied on seed Node '" + seedNode.serialNr() + "'.");
@@ -108,16 +115,17 @@ public abstract class AbstractSlicer {
          throw new IllegalStateException("Modality at applied rule does not have the " + SymbolicExecutionTermLabel.NAME + " term label.");
       }
       // Perform slicing
-      return doSlicing(seedNode, seedLocation);
+      return doSlicing(seedNode, seedLocation, sec);
    }
 
    /**
     * Performs the slicing.
     * @param seedNode The seed {@link Node} to start slicing at.
     * @param seedLocation The seed {@link Location}.
+    * @param sec The optional {@link ISymbolicEquivalenceClass}es to consider.
     * @return The computed slice.
     */
-   protected abstract ImmutableArray<Node> doSlicing(Node seedNode, Location seedLocation) throws ProofInputException;
+   protected abstract ImmutableArray<Node> doSlicing(Node seedNode, Location seedLocation, ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException;
    
    /**
     * The result returned by {@link AbstractSlicer#analyzeSequent(Node)}.
@@ -200,9 +208,9 @@ public abstract class AbstractSlicer {
     * @param node The {@link Node} to analyze.
     * @return The computed {@link SequentInfo} or {@code null} if the {@link Node} is not supported.
     */
-   protected SequentInfo analyzeSequent(Node node) {
+   protected SequentInfo analyzeSequent(Node node, ImmutableList<ISymbolicEquivalenceClass> sec) {
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
-      Term topLevel = pio.constrainedFormula().formula();
+      Term topLevel = pio.sequentFormula().formula();
       Pair<ImmutableList<Term>,Term> pair = TermBuilder.goBelowUpdates2(topLevel);
       Term modalityTerm = pair.second;
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);
@@ -215,6 +223,8 @@ public abstract class AbstractSlicer {
          // Compute aliases
          Map<Location, SortedSet<Location>> aliases = new HashMap<Location, SortedSet<Location>>();
          Map<ProgramVariable, Term> localValues = new HashMap<ProgramVariable, Term>();
+         analyzeEquivalenceClasses(services, sec, aliases, thisReference);
+         analyzeSequent(services, node.sequent(), aliases, thisReference);
          analyzeUpdates(pair.first, services, heapLDT, aliases, localValues, ec, thisReference);
          return new SequentInfo(aliases, localValues, ec, thisReference);
       }
@@ -223,6 +233,86 @@ public abstract class AbstractSlicer {
       }
    }
    
+   /**
+    * Analyzes the gievn {@link ISymbolicEquivalenceClass}es.
+    * @param services The {@link Services} to use.
+    * @param sec The {@link ISymbolicEquivalenceClass} to analyze.
+    * @param aliases The alias {@link Map} to fill.
+    * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
+    */
+   protected void analyzeEquivalenceClasses(Services services, ImmutableList<ISymbolicEquivalenceClass> sec, Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
+      if (sec != null) {
+         for (ISymbolicEquivalenceClass eq : sec) {
+            ImmutableList<Term> terms = eq.getTerms();
+            List<Location> locations = new ArrayList<Location>(terms.size());
+            for (Term term : terms) {
+               if (SymbolicExecutionUtil.hasReferenceSort(services, term)) {
+                  Location location = toLocation(services, term);
+                  if (location != null) {
+                     locations.add(location);
+                  }
+               }
+            }
+            if (locations.size() >= 2) {
+               Location first = null;
+               for (Location location : locations) {
+                  if (first == null) {
+                     first = location;
+                  }
+                  else {
+                     updateAliases(services, first, location, aliases, thisReference);
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   /**
+    * Analyzes the given {@link Sequent} for equalities specified by top level formulas.
+    * @param services The {@link Services} to use.
+    * @param sequent The {@link Sequent} to analyze.
+    * @param aliases The alias {@link Map} to fill.
+    * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
+    */
+   protected void analyzeSequent(Services services, Sequent sequent, Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
+      for (SequentFormula sf : sequent.antecedent()) {
+         Term term = sf.formula();
+         if (Equality.EQUALS == term.op()) {
+            analyzeEquality(services, term, aliases, thisReference);
+         }
+      }
+      for (SequentFormula sf : sequent.succedent()) {
+         Term term = sf.formula();
+         if (Junctor.NOT == term.op()) {
+            Term negatedTerm = term.sub(0);
+            if (Equality.EQUALS == negatedTerm.op()) {
+               analyzeEquality(services, negatedTerm, aliases, thisReference);
+            }
+         }
+      }
+   }
+   
+   /**
+    * Analyzes the given equality {@link Term} for aliased locations.
+    * @param services The {@link Services} to use.
+    * @param equality The equality {@link Term} to analyze.
+    * @param aliases The alias {@link Map} to fill.
+    * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
+    */
+   protected void analyzeEquality(Services services, Term equality, Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
+      Term firstSub = equality.sub(0);
+      Term secondSub = equality.sub(1);
+      if (SymbolicExecutionUtil.hasReferenceSort(services, firstSub) &&
+          SymbolicExecutionUtil.hasReferenceSort(services, secondSub)) {
+         Location first = toLocation(services, firstSub);
+         Location second = toLocation(services, secondSub);
+         if (first != null && second != null) {
+            updateAliases(services, first, second, aliases, thisReference);
+         }
+      }
+   }
+
    /**
     * Utility method used by {@link #analyzeSequent(Node)} to analyze the given updates.
     * @param updates The update {@link Term}s to analyze.

@@ -43,7 +43,7 @@ public class InstantiationCost implements Feature {
 	public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Projection is only applicable to rules with find";
 
-        final Term formula = pos.constrainedFormula ().formula ();
+        final Term formula = pos.sequentFormula ().formula ();
         final Term instance = varInst.toTerm ( app, pos, goal );
 
         return Instantiation.computeCost ( instance, formula, goal.sequent (), 

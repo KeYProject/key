@@ -165,6 +165,29 @@ public class ReviewingCodeHelpfulnessExport implements IHTMLSectionAppender {
                           createLatex(statistics.getFilters(), listExample6push(sedStatistics), listExample6push(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
       additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_pop.tex", 
                           createLatex(statistics.getFilters(), listExample6pop(sedStatistics), listExample6pop(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      // Create filter combined html files
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_OA.html", 
+                          createHtml(statistics.getFilters(), listExample1oa(sedStatistics), listExample1oa(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_set.html", 
+                          createHtml(statistics.getFilters(), listExample1set(sedStatistics), listExample1set(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_setAL.html", 
+                         createHtml(statistics.getFilters(), listExample1setAL(sedStatistics), listExample1setAL(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_2_PAGE_NAME + ".html", 
+                          createHtml(statistics.getFilters(), listExample2(sedStatistics), listExample2(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_3_PAGE_NAME + ".html", 
+                          createHtml(statistics.getFilters(), listExample3(sedStatistics), listExample3(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_4_PAGE_NAME + ".html", 
+                          createHtml(statistics.getFilters(), listExample4(sedStatistics), listExample4(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_5_PAGE_NAME + ".html", 
+                          createHtml(statistics.getFilters(), listExample5(sedStatistics), listExample5(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_Si.html", 
+                          createHtml(statistics.getFilters(), listExample6Si(sedStatistics), listExample6Si(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_SS.html", 
+                          createHtml(statistics.getFilters(), listExample6SS(sedStatistics), listExample6SS(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_push.html", 
+                          createHtml(statistics.getFilters(), listExample6push(sedStatistics), listExample6push(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_pop.html", 
+                          createHtml(statistics.getFilters(), listExample6pop(sedStatistics), listExample6pop(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
       // Create code files
       for (IStatisticsFilter filter : statistics.getFilters()) {
          addWrittenCodeFile(noToolStatistics.get(filter).example1oa, 
@@ -409,6 +432,87 @@ public class ReviewingCodeHelpfulnessExport implements IHTMLSectionAppender {
       latex.append("\\bottomrule" + StringUtil.NEW_LINE);
       latex.append("\\end{tabular}" + StringUtil.NEW_LINE);
       return latex.toString();
+   }
+   
+   protected String createHtml(IStatisticsFilter[] filters, Map<IStatisticsFilter, HelpfulnessStatistic> sedMap, Map<IStatisticsFilter, HelpfulnessStatistic> noToolMap) {
+      StringBuffer html = new StringBuffer();
+      // Header
+      html.append("<table border=\"0\" cellpadding=\"3\" cellspacing=\"2\">" + StringUtil.NEW_LINE);
+      html.append("<tr style=\"background-color: #4e9ad6;font-weight: bold;\">" + StringUtil.NEW_LINE);
+      html.append("<td rowspan=\"3\">&nbsp;</td>" + StringUtil.NEW_LINE);
+      html.append("<td colspan=\"8\" align=\"center\">Java experience (%)</td>" + StringUtil.NEW_LINE);
+      html.append("</tr>" + StringUtil.NEW_LINE);
+      html.append("<tr style=\"background-color: #4e9ad6;font-weight: bold;\">" + StringUtil.NEW_LINE);
+      for (IStatisticsFilter filter : filters) {
+//         BigInteger noMax = noToolMap.get(filter).computeMax();
+//         BigInteger sedMax = sedMap.get(filter).computeMax();
+         //html.append("<td>" + filter.getName() + " (" + noMax.add(sedMax) + ")</td>" + StringUtil.NEW_LINE);
+         html.append("<td colspan=\"2\">" + filter.getName() + "</td>" + StringUtil.NEW_LINE);
+      }
+      html.append("</tr>" + StringUtil.NEW_LINE);
+      html.append("<tr style=\"background-color: #4e9ad6;font-weight: bold;\">" + StringUtil.NEW_LINE);
+      for (@SuppressWarnings("unused") IStatisticsFilter filter : filters) {
+//         BigInteger noMax = noToolMap.get(filter).computeMax();
+//         BigInteger sedMax = sedMap.get(filter).computeMax();
+//         html.append("<td>DCR (" + noMax + ")</td>" + StringUtil.NEW_LINE);
+//         html.append("<td>SED (" + sedMax + ")</td>" + StringUtil.NEW_LINE);
+         html.append("<td>DCR</td>" + StringUtil.NEW_LINE);
+         html.append("<td>SED</td>" + StringUtil.NEW_LINE);
+      }
+      html.append("</tr>" + StringUtil.NEW_LINE);
+      // Very
+      html.append("<tr style=\"background-color: #b1d3ec;\">" + StringUtil.NEW_LINE);
+      html.append("<td>Yes, Very helpful</td>" + StringUtil.NEW_LINE);
+      for (IStatisticsFilter filter : filters) {
+         BigDecimal noToolPercentage = noToolMap.get(filter).computeVeryPercentage(0);
+         html.append("<td>" + (noToolPercentage != null ? noToolPercentage : "&nbsp;") + "</td>" + StringUtil.NEW_LINE);
+         BigDecimal sedPercentage = sedMap.get(filter).computeVeryPercentage(0);
+         html.append("<td>" + (sedPercentage != null ? sedPercentage : "&nbsp;") + "</td>" + StringUtil.NEW_LINE);
+      }
+      html.append("</tr>" + StringUtil.NEW_LINE);
+      // Helpful
+      html.append("<tr style=\"background-color: #b1d3ec;\">" + StringUtil.NEW_LINE);
+      html.append("<td>Yes, Helpful</td>" + StringUtil.NEW_LINE);
+      for (IStatisticsFilter filter : filters) {
+         BigDecimal noToolPercentage = noToolMap.get(filter).computeHelpfulPercentage(0);
+         html.append("<td>" + (noToolPercentage != null ? noToolPercentage : "&nbsp;") + "</td>" + StringUtil.NEW_LINE);
+         BigDecimal sedPercentage = sedMap.get(filter).computeHelpfulPercentage(0);
+         html.append("<td>" + (sedPercentage != null ? sedPercentage : "&nbsp;") + "</td>" + StringUtil.NEW_LINE);
+      }
+      html.append("</tr>" + StringUtil.NEW_LINE);
+      // Little
+      html.append("<tr style=\"background-color: #b1d3ec;\">" + StringUtil.NEW_LINE);
+      html.append("<td>Yes, Somewhat helpful</td>" + StringUtil.NEW_LINE);
+      for (IStatisticsFilter filter : filters) {
+         BigDecimal noToolPercentage = noToolMap.get(filter).computeLittlePercentage(0);
+         html.append("<td>" + (noToolPercentage != null ? noToolPercentage : "&nbsp;") + "</td>" + StringUtil.NEW_LINE);
+         BigDecimal sedPercentage = sedMap.get(filter).computeLittlePercentage(0);
+         html.append("<td>" + (sedPercentage != null ? sedPercentage : "&nbsp;") + "</td>" + StringUtil.NEW_LINE);
+      }
+      html.append("</tr>" + StringUtil.NEW_LINE);
+      // Not Helpful
+      html.append("<tr style=\"background-color: #b1d3ec;\">" + StringUtil.NEW_LINE);
+      html.append("<td>No, Not helpful</td>" + StringUtil.NEW_LINE);
+      for (IStatisticsFilter filter : filters) {
+         BigDecimal noToolPercentage = noToolMap.get(filter).computeNotHeplfulPercentage(0);
+         html.append("<td>" + (noToolPercentage != null ? noToolPercentage : "&nbsp;") + "</td>" + StringUtil.NEW_LINE);
+         BigDecimal sedPercentage = sedMap.get(filter).computeNotHeplfulPercentage(0);
+         html.append("<td>" + (sedPercentage != null ? sedPercentage : "&nbsp;") + "</td>" + StringUtil.NEW_LINE);
+      }
+      html.append("</tr>" + StringUtil.NEW_LINE);
+      // Not considered
+      html.append("<tr style=\"background-color: #b1d3ec;\">" + StringUtil.NEW_LINE);
+      html.append("<td>Not considered</td>" + StringUtil.NEW_LINE);
+      for (IStatisticsFilter filter : filters) {
+         BigDecimal noToolPercentage = noToolMap.get(filter).computeNotConsideredPercentage(0);
+         html.append("<td>" + (noToolPercentage != null ? noToolPercentage : "&nbsp;") + "</td>" + StringUtil.NEW_LINE);
+         BigDecimal sedPercentage = sedMap.get(filter).computeNotConsideredPercentage(0);
+         html.append("<td>" + (sedPercentage != null ? sedPercentage : "&nbsp;") + "</td>" + StringUtil.NEW_LINE);
+      }
+      html.append("</tr>" + StringUtil.NEW_LINE);
+      // Footer
+      html.append("</table>" + StringUtil.NEW_LINE);
+      return html.toString();
    }
    
    protected String createLatex(HelpfulnessStatistic sed, HelpfulnessStatistic noTool) {

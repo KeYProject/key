@@ -12,6 +12,7 @@ import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
 import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
 import org.key_project.sed.key.evaluation.model.definition.ReviewingCodeEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
+import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.server.report.AdditionalFile;
 import org.key_project.sed.key.evaluation.server.report.EvaluationResult;
 import org.key_project.sed.key.evaluation.server.report.filter.IStatisticsFilter;
@@ -32,6 +33,8 @@ public class ReviewingCodeSummaryExport extends AbstractSummaryExport {
                                                    EvaluationResult result, 
                                                    Statistics statistics, 
                                                    StringBuffer sb) {
+      // Get tools
+      Tool sedTool = evaluation.getTool(ReviewingCodeEvaluation.SED_TOOL_NAME);
       // Get needed questions
       AbstractForm evaluationForm = evaluation.getForm(ReviewingCodeEvaluation.EVALUATION_FORM_NAME);
       QuestionPage feedbackPage = (QuestionPage) evaluationForm.getPage(ReviewingCodeEvaluation.FEEDBACK_PAGE);
@@ -40,7 +43,7 @@ public class ReviewingCodeSummaryExport extends AbstractSummaryExport {
       SectionQuestion feedbackSection = (SectionQuestion) feedbackPage.getQuestion(ReviewingCodeEvaluation.FEEDBACK_SECTION);
       AbstractChoicesQuestion dcrVsSedQuestion = (AbstractChoicesQuestion) dcrVsSedSection.getChildQuestions()[0];
       AbstractQuestion feedbackQuestion = feedbackSection.getChildQuestions()[0];
-      // Crate Latex file
+      // Crate Latex files
       String sedFeatures = createFeatureLatex(sedSection, statistics);
       String dcrVsSed = createQuestionLatex(dcrVsSedQuestion, statistics, "\\Java experience");
       String feedback = createValueLatex(feedbackQuestion, "rc", result);
@@ -52,6 +55,11 @@ public class ReviewingCodeSummaryExport extends AbstractSummaryExport {
          additionalFiles.add(new AdditionalFile("_SED_Features_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", sed.toString().getBytes(IOUtil.DEFAULT_CHARSET)));
       }
       additionalFiles.add(new AdditionalFile("_Feedback.tex", feedback.toString().getBytes(IOUtil.DEFAULT_CHARSET)));
+      // Create HTML files
+      String sedFeaturesHtml = createFeatureHtml(sedSection, statistics, "Java experience", sedTool.getName());
+      String dcrVsSedHtml = createQuestionHtml(dcrVsSedQuestion, statistics, "Java experience");
+      additionalFiles.add(new AdditionalFile("_SED_Features.html", sedFeaturesHtml.toString().getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_DCR_vs_SED.html", dcrVsSedHtml.toString().getBytes(IOUtil.DEFAULT_CHARSET)));
       return additionalFiles;
    }
 }

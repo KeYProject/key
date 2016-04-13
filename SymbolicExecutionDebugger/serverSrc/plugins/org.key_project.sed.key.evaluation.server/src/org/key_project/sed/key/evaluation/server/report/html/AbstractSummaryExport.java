@@ -134,4 +134,77 @@ public abstract class AbstractSummaryExport implements IHTMLSectionAppender {
          }
       }
    }
+
+   protected String createFeatureHtml(SectionQuestion sectionQuestion, Statistics statistics, String experienceLabel, String toolName) {
+      StringBuffer html = new StringBuffer();
+      html.append("<table border=\"0\" cellpadding=\"3\" cellspacing=\"2\">" + StringUtil.NEW_LINE);
+      html.append("<tr style=\"background-color: #4e9ad6;font-weight: bold;\">" + StringUtil.NEW_LINE);
+      html.append("<td rowspan=\"3\" colspan=\"2\">&nbsp;</td>" + StringUtil.NEW_LINE);
+      html.append("<td colspan=\"20\">" + experienceLabel + "</td>" + StringUtil.NEW_LINE);
+      html.append("</tr>" + StringUtil.NEW_LINE);
+      html.append("<tr style=\"background-color: #4e9ad6;font-weight: bold;\">" + StringUtil.NEW_LINE);
+      for (IStatisticsFilter filter : statistics.getFilters()) {
+         html.append("<td colspan=\"5\">" + filter.getName() + "</td>" + StringUtil.NEW_LINE);
+      }
+      html.append("</tr>" + StringUtil.NEW_LINE);
+      html.append("<tr style=\"background-color: #4e9ad6;font-weight: bold;\">" + StringUtil.NEW_LINE);
+      for (@SuppressWarnings("unused") IStatisticsFilter filter : statistics.getFilters()) {
+         html.append("<td>Very Helpful (%)</td>" + StringUtil.NEW_LINE);
+         html.append("<td>Helpful (%)</td>" + StringUtil.NEW_LINE);
+         html.append("<td>Somewhat Helpful (%)</td>" + StringUtil.NEW_LINE);
+         html.append("<td>Not Helpful (%)</td>" + StringUtil.NEW_LINE);
+         html.append("<td>Never Used (%)</td>" + StringUtil.NEW_LINE);
+      }
+      html.append("</tr>" + StringUtil.NEW_LINE);
+      appendFeatureChildQuestionHtml(sectionQuestion, statistics, toolName, html);
+      html.append("</table>" + StringUtil.NEW_LINE);
+      return html.toString();
+   }
+   
+   protected void appendFeatureChildQuestionHtml(SectionQuestion sectionQuestion, Statistics statistics, String toolName, StringBuffer html) {
+      boolean first = true;
+      for (AbstractQuestion question : sectionQuestion.getChildQuestions()) {
+         if (question instanceof AbstractChoicesQuestion) {
+            html.append("<tr style=\"background-color: #b1d3ec;\">" + StringUtil.NEW_LINE);
+            if (first) {
+               html.append("<td rowspan=\"" + sectionQuestion.countChildQuestions() + "\">" + toolName + "</td>" + StringUtil.NEW_LINE);
+               first = false;
+            }
+            AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) question;
+            html.append("<td>" + question.getLatexLabel() + "</td>" + StringUtil.NEW_LINE);
+            for (Choice choice : choiceQuestion.getChoices()) {
+               for (IStatisticsFilter filter : statistics.getFilters()) {
+                  FilteredStatistics fs = statistics.getFilteredStatistics(filter);
+                  html.append("<td>" + fs.computeChoicePercent(choiceQuestion, choice) + "</td>" + StringUtil.NEW_LINE);
+               }
+            }
+            html.append("</tr>" + StringUtil.NEW_LINE);
+         }
+      }
+   }
+
+   protected String createQuestionHtml(AbstractChoicesQuestion choiceQuestion, Statistics statistics, String experienceLabel) {
+      StringBuffer html = new StringBuffer();
+      html.append("<table border=\"0\" cellpadding=\"3\" cellspacing=\"2\">" + StringUtil.NEW_LINE);
+      html.append("<tr style=\"background-color: #4e9ad6;font-weight: bold;\">" + StringUtil.NEW_LINE);
+      html.append("<td rowspan=\"2\">&nbsp;</td>" + StringUtil.NEW_LINE);
+      html.append("<td colspan=\"5\">" + experienceLabel + "</td>" + StringUtil.NEW_LINE);
+      html.append("</tr>" + StringUtil.NEW_LINE);
+      html.append("<tr style=\"background-color: #4e9ad6;font-weight: bold;\">" + StringUtil.NEW_LINE);
+      for (IStatisticsFilter filter : statistics.getFilters()) {
+         html.append("<td>" + filter.getName() + "</td>" + StringUtil.NEW_LINE);
+      }
+      html.append("</tr>" + StringUtil.NEW_LINE);
+      for (Choice choice : choiceQuestion.getChoices()) {
+         html.append("<tr style=\"background-color: #b1d3ec;\">" + StringUtil.NEW_LINE);
+         html.append("<td>" + choice.getLatexText() + "</td>" + StringUtil.NEW_LINE);
+         for (IStatisticsFilter filter : statistics.getFilters()) {
+            FilteredStatistics fs = statistics.getFilteredStatistics(filter);
+            html.append("<td>" + fs.computeChoicePercent(choiceQuestion, choice) + "</td>" + StringUtil.NEW_LINE);
+         }
+         html.append("</tr>" + StringUtil.NEW_LINE);
+      }
+      html.append("</table>" + StringUtil.NEW_LINE);
+      return html.toString();
+   }
 }

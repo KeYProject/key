@@ -55,6 +55,11 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
         t.execPreOrder(new Visitor() {
             @Override
+            public boolean visitSubtree(Term visited) {
+                return true;
+            }
+
+            @Override
             public void visit(Term visited) {
                 if (visited.op() instanceof SchemaVariable) {
                     result.add((SchemaVariable) visited.op());

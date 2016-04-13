@@ -125,6 +125,10 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
         private LinkedList<QuantifiableVariable> vars = new LinkedList<QuantifiableVariable>();
 
+        @Override
+        public boolean visitSubtree(Term visited) {
+            return true;
+        }
 
         @Override
         public void visit(Term visited) {

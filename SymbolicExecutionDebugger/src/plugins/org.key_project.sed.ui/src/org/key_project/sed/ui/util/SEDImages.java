@@ -343,7 +343,7 @@ public final class SEDImages {
            path = "icons/loop_invariant.gif";
         }
         else if (LOOP_INVARIANT_INITIALLY_INVALID.equals(key)) {
-           path = "icons/loop_invariant _initially_invalid.gif";
+           path = "icons/loop_invariant_initially_invalid.gif";
         }
         else if (LOOP_BODY_TERMINATION.equals(key)) {
            path = "icons/loop_body_termination.gif";

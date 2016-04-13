@@ -1281,7 +1281,7 @@ public class TermBuilder {
      * @param number an integer
      * @return Term in Z-Notation representing the given number
      */
-    public Term zTerm(int number) {
+    public Term zTerm(long number) {
         return zTerm(""+number);
     }
 
@@ -2205,13 +2205,9 @@ public class TermBuilder {
     * @return The created {@link Term}.
     */
    public Term impPreserveLabels(Term t1, Term t2) {
-      if (t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
-         if (!t1.hasLabels()) {
-            return t2;
-         }
-         else {
-            return tf.createTerm(Junctor.IMP, t1, t2);
-         }
+      if ((t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) &&
+          (!t1.hasLabels() && !t2.hasLabels())) {
+         return tt();
       }
       else if (t1.op() == Junctor.TRUE && !t1.hasLabels()) {
          return t2;
@@ -2267,16 +2263,9 @@ public class TermBuilder {
     * @return The created {@link Term}.
     */
    public Term andPreserveLabels(Term t1, Term t2) {
-      if (t1.op() == Junctor.FALSE || t2.op() == Junctor.FALSE) {
-         if (!t1.hasLabels() && !t2.hasLabels()) {
-            return ff();
-         }
-         else if (!t1.hasLabels()) {
-            return t2;
-         }
-         else {
-            return t1;
-         }
+      if ((t1.op() == Junctor.FALSE || t2.op() == Junctor.FALSE) &&
+          (!t1.hasLabels() && !t2.hasLabels())) {
+         return ff();
       }
       else if (t1.op() == Junctor.TRUE && !t1.hasLabels()) {
          return t2;
@@ -2311,16 +2300,9 @@ public class TermBuilder {
     * @return The created {@link Term}.
     */
    public Term orPreserveLabels(Term t1, Term t2) {
-      if (t1.op() == Junctor.TRUE || t2.op() == Junctor.TRUE) {
-         if (!t1.hasLabels() && !t2.hasLabels()) {
-            return tt();
-         }
-         else if (!t1.hasLabels()) {
-            return t2;
-         }
-         else {
-            return t1;
-         }
+      if ((t1.op() == Junctor.TRUE || t2.op() == Junctor.TRUE) &&
+          (!t1.hasLabels() && !t2.hasLabels())) {
+         return tt();
       }
       else if (t1.op() == Junctor.FALSE && !t1.hasLabels()) {
          return t2;

@@ -1005,10 +1005,10 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                      new NotUndefinedValueValidator("Question '" + layoutTitle + "' not answered."), 
                                                                      false,
                                                                      choices);
-      String truthTitle = "Truth value evaluation of postconditions, preconditions and loop invariants";
+      String truthTitle = "Truth value tracing of postconditions, preconditions and loop invariants";
       RadioButtonsQuestion truthQuestion = new RadioButtonsQuestion("truth", 
                                                                     truthTitle, 
-                                                                    "Truth Value Evaluation",
+                                                                    "Truth Value Tracing",
                                                                     null,
                                                                     isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_UP_TRUTH) : null,
                                                                     false,

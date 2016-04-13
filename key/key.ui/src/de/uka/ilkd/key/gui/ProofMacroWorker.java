@@ -54,7 +54,15 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
      * The macro which is to be executed
      */
     private final ProofMacro macro;
+    
+    /**
+     * The resulting information of the task or null if the task was cancelled an exception was thrown
+     */
+    private TaskFinishedInfo info;
 
+    /** The thrown exception leading to cancellation of the task */
+    private Exception exception;
+    
     /**
      * The mediator of the environment
      */
@@ -86,8 +94,7 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
     protected Void doInBackground() throws Exception {
         final ProverTaskListener ptl = mediator.getUI();
         Proof selectedProof = node.proof();
-        TaskFinishedInfo info =
-                ProofMacroFinishedInfo.getDefaultInfo(macro, selectedProof);
+        info = ProofMacroFinishedInfo.getDefaultInfo(macro, selectedProof);
         ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
         try {
             synchronized(macro) {
@@ -96,12 +103,11 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
         } catch (final InterruptedException exception) {
             Debug.out("Proof macro has been interrupted:");
             Debug.out(exception);
+            this.exception = exception;
         } catch (final Exception exception) {
             // This should actually never happen.
-            ExceptionDialog.showDialog(MainWindow.getInstance(), exception);
-        } finally {
-            ptl.taskFinished(info);
-        }
+            this.exception = exception;
+        } 
         return null;
     }
 
@@ -113,12 +119,20 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
     @Override
     protected void done() {
         synchronized(macro) {
+            mediator.removeInterruptedListener(this);
+            if ( ! isCancelled() && exception != null ) { // user cancelled task is fine, we do not report this
+                // This should actually never happen.
+                ExceptionDialog.showDialog(MainWindow.getInstance(), exception);
+            }                        
+            
+            mediator.getUI().taskFinished(info);
+
             if(SELECT_GOAL_AFTER_MACRO) {
                 selectOpenGoalBelow();
             }
+                        
             mediator.setInteractive(true);
             mediator.startInterface(true);
-            mediator.removeInterruptedListener(this);
         }
     }
 

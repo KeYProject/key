@@ -26,8 +26,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Class for analysing and modifying polynomial expressions over the integers
@@ -253,19 +251,6 @@ public class Polynomial {
                     new BigInteger ( AbstractTermTransformer
                                      .convertToDecimalString ( polynomial, services ) );
                 constantPart = constantPart.add ( c );
-            } else if ( op instanceof SortDependingFunction
-        	        && ((SortDependingFunction)op).getKind().equals(Sort.CAST_NAME)
-                        && polynomial.sub ( 0 ).sort ().extendsTrans (
-                                             tc.getIntegerLDT ().targetSort () )
-                        &&
-                        ( /*polynomial.sort () == tc.getByteLDT ().targetSort ()
-                          || polynomial.sort () == tc.getShortLDT ().targetSort ()
-                          || polynomial.sort () == tc.getCharLDT ().targetSort ()
-                          || polynomial.sort () == tc.getIntLDT ().targetSort ()
-                          || polynomial.sort () == tc.getLongLDT ().targetSort ()
-                          || */polynomial.sort () == tc.getIntegerLDT ().targetSort () ) ) {
-                // HACK: work around the hackish integer type hierarchy
-                analyse ( polynomial.sub ( 0 ) );
             } else {
                 parts = addPart ( parts,
                                   Monomial.create ( polynomial, services ) );

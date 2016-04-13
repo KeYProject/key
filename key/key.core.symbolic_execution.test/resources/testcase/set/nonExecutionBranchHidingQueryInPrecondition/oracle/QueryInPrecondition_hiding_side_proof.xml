@@ -21,15 +21,15 @@ mod: {}
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x, y" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                <methodReturn name="&lt;return of main&gt;" signature="&lt;return of QueryInPrecondition.main(x,y)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	Z(neglit(1(1(7(4(#)))))) {or(or(and(leq(x,Z(neglit(1(#)))),leq(y,Z(neglit(1(#))))),and(geq(x,Z(0(#))),geq(y,Z(0(#))))),and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#)))))}, 
-	Z(2(4(#))) {and(lt(y,Z(0(#))),gt(x,Z(neglit(1(#)))))}
+	Z(2(4(#))) {and(lt(y,Z(0(#))),and(equals(QueryResult_0,TRUE),gt(x,Z(neglit(1(#))))))}, 
+	Z(neglit(1(1(7(4(#)))))) {or(or(and(and(not(equals(QueryResult_0,TRUE)),leq(x,Z(neglit(1(#))))),leq(y,Z(neglit(1(#))))),and(geq(x,Z(0(#))),geq(y,Z(0(#))))),and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#)))))}
 as result of main&gt;" signatureIncludingReturnValue="&lt;return 
-	Z(neglit(1(1(7(4(#)))))) {or(or(and(leq(x,Z(neglit(1(#)))),leq(y,Z(neglit(1(#))))),and(geq(x,Z(0(#))),geq(y,Z(0(#))))),and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#)))))}, 
-	Z(2(4(#))) {and(lt(y,Z(0(#))),gt(x,Z(neglit(1(#)))))}
+	Z(2(4(#))) {and(lt(y,Z(0(#))),and(equals(QueryResult_0,TRUE),gt(x,Z(neglit(1(#))))))}, 
+	Z(neglit(1(1(7(4(#)))))) {or(or(and(and(not(equals(QueryResult_0,TRUE)),leq(x,Z(neglit(1(#))))),leq(y,Z(neglit(1(#))))),and(geq(x,Z(0(#))),geq(y,Z(0(#))))),and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#)))))}
 as result of QueryInPrecondition.main(x,y)&gt;" isReturnValueComputed="true" methodReturnCondition="true">
-                  <methodReturnValue name="Z(neglit(1(1(7(4(#)))))) {or(or(and(leq(x,Z(neglit(1(#)))),leq(y,Z(neglit(1(#))))),and(geq(x,Z(0(#))),geq(y,Z(0(#))))),and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#)))))}" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="true" conditionString="or(or(and(leq(x,Z(neglit(1(#)))),leq(y,Z(neglit(1(#))))),and(geq(x,Z(0(#))),geq(y,Z(0(#))))),and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#)))))">
+                  <methodReturnValue name="Z(2(4(#))) {and(lt(y,Z(0(#))),and(equals(QueryResult_0,TRUE),gt(x,Z(neglit(1(#))))))}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="and(lt(y,Z(0(#))),and(equals(QueryResult_0,TRUE),gt(x,Z(neglit(1(#))))))">
                   </methodReturnValue>
-                  <methodReturnValue name="Z(2(4(#))) {and(lt(y,Z(0(#))),gt(x,Z(neglit(1(#)))))}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="and(lt(y,Z(0(#))),gt(x,Z(neglit(1(#)))))">
+                  <methodReturnValue name="Z(neglit(1(1(7(4(#)))))) {or(or(and(and(not(equals(QueryResult_0,TRUE)),leq(x,Z(neglit(1(#))))),leq(y,Z(neglit(1(#))))),and(geq(x,Z(0(#))),geq(y,Z(0(#))))),and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#)))))}" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="true" conditionString="or(or(and(and(not(equals(QueryResult_0,TRUE)),leq(x,Z(neglit(1(#))))),leq(y,Z(neglit(1(#))))),and(geq(x,Z(0(#))),geq(y,Z(0(#))))),and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#)))))">
                   </methodReturnValue>
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>

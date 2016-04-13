@@ -35,31 +35,16 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PositionTable;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.BranchResult;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValue;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.BranchResult;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
 
 /**
  * An extended {@link ProofSourceViewerDecorator} to visualize {@link BranchResult}s
  * via {@link #showSequent(Term, Services, KeYMediator, BranchResult)}.
  * @author Martin Hentschel
  */
-public class TruthValueEvaluationViewerDecorator extends ProofSourceViewerDecorator {
-   /**
-    * The {@link RGB} specifying the {@link Color} to highlight {@link TruthValue#TRUE}.
-    */
-   public static final RGB trueRGB = new RGB(0, 117, 0);
-
-   /**
-    * The {@link RGB} specifying the {@link Color} to highlight {@link TruthValue#FALSE}.
-    */
-   public static final RGB falseRGB = new RGB(170, 0, 0);
-
-   /**
-    * The {@link RGB} specifying the {@link Color} to highlight {@link TruthValue#UNKNOWN} or {@code null}.
-    */
-   public static final RGB unknownRGB = new RGB(217, 108, 0);
-   
+public class TruthValueTracingViewerDecorator extends ProofSourceViewerDecorator {
    /**
     * The {@link Color} to highlight {@link TruthValue#TRUE}.
     */
@@ -78,8 +63,11 @@ public class TruthValueEvaluationViewerDecorator extends ProofSourceViewerDecora
    /**
     * Constructor.
     * @param viewer The {@link ISourceViewer} to decorate.
+    * @param trueRGB The {@link RGB} to highlight true.
+    * @param falseRGB The {@link RGB} to highlight false.
+    * @param unknownRGB The {@link RGB} to highlight unknown.
     */
-   public TruthValueEvaluationViewerDecorator(ISourceViewer viewer) {
+   public TruthValueTracingViewerDecorator(ISourceViewer viewer, RGB trueRGB, RGB falseRGB, RGB unknownRGB) {
       super(viewer);
       trueColor = new Color(getViewerText().getDisplay(), trueRGB);
       falseColor = new Color(getViewerText().getDisplay(), falseRGB);
@@ -233,7 +221,7 @@ public class TruthValueEvaluationViewerDecorator extends ProofSourceViewerDecora
       else {
          // Highlight truth values
          FormulaTermLabel label = branchResult.getPredicateLabel(term);
-         if (TruthValueEvaluationUtil.isIfThenElseFormula(term)) {
+         if (TruthValueTracingUtil.isIfThenElseFormula(term)) {
             fillIfThenElse(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges, label);
          }
          else if (term.op() instanceof Junctor || term.op() == Equality.EQV) {
