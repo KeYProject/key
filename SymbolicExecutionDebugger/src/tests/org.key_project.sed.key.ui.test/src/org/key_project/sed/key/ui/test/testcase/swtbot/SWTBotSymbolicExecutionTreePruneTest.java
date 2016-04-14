@@ -110,7 +110,7 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
          }
       };
 
-      doKeYDebugTargetTest("SWTBotSymbolicExecutionTreePruneTest_testPruning", Activator.PLUGIN_ID, "data/number/test", false, false, createMethodSelector("Number", "equals", "QNumber;"), null, null, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, 8, executor);
+      doKeYDebugTargetTest("SWTBotSymbolicExecutionTreePruneTest_testPruning", Activator.PLUGIN_ID, "data/number/test", false, false, createMethodSelector("Number", "equals", "QNumber;"), null, null, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE, 8, executor);
    }
 
    /**
@@ -142,9 +142,7 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
       TestUtilsUtil.clickDirectly(wizardShell.bot().button("Next >"));
       TestUtilsUtil.clickDirectly(wizardShell.bot().button("Finish"));
       bot.waitUntil(Conditions.shellCloses(wizardShell));
-      // set true to generate new test files in the oracle dir which is
-      // defined by pathToOracleFiles
-      if (false) {
+      if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
          // Save oracle files
          File targetOracleDirectory = new File(pathToOracleFiles);
          ResourceUtil.copyIntoFileSystem(project.getFile(fileName + ExecutionTreeUtil.DOMAIN_FILE_EXTENSION_WITH_DOT), new File(targetOracleDirectory, fileName + ExecutionTreeUtil.DOMAIN_FILE_EXTENSION_WITH_DOT));

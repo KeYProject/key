@@ -106,6 +106,7 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE, 
                            Boolean.FALSE, 
                            Boolean.TRUE, 
+                           Boolean.FALSE,
                            10, 
                            executor);
    }
@@ -193,6 +194,7 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
                 Boolean.FALSE, 
                 Boolean.FALSE, 
                 Boolean.TRUE, 
+                Boolean.FALSE,
                 10, 
                 executor);
 	}
@@ -269,6 +271,7 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE, 
                            Boolean.FALSE, 
                            Boolean.TRUE, 
+                           Boolean.FALSE,
                            10, 
                            executor);
    }
@@ -329,6 +332,7 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
                Boolean.FALSE, 
                Boolean.FALSE, 
                Boolean.TRUE, 
+               Boolean.FALSE,
                10, 
                executor);
    }
@@ -400,6 +404,7 @@ public class SWTBotManualViewTest extends AbstractKeYDebugTargetTestCase {
             Boolean.FALSE, 
             Boolean.FALSE, 
             Boolean.TRUE, 
+            Boolean.FALSE,
             10, 
             executor);
       
