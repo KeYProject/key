@@ -1438,7 +1438,7 @@ javaliteral returns [SLExpression ret=null] throws SLTranslationException
 	    Term charListTerm
 	       = services.getTypeConverter()
 	                 .convertToLogicElement(
-	                 	new StringLiteral("\"" + l.getText() + "\""));
+	                 	new StringLiteral(l.getText()));
 	    Function strPool
 	    	= (Function) services.getNamespaces()
 	    	                     .functions()
