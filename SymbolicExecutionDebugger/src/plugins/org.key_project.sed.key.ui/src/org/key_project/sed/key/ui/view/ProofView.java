@@ -166,11 +166,6 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
 	 */
 	private State subtreeState;
 	
-	/**
-	 * The root of the tree, changes after use of the show subtree of node filter.
-	 */
-	private Node filterNode;
-	
    /**
     * the {@link ISelectionChangedListener} for the {@link IDebugView}.
     */
@@ -245,7 +240,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
 	    */
       @Override
       public void handleStateChange(State state, Object oldValue) {
-         handleSubtreeStateChanged(state, oldValue);
+         handleSubtreeStateChanged(state);
       }
 	};
 	
@@ -266,29 +261,29 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
 	 * the constructor of the class.
 	 */
 	public ProofView() {
-	   ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
+      ICommandService service = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
       if (service != null) {
          Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
          if (hideCmd != null) {
             hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
             if (hideState != null) {
-            	hideState.addListener(hideStateListener);
+               hideState.addListener(hideStateListener);
             }
          }
          Command symbolicCmd = service.getCommand(ShowSymbolicExecutionTreeOnlyHandler.COMMAND_ID);
          if (symbolicCmd != null) {
             symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
             if (symbolicState != null) {
-            	symbolicState.addListener(symbolicStateListener);
+               symbolicState.addListener(symbolicStateListener);
             }
          }
          Command subtreeCmd = service.getCommand(ShowSubtreeOfNodeHandler.COMMAND_ID);
-            if (subtreeCmd != null) {
-               subtreeState = subtreeCmd.getState(RegistryToggleState.STATE_ID);
-               if (subtreeState != null) {
-                  subtreeState.addListener(subtreeStateListener);
-               }
+         if (subtreeCmd != null) {
+            subtreeState = subtreeCmd.getState(RegistryToggleState.STATE_ID);
+            if (subtreeState != null) {
+               subtreeState.addListener(subtreeStateListener);
             }
+         }
       }
 	}
 
@@ -325,26 +320,30 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
 	/**
 	 * handles the change in the subtreeState.
 	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
-	 * @param oldValue The old value; may be anything.
 	 */
-	protected void handleSubtreeStateChanged(State state, Object oldValue) {
-	  if (proof != null) {
-   	  if ((boolean) state.getValue()) {
-   	     filterNode = getSelectedNode();
-   	     contentProvider.setShowSubtreeState(true, filterNode);
-	        treeViewer.setInput(filterNode.proof());
-   	     
-   	  } else {
-   	     Node currentSelection = getSelectedNode();
-   	     contentProvider.setShowSubtreeState(false, proof.root());
-   	     treeViewer.setInput(proof);
-   	     if (!(boolean) hideState.getValue()) {
-   	        selectNodeThreadSafe(currentSelection);
-   	     }
-   	     filterNode = proof.root();
-   	  }
-	  }
-	}
+   protected void handleSubtreeStateChanged(State state) {
+      showSubtree(true);
+   }
+   
+   /**
+    * Shows a new sub tree.
+    * @param keepSelection {@code true} keep selection, {@code false} do not keep selection
+    */
+   protected void showSubtree(boolean keepSelection) {
+      if (proof != null) {
+         Node currentSelection = getSelectedNode();
+         if (baseViewNode != null && (boolean) subtreeState.getValue()) {
+            contentProvider.setShowSubtreeState(true, baseViewNode.getExecutionNode().getProofNode());
+         }
+         else {
+            contentProvider.setShowSubtreeState(false, proof.root());
+         }
+         treeViewer.setInput(proof);
+         if (currentSelection != null && keepSelection) {
+            selectNodeThreadSafe(currentSelection);
+         }
+      }
+   }
 	
    /**
     * {@inheritDoc}
@@ -358,7 +357,6 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
       this.contentProvider = new LazyProofTreeContentProvider();
       contentProvider.setHideState((boolean) hideState.getValue());
       contentProvider.setSymbolicState((boolean) symbolicState.getValue());
-      subtreeState.setValue(false);
       treeViewer.setContentProvider(contentProvider);
       treeViewer.addSelectionChangedListener(treeViewerSelectionListener);
       //create source viewer
@@ -503,7 +501,6 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
             environment.getProofControl().setMinimizeInteraction(true);
          }
          if (proof != null && !proof.isDisposed()) {
-            subtreeState.setValue(false);
             contentProvider.setShowSubtreeState(false, proof.root());
             proof.addProofDisposedListener(proofDisposedListener);
             proof.addRuleAppListener(ruleAppListener);
@@ -522,21 +519,18 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
       // Update selection
       if (seNode != baseViewNode) {
          baseViewNode = seNode;
-         if (seNode != null && !(boolean) hideState.getValue()) {
+         if ((boolean) subtreeState.getValue()) {
+            showSubtree(false);
+         }
+         if (seNode != null) {
             if (treeViewer != null && sourceViewer!= null) {
                Node keyNode = seNode.getExecutionNode().getProofNode();
-               if (!(boolean) subtreeState.getValue()) {
-                  selectNodeThreadSafe(keyNode);
-               }
-               else if (keyNode.serialNr() >= filterNode.serialNr()) {
-                  selectNodeThreadSafe(keyNode);
-               }
+               selectNodeThreadSafe(keyNode);
             }
          }
       }
    }
 
-   
    /**
     * Updates the providers of {@link ProofView#getTreeViewer()} and {@link ProofView#getSourceViewer()}
     * and creates context menus. Selection is set to root.
@@ -554,12 +548,11 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
          treeViewer.setLabelProvider(labelProvider);
          contentProvider.injectTopLevelElements();
          //set default selection to root
-         if (!(boolean) hideState.getValue() || getSelectedNode() == null) {
-            if (!(boolean) subtreeState.getValue()) {
-               selectNodeThreadSafe(proof.root());
-            } else {
-               selectNodeThreadSafe(filterNode);
-            }
+         if (baseViewNode != null && (boolean) subtreeState.getValue()) {
+            selectNodeThreadSafe(baseViewNode.getExecutionNode().getProofNode());
+         }
+         else {
+            selectNodeThreadSafe(proof.root());
          }
       }
       else {
@@ -705,7 +698,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
     */
    protected void selectNodeThreadSafe(final Node node) {
       if (!treeViewer.getControl().getDisplay().isDisposed()) {
-         treeViewer.getControl().getDisplay().asyncExec(new Runnable() {
+         treeViewer.getControl().getDisplay().syncExec(new Runnable() {
             @Override
             public void run() {
                if (!treeViewer.getControl().isDisposed()) {
