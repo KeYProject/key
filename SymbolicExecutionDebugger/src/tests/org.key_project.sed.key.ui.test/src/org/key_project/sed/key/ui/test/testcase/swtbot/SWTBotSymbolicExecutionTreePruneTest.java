@@ -22,7 +22,7 @@ import org.key_project.sed.core.test.util.DebugTargetResumeSuspendListener;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.test.testcase.swtbot.AbstractKeYDebugTargetTestCase;
 import org.key_project.sed.key.ui.test.Activator;
-import org.key_project.sed.key.ui.view.ManualView;
+import org.key_project.sed.key.ui.view.ProofView;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.view.ExecutionTreeView;
 import org.key_project.util.eclipse.BundleUtil;
@@ -66,8 +66,8 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
             // test diagram before prune
             assertDiagram(bot, project.getProject(), "Number.set", pathToOracleFiles, null);
 
-            SWTBotView manualView = bot.viewById(ManualView.VIEW_ID);
-            SWTBotTree tree = manualView.bot().tree();
+            SWTBotView proofView = bot.viewById(ProofView.VIEW_ID);
+            SWTBotTree tree = proofView.bot().tree();
 
             // prune branch node
             TestUtilsUtil.selectInTree(tree, "Null Reference (n = null)");
@@ -99,13 +99,13 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
 
          @Override
          public void configureDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
-            TestUtilsUtil.openView(ManualView.VIEW_ID);
+            TestUtilsUtil.openView(ProofView.VIEW_ID);
          }
 
          @Override
          public void cleanupDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
-            if (TestUtilsUtil.findView(ManualView.VIEW_ID) != null) {
-               TestUtilsUtil.closeView(ManualView.VIEW_ID);
+            if (TestUtilsUtil.findView(ProofView.VIEW_ID) != null) {
+               TestUtilsUtil.closeView(ProofView.VIEW_ID);
             }
          }
       };

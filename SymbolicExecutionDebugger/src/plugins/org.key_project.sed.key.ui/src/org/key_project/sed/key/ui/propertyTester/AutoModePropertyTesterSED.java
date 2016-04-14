@@ -2,13 +2,13 @@ package org.key_project.sed.key.ui.propertyTester;
 
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.ui.IViewPart;
-import org.key_project.sed.key.ui.view.ManualView;
+import org.key_project.sed.key.ui.view.ProofView;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 import de.uka.ilkd.key.control.ProofControl;
 
 /**
- * tests the properties that are needed for starting and stopping auto mode on {@link ManualView}.
+ * tests the properties that are needed for starting and stopping auto mode on {@link ProofView}.
  * @author Seena Vellaramkalayil
  *
  */
@@ -41,10 +41,10 @@ public class AutoModePropertyTesterSED extends PropertyTester {
    @Override
    public boolean test(Object receiver, String property, Object[] args,
          Object expectedValue) {
-         IViewPart tempView = WorkbenchUtil.findView(ManualView.VIEW_ID);
+         IViewPart tempView = WorkbenchUtil.findView(ProofView.VIEW_ID);
          if (tempView != null) {
-            if (tempView instanceof ManualView) {
-               ManualView view = (ManualView) tempView;
+            if (tempView instanceof ProofView) {
+               ProofView view = (ProofView) tempView;
                if (view.getProof() != null) {
                   if (view.getProof().isDisposed()) {
                      return false;

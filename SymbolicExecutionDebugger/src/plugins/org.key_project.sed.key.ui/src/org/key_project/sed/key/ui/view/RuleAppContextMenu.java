@@ -26,7 +26,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
- * provides the context menu entries for manual rule application on {@link ManualView}.
+ * Provides the context menu entries in the sequent view as part of the {@link ProofView}.
  * @author Seena Vellaramkalayil
  */
 public class RuleAppContextMenu extends ExtensionContributionFactory {
@@ -38,8 +38,8 @@ public class RuleAppContextMenu extends ExtensionContributionFactory {
    public void createContributionItems(IServiceLocator serviceLocator,
          IContributionRoot additions) {
       IWorkbenchPart activeView = WorkbenchUtil.getActivePart();
-      if (activeView instanceof ManualView) {
-         ManualView view = (ManualView) activeView;
+      if (activeView instanceof ProofView) {
+         ProofView view = (ProofView) activeView;
          Node node = view.getSelectedNode();
          Goal goal = view.getProof().getGoal(node);
          if (goal != null) {

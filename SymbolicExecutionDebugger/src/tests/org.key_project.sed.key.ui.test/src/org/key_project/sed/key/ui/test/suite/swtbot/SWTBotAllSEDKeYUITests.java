@@ -27,7 +27,7 @@ import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotKeYSourceCodeLookup
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotKeYTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotLoopInvariantTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotMainTabTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotManualViewTest;
+import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotProofViewTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotOpenProofTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotPostconditionTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotPreconditionTabTest;
@@ -56,7 +56,7 @@ import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotSymbolicExecutionTr
    SWTBotPostconditionTabTest.class,
    SWTBotPreconditionTabTest.class,
    SWTBotSideProofsViewTest.class,
-   SWTBotManualViewTest.class,
+   SWTBotProofViewTest.class,
    SWTBotSymbolicExecutionTreePruneTest.class
 })
 public class SWTBotAllSEDKeYUITests {

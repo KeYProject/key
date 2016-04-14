@@ -707,11 +707,11 @@
          <menuContribution
                allPopups="false"
                class="org.key_project.sed.key.ui.view.RuleAppContextMenu"
-               locationURI="popup:org.key_project.sed.key.ui.ManualView.popup?before=group.add">
+               locationURI="popup:org.key_project.sed.key.ui.ProofView.popup?before=group.add">
          </menuContribution>
          <menuContribution
                allPopups="false"
-               locationURI="toolbar:org.key_project.sed.key.ui.view.ManualView">
+               locationURI="toolbar:org.key_project.sed.key.ui.ProofView">
             <command
                   commandId="org.key_project.sed.key.ui.startAutoModeCommand"
                   icon="icons/nav_go.gif"
@@ -751,7 +751,7 @@
          </menuContribution>
          <menuContribution
                allPopups="false"
-               locationURI="popup:org.key_project.sed.key.ui.view.ManualView">
+               locationURI="popup:org.key_project.sed.key.ui.ProofView">
          </menuContribution>
       </extension>
       <extension
@@ -834,10 +834,12 @@
                restorable="true">
          </view>
          <view
+               allowMultiple="false"
                category="org.key_project.sed.ui.category"
-               class="org.key_project.sed.key.ui.view.ManualView"
-               id="org.key_project.sed.key.ui.view.ManualView"
-               name="Manual Rule Application View"
+               class="org.key_project.sed.key.ui.view.ProofView"
+               icon="icons/proof_tree.gif"
+               id="org.key_project.sed.key.ui.ProofView"
+               name="Proof"
                restorable="true">
          </view>
       </extension>
@@ -855,6 +857,16 @@
             </view>
             <viewShortcut
                   id="org.key_project.sed.key.ui.view.SymbolicExecutionProofSearchStragyView">
+            </viewShortcut>
+            <view
+                  id="org.key_project.sed.key.ui.ProofView"
+                  minimized="false"
+                  relationship="stack"
+                  relative="org.eclipse.ui.views.PropertySheet"
+                  visible="true">
+            </view>
+            <viewShortcut
+                  id="org.key_project.sed.key.ui.ProofView">
             </viewShortcut>
          </perspectiveExtension>
       </extension>

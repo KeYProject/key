@@ -63,16 +63,14 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * the view based on the {@link IDebugView} providing the possibility to apply rules manually.
+ * The view based on the {@link IDebugView} which shows the {@link Proof}.
  * @author Seena Vellaramkalayil
- *
  */
-public class ManualView extends AbstractViewBasedView {
-   
+public class ProofView extends AbstractViewBasedView {   
    /**
     * the unique id of this view.
     */
-   public static final String VIEW_ID = "org.key_project.sed.key.ui.view.ManualView";
+   public static final String VIEW_ID = "org.key_project.sed.key.ui.ProofView";
    
    /**
     * the {@link SashForm} to divide {@link TreeViewer} and {@link SourceViewer}.
@@ -287,7 +285,7 @@ public class ManualView extends AbstractViewBasedView {
 	/**
 	 * the constructor of the class.
 	 */
-	public ManualView() {
+	public ProofView() {
 	   ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
       if (service != null) {
          Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
@@ -348,8 +346,8 @@ public class ManualView extends AbstractViewBasedView {
 	}
 
 	/**
-	 * sets the value of {@link ManualView#isManualRule}.
-	 * @param b the boolean to set {@link ManualView#isManualRule} to
+	 * sets the value of {@link ProofView#isManualRule}.
+	 * @param b the boolean to set {@link ProofView#isManualRule} to
 	 */
 	public void setManualRule(boolean b) {
 		isManualRule = b;
@@ -516,7 +514,7 @@ public class ManualView extends AbstractViewBasedView {
 
    
    /**
-    * Updates the providers of {@link ManualView#getTreeViewer()} and {@link ManualView#getSourceViewer()}
+    * Updates the providers of {@link ProofView#getTreeViewer()} and {@link ProofView#getSourceViewer()}
     * and creates context menus. Selection is set to root.
     */
    protected void updateViewer() {
@@ -638,7 +636,7 @@ public class ManualView extends AbstractViewBasedView {
     * @return String id of the context menu
     */
    protected String getSourceViewerMenuId() {
-      return "org.key_project.sed.key.ui.ManualView.popup";
+      return VIEW_ID + ".popup";
    }
 
    
@@ -666,7 +664,7 @@ public class ManualView extends AbstractViewBasedView {
 
       @Override
       public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-         if (selection instanceof IStructuredSelection && part instanceof ManualView) {
+         if (selection instanceof IStructuredSelection && part instanceof ProofView) {
             Object selectedObj = SWTUtil.getFirstElement(selection);
             if (selectedObj instanceof Node) {
                Node node = (Node) selectedObj;

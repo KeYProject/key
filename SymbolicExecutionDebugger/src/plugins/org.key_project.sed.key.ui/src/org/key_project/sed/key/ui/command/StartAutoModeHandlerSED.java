@@ -7,13 +7,13 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.IViewPart;
 import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandler;
 import org.key_project.keyide.ui.job.AbstractKeYEnvironmentJob;
-import org.key_project.sed.key.ui.view.ManualView;
+import org.key_project.sed.key.ui.view.ProofView;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 
 /**
- * Class to handle the start auto mode command in the {@link ManualView}.
+ * Class to handle the start auto mode command in the {@link ProofView}.
  * @author Seena Vellaramkalayil
  *
  */
@@ -22,21 +22,21 @@ public class StartAutoModeHandlerSED extends AbstractSaveExecutionHandler {
    @Override
    protected Object doExecute(ExecutionEvent event) throws Exception {
     //initialize values for execution
-    if (WorkbenchUtil.findView(ManualView.VIEW_ID) != null) {
-       IViewPart viewPart = WorkbenchUtil.openView(ManualView.VIEW_ID);
-       if (viewPart instanceof ManualView) {
-         final ManualView manualView = (ManualView) viewPart;
-         if (manualView.getProof() != null) {
-            if (!manualView.getEnvironment().getProofControl().isInAutoMode()
-                && manualView.getProof() != null) {
-               new AbstractKeYEnvironmentJob("Auto Mode", manualView.getEnvironment()) {
+    if (WorkbenchUtil.findView(ProofView.VIEW_ID) != null) {
+       IViewPart viewPart = WorkbenchUtil.openView(ProofView.VIEW_ID);
+       if (viewPart instanceof ProofView) {
+         final ProofView proofView = (ProofView) viewPart;
+         if (proofView.getProof() != null) {
+            if (!proofView.getEnvironment().getProofControl().isInAutoMode()
+                && proofView.getProof() != null) {
+               new AbstractKeYEnvironmentJob("Auto Mode", proofView.getEnvironment()) {
                   // job that starts the automode in KeY
                   @Override
                   protected IStatus run(IProgressMonitor monitor) {
                      monitor.beginTask("Proving with KeY", IProgressMonitor.UNKNOWN);
-                     Proof proof = manualView.getProof();
+                     Proof proof = proofView.getProof();
                      proof.getActiveStrategy(); // Make sure that the strategy is initialized correctly
-                     manualView.getEnvironment().getProofControl().startAndWaitForAutoMode(proof);
+                     proofView.getEnvironment().getProofControl().startAndWaitForAutoMode(proof);
                      monitor.done();
                      return Status.OK_STATUS;
                   }
