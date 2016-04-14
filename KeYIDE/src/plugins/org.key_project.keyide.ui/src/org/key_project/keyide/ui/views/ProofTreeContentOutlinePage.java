@@ -47,7 +47,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.KeYSelectionModel;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -323,6 +322,18 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		}
 	}
 
+   /**
+    * Makes sure that the given {@link Node} is known by the shown
+    * {@link TreeViewer}.
+    * 
+    * @param node
+    *            The {@link Node} to make that is known by the shown
+    *            {@link TreeViewer}.
+    */
+   public void makeSureElementIsLoaded(Node node) {
+      makeSureElementIsLoaded(node, getTreeViewer(), contentProvider);
+   }
+
 	/**
 	 * Makes sure that the given {@link Node} is known by the shown
 	 * {@link TreeViewer}.
@@ -331,13 +342,13 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	 *            The {@link Node} to make that is known by the shown
 	 *            {@link TreeViewer}.
 	 */
-	protected void makeSureElementIsLoaded(Node node) {
+	public static void makeSureElementIsLoaded(Node node, TreeViewer treeViewer, LazyProofTreeContentProvider contentProvider) {
 		// Collect unknown parents
 		Deque<Object> unknownParents = new LinkedList<Object>();
 		boolean unknown = true;
 		Object current = node;
 		while (unknown && current != null) {
-			if (getTreeViewer().testFindItem(current) == null) {
+			if (treeViewer.testFindItem(current) == null) {
 				unknownParents.addFirst(current);
 			} else {
 				unknown = false;

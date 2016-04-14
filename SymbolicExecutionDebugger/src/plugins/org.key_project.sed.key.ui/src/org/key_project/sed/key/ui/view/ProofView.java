@@ -1,19 +1,19 @@
 package org.key_project.sed.key.ui.view;
 
-import java.util.Deque;
-import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.IStateListener;
 import org.eclipse.core.commands.State;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.debug.ui.IDebugView;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -22,7 +22,6 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -31,47 +30,58 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.RegistryToggleState;
-import org.key_project.key4eclipse.common.ui.breakpoints.KeYBreakpointManager;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
-import org.key_project.keyide.ui.handlers.BreakpointToggleHandler;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
+import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
+import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.keyide.ui.handlers.HideIntermediateProofstepsHandler;
 import org.key_project.keyide.ui.handlers.ShowSymbolicExecutionTreeOnlyHandler;
 import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
+import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
 import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.ui.ShowSubtreeOfNodeHandler;
+import org.key_project.sed.key.ui.propertyTester.AutoModePropertyTesterSED;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * The view based on the {@link IDebugView} which shows the {@link Proof}.
  * @author Seena Vellaramkalayil
  */
-public class ProofView extends AbstractViewBasedView {   
+public class ProofView extends AbstractViewBasedView implements IProofProvider {   
    /**
     * the unique id of this view.
     */
    public static final String VIEW_ID = "org.key_project.sed.key.ui.ProofView";
    
+   /**
+    * Contains the registered {@link IProofProviderListener}.
+    */
+   private final List<IProofProviderListener> proofProviderListener = new LinkedList<IProofProviderListener>();
+
    /**
     * the {@link SashForm} to divide {@link TreeViewer} and {@link SourceViewer}.
     */
@@ -91,11 +101,30 @@ public class ProofView extends AbstractViewBasedView {
     * the {@link IDebugView} this view is based on.
     */
    private IViewPart baseView;
+   
+   /**
+    * The selected {@link IKeYSENode} in {@link #baseView}.
+    */
+   private IKeYSENode<?> baseViewNode;
 
    /**
     * the loaded {@link Proof}.
     */
    private Proof proof;
+
+   /**
+    * Listens for dispose changes on {@link #proof}.
+    */
+   private final ProofDisposedListener proofDisposedListener = new ProofDisposedListener() {
+      @Override
+      public void proofDisposing(ProofDisposedEvent e) {
+      }
+      
+      @Override
+      public void proofDisposed(ProofDisposedEvent e) {
+         handleProofDisposed(e);
+      }
+   };
 
    /**
     * the {@link LazyProofTreeContentProvider} of the treeViewer.
@@ -123,28 +152,7 @@ public class ProofView extends AbstractViewBasedView {
    private IProject currentProject;
    
    /**
-    * the currently selected node.
-    */
-   private Node selectedNode;
-   
-   /**
-    * the flag indicating whether there is a new proof loaded or not.
-    */
-   private boolean newProof;
-   
-   /**
-    * the flag indicating if a rule was manually applied or not.
-    */
-   private boolean isManualRule;
-   
-   /**
-    * {@code true} if rule was applied manually and debugView is not updated yet, {@code false} otherwise.
-    * Is needed so that selection is not updated twice after manual rule application.
-    */
-   private boolean beforeBaseViewUpdate;
-   
-   /**
-	 * The {@link State} which indicates hiding or showing of intermediate proofsteps.
+	 * The {@link State} which indicates hiding or showing of intermediate proof steps.
 	 */
 	private State hideState;
 	
@@ -152,11 +160,6 @@ public class ProofView extends AbstractViewBasedView {
 	 * the {@link State} for the show symbolic execution tree only outline filter.
 	 */
 	private State symbolicState;
-   
-	/**
-	 * the {@link State} for stopping at breakpoints while auto mode is running. 
-	 */
-	private State breakpointState;
 	
 	/**
 	 * the {@link State} for showing the subtree of a node.
@@ -171,19 +174,17 @@ public class ProofView extends AbstractViewBasedView {
    /**
     * the {@link ISelectionChangedListener} for the {@link IDebugView}.
     */
-   private ISelectionChangedListener baseViewListener = new ISelectionChangedListener() {
-
+   private final ISelectionChangedListener baseViewListener = new ISelectionChangedListener() {
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
-         handleSelectionChanged(event.getSelection());
+         handleBaseViewSelectionChanged(event.getSelection());
       }
    };
    
    /**
     * the {@link AutoModeListener}.
     */
-   private AutoModeListener autoModeListener = new AutoModeListener() {
-
+   private final AutoModeListener autoModeListener = new AutoModeListener() {
       @Override
       public void autoModeStarted(ProofEvent e) {
          handleAutoModeStarted(e);
@@ -198,7 +199,7 @@ public class ProofView extends AbstractViewBasedView {
    /**
     * the {@link IMenuListener} listening to actions on the context menu of the sourceViewer.
     */
-   private IMenuListener contextMenuListener = new IMenuListener() {
+   private final IMenuListener contextMenuListener = new IMenuListener() {
       /**
        * {@inheritDoc}
        */
@@ -213,8 +214,7 @@ public class ProofView extends AbstractViewBasedView {
    /**
 	 * The {@link IStateListener} to sync the hide intermediate proof steps toggleState with the outline page.
 	 */
-	private IStateListener hideStateListener = new IStateListener() {
-
+	private final IStateListener hideStateListener = new IStateListener() {
 		@Override
 		public void handleStateChange(State state, Object oldValue) {
 		   contentProvider.setHideState((boolean) state.getValue());
@@ -225,7 +225,7 @@ public class ProofView extends AbstractViewBasedView {
 	/**
 	 * the {@link IStateListener} to sync the show symbolic execution tree only toggleState with the outline page.
 	 */
-	private IStateListener symbolicStateListener = new IStateListener() {
+	private final IStateListener symbolicStateListener = new IStateListener() {
 	   /**
 	    * {@inheritDoc}
 	    */
@@ -237,23 +237,9 @@ public class ProofView extends AbstractViewBasedView {
 	};
 	
 	/**
-	 * the {@link IStateListener} to listen to changes on the breakpointState.
-	 */
-	private IStateListener breakpointStateListener = new IStateListener() {
-	   /**
-	    * {@inheritDoc}
-	    */
-	   @Override
-      public void handleStateChange(State state, Object oldValue) {
-         handleBreakpointStateChanged(state, oldValue);
-      }
-	   
-	};
-	
-	/**
 	 * the {@link IStateListener} to listen to changes on the subtreeState.
 	 */
-	private IStateListener subtreeStateListener = new IStateListener() {
+	private final IStateListener subtreeStateListener = new IStateListener() {
 	   /**
 	    * {@inheritDoc}
 	    */
@@ -263,16 +249,10 @@ public class ProofView extends AbstractViewBasedView {
       }
 	};
 	
-
-	/**
-	 * the {@link KeYBreakpointManager} managing the available breakpoints.
-	 */
-	private KeYBreakpointManager breakpointManager;
-	
 	/**
 	 * the {link RuleAppListener} listening to rule applications.
 	 */
-	private RuleAppListener ruleAppListener = new RuleAppListener() {
+	private final RuleAppListener ruleAppListener = new RuleAppListener() {
 		/**
 		 * {@inheritDoc}
 		 */
@@ -302,13 +282,6 @@ public class ProofView extends AbstractViewBasedView {
             	symbolicState.addListener(symbolicStateListener);
             }
          }
-         Command breakpointCmd = service.getCommand(BreakpointToggleHandler.COMMAND_ID);
-            if (breakpointCmd != null) {
-               breakpointState = breakpointCmd.getState(RegistryToggleState.STATE_ID);
-               if (breakpointState != null) {
-                  breakpointState.addListener(breakpointStateListener);
-               }
-            }
          Command subtreeCmd = service.getCommand(ShowSubtreeOfNodeHandler.COMMAND_ID);
             if (subtreeCmd != null) {
                subtreeState = subtreeCmd.getState(RegistryToggleState.STATE_ID);
@@ -317,40 +290,23 @@ public class ProofView extends AbstractViewBasedView {
                }
             }
       }
-      beforeBaseViewUpdate = false;
-	   setManualRule(false);
 	}
-	
-	/**
+
+   /**
 	 * handles the {@link ProofEvent} when a rule is applied manually. Updates selection.
 	 * @param e the {@link ProofEvent} to handle
 	 */
 	protected void handleRuleApplied(ProofEvent e) {
-	   
-		if (!getProof().closed() && isManualRule) {
-		   updateSelectedNodeThreadSafe();
-			Iterator<Node> iterator = selectedNode.childrenIterator();
-			Node newSelectedNode = selectedNode;
-			while (iterator.hasNext()) {
-				Node child = iterator.next();
-				if (child.leaf()) {
-					newSelectedNode = child;
-				}
-			}
-			selectNodeThreadSafe(newSelectedNode);
-			setManualRule(false);
-			//don't listen to selection changes on baseView
-			beforeBaseViewUpdate = true;
-		}
-		
-	}
-
-	/**
-	 * sets the value of {@link ProofView#isManualRule}.
-	 * @param b the boolean to set {@link ProofView#isManualRule} to
-	 */
-	public void setManualRule(boolean b) {
-		isManualRule = b;
+	   Node selectedNode = getSelectedNode();
+	   if (selectedNode != null) {
+	      Node newNode = selectedNode;
+	      while (!newNode.leaf()) {
+	         newNode = newNode.child(0);
+	      }
+	      if (selectedNode != newNode) {
+	         selectNodeThreadSafe(newNode);
+	      }
+	   }
 	}
 	
 	/**
@@ -360,21 +316,10 @@ public class ProofView extends AbstractViewBasedView {
 	 */
 	protected void handleHideSymbolicStateChanged(State state, Object oldValue) {
 		Node currentSelection = getSelectedNode();
-		getTreeViewer().setInput(proof);
+		treeViewer.setInput(proof);
 		if (currentSelection != null) {
 		   selectNodeThreadSafe(currentSelection);
 		}
-	}
-
-	/**
-	 * handles a change in breakpointState.
-	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
-	 * @param oldValue The old value; may be anything.
-	 */
-	protected void handleBreakpointStateChanged(State state, Object oldValue) {
-	   if (state.getValue() instanceof Boolean) {
-	      breakpointManager.setEnabled((boolean) state.getValue());
-	   } 
 	}
 	
 	/**
@@ -387,13 +332,13 @@ public class ProofView extends AbstractViewBasedView {
    	  if ((boolean) state.getValue()) {
    	     filterNode = getSelectedNode();
    	     contentProvider.setShowSubtreeState(true, filterNode);
-	        getTreeViewer().setInput(filterNode.proof());
+	        treeViewer.setInput(filterNode.proof());
    	     
    	  } else {
    	     Node currentSelection = getSelectedNode();
    	     contentProvider.setShowSubtreeState(false, proof.root());
-   	     getTreeViewer().setInput(proof);
-   	     if (!newProof && !(boolean) hideState.getValue()) {
+   	     treeViewer.setInput(proof);
+   	     if (!(boolean) hideState.getValue()) {
    	        selectNodeThreadSafe(currentSelection);
    	     }
    	     filterNode = proof.root();
@@ -408,107 +353,186 @@ public class ProofView extends AbstractViewBasedView {
    public void createPartControl(Composite parent) {
       parentComposite = new SashForm(parent, SWT.HORIZONTAL);
       //create tree viewer
-      this.treeViewer = new TreeViewer(parentComposite, SWT.SINGLE | SWT.H_SCROLL
-            | SWT.V_SCROLL | SWT.VIRTUAL | SWT.BORDER);
-      getTreeViewer().setUseHashlookup(true);
+      this.treeViewer = new TreeViewer(parentComposite, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL | SWT.BORDER);
+      treeViewer.setUseHashlookup(true);
       this.contentProvider = new LazyProofTreeContentProvider();
       contentProvider.setHideState((boolean) hideState.getValue());
       contentProvider.setSymbolicState((boolean) symbolicState.getValue());
       subtreeState.setValue(false);
-      getTreeViewer().setContentProvider(contentProvider);
+      treeViewer.setContentProvider(contentProvider);
+      treeViewer.addSelectionChangedListener(treeViewerSelectionListener);
       //create source viewer
-      this.sourceViewer = new SourceViewer(parentComposite, null, SWT.MULTI | SWT.BORDER
-            | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
-      getSourceViewer().setEditable(false);
+      this.sourceViewer = new SourceViewer(parentComposite, null, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
+      sourceViewer.setEditable(false);
       parentComposite.setWeights(new int[]{15, 85}); 
       parentComposite.setOrientation(SWT.HORIZONTAL);
       FormData data = new FormData();
-      getSourceViewer().getControl().setLayoutData(data);
-      sourceViewerDecorator = new ProofSourceViewerDecorator(getSourceViewer());
-      getSite().setSelectionProvider(getTreeViewer());
+      sourceViewer.getControl().setLayoutData(data);
+      sourceViewerDecorator = new ProofSourceViewerDecorator(sourceViewer);
+      getSite().setSelectionProvider(treeViewer);
       //update viewers if debugView is already open
-      if (getProof() != null && environment != null && baseView != null) {
-         updateViewer();
+      updateViewer();
+      createTreeViewerContextMenu();
+      createSourceViewerContextMenu();
+   }
+   
+   /**
+    * method to create the context menu shown on this view's tree viewer.
+    */
+   protected void createTreeViewerContextMenu() {
+      MenuManager menuManager = new MenuManager("Outline popup", "org.key_project.keyide.ui.view.outline.popup");
+      Menu menu = menuManager.createContextMenu(treeViewer.getControl());
+      treeViewer.getControl().setMenu(menu);
+      getSite().registerContextMenu("org.key_project.keyide.ui.view.outline.popup", menuManager, treeViewer);
+   }
+   
+   /**
+    * method to create the context menu containing the available rules to apply on the proof.
+    */
+   protected void createSourceViewerContextMenu() {
+      StyledText styledText = sourceViewer.getTextWidget();
+      MenuManager menuMgr = new MenuManager(getSourceViewerMenuId(), getSourceViewerMenuId());
+      menuMgr.setRemoveAllWhenShown(true);
+      menuMgr.addMenuListener(contextMenuListener);
+      Menu menu = menuMgr.createContextMenu(styledText);
+      styledText.setMenu(menu);
+      getSite().registerContextMenu(getSourceViewerMenuId(), menuMgr, sourceViewer);
+   }
+
+   /**
+    * When the selection on {@link #treeViewer} has changed.
+    * @param event The selection changed event.
+    */
+   protected void handleTreeViewerSelectionChanged(SelectionChangedEvent event) {
+      Node node = getNode(event.getSelection());
+      if (node != null) {
+         sourceViewerDecorator.showNode(node, SymbolicExecutionUtil.createNotationInfo(getProof()));
       }
-      getSite().getPage().addSelectionListener(selectionListener);
+      else {
+         sourceViewerDecorator.showNode(null, SymbolicExecutionUtil.createNotationInfo((Node) null));
+      }
+   }
+   
+   /**
+    * When the current proof was disposed.
+    * @param e The {@link ProofDisposedEvent}.
+    */
+   protected void handleProofDisposed(ProofDisposedEvent e) {
+      if (treeViewer != null && !treeViewer.getControl().isDisposed()) {
+         treeViewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               changeProof(null, null, null, baseViewNode);
+            }
+         });
+      }
    }
    
    /**
     * changes the currently shown proof if there is a selection change on the {@link DebugView}.
     * @param selection the current selection on {@link DebugView}
     */
-   protected void handleSelectionChanged(ISelection selection) {
-      //make sure that this is no update after manual rule application
-      if (!beforeBaseViewUpdate) {
-         Assert.isNotNull(selection);
-         Object[] elements = SWTUtil.toArray(selection);
-         for (Object element: elements) {
+   protected void handleBaseViewSelectionChanged(ISelection selection) {
+      // Find selected elements of interest (first selected IKeYSENode or a KeYDebugTarget otherwise)
+      Object[] elements = SWTUtil.toArray(selection);
+      KeYDebugTarget keyTarget = null;
+      IKeYSENode<?> seNode = null;
+      if (elements != null) {
+         int i = 0;
+         while (i < elements.length && seNode == null) {
+            Object element = elements[i];
             if (element instanceof ILaunch) {
                element = ((ILaunch) element).getDebugTarget();
             }
-            if (element instanceof IDebugElement) {
-               IDebugTarget target = ((IDebugElement) element).getDebugTarget();
-               if (target instanceof KeYDebugTarget) {
-                  KeYDebugTarget keyTarget = (KeYDebugTarget) target;
-                  //update only if selected target is not terminated
-                  if (!keyTarget.isTerminated()) {
-      	        	   if (getProof() != null && !getProof().isDisposed()) {
-      	        	      getProof().removeRuleAppListener(ruleAppListener);
-      	        	      DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(breakpointManager);
-      	        	      if (!getProof().equals(keyTarget.getProof())) {
-      	        	         newProof = true;
-      	        	      }
-      	        	   } else {
-      	        	      newProof = true;
-      	        	   }
-                     this.proof = keyTarget.getProof();
-                     if (newProof && contentProvider != null) {
-                        subtreeState.setValue(false);
-                        contentProvider.setShowSubtreeState(false, proof.root());
-                     }
-                     this.environment = keyTarget.getEnvironment();
-                     if (keyTarget.getMethod() != null) {
-                        this.currentProject = keyTarget.getMethod().getResource().getProject();
-                     } else {
-                        this.currentProject = null;
-                     }
-                     environment.getProofControl().setMinimizeInteraction(true);
-                     if (getTreeViewer() != null && getSourceViewer() != null) {
-                        updateViewer();
-                     }
-                     getProof().addRuleAppListener(ruleAppListener);
-                     breakpointManager = new KeYBreakpointManager(getProof());
-                     DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
-                  } else {
-                     proof = null;
-                     environment = null;
-                     return;
-                  }
+            if (element instanceof IKeYSENode<?>) {
+               IKeYSENode<?> node = (IKeYSENode<?>) element;
+               KeYDebugTarget target = node.getDebugTarget();
+               if (!target.isTerminated()) {
+                  seNode = node;
+                  keyTarget = target;
                }
-               if (element instanceof IKeYSENode<?>) {
-                  //select associated node in the view
-                  if (!(boolean) hideState.getValue()) {
-                     IKeYSENode<?> seNode = (IKeYSENode<?>) element;
-                     if (getTreeViewer() != null && getSourceViewer() != null) {
-                        Node keyNode = seNode.getExecutionNode().getProofNode();
-                        if (!(boolean) subtreeState.getValue()) {
-                           selectNodeThreadSafe(keyNode);
-                        } else if (keyNode.serialNr() >= filterNode.serialNr()) {
-                           selectNodeThreadSafe(keyNode);
-                        }
-                     }
-                  }
+            }
+            else if (element instanceof IDebugElement) {
+               IDebugTarget target = ((IDebugElement) element).getDebugTarget();
+               if (target instanceof KeYDebugTarget && !target.isTerminated()) {
+                  keyTarget = (KeYDebugTarget) target;
+               }
+            }
+            i++;
+         }
+      }
+      // Get new proof and its environment
+      Proof newProof = null;
+      SymbolicExecutionEnvironment<?> newEnvironment = null;
+      IMethod newMethod = null;
+      if (keyTarget != null) {
+         newProof = keyTarget.getProof();
+         newEnvironment = keyTarget.getEnvironment();
+         newMethod = keyTarget.getMethod();
+      }
+      // Replace content.
+      changeProof(newProof, newEnvironment, newMethod, seNode);
+   }
+   
+   /**
+    * Updates the shown proof.
+    * @param newProof The new {@link Proof}.
+    * @param newEnvironment The new {@link SymbolicExecutionEnvironment}.
+    * @param newMethod The new {@link IMethod}.
+    * @param seNode The {@link IKeYSENode}.
+    */
+   protected void changeProof(Proof newProof, 
+                              SymbolicExecutionEnvironment<?> newEnvironment, 
+                              IMethod newMethod, 
+                              IKeYSENode<?> seNode) {
+      // Replace content if needed
+      if (newProof != proof) {
+         // Remove listener from old proof
+         if (environment != null) {
+            environment.getProofControl().removeAutoModeListener(autoModeListener);
+         }
+         if (proof != null && !proof.isDisposed()) {
+            proof.removeProofDisposedListener(proofDisposedListener);
+            proof.removeRuleAppListener(ruleAppListener);
+         }
+         // Add listener to new proof
+         proof = newProof;
+         environment = newEnvironment;
+         if (environment != null) {
+            environment.getProofControl().addAutoModeListener(autoModeListener);
+            environment.getProofControl().setMinimizeInteraction(true);
+         }
+         if (proof != null && !proof.isDisposed()) {
+            subtreeState.setValue(false);
+            contentProvider.setShowSubtreeState(false, proof.root());
+            proof.addProofDisposedListener(proofDisposedListener);
+            proof.addRuleAppListener(ruleAppListener);
+         }
+         if (newMethod != null) {
+            this.currentProject = newMethod.getResource().getProject();
+         }
+         else {
+            this.currentProject = null;
+         }
+         if (treeViewer != null && sourceViewer != null) {
+            updateViewer();
+         }
+         fireCurrentProofsChanged(new ProofProviderEvent(this, getCurrentProofs(), getCurrentProof(), getUI(), getEnvironment()));
+      }
+      // Update selection
+      if (seNode != baseViewNode) {
+         baseViewNode = seNode;
+         if (seNode != null && !(boolean) hideState.getValue()) {
+            if (treeViewer != null && sourceViewer!= null) {
+               Node keyNode = seNode.getExecutionNode().getProofNode();
+               if (!(boolean) subtreeState.getValue()) {
+                  selectNodeThreadSafe(keyNode);
+               }
+               else if (keyNode.serialNr() >= filterNode.serialNr()) {
+                  selectNodeThreadSafe(keyNode);
                }
             }
          }
-         if (elements.length == 0 && getTreeViewer() != null && sourceViewerDecorator != null) {
-            //if proof was removed after termination show nothing
-            getTreeViewer().setInput(null);
-            sourceViewerDecorator.showNode(null, null);
-         }
-      } else {
-         //reset flag
-         beforeBaseViewUpdate = false;
       }
    }
 
@@ -518,48 +542,30 @@ public class ProofView extends AbstractViewBasedView {
     * and creates context menus. Selection is set to root.
     */
    protected void updateViewer() {
-      Assert.isNotNull(getTreeViewer());
-      Assert.isNotNull(getSourceViewer());
+      Assert.isNotNull(treeViewer);
+      Assert.isNotNull(sourceViewer);
       Assert.isNotNull(sourceViewerDecorator);
-      getTreeViewer().setInput(getProof());
-      this.labelProvider = new ProofTreeLabelProvider(getTreeViewer(), environment.getProofControl(), getProof());
-      getTreeViewer().setLabelProvider(labelProvider);
-      contentProvider.injectTopLevelElements();
-      createTreeViewerContextMenu();
-      //set default selection to root
-      if (!(boolean) hideState.getValue() || newProof) {
-         if (!(boolean) subtreeState.getValue()) {
-            selectNodeThreadSafe(proof.root());
-         } else {
-            selectNodeThreadSafe(filterNode);
+      if (proof != null) {
+         treeViewer.setInput(proof);
+         if (labelProvider != null) {
+            labelProvider.dispose();
          }
-         newProof = false;
+         labelProvider = new ProofTreeLabelProvider(treeViewer, environment.getProofControl(), proof);
+         treeViewer.setLabelProvider(labelProvider);
+         contentProvider.injectTopLevelElements();
+         //set default selection to root
+         if (!(boolean) hideState.getValue() || getSelectedNode() == null) {
+            if (!(boolean) subtreeState.getValue()) {
+               selectNodeThreadSafe(proof.root());
+            } else {
+               selectNodeThreadSafe(filterNode);
+            }
+         }
       }
-      getSourceViewer().getControl().setSize(1000,1000);
-      createSourceViewerContextMenu();
-   }
-   
-   /**
-    * method to create the context menu shown on this view's tree viewer.
-    */
-   private void createTreeViewerContextMenu() {
-      MenuManager menuManager = new MenuManager("Outline popup", "org.key_project.keyide.ui.view.outline.popup");
-      Menu menu = menuManager.createContextMenu(getTreeViewer().getControl());
-      getTreeViewer().getControl().setMenu(menu);
-      getSite().registerContextMenu("org.key_project.keyide.ui.view.outline.popup", menuManager, getTreeViewer());
-   }
-   
-   /**
-    * method to create the context menu containing the available rules to apply on the proof.
-    */
-   private void createSourceViewerContextMenu() {
-      StyledText styledText = getSourceViewer().getTextWidget();
-      MenuManager menuMgr = new MenuManager(getSourceViewerMenuId(), getSourceViewerMenuId());
-      menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(contextMenuListener);
-      Menu menu = menuMgr.createContextMenu(styledText);
-      styledText.setMenu(menu);
-      getSite().registerContextMenu(getSourceViewerMenuId(), menuMgr, getSourceViewer());
+      else {
+         treeViewer.setInput(null);
+      }
+      sourceViewer.getTextWidget().layout();
    }
 
    /**
@@ -567,10 +573,10 @@ public class ProofView extends AbstractViewBasedView {
     * @param e the {@link ProofEvent} to handle
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      getSite().getPage().addSelectionListener(selectionListener);
-      if (baseView != null) {
-         baseView.getSite().getSelectionProvider().addSelectionChangedListener(baseViewListener);
-     }
+      if (proof != null) {
+         proof.addRuleAppListener(ruleAppListener);
+      }
+      AutoModePropertyTesterSED.updateProperties();
    }
 
    /**
@@ -578,10 +584,10 @@ public class ProofView extends AbstractViewBasedView {
     * @param e the {@link ProofEvent} to handle
     */
    protected void handleAutoModeStarted(ProofEvent e) {
-      if (getProof() != null) {
-         getSite().getPage().removeSelectionListener(selectionListener);
-         baseView.getSite().getSelectionProvider().removeSelectionChangedListener(baseViewListener);
+      if (proof != null) {
+         proof.removeRuleAppListener(ruleAppListener);
       }
+      AutoModePropertyTesterSED.updateProperties();
    }
 
    /**
@@ -589,6 +595,9 @@ public class ProofView extends AbstractViewBasedView {
     */
    @Override
    public void setFocus() {
+      if (treeViewer != null && !treeViewer.getControl().isDisposed()) {
+         treeViewer.getControl().setFocus();
+      }
    }
    
    /**
@@ -599,11 +608,18 @@ public class ProofView extends AbstractViewBasedView {
       if (parentComposite != null) {
          parentComposite.dispose();
       }
-      if (getTreeViewer() != null) {
-         getTreeViewer().getControl().dispose();
+      if (treeViewer != null) {
+         treeViewer.removeSelectionChangedListener(treeViewerSelectionListener);
+         treeViewer.getControl().dispose();
       }
-      if (getSourceViewer() != null) {
-         getSourceViewer().getControl().dispose();
+      if (labelProvider != null) {
+         labelProvider.dispose();
+      }
+      if (contentProvider != null) {
+         contentProvider.dispose();
+      }
+      if (sourceViewer != null) {
+         sourceViewer.getControl().dispose();
       }
       if (environment != null) {
          environment.getProofControl().removeAutoModeListener(autoModeListener);
@@ -611,23 +627,16 @@ public class ProofView extends AbstractViewBasedView {
       if (baseView != null) {
          baseView.getSite().getSelectionProvider().removeSelectionChangedListener(baseViewListener);
       }
-      if (getProof() != null && !getProof().isDisposed()) {
-    	  getProof().removeRuleAppListener(ruleAppListener);
+      if (proof != null && !proof.isDisposed()) {
+         proof.removeProofDisposedListener(proofDisposedListener);
+         proof.removeRuleAppListener(ruleAppListener);
       }
       if (hideState != null) {
     	  hideState.removeListener(hideStateListener);
       }
       if (symbolicState != null) {
     	  symbolicState.removeListener(symbolicStateListener);
-      }	
-      if (breakpointState != null) {
-         breakpointState.removeListener(breakpointStateListener);
-      }
-      if (breakpointManager != null) {
-         DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(breakpointManager);
-      }
-      getSite().getPage().removeSelectionListener(selectionListener);
-      
+      }      
       super.dispose();
    }
    
@@ -649,34 +658,12 @@ public class ProofView extends AbstractViewBasedView {
    }
    
    /**
-    * returns the environment of the proof.
-    * @return {@link KeYEnvironment<?>} the environment
+    * Listens for selection changes on {@link #treeViewer}.
     */
-   public KeYEnvironment<?> getEnvironment() {
-      return environment;
-   }
-   
-   
-   /**
-    * the selection listener. Listens to changes on the treeViewer so that content of sourceViewer is the same.
-    */
-   private final ISelectionListener selectionListener = new ISelectionListener() {
-
+   private final ISelectionChangedListener treeViewerSelectionListener = new ISelectionChangedListener() {
       @Override
-      public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-         if (selection instanceof IStructuredSelection && part instanceof ProofView) {
-            Object selectedObj = SWTUtil.getFirstElement(selection);
-            if (selectedObj instanceof Node) {
-               Node node = (Node) selectedObj;
-               if (getProof().find(node)) {
-                  sourceViewerDecorator.showNode(node, SymbolicExecutionUtil.createNotationInfo(getProof()));
-               } 
-            }  else if (selectedObj instanceof BranchFolder) {
-               BranchFolder bf = (BranchFolder) selectedObj;
-               Node node = bf.getChild();
-               sourceViewerDecorator.showNode(node, SymbolicExecutionUtil.createNotationInfo(getProof()));
-            }
-         } 
+      public void selectionChanged(SelectionChangedEvent event) {
+         handleTreeViewerSelectionChanged(event);
       }
    };
 
@@ -684,12 +671,8 @@ public class ProofView extends AbstractViewBasedView {
     * {@inheritDoc}
     */
    @Override
-   protected boolean shouldHandleBaseViewReference(
-         IViewReference baseViewReference) {
-      if (IDebugUIConstants.ID_DEBUG_VIEW.equals(baseViewReference.getId())) {
-         return true;
-      }
-      return false;
+   protected boolean shouldHandleBaseViewReference(IViewReference baseViewReference) {
+      return IDebugUIConstants.ID_DEBUG_VIEW.equals(baseViewReference.getId());
    }
 
    /**
@@ -704,8 +687,7 @@ public class ProofView extends AbstractViewBasedView {
     * {@inheritDoc}
     */
    @Override
-   protected void handleBaseViewChanged(IViewPart oldBaseView,
-         IViewPart newBaseView) {
+   protected void handleBaseViewChanged(IViewPart oldBaseView, IViewPart newBaseView) {
       if (oldBaseView != null) {
          oldBaseView.getSite().getSelectionProvider().removeSelectionChangedListener(baseViewListener);
       }
@@ -713,65 +695,8 @@ public class ProofView extends AbstractViewBasedView {
          this.baseView = newBaseView;
          ISelectionProvider selectionProvider = baseView.getSite().getSelectionProvider();
          selectionProvider.addSelectionChangedListener(baseViewListener);
-         handleSelectionChanged(selectionProvider.getSelection());
-         
+         handleBaseViewSelectionChanged(selectionProvider.getSelection());
       }
-   }
-   
-   
-   /**
-    * method to make sure that a given {@link Node} is loaded. Is needed because of the filters.
-    * @param node the {@link Node} to check
-    */
-	protected void makeSureElementIsLoaded(Node node) {
-		// Collect unknown parents
-		Deque<Object> unknownParents = new LinkedList<Object>();
-		boolean unknown = true;
-		Object current = node;
-		while (unknown && current != null) {
-			if (getTreeViewer().testFindItem(current) == null) {
-				unknownParents.addFirst(current);
-			} else {
-				unknown = false;
-			}
-			current = contentProvider.getParent(current);
-		}
-		// Inject unknown elements
-		for (Object unknownElement : unknownParents) {
-			Object parent = contentProvider.getParent(unknownElement);
-			int viewIndex = contentProvider.getIndexOf(parent, unknownElement);
-			if (!contentProvider.getHideState() && !contentProvider.getSymbolicState() && !contentProvider.getShowSubtreeState()) {
-				Assert.isTrue(viewIndex >= 0, "Content provider returned wrong parents or child index computation is buggy.");
-				contentProvider.updateChildCount(parent, 0);
-				contentProvider.updateElement(parent, viewIndex);
-			} else if (viewIndex >= 0) {
-				contentProvider.updateChildCount(parent, 0);
-				contentProvider.updateElement(parent, viewIndex);
-			}
-		}
-	}
-   
-	/**
-	 * selects a given {@link Node}. 
-	 * @param node the {@link Node} to select
-	 */
-   protected void selectNode(Node node) {
-	   makeSureElementIsLoaded(node);
-	   
-	   Object parent = contentProvider.getParent(node);
-	   int viewIndex = contentProvider.getIndexOf(parent, node);
-	   
-	   if (viewIndex >= 0) {
-		   getTreeViewer().setSelection(SWTUtil.createSelection(node), true);
-		   sourceViewerDecorator.showNode(node, SymbolicExecutionUtil.createNotationInfo(proof));
-	   } else {
-		   getTreeViewer().setSelection(SWTUtil.createSelection(parent), true);
-		   if (parent instanceof Node) {
-		      sourceViewerDecorator.showNode((Node) parent, SymbolicExecutionUtil.createNotationInfo(proof));
-		   } else if (parent instanceof BranchFolder) {
-		      sourceViewerDecorator.showNode(((BranchFolder) parent).getChild(), SymbolicExecutionUtil.createNotationInfo(proof));
-		   }
-	   }
    }
    
    /**
@@ -779,61 +704,50 @@ public class ProofView extends AbstractViewBasedView {
     * @param node the {@link Node} to select
     */
    protected void selectNodeThreadSafe(final Node node) {
-	   
-	   if (!treeViewer.getControl().getDisplay().isDisposed()) {
-		   treeViewer.getControl().getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					if (!treeViewer.getControl().isDisposed()) {
-						selectNode(node);
-					}
-				}
-			});
-		}
-   }
-   
-   /**
-    * method to update local variable selectedNode thread safe.
-    */
-   private void updateSelectedNodeThreadSafe() {
       if (!treeViewer.getControl().getDisplay().isDisposed()) {
          treeViewer.getControl().getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
                if (!treeViewer.getControl().isDisposed()) {
-                  updateSelectedNode();
+                  selectNode(node);
                }
             }
          });
       }
    }
    
-   /**
-    * updates local variable selectedNode.
-    */
-   private void updateSelectedNode() {
-      if (getTreeViewer().getSelection() != null) {
-         Object selection = SWTUtil.getFirstElement(getTreeViewer().getSelection());
-         if (selection instanceof Node) {
-            selectedNode = (Node) selection;
-         } else if (selection instanceof BranchFolder) {
-            selectedNode = ((BranchFolder) selection).getChild();
-         } else {
-            selectedNode = null;
-         }
-      } else {
-         selectedNode = null;
-      }
+	/**
+	 * selects a given {@link Node}. 
+	 * @param node the {@link Node} to select
+	 */
+   protected void selectNode(Node node) {
+      ProofTreeContentOutlinePage.makeSureElementIsLoaded(node, treeViewer, contentProvider);
+      treeViewer.setSelection(SWTUtil.createSelection(node), true);
    }
    
-   
    /**
-    * returns the currently selected node.
+    * Returns the currently selected node.
     * @return {@link Node} that is selected on the treeViewer
     */
    public Node getSelectedNode() {
-      updateSelectedNode();
-      return this.selectedNode;
+      return treeViewer != null ? getNode(treeViewer.getSelection()) : null;
+   }
+   
+   /**
+    * Returns the currently selected node.
+    * @return {@link Node} that is selected on the treeViewer
+    */
+   public Node getNode(ISelection selection) {
+      Object selectedObj = SWTUtil.getFirstElement(selection);
+      if (selectedObj instanceof Node) {
+         return (Node) selectedObj;
+      }
+      else if (selectedObj instanceof BranchFolder) {
+         return ((BranchFolder) selectedObj).getChild();
+      }
+      else {
+         return null;
+      }
    }
    
    /**
@@ -843,22 +757,6 @@ public class ProofView extends AbstractViewBasedView {
    public Proof getProof() {
       return proof;
    }
-
-   /**
-    * returns the {@link TreeViewer}.
-    * @return the {@link TreeViewer}
-    */
-   public TreeViewer getTreeViewer() {
-      return treeViewer;
-   }
-   
-   /**
-    * returns the {@link SourceViewer}. 
-    * @return the {@link SourceViewer}
-    */
-   public SourceViewer getSourceViewer() {
-      return sourceViewer;
-   }
    
    /**
     * returns the currently loaded {@link IProject}.
@@ -867,5 +765,75 @@ public class ProofView extends AbstractViewBasedView {
    public IProject getProject() {
       return currentProject;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYEnvironment<?> getEnvironment() {
+      return environment;
+   }
    
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Proof getCurrentProof() {
+      return proof;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Proof[] getCurrentProofs() {
+      return new Proof[] {proof};
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public UserInterfaceControl getUI() {
+      return environment != null ? environment.getUi() : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ProofControl getProofControl() {
+      return environment != null ? environment.getProofControl() : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addProofProviderListener(IProofProviderListener l) {
+      if (l != null) {
+         proofProviderListener.add(l);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeProofProviderListener(IProofProviderListener l) {
+      if (l != null) {
+         proofProviderListener.remove(l);
+      }
+   }
+   
+   /**
+    * Informs all registered {@link IProofProviderListener} about the event.
+    * @param e The {@link ProofProviderEvent}.
+    */
+   protected void fireCurrentProofsChanged(ProofProviderEvent e) {
+      IProofProviderListener[] toInform = proofProviderListener.toArray(new IProofProviderListener[proofProviderListener.size()]);
+      for (IProofProviderListener l : toInform) {
+         l.currentProofsChanged(e);
+      }
+   }
 }

@@ -165,26 +165,6 @@
             name="Generate test cases.">
       </command>
       <command
-            categoryId="org.key_project.keyide.ui.commands.category"
-            description="If selected auto mode will stop at breakpoints and ignore them otherwise."
-            id="org.key_project.sed.key.ui.stopAtBreakpoints"
-            name="Stop At Breakpoints">
-         <state
-               id="org.eclipse.ui.commands.toggleState">
-            <class
-                  class="org.eclipse.ui.handlers.RegistryToggleState">
-               <parameter
-                     name="default"
-                     value="false">
-               </parameter>
-               <parameter
-                     name="persisted"
-                     value="true">
-               </parameter>
-            </class>
-         </state>
-      </command>
-      <command
             categoryId="org.key_project.key4eclipse.common.ui.category"
             description="Shows the subtree with the selected node as the root."
             id="org.key_project.sed.key.ui.showSubtreeCommand"
@@ -230,10 +210,6 @@
          <image
                commandId="org.key_project.sed.key.ui.generateTestCases"
                icon="icons/testGeneration.png">
-         </image>
-         <image
-               commandId="org.key_project.sed.key.ui.stopAtBreakpoints"
-               icon="icons/stopAtBreakpoints.gif">
          </image>
       </extension>
       <extension
@@ -350,7 +326,7 @@
             </enabledWhen>
          </handler>
          <handler
-               class="org.key_project.keyide.ui.handlers.StopAutoModeHandler"
+               class="org.key_project.sed.key.ui.command.StopAutoModeHandlerSED"
                commandId="org.key_project.sed.key.ui.stopAutoModeCommand">
             <enabledWhen>
                <test
@@ -370,10 +346,6 @@
                      value="true">
                </test>
             </enabledWhen>
-         </handler>
-         <handler
-               class="org.key_project.keyide.ui.handlers.BreakpointToggleHandler"
-               commandId="org.key_project.sed.key.ui.stopAtBreakpoints">
          </handler>
          <handler
                class="org.key_project.sed.key.ui.ShowSubtreeOfNodeHandler"
@@ -732,14 +704,6 @@
                   id="org.key_project.sed.key.ui.generateTestCases"
                   label="Generate Test Cases"
                   tooltip="Generate test cases for open goals">
-            </command>
-            <command
-                  commandId="org.key_project.sed.key.ui.stopAtBreakpoints"
-                  icon="icons/stopAtBreakpoints.gif"
-                  id="org.key_project.sed.key.ui.stopAtBreakpoints"
-                  label="Stop At Breakpoints"
-                  style="toggle"
-                  tooltip="Stop at breakpoints">
             </command>
             <command
                   commandId="org.key_project.sed.key.ui.showSubtreeCommand"

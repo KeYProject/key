@@ -10,6 +10,7 @@ import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandle
 import org.key_project.key4eclipse.common.ui.testGeneration.ProofGenerateTestsJob;
 import org.key_project.keyide.ui.editor.KeYEditor;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
@@ -29,12 +30,7 @@ public class GenerateTestCasesHandler extends AbstractSaveExecutionHandler {
          if (editorPart instanceof KeYEditor) {
             KeYEditor editor = (KeYEditor) editorPart;
             if (!editor.getProofControl().isInAutoMode()) {
-               Proof currentProof = editor.getCurrentProof();
-               IProject currentProject = editor.getProject();
-               if (currentProof != null && currentProject != null) {
-                  Job job = new ProofGenerateTestsJob(currentProject, currentProof, editor.getUI());
-                  job.schedule();
-               }
+               generateTestCases(editor.getCurrentProof(), editor.getProject(), editor.getUI());
             }
          }
       }
@@ -42,5 +38,18 @@ public class GenerateTestCasesHandler extends AbstractSaveExecutionHandler {
          MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error", "SMT Solver '" + SolverType.Z3_CE_SOLVER + "' is not available.\nPlease configure the SMT Solver Options in the main window of KeY.");
       }
       return null;
+   }
+   
+   /**
+    * Generate test cases.
+    * @param currentProof The current {@link Proof}.
+    * @param currentProject The current {@link IProject}.
+    * @param ui The {@link UserInterfaceControl} to use.
+    */
+   public static void generateTestCases(Proof currentProof, IProject currentProject, UserInterfaceControl ui) {
+      if (currentProof != null && currentProject != null) {
+         Job job = new ProofGenerateTestsJob(currentProject, currentProof, ui);
+         job.schedule();
+      }
    }
 }
