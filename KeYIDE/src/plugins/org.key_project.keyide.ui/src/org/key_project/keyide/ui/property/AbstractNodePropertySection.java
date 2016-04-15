@@ -14,6 +14,9 @@
 package org.key_project.keyide.ui.property;
 
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.layout.FormAttachment;
@@ -30,6 +33,10 @@ import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.keyide.ui.editor.KeYEditor;
+import org.key_project.keyide.ui.providers.BranchFolder;
+import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -53,7 +60,7 @@ public abstract class AbstractNodePropertySection extends AbstractPropertySectio
    /**
     * The used {@link KeYSelectionListener} to observe {@link #selectionModel}.
     */
-   private KeYSelectionListener selectionListener = new KeYSelectionListener() {
+   private final KeYSelectionListener selectionListener = new KeYSelectionListener() {
       @Override
       public void selectedProofChanged(KeYSelectionEvent e) {
          updateShownContentThreadSave();
@@ -61,6 +68,21 @@ public abstract class AbstractNodePropertySection extends AbstractPropertySectio
       
       @Override
       public void selectedNodeChanged(KeYSelectionEvent e) {
+         updateShownContentThreadSave();
+      }
+   };
+   
+   /**
+    * In case {@link #selectionModel} is {@code null}, this {@link ISelectionProvider} is used instead.
+    */
+   private ISelectionProvider selectionProvider;
+
+   /**
+    * The used {@link ISelectionProvider} to observe {@link #selectionProvider}.
+    */
+   private final ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
+      @Override
+      public void selectionChanged(SelectionChangedEvent event) {
          updateShownContentThreadSave();
       }
    };
@@ -129,12 +151,20 @@ public abstract class AbstractNodePropertySection extends AbstractPropertySectio
          selectionModel.removeKeYSelectionListener(selectionListener);
          selectionModel = null;
       }
+      if (selectionProvider != null) {
+         selectionProvider.removeSelectionChangedListener(selectionChangedListener);
+         selectionProvider = null;
+      }
       part = updatePart(part);
       if (part instanceof KeYEditor) {
          selectionModel = ((KeYEditor) part).getSelectionModel();
          if (selectionModel != null) {
             selectionModel.addKeYSelectionListener(selectionListener);
          }
+      }
+      else {
+         selectionProvider = part.getSite().getSelectionProvider();
+         selectionProvider.addSelectionChangedListener(selectionChangedListener);
       }
       updateShownContent(getSelectedNode());
    }
@@ -169,7 +199,31 @@ public abstract class AbstractNodePropertySection extends AbstractPropertySectio
     * @return The selected {@link Node}.
     */
    protected Node getSelectedNode() {
-      return selectionModel != null ? selectionModel.getSelectedNode() : null;
+      if (selectionModel != null) {
+         return selectionModel.getSelectedNode();
+      }
+      else if (selectionProvider != null) {
+         Object[] elements = SWTUtil.toArray(selectionProvider.getSelection());
+         Object element = ArrayUtil.search(elements, new IFilter<Object>() {
+            @Override
+            public boolean select(Object element) {
+               return element instanceof Node || 
+                      element instanceof BranchFolder;
+            }
+         });
+         if (element instanceof Node) {
+            return (Node) element;
+         }
+         else if (element instanceof BranchFolder) {
+            return ((BranchFolder) element).getChild();
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
+      }
    }
 
    /**
@@ -201,6 +255,9 @@ public abstract class AbstractNodePropertySection extends AbstractPropertySectio
    public void dispose() {
       if (selectionModel != null) {
          selectionModel.removeKeYSelectionListener(selectionListener);
+      }
+      if (selectionProvider != null) {
+         selectionProvider.removeSelectionChangedListener(selectionChangedListener);
       }
       super.dispose();
    }

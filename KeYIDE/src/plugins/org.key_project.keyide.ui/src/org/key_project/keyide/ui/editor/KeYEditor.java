@@ -106,7 +106,7 @@ import de.uka.ilkd.key.util.ProofUserManager;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan K�sdorf, Marco Drebing
  */
-public class KeYEditor extends TextEditor implements IProofProvider, ITabbedPropertySheetPageContributor, IBean {
+public class KeYEditor extends TextEditor implements IProofProvider, ITabbedPropertySheetPageContributor, IBean, IPosInSequentProvider {
    /**
     * The unique ID of this editor.
     */
@@ -116,11 +116,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * The ID of this {@link ITabbedPropertySheetPageContributor}.
     */
    public static final String CONTRIBUTOR_ID = "org.key_project.keyide.ui.KeYPropertyContributor";
-   
-   /**
-    * Property {@link #getSelectedPosInSequent()}.
-    */
-   public static final String PROP_SELECTED_POS_IN_SEQUENT = "selectedPosInSequent";
 
    /**
     * {@code true} can start auto mode, {@code false} is not allowed to start auto mode.
@@ -781,9 +776,9 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    }
    
    /**
-    * Returns the selected {@link PosInSequent}.
-    * @return The selected {@link PosInSequent}.
+    * {@inheritDoc}
     */
+   @Override
    public PosInSequent getSelectedPosInSequent() {
       return viewerDecorator.getSelectedPosInSequent();
    }

@@ -1,5 +1,8 @@
 package org.key_project.sed.key.ui.view;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,10 +39,15 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.RegistryToggleState;
+import org.eclipse.ui.views.properties.IPropertySheetPage;
+import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
+import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
+import org.key_project.keyide.ui.editor.IPosInSequentProvider;
+import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.handlers.HideIntermediateProofstepsHandler;
 import org.key_project.keyide.ui.handlers.ShowSymbolicExecutionTreeOnlyHandler;
 import org.key_project.keyide.ui.providers.BranchFolder;
@@ -52,6 +60,7 @@ import org.key_project.sed.key.ui.ShowSubtreeOfNodeHandler;
 import org.key_project.sed.key.ui.propertyTester.AutoModePropertyTesterSED;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -71,11 +80,16 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The view based on the {@link IDebugView} which shows the {@link Proof}.
  * @author Seena Vellaramkalayil
  */
-public class ProofView extends AbstractViewBasedView implements IProofProvider {   
+public class ProofView extends AbstractViewBasedView implements IProofProvider, ITabbedPropertySheetPageContributor, IPosInSequentProvider {   
    /**
     * the unique id of this view.
     */
    public static final String VIEW_ID = "org.key_project.sed.key.ui.ProofView";
+   
+   /**
+    * The used {@link PropertyChangeSupport}.
+    */
+   private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
    
    /**
     * Contains the registered {@link IProofProviderListener}.
@@ -367,6 +381,12 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
       FormData data = new FormData();
       sourceViewer.getControl().setLayoutData(data);
       sourceViewerDecorator = new ProofSourceViewerDecorator(sourceViewer);
+      sourceViewerDecorator.addPropertyChangeListener(ProofSourceViewerDecorator.PROP_SELECTED_POS_IN_SEQUENT, new PropertyChangeListener() {
+         @Override
+         public void propertyChange(PropertyChangeEvent evt) {
+            handleViewerDecoratorSelectedPosInSequentChanged(evt);
+         }
+      });
       getSite().setSelectionProvider(treeViewer);
       //update viewers if debugView is already open
       updateViewer();
@@ -377,6 +397,14 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
       createSourceViewerContextMenu();
    }
    
+   /**
+    * When the selected {@link PosInSequent} in {@link #sourceViewerDecorator} has changed.
+    * @param evt The event.
+    */
+   protected void handleViewerDecoratorSelectedPosInSequentChanged(PropertyChangeEvent evt) {
+      pcs.firePropertyChange(PROP_SELECTED_POS_IN_SEQUENT, evt.getOldValue(), evt.getNewValue());
+   }
+
    /**
     * method to create the context menu shown on this view's tree viewer.
     */
@@ -398,6 +426,32 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
       Menu menu = menuMgr.createContextMenu(styledText);
       styledText.setMenu(menu);
       getSite().registerContextMenu(getSourceViewerMenuId(), menuMgr, sourceViewer);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
+      if (IPropertySheetPage.class.equals(adapter)) {
+         final TabbedPropertySheetPage pcp = new TabbedPropertySheetPage(this);
+         // Make sure that initial content is shown even if the focus is set to the outline view and not to the editor. 
+         getSite().getShell().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               if (!pcp.getControl().isDisposed()) {
+                  pcp.selectionChanged(ProofView.this, treeViewer.getSelection());
+               }
+            }
+         });
+         return pcp;
+      }
+      else if (IProofProvider.class.equals(adapter)) {
+         return this;
+      }
+      else {
+         return super.getAdapter(adapter);
+      }
    }
 
    /**
@@ -651,9 +705,9 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
 
    
    /**
-    * returns the {@link PosInSequent} that is currently selected.
-    * @return {@link PosInSequent} the position in the sequent that is selected
+    * {@inheritDoc}
     */
+   @Override
    public PosInSequent getSelectedPosInSequent() {
       return sourceViewerDecorator.getSelectedPosInSequent();
    }
@@ -828,5 +882,93 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
       for (IProofProviderListener l : toInform) {
          l.currentProofsChanged(e);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getContributorId() {
+      return KeYEditor.CONTRIBUTOR_ID;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addPropertyChangeListener(PropertyChangeListener listener) {
+      pcs.addPropertyChangeListener(listener);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+      pcs.addPropertyChangeListener(propertyName, listener);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removePropertyChangeListener(PropertyChangeListener listener) {
+      pcs.removePropertyChangeListener(listener);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+      pcs.removePropertyChangeListener(propertyName, listener);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public PropertyChangeListener[] getPropertyChangeListeners() {
+      return pcs.getPropertyChangeListeners();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public PropertyChangeListener[] getPropertyChangeListeners(String propertyName) {
+      return pcs.getPropertyChangeListeners(propertyName);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasListeners() {
+      return getPropertyChangeListeners().length >= 1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasListeners(String propertyName) {
+      return pcs.hasListeners(propertyName);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasListener(PropertyChangeListener listener) {
+      return ArrayUtil.contains(getPropertyChangeListeners(), listener);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasListener(String propertyName, PropertyChangeListener listener) {
+      return ArrayUtil.contains(getPropertyChangeListeners(propertyName), listener);
    }
 }
