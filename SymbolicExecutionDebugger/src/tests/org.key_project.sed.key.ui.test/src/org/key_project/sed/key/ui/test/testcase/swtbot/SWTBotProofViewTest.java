@@ -1,6 +1,5 @@
 package org.key_project.sed.key.ui.test.testcase.swtbot;
 
-
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jdt.core.IJavaProject;
@@ -34,7 +33,6 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 /**
  * Tests the {@link ProofView}.
  * @author Seena Vellaramkalayil
- *
  */
 public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
    
@@ -63,19 +61,19 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
             assertNotNull(proofView.getCurrentProof());
             assertTrue(!proofView.getCurrentProof().closed());
             //make sure that both buttons are visible and correctly enabled
-            assertTrue(view.toolbarButton("Start Auto Mode").isVisible());
-            assertTrue(view.toolbarButton("Start Auto Mode").isEnabled());
-            assertTrue(view.toolbarButton("Stop Auto Mode").isVisible());
-            assertFalse(view.toolbarButton("Stop Auto Mode").isEnabled());
+            assertTrue(view.toolbarButton("Starts the proof auto mode with the current specification.").isVisible());
+            assertTrue(view.toolbarButton("Starts the proof auto mode with the current specification.").isEnabled());
+            assertTrue(view.toolbarButton("Stops the automode.").isVisible());
+            assertFalse(view.toolbarButton("Stops the automode.").isEnabled());
             //start auto mode
-            TestUtilsUtil.clickDirectly(view.toolbarButton("Start Auto Mode"));
+            TestUtilsUtil.clickDirectly(view.toolbarButton("Starts the proof auto mode with the current specification."));
             TestKeYUIUtil.waitWhileAutoMode(bot, proofView.getEnvironment().getUi());
             assertFalse(proofView.getCurrentProof().closed());
-            bot.waitWhile(Conditions.widgetIsEnabled(view.toolbarButton("Stop Auto Mode")));
-            bot.waitUntil(Conditions.widgetIsEnabled(view.toolbarButton("Start Auto Mode")));
+            bot.waitWhile(Conditions.widgetIsEnabled(view.toolbarButton("Stops the automode.")));
+            bot.waitUntil(Conditions.widgetIsEnabled(view.toolbarButton("Starts the proof auto mode with the current specification.")));
             //make sure that auto mode can be started again
-            assertTrue(view.toolbarButton("Start Auto Mode").isEnabled()); 
-            assertFalse(view.toolbarButton("Stop Auto Mode").isEnabled());
+            assertTrue(view.toolbarButton("Starts the proof auto mode with the current specification.").isEnabled()); 
+            assertFalse(view.toolbarButton("Stops the automode.").isEnabled());
             view.close();
          }
 
