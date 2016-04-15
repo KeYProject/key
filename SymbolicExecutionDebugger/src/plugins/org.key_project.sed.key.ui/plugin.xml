@@ -201,11 +201,11 @@
          </image>
          <image
                commandId="org.key_project.sed.key.ui.stopAutoModeCommand"
-               icon="icons/terminatedlaunch_obj.gif">
+               icon="icons/stopAutoMode.gif">
          </image>
          <image
                commandId="org.key_project.sed.key.ui.startAutoModeCommand"
-               icon="icons/nav_go.gif">
+               icon="icons/startAutoMode.gif">
          </image>
          <image
                commandId="org.key_project.sed.key.ui.generateTestCases"
@@ -680,17 +680,17 @@
                locationURI="toolbar:org.key_project.sed.key.ui.ProofView">
             <command
                   commandId="org.key_project.sed.key.ui.startAutoModeCommand"
-                  icon="icons/nav_go.gif"
+                  icon="icons/startAutoMode.gif"
                   id="org.key_project.sed.key.ui.startAutoModeCommand"
                   label="Start Auto Mode"
-                  tooltip="Start Auto Mode">
+                  tooltip="Starts the proof auto mode with the current specification.">
             </command>
             <command
                   commandId="org.key_project.sed.key.ui.stopAutoModeCommand"
-                  icon="icons/terminatedlaunch_obj.gif"
+                  icon="icons/stopAutoMode.gif"
                   id="org.key_project.sed.key.ui.stopAutoModeCommand"
                   label="Stop Auto Mode"
-                  tooltip="Stop Auto Mode">
+                  tooltip="Stops the automode.">
             </command>
             <command
                   commandId="org.key_project.sed.key.ui.generateTestCases"

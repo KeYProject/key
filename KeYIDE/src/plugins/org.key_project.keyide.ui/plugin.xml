@@ -83,11 +83,11 @@
          point="org.eclipse.ui.commandImages">
       <image
             commandId="org.key_project.keyide.ui.commands.startAutoModeCommand"
-            icon="icons/nav_go.gif">
+            icon="icons/startAutoMode.gif">
       </image>
       <image
             commandId="org.key_project.keyide.ui.commands.stopAutoModeCommand"
-            icon="icons/terminatedlaunch_obj.gif">
+            icon="icons/stopAutoMode.gif">
       </image>
       <image
             commandId="org.key_project.keyide.ui.commands.pruneProof"
@@ -260,7 +260,7 @@
                   label="KeY Editor">
                  <command
                        commandId="org.key_project.keyide.ui.commands.startAutoModeCommand"
-                       icon="icons/nav_go.gif"
+                       icon="icons/startAutoMode.gif"
                        id="org.key_project.keyide.ui.commands.startAutoModeCommand"
                        label="Start Auto Mode"
                        tooltip="Start Auto Mode">
@@ -276,7 +276,7 @@
                 </command>
                  <command
                        commandId="org.key_project.keyide.ui.commands.stopAutoModeCommand"
-                       icon="icons/terminatedlaunch_obj.gif"
+                       icon="icons/stopAutoMode.gif"
                        id="org.key_project.keyide.ui.commands.stopAutoModeCommand"
                        label="Stop Auto Mode"
                        style="push">

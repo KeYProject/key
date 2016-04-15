@@ -58,8 +58,8 @@ public class OpenProofHandler extends AbstractHandler {
                                                   keyTarget.getProof(), 
                                                   keyTarget.getEnvironment(), 
                                                   keyTarget.getMethod(),
-                                                  false,
-                                                  false,
+                                                  true,
+                                                  true,
                                                   true,
                                                   false);
                   }

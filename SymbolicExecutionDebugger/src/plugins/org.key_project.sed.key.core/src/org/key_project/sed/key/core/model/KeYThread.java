@@ -184,6 +184,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
       getProof().addProofTreeListener(proofChangedListener);
       target.registerDebugNode(this);
       initializeAnnotations();
+      configureProofForInteractiveVerification();
    }
 
    /**
@@ -394,6 +395,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
+      configureProofForInteractiveVerification();
       if (e.getSource() == getProof() && !getProofControl().isInAutoMode()) { // Sadly auto mode stopped events are misused and do not really indicate that a auto mode has stopped
          try {
             updateExecutionTree(getBuilder());
@@ -525,7 +527,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
     * Runs the auto mode in KeY until the maximal number of set nodes are executed.
     * @param keyNode The node for which the auto mode is started.
     * @param maximalNumberOfSetNodesToExecute The maximal number of set nodes to execute.
-    * @param gaols The {@link Goal}s to work with.
+    * @param goals The {@link Goal}s to work with.
     * @param stepOver Include step over stop condition?
     * @param stepReturn Include step return condition?
     */
@@ -536,6 +538,30 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
                               boolean stepReturn) {
       lastResumedKeyNode = keyNode;
       Proof proof = getProof();
+      // Configure proof
+      configureProof(proof, maximalNumberOfSetNodesToExecute, stepOver, stepReturn);
+      // Run proof
+      getProofControl().startAutoMode(proof, goals);
+   }
+   
+   /**
+    * Configures {@link #getProof()} with settings for interactive verification.
+    */
+   protected void configureProofForInteractiveVerification() {
+      configureProof(getProof(), 
+                     KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
+                     false, 
+                     false);
+   }
+   
+   /**
+    * Configures the given {@link Proof}.
+    * @param proof The {@link Proof} to configure.
+    * @param maximalNumberOfSetNodesToExecute The maximal number of set nodes to execute.
+    * @param stepOver Include step over stop condition?
+    * @param stepReturn Include step return condition?
+    */
+   protected void configureProof(Proof proof, int maximalNumberOfSetNodesToExecute, boolean stepOver, boolean stepReturn) {
       // Set strategy to use
       StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
       proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
@@ -552,10 +578,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
          stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
       }
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
-      // Run proof
-      getProofControl().startAutoMode(proof, goals);
    }
-
 
    /**
     * Creates a new factory that should be used by others afterwards.
