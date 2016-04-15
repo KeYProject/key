@@ -226,21 +226,13 @@
          <enabledWhen>
             <and>
                <with
-                     variable="activeMenuSelection">
+                     variable="selection">
                   <and>
                      <test
                            forcePluginActivation="true"
                            property="org.key_project.keyide.ui.isGoal">
                      </test>
                   </and>
-               </with>
-               <with
-                     variable="activeEditor">
-                  <test
-                        forcePluginActivation="true"
-                        property="org.key_project.keyide.ui.canPruneProof"
-                        value="true">
-                  </test>
                </with>
             </and>
          </enabledWhen>
