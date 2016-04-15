@@ -969,7 +969,7 @@ name_clause
 :
     spec=SPEC_NAME name=STRING_LITERAL SEMICOLON
     {
-	result=createPositionedString(name.getText(), spec);
+	result=createPositionedString(name.getText().substring(1,name.getText().length() - 1), spec);
     }
 ;
 
