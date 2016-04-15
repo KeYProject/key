@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
@@ -51,7 +52,9 @@ import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.ui.preference.page.KeYColorsPreferencePage;
+import org.key_project.sed.key.ui.view.ProofView;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ObjectUtil;
@@ -65,6 +68,7 @@ import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
@@ -398,7 +402,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
          }
       });
       Color notConsideredColor = null;
-      for (BranchResult branchResult : branchResults) {
+      for (final BranchResult branchResult : branchResults) {
          if (shouldShowBranchResult(branchResult, uninterpretedPredicatePosition, uninterpretedPredicateGroundTerm)) {
             // Remove uninterpreted predicate from expressions. Currently, only the AND operator is supported and should be needed.
             if (uninterpretedPredicatePosition != null) {
@@ -426,13 +430,23 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
                   currentPosition = currentPosition.up();
                }
             }
+            // Context menu
+            MenuManager menuManager = new MenuManager();
+            menuManager.add(new Action("Open Goal") {
+               @Override
+               public void run() {
+                  openGoal(branchResult);
+               }
+            });
             // Create group
             Group viewerGroup = factory.createGroup(root, "Node " + branchResult.getLeafNode().serialNr());
             viewerGroup.setLayout(new FillLayout());
             viewerGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            viewerGroup.setMenu(menuManager.createContextMenu(viewerGroup));
             controls.add(viewerGroup);
             // Create viewer
             SourceViewer viewer = new SourceViewer(viewerGroup, null, SWT.MULTI | SWT.FULL_SELECTION);
+            viewer.getControl().setMenu(menuManager.createContextMenu(viewer.getControl()));
             viewer.setEditable(false);
             final Font font = SWTUtil.initializeViewerFont(viewer);
             viewer.getTextWidget().addDisposeListener(new DisposeListener() {
@@ -459,6 +473,23 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
       addLegend(notConsideredColor);
       // Layout root
       updateLayout();
+   }
+
+   /**
+    * Opens the {@link Goal} of the given {@link BranchResult}.
+    * @param branchResult The {@link BranchResult}.
+    */
+   protected void openGoal(BranchResult branchResult) {
+      try {
+         IWorkbenchPart part = WorkbenchUtil.openView(ProofView.VIEW_ID);
+         if (part instanceof ProofView) {
+            ((ProofView) part).selectNode(branchResult.getLeafNode());
+         }
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(root.getShell(), e);
+      }
    }
 
    /**

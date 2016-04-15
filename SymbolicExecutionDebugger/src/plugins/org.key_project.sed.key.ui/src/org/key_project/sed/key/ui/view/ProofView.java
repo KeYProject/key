@@ -330,7 +330,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
     * @param keepSelection {@code true} keep selection, {@code false} do not keep selection
     */
    protected void showSubtree(boolean keepSelection) {
-      if (proof != null) {
+      if (proof != null && treeViewer != null) {
          Node currentSelection = getSelectedNode();
          if (baseViewNode != null && (boolean) subtreeState.getValue()) {
             contentProvider.setShowSubtreeState(true, baseViewNode.getExecutionNode().getProofNode());
@@ -370,6 +370,9 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
       getSite().setSelectionProvider(treeViewer);
       //update viewers if debugView is already open
       updateViewer();
+      if ((boolean) subtreeState.getValue()) {
+         showSubtree(true);
+      }
       createTreeViewerContextMenu();
       createSourceViewerContextMenu();
    }
@@ -501,7 +504,9 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
             environment.getProofControl().setMinimizeInteraction(true);
          }
          if (proof != null && !proof.isDisposed()) {
-            contentProvider.setShowSubtreeState(false, proof.root());
+            if (contentProvider != null) { // Might be null when view is opened and a proof is already defined.
+               contentProvider.setShowSubtreeState(false, proof.root());
+            }
             proof.addProofDisposedListener(proofDisposedListener);
             proof.addRuleAppListener(ruleAppListener);
          }
@@ -629,7 +634,10 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
       }
       if (symbolicState != null) {
     	  symbolicState.removeListener(symbolicStateListener);
-      }      
+      }
+      if (subtreeState != null) {
+         subtreeState.removeListener(subtreeStateListener);
+      }     
       super.dispose();
    }
    
@@ -710,10 +718,10 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
    }
    
 	/**
-	 * selects a given {@link Node}. 
+	 * Selects a given {@link Node}. 
 	 * @param node the {@link Node} to select
 	 */
-   protected void selectNode(Node node) {
+   public void selectNode(Node node) {
       ProofTreeContentOutlinePage.makeSureElementIsLoaded(node, treeViewer, contentProvider);
       treeViewer.setSelection(SWTUtil.createSelection(node), true);
    }
