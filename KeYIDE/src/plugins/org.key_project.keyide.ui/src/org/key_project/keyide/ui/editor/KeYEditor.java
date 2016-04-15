@@ -523,9 +523,9 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    }
    
    /**
-    * Returns the project which provides the proof or the source code.
-    * @return The {@link IProject} if known or {@code null} if unknown.
+    * {@inheritDoc}
     */
+   @Override
    public IProject getProject() {
       IEditorInput input = getEditorInput();
       if (input instanceof ProofOblInputEditorInput) {

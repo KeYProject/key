@@ -341,7 +341,7 @@
             </enabledWhen>
          </handler>
          <handler
-               class="org.key_project.sed.key.ui.command.GenerateTestCasesHandlerSED"
+               class="org.key_project.keyide.ui.handlers.GenerateTestCasesHandler"
                commandId="org.key_project.sed.key.ui.generateTestCases">
             <enabledWhen>
                <test

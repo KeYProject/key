@@ -40,7 +40,7 @@ public class RuleAppContextMenu extends ExtensionContributionFactory {
          ProofView view = (ProofView) activeView;
          Node node = view.getSelectedNode();
          if (node != null) {
-            Goal goal = view.getProof().getGoal(node);
+            Goal goal = view.getCurrentProof().getGoal(node);
             if (goal != null) {
                PosInSequent position = view.getSelectedPosInSequent();
                // Add taclet apps

@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
@@ -291,6 +292,16 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView impleme
    public ProofControl getProofControl() {
       KeYEnvironment<?> environment = getEnvironment();
       return environment != null ? environment.getProofControl() : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IProject getProject() {
+      return proofsDebugTarget != null && proofsDebugTarget.getMethod() != null? 
+             proofsDebugTarget.getMethod().getResource().getProject() : 
+             null;
    }
 
    /**

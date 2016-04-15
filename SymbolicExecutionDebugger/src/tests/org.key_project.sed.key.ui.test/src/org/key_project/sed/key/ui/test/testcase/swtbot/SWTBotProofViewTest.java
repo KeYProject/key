@@ -60,8 +60,8 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
             SWTBotView view = getProofBotView(bot);
             ProofView proofView = getProofView(view);
             debugView.bot().tree().select(0);
-            assertNotNull(proofView.getProof());
-            assertTrue(!proofView.getProof().closed());
+            assertNotNull(proofView.getCurrentProof());
+            assertTrue(!proofView.getCurrentProof().closed());
             //make sure that both buttons are visible and correctly enabled
             assertTrue(view.toolbarButton("Start Auto Mode").isVisible());
             assertTrue(view.toolbarButton("Start Auto Mode").isEnabled());
@@ -70,7 +70,7 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
             //start auto mode
             TestUtilsUtil.clickDirectly(view.toolbarButton("Start Auto Mode"));
             TestKeYUIUtil.waitWhileAutoMode(bot, proofView.getEnvironment().getUi());
-            assertFalse(proofView.getProof().closed());
+            assertFalse(proofView.getCurrentProof().closed());
             bot.waitWhile(Conditions.widgetIsEnabled(view.toolbarButton("Stop Auto Mode")));
             bot.waitUntil(Conditions.widgetIsEnabled(view.toolbarButton("Start Auto Mode")));
             //make sure that auto mode can be started again
@@ -364,14 +364,14 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
             assertTrue(proofView.bot().tree().getTreeItem("10:OPEN GOAL") != null);
             assertTrue(proofView.bot().tree().getTreeItem("10:OPEN GOAL").isSelected());
             //get the node that is selected
-            Node goal = view.getProof().openGoals().head().node();
+            Node goal = view.getCurrentProof().openGoals().head().node();
             IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter(goal.sequent());
             LogicPrinter printer = new LogicPrinter(new ProgramPrinter(null), 
-                                       SymbolicExecutionUtil.createNotationInfo(view.getProof()), 
+                                       SymbolicExecutionUtil.createNotationInfo(view.getCurrentProof()), 
                                        goal.proof().getServices());
             //check if source viewer is showing the content correctly
             assertEquals(proofView.bot().styledText().getText(), 
-                         ProofSourceViewerDecorator.computeText(SymbolicExecutionUtil.createNotationInfo(view.getProof()), goal, filter, printer));
+                         ProofSourceViewerDecorator.computeText(SymbolicExecutionUtil.createNotationInfo(view.getCurrentProof()), goal, filter, printer));
             proofView.close();
             
             
@@ -417,7 +417,7 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
     */
    private void assertSameProof(ISEDebugTarget target, ProofView view) {
       assertTrue(target instanceof KeYDebugTarget);
-      assertEquals(((KeYDebugTarget) target).getProof(), view.getProof());
+      assertEquals(((KeYDebugTarget) target).getProof(), view.getCurrentProof());
    }
    
    /**

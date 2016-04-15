@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.WeakHashMap;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -231,6 +232,14 @@ public class ProofProviderAdapterFactory implements IAdapterFactory {
        */
       @Override
       public KeYEnvironment<?> getEnvironment() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IProject getProject() {
          return null;
       }
 

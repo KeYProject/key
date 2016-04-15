@@ -404,7 +404,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
    protected void handleTreeViewerSelectionChanged(SelectionChangedEvent event) {
       Node node = getNode(event.getSelection());
       if (node != null) {
-         sourceViewerDecorator.showNode(node, SymbolicExecutionUtil.createNotationInfo(getProof()));
+         sourceViewerDecorator.showNode(node, SymbolicExecutionUtil.createNotationInfo(getCurrentProof()));
       }
       else {
          sourceViewerDecorator.showNode(null, SymbolicExecutionUtil.createNotationInfo((Node) null));
@@ -741,14 +741,6 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider {
       else {
          return null;
       }
-   }
-   
-   /**
-    * returns the shown proof.
-    * @return {@link Proof} that is opened.
-    */
-   public Proof getProof() {
-      return proof;
    }
    
    /**

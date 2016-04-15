@@ -4,11 +4,11 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandler;
 import org.key_project.key4eclipse.common.ui.testGeneration.ProofGenerateTestsJob;
-import org.key_project.keyide.ui.editor.KeYEditor;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
@@ -26,11 +26,14 @@ public class GenerateTestCasesHandler extends AbstractSaveExecutionHandler {
    @Override
    protected Object doExecute(ExecutionEvent event) throws Exception {
       if (AbstractTestGenerator.isSolverAvailable()) {
-         IEditorPart editorPart = HandlerUtil.getActiveEditor(event);
-         if (editorPart instanceof KeYEditor) {
-            KeYEditor editor = (KeYEditor) editorPart;
-            if (!editor.getProofControl().isInAutoMode()) {
-               generateTestCases(editor.getCurrentProof(), editor.getProject(), editor.getUI());
+         IWorkbenchPart workbenchPart = HandlerUtil.getActivePart(event);
+         if (!(workbenchPart instanceof IProofProvider)) {
+            workbenchPart = HandlerUtil.getActiveEditor(event);
+         }
+         if (workbenchPart instanceof IProofProvider) {
+            IProofProvider provider = (IProofProvider) workbenchPart;
+            if (!provider.getProofControl().isInAutoMode()) {
+               generateTestCases(provider.getCurrentProof(), provider.getProject(), provider.getUI());
             }
          }
       }

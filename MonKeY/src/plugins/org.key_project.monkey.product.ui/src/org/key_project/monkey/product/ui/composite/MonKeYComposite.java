@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -1142,6 +1143,14 @@ public class MonKeYComposite extends Composite implements IProofProvider {
          }
       }
       return result.toArray(new Proof[result.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IProject getProject() {
+      return null;
    }
 
    /**
