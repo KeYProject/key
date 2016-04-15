@@ -13,31 +13,16 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
-
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * The default implementation of {@link IExecutionTermination}.
@@ -58,11 +43,6 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
     * The {@link TerminationKind}.
     */
    private TerminationKind terminationKind;
-   
-   /**
-    * Is the branch verified?
-    */
-   private Boolean branchVerified;
    
    /**
     * Constructor.
@@ -156,9 +136,6 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
     */
    @Override
    public boolean isBranchVerified() {
-      if (branchVerified == null) {
-         branchVerified = Boolean.valueOf(SymbolicExecutionUtil.lazyComputeIsBranchVerified(getProofNode()));
-      }
-      return branchVerified.booleanValue();
+      return SymbolicExecutionUtil.lazyComputeIsBranchVerified(getProofNode());
    }
 }

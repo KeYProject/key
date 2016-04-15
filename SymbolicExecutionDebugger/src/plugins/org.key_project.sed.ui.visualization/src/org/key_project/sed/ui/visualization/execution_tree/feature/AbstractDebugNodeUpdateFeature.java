@@ -40,6 +40,7 @@ import org.eclipse.graphiti.features.impl.AbstractUpdateFeature;
 import org.eclipse.graphiti.features.impl.DefaultRemoveFeature;
 import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
@@ -48,9 +49,9 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.key_project.sed.core.annotation.ISEAnnotation;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEDebugElement;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.model.ISEGroupable;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.util.ISEIterator;
 import org.key_project.sed.core.util.NodeUtil;
@@ -234,8 +235,12 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             if (isPruneUpdateNeeded(pe)) {
             	return Reason.createTrueReason("Node got pruned");
             	
-            } else if (isNameUpdateNeeded(pe)) {
+            }
+            else if (isNameUpdateNeeded(pe)) {
                return Reason.createTrueReason("Name is out of date.");
+            }
+            else if (isIconUpdateNeeded(pe)) {
+               return Reason.createTrueReason("Icon is out of date.");
             }
             else {
                final boolean groupingSupported = ExecutionTreeUtil.isGroupingSupported(getFeatureProvider(), context);
@@ -301,6 +306,47 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       }
       else {
          return false;
+      }
+   }
+   
+   /**
+    * Checks if the shown name in the given {@link PictogramElement}
+    * is equal to the icon defined by his business object.
+    * @param pictogramElement The {@link PictogramElement} to check.
+    * @return {@code true} icon is different and an update is required, {@code false} icon is the same and no update is required.
+    * @throws DebugException Occurred Exception.
+    */
+   protected boolean isIconUpdateNeeded(PictogramElement pictogramElement) throws DebugException {
+      Image image = findIconImage(pictogramElement);
+      if (image != null) {
+         String pictogramImageId = image.getId();
+         String businessImageId = getBusinessIconId(pictogramElement);
+         return !StringUtil.equalIgnoreWhiteSpace(businessImageId, pictogramImageId);
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Returns the image ID defined by the business object of the given {@link PictogramElement}.
+    * @param pictogramElement The {@link PictogramElement} for that the business image ID is needed.
+    * @return The image ID defined by the business object of the given {@link PictogramElement}.
+    * @throws DebugException The business image ID.
+    */
+   protected String getBusinessIconId(PictogramElement pictogramElement) throws DebugException {
+      Object bo = getBusinessObjectForPictogramElement(pictogramElement);
+      if (bo instanceof ISENode) {
+         IAddFeature addFeature = getFeatureProvider().getAddFeature(new AddContext(new AreaContext(), bo));
+         if (addFeature instanceof AbstractDebugNodeAddFeature) {
+            return ((AbstractDebugNodeAddFeature) addFeature).getImageId((ISENode) bo);
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
       }
    }
    
@@ -412,6 +458,25 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       }
       return result;
    }
+   
+   /**
+    * Finds the {@link Image} which shows the image of an {@link ISENode}.
+    * @param pictogramElement The {@link PictogramElement} to search the {@link Image} in.
+    * @return The found {@link Image} or {@code null} if no one was found.
+    */
+   protected Image findIconImage(PictogramElement pictogramElement) {
+      Image result = null;
+      if (pictogramElement.getGraphicsAlgorithm() instanceof Image) {
+         result = (Image)pictogramElement.getGraphicsAlgorithm();
+      }
+      else if (pictogramElement instanceof ContainerShape && pictogramElement.getGraphicsAlgorithm() instanceof RoundedRectangle) {
+         ContainerShape cs = (ContainerShape)pictogramElement;
+         for (Shape shape : cs.getChildren()) {
+            result = findIconImage(shape);
+         }
+      }
+      return result;
+   }
 
    /**
     * {@inheritDoc}
@@ -442,9 +507,14 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             // Update name
             PictogramElement pictogramElement = context.getPictogramElement();
 
-            monitor.beginTask("Update element: " + pictogramElement, 3);
+            monitor.beginTask("Update element: " + pictogramElement, 4);
 
             boolean success = updateName(pictogramElement, new SubProgressMonitor(monitor, 1));
+            monitor.worked(1);
+            
+            if (success) {
+               success = updateIcon(pictogramElement, new SubProgressMonitor(monitor, 1));
+            }
             monitor.worked(1);
 
             // Update children, they have the correct layout after this step
@@ -519,7 +589,39 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                return true;
             }
             else {
-               return false;
+               return true; // Nothing to do
+            }
+         }
+         else {
+            return false;
+         }
+      }
+      finally {
+         monitor.worked(1);
+         monitor.done();
+      }
+   }
+
+   /**
+    * Updates the shown icon in the given {@link PictogramElement}.
+    * @param pictogramElement The {@link PictogramElement} to update.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @return {@code true}, if update process was successful
+    * @throws DebugException Occurred Exception.
+    */
+   protected boolean updateIcon(PictogramElement pictogramElement, 
+                                IProgressMonitor monitor) throws DebugException {
+      try {
+         if (!monitor.isCanceled()) {
+            monitor.beginTask("Update icons", 1);
+            Image image = findIconImage(pictogramElement);
+            if (image != null) {
+               String businessImageId = getBusinessIconId(pictogramElement);
+               image.setId(businessImageId);
+               return true;
+            }
+            else {
+               return true; // Nothing to do
             }
          }
          else {
