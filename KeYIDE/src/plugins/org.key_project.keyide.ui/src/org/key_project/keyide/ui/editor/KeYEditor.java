@@ -95,6 +95,7 @@ import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -411,6 +412,9 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
                ProofOblInputEditorInput in = (ProofOblInputEditorInput) input;
                this.environment = in.getEnvironment();
                this.currentProof = environment.createProof(in.getProblem());
+               // Ensure that active strategy matches with profile of proof (only required because KeY has a single global proof management)
+               Profile profile = currentProof.getServices().getProfile();
+               currentProof.setActiveStrategy(profile.getDefaultStrategyFactory().create(currentProof, currentProof.getSettings().getStrategySettings().getActiveStrategyProperties()));
             }
             else if (input instanceof ProofEditorInput) {
                ProofEditorInput in = (ProofEditorInput) input;
@@ -459,6 +463,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             else {
                selectionModel.setSelectedNode(currentProof.root());                         
             }
+            // Add support for breakpoints
             breakpointManager = new KeYBreakpointManager(currentProof);
             DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
             ProofUserManager.getInstance().addUser(currentProof, environment, this);

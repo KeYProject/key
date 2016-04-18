@@ -63,12 +63,10 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.AbstractKeYlessExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
@@ -1432,6 +1430,14 @@ public class SymbolicExecutionTreeBuilder {
          currentIgnoreSet.add(next);
       }
       newMethodCallStackMap.put(node, newMethodCallStack);
+   }
+
+   /**
+    * Checks if the uninterpreted predicate is available or not.
+    * @return {@code true} uninterpreted predicate is available, {@code false} otherwise.
+    */
+   public boolean isUninterpretedPredicateUsed() {
+      return isUninterpretedPredicateUsed;
    }
 
    /**

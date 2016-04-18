@@ -49,7 +49,6 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
 //TODO Document class OutlineContentAndLabelProviderTest
@@ -421,7 +420,6 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 			   
 			   Object itemData = viewerIter.next().getData();
 			   if (itemData instanceof Node) {
-				   Node node = (Node) itemData;
 				   assertTrue(itemData.equals(exeNode.getProofNode()));
 				   break;
 			   } else if (itemData instanceof BranchFolder) {

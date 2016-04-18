@@ -49,6 +49,7 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpointconditions;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
@@ -574,7 +575,12 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
       if (proof != null && !proof.isDisposed()) {
          // Set strategy to use
          StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-         proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
+         if (getBuilder().isUninterpretedPredicateUsed()) {
+            proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
+         }
+         else {
+            proof.setActiveStrategy(new JavaCardDLStrategy.Factory().create(proof, strategyProperties));
+         }
          // Update stop condition
          CompoundStopCondition stopCondition = new CompoundStopCondition();
          stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute));

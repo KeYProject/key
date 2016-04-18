@@ -59,6 +59,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Triple;
 
@@ -1167,4 +1168,11 @@ public class Proof implements Named {
       return null;
    }
 
+   public StrategyFactory getActiveStrategyFactory() {
+      Name activeStrategyName = getActiveStrategy() != null ? getActiveStrategy().name() : null;
+      return activeStrategyName != null ?
+             getServices().getProfile().getStrategyFactory(activeStrategyName) :
+             getServices().getProfile().getDefaultStrategyFactory();
+      
+   }
 }
