@@ -266,8 +266,13 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void ruleApplied(ProofEvent e) {
-			handleRuleApplied(e);
+		public void ruleApplied(final ProofEvent e) {
+	      treeViewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               handleRuleApplied(e);
+            }
+	      });
 		}
 	};
 

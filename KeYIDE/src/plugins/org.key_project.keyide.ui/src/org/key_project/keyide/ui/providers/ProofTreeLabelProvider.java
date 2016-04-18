@@ -162,7 +162,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
       this.viewer = viewer;
       this.proofControl = proofControl;
       this.proof = proof;
-      if (proof != null) {
+      if (proof != null && !proof.isDisposed()) {
          proof.addProofTreeListener(proofTreeListener);
          proofControl.addAutoModeListener(autoModeListener);
       }
@@ -321,7 +321,9 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      proof.addProofTreeListener(proofTreeListener);
+      if (proof != null && !proof.isDisposed()) {
+         proof.addProofTreeListener(proofTreeListener);
+      }
       fireAllNodesChanged();
    }
 
@@ -330,7 +332,9 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStarted(ProofEvent e) {
-      proof.removeProofTreeListener(proofTreeListener);
+      if (proof != null && !proof.isDisposed()) {
+         proof.removeProofTreeListener(proofTreeListener);
+      }
    }
 
    /**

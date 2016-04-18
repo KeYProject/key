@@ -181,10 +181,11 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
       getProofControl().addAutoModeListener(autoModeListener);
-      getProof().addProofTreeListener(proofChangedListener);
+      Proof proof = getProof();
+      proof.addProofTreeListener(proofChangedListener);
       target.registerDebugNode(this);
       initializeAnnotations();
-      configureProofForInteractiveVerification();
+      configureProofForInteractiveVerification(proof);
    }
 
    /**
@@ -378,9 +379,12 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStarted(ProofEvent e) {
-      if (e.getSource() == getProof() && getProofControl().isInAutoMode()) { // Sadly auto mode started events are misused and do not really indicate that a auto mode is running
+      Proof proof = getProof();
+      if (e.getSource() == proof && getProofControl().isInAutoMode()) { // Sadly auto mode started events are misused and do not really indicate that a auto mode is running
          try {
-            getProof().removeProofTreeListener(proofChangedListener);
+            if (proof != null) {
+               proof.removeProofTreeListener(proofChangedListener);
+            }
             // Inform UI that the process is resumed
             super.resume();
          }
@@ -395,8 +399,9 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      configureProofForInteractiveVerification();
-      if (e.getSource() == getProof() && !getProofControl().isInAutoMode()) { // Sadly auto mode stopped events are misused and do not really indicate that a auto mode has stopped
+      Proof proof = getProof();
+      configureProofForInteractiveVerification(proof);
+      if (e.getSource() == proof && !getProofControl().isInAutoMode()) { // Sadly auto mode stopped events are misused and do not really indicate that a auto mode has stopped
          try {
             updateExecutionTree(getBuilder());
          }
@@ -406,7 +411,10 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
          }
          finally {
             try {
-               getProof().addProofTreeListener(proofChangedListener);
+               if (proof != null && !proof.isDisposed()) {
+                  proof.addProofTreeListener(proofChangedListener);
+                  
+               }
                super.suspend();
             }
             catch (DebugException e1) {
@@ -546,9 +554,10 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    
    /**
     * Configures {@link #getProof()} with settings for interactive verification.
+    * @param proof The {@link Proof} to configure.
     */
-   protected void configureProofForInteractiveVerification() {
-      configureProof(getProof(), 
+   protected void configureProofForInteractiveVerification(Proof proof) {
+      configureProof(proof, 
                      KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
                      false, 
                      false);
@@ -562,22 +571,24 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
     * @param stepReturn Include step return condition?
     */
    protected void configureProof(Proof proof, int maximalNumberOfSetNodesToExecute, boolean stepOver, boolean stepReturn) {
-      // Set strategy to use
-      StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-      proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
-      // Update stop condition
-      CompoundStopCondition stopCondition = new CompoundStopCondition();
-      stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute));
-      SymbolicExecutionBreakpointStopCondition breakpointParentStopCondition = getBreakpointManager().getBreakpointStopCondition();
-      stopCondition.addChildren(breakpointParentStopCondition);
-      proof.getServices().setFactory(createNewFactory(breakpointParentStopCondition));
-      if (stepOver) {
-         stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
+      if (proof != null && !proof.isDisposed()) {
+         // Set strategy to use
+         StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+         proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
+         // Update stop condition
+         CompoundStopCondition stopCondition = new CompoundStopCondition();
+         stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute));
+         SymbolicExecutionBreakpointStopCondition breakpointParentStopCondition = getBreakpointManager().getBreakpointStopCondition();
+         stopCondition.addChildren(breakpointParentStopCondition);
+         proof.getServices().setFactory(createNewFactory(breakpointParentStopCondition));
+         if (stepOver) {
+            stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
+         }
+         if (stepReturn) {
+            stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
+         }
+         proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       }
-      if (stepReturn) {
-         stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
-      }
-      proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
    }
 
    /**
