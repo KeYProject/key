@@ -25,6 +25,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.slicing.ThinBackwardSlicer;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -582,6 +583,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
                                                                              Proof proof, 
                                                                              Pair<Node, ReferencePrefix> seed) throws Exception {
          SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, false, false, false, false, false);
+         SymbolicExecutionUtil.initializeStrategy(builder);
          builder.analyse();
          IExecutionNode<?> node = builder.getExecutionNode(seed.first);
          assert node instanceof AbstractExecutionNode<?>;

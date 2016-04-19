@@ -49,8 +49,6 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpointconditions;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
-import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
@@ -64,7 +62,6 @@ import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTree
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepReturnSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -574,13 +571,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    protected void configureProof(Proof proof, int maximalNumberOfSetNodesToExecute, boolean stepOver, boolean stepReturn) {
       if (proof != null && !proof.isDisposed()) {
          // Set strategy to use
-         StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-         if (getBuilder().isUninterpretedPredicateUsed()) {
-            proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
-         }
-         else {
-            proof.setActiveStrategy(new JavaCardDLStrategy.Factory().create(proof, strategyProperties));
-         }
+         SymbolicExecutionUtil.initializeStrategy(getBuilder());
          // Update stop condition
          CompoundStopCondition stopCondition = new CompoundStopCondition();
          stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute));

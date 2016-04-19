@@ -178,7 +178,7 @@ public class KeYDebugTarget extends AbstractSEDebugTarget {
       // Add thread
       KeYThread thread = new KeYThread(this, environment.getBuilder().getStartNode());
       threads = new KeYThread[] {thread};
-      // Initialize proof to use the symbolic execution strategy
+      // Initialize proof with default symbolic execution strategy settings
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun());
       ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
    }

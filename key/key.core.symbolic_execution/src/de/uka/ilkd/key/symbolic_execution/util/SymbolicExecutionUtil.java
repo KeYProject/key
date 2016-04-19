@@ -131,8 +131,11 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
+import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.ExecutionVariableExtractor;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -140,6 +143,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -4009,4 +4013,20 @@ public final class SymbolicExecutionUtil {
 		}
 		return result;
 	}
+
+	/**
+	 * Initializes the {@link Proof} of the given {@link SymbolicExecutionTreeBuilder}
+	 * so that the correct {@link Strategy} is used.
+	 * @param builder The {@link SymbolicExecutionTreeBuilder} to initialize.
+	 */
+   public static void initializeStrategy(SymbolicExecutionTreeBuilder builder) {
+      Proof proof = builder.getProof();
+      StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+      if (builder.isUninterpretedPredicateUsed()) {
+         proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
+      }
+      else {
+         proof.setActiveStrategy(new JavaCardDLStrategy.Factory().create(proof, strategyProperties));
+      }
+   }
 }
