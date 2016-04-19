@@ -51,7 +51,7 @@ public class TacletContextMenu extends ExtensionContributionFactory {
       if (activeEditor instanceof KeYEditor) {
          KeYEditor keyEditor = (KeYEditor)activeEditor;
          Goal goal = keyEditor.getSelectionModel().getSelectedGoal();
-         if (goal != null) {
+         if (goal != null && !keyEditor.getProofControl().isInAutoMode()) {
             PosInSequent pos = keyEditor.getSelectedPosInSequent();
             // Add taclet rules
             ImmutableList<TacletApp> appList = KeYIDEUtil.findTaclets(keyEditor.getUI(), goal, pos);

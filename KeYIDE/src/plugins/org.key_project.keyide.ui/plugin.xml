@@ -165,6 +165,10 @@
                            property="org.key_project.keyide.ui.canPruneProof"
                            value="true">
                      </test>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.key_project.keyide.ui.isNotAutoMode">
+                     </test>
                   </with>
                   <not>
                      <with
@@ -174,15 +178,6 @@
                         </equals>
                      </with>
                   </not></or>
-            <with
-                  variable="activeMenuSelection">
-               <and>
-                  <test
-                        forcePluginActivation="true"
-                        property="org.key_project.keyide.ui.nodeSupportsPruning">
-                  </test>
-               </and>
-            </with>
             </and>
          </enabledWhen>
       </handler>
@@ -192,11 +187,17 @@
          <enabledWhen>
             <with
                   variable="activeEditor">
-               <test
-                     forcePluginActivation="true"
-                     property="org.key_project.keyide.ui.canApplyRules"
-                     value="true">
-               </test>
+               <and>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.canApplyRules"
+                        value="true">
+                  </test>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.isNotAutoMode">
+                  </test>
+               </and>
             </with>
          </enabledWhen>
       </handler>
