@@ -203,7 +203,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 				while (nonBranchingNode != newRoot && nonBranchingNode.parent() != null && nonBranchingNode.parent().childrenCount() == 1) {
 					nonBranchingNode = nonBranchingNode.parent();
 				}
-				if (nonBranchingNode == newRoot || nonBranchingNode == proof.root()) {
+				if (nonBranchingNode == newRoot || proof.isDisposed() || nonBranchingNode == proof.root()) {
 					return proof;
 				}
 			}

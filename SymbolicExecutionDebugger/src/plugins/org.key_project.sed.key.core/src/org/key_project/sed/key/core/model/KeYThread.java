@@ -102,6 +102,17 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    private KeYVariable[] variables;
    
    /**
+    * Indicates if {@link #getLeafsToSelect()} will return the leaf nodes
+    * or an empty array otherwise. An empty array is returned in case
+    * of interactive verification whereas new leafs to select are supported
+    * when the auto mode was started via the debug API.
+    * <p>
+    * The value is initially {@code true} because after a launch the debug API
+    * asks for the initial elements to select.
+    */
+   private boolean leafsToSelectAvailable = true;
+   
+   /**
     * Listens for auto mode start and stop events.
     */
    private final AutoModeListener autoModeListener = new AutoModeListener() {
@@ -542,6 +553,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
                               ImmutableList<Goal> goals, 
                               boolean stepOver,
                               boolean stepReturn) {
+      leafsToSelectAvailable = true;
       lastResumedKeyNode = keyNode;
       Proof proof = getProof();
       // Configure proof
@@ -767,7 +779,13 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
     */
    @Override
    public ISENode[] getLeafsToSelect() throws DebugException {
-      return collectLeafs(lastResumedKeyNode != null ? lastResumedKeyNode : this);
+      if (leafsToSelectAvailable) {
+         leafsToSelectAvailable = false;
+         return collectLeafs(lastResumedKeyNode != null ? lastResumedKeyNode : this);
+      }
+      else {
+         return new ISENode[0];
+      }
    }
    
    /**
