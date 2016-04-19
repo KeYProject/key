@@ -243,29 +243,30 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 * @return The new updated number of children.
 	 */
 	protected int doUpdateChildCount(Object element, int currentChildCount) {
-		if (element instanceof Proof) {
-			Proof currentProof = (Proof) element;
-			Node branchNode = currentProof.root();
-			if (showSubtree) {
-			   branchNode = newRoot;
-			}
-			int childCount = getBranchFolderChildCount(branchNode);
-			int folderCount = getFolderCountInBranch(currentProof);
-			viewer.setChildCount(element, childCount + folderCount);
-			return childCount + folderCount;
-		}
-		if (element instanceof Node) {
-			viewer.setChildCount(element, 0);
-			return 0;
-		}
-		if (element instanceof BranchFolder) {
+      if (element instanceof Node) {
+         viewer.setChildCount(element, 0); // A node has never children, only BranchFolders have children.
+         return 0;
+      }
+      else if (element instanceof BranchFolder) {
 			BranchFolder branchFolder = (BranchFolder) element;
 			Node branchNode = branchFolder.getChild();
 			int childCount = getBranchFolderChildCount(branchNode);
 			int folderCount = getFolderCountInBranch(branchFolder);
 			viewer.setChildCount(element, childCount + folderCount);
 			return childCount + folderCount;
-		} else {
+		}
+      else if (element instanceof Proof) {
+         Proof currentProof = (Proof) element;
+         Node root = currentProof.root();
+         if (showSubtree) {
+            root = newRoot;
+         }
+         int childCount = getBranchFolderChildCount(root);
+         int folderCount = getFolderCountInBranch(currentProof);
+         viewer.setChildCount(element, childCount + folderCount);
+         return childCount + folderCount;
+      }
+      else {
 			return 0;
 		}
 	}
@@ -335,17 +336,19 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 */
 	protected void doHandleProofExpanded(Node node) {
 		Object parent = getParent(node);
-		int parentChildCount = doUpdateChildCount(parent, -1);
-		int childIndex = getIndexOf(parent, node);
-		//TODO there might be a better solution
-		if (node.childrenCount() > 1) {
-			childIndex = 0;
-		}
-		if (childIndex >= 0 && childIndex < parentChildCount) {
-			for (int i = childIndex; i < parentChildCount; i++) {
-				updateElement(parent, i);
-			}
-		}
+		doUpdateChildCount(parent, -1);
+//		if (false) { // TODO: This code was added for compatibility reasons with Eclipse 4.4. Reason does no longer exist in Eclipse 4.4.2?
+//	      int parentChildCount = doUpdateChildCount(parent, -1);
+//	      int childIndex = getIndexOf(parent, node);
+//	      if (node.childrenCount() > 1) { // If statement added by students in context of filtering. Don't know why.
+//	         childIndex = 0;
+//	      }
+//	      if (childIndex >= 0 && childIndex < parentChildCount) {
+//	         for (int i = childIndex; i < parentChildCount; i++) {
+//	            updateElement(parent, i);
+//	         }
+//	      }
+//		}
 	}
 
 	/**
@@ -359,7 +362,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	protected int getBranchFolderChildCount(Node node) {
 		Node branchNode = getBranchNode(node);
 		int count;
-		
 		if (!hideState && symbolicState) {
 			Node startNode = branchNode;
 			count = 0; // counter for execution nodes
@@ -403,19 +405,25 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 					}
 				}
 			}
-		} else {
+		}
+		else if (hideState) {
+         // Skip over hidden nodes
+         while (branchNode.childrenCount() == 1) {
+            branchNode = branchNode.child(0);
+         }
+         if (branchNode.leaf()) {
+            count = 1; // The open goal
+         }
+         else {
+            count = 0; // Child branch folders are not counted!
+         }
+		}
+		else {
+		   // Count the number of children on the same branch.
 			count = 1;
 			while (branchNode.childrenCount() == 1) {
 				branchNode = branchNode.child(0);
 				count += 1;
-			}
-			// return the number of nodes when the hideIntermediateProofsteps filter is active
-			if (hideState) {
-				if (branchNode.leaf()) {
-					count = 1;
-				} else {
-					count = 0;
-				}
 			}
 		}
 		return count;
@@ -472,18 +480,18 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 			}
 			childCount = getBranchFolderChildCount(node);
 		}
-		if (parent instanceof Proof) {
-
+		else if (parent instanceof Proof) {
 			Proof currentProof = (Proof) parent;
 			node = currentProof.root();
 			if (showSubtree) {
 			   node = newRoot;
 			}
 			childCount = getBranchFolderChildCount(node);
-		} else if (parent instanceof BranchFolder) {
+		}
+		else if (parent instanceof BranchFolder) {
 			BranchFolder branchFolder = (BranchFolder) parent;
 			node = branchFolder.getChild();
-			childCount = getBranchFolderChildCount(node);
+         childCount = getBranchFolderChildCount(node);
 		}
 		// element is a Node
 		if (index < childCount) {
@@ -491,7 +499,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 				while (node.childrenCount() == 1) {
 					node = node.child(0);
 				}
-			} else if (symbolicState) {
+			}
+			else if (symbolicState) {
 				Node startNode = node;
 				int count = -1;
 				boolean termination = false; // indicates if a termination node was found
@@ -531,7 +540,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 						}
 					}
 				}
-			} else {
+			}
+			else {
 				// gets the right node when no filter is active
 				for (int i = 0; i < index; i++) {
 					node = node.child(0);
@@ -539,16 +549,22 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 			}
 			return node;
 		}
-		// element is a BranchFolder
+		// element is a BranchFolder (as long as hide intermediate state is not enabled)
 		else {
-			int folderIndex = index - childCount;
-			while (node.childrenCount() == 1) {
-				node = node.child(0);
-			}
-			BranchFolder branchFolder = new BranchFolder(
-					node.child(folderIndex));
-			branchFolders.put(node.child(folderIndex), branchFolder);
-			return branchFolder;
+         int folderIndex = index - childCount;
+         while (node.childrenCount() == 1) {
+            node = node.child(0);
+         }
+		   if (hideState && node.leaf()) {
+		      // element is the goal instead of a branch folder
+		      return node;
+		   }
+		   else {
+	         // element is a BranchFolder
+	         BranchFolder branchFolder = new BranchFolder(node.child(folderIndex));
+	         branchFolders.put(node.child(folderIndex), branchFolder);
+	         return branchFolder;
+		   }
 		}
 	}
 	
@@ -564,12 +580,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 */
 	public int getIndexOf(Object parent, Object element) {
 		// Make sure that parameters are valid
-		Assert.isTrue(element instanceof BranchFolder
-				|| element instanceof Node,
-				"Unsupported element \"" + element.getClass() + "\".");
-		Assert.isTrue(parent instanceof Proof || parent instanceof BranchFolder
-				|| parent instanceof Node,
-				"Unsupported parent \"" + parent.getClass() + "\".");
+		Assert.isTrue(element instanceof BranchFolder || element instanceof Node, "Unsupported element \"" + element.getClass() + "\".");
+		Assert.isTrue(parent instanceof Proof || parent instanceof BranchFolder || parent instanceof Node, "Unsupported parent \"" + parent.getClass() + "\".");
 		// Find first shown child node of the given parent
 		Node current = null;
 		if (parent instanceof Proof) {
@@ -577,7 +589,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 			if (showSubtree) {
 			   current = newRoot;
 			}
-		} else if (parent instanceof BranchFolder) {
+		}
+		else if (parent instanceof BranchFolder) {
 			current = ((BranchFolder) parent).getChild();
 		}
 		
@@ -593,7 +606,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 					return 0;
 				}
 			}
-		} else if (symbolicState) {
+		} 
+		else if (symbolicState) {
 			if (element instanceof Node) {
 				Node node = (Node) element;
 				if (!isExecutionNode(node)) {
@@ -647,7 +661,12 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 						int childIndex = current.getChildNr(node);
 						if (childIndex >= 0) {
 							found = true;
-							index += childIndex + 1;
+							if (hideState) {
+	                     index += childIndex;
+							}
+							else {
+                        index += childIndex + 1;
+							}
 						} else {
 							current = null; // Stop search, because element is
 											// not a child of parent
@@ -688,14 +707,16 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 				node = node.child(0);
 			}
 			return node.childrenCount();
-		} else if (parent instanceof BranchFolder) {
+		}
+		else if (parent instanceof BranchFolder) {
 			BranchFolder branchFolder = (BranchFolder) parent;
 			Node node = branchFolder.getChild();
 			while (node.childrenCount() == 1) {
 				node = node.child(0);
 			}
 			return node.childrenCount();
-		} else {
+		}
+		else {
 			return -1;
 		}
 	}

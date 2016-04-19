@@ -2,17 +2,19 @@ package org.key_project.keyide.ui.views;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.Page;
 import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
+import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.keyide.ui.providers.GoalsLabelProvider;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -42,7 +44,7 @@ public class GoalsPage extends Page implements IGoalsPage {
    /**
     * the viewer of this page.
     */
-   private ListViewer viewer;
+   private TableViewer viewer;
    
    /**
     * the environment of the proof.
@@ -62,7 +64,7 @@ public class GoalsPage extends Page implements IGoalsPage {
    /**
     * the label provider for the viewer.
     */
-   private LabelProvider labelProvider;
+   private GoalsLabelProvider labelProvider;
 
    /**
     * The {link KeySelectionListener} listens to changes on the current
@@ -87,47 +89,42 @@ public class GoalsPage extends Page implements IGoalsPage {
    private ProofTreeListener proofTreeListener = new ProofTreeListener() {
       @Override
       public void proofExpanded(ProofTreeEvent e) {
-         updateProofThreadSafe();
       }
 
       @Override
       public void proofIsBeingPruned(ProofTreeEvent e) {
-         updateProofThreadSafe();
       }
 
       @Override
       public void proofPruned(ProofTreeEvent e) {
-         updateProofThreadSafe();
       }
 
       @Override
       public void proofStructureChanged(ProofTreeEvent e) {
-         updateProofThreadSafe();
       }
 
       @Override
       public void proofClosed(ProofTreeEvent e) {
-         updateProofThreadSafe();
+         updateGoalsThreadSafe();
       }
 
       @Override
       public void proofGoalRemoved(ProofTreeEvent e) {
-         updateProofThreadSafe();
+         updateGoalsThreadSafe();
       }
 
       @Override
       public void proofGoalsAdded(ProofTreeEvent e) {
-         updateProofThreadSafe();
+         updateGoalsThreadSafe();
       }
 
       @Override
       public void proofGoalsChanged(ProofTreeEvent e) {
-         updateProofThreadSafe();
+         updateGoalsThreadSafe();
       }
 
       @Override
       public void smtDataUpdate(ProofTreeEvent e) {
-         updateProofThreadSafe();
       }
    };
 
@@ -209,7 +206,7 @@ public class GoalsPage extends Page implements IGoalsPage {
    protected void handleAutoModeStopped(ProofEvent e) {
       if (e.getSource() == proof) {
          proof.addProofTreeListener(proofTreeListener);
-         updateProofThreadSafe();
+         updateGoalsThreadSafe();
       }
    }
    
@@ -221,15 +218,15 @@ public class GoalsPage extends Page implements IGoalsPage {
    }
 
    /**
-    * Method executes {@link #handleProofChanged()} asynchronously and thread safe.
+    * Method executes {@link #handleGoalsChanged()} asynchronously and thread safe.
     */
-   protected void updateProofThreadSafe() {
+   protected void updateGoalsThreadSafe() {
       if (!viewer.getControl().isDisposed()) {
-         viewer.getControl().getDisplay().syncExec(new Runnable() {
+         viewer.getControl().getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
                if (!viewer.getControl().isDisposed()) {
-                  handleProofChanged();
+                  handleGoalsChanged();
                }
             }
          });
@@ -240,8 +237,11 @@ public class GoalsPage extends Page implements IGoalsPage {
     * This method sets a new input to the viewer and is called when the proof 
     * has changed.
     */
-   protected void handleProofChanged() {
-      viewer.setInput(proof.openGoals());
+   protected void handleGoalsChanged() {
+      ImmutableList<Goal> goals = proof.openGoals();
+      if (!ObjectUtil.equals(goals, viewer.getInput())) {
+         viewer.setInput(goals);
+      }
    }
    
    /**
@@ -250,11 +250,9 @@ public class GoalsPage extends Page implements IGoalsPage {
    protected void updateSelectedNode() {
       Node mediatorNode = selectionModel.getSelectedNode();
       Object selectedNode = getSelectedNode(viewer.getSelection());
-      if(mediatorNode != selectedNode) {
-         viewer.setSelection(
-                  SWTUtil.createSelection(proof.getGoal(mediatorNode)), true);
+      if (mediatorNode != selectedNode) {
+         viewer.setSelection(SWTUtil.createSelection(proof.getGoal(mediatorNode)), true);
       }
-
    }
    
    /**
@@ -296,7 +294,7 @@ public class GoalsPage extends Page implements IGoalsPage {
     */
    @Override
    public void createControl(Composite parent) {
-      this.viewer = new ListViewer(parent);
+      this.viewer = new TableViewer(parent);
       this.contentProvider = new ImmutableCollectionContentProvider();
       this.labelProvider = new GoalsLabelProvider();
       viewer.setContentProvider(contentProvider);
@@ -332,6 +330,12 @@ public class GoalsPage extends Page implements IGoalsPage {
    public void dispose() {
       if (viewer.getControl() != null) {
          viewer.getControl().dispose();
+      }
+      if (contentProvider != null) {
+         contentProvider.dispose();
+      }
+      if (labelProvider != null) {
+         labelProvider.dispose();
       }
       environment.getProofControl().removeAutoModeListener(autoModeListener);
       proof.removeProofTreeListener(proofTreeListener);
