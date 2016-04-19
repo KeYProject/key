@@ -1423,6 +1423,7 @@ public final class KeYUtil {
          };
          ByteArrayOutputStream out = new ByteArrayOutputStream();
          saver.save(out);
+         proof.setProofFile(location);
          // Save proof file content
          if (file.exists()) {
             file.setContents(new ByteArrayInputStream(out.toByteArray()), true, true, null);
