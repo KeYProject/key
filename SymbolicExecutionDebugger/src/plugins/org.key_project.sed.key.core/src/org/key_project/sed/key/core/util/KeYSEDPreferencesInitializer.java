@@ -40,13 +40,13 @@ public class KeYSEDPreferencesInitializer extends AbstractPreferenceInitializer 
       KeYSEDPreferences.setDefaultUsePrettyPrinting(true);
       KeYSEDPreferences.setDefaultShowSignatureOnMethodReturnNodes(false);
       KeYSEDPreferences.setDefaultVariablesAreOnlyComputedFromUpdates(false);
-      KeYSEDPreferences.setDefaultTruthValueTracingEnabled(false);
+      KeYSEDPreferences.setDefaultTruthValueTracingEnabled(true);
       KeYSEDPreferences.setDefaultHighlightReachedSourceCode(true);
       KeYSEDPreferences.setDefaultGroupingEnabled(true);
       KeYSEDPreferences.setDefaultSimplifyConditions(true);
-      KeYSEDPreferences.setDefaultTruthValueTracingTrue(new RGB(0, 117, 0));
-      KeYSEDPreferences.setDefaultTruthValueTracingFalse(new RGB(170, 0, 0));
-      KeYSEDPreferences.setDefaultTruthValueTracingUnknown(new RGB(217, 108, 0));
+      KeYSEDPreferences.setDefaultTruthValueTracingTrue(new RGB(0, 0, 255)); // new RGB(0, 117, 0)
+      KeYSEDPreferences.setDefaultTruthValueTracingFalse(new RGB(255, 0, 128)); // new RGB(170, 0, 0)
+      KeYSEDPreferences.setDefaultTruthValueTracingUnknown(new RGB(115, 115, 115)); // new RGB(217, 108, 0)
       KeYSEDPreferences.setDefaultHideFullBranchConditionIfAdditionalLabelIsAvailable(false);
    }
 }
