@@ -20,10 +20,13 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 
 /**
@@ -172,6 +175,47 @@ public final class KeYTypeUtil {
       }
       else {
          return null;
+      }
+   }
+   
+   /**
+    * Resolves the type of the given {@link ParameterDeclaration}.
+    * @param parameterDeclaration The {@link ParameterDeclaration} to resolve.
+    * @return The full qualified type name or {@code null} if the given {@link ParameterDeclaration} is {@code null}.
+    */
+   public static String resolveType(ParameterDeclaration parameterDeclaration) {
+      return parameterDeclaration != null ? resolveType(parameterDeclaration.getTypeReference()) : null;
+   }
+
+   /**
+    * Resolves the type of the given {@link TypeReference}.
+    * @param typeReference The {@link TypeReference} to resolve.
+    * @return The full qualified type name or {@code null} if the given {@link TypeReference} is {@code null}.
+    */
+   public static String resolveType(TypeReference typeReference) {
+      return typeReference != null ? resolveType(typeReference.getKeYJavaType()) : null;
+   }
+
+   /**
+    * Resolves the type of the given {@link Type}.
+    * @param type The {@link Type} to resolve.
+    * @return The full qualified type name or {@code null} if the given {@link Type} is {@code null}.
+    */
+   public static String resolveType(Type type) {
+      if (type instanceof KeYJavaType) {
+         return resolveType(((KeYJavaType) type).getJavaType());
+      }
+      else if (type instanceof ArrayType) {
+         ArrayType arrayType = (ArrayType) type;
+         StringBuffer sb = new StringBuffer();
+         sb.append(resolveType(arrayType.getBaseType()));
+         for (int i = 0; i < arrayType.getDimension(); i++) {
+            sb.append("[]");
+         }
+         return sb.toString();
+      }
+      else {
+         return type != null ? type.getFullName() : null;
       }
    }
 }
