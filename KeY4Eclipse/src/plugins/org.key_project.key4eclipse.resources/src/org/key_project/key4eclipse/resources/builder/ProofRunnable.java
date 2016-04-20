@@ -44,7 +44,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.testgen.MemoryTestGenerationLog;
 import de.uka.ilkd.key.smt.testgen.StopRequest;
+import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -216,15 +218,24 @@ public class ProofRunnable implements Runnable {
      */
     private Proof createProof(ProofElement pe) throws ProofInputException {
         Proof proof = pe.getKeYEnvironment().createProof(pe.getProofObl());
-
-        StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+        // Set default strategy settings
+        StrategyFactory factory = proof.getActiveStrategyFactory();
+        StrategySettingsDefinition model = factory != null ? factory.getSettingsDefinition() : null;
+        StrategyProperties strategyProperties;
+        if (model != null) {
+           strategyProperties = model.getDefaultPropertiesFactory().createDefaultStrategyProperties();
+           proof.getSettings().getStrategySettings().setMaxSteps(model.getDefaultMaxRuleApplications());
+        }
+        else {
+           strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties(); 
+        }
         strategyProperties.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);
         proof.getSettings().getStrategySettings().setActiveStrategyProperties(strategyProperties);
-
+        // Run auto mode
         ProofStarter ps = new ProofStarter(false);
         ps.init(proof);
         ps.start();
-
+        // Update one step simplifier
         OneStepSimplifier.refreshOSS(proof);
         return proof;
     }
