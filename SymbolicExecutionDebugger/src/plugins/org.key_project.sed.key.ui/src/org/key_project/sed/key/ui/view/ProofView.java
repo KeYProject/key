@@ -30,6 +30,9 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -381,6 +384,15 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       //create source viewer
       this.sourceViewer = new SourceViewer(parentComposite, null, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
       sourceViewer.setEditable(false);
+      final Font font = SWTUtil.initializeViewerFont(sourceViewer);
+      sourceViewer.getTextWidget().addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(DisposeEvent e) {
+            if (font != null) {
+               font.dispose();
+            }
+         }
+      });
       parentComposite.setWeights(new int[]{15, 85}); 
       parentComposite.setOrientation(SWT.HORIZONTAL);
       FormData data = new FormData();
