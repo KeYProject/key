@@ -699,6 +699,12 @@
                   tooltip="Stops the automode.">
             </command>
             <command
+                  commandId="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand"
+                  icon="icons/stopAtBreakpoints.gif"
+                  label="Stop at Breakpoints"
+                  style="toggle">
+            </command>
+            <command
                   commandId="org.key_project.sed.key.ui.generateTestCases"
                   icon="icons/testGeneration.png"
                   id="org.key_project.sed.key.ui.generateTestCases"

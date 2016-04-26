@@ -19,9 +19,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.IStateListener;
+import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.RegistryToggleState;
+import org.key_project.keyide.ui.handlers.BreakpointToggleHandler;
 import org.key_project.sed.core.model.ISEDebugElement;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISETermination;
@@ -62,6 +69,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTree
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepReturnSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -181,6 +189,21 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    private SEMemoryBranchCondition[] groupStartConditions;
 
    /**
+    * The {@link State} specifying if breakpoints are activated or not.
+    */
+   private State breakpointsActivatedState;
+
+   /**
+    * Listens for changes on {@link #breakpointsActivatedState}.
+    */
+   private final IStateListener breakpointsActivatedStateListener = new IStateListener() {
+      @Override
+      public void handleStateChange(State state, Object oldValue) {
+         hnadleStopAtBreakpointsChanged(state, oldValue);
+      }
+   };
+
+   /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param executionNode The {@link IExecutionStart} to represent by this debug node.
@@ -189,12 +212,29 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
       super(target, true);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeBreakpointToggle();
       getProofControl().addAutoModeListener(autoModeListener);
       Proof proof = getProof();
       proof.addProofTreeListener(proofChangedListener);
       target.registerDebugNode(this);
       initializeAnnotations();
       configureProofForInteractiveVerification(proof);
+   }
+
+   /**
+    * Initializes {@link #breakpointsActivatedState}.
+    */
+   protected void initializeBreakpointToggle() {
+      ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
+      if (service != null) {
+         Command command = service.getCommand(BreakpointToggleHandler.COMMAND_ID);
+         if (command != null) {
+            breakpointsActivatedState = command.getState(RegistryToggleState.STATE_ID);
+            if (breakpointsActivatedState != null) {
+               breakpointsActivatedState.addListener(breakpointsActivatedStateListener);
+            }
+         }
+      }
    }
 
    /**
@@ -492,6 +532,9 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    public void terminate() throws DebugException {
       getProofControl().removeAutoModeListener(autoModeListener);
       getProof().removeProofTreeListener(proofChangedListener);
+      if (breakpointsActivatedState != null) {
+         breakpointsActivatedState.removeListener(breakpointsActivatedStateListener);
+      }
       super.terminate();
    }
    
@@ -567,10 +610,44 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
     * @param proof The {@link Proof} to configure.
     */
    protected void configureProofForInteractiveVerification(Proof proof) {
-      configureProof(proof, 
-                     KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
-                     false, 
-                     false);
+      if (proof != null && !proof.isDisposed()) {
+         // Set default strategy settings
+         SymbolicExecutionUtil.initializeStrategy(getBuilder());
+         // Remove custom strategy because it destroys the behavior of the model search arithmetic treatment.
+         proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(null);
+         if (isStopAtBreakpointsActivated()) {
+            proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(getBreakpointManager().getBreakpointStopCondition());
+         }
+         else {
+            proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(null);
+         }
+      }
+   }
+
+   /**
+    * When the stop at breakpoints state has changed.
+    * @param state The changed {@link State}.
+    * @param oldValue The old value.
+    */
+   protected void hnadleStopAtBreakpointsChanged(State state, Object oldValue) {
+      Proof proof = getProof();
+      if (proof != null && !proof.isDisposed() && isSuspended()) {
+         if (isStopAtBreakpointsActivated()) {
+            proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(getBreakpointManager().getBreakpointStopCondition());
+         }
+         else {
+            proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(null);
+         }
+      }
+   }
+
+   /**
+    * Checks if {@link #breakpointsActivatedState} is selected or not.
+    * @return {@code true} stop at breakpoints, {@code false} do not stop at breakpoints.
+    */
+   protected boolean isStopAtBreakpointsActivated() {
+      Object value = breakpointsActivatedState.getValue();
+      return value instanceof Boolean && ((Boolean)value).booleanValue();
    }
    
    /**
@@ -596,6 +673,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
          if (stepReturn) {
             stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
          }
+         proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
          proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       }
    }

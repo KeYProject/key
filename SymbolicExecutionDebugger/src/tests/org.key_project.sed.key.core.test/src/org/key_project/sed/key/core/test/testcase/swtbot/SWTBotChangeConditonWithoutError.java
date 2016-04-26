@@ -41,12 +41,10 @@ public class SWTBotChangeConditonWithoutError extends AbstractKeYDebugTargetTest
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
             resume(bot, item, target);
             assertTrue(TestBreakpointsUtil.checkTargetConditiondofAllBreakpoints(target, null, false));
-            assertTrue(TestBreakpointsUtil.checkProofConditionofAllBreakpoints(target,  null, false));
             assertTrue(TestBreakpointsUtil.changeCondition(bot, "BreakpointStopCallerAndLoop [entry] - main(int)", "a==0&&x==5"));
             assertTrue(TestBreakpointsUtil.changeCondition(bot, "BreakpointStopCallerAndLoop [line: 16] - main(int)", "a==0&&x==5"));
             TestUtilsUtil.sleep(2000);
             assertTrue(TestBreakpointsUtil.checkTargetConditiondofAllBreakpoints(target, "a==0&&x==5", true));
-            assertTrue(TestBreakpointsUtil.checkProofConditionofAllBreakpoints(target,  "a==0&&x==5", true));
             TestBreakpointsUtil.removeAllBreakpoints();
          }
       };

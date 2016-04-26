@@ -650,7 +650,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     * @param e the {@link ProofEvent} to handle
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      if (proof != null) {
+      if (proof != null && !proof.isDisposed()) {
          proof.addRuleAppListener(ruleAppListener);
       }
       AutoModePropertyTesterSED.updateProperties();
@@ -661,7 +661,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     * @param e the {@link ProofEvent} to handle
     */
    protected void handleAutoModeStarted(ProofEvent e) {
-      if (proof != null) {
+      if (proof != null && !proof.isDisposed()) {
          proof.removeRuleAppListener(ruleAppListener);
       }
       AutoModePropertyTesterSED.updateProperties();

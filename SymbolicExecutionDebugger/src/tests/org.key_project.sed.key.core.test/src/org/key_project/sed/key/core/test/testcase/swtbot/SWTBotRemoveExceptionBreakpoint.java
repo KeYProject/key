@@ -41,10 +41,8 @@ public class SWTBotRemoveExceptionBreakpoint extends AbstractKeYDebugTargetTestC
             resume(bot, item, target);
             //allBreakpoints there
             assertTrue(TestBreakpointsUtil.checkTargetContainsSomeBreakpoints(target, 1, 2, 1, 1));
-            assertTrue(TestBreakpointsUtil.checkProofContainsSomeBreakpoints(target,  1, 2, 1, 1));
             assertTrue(TestBreakpointsUtil.removeBrakpoint(bot, "NullPointerException: caught and uncaught"));
             assertTrue(TestBreakpointsUtil.checkTargetContainsSomeBreakpoints(target, 1, 1, 1, 1));
-            assertTrue(TestBreakpointsUtil.checkProofContainsSomeBreakpoints(target,  1, 1, 1, 1));
             TestBreakpointsUtil.removeAllBreakpoints();
                
          }
