@@ -16,7 +16,6 @@ package org.key_project.key4eclipse.common.ui;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.key_project.key4eclipse.common.ui.breakpoints.MainFrameBreakpointManager;
 import org.key_project.key4eclipse.common.ui.util.EclipseEditFileActionHandler;
-import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.osgi.framework.BundleContext;
 
 /**

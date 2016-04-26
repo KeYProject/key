@@ -18,10 +18,13 @@ import org.key_project.key4eclipse.common.ui.test.Activator;
 import org.key_project.key4eclipse.common.ui.util.EclipseUserInterfaceCustomization;
 import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
+import org.key_project.keyide.ui.perspectives.KeYPerspective;
+import org.key_project.keyide.ui.starter.KeYIDEProofStarter;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithException;
+import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -178,15 +181,15 @@ public class SWTBotLoopInvariantRuleCompletionTest extends TestCase {
       
       //Don't show the dialogs inquiring about starters and perspectives. Store defaults for restore()
       previousperspective = bot.activePerspective();
-      bot.perspectiveByLabel("KeY").activate();
+      bot.perspectiveById(KeYPerspective.PERSPECTIVE_ID).activate();
       prevProofStarter = StarterPreferenceUtil.getSelectedProofStarterID();
-      StarterPreferenceUtil.setSelectedProofStarterID("org.key_project.keyide.ui.starter.KeYIDEProofStarter");
+      StarterPreferenceUtil.setSelectedProofStarterID(KeYIDEProofStarter.STARTER_ID);
       prevDontAsk = StarterPreferenceUtil.isDontAskForProofStarter();
       StarterPreferenceUtil.setDontAskForProofStarter(true);
       
       // Create test project
       IJavaProject project = TestUtilsUtil.createJavaProject("LoopInvariantRuleCompletionTest");
-      IFolder src = project.getProject().getFolder("src");
+      IFolder src = project.getProject().getFolder(JDTUtil.getSourceFolderName());
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/loopInvariantExample", src);
       
       editor = null;

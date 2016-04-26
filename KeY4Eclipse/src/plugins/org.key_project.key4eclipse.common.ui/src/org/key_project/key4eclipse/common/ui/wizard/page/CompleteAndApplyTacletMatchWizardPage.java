@@ -1,7 +1,8 @@
 package org.key_project.key4eclipse.common.ui.wizard.page;
 
 import java.io.StringWriter;
-import java.util.Vector;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -86,11 +87,6 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
     */
    private Text validationText;
 
-   /**
-    * the ID of the spec currently selected.
-    */
-   private int currentID = 0;
-
    private StackLayout assumptionsStackLayout;
 
    private Group assumptionViewGrp;
@@ -131,7 +127,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       mkTacletView(left);
       mkVariableInstantiationView(right);
       mkProgramVariablesView(left);
-      mkAssumptionsView(right);
+      boolean hasAssumptions = mkAssumptionsView(right);
       mkValidationView(right);
 
       specSelector.select(0);
@@ -139,7 +135,12 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
 
       root.setWeights(new int[]{30, 70});
       left.setWeights(new int[]{75, 25});
-      right.setWeights(new int[]{75, 25});
+      if (hasAssumptions) {
+         right.setWeights(new int[]{50, 25, 25});
+      }
+      else {
+         right.setWeights(new int[]{75, 25});
+      }
 
       // Set initial page complete state.
       updatePageComplete();
@@ -244,18 +245,21 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
     * generates a taclet-assumes instantiation view.
     * @param parent the parent composite
     */
-   private void mkAssumptionsView(Composite parent) {
+   private boolean mkAssumptionsView(Composite parent) {
       if (models[0].application().taclet().ifSequent().isEmpty()) {
          //No Assumptions to instantiate
-         return;
+         return false;
       }
-      //Generate a Group that holds the stack of AssumptionSpec Views for each model.
-      assumptionViewGrp = new Group(parent, SWT.NONE);
-      assumptionViewGrp.setText("Assumption instantiation");
-      assumptionsStackLayout = new StackLayout();
-      assumptionViewGrp.setLayout(assumptionsStackLayout);
-      for (int i = 0; i < models.length; i++) {
-         mkAssumptionsSpec(0);
+      else {
+         //Generate a Group that holds the stack of AssumptionSpec Views for each model.
+         assumptionViewGrp = new Group(parent, SWT.NONE);
+         assumptionViewGrp.setText("Assumption instantiation");
+         assumptionsStackLayout = new StackLayout();
+         assumptionViewGrp.setLayout(assumptionsStackLayout);
+         for (int i = 0; i < models.length; i++) {
+            mkAssumptionsSpec(0);
+         }
+         return true;
       }
    }
    
@@ -291,7 +295,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
     * @return The model currently selected.
     */
    private TacletInstantiationModel getCurrentModel() {
-      return models[currentID ];
+      return models[specSelector.getSelectionIndex()];
    }
    
    /**
@@ -330,8 +334,8 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       varspecs.setText("instantiation");
       tableLayout.setColumnData(varnames, new ColumnWeightData(20));
       tableLayout.setColumnData(varspecs, new ColumnWeightData(80));
-      final Vector<TableItem> editableItems = new Vector<TableItem>();
-      final Vector<Integer> editableItemOriginalRowID = new Vector<Integer>();
+      final List<TableItem> editableItems = new LinkedList<TableItem>();
+      final List<Integer> editableItemOriginalRowID = new LinkedList<Integer>();
       for (int i = 0; i < model.tableModel().getRowCount(); i++) {
          TableItem item = new TableItem(table, SWT.NONE);
          String left = model.tableModel().getValueAt(i, 0).toString();
@@ -343,7 +347,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
             right = rightSideSpec.toString();
          }
          item.setText(new String[] {left, right});
-         if (rightSideSpec == null) {
+         if (model.tableModel().isCellEditable(i, 1)) {
             editableItems.add(item);
             editableItemOriginalRowID.add(i);
          }

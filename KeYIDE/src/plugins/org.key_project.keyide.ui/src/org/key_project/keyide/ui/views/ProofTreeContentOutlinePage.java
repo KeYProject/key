@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.IStateListener;
 import org.eclipse.core.commands.State;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -359,13 +358,9 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		for (Object unknownElement : unknownParents) {
 			Object parent = contentProvider.getParent(unknownElement);
 			int viewIndex = contentProvider.getIndexOf(parent, unknownElement);
-			if (contentProvider.getHideState() == false && contentProvider.getSymbolicState() == false) {
-			   Assert.isTrue(viewIndex >= 0, "Content provider returned wrong parents or child index computation is buggy.");
-			   contentProvider.updateChildCount(parent, 0);
-			   contentProvider.updateElement(parent, viewIndex);
-			} else if (viewIndex >= 0){
-				contentProvider.updateChildCount(parent, 0);
-				contentProvider.updateElement(parent, viewIndex);
+			if (viewIndex >= 0) {
+            contentProvider.updateChildCount(parent, 0);
+            contentProvider.updateElement(parent, viewIndex);
 			}
 		}
 	}
