@@ -139,7 +139,7 @@ public class InfoTreeModel extends DefaultTreeModel {
                 }
                 ImmutableSet<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
                 OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(goal.proof());
-                if (simplifier != null) {
+                if (simplifier != null && !simplifier.isShutdown()) {
                     set = set.union(simplifier.getCapturedTaclets());
                 }
 

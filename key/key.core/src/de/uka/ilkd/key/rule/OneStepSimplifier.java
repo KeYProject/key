@@ -216,6 +216,13 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
     }
 
+    
+    /** 
+     * returns true if the indices are shutdown
+     */
+    public boolean isShutdown() {
+        return indices == null;
+    }
 
     /**
      * Helper for simplifyPosOrSub. Performs a single step of simplification
