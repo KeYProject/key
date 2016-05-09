@@ -222,6 +222,7 @@
                class="org.key_project.sed.key.ui.command.SaveProofHandler"
                commandId="org.key_project.sed.key.ui.saveProofCommand">
             <enabledWhen>
+                  <or>
                <iterate
                      ifEmpty="false"
                      operator="and">
@@ -248,6 +249,11 @@
                      </and>
                   </or>
                </iterate>
+               <test
+                     forcePluginActivation="true"
+                     property="org.key_project.sed.key.ui.proofViewHasDebugTarget">
+               </test>
+                  </or>
             </enabledWhen>
          </handler>
          <handler
@@ -693,6 +699,12 @@
                   tooltip="Stops the automode.">
             </command>
             <command
+                  commandId="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand"
+                  icon="icons/stopAtBreakpoints.gif"
+                  label="Stop at Breakpoints"
+                  style="toggle">
+            </command>
+            <command
                   commandId="org.key_project.sed.key.ui.generateTestCases"
                   icon="icons/testGeneration.png"
                   id="org.key_project.sed.key.ui.generateTestCases"
@@ -705,6 +717,17 @@
                   label="Show Subtree of this Node"
                   style="toggle"
                   tooltip="Show Subtree of Node">
+            </command>
+            <separator
+                  name="org.key_project.sed.key.ui.saveSeparator"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.key_project.sed.key.ui.saveProofCommand"
+                  icon="icons/saveKeYProof.gif"
+                  label="Save"
+                  style="push"
+                  tooltip="Save proof as *.proof file.">
             </command>
          </menuContribution>
          <menuContribution
@@ -740,6 +763,13 @@
                id="org.key_project.sed.key.ui.autoModePropertyTesterSED"
                namespace="org.key_project.sed.key.ui"
                properties="isAutoMode, isNotAutoMode, proofIsNotClosed"
+               type="java.lang.Object">
+         </propertyTester>
+         <propertyTester
+               class="org.key_project.sed.key.ui.propertyTester.ProofViewPropertyTester"
+               id="org.key_project.sed.key.ui.ProofViewPropertyTester"
+               namespace="org.key_project.sed.key.ui"
+               properties="proofViewHasDebugTarget"
                type="java.lang.Object">
          </propertyTester>
       </extension>

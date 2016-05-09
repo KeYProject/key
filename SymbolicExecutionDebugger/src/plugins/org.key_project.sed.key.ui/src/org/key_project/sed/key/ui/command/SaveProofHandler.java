@@ -29,11 +29,13 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.ui.util.LogUtil;
+import org.key_project.sed.key.ui.view.ProofView;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -53,36 +55,12 @@ public class SaveProofHandler extends AbstractHandler {
    @Override
    public Object execute(ExecutionEvent event) throws ExecutionException {
       try {
-         ISelection selection = HandlerUtil.getCurrentSelection(event);
-         Object[] elements = SWTUtil.toArray(selection);
-         for (Object element : elements) {
-            // Find proof
-            if (element instanceof ILaunch) {
-               element = ((ILaunch)element).getDebugTarget();
-            }
-            if (element instanceof IDebugElement) {
-               IDebugTarget target = ((IDebugElement)element).getDebugTarget();
-               if (target instanceof KeYDebugTarget) {
-                  KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-                  Proof proof = keyTarget.getProof();
-                  if (proof.getProofFile() != null) { // Check if proof file already exists
-                     ProofSaver saver = new ProofSaver(proof, proof.getProofFile().getAbsolutePath(), KeYConstants.INTERNAL_VERSION);
-                     String errorMsg;
-                     try {
-                         errorMsg = saver.save();
-                     }
-                     catch (IOException e) {
-                         errorMsg = e.toString();
-                     }
-                     if (errorMsg != null) {
-                        saveAs(keyTarget, HandlerUtil.getActiveShell(event));
-                     }
-                  }
-                  else {
-                     saveAs(keyTarget, HandlerUtil.getActiveShell(event));
-                  }
-               }
-            }
+         IWorkbenchPart part = HandlerUtil.getActivePart(event);
+         if (part instanceof ProofView) {
+            saveProofViewProof((ProofView) part, event);
+         }
+         else {
+            saveDebugSelection(event);
          }
       }
       catch (Exception e) {
@@ -92,6 +70,69 @@ public class SaveProofHandler extends AbstractHandler {
       return null;
    }
    
+   /**
+    * Saves the {@link Proof} of the given {@link ProofView}.
+    * @param proofView The {@link ProofView}.
+    * @param event The current {@link ExecutionEvent} to work with.
+    * @throws CoreException Occurred Exception.
+    */
+   protected void saveProofViewProof(ProofView proofView, ExecutionEvent event) throws CoreException {
+      KeYDebugTarget target = proofView.getKeyDebugTarget();
+      if (target != null) {
+         saveProof(target, proofView.getCurrentProof(), HandlerUtil.getActiveShell(event));
+      }
+   }
+
+   /**
+    * Saves the current debug view selection.
+    * @param event The {@link ExecutionEvent} to work with.
+    * @throws CoreException Occurred Exception.
+    */
+   protected void saveDebugSelection(ExecutionEvent event) throws CoreException {
+      ISelection selection = HandlerUtil.getCurrentSelection(event);
+      Object[] elements = SWTUtil.toArray(selection);
+      for (Object element : elements) {
+         // Find proof
+         if (element instanceof ILaunch) {
+            element = ((ILaunch)element).getDebugTarget();
+         }
+         if (element instanceof IDebugElement) {
+            IDebugTarget target = ((IDebugElement)element).getDebugTarget();
+            if (target instanceof KeYDebugTarget) {
+               KeYDebugTarget keyTarget = (KeYDebugTarget)target;
+               Proof proof = keyTarget.getProof();
+               saveProof(keyTarget, proof, HandlerUtil.getActiveShell(event));
+            }
+         }
+      }
+   }
+   
+   /**
+    * Saves the given {@link Proof} of the given {@link KeYDebugTarget}.
+    * @param keyTarget The {@link KeYDebugTarget} to save.
+    * @param proof The {@link Proof} to save.
+    * @param shell The parent {@link Shell}.
+    * @throws CoreException Occurred Exception.
+    */
+   protected void saveProof(KeYDebugTarget keyTarget, Proof proof, Shell shell) throws CoreException {
+      if (proof.getProofFile() != null) { // Check if proof file already exists
+         ProofSaver saver = new ProofSaver(proof, proof.getProofFile().getAbsolutePath(), KeYConstants.INTERNAL_VERSION);
+         String errorMsg;
+         try {
+             errorMsg = saver.save();
+         }
+         catch (IOException e) {
+             errorMsg = e.toString();
+         }
+         if (errorMsg != null) {
+            saveAs(keyTarget, shell);
+         }
+      }
+      else {
+         saveAs(keyTarget, shell);
+      }
+   }
+
    /**
     * Open the save as dialog.
     * @param target The {@link KeYDebugTarget} to save.

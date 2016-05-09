@@ -41,12 +41,10 @@ public class SWTBotChangeAccessModification extends AbstractKeYDebugTargetTestCa
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
             resume(bot, item, target);
             assertTrue(TestBreakpointsUtil.checkTargetAccessAndModificationofAllBreakpoints(target, 2,2));
-            assertTrue(TestBreakpointsUtil.checkProofAccessAndModificationofAllBreakpoints(target,  2,2));
             assertTrue(TestBreakpointsUtil.changeAccessAndModification(bot, "BreakpointStopCallerAndLoop [access and modification] - x", false, true));
             assertTrue(TestBreakpointsUtil.changeAccessAndModification(bot, "BreakpointStopCallerAndLoop [access and modification] - callee", true, false));
             TestUtilsUtil.sleep(2000);
             assertTrue(TestBreakpointsUtil.checkTargetAccessAndModificationofAllBreakpoints(target, 1,1));
-            assertTrue(TestBreakpointsUtil.checkProofAccessAndModificationofAllBreakpoints(target,  1,1));
             TestBreakpointsUtil.removeAllBreakpoints();
          }
       };

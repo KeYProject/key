@@ -141,10 +141,12 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
 				assertTrue(proofView.bot().tree().rowCount() == 1);
 				// select open goal and apply manual rule
 				TestUtilsUtil.selectInTree(proofView.bot().tree(), "10:OPEN GOAL");
+            TestSedCoreUtil.waitForDebugTreeInterface();
 				final SWTBotStyledText styledText = proofView.bot().styledText();
-				Point point = TestUtilsUtil.selectText(styledText, "{exc:=null}");
+				Point point = TestUtilsUtil.selectText(styledText, "if (this.content==n.content)");
 				TestUtilsUtil.setCursorLocation(styledText, point.x + 1, point.y + 15);
 				TestUtilsUtil.clickContextMenu(styledText, point.x + 1, point.y + 15, "ifElseUnfold");
+            TestSedCoreUtil.waitForDebugTreeInterface();
 				// check if hide intermediate proof steps filter is still
 				// working
 				assertTrue(proofView.bot().tree().getTreeItem("11:OPEN GOAL") != null);
@@ -217,7 +219,8 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
             Point point0 = TestUtilsUtil.selectText(styledText0, "well");
             TestUtilsUtil.setCursorLocation(styledText0, ((int) (point0.x * 0.3)), point0.y);
             TestUtilsUtil.clickContextMenu(styledText0,  ((int) (point0.x * 0.3)), point0.y, "impRight");
-            assertTrue((count + 1) == proofView.bot().tree().rowCount());
+            TestSedCoreUtil.waitForDebugTreeInterface();
+            assertEquals(count + 1, proofView.bot().tree().rowCount());
             //step into and check if the same proof is still loaded on both views
             performStep(debugView, bot, target, 0, 0, 0);
             ProofView view = getProofView(proofView);
@@ -227,10 +230,11 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
             proofView.bot().tree().select(count - 1);
             assertTrue(proofView.bot().tree().getTreeItem("10:OPEN GOAL") != null);
             final SWTBotStyledText styledText = proofView.bot().styledText();
-            Point point = TestUtilsUtil.selectText(styledText, "{exc:=null}");
+            Point point = TestUtilsUtil.selectText(styledText, "if (this.content==n.content)");
             TestUtilsUtil.setCursorLocation(styledText, point.x + 1, point.y + 15);
             TestUtilsUtil.clickContextMenu(styledText, point.x + 1, point.y + 15, "ifElseUnfold");
-            assertTrue((count + 1) == proofView.bot().tree().rowCount());
+            TestSedCoreUtil.waitForDebugTreeInterface();
+            assertEquals(count + 1, proofView.bot().tree().rowCount());
             //make sure that new node is loaded in debugView
             TestSedCoreUtil.waitForDebugTreeInterface();
             assertNotNull(TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0, 1));

@@ -41,14 +41,12 @@ public class SWTBotChangeHitCount extends AbstractKeYDebugTargetTestCase {
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
             resume(bot, item, target);
             assertTrue(TestBreakpointsUtil.checkTargetHitCountofAllBreakpoints(target, -1));
-            assertTrue(TestBreakpointsUtil.checkProofHitCountofAllBreakpoints(target,  -1));
             assertTrue(TestBreakpointsUtil.changeHitCount(bot, "BreakpointStopCallerAndLoop [entry] - main(int)", 2));
             assertTrue(TestBreakpointsUtil.changeHitCount(bot, "NullPointerException: caught and uncaught", 2));
             assertTrue(TestBreakpointsUtil.changeHitCount(bot, "BreakpointStopCallerAndLoop [line: 16] - main(int)", 2));
             assertTrue(TestBreakpointsUtil.changeHitCount(bot, "BreakpointStopCallerAndLoop [access and modification] - x", 2));
             TestUtilsUtil.sleep(2000);
             assertTrue(TestBreakpointsUtil.checkTargetHitCountofAllBreakpoints(target, 2));
-            assertTrue(TestBreakpointsUtil.checkProofHitCountofAllBreakpoints(target,  2));
             TestBreakpointsUtil.removeAllBreakpoints();
          }
       };

@@ -41,14 +41,12 @@ public class SWTBotChangeEnabled extends AbstractKeYDebugTargetTestCase {
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
             resume(bot, item, target);
             assertTrue(TestBreakpointsUtil.checkTargetEnabledofAllBreakpoints(target, true));
-            assertTrue(TestBreakpointsUtil.checkProofEnabledofAllBreakpoints(target,  true));
             assertTrue(TestBreakpointsUtil.changeEnabled(bot, "BreakpointStopCallerAndLoop [entry] - main(int)", false));
             assertTrue(TestBreakpointsUtil.changeEnabled(bot, "NullPointerException: caught and uncaught", false));
             assertTrue(TestBreakpointsUtil.changeEnabled(bot, "BreakpointStopCallerAndLoop [line: 16] - main(int)", false));
             assertTrue(TestBreakpointsUtil.changeEnabled(bot, "BreakpointStopCallerAndLoop [access and modification] - x", false));
             TestUtilsUtil.sleep(2000);
             assertTrue(TestBreakpointsUtil.checkTargetEnabledofAllBreakpoints(target, false));
-            assertTrue(TestBreakpointsUtil.checkProofEnabledofAllBreakpoints(target,  false));
             TestBreakpointsUtil.removeAllBreakpoints();
          }
       };

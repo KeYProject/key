@@ -1,8 +1,11 @@
 package org.key_project.key4eclipse.common.ui.wizard.page;
 
 import java.io.StringWriter;
-import java.util.Vector;
+import java.util.LinkedList;
+import java.util.List;
 
+import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -12,14 +15,12 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -64,7 +65,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
    /**
     * the root Composite of this page.
     */
-   private Composite root;
+   private SashForm root;
 
    /**
     * The spec selector combo.
@@ -84,12 +85,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
    /**
     * The validationView's Text field.
     */
-   private Label validationText;
-
-   /**
-    * the ID of the spec currently selected.
-    */
-   private int currentID = 0;
+   private Text validationText;
 
    private StackLayout assumptionsStackLayout;
 
@@ -116,25 +112,36 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
    @Override
    public void createControl(Composite parent) {
       // Create root
-      root = new SashForm(parent, SWT.HORIZONTAL);
-      int defaultSashWidth = 10;
-      ((SashForm) root).setSashWidth(defaultSashWidth);
-      setControl(root);
+      Composite parentRoot = new Composite(parent, SWT.NONE);
+      parentRoot.setLayout(new GridLayout(1, false));
+      setControl(parentRoot);
       //set general layout. Should be easily modifiable.
+      root = new SashForm(parentRoot, SWT.HORIZONTAL);
+      GridData g = new GridData(GridData.FILL_BOTH);
+      g.widthHint = 800;
+      g.heightHint = 400;
+      root.setLayoutData(g);
       SashForm left  = new SashForm(root, SWT.VERTICAL);
-      ((SashForm) left).setSashWidth(defaultSashWidth);
       SashForm right = new SashForm(root, SWT.VERTICAL);
-      ((SashForm) right).setSashWidth(defaultSashWidth);
       
       mkTacletView(left);
       mkVariableInstantiationView(right);
       mkProgramVariablesView(left);
-      mkAssumptionsView(right);
+      boolean hasAssumptions = mkAssumptionsView(right);
       mkValidationView(right);
 
       specSelector.select(0);
       specSwitchTo(0);
-      
+
+      root.setWeights(new int[]{30, 70});
+      left.setWeights(new int[]{75, 25});
+      if (hasAssumptions) {
+         right.setWeights(new int[]{50, 25, 25});
+      }
+      else {
+         right.setWeights(new int[]{75, 25});
+      }
+
       // Set initial page complete state.
       updatePageComplete();
    }
@@ -169,7 +176,9 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       Group statusGrp = new Group(parent, SWT.NONE);
       statusGrp.setLayoutData(new GridData(GridData.FILL_BOTH));
       statusGrp.setLayout(new GridLayout(1, false));
-      Text tacletText = new Text(statusGrp, SWT.WRAP | SWT.READ_ONLY);
+      Text tacletText = new Text(statusGrp, SWT.WRAP | SWT.V_SCROLL);
+      tacletText.setEditable(false);
+      tacletText.setLayoutData(new GridData(GridData.FILL_BOTH));
       //show taclet name in group border
       statusGrp.setText("Selected Taclet - " + taclet.name());
       // show taclet
@@ -186,7 +195,9 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       statusGrp.setLayoutData(new GridData(GridData.FILL_BOTH));
       statusGrp.setLayout(new GridLayout(1, false));
       statusGrp.setText("Sequent program variables");
-      Label status = new Label(statusGrp, SWT.WRAP);
+      Text status = new Text(statusGrp, SWT.WRAP | SWT.V_SCROLL);
+      status.setLayoutData(new GridData(GridData.FILL_BOTH));
+      status.setEditable(false);
       ImmutableList<Named> vars = models[0].programVariables().elements();
       String text;
       if (vars.size() > 0) {
@@ -234,18 +245,21 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
     * generates a taclet-assumes instantiation view.
     * @param parent the parent composite
     */
-   private void mkAssumptionsView(Composite parent) {
+   private boolean mkAssumptionsView(Composite parent) {
       if (models[0].application().taclet().ifSequent().isEmpty()) {
          //No Assumptions to instantiate
-         return;
+         return false;
       }
-      //Generate a Group that holds the stack of AssumptionSpec Views for each model.
-      assumptionViewGrp = new Group(parent, SWT.NONE);
-      assumptionViewGrp.setText("Assumption instantiation");
-      assumptionsStackLayout = new StackLayout();
-      assumptionViewGrp.setLayout(assumptionsStackLayout);
-      for (int i = 0; i < models.length; i++) {
-         mkAssumptionsSpec(0);
+      else {
+         //Generate a Group that holds the stack of AssumptionSpec Views for each model.
+         assumptionViewGrp = new Group(parent, SWT.NONE);
+         assumptionViewGrp.setText("Assumption instantiation");
+         assumptionsStackLayout = new StackLayout();
+         assumptionViewGrp.setLayout(assumptionsStackLayout);
+         for (int i = 0; i < models.length; i++) {
+            mkAssumptionsSpec(0);
+         }
+         return true;
       }
    }
    
@@ -258,7 +272,9 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       statusGrp.setLayoutData(new GridData(GridData.FILL_BOTH));
       statusGrp.setLayout(new GridLayout(1, false));
       statusGrp.setText("Input validation result");
-      validationText = new Label(statusGrp, SWT.WRAP);
+      validationText = new Text(statusGrp, SWT.WRAP | SWT.V_SCROLL);
+      validationText.setEditable(false);
+      validationText.setLayoutData(new GridData(GridData.FILL_BOTH));
    }
    
    /**
@@ -266,10 +282,10 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
     * @param id The ID of the spec in models
     */
    private void specSwitchTo(int id) {
-      stackLayout.topControl = (Composite) specSwitchComposite.getChildren()[id];
+      stackLayout.topControl = specSwitchComposite.getChildren()[id];
       specSwitchComposite.layout();
       if (assumptionsStackLayout != null && assumptionViewGrp != null) {
-         assumptionsStackLayout.topControl = (Composite) assumptionViewGrp.getChildren()[id];
+         assumptionsStackLayout.topControl = assumptionViewGrp.getChildren()[id];
          assumptionViewGrp.layout();
       }
       validationViewUpdate();
@@ -279,7 +295,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
     * @return The model currently selected.
     */
    private TacletInstantiationModel getCurrentModel() {
-      return models[currentID ];
+      return models[specSelector.getSelectionIndex()];
    }
    
    /**
@@ -307,17 +323,21 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       specSelector.add(name);
       TacletInstantiationModel model = models[id];
       Composite specComposite = new Composite(specSwitchComposite, SWT.NONE);
-      specComposite.setLayout(new GridLayout(1, false));
-      specComposite.setLayout(new FillLayout());
+      TableColumnLayout tableLayout = new TableColumnLayout();
+      specComposite.setLayout(tableLayout);
       final Table table = new Table(specComposite, SWT.BORDER | SWT.FULL_SELECTION);
+      table.setHeaderVisible(true);
+      table.setLinesVisible(true);
       TableColumn varnames = new TableColumn(table, SWT.NONE);
+      varnames.setText("formula");
       TableColumn varspecs = new TableColumn(table, SWT.NONE);
-      TableItem item = new TableItem(table, SWT.NONE);
-      item.setText(new String[] {"formula", "instantiation"});
-      final Vector<TableItem> editableItems = new Vector<TableItem>();
-      final Vector<Integer> editableItemOriginalRowID = new Vector<Integer>();
+      varspecs.setText("instantiation");
+      tableLayout.setColumnData(varnames, new ColumnWeightData(20));
+      tableLayout.setColumnData(varspecs, new ColumnWeightData(80));
+      final List<TableItem> editableItems = new LinkedList<TableItem>();
+      final List<Integer> editableItemOriginalRowID = new LinkedList<Integer>();
       for (int i = 0; i < model.tableModel().getRowCount(); i++) {
-         item = new TableItem(table, SWT.NONE);
+         TableItem item = new TableItem(table, SWT.NONE);
          String left = model.tableModel().getValueAt(i, 0).toString();
          Object rightSideSpec = model.tableModel().getValueAt(i, 1);
          String right;
@@ -327,13 +347,11 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
             right = rightSideSpec.toString();
          }
          item.setText(new String[] {left, right});
-         if (rightSideSpec == null) {
+         if (model.tableModel().isCellEditable(i, 1)) {
             editableItems.add(item);
             editableItemOriginalRowID.add(i);
          }
       }
-      varnames.pack();
-      varspecs.pack();
       
       final TableEditor editor = new TableEditor(table);
       editor.horizontalAlignment = SWT.RIGHT;
@@ -378,7 +396,6 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
             editor.setEditor(newEditor, item, 1);
          }
       });
-      table.setLinesVisible(true);
    }
    
    /**

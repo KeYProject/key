@@ -1,7 +1,6 @@
 package org.key_project.key4eclipse.common.ui.test.testcase.swtbot;
 
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -26,11 +25,14 @@ import org.key_project.key4eclipse.common.ui.test.Activator;
 import org.key_project.key4eclipse.common.ui.util.EclipseUserInterfaceCustomization;
 import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
+import org.key_project.keyide.ui.perspectives.KeYPerspective;
+import org.key_project.keyide.ui.starter.KeYIDEProofStarter;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithException;
+import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -43,7 +45,6 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 /**
  * Tests for CompleteAndApplyTacletMatchWizardPage.
  * @author Viktor Pfanschilling
- *
  */
 public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
    /**
@@ -102,7 +103,7 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
          
          //edit the table
          SWTBotTable t = dialogShell.bot().table();
-         SWTBotTableItem ti = t.getTableItem(2);
+         SWTBotTableItem ti = t.getTableItem(1);
          ti.click();
 
          Text wdgt = bot.widget(widgetOfType(Text.class), t.widget);
@@ -133,7 +134,7 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
          
          //edit the spec to unlock the finish button.
          SWTBotTable t = dialogShell.bot().table();
-         SWTBotTableItem ti = t.getTableItem(2);
+         SWTBotTableItem ti = t.getTableItem(1);
          ti.click();
          Text wdgt = bot.widget(widgetOfType(Text.class), t.widget);
          SWTBotText txt = new SWTBotText(wdgt, null);
@@ -229,29 +230,25 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
       
       //Don't show the dialogs inquiring about starters and perspectives. Store defaults for restore()
       previousperspective = bot.activePerspective();
-      bot.perspectiveByLabel("KeY").activate();
+      bot.perspectiveById(KeYPerspective.PERSPECTIVE_ID).activate();
       prevProofStarter = StarterPreferenceUtil.getSelectedProofStarterID();
-      StarterPreferenceUtil.setSelectedProofStarterID("org.key_project.keyide.ui.starter.KeYIDEProofStarter");
+      StarterPreferenceUtil.setSelectedProofStarterID(KeYIDEProofStarter.STARTER_ID);
       prevDontAsk = StarterPreferenceUtil.isDontAskForProofStarter();
       StarterPreferenceUtil.setDontAskForProofStarter(true);
       
       // Create test project
       IJavaProject project = TestUtilsUtil.createJavaProject("TacletMatchWizardPageTest");
-      IFolder src = project.getProject().getFolder("src");
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/tacletMatchWizardExample", src);
+      IFolder src = project.getProject().getFolder(JDTUtil.getSourceFolderName());
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/tacletMatchWizardExample/proofs", src);
       
       editor = null;
       // Get local file in operating system of folder src 
       File location = ResourceUtil.getLocation(src);
-      File[] filesInLoc = location.listFiles();
-      assertNotNull(filesInLoc);
-      assertEquals(filesInLoc.length, 1);
-      File proofFolder = filesInLoc[0];
       
       // Load proof file in KeY
       environment = KeYEnvironment.load(
             SymbolicExecutionJavaProfile.getDefaultInstance(false), 
-            new File(proofFolder, filename),
+            new File(location, filename),
             null, null, null, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(),
             EclipseUserInterfaceCustomization.getInstance(), true);
       
@@ -259,7 +256,6 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
       assertNotNull(proof);
       
       IRunnableWithException run = new AbstractRunnableWithException() {
-
          @Override
          public void run() {
             try {
@@ -271,7 +267,6 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
             }
          }
       };
-      
       Display.getDefault().syncExec(run);
       if (run.getException() != null) {
          throw run.getException();

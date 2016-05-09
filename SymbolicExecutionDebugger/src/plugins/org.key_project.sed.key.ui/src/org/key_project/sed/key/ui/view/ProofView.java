@@ -154,6 +154,11 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
    private ProofTreeLabelProvider labelProvider;
 
    /**
+    * The {@link KeYDebugTarget} which offers the currently shown {@link Proof}.
+    */
+   private KeYDebugTarget keyDebugTarget;
+   
+   /**
     * the {@link KeYEnvironment} of the proof.
     */
    private KeYEnvironment<?> environment;
@@ -494,7 +499,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
          treeViewer.getControl().getDisplay().syncExec(new Runnable() {
             @Override
             public void run() {
-               changeProof(null, null, null, baseViewNode);
+               changeProof(keyDebugTarget, null, null, null, baseViewNode);
             }
          });
       }
@@ -543,20 +548,23 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
          newMethod = keyTarget.getMethod();
       }
       // Replace content.
-      changeProof(newProof, newEnvironment, newMethod, seNode);
+      changeProof(keyTarget, newProof, newEnvironment, newMethod, seNode);
    }
    
    /**
     * Updates the shown proof.
+    * @param newTarget The new {@link KeYDebugTarget}.
     * @param newProof The new {@link Proof}.
     * @param newEnvironment The new {@link SymbolicExecutionEnvironment}.
     * @param newMethod The new {@link IMethod}.
     * @param seNode The {@link IKeYSENode}.
     */
-   protected void changeProof(Proof newProof, 
+   protected void changeProof(KeYDebugTarget newTarget,
+                              Proof newProof, 
                               SymbolicExecutionEnvironment<?> newEnvironment, 
                               IMethod newMethod, 
                               IKeYSENode<?> seNode) {
+      keyDebugTarget = newTarget;
       // Replace content if needed
       if (newProof != proof) {
          // Remove listener from old proof
@@ -642,7 +650,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     * @param e the {@link ProofEvent} to handle
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      if (proof != null) {
+      if (proof != null && !proof.isDisposed()) {
          proof.addRuleAppListener(ruleAppListener);
       }
       AutoModePropertyTesterSED.updateProperties();
@@ -653,7 +661,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     * @param e the {@link ProofEvent} to handle
     */
    protected void handleAutoModeStarted(ProofEvent e) {
-      if (proof != null) {
+      if (proof != null && !proof.isDisposed()) {
          proof.removeRuleAppListener(ruleAppListener);
       }
       AutoModePropertyTesterSED.updateProperties();
@@ -907,6 +915,14 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
    @Override
    public String getContributorId() {
       return KeYEditor.CONTRIBUTOR_ID;
+   }
+
+   /**
+    * Returns the {@link KeYDebugTarget} from which the {@link Proof} is currently shown.
+    * @return The {@link KeYDebugTarget} or {@code null} if not available.
+    */
+   public KeYDebugTarget getKeyDebugTarget() {
+      return keyDebugTarget;
    }
 
    /**

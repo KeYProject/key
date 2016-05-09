@@ -43,7 +43,6 @@ public class SWTBotChangeConditonWithErrorOKThenOKWithoutChange extends Abstract
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
             resume(bot, item, target);
             assertTrue(TestBreakpointsUtil.checkTargetConditiondofAllBreakpoints(target, null, false));
-            assertTrue(TestBreakpointsUtil.checkProofConditionofAllBreakpoints(target,  null, false));
             assertTrue(TestBreakpointsUtil.changeCondition(bot, "BreakpointStopCallerAndLoop [entry] - main(int)", "abcdefg"));
             TestUtilsUtil.sleep(2000);
             TestUtilsUtil.clickDirectly(bot,"Edit Condition");

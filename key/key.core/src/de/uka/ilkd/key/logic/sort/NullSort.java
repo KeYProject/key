@@ -138,10 +138,8 @@ public final class NullSort implements Sort  {
         return NAME.toString();
     }
 
-
     @Override
     public String declarationString() {
-        // TODO Auto-generated method stub
-        return null;
+        return NAME.toString();
     }
 }
