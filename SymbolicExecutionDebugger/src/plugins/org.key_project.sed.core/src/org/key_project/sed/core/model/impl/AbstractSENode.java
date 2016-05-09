@@ -36,9 +36,9 @@ import org.key_project.sed.core.annotation.ISEAnnotationType;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEConstraint;
 import org.key_project.sed.core.model.ISEDebugElement;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.model.ISEGroupable;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.model.event.ISEAnnotationLinkListener;
 import org.key_project.sed.core.model.event.SEAnnotationLinkEvent;
@@ -69,7 +69,7 @@ public abstract class AbstractSENode extends AbstractSEDebugElement implements I
    /**
     * The thread.
     */
-   private final ISEThread thread;
+   private ISEThread thread;
    
    /**
     * All contained {@link ISEAnnotationLink}s.
@@ -88,8 +88,8 @@ public abstract class AbstractSENode extends AbstractSEDebugElement implements I
     * @param thread The {@link ISEThread} in that this node is contained.
     */
    public AbstractSENode(ISEDebugTarget target, 
-                               ISENode parent, 
-                               ISEThread thread) {
+                         ISENode parent, 
+                         ISEThread thread) {
       super(target);
       this.parent = parent;
       this.thread = thread;
@@ -127,6 +127,16 @@ public abstract class AbstractSENode extends AbstractSEDebugElement implements I
    @Override
    public ISEThread getThread() {
       return thread;
+   }
+   
+   /**
+    * It is valid to set the thread as long it was not defined before.
+    * So a thread might be set lazily later but can never be changed.
+    * @param parent The new thread to set.
+    */
+   protected void setThread(ISEThread thread) {
+      Assert.isTrue(this.thread == null || this.thread == thread);
+      this.thread = thread;
    }
 
    /**

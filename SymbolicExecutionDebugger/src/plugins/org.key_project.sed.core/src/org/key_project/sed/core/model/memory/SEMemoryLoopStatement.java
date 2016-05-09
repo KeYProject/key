@@ -370,4 +370,20 @@ public class SEMemoryLoopStatement extends AbstractSELoopStatement implements IS
    public void setGroupable(boolean groupable) {
       this.groupable = groupable;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setParent(ISENode parent) {
+      super.setParent(parent);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setThread(ISEThread thread) {
+      super.setThread(thread);
+   }
 }

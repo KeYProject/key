@@ -342,4 +342,20 @@ public class SEMemoryLoopBodyTermination extends AbstractSELoopBodyTermination i
          groupStartConditions.add(groupStartCondition);
       }
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setParent(ISENode parent) {
+      super.setParent(parent);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setThread(ISEThread thread) {
+      super.setThread(thread);
+   }
 }
