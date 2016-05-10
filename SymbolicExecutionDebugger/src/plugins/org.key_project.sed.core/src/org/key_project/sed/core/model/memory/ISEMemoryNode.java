@@ -16,6 +16,7 @@ package org.key_project.sed.core.model.memory;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEConstraint;
 import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.ISEThread;
 
 /**
@@ -97,4 +98,16 @@ public interface ISEMemoryNode extends ISENode {
     * @param thread The new thread to set.
     */
    public void setThread(ISEThread thread);
+   
+   /**
+    * Adds the outgoing link.
+    * @param link The outgoing link to add.
+    */
+   public void addOutgoingLink(ISENodeLink link);
+   
+   /**
+    * Adds the incoming link.
+    * @param link The incoming link to add.
+    */
+   public void addIncomingLink(ISENodeLink link);
 }

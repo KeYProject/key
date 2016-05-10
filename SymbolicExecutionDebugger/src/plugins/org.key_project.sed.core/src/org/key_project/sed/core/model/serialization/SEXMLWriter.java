@@ -52,6 +52,7 @@ import org.key_project.sed.core.model.ISELoopStatement;
 import org.key_project.sed.core.model.ISEMethodCall;
 import org.key_project.sed.core.model.ISEMethodContract;
 import org.key_project.sed.core.model.ISEMethodReturn;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.ISEStatement;
 import org.key_project.sed.core.model.ISETermination;
 import org.key_project.sed.core.model.ISEThread;
@@ -237,6 +238,11 @@ public class SEXMLWriter {
    public static final String TAG_RELEVANT_CONSTRAINT = "relevantConstraint";
 
    /**
+    * Tag name to store outgoing {@link ISENodeLink} instances.
+    */
+   public static final String TAG_OUTGOING_LINK = "outgoingLink";
+
+   /**
     * Attribute name to define namespaces.
     */
    public static final String ATTRIBUTE_NAMESPACE = "xmlns";
@@ -391,6 +397,11 @@ public class SEXMLWriter {
     * Attribute name to store {@link ISEGroupable#isGroupable()}.
     */
    public static final String ATTRIBUTE_GROUPABLE = "groupable";
+
+   /**
+    * Attribute name to store {@link ISENodeLink#getTarget()}.
+    */
+   public static final String ATTRIBUTE_LINK_TARGET = "targetId";
    
    /**
     * Writes the given {@link ISEDebugTarget}s into the {@link OutputStream} with the defined encoding.
@@ -1131,9 +1142,16 @@ public class SEXMLWriter {
          XMLUtil.appendStartTag(level, tagName, attributeValues, sb);
          // Append constraints
          appendConstraints(level + 1, node, saveConstraints, sb, monitor);
+         // Append outgoing links
+         ISENodeLink[] outgoingLinks = node.getOutgoingLinks();
+         if (!ArrayUtil.isEmpty(outgoingLinks)) {
+            for (ISENodeLink link : outgoingLinks) {
+               appendOutgoingLink(level + 1, link, sb);
+            }
+         }
          // Append annotation links
-         ISEAnnotationLink[] links = node.getAnnotationLinks();
-         for (ISEAnnotationLink link : links) {
+         ISEAnnotationLink[] annotationLinks = node.getAnnotationLinks();
+         for (ISEAnnotationLink link : annotationLinks) {
             sb.append(toXML(level + 1, link));
          }
          // Append variables
@@ -1177,6 +1195,23 @@ public class SEXMLWriter {
          // Append end tag
          XMLUtil.appendEndTag(level, tagName, sb);
       }
+   }
+
+   /**
+    * Appends the outgoing {@link ISENodeLink}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param link The {@link ISENodeLink} to append.
+    * @param sb The {@link StringBuffer} to write to.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void appendOutgoingLink(int level, ISENodeLink link, StringBuffer sb) throws DebugException {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_ID, link.getId());
+      attributeValues.put(ATTRIBUTE_NAME, link.getName());
+      if (link.getTarget() != null) {
+         attributeValues.put(ATTRIBUTE_LINK_TARGET, link.getTarget().getId());
+      }
+      XMLUtil.appendEmptyTag(level, TAG_OUTGOING_LINK, attributeValues, sb);
    }
 
    /**

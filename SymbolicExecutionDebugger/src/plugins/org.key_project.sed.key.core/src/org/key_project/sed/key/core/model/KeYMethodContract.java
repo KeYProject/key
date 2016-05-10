@@ -23,6 +23,7 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEMethodContract;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.impl.AbstractSEMethodContract;
 import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.launch.KeYSourceLookupParticipant.SourceRequest;
@@ -504,5 +505,21 @@ public class KeYMethodContract extends AbstractSEMethodContract implements IKeYS
    @Override
    public boolean isTruthValueTracingEnabled() {
       return SymbolicExecutionJavaProfile.isTruthValueTracingEnabled(getExecutionNode().getProof());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getOutgoingLinks() throws DebugException {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getIncomingLinks() throws DebugException {
+      return null;
    }
 }

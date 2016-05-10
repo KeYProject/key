@@ -43,6 +43,7 @@ import org.key_project.sed.core.model.memory.SEMemoryExceptionalMethodReturn;
 import org.key_project.sed.core.model.memory.SEMemoryExceptionalTermination;
 import org.key_project.sed.core.model.memory.SEMemoryMethodCall;
 import org.key_project.sed.core.model.memory.SEMemoryMethodReturn;
+import org.key_project.sed.core.model.memory.SEMemoryNodeLink;
 import org.key_project.sed.core.model.memory.SEMemoryStatement;
 import org.key_project.sed.core.model.memory.SEMemoryTermination;
 import org.key_project.sed.core.model.memory.SEMemoryThread;
@@ -130,7 +131,6 @@ public class ExampleLaunchConfigurationDelegate extends LaunchConfigurationDeleg
        statement.setPathCondition("true");
        statement.setCallStack(createCallStack(call));
        call.addChild(statement);
-       
        // Not Null Branch Condition
        SEMemoryBranchCondition notNullBC = new SEMemoryBranchCondition(target, statement, thread);
        notNullBC.setName("other != null");
@@ -165,6 +165,13 @@ public class ExampleLaunchConfigurationDelegate extends LaunchConfigurationDeleg
        nullBC.setPathCondition("other == null");
        nullBC.setCallStack(createCallStack(call));
        statement.addChild(nullBC);
+       // Link between both branch conditions
+       SEMemoryNodeLink bcsLink = new SEMemoryNodeLink(target);
+       bcsLink.setSource(nullBC);
+       bcsLink.setTarget(notNullBC);
+       bcsLink.setName("Sibling");
+       nullBC.addOutgoingLink(bcsLink);
+       notNullBC.addIncomingLink(bcsLink);
        // Exceptional method return
        SEMemoryExceptionalMethodReturn exceptionalReturn = new SEMemoryExceptionalMethodReturn(target, nullBC, thread);
        exceptionalReturn.setName("<throw java.lang.NullPointerException>");
@@ -186,6 +193,12 @@ public class ExampleLaunchConfigurationDelegate extends LaunchConfigurationDeleg
        exceptionalTermination.setName("<uncaught java.lang.NullPointerException>");
        exceptionalTermination.setPathCondition("other == null");
        exceptionalReturn.addChild(exceptionalTermination);
+       // Link between both terminations
+       SEMemoryNodeLink terminationLink = new SEMemoryNodeLink(target);
+       terminationLink.setSource(termination);
+       terminationLink.setTarget(exceptionalTermination);
+       termination.addOutgoingLink(terminationLink);       
+       exceptionalTermination.addIncomingLink(terminationLink);       
        
        // May add ISEDVariable with ISEDValue to each ISEDDebugNode
        SEMemoryVariable variable = new SEMemoryVariable(target, thread);

@@ -98,6 +98,7 @@ import org.key_project.sed.core.model.ISELoopStatement;
 import org.key_project.sed.core.model.ISEMethodCall;
 import org.key_project.sed.core.model.ISEMethodContract;
 import org.key_project.sed.core.model.ISEMethodReturn;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.ISEStatement;
 import org.key_project.sed.core.model.ISETermination;
 import org.key_project.sed.core.model.ISEThread;
@@ -1073,6 +1074,8 @@ public final class TestSedCoreUtil {
          }
          // Compare parent
          if (compareReferences) {
+            compareLinks(expected.getOutgoingLinks(), current.getOutgoingLinks());
+            compareLinks(expected.getIncomingLinks(), current.getIncomingLinks());
             compareNode(expected.getParent(), current.getParent(), false, compareId, compareVariables, compareCallStack, compareConstraints);
             // Compare children
             ISENode[] expectedChildren = expected.getChildren();
@@ -1154,6 +1157,43 @@ public final class TestSedCoreUtil {
       }
    }
    
+   /**
+    * Compares the given {@link ISENodeLink}s.
+    * @param expectedEntries The expected {@link ISENodeLink}s.
+    * @param currentEntries The current {@link ISENodeLink}s.
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareLinks(ISENodeLink[] expectedEntries, ISENodeLink[] currentEntries) throws DebugException {
+      if (expectedEntries != null) {
+         TestCase.assertNotNull(currentEntries);
+         TestCase.assertEquals(expectedEntries.length, currentEntries.length);
+         for (int i = 0; i < expectedEntries.length; i++) {
+            compareLink(expectedEntries[i], currentEntries[i]);
+         }
+      }
+      else {
+         TestCase.assertTrue(ArrayUtil.isEmpty(currentEntries));
+      }
+   }
+
+   /**
+    * Compares the given {@link ISENodeLink}s.
+    * @param expected The expected {@link ISENodeLink}.
+    * @param current The current {@link ISENodeLink}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareLink(ISENodeLink expected, ISENodeLink current) throws DebugException {
+      if (expected != null) {
+         TestCase.assertNotNull(current);
+         TestCase.assertEquals(expected.getName(), current.getName());
+         compareNode(expected.getSource(), current.getSource(), false, false, false, false, false);
+         compareNode(expected.getTarget(), current.getTarget(), false, false, false, false, false);
+      }
+      else {
+         TestCase.assertNull(current);
+      }
+   }
+
    /**
     * Compares the given call stack entries.
     * @param expected The expected {@link ISENode}s.

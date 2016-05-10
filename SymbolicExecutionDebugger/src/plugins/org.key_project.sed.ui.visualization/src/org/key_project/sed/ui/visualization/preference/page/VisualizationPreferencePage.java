@@ -76,5 +76,8 @@ public class VisualizationPreferencePage extends FieldEditorPreferencePage imple
       
       ColorFieldEditor nodeConnectionColor = new ColorFieldEditor(VisualizationPreferences.EXECUTION_TREE_NODE_CONNECTION_COLOR, "Connection Color", executionTreeGroup);
       addField(nodeConnectionColor);
+      
+      ColorFieldEditor nodeLinkColor = new ColorFieldEditor(VisualizationPreferences.EXECUTION_TREE_NODE_LINK_COLOR, "Link Color", executionTreeGroup);
+      addField(nodeLinkColor);
    }
 }

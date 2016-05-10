@@ -37,5 +37,6 @@ public class VisualizationPreferencesInitializer extends AbstractPreferenceIniti
       VisualizationPreferences.setDefaultExecutionTreeNodeForegroundColor(new RGB(67, 106, 149));
       VisualizationPreferences.setDefaultExecutionTreeNodeTextColor(new RGB(0, 0, 0));
       VisualizationPreferences.setDefaultExecutionTreeNodeConnectionColor(new RGB(0, 0, 0));
+      VisualizationPreferences.setDefaultExecutionTreeNodeLinkColor(new RGB(0, 0, 250));
    }
 }

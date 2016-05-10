@@ -24,6 +24,7 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEBranchStatement;
 import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.impl.AbstractSEBranchStatement;
 import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
@@ -442,5 +443,21 @@ public class KeYBranchStatement extends AbstractSEBranchStatement implements IKe
    @Override
    public boolean isTruthValueTracingEnabled() {
       return SymbolicExecutionJavaProfile.isTruthValueTracingEnabled(getExecutionNode().getProof());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getOutgoingLinks() throws DebugException {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getIncomingLinks() throws DebugException {
+      return null;
    }
 }

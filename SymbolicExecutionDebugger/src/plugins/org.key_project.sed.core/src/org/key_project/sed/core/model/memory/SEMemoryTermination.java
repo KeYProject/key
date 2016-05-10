@@ -22,6 +22,7 @@ import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEConstraint;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.ISETermination;
 import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.model.impl.AbstractSETermination;
@@ -91,6 +92,16 @@ public class SEMemoryTermination extends AbstractSETermination implements ISEMem
     * The known group start conditions.
     */
    private final List<ISEBranchCondition> groupStartConditions = new LinkedList<ISEBranchCondition>();
+   
+   /**
+    * The outgoing {@link ISENodeLink}s.
+    */
+   private final List<ISENodeLink> outgoingLinks = new LinkedList<ISENodeLink>();
+   
+   /**
+    * The incoming {@link ISENodeLink}s.
+    */
+   private final List<ISENodeLink> incomingLinks = new LinkedList<ISENodeLink>();
    
    /**
     * Constructor.
@@ -357,5 +368,37 @@ public class SEMemoryTermination extends AbstractSETermination implements ISEMem
    @Override
    public void setThread(ISEThread thread) {
       super.setThread(thread);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addOutgoingLink(ISENodeLink link) {
+      outgoingLinks.add(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getOutgoingLinks() throws DebugException {
+      return outgoingLinks.toArray(new ISENodeLink[outgoingLinks.size()]);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addIncomingLink(ISENodeLink link) {
+      incomingLinks.add(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getIncomingLinks() throws DebugException {
+      return incomingLinks.toArray(new ISENodeLink[incomingLinks.size()]);
    }
 }
