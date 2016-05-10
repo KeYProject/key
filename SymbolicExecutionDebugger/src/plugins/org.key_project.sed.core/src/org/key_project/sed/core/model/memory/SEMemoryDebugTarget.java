@@ -37,6 +37,11 @@ public class SEMemoryDebugTarget extends AbstractSEDebugTarget implements ISEMem
    private final List<ISEThread> threads = new LinkedList<ISEThread>();
    
    /**
+    * Is grouping supported?;
+    */
+   private boolean groupingSupported = true;
+   
+   /**
     * Constructor.
     * @param launch The {@link ILaunch} in that this {@link IDebugTarget} is used.
     * @param executable {@code true} Support suspend, resume, etc.; {@code false} Do not support suspend, resume, etc.
@@ -163,6 +168,14 @@ public class SEMemoryDebugTarget extends AbstractSEDebugTarget implements ISEMem
     */
    @Override
    public boolean isGroupingSupported() {
-      return true;
+      return groupingSupported;
+   }
+
+   /**
+    * Defines if grouping is supported.
+    * @param groupingSupported {@code true} supported, {@code false} not supported.
+    */
+   public void setGroupingSupported(boolean groupingSupported) {
+      this.groupingSupported = groupingSupported;
    }
 }
