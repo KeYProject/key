@@ -165,20 +165,23 @@ public class NodeTabComposite implements ISENodeTabContent {
       data.top = new FormAttachment(typeCLabel, 0, SWT.CENTER);
       typeLabel.setLayoutData(data);
 
-      Text pathText = factory.createText(composite, path != null ? path : StringUtil.EMPTY_STRING);
-      pathText.setEditable(false);
-      data = new FormData();
-      data.left = new FormAttachment(0, labelWidth);
-      data.right = new FormAttachment(100, 0);
-      data.top = new FormAttachment(typeCLabel, 0, ITabbedPropertyConstants.VSPACE);
-      pathText.setLayoutData(data);
-      
-      CLabel pathLabel = factory.createCLabel(composite, "Path:");
-      data = new FormData();
-      data.left = new FormAttachment(0, 0);
-      data.right = new FormAttachment(pathText, -ITabbedPropertyConstants.HSPACE);
-      data.top = new FormAttachment(pathText, 0, SWT.CENTER);
-      pathLabel.setLayoutData(data);
+      CLabel pathLabel = null;
+      if (path != null) {
+         Text pathText = factory.createText(composite, path != null ? path : StringUtil.EMPTY_STRING);
+         pathText.setEditable(false);
+         data = new FormData();
+         data.left = new FormAttachment(0, labelWidth);
+         data.right = new FormAttachment(100, 0);
+         data.top = new FormAttachment(typeCLabel, 0, ITabbedPropertyConstants.VSPACE);
+         pathText.setLayoutData(data);
+         
+         pathLabel = factory.createCLabel(composite, "Path:");
+         data = new FormData();
+         data.left = new FormAttachment(0, 0);
+         data.right = new FormAttachment(pathText, -ITabbedPropertyConstants.HSPACE);
+         data.top = new FormAttachment(pathText, 0, SWT.CENTER);
+         pathLabel.setLayoutData(data);
+      }
 
       if (returnCondition != null) {
          Text methodReturnText = factory.createText(composite, returnCondition);
@@ -186,7 +189,7 @@ public class NodeTabComposite implements ISENodeTabContent {
          data = new FormData();
          data.left = new FormAttachment(0, labelWidth);
          data.right = new FormAttachment(100, 0);
-         data.top = new FormAttachment(pathLabel, 0, ITabbedPropertyConstants.VSPACE);
+         data.top = new FormAttachment(pathLabel != null ? pathLabel : typeCLabel, 0, ITabbedPropertyConstants.VSPACE);
          methodReturnText.setLayoutData(data);
          
          CLabel methodReturnLabel = factory.createCLabel(composite, "Return Condition:");
