@@ -319,6 +319,7 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
          Text text = gaService.createDefaultText(getDiagram(), textDecorator);
          text.setStyle(ExecutionTreeStyleUtil.getStyleForLinkConnection(getDiagram()));
          text.setValue(link.getName());
+         text.setX(GraphitiUtil.calculateTextSize(text.getValue(), text.getFont()).getWidth() / -2); // Center text
          link(text.getPictogramElement(), link);
       }
       
