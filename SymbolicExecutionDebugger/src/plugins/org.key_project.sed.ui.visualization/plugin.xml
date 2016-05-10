@@ -214,7 +214,7 @@
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiCallStackPropertySection"
-                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiReadonlyDebugNodeTreeFilter"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiCallStackFilter"
                     id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiCallStackPropertySection"
                     tab="org.key_project.sed.ui.visualization.callStack.tab">
               </propertySection>
