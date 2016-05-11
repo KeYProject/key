@@ -921,9 +921,8 @@ public final class SEDUIUtil {
                      Image image = result.get(annotationTypeID);
                      if (image == null) {
                         String imagePath = configElement.getAttribute("icon");
-                        image = null;;
                         if (!StringUtil.isEmpty(imagePath)) {
-                           URL url = Activator.getDefault().getBundle().getResource(imagePath);
+                           URL url = Platform.getBundle(extension.getNamespaceIdentifier()).getResource(imagePath);
                            if (url != null) {
                               image = new Image(Display.getDefault(), url.openStream());
                               result.put(annotationTypeID, image);
