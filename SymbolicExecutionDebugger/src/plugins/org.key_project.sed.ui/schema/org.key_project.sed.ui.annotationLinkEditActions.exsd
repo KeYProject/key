@@ -55,7 +55,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.key_project.sed.ui.action.ISEDAnnotationLinkEditAction"/>
+                  <meta.attribute kind="java" basedOn=":org.key_project.sed.ui.action.ISEAnnotationLinkEditAction"/>
                </appinfo>
             </annotation>
          </attribute>

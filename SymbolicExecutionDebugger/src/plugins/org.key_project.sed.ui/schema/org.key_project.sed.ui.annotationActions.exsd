@@ -79,7 +79,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.key_project.sed.ui.action.ISEDAnnotationAction"/>
+                  <meta.attribute kind="java" basedOn=":org.key_project.sed.ui.action.ISEAnnotationAction"/>
                </appinfo>
             </annotation>
          </attribute>
