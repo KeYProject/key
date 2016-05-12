@@ -59,7 +59,6 @@ import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
@@ -1504,8 +1503,9 @@ public class SymbolicExecutionTreeBuilder {
             Node stackEntry = stackIter.next();
             if (stackEntry != proof.root()) { // Ignore call stack entries provided by the initial sequent
                IExecutionNode<?> executionNode = getExecutionNode(stackEntry);
-               assert executionNode != null : "Can't find execution node for KeY's proof node " + stackEntry.serialNr() + ": " + ProofSaver.printAnything(stackEntry, proof.getServices()) + ".";
-               callStack.add(executionNode);
+               if (executionNode != null) { // It might be null in case of API methods.
+                  callStack.add(executionNode);
+               }
             }
          }
          return callStack.toArray(new IExecutionNode[callStack.size()]);
