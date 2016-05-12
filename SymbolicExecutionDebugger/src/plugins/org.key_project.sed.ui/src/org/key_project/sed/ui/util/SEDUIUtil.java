@@ -55,13 +55,12 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.key_project.sed.core.annotation.ISEAnnotationType;
 import org.key_project.sed.core.model.ISEDebugElement;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.provider.SEDebugNodeContentProvider;
 import org.key_project.sed.core.provider.SEDebugTargetContentProvider;
 import org.key_project.sed.core.util.LogUtil;
 import org.key_project.sed.core.util.SEPreorderIterator;
-import org.key_project.sed.ui.Activator;
 import org.key_project.sed.ui.action.ISEAnnotationAction;
 import org.key_project.sed.ui.action.ISEAnnotationLinkAction;
 import org.key_project.sed.ui.action.ISEAnnotationLinkEditAction;
@@ -562,7 +561,7 @@ public final class SEDUIUtil {
                      String toolTipText = configElement.getAttribute("toolTipText");
                      Image image = null;;
                      if (!StringUtil.isEmpty(imagePath)) {
-                        URL url = Activator.getDefault().getBundle().getResource(imagePath);
+                        URL url = Platform.getBundle(extension.getNamespaceIdentifier()).getResource(imagePath);
                         if (url != null) {
                            image = new Image(Display.getDefault(), url.openStream());
                         }
@@ -616,7 +615,7 @@ public final class SEDUIUtil {
                      String toolTipText = configElement.getAttribute("toolTipText");
                      Image image = null;;
                      if (!StringUtil.isEmpty(imagePath)) {
-                        URL url = Activator.getDefault().getBundle().getResource(imagePath);
+                        URL url = Platform.getBundle(extension.getNamespaceIdentifier()).getResource(imagePath);
                         if (url != null) {
                            image = new Image(Display.getDefault(), url.openStream());
                         }
