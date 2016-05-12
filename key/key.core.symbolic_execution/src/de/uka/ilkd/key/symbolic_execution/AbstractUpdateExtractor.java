@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -607,7 +608,7 @@ public abstract class AbstractUpdateExtractor {
     * </p>
     * @author Martin Hentschel
     */
-   protected class ExtractLocationParameter {
+   public class ExtractLocationParameter {
       /**
        * The {@link ProgramVariable} or {@code null} if an array index is used instead.
        */
@@ -936,19 +937,7 @@ public abstract class AbstractUpdateExtractor {
                                                                        boolean currentLayout,
                                                                        boolean simplifyConditions) throws ProofInputException {
       // Get original updates
-      ImmutableList<Term> originalUpdates;
-      if (!currentLayout) {
-         originalUpdates = ImmutableSLList.nil();
-      }
-      else {
-         if (node.proof().root() == node) {
-            originalUpdates = SymbolicExecutionUtil.computeRootElementaryUpdates(node);
-         }
-         else {
-            Term originalModifiedFormula = modalityPio.subTerm();
-            originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;            
-         }
-      }
+      ImmutableList<Term> originalUpdates = computeOriginalUpdates(modalityPio, currentLayout);
       // Combine memory layout with original updates
       Map<LocationVariable, Term> preUpdateMap = new HashMap<LocationVariable, Term>();
       ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
@@ -960,6 +949,9 @@ public abstract class AbstractUpdateExtractor {
       TermBuilder tb = getServices().getTermBuilder();
       Term updateLayoutTerm = tb.applyParallel(originalUpdates, layoutTerm);
       updateLayoutTerm = tb.applyParallel(additionalUpdates, updateLayoutTerm);
+      for (Term additionalUpdate : collectAdditionalUpdates()) {
+         updateLayoutTerm = tb.apply(additionalUpdate, updateLayoutTerm);
+      }      
       final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, modalityPio, layoutCondition, updateLayoutTerm, null, false);
       // Instantiate and run proof
@@ -1038,6 +1030,37 @@ public abstract class AbstractUpdateExtractor {
       finally {
          SymbolicExecutionSideProofUtil.disposeOrStore("Layout computation on node " + node.serialNr() + " with layout term " + ProofSaver.printAnything(layoutTerm, getServices()) + ".", info);
       }
+   }
+   
+   /**
+    * Collects additional updates.
+    * @return The additional updates.
+    */
+   protected List<Term> collectAdditionalUpdates() {
+      return Collections.emptyList();
+   }
+   
+   /**
+    * Computes the original updates.
+    * @param pio The {@link PosInOccurrence}.
+    * @param currentLayout Is current layout?
+    * @return The original updates.
+    */
+   protected ImmutableList<Term> computeOriginalUpdates(PosInOccurrence pio, boolean currentLayout) {
+      ImmutableList<Term> originalUpdates;
+      if (!currentLayout) {
+         originalUpdates = ImmutableSLList.nil();
+      }
+      else {
+         if (node.proof().root() == node) {
+            originalUpdates = SymbolicExecutionUtil.computeRootElementaryUpdates(node);
+         }
+         else {
+            Term originalModifiedFormula = pio.subTerm();
+            originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;            
+         }
+      }
+      return originalUpdates;
    }
 
    /**
@@ -1326,7 +1349,7 @@ public abstract class AbstractUpdateExtractor {
     * </p>
     * @author Martin Hentschel
     */
-   protected static class ExecutionVariableValuePair {
+   public static class ExecutionVariableValuePair {
       /**
        * The {@link ProgramVariable} or {@code null} if an array index is used instead.
        */
