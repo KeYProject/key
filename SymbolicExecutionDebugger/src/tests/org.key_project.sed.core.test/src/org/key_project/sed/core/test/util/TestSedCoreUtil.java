@@ -1191,7 +1191,7 @@ public final class TestSedCoreUtil {
     * @throws DebugException Occurred Exception.
     */
    protected static void compareLinks(ISENodeLink[] expectedEntries, ISENodeLink[] currentEntries) throws DebugException {
-      if (expectedEntries != null) {
+      if (!ArrayUtil.isEmpty(expectedEntries)) {
          TestCase.assertNotNull(currentEntries);
          TestCase.assertEquals(expectedEntries.length, currentEntries.length);
          for (int i = 0; i < expectedEntries.length; i++) {
