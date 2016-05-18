@@ -274,12 +274,6 @@ SEMICOLON
 ;
 
 STRING_LITERAL
-@after {
-    // strip quotation marks
-    final String text = getText();
-    final int length = text.length();
-    setText(text.substring(1, length - 1));
-}
     : '"' ( ESC | ~('"'|'\\') )* '"'
     ;
 

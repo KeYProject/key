@@ -1471,6 +1471,30 @@ public class TestUtilsUtil {
    }
 
    /**
+    * Returns the selection of the given {@link SWTBotTable}.
+    * @param table The {@link SWTBotTable}.
+    * @return The selected {@link Object}s.
+    * @throws Exception Occurred Exception.
+    */
+   public static Object[] getSelectedObjects(final SWTBotTable table) throws Exception {
+      IRunnableWithResult<Object[]> run = new AbstractRunnableWithResult<Object[]>() {
+         @Override
+         public void run() {
+            List<Object> result = new LinkedList<Object>();
+            for (TableItem item : table.widget.getSelection()) {
+               result.add(item.getData());
+            }
+            setResult(result.toArray(new Object[result.size()]));
+         }
+      };
+      table.widget.getDisplay().syncExec(run);
+      if (run.getException() != null) {
+         throw run.getException();
+      }
+      return run.getResult();
+   }
+
+   /**
     * Waits until the {@link SWTBotTreeItem} is expanded.
     * @param bot The {@link SWTWorkbenchBot} to use. 
     * @param item The {@link SWTBotTreeItem} to wait for.

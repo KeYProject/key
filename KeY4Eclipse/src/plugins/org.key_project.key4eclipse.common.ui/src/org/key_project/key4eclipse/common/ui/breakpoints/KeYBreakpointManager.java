@@ -47,7 +47,6 @@ import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.strategy.BreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.ExceptionBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.FieldWatchpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.LineBreakpoint;
@@ -419,7 +418,7 @@ public class KeYBreakpointManager implements IBreakpointListener {
          proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(getBreakpointStopCondition());
          proof.getServices().setFactory(KeYBreakpointManager.createNewFactory(getBreakpointStopCondition()));
          StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-         proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
+         proof.setActiveStrategy(proof.getActiveStrategyFactory().create(proof, strategyProperties));
       }
       else {
          proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(null);

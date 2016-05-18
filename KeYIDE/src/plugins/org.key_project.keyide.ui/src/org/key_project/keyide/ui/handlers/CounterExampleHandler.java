@@ -18,11 +18,11 @@ import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.key4eclipse.common.ui.counterExample.NodeCounterExampleGeneratorJob;
 import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandler;
-import org.key_project.keyide.ui.editor.KeYEditor;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.proof.Node;
@@ -40,14 +40,17 @@ public class CounterExampleHandler extends AbstractSaveExecutionHandler {
    @Override
    protected Object doExecute(ExecutionEvent event) throws Exception {
       if (AbstractCounterExampleGenerator.isSolverAvailable()) {
-         IEditorPart editorPart = HandlerUtil.getActiveEditor(event);
-         if (editorPart instanceof KeYEditor) {
-            KeYEditor editor = (KeYEditor) editorPart;
+         IWorkbenchPart workbenchPart = HandlerUtil.getActivePart(event);
+         if (!(workbenchPart instanceof IProofProvider)) {
+            workbenchPart = HandlerUtil.getActiveEditor(event);
+         }
+         if (workbenchPart instanceof IProofProvider) {
+            IProofProvider provider = (IProofProvider) workbenchPart;
             ISelection selection = HandlerUtil.getCurrentSelection(event);
             Object[] elements = SWTUtil.toArray(selection);
             for (Object element : elements) {
                 if (element instanceof Node) {
-                    Job job = new NodeCounterExampleGeneratorJob(editor.getUI(), (Node) element);
+                    Job job = new NodeCounterExampleGeneratorJob(provider.getUI(), (Node) element);
                     job.schedule();
                 }
             }

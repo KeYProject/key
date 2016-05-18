@@ -41,10 +41,8 @@ public class SWTBotRemoveWatchpoint extends AbstractKeYDebugTargetTestCase {
             resume(bot, item, target);
             //allBreakpoints there
             assertTrue(TestBreakpointsUtil.checkTargetContainsSomeBreakpoints(target, 1, 1, 1, 2));
-            assertTrue(TestBreakpointsUtil.checkProofContainsSomeBreakpoints(target,  1, 1, 1, 2));
             assertTrue(TestBreakpointsUtil.removeBrakpoint(bot, "BreakpointStopCallerAndLoop [access and modification] - x"));
             assertTrue(TestBreakpointsUtil.checkTargetContainsSomeBreakpoints(target, 1, 1, 1, 1));
-            assertTrue(TestBreakpointsUtil.checkProofContainsSomeBreakpoints(target,  1, 1, 1, 1));
             TestBreakpointsUtil.removeAllBreakpoints(); 
          }
       };

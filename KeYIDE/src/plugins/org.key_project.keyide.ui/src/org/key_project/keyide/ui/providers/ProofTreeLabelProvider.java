@@ -27,13 +27,16 @@ import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * The {@link LabelProvider} used to label a proof tree consiting of 
@@ -59,7 +62,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
    /**
     * A mapping from {@link Node}s to {@link BranchFolder}s.
     */
-   private final Map<Node, BranchFolder> nodeToBranchMapping = new HashMap<Node, BranchFolder>(); 
+   private final Map<Node, BranchFolder> nodeToBranchMapping = new HashMap<Node, BranchFolder>();
    
    /**
     * The ProofTreeListener
@@ -159,7 +162,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
       this.viewer = viewer;
       this.proofControl = proofControl;
       this.proof = proof;
-      if (proof != null) {
+      if (proof != null && !proof.isDisposed()) {
          proof.addProofTreeListener(proofTreeListener);
          proofControl.addAutoModeListener(autoModeListener);
       }
@@ -204,44 +207,123 @@ public class ProofTreeLabelProvider extends LabelProvider {
       }
    }
    
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public Image getImage(Object element) {
-      if (element instanceof Node){
-         Node node = (Node)element;
-         if (node.isClosed()) {
-            return KeYImages.getImage(KeYImages.NODE_PROVED);
-         }
-         else {
-            if (node.getNodeInfo().getInteractiveRuleApplication()) {
-               return KeYImages.getImage(KeYImages.NODE_INTERACTIVE);
-            }
-            else {
-               return KeYImages.getImage(KeYImages.NODE);
-            }
-         }
-      }
-      else if (element instanceof BranchFolder){
-         if (((BranchFolder)element).isClosed()){
-            return KeYImages.getImage(KeYImages.FOLDER_PROVED);
-         }
-         else {
-            return KeYImages.getImage(KeYImages.FOLDER);
-         }
-      }
-      else {
-         return super.getImage(element); // Unknown element
-      }
-   }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Image getImage(Object element) {
+		if (element instanceof Node) {
+			Node node = (Node) element;
+			NodeInfo info = node.getNodeInfo();
+			SourceElement statement = info.getActiveStatement();
+
+			if (node.isClosed()) {
+				return KeYImages.getImage(KeYImages.NODE_PROVED);
+
+			} else if (node.root()) {
+				return KeYImages.getImage(KeYImages.THREAD);
+
+			} else if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, node.getAppliedRuleApp())) {
+				// Get position information
+				PositionInfo posInfo = null;
+				if (statement != null) {
+					posInfo = statement.getPositionInfo();
+				}
+
+				if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement)) {
+					return KeYImages.getImage(KeYImages.METHOD_CALL);
+
+				} else if (SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp())) {
+					return KeYImages.getImage(KeYImages.METHOD_RETURN);
+
+				} else if (SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, node.getAppliedRuleApp())) {
+					return KeYImages.getImage(KeYImages.EXCEPTIONAL_METHOD_RETURN);
+
+				} else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
+					if (SymbolicExecutionUtil.isLoopBodyTermination(node, node.getAppliedRuleApp())) {
+						if (SymbolicExecutionUtil.lazyComputeIsBranchVerified(node)) {
+							return KeYImages.getImage(KeYImages.LOOP_BODY_TERMINATION);
+						} else {
+							return KeYImages.getImage(KeYImages.LOOP_BODY_TERMINATION_NOT_VERIFIED);
+						}
+					} else if (SymbolicExecutionUtil.lazyComputeIsExceptionalTermination(node, SymbolicExecutionUtil.extractExceptionVariable(node.proof()))) {
+						if (SymbolicExecutionUtil.lazyComputeIsBranchVerified(node)) {
+							return KeYImages.getImage(KeYImages.EXCEPTIONAL_TERMINATION);
+						} else {
+							return KeYImages.getImage(KeYImages.EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
+						}
+					} else {
+						if (SymbolicExecutionUtil.lazyComputeIsBranchVerified(node)) {
+							return KeYImages.getImage(KeYImages.TERMINATION);
+						} else {
+							return KeYImages.getImage(KeYImages.TERMINATION_NOT_VERIFIED);
+						}
+					}
+				} else if (SymbolicExecutionUtil.isBranchStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
+					return KeYImages.getImage(KeYImages.BRANCH_STATEMENT);
+
+				} else if (SymbolicExecutionUtil.isLoopStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
+					return KeYImages.getImage(KeYImages.LOOP_STATEMENT);
+
+				} else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
+					return KeYImages.getImage(KeYImages.STATEMENT);
+
+				} else if (SymbolicExecutionUtil.isOperationContract(node, node.getAppliedRuleApp())) {
+					// is precondition compiled
+					if (node.childrenCount() >= 3 && node.child(2).isClosed()) {
+						// is not null check compiled
+						if (node.childrenCount() >= 4 && node.child(3).isClosed()) {
+							return KeYImages.getImage(KeYImages.METHOD_CONTRACT);
+						} else {
+							return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_NPC);
+						}
+					} else {
+						// is not null check compiled
+						if (node.childrenCount() >= 4 && node.child(3).isClosed()) {
+							return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_PRE);
+						} else {
+							return KeYImages.getImage(KeYImages.METHOD_CONTRACT_NOT_PRE_NOT_NPC);
+						}
+					}
+				} else if (SymbolicExecutionUtil.hasLoopCondition(node, node.getAppliedRuleApp(), statement)) {
+					return KeYImages.getImage(KeYImages.LOOP_CONDITION);
+
+				} else if (SymbolicExecutionUtil.isLoopInvariant(node, node.getAppliedRuleApp())) {
+					// is initially valid
+					if (node.childrenCount() >= 1 && node.child(0).isClosed()) {
+						return KeYImages.getImage(KeYImages.LOOP_INVARIANT);
+					} else {
+						return KeYImages.getImage(KeYImages.LOOP_INVARIANT_INITIALLY_INVALID);
+					}
+				} else {
+					return KeYImages.getImage(KeYImages.NODE);
+				}
+			} else {
+				if (node.getNodeInfo().getInteractiveRuleApplication()) {
+					return KeYImages.getImage(KeYImages.NODE_INTERACTIVE);
+				} else {
+					return KeYImages.getImage(KeYImages.NODE);
+				}
+			}
+		} else if (element instanceof BranchFolder) {
+			if (((BranchFolder) element).isClosed()) {
+				return KeYImages.getImage(KeYImages.FOLDER_PROVED);
+			} else {
+				return KeYImages.getImage(KeYImages.FOLDER);
+			}
+		} else {
+			return super.getImage(element); // Unknown element
+		}
+	}
 
    /**
     * When the auto mode is started.
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      proof.addProofTreeListener(proofTreeListener);
+      if (proof != null && !proof.isDisposed()) {
+         proof.addProofTreeListener(proofTreeListener);
+      }
       fireAllNodesChanged();
    }
 
@@ -250,7 +332,9 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStarted(ProofEvent e) {
-      proof.removeProofTreeListener(proofTreeListener);
+      if (proof != null && !proof.isDisposed()) {
+         proof.removeProofTreeListener(proofTreeListener);
+      }
    }
 
    /**

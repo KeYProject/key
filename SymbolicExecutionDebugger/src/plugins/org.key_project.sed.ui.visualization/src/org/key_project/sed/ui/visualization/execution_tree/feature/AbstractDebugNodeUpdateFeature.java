@@ -27,15 +27,20 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IReason;
+import org.eclipse.graphiti.features.IRemoveFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
+import org.eclipse.graphiti.features.context.IRemoveContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.AreaContext;
 import org.eclipse.graphiti.features.context.impl.LayoutContext;
+import org.eclipse.graphiti.features.context.impl.RemoveContext;
 import org.eclipse.graphiti.features.context.impl.UpdateContext;
 import org.eclipse.graphiti.features.impl.AbstractUpdateFeature;
+import org.eclipse.graphiti.features.impl.DefaultRemoveFeature;
 import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
@@ -44,9 +49,9 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.key_project.sed.core.annotation.ISEAnnotation;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEDebugElement;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.model.ISEGroupable;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.util.ISEIterator;
 import org.key_project.sed.core.util.NodeUtil;
@@ -227,9 +232,15 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       else {
          try {
             PictogramElement pe = context.getPictogramElement();
-
-            if (isNameUpdateNeeded(pe)) {
+            if (isPruneUpdateNeeded(pe)) {
+            	return Reason.createTrueReason("Node got pruned");
+            	
+            }
+            else if (isNameUpdateNeeded(pe)) {
                return Reason.createTrueReason("Name is out of date.");
+            }
+            else if (isIconUpdateNeeded(pe)) {
+               return Reason.createTrueReason("Icon is out of date.");
             }
             else {
                final boolean groupingSupported = ExecutionTreeUtil.isGroupingSupported(getFeatureProvider(), context);
@@ -249,6 +260,36 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
    
    /**
+    * Checks if the business object of the given {@link PictogramElement} got
+    * pruned.
+    * 
+    * @param pe
+    *           the {@link PictogramElement}.
+    * @return true if the business object got pruned; otherwise false.
+    * @throws DebugException
+    */
+   protected boolean isPruneUpdateNeeded(PictogramElement pe) throws DebugException {
+      Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pe);
+      if (bo instanceof ISENode) {
+         ISENode node = (ISENode) bo;
+         if (!node.hasChildren() && node.getParent() != null) {
+            if (!node.getParent().hasChildren()) {
+               return true;
+            } else {
+               ISENode[] children = node.getParent().getChildren();
+               for (ISENode child : children) {
+                  if (child == node) {
+                     return false;
+                  }
+               }
+               return true;
+            }
+         }
+      }
+      return false;
+   }
+   
+   /**
     * Checks if the shown name in the given {@link PictogramElement}
     * is equal to the name defined by his business object 
     * ({@link ISENode#getName()}).
@@ -265,6 +306,47 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       }
       else {
          return false;
+      }
+   }
+   
+   /**
+    * Checks if the shown name in the given {@link PictogramElement}
+    * is equal to the icon defined by his business object.
+    * @param pictogramElement The {@link PictogramElement} to check.
+    * @return {@code true} icon is different and an update is required, {@code false} icon is the same and no update is required.
+    * @throws DebugException Occurred Exception.
+    */
+   protected boolean isIconUpdateNeeded(PictogramElement pictogramElement) throws DebugException {
+      Image image = findIconImage(pictogramElement);
+      if (image != null) {
+         String pictogramImageId = image.getId();
+         String businessImageId = getBusinessIconId(pictogramElement);
+         return !StringUtil.equalIgnoreWhiteSpace(businessImageId, pictogramImageId);
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Returns the image ID defined by the business object of the given {@link PictogramElement}.
+    * @param pictogramElement The {@link PictogramElement} for that the business image ID is needed.
+    * @return The image ID defined by the business object of the given {@link PictogramElement}.
+    * @throws DebugException The business image ID.
+    */
+   protected String getBusinessIconId(PictogramElement pictogramElement) throws DebugException {
+      Object bo = getBusinessObjectForPictogramElement(pictogramElement);
+      if (bo instanceof ISENode) {
+         IAddFeature addFeature = getFeatureProvider().getAddFeature(new AddContext(new AreaContext(), bo));
+         if (addFeature instanceof AbstractDebugNodeAddFeature) {
+            return ((AbstractDebugNodeAddFeature) addFeature).getImageId((ISENode) bo);
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
       }
    }
    
@@ -376,6 +458,25 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       }
       return result;
    }
+   
+   /**
+    * Finds the {@link Image} which shows the image of an {@link ISENode}.
+    * @param pictogramElement The {@link PictogramElement} to search the {@link Image} in.
+    * @return The found {@link Image} or {@code null} if no one was found.
+    */
+   protected Image findIconImage(PictogramElement pictogramElement) {
+      Image result = null;
+      if (pictogramElement.getGraphicsAlgorithm() instanceof Image) {
+         result = (Image)pictogramElement.getGraphicsAlgorithm();
+      }
+      else if (pictogramElement instanceof ContainerShape && pictogramElement.getGraphicsAlgorithm() instanceof RoundedRectangle) {
+         ContainerShape cs = (ContainerShape)pictogramElement;
+         for (Shape shape : cs.getChildren()) {
+            result = findIconImage(shape);
+         }
+      }
+      return result;
+   }
 
    /**
     * {@inheritDoc}
@@ -393,14 +494,27 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       }
       else {
          try {
+            // remove pruned nodes
+            if (isPruneUpdateNeeded(context.getPictogramElement())) {
+               IRemoveContext removeContext = new RemoveContext(context.getPictogramElement());
+               IRemoveFeature feature = new DefaultRemoveFeature(getFeatureProvider());
+               feature.execute(removeContext);
+               return true;
+            }
+        
             // Define monitor to use
             IProgressMonitor monitor = GraphitiUtil.getProgressMonitor(context);
             // Update name
             PictogramElement pictogramElement = context.getPictogramElement();
 
-            monitor.beginTask("Update element: " + pictogramElement, 3);
+            monitor.beginTask("Update element: " + pictogramElement, 4);
 
             boolean success = updateName(pictogramElement, new SubProgressMonitor(monitor, 1));
+            monitor.worked(1);
+            
+            if (success) {
+               success = updateIcon(pictogramElement, new SubProgressMonitor(monitor, 1));
+            }
             monitor.worked(1);
 
             // Update children, they have the correct layout after this step
@@ -475,7 +589,39 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                return true;
             }
             else {
-               return false;
+               return true; // Nothing to do
+            }
+         }
+         else {
+            return false;
+         }
+      }
+      finally {
+         monitor.worked(1);
+         monitor.done();
+      }
+   }
+
+   /**
+    * Updates the shown icon in the given {@link PictogramElement}.
+    * @param pictogramElement The {@link PictogramElement} to update.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @return {@code true}, if update process was successful
+    * @throws DebugException Occurred Exception.
+    */
+   protected boolean updateIcon(PictogramElement pictogramElement, 
+                                IProgressMonitor monitor) throws DebugException {
+      try {
+         if (!monitor.isCanceled()) {
+            monitor.beginTask("Update icons", 1);
+            Image image = findIconImage(pictogramElement);
+            if (image != null) {
+               String businessImageId = getBusinessIconId(pictogramElement);
+               image.setId(businessImageId);
+               return true;
+            }
+            else {
+               return true; // Nothing to do
             }
          }
          else {
@@ -508,7 +654,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                if (bos[i] instanceof ISEDebugElement) {
                   final boolean groupingSupported = ExecutionTreeUtil.isGroupingSupported((ISEDebugElement)bos[i]);
                   // Add all children left aligned
-                  Set<ISENode> leafs = updateChildrenLeftAligned((ISEDebugElement)bos[i], groupingSupported, monitor, maxX);
+                  Set<ISENode> leafs = updateChildrenLeftAligned((ISEDebugElement)bos[i], groupingSupported, monitor);
                   maxX += OFFSET;
                   monitor.worked(1);
 
@@ -592,14 +738,12 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * @param bo The business object to create graphical representations for.
     * @param groupingSupported Is grouping supported?
     * @param monitor The {@link IProgressMonitor} to use.
-    * @param initialX The initial X value which is used if no parentPE is defined.
     * @return The found leaf {@link ISENode}s.
     * @throws DebugException Occurred Exception.
     */
    protected Set<ISENode> updateChildrenLeftAligned(ISEDebugElement bo, 
-                                                          boolean groupingSupported,
-                                                          IProgressMonitor monitor,
-                                                          int initialX) throws DebugException {
+                                                    boolean groupingSupported,
+                                                    IProgressMonitor monitor) throws DebugException {
       Set<ISENode> leafs = new LinkedHashSet<ISENode>();
       ISEIterator iter = new SEPreorderIterator(bo);
 
@@ -607,16 +751,22 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          ISEDebugElement next = iter.next();
          
          // Ignore the bo, because either it is ISEDDebugTarget (the very first bo)
-         // which has no graphical representation or its a parentnode which
+         // which has no graphical representation or its a parent node which
          // already has a graphical representation
-         if(next == bo) {
+         if (next == bo) {
             continue;
+         }
+         // Add an additional offset in case a new thread (separate tree) is found.
+         if (next instanceof ISEThread) {
+            if (maxX > 0) {
+               maxX += OFFSET;
+            }
          }
 
          ISENode nextNode = (ISENode)next;
          PictogramElement nextPE = getPictogramElementForBusinessObject(next, groupingSupported);
          if (nextPE == null) {          
-            createGraphicalRepresentationForNode(nextNode, groupingSupported, initialX);
+            createGraphicalRepresentationForNode(nextNode, groupingSupported, maxX);
             nextPE = getPictogramElementForBusinessObject(nextNode, groupingSupported);
             if (nextPE != null) {
                // Update maxX to make sure that ISEDDebugTargets don't overlap each other.
@@ -628,11 +778,12 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                   rectGA.setWidth(rectGA.getWidth() + 2 * METOFF);
                }
 
-               if(nextGA.getX() + nextGA.getWidth() > maxX)
+               if (nextGA.getX() + nextGA.getWidth() > maxX) {
                   maxX = nextGA.getX() + nextGA.getWidth();
+               }
                
                // If a node in a group is added, the height of the parent group rect has to be checked
-               if(groupingSupported && NodeUtil.getGroupStartNode(nextNode) != null) {
+               if (groupingSupported && NodeUtil.getGroupStartNode(nextNode) != null) {
                   updateGroupRectHeights(nextNode, groupingSupported, monitor);
                }
             }

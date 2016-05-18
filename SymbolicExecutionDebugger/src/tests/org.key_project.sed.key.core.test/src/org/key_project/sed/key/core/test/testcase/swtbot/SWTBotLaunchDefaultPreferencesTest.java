@@ -340,10 +340,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          SWTWorkbenchBot bot = new SWTWorkbenchBot();
          SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
          if (truthValueTracingEnabled) {
-            preferenceShell.bot().checkBox("Truth value tracing enabled (EXPERIMENTAL, not all rules are correctly supported)").select();
+            preferenceShell.bot().checkBox("Truth status tracing enabled").select();
          }
          else {
-            preferenceShell.bot().checkBox("Truth value tracing enabled (EXPERIMENTAL, not all rules are correctly supported)").deselect();
+            preferenceShell.bot().checkBox("Truth status tracing enabled").deselect();
          }
          preferenceShell.bot().button("OK").click();
          assertEquals(truthValueTracingEnabled, KeYSEDPreferences.isTruthValueTracingEnabled());

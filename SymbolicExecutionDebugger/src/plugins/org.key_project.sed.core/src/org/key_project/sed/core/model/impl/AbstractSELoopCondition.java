@@ -31,8 +31,8 @@ public abstract class AbstractSELoopCondition extends AbstractSEGroupableStackFr
     * @param thread The {@link ISEThread} in that this loop condition is contained.
     */
    public AbstractSELoopCondition(ISEDebugTarget target, 
-                                ISENode parent,
-                                ISEThread thread) {
+                                  ISENode parent,
+                                  ISEThread thread) {
       super(target, parent, thread);
    }
 

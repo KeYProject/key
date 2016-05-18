@@ -15,6 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.testcase;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
@@ -22,6 +23,7 @@ import org.junit.runners.MethodSorters;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
@@ -485,6 +487,153 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false, 
                 false, 
                 false);
+   }
+   
+   /**
+    * Tests simple pruning on the example /set/complexIf.
+    * @throws Exception
+    * @author Anna Filighera
+    */
+   public void testSimplePruning() throws Exception {
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
+      try {
+         env = doSETTest(testCaseDirectory, 
+               "/set/complexIf/test/ComplexIf.java", 
+               "ComplexIf", 
+               "min", 
+               null, 
+               "/set/complexIf/oracle/ComplexIf.xml", 
+               false, 
+               false, 
+               false, 
+               false, 
+               ALL_IN_ONE_RUN, 
+               false, 
+               false, 
+               false, 
+               false, 
+               false, 
+               false, 
+               false, 
+               false, 
+               true);
+         env.getBuilder().prune(env.getProof().root().child(0).child(0));
+         assertSetTreeAfterStep(env.getBuilder(), "/set/complexIf/oracle/PrunedIf.xml", testCaseDirectory);
+      } finally {
+         if (env.getProof() != null) {
+            env.getProof().dispose();
+         }
+         if (env != null) {
+            env.dispose();
+         }
+      }
+   }
+   
+   /**
+    * Tests pruning on a branch of the first split in the example /set/complexIf.
+    * @throws Exception
+    * @author Anna Filighera
+    */
+   public void testBranchPruning() throws Exception {
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
+      try {
+         env = doSETTest(testCaseDirectory, 
+               "/set/complexIf/test/ComplexIf.java", 
+               "ComplexIf", 
+               "min", 
+               null, 
+               "/set/complexIf/oracle/ComplexIf.xml", 
+               false, 
+               false, 
+               false, 
+               false, 
+               ALL_IN_ONE_RUN, 
+               false, 
+               false, 
+               false, 
+               false, 
+               false, 
+               false, 
+               false, 
+               false, 
+               true);
+         
+         Iterator<Node> iter = env.getProof().root().subtreeIterator();
+         Node node = null;
+         while (iter.hasNext()) {
+            node = iter.next();
+            if (node.childrenCount() == 2) {
+               break;
+            }
+         }
+         assertTrue("They prooftree does not contain nodes it should.", node.childrenCount() == 2);
+         env.getBuilder().prune(node.child(0));
+         assertSetTreeAfterStep(env.getBuilder(), "/set/complexIf/oracle/BranchPrunedIf.xml", testCaseDirectory);
+      } finally {
+         if (env.getProof() != null) {
+            env.getProof().dispose();
+         }
+         if (env != null) {
+            env.dispose();
+         }
+      }
+   }
+   
+
+   /**
+    * Tests pruning on both branches of a split in a branch of the first split in the example /set/complexIf.
+    * @throws Exception
+    * @author Anna Filighera
+    */
+   public void testComplexPruning() throws Exception {
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
+      try {
+         env = doSETTest(testCaseDirectory, 
+               "/set/complexIf/test/ComplexIf.java", 
+               "ComplexIf", 
+               "min", 
+               null, 
+               "/set/complexIf/oracle/ComplexIf.xml", 
+               false, 
+               false, 
+               false, 
+               false, 
+               ALL_IN_ONE_RUN, 
+               false, 
+               false, 
+               false, 
+               false, 
+               false, 
+               false, 
+               false, 
+               false, 
+               true);
+         
+         Iterator<Node> iter = env.getProof().root().subtreeIterator();
+         Node node = null;
+         int branchesCount = 0;
+         while (iter.hasNext()) {
+            node = iter.next();
+            if (node.childrenCount() == 2) {
+               branchesCount++;
+            }
+            if (branchesCount == 2) {
+               break;
+            }
+         }
+         assertTrue("They prooftree does not contain nodes it should.", node.childrenCount() == 2);
+         env.getBuilder().prune(node.child(0));
+         assertSetTreeAfterStep(env.getBuilder(), "/set/complexIf/oracle/Branch0InBranchPrunedIf.xml", testCaseDirectory);
+         env.getBuilder().prune(node.child(1));
+         assertSetTreeAfterStep(env.getBuilder(), "/set/complexIf/oracle/Branch1InBranchPrunedIf.xml", testCaseDirectory);
+      } finally {
+         if (env.getProof() != null) {
+            env.getProof().dispose();
+         }
+         if (env != null) {
+            env.dispose();
+         }
+      }
    }
    
    /**

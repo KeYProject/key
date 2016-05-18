@@ -55,8 +55,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.impl.AbstractSEDebugTarget;
 import org.key_project.sed.core.slicing.ISESlicer;
 import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
@@ -175,12 +175,12 @@ public class KeYDebugTarget extends AbstractSEDebugTarget {
       setName(proof.name() != null ? proof.name().toString() : "Unnamed");
       // Initialize breakpoints
       initBreakpoints();
+      // Initialize proof with default symbolic execution strategy settings
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun());
+      ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
       // Add thread
       KeYThread thread = new KeYThread(this, environment.getBuilder().getStartNode());
       threads = new KeYThread[] {thread};
-      // Initialize proof to use the symbolic execution strategy
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun());
-      ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
    }
 
    /**
@@ -621,7 +621,7 @@ public class KeYDebugTarget extends AbstractSEDebugTarget {
       };
       Display.getDefault().asyncExec(run);
    }
-
+   
    /**
     * When the proof is disposed.
     * @param e The event.
@@ -720,5 +720,15 @@ public class KeYDebugTarget extends AbstractSEDebugTarget {
    @Override
    public boolean isGroupingSupported() {
       return launchSettings.isGroupingEnabled();
+   }
+   
+   /**
+    * Deletes the given {@link IExecutionNode} from the map containing references between {@link IExecutionNode}'s 
+    * and their corresponding {@link IKeYSENode}'s.
+    * @param executionNode The {@link IExecutionNode} to be removed.
+    * @author Anna Filighera
+    */
+   public void removeExecutionNode(IExecutionNode<?> executionNode) {
+	   executionToDebugMapping.remove(executionNode);
    }
 }

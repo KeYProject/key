@@ -19,6 +19,7 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.ISEVariable;
 import org.key_project.sed.core.model.impl.AbstractSEExceptionalMethodReturn;
 import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
@@ -477,5 +478,21 @@ public class KeYExceptionalMethodReturn extends AbstractSEExceptionalMethodRetur
    @Override
    public boolean isTruthValueTracingEnabled() {
       return SymbolicExecutionJavaProfile.isTruthValueTracingEnabled(getExecutionNode().getProof());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getOutgoingLinks() throws DebugException {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getIncomingLinks() throws DebugException {
+      return null;
    }
 }

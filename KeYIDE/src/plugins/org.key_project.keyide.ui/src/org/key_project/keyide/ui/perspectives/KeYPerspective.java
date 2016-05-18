@@ -17,6 +17,7 @@ import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
+import org.key_project.keyide.ui.views.GoalsView;
 import org.key_project.keyide.ui.views.StrategySettingsView;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -49,10 +50,15 @@ public class KeYPerspective implements IPerspectiveFactory {
       // Put the out line on the right.
       IFolderLayout rightFolder = layout.createFolder("right", IPageLayout.RIGHT, 0.8f, editorArea);
       rightFolder.addView(IPageLayout.ID_OUTLINE);
+      
       // Put the properties view on the bottom
       IFolderLayout bottomFolder = layout.createFolder("bottom", IPageLayout.BOTTOM, 0.75f, editorArea);
       bottomFolder.addView(IPageLayout.ID_PROP_SHEET);
       bottomFolder.addView(IPageLayout.ID_PROBLEM_VIEW);
+      
+      IFolderLayout bottomRightFolder = layout.createFolder("bottomRight", IPageLayout.BOTTOM, 0.75f, "right");
+      // Put the Goals View under the outline
+      bottomRightFolder.addView(GoalsView.VIEW_ID);
       // Perspective Shortcuts
       layout.addPerspectiveShortcut(JavaUI.ID_PERSPECTIVE);
       layout.addPerspectiveShortcut(JavaUI.ID_HIERARCHYPERSPECTIVE);

@@ -288,7 +288,7 @@ public class ProofManager {
                   if (methodInfo == null) {
                      String[] parameterTypes = new String[method.getParameters().size()];
                      for (int i = 0; i < parameterTypes.length; i++) {
-                        parameterTypes[i] = method.getParameters().get(i).getTypeReference().getKeYJavaType().getFullName();
+                        parameterTypes[i] = KeYTypeUtil.resolveType(method.getParameters().get(i));
                      }
                      methodInfo = new MethodInfo(projectInfo, typeInfo, displayName, method.getName(), method.getContainerType().getFullName(), searchFile(method.getContainerType()), parameterTypes);
                      typeInfo.addMethod(methodInfo, methodIndex);

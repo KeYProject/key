@@ -353,7 +353,7 @@ public abstract class AbstractProofControl implements ProofControl {
        progVars.add(goal.getGlobalProgVars());
        
        return new TacletInstantiationModel(
-            app, goal.sequent(), proof.getServices(),
+            app, goal.sequent(),
        new NamespaceSet(ns.variables(),
               ns.functions(),
               ns.sorts(),

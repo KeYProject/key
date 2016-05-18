@@ -231,4 +231,24 @@ public interface ISENode extends ISEDebugElement {
     * the failure.</li>
     */
    public ISEBranchCondition getGroupStartCondition(ISENode startNode) throws DebugException;
+   
+   /**
+    * Returns the outgoing links.
+    * @return The outgoing links.
+    * @throws DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public ISENodeLink[] getOutgoingLinks() throws DebugException;
+   
+   /**
+    * Returns the incoming links.
+    * @return The incoming links.
+    * @throws DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public ISENodeLink[] getIncomingLinks() throws DebugException;
 }

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_9cca134a-c8fe-4542-9ea2-7fd9f8cabbf2" name="equals(Number)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_b0c9477b-5ee3-41c9-9692-76950656116e" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+         <sedMethodCall xml:id="_862e8183-4b09-4a8c-8a57-75cb6cb1bca4" name="&lt;call self.equals(n)&gt;" pathCondition="true" lineNumber="-1" charStart="64" charEnd="70" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java" groupable="true">
+            <sedBranchStatement xml:id="_bf8e47f1-036b-4689-b689-e056d8efe6b2" name="if (this.content==n.content)" pathCondition="true" lineNumber="-1" charStart="86" charEnd="112" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java" groupable="true">
+               <sedBranchCondition xml:id="_9681c2ad-6aff-418f-ab9a-3ec19c95c29f" name="not(equals(n,null))" pathCondition="not(equals(n,null))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+                  <sedBranchCondition xml:id="_faabe68b-505a-4876-9f6b-e805d3b2f631" name="equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+                     <sedStatement xml:id="_91d8a8e6-e64d-41be-a07a-b7f22ffda9d5" name="return true;" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))" lineNumber="-1" charStart="118" charEnd="130" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+                        <sedMethodReturn xml:id="_c2abbb0c-3c4d-44a1-afb6-879c1e39be8d" name="&lt;return of equals&gt;" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))" lineNumber="-1" charStart="64" charEnd="70" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java" methodReturnConditionRef="_dba52849-76dc-4c5f-954f-94feeaeda283">
+                           <sedTermination xml:id="_95a71154-4710-4401-b7cd-bd6717e8d7c4" name="&lt;end&gt;" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java" verified="true">
+                           </sedTermination>
+                           <sedGroupEndConditionReference nodeIdRef="_dba52849-76dc-4c5f-954f-94feeaeda283"/>
+                        </sedMethodReturn>
+                        <sedGroupEndConditionReference nodeIdRef="_b69e0189-9fff-4569-a2fd-0d0025feb0b5"/>
+                     </sedStatement>
+                  </sedBranchCondition>
+                  <sedBranchCondition xml:id="_71ee6bfa-eef0-4695-87f4-c3c43f6ac539" name="not(equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+                     <sedStatement xml:id="_7390dcd8-3bce-4610-aacb-b5466d7a023b" name="return false;" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))))" lineNumber="-1" charStart="150" charEnd="163" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+                        <sedMethodReturn xml:id="_cce93f55-61d8-4a70-90d3-68bf37caff38" name="&lt;return of equals&gt;" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))))" lineNumber="-1" charStart="64" charEnd="70" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java" methodReturnConditionRef="_ef805b25-1787-4edb-b4ba-63b459dfe04d">
+                           <sedTermination xml:id="_51c026a3-4d32-47e4-a973-0b9c91b4f51d" name="&lt;end&gt;" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java" verified="true">
+                           </sedTermination>
+                           <sedGroupEndConditionReference nodeIdRef="_ef805b25-1787-4edb-b4ba-63b459dfe04d"/>
+                        </sedMethodReturn>
+                        <sedGroupEndConditionReference nodeIdRef="_10b66610-1cd9-4b78-a59e-38d8da86a5d2"/>
+                     </sedStatement>
+                  </sedBranchCondition>
+               </sedBranchCondition>
+               <sedBranchCondition xml:id="_a20a619b-dd17-4edd-a7ab-5a0a45dbcfe0" name="equals(n,null)" pathCondition="equals(n,null)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+                  <sedExceptionalMethodReturn xml:id="_7a39c4e6-4f5d-49ec-9e3a-54e6d6b4986d" name="&lt;throw java.lang.NullPointerException&gt;" pathCondition="equals(n,null)" lineNumber="-1" charStart="64" charEnd="70" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java" methodReturnConditionRef="_eca2776b-4b26-4712-a808-8d542106986b">
+                     <sedExceptionalTermination xml:id="_e449b43b-7427-464f-b88d-6d12986d18db" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(n,null)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java" verified="true">
+                     </sedExceptionalTermination>
+                     <sedGroupEndConditionReference nodeIdRef="_eca2776b-4b26-4712-a808-8d542106986b"/>
+                     <sedGroupEndConditionReference nodeIdRef="_acb39604-72e5-41ed-a5dd-2eabe8131267"/>
+                  </sedExceptionalMethodReturn>
+               </sedBranchCondition>
+               <sedGroupEndCondition xml:id="_b69e0189-9fff-4569-a2fd-0d0025feb0b5" name="and(not(equals(n,null)),equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+                  <sedChildReference nodeIdRef="_91d8a8e6-e64d-41be-a07a-b7f22ffda9d5"/>
+               </sedGroupEndCondition>
+               <sedGroupEndCondition xml:id="_10b66610-1cd9-4b78-a59e-38d8da86a5d2" name="and(not(equals(n,null)),not(equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+                  <sedChildReference nodeIdRef="_7390dcd8-3bce-4610-aacb-b5466d7a023b"/>
+               </sedGroupEndCondition>
+               <sedGroupEndCondition xml:id="_acb39604-72e5-41ed-a5dd-2eabe8131267" name="equals(n,null)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+                  <sedChildReference nodeIdRef="_7a39c4e6-4f5d-49ec-9e3a-54e6d6b4986d"/>
+               </sedGroupEndCondition>
+            </sedBranchStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_dba52849-76dc-4c5f-954f-94feeaeda283" name="and(not(equals(n,null)),equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+               <sedChildReference nodeIdRef="_c2abbb0c-3c4d-44a1-afb6-879c1e39be8d"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_ef805b25-1787-4edb-b4ba-63b459dfe04d" name="and(not(equals(n,null)),not(equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+               <sedChildReference nodeIdRef="_cce93f55-61d8-4a70-90d3-68bf37caff38"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_eca2776b-4b26-4712-a808-8d542106986b" name="equals(n,null)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+               <sedChildReference nodeIdRef="_7a39c4e6-4f5d-49ec-9e3a-54e6d6b4986d"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_dba52849-76dc-4c5f-954f-94feeaeda283" name="and(not(equals(n,null)),equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+               <sedChildReference nodeIdRef="_c2abbb0c-3c4d-44a1-afb6-879c1e39be8d"/>
+            </sedGroupEndCondition>
+            <sedGroupEndCondition xml:id="_ef805b25-1787-4edb-b4ba-63b459dfe04d" name="and(not(equals(n,null)),not(equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+               <sedChildReference nodeIdRef="_cce93f55-61d8-4a70-90d3-68bf37caff38"/>
+            </sedGroupEndCondition>
+            <sedGroupEndCondition xml:id="_eca2776b-4b26-4712-a808-8d542106986b" name="equals(n,null)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="C:\Users\Leo\BP\Development\junit-workspace\SWTBotSymbolicExecutionTreePruneTest_testPruning\src\Number.java">
+               <sedChildReference nodeIdRef="_7a39c4e6-4f5d-49ec-9e3a-54e6d6b4986d"/>
+            </sedGroupEndCondition>
+         </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_95a71154-4710-4401-b7cd-bd6717e8d7c4"/>
+         <sedTerminationEntry nodeIdRef="_51c026a3-4d32-47e4-a973-0b9c91b4f51d"/>
+         <sedTerminationEntry nodeIdRef="_e449b43b-7427-464f-b88d-6d12986d18db"/>
+      </sedThread>
+   </sedTarget>
+</launch>

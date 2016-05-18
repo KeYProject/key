@@ -109,7 +109,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl> extend
                                                          boolean aliasChecks) {
       if (proof != null) {
          StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, methodTreatmentContract, loopTreatmentInvariant, nonExecutionBranchHidingSideProofs, aliasChecks);
-         proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
+         proof.setActiveStrategy(proof.getActiveStrategyFactory().create(proof, strategyProperties));
          proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
          proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfNodesPerBranch));
          SymbolicExecutionUtil.updateStrategySettings(proof, strategyProperties);

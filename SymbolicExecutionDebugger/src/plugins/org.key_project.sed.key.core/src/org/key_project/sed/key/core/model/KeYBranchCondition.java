@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.ISourcePathProvider;
 import org.key_project.sed.core.model.impl.AbstractSEBranchCondition;
 import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
@@ -312,5 +313,21 @@ public class KeYBranchCondition extends AbstractSEBranchCondition implements IKe
    @Override
    public boolean isTruthValueTracingEnabled() {
       return SymbolicExecutionJavaProfile.isTruthValueTracingEnabled(getExecutionNode().getProof());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getOutgoingLinks() throws DebugException {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getIncomingLinks() throws DebugException {
+      return null;
    }
 }

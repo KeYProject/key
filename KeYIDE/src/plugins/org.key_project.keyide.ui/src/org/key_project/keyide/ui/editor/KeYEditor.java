@@ -60,9 +60,12 @@ import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
 import org.key_project.keyide.ui.handlers.BreakpointToggleHandler;
+import org.key_project.keyide.ui.handlers.MinimizeInteractionsHandler;
 import org.key_project.keyide.ui.propertyTester.AutoModePropertyTester;
 import org.key_project.keyide.ui.propertyTester.ProofPropertyTester;
 import org.key_project.keyide.ui.util.LogUtil;
+import org.key_project.keyide.ui.views.GoalsPage;
+import org.key_project.keyide.ui.views.IGoalsPage;
 import org.key_project.keyide.ui.views.IStrategySettingsPage;
 import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
 import org.key_project.keyide.ui.views.StrategySettingsPage;
@@ -92,6 +95,9 @@ import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ProofUserManager;
@@ -99,9 +105,9 @@ import de.uka.ilkd.key.util.ProofUserManager;
 /**
  * This class represents the Editor for viewing KeY-Proofs
  * 
- * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
+ * @author Christoph Schneider, Niklas Bunzel, Stefan Kï¿½sdorf, Marco Drebing
  */
-public class KeYEditor extends TextEditor implements IProofProvider, ITabbedPropertySheetPageContributor, IBean {
+public class KeYEditor extends TextEditor implements IProofProvider, ITabbedPropertySheetPageContributor, IBean, IPosInSequentProvider {
    /**
     * The unique ID of this editor.
     */
@@ -111,11 +117,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * The ID of this {@link ITabbedPropertySheetPageContributor}.
     */
    public static final String CONTRIBUTOR_ID = "org.key_project.keyide.ui.KeYPropertyContributor";
-   
-   /**
-    * Property {@link #getSelectedPosInSequent()}.
-    */
-   public static final String PROP_SELECTED_POS_IN_SEQUENT = "selectedPosInSequent";
 
    /**
     * {@code true} can start auto mode, {@code false} is not allowed to start auto mode.
@@ -306,6 +307,23 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
          configureProofForBreakpoints();
       }
    };
+
+   /**
+    * The state of the minimize interactions button.
+    */
+   private State minimizeInteractionState;
+
+   /**
+    * Listens for changes on minimizeInteractionState.
+    */
+   private final IStateListener minimizeInteractionsListener = new IStateListener() {
+      @Override
+      public void handleStateChange(State state, Object oldValue) {
+         handleMinimizeInteractionStateChanged();
+      }
+   };
+   
+   
    
    /**
     * Constructor to initialize the ContextMenu IDs
@@ -320,6 +338,10 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    @Override
    public void dispose() {
+      if (minimizeInteractionState != null) {
+         minimizeInteractionState.removeListener(minimizeInteractionsListener);
+         minimizeInteractionState = null;
+      }
       if (breakpointsActivatedState != null) {
          breakpointsActivatedState.removeListener(stateListener);
          breakpointsActivatedState = null;
@@ -366,6 +388,14 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
                breakpointsActivatedState.addListener(stateListener);
             }
          }
+         
+         Command minimizeInteractionsCommand = service.getCommand(MinimizeInteractionsHandler.COMMAND_ID);
+         if (minimizeInteractionsCommand != null) {
+            minimizeInteractionState = minimizeInteractionsCommand.getState(RegistryToggleState.STATE_ID);
+            if (minimizeInteractionState != null) {
+               minimizeInteractionState.addListener(minimizeInteractionsListener);
+            }
+         }
       }
       super.init(site, input);
    }
@@ -382,6 +412,9 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
                ProofOblInputEditorInput in = (ProofOblInputEditorInput) input;
                this.environment = in.getEnvironment();
                this.currentProof = environment.createProof(in.getProblem());
+               // Ensure that active strategy matches with profile of proof (only required because KeY has a single global proof management)
+               Profile profile = currentProof.getServices().getProfile();
+               currentProof.setActiveStrategy(profile.getDefaultStrategyFactory().create(currentProof, currentProof.getSettings().getStrategySettings().getActiveStrategyProperties()));
             }
             else if (input instanceof ProofEditorInput) {
                ProofEditorInput in = (ProofEditorInput) input;
@@ -400,7 +433,14 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
                File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(eclipseFile.getProject());
                List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(eclipseFile.getProject());
                List<File> includes = KeYResourceProperties.getKeYIncludes(eclipseFile.getProject());
-               this.environment = KeYEnvironment.load(file, classPaths, bootClassPath, includes, EclipseUserInterfaceCustomization.getInstance());
+               this.environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(false), 
+                                                      file, 
+                                                      classPaths, 
+                                                      bootClassPath, 
+                                                      includes, 
+                                                      SymbolicExecutionTreeBuilder.createPoPropertiesToForce(),
+                                                      EclipseUserInterfaceCustomization.getInstance(),
+                                                      true);
                Assert.isTrue(getEnvironment().getLoadedProof() != null, "No proof loaded.");
                this.currentProof = getEnvironment().getLoadedProof();
             }
@@ -423,10 +463,11 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             else {
                selectionModel.setSelectedNode(currentProof.root());                         
             }
+            // Add support for breakpoints
             breakpointManager = new KeYBreakpointManager(currentProof);
             DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
             ProofUserManager.getInstance().addUser(currentProof, environment, this);
-            getUI().getProofControl().setMinimizeInteraction(true);
+            getUI().getProofControl().setMinimizeInteraction(isMinimizeInteractions());
             this.currentNode = selectionModel.getSelectedNode();
             configureProofForBreakpoints();
          }
@@ -462,6 +503,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       getCurrentProof().addRuleAppListener(ruleAppListener);
       sourceViewer.setEditable(false);
       setCurrentNode(getCurrentNode());
+      
    }
    
    /**
@@ -481,9 +523,9 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    }
    
    /**
-    * Returns the project which provides the proof or the source code.
-    * @return The {@link IProject} if known or {@code null} if unknown.
+    * {@inheritDoc}
     */
+   @Override
    public IProject getProject() {
       IEditorInput input = getEditorInput();
       if (input instanceof ProofOblInputEditorInput) {
@@ -676,6 +718,15 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    }
 
    /**
+    * Handles a change in the state of the Minimize Interactions context menu filter.
+    * @author Viktor Pfanschilling
+    */
+   protected void handleMinimizeInteractionStateChanged() {
+      boolean minimized = isMinimizeInteractions();
+      getUI().getProofControl().setMinimizeInteraction(minimized);
+   }
+
+   /**
     * When the auto mode is started.
     * @param e The {@link ProofEvent}.
     */
@@ -715,14 +766,24 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    public void setCurrentNode(Node currentNode) {
       this.currentNode = currentNode;
-      getUI().getProofControl().setMinimizeInteraction(true);
+      getUI().getProofControl().setMinimizeInteraction(isMinimizeInteractions());
       viewerDecorator.showNode(currentNode, SymbolicExecutionUtil.createNotationInfo(currentProof));
+   }
+
+   /**
+    * Returns whether interactions are minimized.
+    * @return whether interactions are minimized
+    */
+   public boolean isMinimizeInteractions() {
+      Object value = minimizeInteractionState.getValue();
+      boolean minimized = (value instanceof Boolean && ((Boolean) value).booleanValue());
+      return minimized;
    }
    
    /**
-    * Returns the selected {@link PosInSequent}.
-    * @return The selected {@link PosInSequent}.
+    * {@inheritDoc}
     */
+   @Override
    public PosInSequent getSelectedPosInSequent() {
       return viewerDecorator.getSelectedPosInSequent();
    }
@@ -801,6 +862,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
          return this;
       } else if (KeYBreakpointManager.class.equals(adapter)){
          return getBreakpointManager();
+      } else if (IGoalsPage.class.equals(adapter)) {
+         return new GoalsPage(getCurrentProof(), getEnvironment(), selectionModel);
       }
       else {
          return super.getAdapter(adapter);

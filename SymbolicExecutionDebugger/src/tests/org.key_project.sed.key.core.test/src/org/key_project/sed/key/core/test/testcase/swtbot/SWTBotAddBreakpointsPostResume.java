@@ -39,11 +39,9 @@ public class SWTBotAddBreakpointsPostResume extends AbstractKeYDebugTargetTestCa
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
             
             assertTrue(TestBreakpointsUtil.checkTargetContainsSomeBreakpoints(target,  0, 0, 0, 0));
-            assertTrue(TestBreakpointsUtil.checkProofContainsSomeBreakpoints(target,  0, 0, 0, 0));
             resume(bot, item, target);
             TestBreakpointsUtil.addSomeBreakpoints(CALLER_PATH, bot, 15, 14, 5, "NullPointerException");
             assertTrue(TestBreakpointsUtil.checkTargetContainsSomeBreakpoints(target, 1, 1, 1, 1));
-            assertTrue(TestBreakpointsUtil.checkProofContainsSomeBreakpoints(target,  1, 1, 1, 1));
             TestBreakpointsUtil.removeAllBreakpoints();
          }
       };

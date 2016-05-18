@@ -27,6 +27,7 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEMethodCall;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.impl.AbstractSEMethodCall;
 import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
@@ -500,5 +501,39 @@ public class KeYMethodCall extends AbstractSEMethodCall implements IKeYSENode<IE
    @Override
    public boolean isTruthValueTracingEnabled() {
       return SymbolicExecutionJavaProfile.isTruthValueTracingEnabled(getExecutionNode().getProof());
+   }
+   
+   /**
+    * Returns the map containing all method returns. 
+    * @return The map containing the {@link IExecutionBaseMethodReturn}'s and their corresponding {@link IKeYBaseMethodReturn}'s.
+    * @author Anna Filighera
+    */
+   public Map<IExecutionBaseMethodReturn<?>, IKeYBaseMethodReturn> getAllMethodReturns() {
+	   return knownMethodReturns;
+   }
+   
+   /**
+    * Removes the given {@link IExecutionBaseMethodReturn} from the method return map.
+    * @param methodReturn The {@link IExecutionBaseMethodReturn} to be removed.
+    * @author Anna Filighera
+    */
+   public void removeMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
+	   knownMethodReturns.remove(methodReturn);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getOutgoingLinks() throws DebugException {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getIncomingLinks() throws DebugException {
+      return null;
    }
 }

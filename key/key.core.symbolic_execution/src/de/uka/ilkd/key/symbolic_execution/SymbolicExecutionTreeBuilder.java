@@ -15,6 +15,7 @@ package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -59,7 +60,6 @@ import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
@@ -69,6 +69,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionBlockStartNode;
@@ -170,7 +171,7 @@ public class SymbolicExecutionTreeBuilder {
     */
    private ExecutionStart startNode;
    
-   /**
+   /** 
     * <p>
     * Maps a {@link Node} of KeY's proof tree to his execution tree model representation
     * if it is available.
@@ -181,6 +182,12 @@ public class SymbolicExecutionTreeBuilder {
     * </p>
     */
    private Map<Node, AbstractExecutionNode<?>> keyNodeMapping = new LinkedHashMap<Node, AbstractExecutionNode<?>>();
+   
+   /**
+    * In case a {@link Node} is represented by multiple {@link AbstractExecutionNode}s,
+    * this map maps the {@link Node} to all its representations.
+    */
+   private Map<Node, List<AbstractExecutionNode<?>>> multipleExecutionNodes = new LinkedHashMap<Node, List<AbstractExecutionNode<?>>>();
    
    /**
     * Maps a loop condition of a {@link Node} of KeY's proof tree to his 
@@ -475,10 +482,120 @@ public class SymbolicExecutionTreeBuilder {
       AnalyzerProofVisitor visitor = new AnalyzerProofVisitor(completions);
       NodePreorderIterator iter = new NodePreorderIterator(proof.root());
       while (iter.hasNext()) {
-         visitor.visit(proof, iter.next()); // This visitor pattern must be used because a recursive iteration causes StackOverflowErrors if the proof tree in KeY is to deep (e.g. simple list with 2000 elements during computation of fibonacci(7)
+         Node node = iter.next();
+         visitor.visit(proof, node); // This visitor pattern must be used because a recursive iteration causes StackOverflowErrors if the proof tree in KeY is to deep (e.g. simple list with 2000 elements during computation of fibonacci(7)
       }
       visitor.completeTree();
       return completions;
+   }
+   /**
+    * Prunes the symbolic execution tree at the first {@link IExecutionNode} in the parent hierarchy of the given 
+    * {@link Node} (including the Node itself).
+    * @param node {@link Node} to be pruned.
+    * @author Anna Filighera
+    * @return The {@link AbstractExecutionNode}'s which where deleted.
+    */
+   public HashSet<AbstractExecutionNode<?>> prune(Node node) { 
+      HashSet<AbstractExecutionNode<?>> exNodesToDelete = new HashSet<AbstractExecutionNode<?>>(proof.countNodes());
+      IExecutionNode<?> firstFather = getExecutionNode(node);
+      boolean pruneOnExNode = false;
+      
+      // search for the first node in the parent hierarchy (including the node itself) who is an AbstractExecutionNode
+      if (firstFather != null && firstFather != startNode) {
+         pruneOnExNode = true;
+      } else {
+    	  while (firstFather == null) {
+    		  node = node.parent();
+    	      firstFather = getExecutionNode(node);
+    	  }
+      }
+      // determine which nodes should be pruned
+      ExecutionNodePreorderIterator subtreeToBePruned = new ExecutionNodePreorderIterator(firstFather);
+      // include the first execution node in the hierarchy only if it was pruned on 
+      if (!pruneOnExNode) {
+         subtreeToBePruned.next();
+      }
+      while (subtreeToBePruned.hasNext()) {
+         AbstractExecutionNode<?> exNode = (AbstractExecutionNode<?>) subtreeToBePruned.next();
+         exNodesToDelete.add(exNode);  
+         Node correspondingNode = exNode.getProofNode();
+         keyNodeMapping.remove(correspondingNode);
+         keyNodeLoopConditionMapping.remove(correspondingNode);
+         keyNodeBranchConditionMapping.remove(correspondingNode);
+         SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(correspondingNode.getAppliedRuleApp());
+         if (label != null) {
+            methodCallStackMap.remove(label);
+            afterBlockMap.remove(label);
+            methodReturnsToIgnoreMap.remove(label);
+         }   
+      }
+      // remove all parent-child-references of pruned nodes
+      Iterator<AbstractExecutionNode<?>> prunedExNodes = exNodesToDelete.iterator();
+      while (prunedExNodes.hasNext()) {
+         AbstractExecutionNode<?> exNode = prunedExNodes.next();
+         exNode.getParent().removeChild(exNode);
+         exNode.setParent(null);       
+      } 
+      // remove all other references to deleted nodes
+      ExecutionNodePreorderIterator remainingExNodes = new ExecutionNodePreorderIterator(startNode);
+      while (remainingExNodes.hasNext()) {
+         AbstractExecutionNode<?> exNode = (AbstractExecutionNode<?>) remainingExNodes.next();
+         LinkedList<IExecutionBlockStartNode<?>> deletedBlocks = new LinkedList<IExecutionBlockStartNode<?>>();
+         Iterator<IExecutionBlockStartNode<?>> blockIter = exNode.getCompletedBlocks().iterator();
+         // remove pruned completed blocks
+         while (blockIter.hasNext()) {
+            IExecutionBlockStartNode<?> block = blockIter.next();
+            if (exNodesToDelete.contains(block)) {
+               deletedBlocks.add(block);
+            }
+         }
+         for (IExecutionBlockStartNode<?> block : deletedBlocks) {
+            exNode.removeCompletedBlock(block);
+         }
+         // remove all pruned method returns
+         if (exNode instanceof ExecutionMethodCall) {
+            Iterator<IExecutionBaseMethodReturn<?>> iter = ((ExecutionMethodCall) exNode).getMethodReturns().iterator();
+            LinkedList<IExecutionBaseMethodReturn<?>> removed = new LinkedList<IExecutionBaseMethodReturn<?>>();
+            while (iter.hasNext()) {
+               IExecutionBaseMethodReturn<?> methodReturn = iter.next();
+               if (exNodesToDelete.contains(methodReturn)) {
+                  removed.add(methodReturn);
+               }
+            }
+            for (IExecutionBaseMethodReturn<?> deleted : removed) {
+               ((ExecutionMethodCall) exNode).removeMethodReturn(deleted);
+            }
+         }
+         // remove all pruned execution nodes that complete a still existing block
+         if (exNode instanceof AbstractExecutionBlockStartNode) {
+            Iterator<IExecutionNode<?>> iter = ((AbstractExecutionBlockStartNode<?>) exNode).getBlockCompletions().iterator();
+            LinkedList<IExecutionNode<?>> removed = new LinkedList<IExecutionNode<?>>();
+            while (iter.hasNext()) {
+               IExecutionNode<?> completion = iter.next();
+               if (exNodesToDelete.contains(completion)) {
+                  removed.add(completion);
+               }
+            }
+            for (IExecutionNode<?> deleted : removed) {
+               ((AbstractExecutionBlockStartNode<?>) exNode).removeBlockCompletion(deleted);
+            }
+         }  
+         // remove all pruned terminations
+         if (exNode instanceof ExecutionStart) {
+             Iterator<IExecutionTermination> iter = ((ExecutionStart) exNode).getTerminations().iterator();
+             LinkedList<IExecutionTermination> removed = new LinkedList<IExecutionTermination>();
+             while (iter.hasNext()) {
+            	 IExecutionTermination termination = iter.next();
+                if (exNodesToDelete.contains(termination)) {
+                   removed.add(termination);
+                }
+             }
+             for (IExecutionTermination deleted : removed) {
+                ((ExecutionStart) exNode).removeTermination(deleted);
+             }
+          }  
+      }
+      return exNodesToDelete;
    }
    
    /**
@@ -832,6 +949,16 @@ public class SymbolicExecutionTreeBuilder {
       if (executionNode != null) {
          // Add new node to symbolic execution tree
          addChild(parentToAddTo, executionNode);
+         if (keyNodeMapping.get(node) != null) {
+            if (multipleExecutionNodes.containsKey(node)) {
+               multipleExecutionNodes.get(node).add(executionNode);
+            } else {
+               LinkedList<AbstractExecutionNode<?>> list = new LinkedList<AbstractExecutionNode<?>>();
+               list.add(keyNodeMapping.get(node));
+               list.add(executionNode);
+               multipleExecutionNodes.put(node, list);
+            }
+         }
          keyNodeMapping.put(node, executionNode);
          parentToAddTo = executionNode;
          // Set call stack on new created node
@@ -1341,6 +1468,14 @@ public class SymbolicExecutionTreeBuilder {
    }
 
    /**
+    * Checks if the uninterpreted predicate is available or not.
+    * @return {@code true} uninterpreted predicate is available, {@code false} otherwise.
+    */
+   public boolean isUninterpretedPredicateUsed() {
+      return isUninterpretedPredicateUsed;
+   }
+
+   /**
     * Utility class used in {@link SymbolicExecutionTreeBuilder#initNewLoopBodyMethodCallStack(Node)}
     * to compute the number of available {@link MethodFrame}s.
     * @author Martin Hentschel
@@ -1404,8 +1539,9 @@ public class SymbolicExecutionTreeBuilder {
             Node stackEntry = stackIter.next();
             if (stackEntry != proof.root()) { // Ignore call stack entries provided by the initial sequent
                IExecutionNode<?> executionNode = getExecutionNode(stackEntry);
-               assert executionNode != null : "Can't find execution node for KeY's proof node " + stackEntry.serialNr() + ": " + ProofSaver.printAnything(stackEntry, proof.getServices()) + ".";
-               callStack.add(executionNode);
+               if (executionNode != null) { // It might be null in case of API methods.
+                  callStack.add(executionNode);
+               }
             }
          }
          return callStack.toArray(new IExecutionNode[callStack.size()]);

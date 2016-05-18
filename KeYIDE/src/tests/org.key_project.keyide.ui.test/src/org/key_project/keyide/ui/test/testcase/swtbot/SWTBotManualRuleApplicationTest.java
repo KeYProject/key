@@ -90,10 +90,11 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                        false,
                        false,
                        "false",
-                       "closeFalse",
+                       new String[] {"closeFalse"},
                        null,
                        1, 
-                       true);
+                       true,
+                       false);
    }
    
    /**
@@ -111,9 +112,10 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                        false,
                        false,
                        "exc=null;",
-                       "assignment",
+                       new String[] {"assignment"},
                        null,
                        1, 
+                       false,
                        false);
    }
    
@@ -189,9 +191,10 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             false,
             false, 
             "exc:=null}", 
-            "Use Operation Contract", 
+            new String[] {"Use Operation Contract"}, 
             appliedRuleTest, 
             3, 
+            false,
             false);
    }
    
@@ -263,9 +266,10 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             false,
             false, 
             "exc:=null}", 
-            "Use Operation Contract", 
+            new String[] {"Use Operation Contract"}, 
             appliedRuleTest, 
             3, 
+            false,
             false);
    }
    
@@ -317,9 +321,10 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                         false,
                         false,
                         "exc:=null}",
-                        "Use Operation Contract",
+                        new String[] {"Use Operation Contract"},
                         appliedRuleTest,
                         0, 
+                        false,
                         false);
    }
    
@@ -376,9 +381,10 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             false,
             true,
             "x:=0}",
-            "Block Contract",
+            new String[] {"Block Contract"},
             appliedRuleTest,
             3, 
+            false,
             false);
    }
    
@@ -433,9 +439,10 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             false,
             true,
             "x:=0}",
-            "Block Contract",
+            new String[] {"Block Contract"},
             appliedRuleTest,
             3, 
+            false,
             false);
    }
    
@@ -490,9 +497,10 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             false,
             true,
             "x:=0}",
-            "Block Contract",
+            new String[] {"Block Contract"},
             appliedRuleTest,
             3, 
+            false,
             false);
    }
    
@@ -560,9 +568,10 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             true,
             false, 
             "     @", 
-            "Use Dependency Contract", 
+            new String[] {"Use Dependency Contract"}, 
             appliedRuleTest, 
             1, 
+            false,
             false);
    }
    
@@ -622,12 +631,50 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             true,
             false, 
             "     @", 
-            "Use Dependency Contract", 
+            new String[] {"Use Dependency Contract"}, 
             appliedRuleTest, 
             0, 
+            false,
             false);
    }
    
+   /**
+    * Tests strategy macros.
+    * @throws Exception
+ 	*/
+   @Test
+   public void testMacro() throws Exception {
+	      IAppliedRuleTest appliedRuleTest = new IAppliedRuleTest() {
+	          
+	          @Override
+	          public void test(IJavaProject project,
+	                KeYEnvironment<DefaultUserInterfaceControl> environment, Proof proof,
+	                SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor,
+	                Node nodeOnWhichRuleIsApplied) {
+	             // wait for the macro to finish applying.
+	             TestKeYUIUtil.waitWhileAutoMode(bot, environment.getUi());
+	             
+	             //make sure that the macro was applied.
+	             assertEquals(proof.root().childrenCount(), 1);
+	             assertEquals(proof.root().countNodes(), 472);
+	          }
+	       };
+	       
+	       doStartProofTest("SWTBotManualRuleApplicationTest_testMacro",
+	              "data/dependencyContract",
+	             false,
+	             "DependencyContractExample_2.proof", 
+	             null,
+	             false, 
+	             false,
+	             false, 
+	             "==>", 
+	             new String[] {"Strategy macros", "Auto Pilot", "Full Auto Pilot"}, 
+	             appliedRuleTest, 
+	             1, 
+	             false,
+	             true);
+   }
    
    /**
     * Performs the following test steps to test an interactive rule application:
@@ -653,6 +700,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
     * @param appliedRuleTest Optionally, some additional test steps, e.g. to deal with an opened {@link Shell}.
     * @param expectedNumOfChildrenAfterRuleApplication The number of child branches the rule creates or {@code 0} if no rule is applied.
     * @param expectedProofClosed {@code true} {@link Proof} should be closed after rule application, {@code false} {@link Proof} will be still open.
+    * @param isMacro Whether or not rule to apply is actually a macro.
     * @throws Exception Occurred Exception.
     */
    protected void doStartProofTest(String projectName,
@@ -664,10 +712,11 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                                    final boolean useDependencyContracts,
                                    final boolean useBlockContracts,
                                    final String textToApplyRuleOn,
-                                   final String ruleNameToApply,
+                                   final String[] ruleNameToApply,
                                    final IAppliedRuleTest appliedRuleTest,
                                    final int expectedNumOfChildrenAfterRuleApplication, 
-                                   final boolean expectedProofClosed) throws Exception {
+                                   final boolean expectedProofClosed,
+                                   final boolean isMacro) throws Exception {
       IKeYEditorTestSteps steps = new IKeYEditorTestSteps() {
          @Override
          public void test(IJavaProject project, 
@@ -703,7 +752,6 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             // Apply rule interactively
             final SWTBotStyledText styledText = editor.bot().styledText();
             Point point = TestUtilsUtil.selectText(styledText, textToApplyRuleOn);
-            
             TestUtilsUtil.setCursorLocation(styledText, point.x - 5, point.y);
             TestUtilsUtil.clickContextMenu(styledText, point.x - 5, point.y, ruleNameToApply);
             if (appliedRuleTest != null) {
@@ -712,8 +760,8 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             // Make sure that correct rule was applied
             assertEquals(expectedProofClosed, keyEditor.getCurrentProof().closed());
             assertEquals(expectedNumOfChildrenAfterRuleApplication, node.childrenCount());
-            if (expectedNumOfChildrenAfterRuleApplication >= 1) {
-               assertEquals(ruleNameToApply, MiscTools.getRuleDisplayName(node));
+            if (expectedNumOfChildrenAfterRuleApplication >= 1 && !isMacro) {
+               assertEquals(ruleNameToApply[ruleNameToApply.length-1], MiscTools.getRuleDisplayName(node));
             }
             assertEquals(expectedProofClosed, node.isClosed());
             // Make sure that start stop auto mode buttons are as expected

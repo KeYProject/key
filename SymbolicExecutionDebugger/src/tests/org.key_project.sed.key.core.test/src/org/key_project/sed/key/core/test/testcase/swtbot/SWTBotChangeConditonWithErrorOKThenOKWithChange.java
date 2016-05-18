@@ -44,7 +44,6 @@ public class SWTBotChangeConditonWithErrorOKThenOKWithChange extends AbstractKeY
             String mainShellText = bot.activeShell().getText();
             resume(bot, item, target);
             assertTrue(TestBreakpointsUtil.checkTargetConditiondofAllBreakpoints(target, null, false));
-            assertTrue(TestBreakpointsUtil.checkProofConditionofAllBreakpoints(target,  null, false));
             assertTrue(TestBreakpointsUtil.changeCondition(bot, "BreakpointStopCallerAndLoop [entry] - main(int)", "abcdefg"));
             TestUtilsUtil.sleep(2000);
             TestUtilsUtil.clickDirectly(bot,"Edit Condition");

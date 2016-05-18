@@ -165,7 +165,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
             updateLaunchConfigurationDialog();
          }
       });
-      truthValueTracingEnabledButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "Truth value tracing enabled (EXPERIMENTAL, not all rules are correctly supported)", SWT.CHECK);
+      truthValueTracingEnabledButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "Truth status tracing enabled", SWT.CHECK);
       truthValueTracingEnabledButton.setEnabled(isEditable());
       truthValueTracingEnabledButton.addSelectionListener(new SelectionAdapter() {
          @Override

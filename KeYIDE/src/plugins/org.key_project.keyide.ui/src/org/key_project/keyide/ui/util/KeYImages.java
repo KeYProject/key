@@ -33,7 +33,7 @@ import de.uka.ilkd.key.proof.Node;
  * To get an image use one of the constant defined in this class, e.g.<br>
  * {@code KeYSEDImages.getImage(KeYSEDImages.LAUNCH_MAIN_TAB_GROUP)))}
  * </p>
- * @author Martin Hentschel, Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
+ * @author Martin Hentschel, Christoph Schneider, Niklas Bunzel, Stefan Kï¿½sdorf, Marco Drebing
  */
 public final class KeYImages {
    /**
@@ -60,7 +60,112 @@ public final class KeYImages {
     * The key of a proved {@link Node} image.
     */
    public static final String NODE_PROVED = "org.key_project.keyide.ui.images.nodeProved";
-
+   
+   /**
+    * The key for the image that is used for method calls.
+    */
+   public static final String METHOD_CALL = "org.key_project.keyide.ui.images.methodCall";
+   
+   /**
+    * The key for the image that is used for method return.
+    */
+   public static final String METHOD_RETURN = "org.key_project.keyide.ui.images.methodReturn";
+   
+   /**
+    * The key for the image that is used for exceptional method return.
+    */
+   public static final String EXCEPTIONAL_METHOD_RETURN = "org.key_project.keyide.ui.images.exceptionalMethodReturn";
+   
+   /**
+    * The key for the image that is used for termination.
+    */
+   public static final String TERMINATION = "org.key_project.keyide.ui.images.termination";
+   
+   /**
+    * The key for the image that is used for termination.
+    */
+   public static final String TERMINATION_NOT_VERIFIED = "org.key_project.keyide.ui.images.terminationNotVerified";
+   
+   /**
+    * The key for the image that is used for branch statement.
+    */
+   public static final String BRANCH_STATEMENT = "org.key_project.keyide.ui.images.branchStatement";
+   
+   /**
+    * The key for the image that is used for branch condition.
+    */
+   public static final String BRANCH_CONDITION = "org.key_project.keyide.ui.images.branchCondition";
+   
+   /**
+    * The key for the image that is used for exceptional termination.
+    */
+   public static final String EXCEPTIONAL_TERMINATION = "org.key_project.keyide.ui.images.exceptionalTermination";
+   
+   /**
+    * The key for the image that is used for exceptional termination which is not verified.
+    */
+   public static final String EXCEPTIONAL_TERMINATION_NOT_VERIFIED = "org.key_project.keyide.ui.images.exceptionalTerminationNotVerified";
+   
+   /**
+    * The key for the image that is used for loop statement.
+    */
+   public static final String LOOP_STATEMENT = "org.key_project.keyide.ui.images.loopStatement";
+   
+   /**
+    * The key for the image that is used for loop condition.
+    */
+   public static final String LOOP_CONDITION = "org.key_project.keyide.ui.images.loopCondition";
+   
+   /**
+    * The key for the image that is used for method contract.
+    */
+   public static final String METHOD_CONTRACT = "org.key_project.keyide.ui.images.methodContract";
+   
+   /**
+    * The key for the image that is used for method contract.
+    */
+   public static final String METHOD_CONTRACT_NOT_PRE = "org.key_project.keyide.ui.images.methodContractNotPre";
+   
+   /**
+    * The key for the image that is used for method contract.
+    */
+   public static final String METHOD_CONTRACT_NOT_NPC = "org.key_project.keyide.ui.images.methodContractNotNpc";
+   
+   /**
+    * The key for the image that is used for method contract.
+    */
+   public static final String METHOD_CONTRACT_NOT_PRE_NOT_NPC = "org.key_project.keyide.ui.images.methodContractNotPreNotNpc";
+   
+   /**
+    * The key for the image that is used for loop invariant.
+    */
+   public static final String LOOP_INVARIANT = "org.key_project.keyide.ui.images.loopInvariant";
+   
+   /**
+    * The key for the image that is used for loop invariant.
+    */
+   public static final String LOOP_INVARIANT_INITIALLY_INVALID = "org.key_project.keyide.ui.images.loopInvariantInitiallyInvalid";
+   
+   /**
+    * The key for the image that is used for loop body termination.
+    */
+   public static final String LOOP_BODY_TERMINATION = "org.key_project.keyide.ui.images.loopBodyTermination";
+   
+   /**
+    * The key for the image that is used for loop body termination not verified.
+    */
+   public static final String LOOP_BODY_TERMINATION_NOT_VERIFIED = "org.key_project.keyide.ui.images.loopBodyTerminationNotVerified";
+   
+   /**
+    * The key for the image that is used for statements.
+ 	*/
+   public static final String STATEMENT = "org.key_project.keyide.ui.images.statement";
+   
+   /**
+    * The key for the image that is used for threads.
+    */
+   public static final String THREAD = "org.key_project.keyide.ui.images.thread";
+   
    /**
     * Forbid instances.
     */
@@ -114,6 +219,69 @@ public final class KeYImages {
        }
        else if (NODE_INTERACTIVE.equals(key)) {
           path = "icons/interactiveAppLogo16.png";
+       }
+       else if (METHOD_CALL.equals(key)) {
+          path = "icons/SEDIcons/method_call.gif";
+       }
+       else if (METHOD_RETURN.equals(key)) {
+          path = "icons/SEDIcons/method_return.gif";
+       }
+       else if (EXCEPTIONAL_METHOD_RETURN.equals(key)) {
+          path = "icons/SEDIcons/exceptional_method_return.gif";
+       }
+       else if (TERMINATION.equals(key)) {
+          path = "icons/SEDIcons/termination.gif";
+       }
+       else if (TERMINATION_NOT_VERIFIED.equals(key)) {
+          path = "icons/SEDIcons/termination_not_verified.gif";
+       }
+       else if (BRANCH_STATEMENT.equals(key)) {
+          path = "icons/SEDIcons/branch_statement.gif";
+       }
+       else if (BRANCH_CONDITION.equals(key)) {
+          path = "icons/SEDIcons/branch_condition.gif";
+       }
+       else if (EXCEPTIONAL_TERMINATION.equals(key)) {
+          path = "icons/SEDIcons/exceptional_termination.gif";
+       }
+       else if (EXCEPTIONAL_TERMINATION_NOT_VERIFIED.equals(key)) {
+          path = "icons/SEDIcons/exceptional_termination_not_verified.gif";
+       }
+       else if (LOOP_STATEMENT.equals(key)) {
+          path = "icons/SEDIcons/loop_statement.gif";
+       }
+       else if (LOOP_CONDITION.equals(key)) {
+          path = "icons/SEDIcons/loop_condition.gif";
+       }
+       else if (METHOD_CONTRACT.equals(key)) {
+          path = "icons/SEDIcons/method_contract.gif";
+       }
+       else if (METHOD_CONTRACT_NOT_PRE.equals(key)) {
+          path = "icons/SEDIcons/method_contract_not_pre.gif";
+       }
+       else if (METHOD_CONTRACT_NOT_NPC.equals(key)) {
+          path = "icons/SEDIcons/method_contract_not_npc.gif";
+       }
+       else if (METHOD_CONTRACT_NOT_PRE_NOT_NPC.equals(key)) {
+          path = "icons/SEDIcons/method_contract_not_pre_not_npc.gif";
+       }
+       else if (LOOP_INVARIANT.equals(key)) {
+          path = "icons/SEDIcons/loop_invariant.gif";
+       }
+       else if (LOOP_INVARIANT_INITIALLY_INVALID.equals(key)) {
+          path = "icons/SEDIcons/loop_invariant _initially_invalid.gif";
+       }
+       else if (LOOP_BODY_TERMINATION.equals(key)) {
+          path = "icons/SEDIcons/loop_body_termination.gif";
+       }
+       else if (LOOP_BODY_TERMINATION_NOT_VERIFIED.equals(key)) {
+          path = "icons/SEDIcons/exceptional_termination_not_verified.gif";
+       }
+       else if (STATEMENT.equals(key)) {
+       	  path = "icons/SEDIcons/statement.gif";
+       }
+       else if (THREAD.equals(key)) {
+    	  path = "icons/SEDIcons/thread.gif";
        }
        // Load image if possible
        if (path != null) {

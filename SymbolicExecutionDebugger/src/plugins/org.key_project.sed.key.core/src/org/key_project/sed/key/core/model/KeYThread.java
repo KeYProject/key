@@ -14,17 +14,29 @@
 package org.key_project.sed.key.core.model;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.IStateListener;
+import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.RegistryToggleState;
+import org.key_project.keyide.ui.handlers.BreakpointToggleHandler;
+import org.key_project.sed.core.model.ISEDebugElement;
 import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.ISETermination;
 import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.model.impl.AbstractSEThread;
 import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
+import org.key_project.sed.core.util.SEPreorderIterator;
 import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
@@ -40,22 +52,25 @@ import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpointconditions;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepReturnSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -96,6 +111,17 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    private KeYVariable[] variables;
    
    /**
+    * Indicates if {@link #getLeafsToSelect()} will return the leaf nodes
+    * or an empty array otherwise. An empty array is returned in case
+    * of interactive verification whereas new leafs to select are supported
+    * when the auto mode was started via the debug API.
+    * <p>
+    * The value is initially {@code true} because after a launch the debug API
+    * asks for the initial elements to select.
+    */
+   private boolean leafsToSelectAvailable = true;
+   
+   /**
     * Listens for auto mode start and stop events.
     */
    private final AutoModeListener autoModeListener = new AutoModeListener() {
@@ -111,6 +137,49 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    };
    
    /**
+    * Listens for proof changes
+    */
+   private final ProofTreeListener proofChangedListener = new ProofTreeListener() {
+      @Override
+      public void proofExpanded(ProofTreeEvent e) {
+      }
+
+      @Override
+      public void proofIsBeingPruned(ProofTreeEvent e) { 
+      }
+
+      @Override
+      public void proofPruned(ProofTreeEvent e) {
+        handleProofPruned(e);  
+      }
+
+      @Override
+      public void proofStructureChanged(ProofTreeEvent e) {  
+      }
+
+      @Override
+      public void proofClosed(ProofTreeEvent e) {
+      }
+
+      @Override
+      public void proofGoalRemoved(ProofTreeEvent e) {  
+      }
+
+      @Override
+      public void proofGoalsAdded(ProofTreeEvent e) { 
+         handleGoalsAdded(e);
+      }
+
+      @Override
+      public void proofGoalsChanged(ProofTreeEvent e) {
+      }
+
+      @Override
+      public void smtDataUpdate(ProofTreeEvent e) {  
+      }
+   };
+   
+   /**
     * The up to know discovered {@link ISETermination} nodes.
     */
    private final Map<IExecutionTermination, ISETermination> knownTerminations = new HashMap<IExecutionTermination, ISETermination>();
@@ -121,6 +190,21 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    private SEMemoryBranchCondition[] groupStartConditions;
 
    /**
+    * The {@link State} specifying if breakpoints are activated or not.
+    */
+   private State breakpointsActivatedState;
+
+   /**
+    * Listens for changes on {@link #breakpointsActivatedState}.
+    */
+   private final IStateListener breakpointsActivatedStateListener = new IStateListener() {
+      @Override
+      public void handleStateChange(State state, Object oldValue) {
+         hnadleStopAtBreakpointsChanged(state, oldValue);
+      }
+   };
+
+   /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param executionNode The {@link IExecutionStart} to represent by this debug node.
@@ -129,9 +213,29 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
       super(target, true);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      initializeBreakpointToggle();
       getProofControl().addAutoModeListener(autoModeListener);
+      Proof proof = getProof();
+      proof.addProofTreeListener(proofChangedListener);
       target.registerDebugNode(this);
       initializeAnnotations();
+      configureProofForInteractiveVerification(proof);
+   }
+
+   /**
+    * Initializes {@link #breakpointsActivatedState}.
+    */
+   protected void initializeBreakpointToggle() {
+      ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
+      if (service != null) {
+         Command command = service.getCommand(BreakpointToggleHandler.COMMAND_ID);
+         if (command != null) {
+            breakpointsActivatedState = command.getState(RegistryToggleState.STATE_ID);
+            if (breakpointsActivatedState != null) {
+               breakpointsActivatedState.addListener(breakpointsActivatedStateListener);
+            }
+         }
+      }
    }
 
    /**
@@ -249,14 +353,88 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    public KeYBreakpointManager getBreakpointManager() {
       return getDebugTarget().getBreakpointManager();
    }
+   
+   /**
+    * When the proof was pruned.
+    * @param e The event.
+    */
+   protected void handleProofPruned(ProofTreeEvent e) {
+	  HashSet<AbstractExecutionNode<?>> deletedExNodes = getBuilder().prune(e.getNode());	 
+	  SEPreorderIterator iter = new SEPreorderIterator(this);
+	  // iterate over key node tree and remove all pruned method returns
+	  try {
+      while (iter.hasNext()) {
+           ISEDebugElement keyNode = iter.next();
+           if (keyNode instanceof KeYMethodCall) {
+              ArrayList<IExecutionBaseMethodReturn<?>> markedForDeletion = new ArrayList<IExecutionBaseMethodReturn<?>>();
+              for (IExecutionBaseMethodReturn<?> exReturn : ((KeYMethodCall) keyNode).getAllMethodReturns().keySet()) {
+                  if (deletedExNodes.contains(exReturn)) {
+                      markedForDeletion.add(exReturn);
+                  }
+              }
+              for (IExecutionBaseMethodReturn<?> exReturn : markedForDeletion) {
+                  ((KeYMethodCall) keyNode).removeMethodReturn(exReturn);
+              }
+          }
+        }
+	  } catch (DebugException e1) {
+      LogUtil.getLogger().logError(e1);
+	  }
+	  // remove all pruned execution nodes that terminate the start node
+      ArrayList<IExecutionTermination> toBeDeleted = new ArrayList<IExecutionTermination>();
+      for (IExecutionTermination termination : knownTerminations.keySet()) {
+    	  if (deletedExNodes.contains(termination)) {
+    		  toBeDeleted.add(termination);
+    	  }
+      }
+      for (IExecutionTermination termination : toBeDeleted) {
+    	  knownTerminations.remove(termination);
+      }
+      // remove all pruned execution nodes from the debug target
+      for (IExecutionNode<?> exNode : deletedExNodes) {
+    	  getDebugTarget().removeExecutionNode(exNode);
+      }
+      try {
+         super.suspend();
+      } catch (DebugException exception) {
+         LogUtil.getLogger().logError(exception);
+      }
+   }
+   
+   /**
+    * handles event when goals are added to the prooftree.
+    * @param e The {@link ProofTreeEvent}
+    */
+   protected void handleGoalsAdded(ProofTreeEvent e) {
+      try {
+         updateExecutionTree(getBuilder());
+      }
+      catch (Exception exception) {
+         LogUtil.getLogger().logError(exception);
+         LogUtil.getLogger().openErrorDialog(null, exception);
+      }
+      finally {
+         try {
+            super.suspend();
+         }
+         catch (DebugException e1) {
+            LogUtil.getLogger().logError(e1);
+            LogUtil.getLogger().openErrorDialog(null, e1);
+         }
+      }
+   }
 
    /**
     * When the auto mode is started.
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStarted(ProofEvent e) {
-      if (e.getSource() == getProof() && getProofControl().isInAutoMode()) { // Sadly auto mode started events are misused and do not really indicate that a auto mode is running
+      Proof proof = getProof();
+      if (e.getSource() == proof && getProofControl().isInAutoMode()) { // Sadly auto mode started events are misused and do not really indicate that a auto mode is running
          try {
+            if (proof != null) {
+               proof.removeProofTreeListener(proofChangedListener);
+            }
             // Inform UI that the process is resumed
             super.resume();
          }
@@ -271,7 +449,9 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      if (e.getSource() == getProof() && !getProofControl().isInAutoMode()) { // Sadly auto mode stopped events are misused and do not really indicate that a auto mode has stopped
+      Proof proof = getProof();
+      configureProofForInteractiveVerification(proof);
+      if (e.getSource() == proof && !getProofControl().isInAutoMode()) { // Sadly auto mode stopped events are misused and do not really indicate that a auto mode has stopped
          try {
             updateExecutionTree(getBuilder());
          }
@@ -281,6 +461,10 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
          }
          finally {
             try {
+               if (proof != null && !proof.isDisposed()) {
+                  proof.addProofTreeListener(proofChangedListener);
+                  
+               }
                super.suspend();
             }
             catch (DebugException e1) {
@@ -339,6 +523,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
     */
    public void disconnect() throws DebugException {
       getProofControl().removeAutoModeListener(autoModeListener);
+      getProof().removeProofTreeListener(proofChangedListener);
    }
    
    /**
@@ -347,6 +532,10 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    @Override
    public void terminate() throws DebugException {
       getProofControl().removeAutoModeListener(autoModeListener);
+      getProof().removeProofTreeListener(proofChangedListener);
+      if (breakpointsActivatedState != null) {
+         breakpointsActivatedState.removeListener(breakpointsActivatedStateListener);
+      }
       super.terminate();
    }
    
@@ -399,7 +588,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
     * Runs the auto mode in KeY until the maximal number of set nodes are executed.
     * @param keyNode The node for which the auto mode is started.
     * @param maximalNumberOfSetNodesToExecute The maximal number of set nodes to execute.
-    * @param gaols The {@link Goal}s to work with.
+    * @param goals The {@link Goal}s to work with.
     * @param stepOver Include step over stop condition?
     * @param stepReturn Include step return condition?
     */
@@ -408,28 +597,87 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
                               ImmutableList<Goal> goals, 
                               boolean stepOver,
                               boolean stepReturn) {
+      leafsToSelectAvailable = true;
       lastResumedKeyNode = keyNode;
       Proof proof = getProof();
-      // Set strategy to use
-      StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-      proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
-      // Update stop condition
-      CompoundStopCondition stopCondition = new CompoundStopCondition();
-      stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute));
-      SymbolicExecutionBreakpointStopCondition breakpointParentStopCondition = getBreakpointManager().getBreakpointStopCondition();
-      stopCondition.addChildren(breakpointParentStopCondition);
-      proof.getServices().setFactory(createNewFactory(breakpointParentStopCondition));
-      if (stepOver) {
-         stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
-      }
-      if (stepReturn) {
-         stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
-      }
-      proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
+      // Configure proof
+      configureProof(proof, maximalNumberOfSetNodesToExecute, stepOver, stepReturn);
       // Run proof
       getProofControl().startAutoMode(proof, goals);
    }
+   
+   /**
+    * Configures {@link #getProof()} with settings for interactive verification.
+    * @param proof The {@link Proof} to configure.
+    */
+   protected void configureProofForInteractiveVerification(Proof proof) {
+      if (proof != null && !proof.isDisposed()) {
+         // Set default strategy settings
+         SymbolicExecutionUtil.initializeStrategy(getBuilder());
+         // Remove custom strategy because it destroys the behavior of the model search arithmetic treatment.
+         proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(null);
+         if (isStopAtBreakpointsActivated()) {
+            proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(getBreakpointManager().getBreakpointStopCondition());
+         }
+         else {
+            proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(null);
+         }
+      }
+   }
 
+   /**
+    * When the stop at breakpoints state has changed.
+    * @param state The changed {@link State}.
+    * @param oldValue The old value.
+    */
+   protected void hnadleStopAtBreakpointsChanged(State state, Object oldValue) {
+      Proof proof = getProof();
+      if (proof != null && !proof.isDisposed() && isSuspended()) {
+         if (isStopAtBreakpointsActivated()) {
+            proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(getBreakpointManager().getBreakpointStopCondition());
+         }
+         else {
+            proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(null);
+         }
+      }
+   }
+
+   /**
+    * Checks if {@link #breakpointsActivatedState} is selected or not.
+    * @return {@code true} stop at breakpoints, {@code false} do not stop at breakpoints.
+    */
+   protected boolean isStopAtBreakpointsActivated() {
+      Object value = breakpointsActivatedState.getValue();
+      return value instanceof Boolean && ((Boolean)value).booleanValue();
+   }
+   
+   /**
+    * Configures the given {@link Proof}.
+    * @param proof The {@link Proof} to configure.
+    * @param maximalNumberOfSetNodesToExecute The maximal number of set nodes to execute.
+    * @param stepOver Include step over stop condition?
+    * @param stepReturn Include step return condition?
+    */
+   protected void configureProof(Proof proof, int maximalNumberOfSetNodesToExecute, boolean stepOver, boolean stepReturn) {
+      if (proof != null && !proof.isDisposed()) {
+         // Set strategy to use
+         SymbolicExecutionUtil.initializeStrategy(getBuilder());
+         // Update stop condition
+         CompoundStopCondition stopCondition = new CompoundStopCondition();
+         stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute));
+         SymbolicExecutionBreakpointStopCondition breakpointParentStopCondition = getBreakpointManager().getBreakpointStopCondition();
+         stopCondition.addChildren(breakpointParentStopCondition);
+         proof.getServices().setFactory(createNewFactory(breakpointParentStopCondition));
+         if (stepOver) {
+            stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
+         }
+         if (stepReturn) {
+            stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
+         }
+         proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
+         proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
+      }
+   }
 
    /**
     * Creates a new factory that should be used by others afterwards.
@@ -610,7 +858,13 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
     */
    @Override
    public ISENode[] getLeafsToSelect() throws DebugException {
-      return collectLeafs(lastResumedKeyNode != null ? lastResumedKeyNode : this);
+      if (leafsToSelectAvailable) {
+         leafsToSelectAvailable = false;
+         return collectLeafs(lastResumedKeyNode != null ? lastResumedKeyNode : this);
+      }
+      else {
+         return new ISENode[0];
+      }
    }
    
    /**
@@ -773,5 +1027,21 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    @Override
    public boolean isTruthValueTracingEnabled() {
       return SymbolicExecutionJavaProfile.isTruthValueTracingEnabled(getExecutionNode().getProof());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getOutgoingLinks() throws DebugException {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getIncomingLinks() throws DebugException {
+      return null;
    }
 }

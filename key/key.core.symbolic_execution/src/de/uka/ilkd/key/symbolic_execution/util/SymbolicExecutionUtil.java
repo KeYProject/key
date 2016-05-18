@@ -112,6 +112,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -132,8 +133,11 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
+import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.ExecutionVariableExtractor;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -141,6 +145,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -3987,6 +3992,122 @@ public final class SymbolicExecutionUtil {
          notationInfo.setAbbrevMap(proof.abbreviations());
       }
       return notationInfo;
+   }
+   
+   /**
+    * Checks if this branch would be closed without the uninterpreted predicate
+    * and thus be treated as valid/closed in a regular proof.
+    * @return {@code true} verified/closed, {@code false} not verified/still open
+    */
+   public static boolean lazyComputeIsBranchVerified(Node node) {
+	      if (!node.proof().isDisposed()) {
+	         // Find uninterpreted predicate
+	         Term predicate = AbstractOperationPO.getUninterpretedPredicate(node.proof());
+	         // Check if node can be treated as verified/closed
+	         if (predicate != null) {
+	            boolean verified = true;
+	            Iterator<Node> leafsIter = node.leavesIterator();
+	            while (verified && leafsIter.hasNext()) {
+	               Node leaf = leafsIter.next();
+	               if (!leaf.isClosed()) {
+	                  final Term toSearch = predicate;
+	                  SequentFormula topLevelPredicate = CollectionUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
+	                     @Override
+	                     public boolean select(SequentFormula element) {
+	                        return toSearch.op() == element.formula().op();
+	                     }
+	                  });
+	                  if (topLevelPredicate == null) {
+	                     verified = false;
+	                  }
+	               }
+	            }
+	            return verified;
+	         }
+	         else {
+	            return node.isClosed();
+	         }
+	      }
+	      else {
+	         return false;
+	      }
+	   }
+   
+   /**
+    * Checks if is an exceptional termination.
+    * @param node the node which is used for computation.
+    * @param exceptionVariable the exception variable which is used to check if the executed program in proof terminates normally.
+    * @return {@code true} exceptional termination, {@code false} normal termination.
+    */
+   public static boolean lazyComputeIsExceptionalTermination(Node node, IProgramVariable exceptionVariable) {
+	   	  Sort result = lazyComputeExceptionSort(node, exceptionVariable);
+	      return result != null && !(result instanceof NullSort);
+	   }
+   
+   /**
+    * Computes the exception {@link Sort} lazily when {@link #getExceptionSort()}
+    * is called the first time. 
+    * @param node the node which is user for computation.
+    * @param exceptionVariable the exception variable which is used to check if the executed program in proof terminates normally.
+    * @return The exception {@link Sort}.
+    */
+   public static Sort lazyComputeExceptionSort(Node node, IProgramVariable exceptionVariable) {
+	      Sort result = null;
+	      if (exceptionVariable != null) {
+	         // Search final value of the exceptional variable which is used to check if the verified program terminates normally
+	         ImmutableArray<Term> value = null;
+	         for (SequentFormula f : node.sequent().succedent()) {
+	            Pair<ImmutableList<Term>,Term> updates = TermBuilder.goBelowUpdates2(f.formula());
+	            Iterator<Term> iter = updates.first.iterator();
+	            while (value == null && iter.hasNext()) {
+	               value = extractValueFromUpdate(iter.next(), exceptionVariable);
+	            }
+	         }
+	         // An exceptional termination is found if the exceptional variable is not null
+	         if (value != null && value.size() == 1) {
+	            result = value.get(0).sort();
+	         }
+	      }
+	      return result;
+	   }
+   
+   /**
+    * Utility method to extract the value of the {@link IProgramVariable}
+    * from the given update term.
+    * @param term The given update term.
+    * @param variable The {@link IProgramVariable} for that the value is needed.
+    * @return The found value or {@code null} if it is not defined in the given update term.
+    */
+	protected static ImmutableArray<Term> extractValueFromUpdate(Term term, IProgramVariable variable) {
+		ImmutableArray<Term> result = null;
+		if (term.op() instanceof ElementaryUpdate) {
+			ElementaryUpdate update = (ElementaryUpdate) term.op();
+			if (ObjectUtil.equals(variable, update.lhs())) {
+				result = term.subs();
+			}
+		} else if (term.op() instanceof UpdateJunctor) {
+			Iterator<Term> iter = term.subs().iterator();
+			while (result == null && iter.hasNext()) {
+				result = extractValueFromUpdate(iter.next(), variable);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Initializes the {@link Proof} of the given {@link SymbolicExecutionTreeBuilder}
+	 * so that the correct {@link Strategy} is used.
+	 * @param builder The {@link SymbolicExecutionTreeBuilder} to initialize.
+	 */
+   public static void initializeStrategy(SymbolicExecutionTreeBuilder builder) {
+      Proof proof = builder.getProof();
+      StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+      if (builder.isUninterpretedPredicateUsed()) {
+         proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
+      }
+      else {
+         proof.setActiveStrategy(new JavaCardDLStrategy.Factory().create(proof, strategyProperties));
+      }
    }
 
    /**

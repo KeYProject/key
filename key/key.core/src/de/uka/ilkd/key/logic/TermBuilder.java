@@ -897,14 +897,16 @@ public class TermBuilder {
                                 "It seems that there are definitions missing from the .key files.");
         return func(f, mby);
     }
-
+    public Function getMeasuredByEmpty(){
+       final Namespace funcNS = services.getNamespaces().functions();
+       final Function f = (Function)funcNS.lookup(new Name("measuredByEmpty"));
+       if (f == null)
+               throw new RuntimeException("LDT: Function measuredByEmpty not found.\n" +
+                               "It seems that there are definitions missing from the .key files.");
+       return f;
+    }
     public Term measuredByEmpty() {
-        final Namespace funcNS = services.getNamespaces().functions();
-        final Function f = (Function)funcNS.lookup(new Name("measuredByEmpty"));
-        if (f == null)
-                throw new RuntimeException("LDT: Function measuredByEmpty not found.\n" +
-                                "It seems that there are definitions missing from the .key files.");
-        return func(f);
+        return func(getMeasuredByEmpty());
     }
 
     /**
@@ -1594,8 +1596,7 @@ public class TermBuilder {
     }
 
     public Term wellFormed(Term heap) {
-        return func(services.getTypeConverter().getHeapLDT().getWellFormed(heap.sort()),
-                heap);
+        return func(services.getTypeConverter().getHeapLDT().getWellFormed(), heap);
     }
 
     public Term wellFormed(LocationVariable heap) {

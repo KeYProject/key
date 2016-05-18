@@ -929,7 +929,7 @@ public class TestCaseGenerator {
 		// init fields
 		if (heap != null) {
 			for (final ObjectVal o : heap.getObjects()) {
-				if (o.getName().equals("#o0")) {
+				if (o.getName().equals("#o0") || o.getSort().name().toString().endsWith("Exception")) {
 					continue;
 				}
 				final String receiverObject = createObjectName(o);

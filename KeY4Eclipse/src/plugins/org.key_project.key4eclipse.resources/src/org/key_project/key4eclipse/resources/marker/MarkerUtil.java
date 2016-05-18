@@ -30,6 +30,7 @@ import org.key_project.util.java.StringUtil;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.util.KeYTypeUtil;
 
 /**
  * Provides methods to create and delete all KeY{@link IMarker}.
@@ -93,7 +94,7 @@ public class MarkerUtil {
                   KeYJavaType type = pe.getContract().getKJT();
                   String[] parameterTypes = new String[pm.getParameters().size()];
                   for (int i = 0; i < parameterTypes.length; i++) {
-                     parameterTypes[i] = pm.getParameters().get(i).getTypeReference().getKeYJavaType().getFullName();
+                     parameterTypes[i] = KeYTypeUtil.resolveType(pm.getParameters().get(i));
                   }               
                   marker.setAttribute(MarkerUtil.TYPE, type.getFullName());
                   marker.setAttribute(MarkerUtil.METHOD_NAME, pm.getName());
