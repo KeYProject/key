@@ -33,7 +33,7 @@ public interface ISEMethodContract extends ISENode, IStackFrame {
     * Checks if the precondition is complied.
     * @return {@code true} precondition complied, {@code false} precondition not complied.
     */
-   public boolean isPreconditionComplied(); 
+   public boolean isPreconditionComplied();
 
    /**
     * Checks if a not null check is available (instance method) or not (static method or constructor).

@@ -46,6 +46,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -73,6 +74,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBlockContract;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionExceptionalMethodReturn;
@@ -899,7 +901,12 @@ public class SymbolicExecutionTreeBuilder {
             }
             else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
                if (!SymbolicExecutionUtil.hasLoopBodyLabel(node.getAppliedRuleApp())) {
-                  result = new ExecutionTermination(settings, node, exceptionVariable, null);
+                  Term modalityTerm = TermBuilder.goBelowUpdates(node.getAppliedRuleApp().posInOccurrence().subTerm());
+                  BlockContractValidityTermLabel bcLabel = (BlockContractValidityTermLabel) modalityTerm.getLabel(BlockContractValidityTermLabel.NAME);
+                  result = new ExecutionTermination(settings, 
+                                                    node, 
+                                                    bcLabel != null ? (IProgramVariable) proof.getServices().getNamespaces().programVariables().lookup(bcLabel.getExceptionVariableName()) : exceptionVariable, 
+                                                    null);
                   startNode.addTermination((ExecutionTermination)result);
                }
             }
@@ -931,6 +938,13 @@ public class SymbolicExecutionTreeBuilder {
                result = new ExecutionLoopInvariant(settings, node);
                // Initialize new call stack of the preserves loop invariant branch
                initNewLoopBodyMethodCallStack(node);
+            }
+         }
+         else if (SymbolicExecutionUtil.isBlockContract(node, node.getAppliedRuleApp())) {
+            if (isNotInImplicitMethod(node)) {
+               result = new ExecutionBlockContract(settings, node);
+               // Initialize new call stack of the validity branch
+               initNewValidiityMethodCallStack(node);
             }
          }
       }
@@ -1278,30 +1292,52 @@ public class SymbolicExecutionTreeBuilder {
     * @param node The {@link Node} on which the loop invariant rule is applied.
     */
    protected void initNewLoopBodyMethodCallStack(Node node) {
-      PosInOccurrence newModalityPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(1).sequent());
-      Term newModality = newModalityPIO != null ? newModalityPIO.subTerm() : null;
+      PosInOccurrence childPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(1).sequent());
+      initNewMethodCallStack(node, childPIO);
+   }
+   
+   /**
+    * This method initializes the method call stack of validity modalities
+    * with the values from the original call stack. For each {@link MethodFrame}
+    * in the new modality is its method call {@link Node} added to the new
+    * method call stack.
+    * @param node The {@link Node} on which the block contract rule is applied.
+    */
+   protected void initNewValidiityMethodCallStack(Node node) {
+      PosInOccurrence childPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(0).sequent());
+      initNewMethodCallStack(node, childPIO);
+   }
+   
+   /**
+    * Initializes a new method call stack.
+    * @param currentNode The current {@link Node}.
+    * @param childPIO The {@link PosInOccurrence} where the modality has a new symbolic execution label counter.
+    */
+   protected void initNewMethodCallStack(Node currentNode, PosInOccurrence childPIO) {
+      Term newModality = childPIO != null ? TermBuilder.goBelowUpdates(childPIO.subTerm()) : null;
       assert newModality != null;
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(newModality);
       assert label != null;
       JavaBlock jb = newModality.javaBlock();
       MethodFrameCounterJavaASTVisitor newCounter = new MethodFrameCounterJavaASTVisitor(jb.program(), proof.getServices());
       int newCount = newCounter.run();
-      Term oldModality = node.getAppliedRuleApp().posInOccurrence().subTerm();
+      Term oldModality = currentNode.getAppliedRuleApp().posInOccurrence().subTerm();
       oldModality = TermBuilder.goBelowUpdates(oldModality);
-      Map<Node, ImmutableList<Node>> currentMethodCallStackMap = getMethodCallStack(node.getAppliedRuleApp());
+      Map<Node, ImmutableList<Node>> currentMethodCallStackMap = getMethodCallStack(currentNode.getAppliedRuleApp());
       Map<Node, ImmutableList<Node>> newMethodCallStackMap = getMethodCallStack(label.getId());
-      ImmutableList<Node> currentMethodCallStack = findMethodCallStack(currentMethodCallStackMap, node);
+      ImmutableList<Node> currentMethodCallStack = findMethodCallStack(currentMethodCallStackMap, currentNode);
       ImmutableList<Node> newMethodCallStack = ImmutableSLList.nil();
       Set<Node> currentIgnoreSet = getMethodReturnsToIgnore(label.getId());
       assert newMethodCallStack.isEmpty() : "Method call stack is not empty.";
-      currentMethodCallStack = currentMethodCallStack.take(currentMethodCallStack.size() - newCount);
       Iterator<Node> currentIter = currentMethodCallStack.iterator();
-      while (currentIter.hasNext()) {
+      int i = 0;
+      while (currentIter.hasNext() && i < newCount) {
          Node next = currentIter.next();
          newMethodCallStack = newMethodCallStack.prepend(next);
          currentIgnoreSet.add(next);
+         i++;
       }
-      newMethodCallStackMap.put(node, newMethodCallStack);
+      newMethodCallStackMap.put(currentNode, newMethodCallStack);
    }
 
    /**

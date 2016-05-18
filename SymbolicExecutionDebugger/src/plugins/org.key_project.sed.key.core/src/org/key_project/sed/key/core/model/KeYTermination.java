@@ -29,6 +29,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -85,6 +86,19 @@ public class KeYTermination extends AbstractSETermination implements IKeYTermina
       target.registerDebugNode(this);
       thread.addTermination(this);
       initializeAnnotations();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getNodeType() {
+      if (TerminationKind.BLOCK_CONTRACT_NORMAL == getExecutionNode().getTerminationKind()) {
+         return "Block Contract " + super.getNodeType();
+      }
+      else {
+         return super.getNodeType();
+      }
    }
 
    /**

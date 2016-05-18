@@ -61,7 +61,8 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
             }
          }
          else if (SymbolicExecutionUtil.isLoopInvariant(node, node.getAppliedRuleApp()) ||
-                  SymbolicExecutionUtil.isOperationContract(node, node.getAppliedRuleApp())) {
+                  SymbolicExecutionUtil.isOperationContract(node, node.getAppliedRuleApp()) ||
+                  SymbolicExecutionUtil.isBlockContract(node, node.getAppliedRuleApp())) {
             // Compute this reference
             PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
             // Compute modified locations

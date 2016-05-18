@@ -43,17 +43,20 @@ import org.key_project.sed.core.annotation.ISEAnnotationType;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEConstraint;
 import org.key_project.sed.core.model.ISEDebugElement;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISETermination;
 import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.model.ISEValue;
 import org.key_project.sed.core.model.ISEVariable;
 import org.key_project.sed.core.model.impl.AbstractSEBaseMethodReturn;
 import org.key_project.sed.core.model.memory.ISEMemoryBaseMethodReturn;
-import org.key_project.sed.core.model.memory.ISEMemoryNode;
 import org.key_project.sed.core.model.memory.ISEMemoryGroupable;
+import org.key_project.sed.core.model.memory.ISEMemoryNode;
 import org.key_project.sed.core.model.memory.ISEMemoryStackFrameCompatibleDebugNode;
+import org.key_project.sed.core.model.memory.SEMemoryBlockContract;
+import org.key_project.sed.core.model.memory.SEMemoryBlockContractExceptionalTermination;
+import org.key_project.sed.core.model.memory.SEMemoryBlockContractTermination;
 import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEMemoryBranchStatement;
 import org.key_project.sed.core.model.memory.SEMemoryConstraint;
@@ -537,9 +540,6 @@ public class SEXMLReader {
          else if (isAnnotationLink(uri, localName, qName)) {
             // Nothing to do
          }
-         else if (isAnnotationLink(uri, localName, qName)) {
-            // Nothing to do
-         }
          else if (isChildReferences(uri, localName, qName)) {
             // Nothing to do
          }
@@ -809,6 +809,12 @@ public class SEXMLReader {
       else if (SEXMLWriter.TAG_BRANCH_STATEMENT.equals(qName)) {
          return createBranchStatement(target, parent, thread, uri, localName, qName, attributes);
       }
+      else if (SEXMLWriter.TAG_BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION.equals(qName)) {
+         return createBlockContractExceptionalTermination(target, parent, thread, uri, localName, qName, attributes);
+      }
+      else if (SEXMLWriter.TAG_BLOCK_CONTRACT_TERMINATION.equals(qName)) {
+         return createBlockContractTermination(target, parent, thread, uri, localName, qName, attributes);
+      }
       else if (SEXMLWriter.TAG_EXCEPTIONAL_TERMINATION.equals(qName)) {
          return createExceptionalTermination(target, parent, thread, uri, localName, qName, attributes);
       }
@@ -847,6 +853,9 @@ public class SEXMLReader {
       }
       else if (SEXMLWriter.TAG_METHOD_CONTRACT.equals(qName)) {
          return createMethodContract(target, parent, thread, uri, localName, qName, attributes);
+      }
+      else if (SEXMLWriter.TAG_BLOCK_CONTRACT.equals(qName)) {
+         return createBlockContract(target, parent, thread, uri, localName, qName, attributes);
       }
       else if (SEXMLWriter.TAG_LOOP_INVARIANT.equals(qName)) {
          return createLoopInvariant(target, parent, thread, uri, localName, qName, attributes);
@@ -1007,6 +1016,44 @@ public class SEXMLReader {
     */   
    protected SEMemoryExceptionalTermination createExceptionalTermination(ISEDebugTarget target, ISENode parent, ISEThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEMemoryExceptionalTermination termination = new SEMemoryExceptionalTermination(target, parent, thread, isVerified(attributes));
+      fillDebugNode(termination, attributes);
+      fillStackFrame(termination, attributes);
+      return termination;
+   }
+
+   /**
+    * Creates a {@link SEMemoryBlockContractExceptionalTermination} instance for the content in the given tag.
+    * @param target The parent {@link ISEDebugTarget} or {@code null} if not available.
+    * @param parent The parent {@link ISENode} or {@code null} if not available.
+    * @param thread The parent {@link ISEThread} or {@code null} if not available.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
+    * @return The created {@link SEMemoryBlockContractExceptionalTermination}.
+    * @throws SAXException Occurred Exception.
+    */   
+   protected SEMemoryBlockContractExceptionalTermination createBlockContractExceptionalTermination(ISEDebugTarget target, ISENode parent, ISEThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      SEMemoryBlockContractExceptionalTermination termination = new SEMemoryBlockContractExceptionalTermination(target, parent, thread, isVerified(attributes));
+      fillDebugNode(termination, attributes);
+      fillStackFrame(termination, attributes);
+      return termination;
+   }
+
+   /**
+    * Creates a {@link SEMemoryBlockContractTermination} instance for the content in the given tag.
+    * @param target The parent {@link ISEDebugTarget} or {@code null} if not available.
+    * @param parent The parent {@link ISENode} or {@code null} if not available.
+    * @param thread The parent {@link ISEThread} or {@code null} if not available.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
+    * @return The created {@link SEMemoryBlockContractTermination}.
+    * @throws SAXException Occurred Exception.
+    */   
+   protected SEMemoryBlockContractTermination createBlockContractTermination(ISEDebugTarget target, ISENode parent, ISEThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      SEMemoryBlockContractTermination termination = new SEMemoryBlockContractTermination(target, parent, thread, isVerified(attributes));
       fillDebugNode(termination, attributes);
       fillStackFrame(termination, attributes);
       return termination;
@@ -1180,6 +1227,27 @@ public class SEXMLReader {
       methodContract.setHasNotNullCheck(hasNotNullCheck(attributes));
       methodContract.setNotNullCheckComplied(isNotNullCheckComplied(attributes));
       return methodContract;
+   }
+   
+   /**
+    * Creates a {@link SEMemoryBlockContract} instance for the content in the given tag.
+    * @param target The parent {@link ISEDebugTarget} or {@code null} if not available.
+    * @param parent The parent {@link ISENode} or {@code null} if not available.
+    * @param thread The parent {@link ISEThread} or {@code null} if not available.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
+    * @return The created {@link SEMemoryBlockContract}.
+    * @throws SAXException Occurred Exception.
+    */   
+   protected SEMemoryBlockContract createBlockContract(ISEDebugTarget target, ISENode parent, ISEThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      SEMemoryBlockContract blockContract = new SEMemoryBlockContract(target, parent, thread);
+      blockContract.setSourcePath(getSourcePath(attributes));
+      fillDebugNode(blockContract, attributes);
+      fillStackFrame(blockContract, attributes);
+      blockContract.setPreconditionComplied(isPreconditionComplied(attributes));
+      return blockContract;
    }
    
    /**

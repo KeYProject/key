@@ -84,6 +84,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -116,6 +117,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
+import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
@@ -195,8 +197,7 @@ public final class SymbolicExecutionUtil {
     * "Body Preserves Invariant" of applied "Loop Invariant" rules to show the
     * loop invariant.
     */
-   public static final TermLabel LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL =
-           new ParameterlessTermLabel(LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME);
+   public static final TermLabel LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL = new ParameterlessTermLabel(LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME);
 
    /**
     * Forbid instances.
@@ -1148,6 +1149,16 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
+    * Checks if the given node should be represented as block contract.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @return {@code true} represent node as block contract, {@code false} represent node as something else. 
+    */
+   public static boolean isBlockContract(Node node, RuleApp ruleApp) {
+      return ruleApp instanceof BlockContractBuiltInRuleApp;
+   }
+
+   /**
     * Checks if the given node should be represented as loop invariant.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
@@ -1559,6 +1570,9 @@ public final class SymbolicExecutionUtil {
          else if (isLoopInvariant(node, ruleApp)) {
             return true;
          }
+         else if (isBlockContract(node, ruleApp)) {
+            return true;
+         }
          else {
             return false;
          }
@@ -1776,11 +1790,13 @@ public final class SymbolicExecutionUtil {
       else if (parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
          return computeLoopInvariantBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability);
       }
+      else if (parent.getAppliedRuleApp() instanceof BlockContractBuiltInRuleApp) {
+         return computeBlockContractBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability);
+      }
       else {
          throw new ProofInputException("Unsupported RuleApp in branch computation \"" + parent.getAppliedRuleApp() + "\".");
       }
    }
-
    /**
     * <p>
     * Computes the branch condition of the given {@link Node} which was constructed by a {@link ContractRuleApp}.
@@ -2233,6 +2249,60 @@ public final class SymbolicExecutionUtil {
       }
       else {
          throw new ProofInputException("Branch condition of initially valid check is not supported."); 
+      }
+   }
+
+   /**
+    * <p>
+    * Computes the branch condition of the given {@link Node} which was constructed by a {@link BlockContractBuiltInRuleApp}.
+    * </p>
+    * <p>
+    * The branch conditions are:
+    * <ul>
+    *    <li>Validity: true</li>
+    *    <li>Usage: Postcondition (added antecedent top level formula)</li>
+    * </ul>
+    * </p>
+    * @param parent The parent {@link Node} of the given one.
+    * @param node The {@link Node} to compute its branch condition.
+    * @param simplify {@code true} simplify condition in a side proof, {@code false} do not simplify condition.
+    * @param improveReadability {@code true} improve readability, {@code false} do not improve readability.
+    * @return The computed branch condition.
+    * @throws ProofInputException Occurred Exception.
+    */
+   private static Term computeBlockContractBuiltInRuleAppBranchCondition(Node parent, Node node, boolean simplify, boolean improveReadability) throws ProofInputException {
+      // Make sure that a computation is possible
+      if (!(parent.getAppliedRuleApp() instanceof BlockContractBuiltInRuleApp)) {
+         throw new ProofInputException("Only BlockContractBuiltInRuleApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
+      }
+      // Make sure that branch is supported
+      int childIndex = CollectionUtil.indexOf(parent.childrenIterator(), node);
+      if (childIndex == 0) { // Validity branch
+         return parent.proof().getServices().getTermBuilder().tt();
+      }
+      else if (childIndex == 2) { // Usage branch
+         // Compute invariant (last antecedent formula of the use branch)
+         Services services = parent.proof().getServices();
+         Semisequent antecedent = node.sequent().antecedent();
+         Term condition = antecedent.get(antecedent.size() - 1).formula();
+         if (simplify) {
+            final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
+            Sequent newSequent = createSequentToProveWithNewSuccedent(parent, (Term)null, condition, null, true);
+            condition = evaluateInSideProof(services, 
+                                            parent.proof(), 
+                                            sideProofEnv,
+                                            newSequent, 
+                                            RESULT_LABEL, 
+                                            "Block contract branch condition computation on node " + parent.serialNr() + " for branch " + node.serialNr() + ".",
+                                            StrategyProperties.SPLITTING_OFF);
+         }
+         if (improveReadability) {
+            condition = improveReadability(condition, services);
+         }
+         return condition;
+      }
+      else {
+         throw new ProofInputException("Branch condition of precondition check is not supported."); 
       }
    }
 
@@ -2861,7 +2931,7 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Labels all specified skolem equalities with the {@link ParameterlessTermLabel#RESULT_LABEL}.
+    * Labels all specified skolem equalities with the {@link SymbolicExecutionUtil#RESULT_LABEL}.
     * @param sequent The {@link Sequent} to modify.
     * @param constantsToLabel The skolem constants to label.
     * @param factory The {@link TermFactory} to use.
@@ -3917,5 +3987,29 @@ public final class SymbolicExecutionUtil {
          notationInfo.setAbbrevMap(proof.abbreviations());
       }
       return notationInfo;
+   }
+
+   /**
+    * Checks if the modality at the applied rule represents the validity branch of an applied block contract.
+    * @param appliedRuleApp The {@link RuleApp} to check.
+    * @return {@code true} validitiy branch, {@code false} otherwise.
+    */
+   public static boolean isBlockContractValidityBranch(RuleApp appliedRuleApp) {
+      return appliedRuleApp != null && isBlockContractValidityBranch(appliedRuleApp.posInOccurrence());
+   }
+
+   /**
+    * Checks if the modality at the given {@link PosInOccurrence} represents the validity branch of an applied block contract.
+    * @param pio The {@link PosInOccurrence} to check.
+    * @return validitiy branch, {@code false} otherwise.
+    */
+   public static boolean isBlockContractValidityBranch(PosInOccurrence pio) {
+      if (pio != null) {
+         Term applicationTerm = TermBuilder.goBelowUpdates(pio.subTerm());
+         return applicationTerm.getLabel(BlockContractValidityTermLabel.NAME) != null;
+      }
+      else {
+         return false;
+      }
    }
 }

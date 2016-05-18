@@ -13,6 +13,7 @@
 
 package org.key_project.sed.ui.visualization.execution_tree.provider;
 
+import org.key_project.sed.core.model.ISEBlockContract;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEBranchStatement;
 import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
@@ -145,6 +146,36 @@ public interface IExecutionTreeImageConstants {
     * Key of the image for {@link ISELoopBodyTermination}s.
     */
    public static final String IMG_LOOP_BODY_TERMINATION_NOT_VERIFIED = PREFIX + "loopBodyTerminationNotVerified";
+
+   /**
+    * Key of the image for {@link ISEBlockContract}s.
+    */
+   public static final String IMG_BLOCK_CONTRACT = PREFIX + "blockContract";
+
+   /**
+    * Key of the image for {@link ISEBlockContract}s.
+    */
+   public static final String IMG_BLOCK_CONTRACT_NOT_PRE = PREFIX + "blockContractNotPre";
+
+   /**
+    * Key of the image for {@link ISEBlockContract}s.
+    */
+   public static final String IMG_BLOCK_CONTRACT_TERMINATION = PREFIX + "blockContractTermination";
+
+   /**
+    * Key of the image for {@link ISEBlockContract}s.
+    */
+   public static final String IMG_BLOCK_CONTRACT_TERMINATION_NOT_VERIFIED = PREFIX + "blockContractTerminationNotVerified";
+
+   /**
+    * Key of the image for {@link ISEBlockContract}s.
+    */
+   public static final String IMG_BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION = PREFIX + "blockContractExceptionalTermination";
+
+   /**
+    * Key of the image for {@link ISEBlockContract}s.
+    */
+   public static final String IMG_BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION_NOT_VERIFIED = PREFIX + "blockContractExceptionalTerminationNotVerified";
    
    /**
     * Key of the image for {@link ISEThread}s.

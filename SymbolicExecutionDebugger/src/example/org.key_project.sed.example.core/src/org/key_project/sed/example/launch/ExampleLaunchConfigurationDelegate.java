@@ -97,97 +97,119 @@ public class ExampleLaunchConfigurationDelegate extends LaunchConfigurationDeleg
        target.setModelIdentifier("org.key_project.sed.example.core");
        // Thread
        SEMemoryThread thread = new SEMemoryThread(target, false);
-       thread.setName("<start>");
-       thread.setPathCondition("true");
+       thread.setName("Main");
        target.addSymbolicThread(thread);
        // Method call
-       SEMemoryMethodCall call = new SEMemoryMethodCall(target, thread, thread);
-       call.setName("<call add(other)>");
-       call.setPathCondition("true");
-       call.setGroupable(true);
-       thread.addChild(call);
+       SEMemoryStatement main28 = new SEMemoryStatement(target, thread, thread);
+       main28.setName("Object x = new Object();");
+       thread.addChild(main28);
        // Statement
-       SEMemoryStatement statement = new SEMemoryStatement(target, call, thread);
-       statement.setName("this.value += other.value;");
-       statement.setPathCondition("true");
-       statement.setCallStack(createCallStack(call));
-       call.addChild(statement);
-       
-       // Not Null Branch Condition
-       SEMemoryBranchCondition notNullBC = new SEMemoryBranchCondition(target, statement, thread);
-       notNullBC.setName("other != null");
-       notNullBC.setPathCondition("other != null");
-       notNullBC.setCallStack(createCallStack(call));
-       statement.addChild(notNullBC);
-       // Method return
-       SEMemoryMethodReturn normalReturn = new SEMemoryMethodReturn(target, notNullBC, thread);
-       normalReturn.setName("<return of this.add(other)>");
-       normalReturn.setPathCondition("other != null");
-       normalReturn.setCallStack(createCallStack(call));
-       notNullBC.addChild(normalReturn);
-       // Method return condition
-       SEMemoryBranchCondition notNullMethodReturnBC = new SEMemoryBranchCondition(target, call, thread);
-       notNullMethodReturnBC.setName("other != null");
-       notNullMethodReturnBC.setPathCondition("other != null");
-       notNullMethodReturnBC.addChild(normalReturn);
-       notNullMethodReturnBC.setCallStack(createCallStack(call));
-       call.addMethodReturnCondition(notNullMethodReturnBC);
-       call.addGroupEndCondition(notNullMethodReturnBC);
-       normalReturn.setMethodReturnCondition(notNullMethodReturnBC);
-       normalReturn.addGroupStartCondition(notNullMethodReturnBC);
-       // Normal termination
-       SEMemoryTermination termination = new SEMemoryTermination(target, normalReturn, thread, true);
-       termination.setName("<end>");
-       termination.setPathCondition("other != null");
-       normalReturn.addChild(termination);
-       
-       // Not Null Branch Condition
-       SEMemoryBranchCondition nullBC = new SEMemoryBranchCondition(target, statement, thread);
-       nullBC.setName("other == null");
-       nullBC.setPathCondition("other == null");
-       nullBC.setCallStack(createCallStack(call));
-       statement.addChild(nullBC);
-       // Exceptional method return
-       SEMemoryExceptionalMethodReturn exceptionalReturn = new SEMemoryExceptionalMethodReturn(target, nullBC, thread);
-       exceptionalReturn.setName("<throw java.lang.NullPointerException>");
-       exceptionalReturn.setPathCondition("other == null");
-       exceptionalReturn.setCallStack(createCallStack(call));
-       nullBC.addChild(exceptionalReturn);
-       // Method return condition
-       SEMemoryBranchCondition nullMethodReturnBC = new SEMemoryBranchCondition(target, call, thread);
-       nullMethodReturnBC.setName("other == null");
-       nullMethodReturnBC.setPathCondition("other == null");
-       nullMethodReturnBC.addChild(exceptionalReturn);
-       nullMethodReturnBC.setCallStack(createCallStack(call));
-       call.addMethodReturnCondition(nullMethodReturnBC);
-       call.addGroupEndCondition(nullMethodReturnBC);
-       exceptionalReturn.setMethodReturnCondition(nullMethodReturnBC);
-       exceptionalReturn.addGroupStartCondition(nullMethodReturnBC);
-       // Normal termination
-       SEMemoryExceptionalTermination exceptionalTermination = new SEMemoryExceptionalTermination(target, exceptionalReturn, thread, true);
-       exceptionalTermination.setName("<uncaught java.lang.NullPointerException>");
-       exceptionalTermination.setPathCondition("other == null");
-       exceptionalReturn.addChild(exceptionalTermination);
-       
-       // May add ISEDVariable with ISEDValue to each ISEDDebugNode
-       SEMemoryVariable variable = new SEMemoryVariable(target, thread);
-       variable.setName("Hello");
-       SEMemoryValue value = new SEMemoryValue(target, variable);
-       value.setValueString("World!");
-       variable.setValue(value);
-       thread.addVariable(variable);
+       SEMemoryStatement main29 = createStatement(main28, "ClassicDeadlock cd = new ClassicDeadlock();");
+       SEMemoryStatement main31 = createStatement(main29, "cd.BuldNetworks(3, x, x)");
+       SEMemoryStatement main13 = createStatement(main31, "if (n === 0)");
+       SEMemoryStatement main23 = createStatement(main13, "todo.start()");
+       SEMemoryStatement main24 = createStatement(main23, "this.BuildNetwork(n-1)");
+       SEMemoryStatement main13again = createStatement(main24, "if (n === 0)");
+       SEMemoryStatement main14 = createStatement(main13again, "this.TakeLocks(x, y)");
+       SEMemoryStatement main6 = createStatement(main14, "synchronized(150)");
+       SEMemoryStatement main7 = createStatement(main6, "synchronized(163)");
 
-       // Fill the source model to highlight reached code parts during symbolic execution 
-       //target.getSourceModel();
-
-       // Use ISEDAnnotation and ISEDAnnotationLink instances to label an ISEDDebugNode, e.g. with hit breakpoints
-       BreakpointAnnotation annotation = new BreakpointAnnotation();
-       target.registerAnnotation(annotation);
-       BreakpointAnnotationLink link = new BreakpointAnnotationLink(annotation, normalReturn);
-       link.setBreakpointName("My Breakpoint");
-       annotation.addLink(link);
+       
+       // Thread
+       SEMemoryThread thread2 = new SEMemoryThread(target, false);
+       thread2.setName("toto");
+       target.addSymbolicThread(thread2);
+       // Method call
+       SEMemoryStatement main20 = new SEMemoryStatement(target, thread2, thread2);
+       main20.setName("TakeLocks(x, y)");
+       thread2.addChild(main20);
+       // Statement
+       main6 = createStatement(main20, "synchronized(163)");
+       main7 = createStatement(main6, "synchronized(150)");
+       
+       //       
+//       // Not Null Branch Condition
+//       SEMemoryBranchCondition notNullBC = new SEMemoryBranchCondition(target, statement, thread);
+//       notNullBC.setName("other != null");
+//       notNullBC.setPathCondition("other != null");
+//       notNullBC.setCallStack(createCallStack(call));
+//       statement.addChild(notNullBC);
+//       // Method return
+//       SEMemoryMethodReturn normalReturn = new SEMemoryMethodReturn(target, notNullBC, thread);
+//       normalReturn.setName("<return of this.add(other)>");
+//       normalReturn.setPathCondition("other != null");
+//       normalReturn.setCallStack(createCallStack(call));
+//       notNullBC.addChild(normalReturn);
+//       // Method return condition
+//       SEMemoryBranchCondition notNullMethodReturnBC = new SEMemoryBranchCondition(target, call, thread);
+//       notNullMethodReturnBC.setName("other != null");
+//       notNullMethodReturnBC.setPathCondition("other != null");
+//       notNullMethodReturnBC.addChild(normalReturn);
+//       notNullMethodReturnBC.setCallStack(createCallStack(call));
+//       call.addMethodReturnCondition(notNullMethodReturnBC);
+//       call.addGroupEndCondition(notNullMethodReturnBC);
+//       normalReturn.setMethodReturnCondition(notNullMethodReturnBC);
+//       normalReturn.addGroupStartCondition(notNullMethodReturnBC);
+//       // Normal termination
+//       SEMemoryTermination termination = new SEMemoryTermination(target, normalReturn, thread, true);
+//       termination.setName("<end>");
+//       termination.setPathCondition("other != null");
+//       normalReturn.addChild(termination);
+//       
+//       // Not Null Branch Condition
+//       SEMemoryBranchCondition nullBC = new SEMemoryBranchCondition(target, statement, thread);
+//       nullBC.setName("other == null");
+//       nullBC.setPathCondition("other == null");
+//       nullBC.setCallStack(createCallStack(call));
+//       statement.addChild(nullBC);
+//       // Exceptional method return
+//       SEMemoryExceptionalMethodReturn exceptionalReturn = new SEMemoryExceptionalMethodReturn(target, nullBC, thread);
+//       exceptionalReturn.setName("<throw java.lang.NullPointerException>");
+//       exceptionalReturn.setPathCondition("other == null");
+//       exceptionalReturn.setCallStack(createCallStack(call));
+//       nullBC.addChild(exceptionalReturn);
+//       // Method return condition
+//       SEMemoryBranchCondition nullMethodReturnBC = new SEMemoryBranchCondition(target, call, thread);
+//       nullMethodReturnBC.setName("other == null");
+//       nullMethodReturnBC.setPathCondition("other == null");
+//       nullMethodReturnBC.addChild(exceptionalReturn);
+//       nullMethodReturnBC.setCallStack(createCallStack(call));
+//       call.addMethodReturnCondition(nullMethodReturnBC);
+//       call.addGroupEndCondition(nullMethodReturnBC);
+//       exceptionalReturn.setMethodReturnCondition(nullMethodReturnBC);
+//       exceptionalReturn.addGroupStartCondition(nullMethodReturnBC);
+//       // Normal termination
+//       SEMemoryExceptionalTermination exceptionalTermination = new SEMemoryExceptionalTermination(target, exceptionalReturn, thread, true);
+//       exceptionalTermination.setName("<uncaught java.lang.NullPointerException>");
+//       exceptionalTermination.setPathCondition("other == null");
+//       exceptionalReturn.addChild(exceptionalTermination);
+//       
+//       // May add ISEDVariable with ISEDValue to each ISEDDebugNode
+//       SEMemoryVariable variable = new SEMemoryVariable(target, thread);
+//       variable.setName("Hello");
+//       SEMemoryValue value = new SEMemoryValue(target, variable);
+//       value.setValueString("World!");
+//       variable.setValue(value);
+//       thread.addVariable(variable);
+//
+//       // Fill the source model to highlight reached code parts during symbolic execution 
+//       //target.getSourceModel();
+//
+//       // Use ISEDAnnotation and ISEDAnnotationLink instances to label an ISEDDebugNode, e.g. with hit breakpoints
+//       BreakpointAnnotation annotation = new BreakpointAnnotation();
+//       target.registerAnnotation(annotation);
+//       BreakpointAnnotationLink link = new BreakpointAnnotationLink(annotation, normalReturn);
+//       link.setBreakpointName("My Breakpoint");
+//       annotation.addLink(link);
        
        return target;
+    }
+    
+    protected SEMemoryStatement createStatement(SEMemoryStatement parent, String name) {
+       SEMemoryStatement main31 = new SEMemoryStatement(parent.getDebugTarget(), parent, parent.getThread());
+       main31.setName(name);
+       parent.addChild(main31);
+       return main31; 
     }
     
     /**

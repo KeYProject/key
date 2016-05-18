@@ -39,6 +39,41 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
    public static final boolean PRINT_SLICE = false;
 
    /** 
+    * Tests slicing on the example {@code blockContractAssignableLocationNotRequested}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testBlockContractAssignableLocationNotRequested() throws Exception {
+      doSlicingTest("/slicing/blockContractAssignableLocationNotRequested/BlockContractAssignableLocationNotRequested.proof", 
+                    new ReturnSelector(122),
+                    true,
+                    109,
+                    14,
+                    12);
+   }
+
+   /** 
+    * Tests slicing on the example {@code blockContractAssignableRequestedLocation}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testBlockContractAssignableRequestedLocation() throws Exception {
+      doSlicingTest("/slicing/blockContractAssignableRequestedLocation/BlockContractAssignableRequestedLocation.proof", 
+                    new ReturnSelector(111),
+                    true,
+                    23);
+   }
+
+   /** 
+    * Tests slicing on the example {@code blockContractAssignableEverything}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testBlockContractAssignableEverything() throws Exception {
+      doSlicingTest("/slicing/blockContractAssignableEverything/BlockContractAssignableEverything.proof", 
+                    new ReturnSelector(97),
+                    true,
+                    23);
+   }
+
+   /** 
     * Tests slicing on the example {@code methodContractAssignableLocationNotRequested}.
     * @throws Exception Occurred Exception.
     */

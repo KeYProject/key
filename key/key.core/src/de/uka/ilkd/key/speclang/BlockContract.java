@@ -99,6 +99,8 @@ public interface BlockContract extends SpecificationElement {
 
     public String getHtmlText(Services services);
 
+    public String getPlainText(Services services, Terms terms);
+
     // TODO Find better name: Creates a new block contract with the given changes.
     public BlockContract update(StatementBlock newBlock,
                                 Map<LocationVariable,Term> newPreconditions,

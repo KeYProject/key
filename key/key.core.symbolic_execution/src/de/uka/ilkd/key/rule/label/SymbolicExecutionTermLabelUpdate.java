@@ -20,6 +20,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -32,6 +33,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
@@ -47,7 +49,9 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
     */
    @Override
    public ImmutableList<Name> getSupportedRuleNames() {
-      return ImmutableSLList.<Name>nil().append(WhileInvariantRule.INSTANCE.name());
+      return ImmutableSLList.<Name>nil()
+                            .prepend(WhileInvariantRule.INSTANCE.name())
+                            .prepend(BlockContractRule.INSTANCE.name());
    }
 
    /**
@@ -69,7 +73,8 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
                             ImmutableArray<QuantifiableVariable> newTermBoundVars,
                             JavaBlock newTermJavaBlock,
                             Set<TermLabel> labels) {
-      if (rule instanceof WhileInvariantRule && "LoopBodyModality".equals(hint)) {
+      if (rule instanceof WhileInvariantRule && "LoopBodyModality".equals(hint) ||
+          rule instanceof BlockContractRule && StringUtil.startsWith(hint, "ValidityModality: exceptionVar=")) {
          TermLabel label = CollectionUtil.searchAndRemove(labels, new IFilter<TermLabel>() {
             @Override
             public boolean select(TermLabel element) {

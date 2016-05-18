@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -73,6 +74,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -469,6 +472,7 @@ public class BlockContractRule implements BuiltInRule {
     private ImmutableList<Goal> apply(final Goal goal, final Services services,
                                       final BlockContractBuiltInRuleApp application)
                                               throws RuleAbortException {
+        final TermLabelState termLabelState = new TermLabelState();
         final Instantiation instantiation =
                 instantiate(application.posInOccurrence().subTerm(), goal, services);
         final BlockContract contract = application.getContract();
@@ -521,7 +525,9 @@ public class BlockContractRule implements BuiltInRule {
                                                         /*anonymisationLocalVariables, */
                                                         modifiesClauses);
         final ImmutableList<Goal> result;
-        final GoalsConfigurator configurator = new GoalsConfigurator(instantiation,
+        final GoalsConfigurator configurator = new GoalsConfigurator(application,
+                                                                     termLabelState,
+                                                                     instantiation,
                                                                      contract.getLabels(),
                                                                      variables,
                                                                      application.posInOccurrence(),
@@ -1116,20 +1122,25 @@ public class BlockContractRule implements BuiltInRule {
 
     }
 
-    private static final class GoalsConfigurator {
-
+    private final static class GoalsConfigurator {
+        private final BlockContractBuiltInRuleApp application;
+        private final TermLabelState termLabelState;
         private final Instantiation instantiation;
         private final List<Label> labels;
         private final BlockContract.Variables variables;
         private final PosInOccurrence occurrence;
         private final Services services;
 
-        public GoalsConfigurator(final Instantiation instantiation,
+        public GoalsConfigurator(final BlockContractBuiltInRuleApp application,
+                                 final TermLabelState termLabelState,
+                                 final Instantiation instantiation,
                                  final List<Label> labels,
                                  final BlockContract.Variables variables,
                                  final PosInOccurrence occurrence,
                                  final Services services)
         {
+            this.application = application;
+            this.termLabelState = termLabelState;
             this.instantiation = instantiation;
             this.labels = labels;
             this.variables = variables;
@@ -1169,12 +1180,29 @@ public class BlockContractRule implements BuiltInRule {
                                                    services).construct();
             Statement wrappedBlock = wrapInMethodFrameIfContextIsAvailable(block);
             StatementBlock finishedBlock = finishTransactionIfModalityIsTransactional(wrappedBlock);
+            JavaBlock newJavaBlock = JavaBlock.createJavaBlock(finishedBlock);
+            Term newPost = tb.and(postconditions);
             goal.changeFormula(new SequentFormula(
                   tb.applySequential(
                     updates,
                     tb.prog(instantiation.modality,
-                            JavaBlock.createJavaBlock(finishedBlock), tb.and(postconditions)))),
+                            newJavaBlock, 
+                            newPost,
+                            TermLabelManager.instantiateLabels(termLabelState,
+                                                               services, 
+                                                               occurrence, 
+                                                               application.rule(), 
+                                                               application,
+                                                               goal, 
+                                                               "ValidityModality: exceptionVar=" + variables.exception, 
+                                                               null, 
+                                                               instantiation.modality,
+                                                               new ImmutableArray<Term>(newPost), 
+                                                               null, 
+                                                               newJavaBlock, 
+                                                               instantiation.formula.getLabels())))),
                             occurrence);
+            TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(), goal, null, null);
             final boolean oldInfFlowCheckInfoValue =
                     goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
                     goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY);
@@ -1219,6 +1247,7 @@ public class BlockContractRule implements BuiltInRule {
             goal.setBranchLabel("Precondition");
             goal.changeFormula(new SequentFormula(tb.apply(update, tb.and(preconditions), null)),
                                occurrence);
+            TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(), goal, null, null);
         }
 
         public void setUpUsageGoal(final Goal goal, final Term[] updates,
@@ -1227,17 +1256,31 @@ public class BlockContractRule implements BuiltInRule {
             goal.setBranchLabel("Usage");
             Term uAssumptions = tb.applySequential(updates, tb.and(assumptions));
             goal.addFormula(new SequentFormula(uAssumptions), true, false);
-            goal.changeFormula(new SequentFormula(tb.applySequential(updates, buildUsageFormula())),
+            goal.changeFormula(new SequentFormula(tb.applySequential(updates, buildUsageFormula(goal))),
                                                   occurrence);
+            TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(), goal, null, null);
         }
 
-        private Term buildUsageFormula()
+        private Term buildUsageFormula(Goal goal)
         {
             return services.getTermBuilder().prog(
                 instantiation.modality,
                 replaceBlock(instantiation.formula.javaBlock(), instantiation.block,
                              constructAbruptTerminationIfCascade()),
-                instantiation.formula.sub(0)
+                instantiation.formula.sub(0),
+                TermLabelManager.instantiateLabels(termLabelState,
+                                                   services, 
+                                                   occurrence, 
+                                                   application.rule(), 
+                                                   application,
+                                                   goal, 
+                                                   "UsageModality", 
+                                                   null, 
+                                                   instantiation.modality,
+                                                   new ImmutableArray<Term>(instantiation.formula.sub(0)), 
+                                                   null, 
+                                                   instantiation.formula.javaBlock(), 
+                                                   instantiation.formula.getLabels())
             );
         }
 

@@ -18,8 +18,8 @@ import java.io.File;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jdt.core.IMethod;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEExceptionalTermination;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.impl.AbstractSEExceptionalTermination;
 import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
@@ -29,6 +29,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -85,6 +86,19 @@ public class KeYExceptionalTermination extends AbstractSEExceptionalTermination 
       target.registerDebugNode(this);
       thread.addTermination(this);
       initializeAnnotations();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getNodeType() {
+      if (TerminationKind.BLOCK_CONTRACT_EXCEPTIONAL == getExecutionNode().getTerminationKind()) {
+         return "Block Contract " + super.getNodeType();
+      }
+      else {
+         return super.getNodeType();
+      }
    }
 
    /**

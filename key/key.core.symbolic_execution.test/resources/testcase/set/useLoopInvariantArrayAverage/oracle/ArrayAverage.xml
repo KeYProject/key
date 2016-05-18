@@ -49,11 +49,11 @@ mod: false" pathCondition="not(equals(array,null))" pathConditionChanged="false"
                                  <callStackEntry path="/0/0/0"/>
                                  <callStackEntry path="/0"/>
                                  <loopCondition name="i&lt;array_1.length" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false" blockOpened="false">
-                                    <callStackEntry path="/0"/>
+                                    <callStackEntry path="/0/0/0"/>
                                     <statement name="sum_2+=array_1[i];" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false">
-                                       <callStackEntry path="/0"/>
+                                       <callStackEntry path="/0/0/0"/>
                                        <statement name="i++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false">
-                                          <callStackEntry path="/0"/>
+                                          <callStackEntry path="/0/0/0"/>
                                           <termination name="&lt;loop body end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                                           </termination>
                                        </statement>

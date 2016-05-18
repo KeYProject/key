@@ -18,9 +18,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 
 /**
- * Label attached to a symbolic execution thread. 
- * Currently realized as singleton. In case one wants to track and distinguish 
- * different lines of execution, this needs to be changed.
+ * Label attached to a symbolic execution thread.
  */
 public class SymbolicExecutionTermLabel implements TermLabel {
    /**
@@ -37,7 +35,7 @@ public class SymbolicExecutionTermLabel implements TermLabel {
    /**
     * The unique ID of this term label in the {@link Sequent}.
     */
-   private int id;
+   private final int id;
 
    /**
     * Constructor.

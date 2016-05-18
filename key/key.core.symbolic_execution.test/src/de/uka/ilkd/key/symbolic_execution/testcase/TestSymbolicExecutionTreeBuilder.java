@@ -43,6 +43,236 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
+   /**
+    * Tests example: /set/blockContractAssignableEverything
+    */
+   public void testBlockContractAssignableEverything() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractAssignableEverything/test/BlockContractAssignableEverything.proof",
+                          "/set/blockContractAssignableEverything/oracle/BlockContractAssignableEverything.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractAssignableLocationNotRequested
+    */
+   public void testBlockContractAssignableLocationNotRequested() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractAssignableLocationNotRequested/test/BlockContractAssignableLocationNotRequested.proof",
+                          "/set/blockContractAssignableLocationNotRequested/oracle/BlockContractAssignableLocationNotRequested.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractAssignableRequestedLocation
+    */
+   public void testBlockContractAssignableRequestedLocation() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractAssignableRequestedLocation/test/BlockContractAssignableRequestedLocation.proof",
+                          "/set/blockContractAssignableRequestedLocation/oracle/BlockContractAssignableRequestedLocation.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractParamRemaned
+    */
+   public void testBlockContractParamRemaned() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractParamRemaned/test/BlockContractParamRemaned.proof",
+                          "/set/blockContractParamRemaned/oracle/BlockContractParamRemaned.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractPreconditionNotVerified
+    */
+   public void testBlockContractPreconditionNotVerified() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractPreconditionNotVerified/test/BlockContractPreconditionNotVerified.proof",
+                          "/set/blockContractPreconditionNotVerified/oracle/BlockContractPreconditionNotVerified.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractThisTest
+    */
+   public void testBlockContractThisTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractThisTest/test/BlockContractThisTest.proof",
+                          "/set/blockContractThisTest/oracle/BlockContractThisTest.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractVarRenamedLater
+    */
+   public void testBlockContractVarRenamedLater() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractVarRenamedLater/test/BlockContractVarRenamedLater.proof",
+                          "/set/blockContractVarRenamedLater/oracle/BlockContractVarRenamedLater.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractWithException
+    */
+   public void testBlockContractWithException() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractWithException/test/BlockContractWithException.proof",
+                          "/set/blockContractWithException/oracle/BlockContractWithException.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractWithExceptionPostconditionNotVerified
+    */
+   public void testBlockContractWithExceptionPostconditionNotVerified() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractWithExceptionPostconditionNotVerified/test/BlockContractWithExceptionPostconditionNotVerified.proof",
+                          "/set/blockContractWithExceptionPostconditionNotVerified/oracle/BlockContractWithExceptionPostconditionNotVerified.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractWithReturn
+    */
+   public void testBlockContractWithReturn() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractWithReturn/test/BlockContractWithReturn.proof",
+                          "/set/blockContractWithReturn/oracle/BlockContractWithReturn.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractWithReturnPostconditionNotVerified
+    */
+   public void testBlockContractWithReturnPostconditionNotVerified() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractWithReturnPostconditionNotVerified/test/BlockContractWithReturnPostconditionNotVerified.proof",
+                          "/set/blockContractWithReturnPostconditionNotVerified/oracle/BlockContractWithReturnPostconditionNotVerified.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
    
    /**
     * Tests example: /set/useLoopInvariantWithoutDecreasing

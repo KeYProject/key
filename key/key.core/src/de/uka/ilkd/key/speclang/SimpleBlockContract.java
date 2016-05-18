@@ -23,6 +23,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -423,6 +424,69 @@ public final class SimpleBlockContract implements BlockContract {
                 + getModality()
                 /*+ (transactionApplicableContract() ? "<br><b>transactionApplicable applicable</b>" : "")*/
                 + "</html>";
+    }
+
+    @Override
+    public String getPlainText(final Services services, Terms terms) {
+        assert services != null;
+        // TODO Clean up.
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final LocationVariable baseHeap = heapLDT.getHeap();
+        final StringBuilder stringBuilder = new StringBuilder();
+        if (terms.result != null) {
+            stringBuilder.append(terms.result);
+            stringBuilder.append(" = ");
+        }
+        else if (method.isConstructor()) {
+            stringBuilder.append(terms.self);
+            stringBuilder.append(" = new ");
+        }
+        if (!method.isStatic() && !method.isConstructor()) {
+            stringBuilder.append(terms.self);
+            stringBuilder.append("#");
+        }
+        stringBuilder.append(method.getName());
+        stringBuilder.append("()");
+        stringBuilder.append(")");
+        stringBuilder.append(" catch(");
+        stringBuilder.append(terms.exception);
+        stringBuilder.append(")");
+        String mods = "";
+        Term baseHeapTerm = services.getTermBuilder().var(baseHeap);
+        for (LocationVariable heap : heapLDT.getAllHeaps()) {
+            Term modifiesClause = getModifiesClause(heap, services.getTermBuilder().var(heap), terms.self, services);
+            if (modifiesClause != null) {
+                mods = mods + "\nmod" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
+                        + StringUtil.trim(LogicPrinter.quickPrintTerm(modifiesClause, services));
+                /*if (heap == baseHeap && !hasRealModifiesClause) {
+                    mods = mods + "<b>, creates no new objects</b>";
+                }*/
+            }
+        }
+        String pres = "";
+        for (LocationVariable heap : heapLDT.getAllHeaps()) {
+            Term precondition = getPrecondition(heap, baseHeapTerm, terms.self, terms.remembranceHeaps, services);
+            if (precondition != null) {
+                pres = pres + "\npre" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
+                        + StringUtil.trim(LogicPrinter.quickPrintTerm(precondition, services));
+            }
+        }
+        String posts = "";
+        for (LocationVariable heap : heapLDT.getAllHeaps()) {
+            Term postcondition = getPostcondition(heap, baseHeapTerm, terms, services);
+            if (postcondition != null) {
+                posts = posts + "\npost" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
+                         + StringUtil.trim(LogicPrinter.quickPrintTerm(postcondition, services));
+            }
+        }
+        return stringBuilder.toString() 
+                + pres
+                + posts
+                + mods
+                + "termination "
+                + getModality()
+                /*+ (transactionApplicableContract() ? "<br><b>transactionApplicable applicable</b>" : "")*/
+                ;
     }
 
     @Override

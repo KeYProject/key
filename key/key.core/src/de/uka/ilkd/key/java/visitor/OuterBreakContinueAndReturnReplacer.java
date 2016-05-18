@@ -116,7 +116,12 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
     protected void walk(final ProgramElement node)
     {
-        stack.push(new ExtList());
+        if (node.getPositionInfo() != PositionInfo.UNDEFINED) {
+           stack.push(new ExtList(new Object[] {node.getPositionInfo()}));
+        }
+        else {
+           stack.push(new ExtList());
+        }
         if (node instanceof LoopStatement || node instanceof Switch) {
             loopAndSwitchCascadeDepth++;
         }
@@ -163,7 +168,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         if (isJumpToOuterLabel(x)) {
             final ProgramVariable flag = flags.get(x.getLabel());
             assert flag != null : "a label flag must not be null";
-            final Statement assign = KeYJavaASTFactory.assign(flag, BooleanLiteral.TRUE);
+            final Statement assign = KeYJavaASTFactory.assign(flag, BooleanLiteral.TRUE, x.getPositionInfo());
             final Statement[] statements = new Statement[] {assign, breakOut};
             addChild(new StatementBlock(statements));
             changed();
@@ -186,13 +191,13 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
             }
-            Statement assignFlag = KeYJavaASTFactory.assign(returnFlag, BooleanLiteral.TRUE);
+            Statement assignFlag = KeYJavaASTFactory.assign(returnFlag, BooleanLiteral.TRUE, x.getPositionInfo());
             final Statement[] statements;
             if (returnValue == null) {
                 statements = new Statement[] {assignFlag, breakOut};
             }
             else {
-                Statement assignValue = KeYJavaASTFactory.assign(returnValue, x.getExpression());
+                Statement assignValue = KeYJavaASTFactory.assign(returnValue, x.getExpression(), x.getPositionInfo());
                 statements = new Statement[] {assignFlag, assignValue, breakOut};
             }
             addChild(new StatementBlock(statements));

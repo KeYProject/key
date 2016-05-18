@@ -24,7 +24,6 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -36,7 +35,7 @@ import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Makes sure that {@link ParameterlessTermLabel#LOOP_BODY_LABEL} is introduced
+ * Makes sure that {@link SymbolicExecutionUtil#LOOP_BODY_LABEL} is introduced
  * when a {@link WhileInvariantRule} is applied.
  * @author Martin Hentschel
  */

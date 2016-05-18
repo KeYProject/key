@@ -67,6 +67,7 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeWriter;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
@@ -487,6 +488,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertEquals(((IExecutionLoopInvariant)expected).isInitiallyValid(), ((IExecutionLoopInvariant)current).isInitiallyValid());
          assertVariables((IExecutionLoopInvariant)expected, (IExecutionLoopInvariant)current, compareVariables, compareConstraints);
          assertConstraints((IExecutionLoopInvariant)expected, (IExecutionLoopInvariant)current, compareConstraints);
+      }
+      else if (expected instanceof IExecutionBlockContract) {
+         assertTrue("Expected IExecutionBlockContract but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBlockContract);
+         assertEquals(((IExecutionBlockContract)expected).isPreconditionComplied(), ((IExecutionBlockContract)current).isPreconditionComplied());
+         assertVariables((IExecutionBlockContract)expected, (IExecutionBlockContract)current, compareVariables, compareConstraints);
+         assertConstraints((IExecutionBlockContract)expected, (IExecutionBlockContract)current, compareConstraints);
       }
       else {
          fail("Unknown execution node \"" + expected + "\".");

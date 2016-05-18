@@ -36,6 +36,9 @@ import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.launch.KeYSourceLookupDirector;
 import org.key_project.sed.key.core.launch.KeYSourceLookupParticipant.SourceRequest;
 import org.key_project.sed.key.core.model.IKeYSENode;
+import org.key_project.sed.key.core.model.KeYBlockContract;
+import org.key_project.sed.key.core.model.KeYBlockContractExceptionalTermination;
+import org.key_project.sed.key.core.model.KeYBlockContractTermination;
 import org.key_project.sed.key.core.model.KeYBranchCondition;
 import org.key_project.sed.key.core.model.KeYBranchStatement;
 import org.key_project.sed.key.core.model.KeYConstraint;
@@ -58,6 +61,7 @@ import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
@@ -215,6 +219,9 @@ public final class KeYModelUtil {
          else if (executionNode instanceof IExecutionOperationContract) {
             result = new KeYMethodContract(target, parent, thread, (IExecutionOperationContract)executionNode);
          }
+         else if (executionNode instanceof IExecutionBlockContract) {
+            result = new KeYBlockContract(target, parent, thread, (IExecutionBlockContract)executionNode);
+         }
          else if (executionNode instanceof IExecutionLoopInvariant) {
             result = new KeYLoopInvariant(target, parent, thread, (IExecutionLoopInvariant)executionNode);
          }
@@ -315,14 +322,20 @@ public final class KeYModelUtil {
          if (terminationNode != null) {
             // Reuse method return created by the method call and set its parent now
             if (terminationNode.getParent() == null) {
-               if (terminationNode instanceof KeYExceptionalTermination) {
+               if (terminationNode instanceof KeYLoopBodyTermination) {
+                  ((KeYLoopBodyTermination)terminationNode).setParent(parent);
+               }
+               else if (terminationNode instanceof KeYBlockContractExceptionalTermination) {
+                  ((KeYBlockContractExceptionalTermination)terminationNode).setParent(parent);
+               }
+               else if (terminationNode instanceof KeYBlockContractTermination) {
+                  ((KeYBlockContractTermination)terminationNode).setParent(parent);
+               }
+               else if (terminationNode instanceof KeYExceptionalTermination) {
                   ((KeYExceptionalTermination)terminationNode).setParent(parent);
                }
                else if (terminationNode instanceof KeYTermination) {
                   ((KeYTermination)terminationNode).setParent(parent);
-               }
-               else if (terminationNode instanceof KeYLoopBodyTermination) {
-                  ((KeYLoopBodyTermination)terminationNode).setParent(parent);
                }
                else {
                   throw new DebugException(LogUtil.getLogger().createErrorStatus("Not supported termination \"" + terminationNode + "\"."));
@@ -343,6 +356,12 @@ public final class KeYModelUtil {
             }
             else if (terminationExecutionNode.getTerminationKind() == TerminationKind.LOOP_BODY) {
                return new KeYLoopBodyTermination(target, parent, thread, terminationExecutionNode);
+            }
+            else if (terminationExecutionNode.getTerminationKind() == TerminationKind.BLOCK_CONTRACT_NORMAL) {
+               return new KeYBlockContractTermination(target, parent, thread, terminationExecutionNode);
+            }
+            else if (terminationExecutionNode.getTerminationKind() == TerminationKind.BLOCK_CONTRACT_EXCEPTIONAL) {
+               return new KeYBlockContractExceptionalTermination(target, parent, thread, terminationExecutionNode);
             }
             else {
                throw new DebugException(LogUtil.getLogger().createErrorStatus("Not supported termination kind \"" + terminationExecutionNode.getTerminationKind() + "\"."));
