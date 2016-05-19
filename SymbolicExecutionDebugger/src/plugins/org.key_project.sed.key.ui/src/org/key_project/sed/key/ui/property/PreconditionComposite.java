@@ -16,6 +16,7 @@ package org.key_project.sed.key.ui.property;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.key.core.model.IKeYSENode;
+import org.key_project.sed.key.core.model.KeYBlockContract;
 import org.key_project.sed.key.core.model.KeYMethodContract;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -54,6 +55,12 @@ public class PreconditionComposite extends AbstractTruthValueComposite {
          assert preNode.getNodeInfo().getBranchLabel().startsWith("Pre");
          return preNode;
       }
+      else if (node instanceof KeYBlockContract) {
+         Node invariantNode = super.computeNodeToShow(node, executionNode);
+         Node preNode = invariantNode.child(1);
+         assert "Precondition".equals(preNode.getNodeInfo().getBranchLabel());
+         return preNode;
+      }
       else {
          return super.computeNodeToShow(node, executionNode);
       }
@@ -66,7 +73,7 @@ public class PreconditionComposite extends AbstractTruthValueComposite {
    protected Triple<Term, PosInTerm, Term> computeTermToShow(IKeYSENode<?> node,
                                                              IExecutionNode<?> executionNode, 
                                                              Node keyNode) {
-      if (node instanceof KeYMethodContract) {
+      if (node instanceof KeYMethodContract || node instanceof KeYBlockContract) {
          PosInOccurrence pio = executionNode.getModalityPIO();
          Term term;
          if (pio.isInAntec()) {

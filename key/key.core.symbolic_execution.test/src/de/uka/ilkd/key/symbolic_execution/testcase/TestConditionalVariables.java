@@ -34,6 +34,7 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
                                                                         false, 
                                                                         false, 
                                                                         false, 
+                                                                        false,
                                                                         false, 
                                                                         false, 
                                                                         false, 

@@ -153,6 +153,12 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
     */
    @Override
    public boolean isBranchVerified() {
-      return SymbolicExecutionUtil.lazyComputeIsBranchVerified(getProofNode());
+      if (TerminationKind.BLOCK_CONTRACT_NORMAL.equals(terminationKind) ||
+          TerminationKind.BLOCK_CONTRACT_EXCEPTIONAL.equals(terminationKind)) {
+         return SymbolicExecutionUtil.lazyComputeIsAdditionalBranchVerified(getProofNode());
+      }
+      else {
+         return SymbolicExecutionUtil.lazyComputeIsMainBranchVerified(getProofNode());
+      }
    }
 }

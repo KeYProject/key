@@ -58,7 +58,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
    public static IDefaultStrategyPropertiesFactory DEFAULT_FACTORY = new IDefaultStrategyPropertiesFactory() {
       @Override
       public StrategyProperties createDefaultStrategyProperties() {
-          return SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false, false, false, false);
+          return SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false, false, false, false, false);
       }
    };
    
@@ -178,6 +178,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     * @param quantifierInstantiationWithSplitting Instantiate quantifiers?
     * @param methodTreatmentContract Use method contracts or inline method bodies otherwise?
     * @param loopTreatmentInvariant Use loop invariants or unrole loops otherwise?
+    * @param blockTreatmentContract Block contracts or expand otherwise?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @return The default {@link StrategyProperties} for symbolic execution.
@@ -185,6 +186,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
    public static StrategyProperties getSymbolicExecutionStrategyProperties(boolean quantifierInstantiationWithSplitting,
                                                                            boolean methodTreatmentContract, 
                                                                            boolean loopTreatmentInvariant,
+                                                                           boolean blockTreatmentContract,
                                                                            boolean nonExecutionBranchHidingSideProofs,
                                                                            boolean aliasChecks) {
       StrategyProperties sp = new StrategyProperties();
@@ -192,6 +194,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
                                                       quantifierInstantiationWithSplitting, 
                                                       methodTreatmentContract, 
                                                       loopTreatmentInvariant, 
+                                                      blockTreatmentContract,
                                                       nonExecutionBranchHidingSideProofs, 
                                                       aliasChecks);
       return sp;

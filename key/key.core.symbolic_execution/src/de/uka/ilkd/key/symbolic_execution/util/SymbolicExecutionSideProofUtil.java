@@ -624,7 +624,7 @@ public final class SymbolicExecutionSideProofUtil {
       StrategyProperties sp = proof != null && !proof.isDisposed() ? 
                               proof.getSettings().getStrategySettings().getActiveStrategyProperties() : // Is a clone that can be modified
                               new StrategyProperties();
-      StrategyProperties.setDefaultStrategyProperties(sp, false, true, true, false, false);
+      StrategyProperties.setDefaultStrategyProperties(sp, false, true, true, false, false, false);
       sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatment);
       sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatment);
       sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, queryTreatment);

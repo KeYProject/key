@@ -3999,39 +3999,81 @@ public final class SymbolicExecutionUtil {
     * and thus be treated as valid/closed in a regular proof.
     * @return {@code true} verified/closed, {@code false} not verified/still open
     */
-   public static boolean lazyComputeIsBranchVerified(Node node) {
-	      if (!node.proof().isDisposed()) {
-	         // Find uninterpreted predicate
-	         Term predicate = AbstractOperationPO.getUninterpretedPredicate(node.proof());
-	         // Check if node can be treated as verified/closed
-	         if (predicate != null) {
-	            boolean verified = true;
-	            Iterator<Node> leafsIter = node.leavesIterator();
-	            while (verified && leafsIter.hasNext()) {
-	               Node leaf = leafsIter.next();
-	               if (!leaf.isClosed()) {
-	                  final Term toSearch = predicate;
-	                  SequentFormula topLevelPredicate = CollectionUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
-	                     @Override
-	                     public boolean select(SequentFormula element) {
-	                        return toSearch.op() == element.formula().op();
-	                     }
-	                  });
-	                  if (topLevelPredicate == null) {
-	                     verified = false;
-	                  }
-	               }
-	            }
-	            return verified;
-	         }
-	         else {
-	            return node.isClosed();
-	         }
-	      }
-	      else {
-	         return false;
-	      }
-	   }
+   public static boolean lazyComputeIsMainBranchVerified(Node node) {
+      if (!node.proof().isDisposed()) {
+         // Find uninterpreted predicate
+         Term predicate = AbstractOperationPO.getUninterpretedPredicate(node.proof());
+         // Check if node can be treated as verified/closed
+         if (predicate != null) {
+            boolean verified = true;
+            Iterator<Node> leafsIter = node.leavesIterator();
+            while (verified && leafsIter.hasNext()) {
+               Node leaf = leafsIter.next();
+               if (!leaf.isClosed()) {
+                  final Term toSearch = predicate;
+                  SequentFormula topLevelPredicate = CollectionUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
+                     @Override
+                     public boolean select(SequentFormula element) {
+                        return toSearch.op() == element.formula().op();
+                     }
+                  });
+                  if (topLevelPredicate == null) {
+                     verified = false;
+                  }
+               }
+            }
+            return verified;
+         }
+         else {
+            return node.isClosed();
+         }
+      }
+      else {
+         return false;
+      }
+	}
+   
+   /**
+    * Checks if this branch would be closed without the uninterpreted predicate
+    * and thus be treated as valid/closed in a regular proof.
+    * @return {@code true} verified/closed, {@code false} not verified/still open
+    */
+   public static boolean lazyComputeIsAdditionalBranchVerified(Node node) {
+      if (!node.proof().isDisposed()) {
+         // Find uninterpreted predicate
+         Set<Term> additinalPredicates = AbstractOperationPO.getAdditionalUninterpretedPredicates(node.proof());
+         // Check if node can be treated as verified/closed
+         if (!CollectionUtil.isEmpty(additinalPredicates)) {
+            boolean verified = true;
+            Iterator<Node> leafsIter = node.leavesIterator();
+            while (verified && leafsIter.hasNext()) {
+               Node leaf = leafsIter.next();
+               if (!leaf.isClosed()) {
+                  final Set<Operator> additinalOperatos = new HashSet<Operator>();
+                  for (Term term : additinalPredicates) {
+                     additinalOperatos.add(term.op());
+                  }
+                  SequentFormula topLevelPredicate = CollectionUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
+                     @Override
+                     public boolean select(SequentFormula element) {
+                        return additinalOperatos.contains(element.formula().op());
+                     }
+                  });
+                  if (topLevelPredicate == null) {
+                     verified = false;
+                  }
+               }
+            }
+            return verified;
+         }
+         else {
+            return node.isClosed();
+         }
+      }
+      else {
+         return false;
+      }
+   }
    
    /**
     * Checks if is an exceptional termination.
@@ -4040,9 +4082,9 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} exceptional termination, {@code false} normal termination.
     */
    public static boolean lazyComputeIsExceptionalTermination(Node node, IProgramVariable exceptionVariable) {
-	   	  Sort result = lazyComputeExceptionSort(node, exceptionVariable);
-	      return result != null && !(result instanceof NullSort);
-	   }
+      Sort result = lazyComputeExceptionSort(node, exceptionVariable);
+      return result != null && !(result instanceof NullSort);
+	}
    
    /**
     * Computes the exception {@link Sort} lazily when {@link #getExceptionSort()}
@@ -4052,24 +4094,24 @@ public final class SymbolicExecutionUtil {
     * @return The exception {@link Sort}.
     */
    public static Sort lazyComputeExceptionSort(Node node, IProgramVariable exceptionVariable) {
-	      Sort result = null;
-	      if (exceptionVariable != null) {
-	         // Search final value of the exceptional variable which is used to check if the verified program terminates normally
-	         ImmutableArray<Term> value = null;
-	         for (SequentFormula f : node.sequent().succedent()) {
-	            Pair<ImmutableList<Term>,Term> updates = TermBuilder.goBelowUpdates2(f.formula());
-	            Iterator<Term> iter = updates.first.iterator();
-	            while (value == null && iter.hasNext()) {
-	               value = extractValueFromUpdate(iter.next(), exceptionVariable);
-	            }
-	         }
-	         // An exceptional termination is found if the exceptional variable is not null
-	         if (value != null && value.size() == 1) {
-	            result = value.get(0).sort();
-	         }
-	      }
-	      return result;
-	   }
+      Sort result = null;
+      if (exceptionVariable != null) {
+         // Search final value of the exceptional variable which is used to check if the verified program terminates normally
+         ImmutableArray<Term> value = null;
+         for (SequentFormula f : node.sequent().succedent()) {
+            Pair<ImmutableList<Term>,Term> updates = TermBuilder.goBelowUpdates2(f.formula());
+            Iterator<Term> iter = updates.first.iterator();
+            while (value == null && iter.hasNext()) {
+               value = extractValueFromUpdate(iter.next(), exceptionVariable);
+            }
+         }
+         // An exceptional termination is found if the exceptional variable is not null
+         if (value != null && value.size() == 1) {
+            result = value.get(0).sort();
+         }
+      }
+      return result;
+	}
    
    /**
     * Utility method to extract the value of the {@link IProgramVariable}

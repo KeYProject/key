@@ -19,6 +19,7 @@ import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.BranchResult;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.MultiEvaluationResult;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValueTracingResult;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
@@ -31,6 +32,47 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestCase {
+   /**
+    * Tests example: /set/truthValueBlockContractMagic42
+    */
+   public void testBlockContractMagic42() throws Exception {
+      // Create expected results
+      ExpectedBranchResult goal66 = new ExpectedBranchResult(new ExpectedTruthValueResult("9.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("11.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("11.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult preconditionResult = new ExpectedTruthValueEvaluationResult(goal66);
+      ExpectedBranchResult goal62 = new ExpectedBranchResult(new ExpectedTruthValueResult("13.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("14.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("19.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("20.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("21.0", TruthValue.TRUE));
+      ExpectedBranchResult goal64 = new ExpectedBranchResult(new ExpectedTruthValueResult("13.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("14.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("21.0", TruthValue.FALSE));
+      ExpectedTruthValueEvaluationResult validitiyResult = new ExpectedTruthValueEvaluationResult(goal62, goal64);
+      ExpectedBranchResult goal152 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("8.0", TruthValue.TRUE));
+      ExpectedBranchResult goal154 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("8.0", TruthValue.FALSE));
+      ExpectedTruthValueEvaluationResult usageResult = new ExpectedTruthValueEvaluationResult(goal152, goal154);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueBlockContractMagic42/test/BlockContractMagic42.proof", 
+                                 "/set/truthValueBlockContractMagic42/oracle/BlockContractMagic42.xml",
+                                 false,
+                                 false,
+                                 true,
+                                 preconditionResult,
+                                 validitiyResult,
+                                 usageResult);
+   }
    
    /**
     * Tests example: /set/truthValueRejectedFormula
@@ -58,6 +100,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueRejectedFormula/oracle/LabelLostVerification.xml",
                                  false,
                                  false,
+                                 false,
                                  result);
    }
    
@@ -83,6 +126,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       // Perform test
       doTruthValueEvaluationTest("/set/truthValueAddingOfLabeledSubtree/test/ImmutableList.proof", 
                                  "/set/truthValueAddingOfLabeledSubtree/oracle/ImmutableList.xml",
+                                 false,
                                  false,
                                  false,
                                  resultInvInitial,
@@ -140,6 +184,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueAssignableAndLoop/oracle/MagicProofNoOSS.xml",
                                  true,
                                  true,
+                                 false,
                                  resultExceptionBranch,
                                  resultInvInitial,
                                  resultPrecondition,
@@ -170,6 +215,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       // Perform test
       doTruthValueEvaluationTest("/set/truthValueAnd/test/And3_replaceKnown.proof", 
                                  "/set/truthValueAnd/oracle/And3_replaceKnown.xml",
+                                 false,
                                  false,
                                  false,
                                  result1);
@@ -203,6 +249,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       // Perform test
       doTruthValueEvaluationTest("/set/truthValueUnderstandingProofsMyInteger/test/MyInteger.proof", 
                                  "/set/truthValueUnderstandingProofsMyInteger/oracle/MyInteger.xml",
+                                 false,
                                  false,
                                  false,
                                  result1);
@@ -319,6 +366,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueUnderstandingProofsArrayUtil/oracle/ArrayUtil.xml",
                                  false,
                                  false,
+                                 false,
                                  result1, 
                                  result2, 
                                  result3, 
@@ -383,6 +431,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueUnderstandingProofsAccount/oracle/Account.xml",
                                  false,
                                  false,
+                                 false,
                                  result1, 
                                  result2,
                                  result3,
@@ -428,6 +477,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueUnderstandingProofsCalendar/oracle/Calendar.xml",
                                  false,
                                  false,
+                                 false,
                                  result1, 
                                  result2);
    }
@@ -444,6 +494,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       // Perform test
       doTruthValueEvaluationTest("/set/truthValueMyInteger/test/MyInteger.proof", 
                                  "/set/truthValueMyInteger/oracle/MyInteger.xml",
+                                 false,
                                  false,
                                  false,
                                  result);
@@ -464,6 +515,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueEquivExample/oracle/EquivExample.xml",
                                  false,
                                  true,
+                                 false,
                                  result);
    }
    
@@ -482,6 +534,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueEquivExample/oracle/EquivExample.xml",
                                  false,
                                  false,
+                                 false,
                                  result);
    }
    
@@ -496,6 +549,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       doTruthValueEvaluationTest("/set/truthValueIfThenElseIntegerTest/test/IfThenElseIntegerTest.java", 
                                  "IfThenElseIntegerTest[IfThenElseIntegerTest::magic(int,int)].JML normal_behavior operation contract.0", 
                                  "/set/truthValueIfThenElseIntegerTest/oracle/IfThenElseIntegerTest.xml",
+                                 false,
                                  false,
                                  false,
                                  thenResult,
@@ -515,6 +569,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueIfThenElseNotFormulaTest/oracle/IfThenElseNotFormulaTest.xml",
                                  false,
                                  false,
+                                 false,
                                  thenResult,
                                  elseResult);
    }
@@ -530,6 +585,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       doTruthValueEvaluationTest("/set/truthValueIfThenElseFormulaTest/test/IfThenElseFormulaTest.java", 
                                  "IfThenElseFormulaTest[IfThenElseFormulaTest::magic(int,int)].JML normal_behavior operation contract.0", 
                                  "/set/truthValueIfThenElseFormulaTest/oracle/IfThenElseFormulaTest.xml",
+                                 false,
                                  false,
                                  false,
                                  thenResult,
@@ -551,6 +607,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueNotLastEvaluationGivesTruthValue/oracle/NotLastEvaluationGivesTruthValue.xml",
                                  false,
                                  true,
+                                 false,
                                  result);
    }
    
@@ -567,6 +624,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueArraySumWhile/oracle/ArraySumWhile.xml",
                                  false,
                                  true,
+                                 false,
                                  initialResult,
                                  preservesResult,
                                  terminationResult);
@@ -585,6 +643,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueArraySumWhile/oracle/ArraySumWhile.xml",
                                  false,
                                  true,
+                                 false,
                                  initialResult,
                                  preservesResult,
                                  terminationResult);
@@ -606,6 +665,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueArrayUtil/oracle/ArrayUtil.xml",
                                  true,
                                  true,
+                                 false,
                                  goal97,
                                  goal826,
                                  goal630,
@@ -630,6 +690,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueArrayUtil/oracle/ArrayUtil.xml",
                                  true,
                                  true,
+                                 false,
                                  goal97,
                                  goal826,
                                  goal630,
@@ -650,6 +711,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
                                  true,
                                  false,
+                                 false,
                                  preResult,
                                  terminationResult);
    }
@@ -665,6 +727,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       doTruthValueEvaluationTest("/set/truthValueSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication.proof", 
                                  "/set/truthValueSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
                                  true,
+                                 false,
                                  false,
                                  preResult,
                                  terminationResult);
@@ -682,6 +745,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
                                  true,
                                  false,
+                                 false,
                                  preResult,
                                  terminationResult);
    }
@@ -697,6 +761,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       doTruthValueEvaluationTest("/set/truthValueSimpleMethodContractApplication/test/SimpleMethodContractApplication.proof", 
                                  "/set/truthValueSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
                                  true,
+                                 false,
                                  false,
                                  preResult,
                                  terminationResult);
@@ -714,6 +779,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       // Perform test
       doTruthValueEvaluationTest("/set/truthValueDifferentBranchesTest/test/DifferentBranchesTest.proof", 
                                  "/set/truthValueDifferentBranchesTest/oracle/DifferentBranchesTest.xml",
+                                 false,
                                  false,
                                  false,
                                  firstResult,
@@ -736,6 +802,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueMultiplePredicateResults/oracle/MultiplePredicateResultsTest.xml",
                                  false,
                                  false,
+                                 false,
                                  expectedResult);
    }
    
@@ -746,6 +813,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @param blockTreatmentContract Block contracts or expand otherwise?
     * @param expectedResults The expected results.
     * @throws Exception Occurred Exception.
     */
@@ -753,6 +821,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                             String oraclePathInBaseDirFile,
                                             boolean useOperationContracts,
                                             boolean useLoopInvariants,
+                                            boolean blockTreatmentContract,
                                             ExpectedTruthValueEvaluationResult... expectedResults) throws Exception {
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       try {
@@ -767,6 +836,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                          false, 
                          useOperationContracts, 
                          useLoopInvariants, 
+                         blockTreatmentContract,
                          false, 
                          false, 
                          false, 
@@ -792,6 +862,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @param blockTreatmentContract Block contracts or expand otherwise?
     * @param expectedResults The expected results.
     * @throws Exception Occurred Exception.
     */
@@ -800,6 +871,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                             String oraclePathInBaseDirFile,
                                             boolean useOperationContracts,
                                             boolean useLoopInvariants,
+                                            boolean blockTreatmentContract,
                                             ExpectedTruthValueEvaluationResult... expectedResults) throws Exception {
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       try {
@@ -816,6 +888,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                          false,
                          useOperationContracts,
                          useLoopInvariants,
+                         blockTreatmentContract,
                          false,
                          false,
                          false,
@@ -855,6 +928,9 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
          }
          else if (next instanceof IExecutionLoopInvariant) {
             nodeToEvaluate = next.getProofNode().child(0); // Initial
+         }
+         else if (next instanceof IExecutionBlockContract) {
+            nodeToEvaluate = next.getProofNode().child(1); // Precondition branch
          }
          else {
             nodeToEvaluate = null;

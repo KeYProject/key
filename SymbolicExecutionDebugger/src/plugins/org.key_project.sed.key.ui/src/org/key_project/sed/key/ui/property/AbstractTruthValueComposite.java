@@ -15,8 +15,10 @@ package org.key_project.sed.key.ui.property;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -50,6 +52,8 @@ import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorato
 import org.key_project.key4eclipse.common.ui.decorator.TruthValueTracingViewerDecorator;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.sed.key.core.model.IKeYSENode;
+import org.key_project.sed.key.core.model.KeYBlockContractExceptionalTermination;
+import org.key_project.sed.key.core.model.KeYBlockContractTermination;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.ui.preference.page.KeYColorsPreferencePage;
 import org.key_project.sed.key.ui.view.ProofView;
@@ -57,6 +61,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -67,6 +72,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -523,21 +529,37 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    
    /**
     * Searches the {@link Term} with the uninterpreted predicate.
+    * @param node The {@link IKeYSENode} which provides the current {@link Sequent} to search the uninterpreted predicate in.
     * @param term The {@link Term} to start search at.
     * @param uninterpretedPredicate The {@link Term} of the proof obligation which specifies the uninterpreted predicate.
+    * @param additionalPredicates The additional uninterpreted predicates.
     * @return The {@link PosInTerm} of the uninterpreted predicate.
     */
-   protected PosInTerm findUninterpretedPredicateTerm(Term term, Term uninterpretedPredicate) {
-      return findUninterpretedPredicateTerm(term, uninterpretedPredicate, PosInTerm.getTopLevel());
+   protected PosInTerm findUninterpretedPredicateTerm(IKeYSENode<?> node, 
+                                                      Term term, 
+                                                      Term uninterpretedPredicate,
+                                                      Set<Term> additionalPredicates) {
+      if (node instanceof KeYBlockContractTermination || node instanceof KeYBlockContractExceptionalTermination) {
+         Set<Operator> additionalPredicateOperators = new HashSet<Operator>();
+         if (!CollectionUtil.isEmpty(additionalPredicates)) {
+            for (Term predicateTerm : additionalPredicates) {
+               additionalPredicateOperators.add(predicateTerm.op());
+            }
+         }
+         return findAdditionalUninterpretedPredicateTerm(term, additionalPredicateOperators, PosInTerm.getTopLevel());
+      }
+      else {
+         return findMainUninterpretedPredicateTerm(term, uninterpretedPredicate, PosInTerm.getTopLevel());
+      }
    }
-      
+
    /**
     * Searches the {@link Term} with the uninterpreted predicate.
     * @param term The {@link Term} to start search at.
     * @param uninterpretedPredicate The {@link Term} of the proof obligation which specifies the uninterpreted predicate.
     * @return The {@link PosInTerm} of the uninterpreted predicate.
     */
-   protected PosInTerm findUninterpretedPredicateTerm(Term term, Term uninterpretedPredicate, PosInTerm current) {
+   protected PosInTerm findMainUninterpretedPredicateTerm(Term term, Term uninterpretedPredicate, PosInTerm current) {
       if (uninterpretedPredicate != null) {
          if (term.op() == uninterpretedPredicate.op()) {
             return current;
@@ -546,7 +568,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
             PosInTerm result = null;
             int i = 0;
             while (result == null && i < term.arity()) {
-               result = findUninterpretedPredicateTerm(term.sub(i), uninterpretedPredicate, current.down(i));
+               result = findMainUninterpretedPredicateTerm(term.sub(i), uninterpretedPredicate, current.down(i));
                i++;
             }
             return result;
@@ -554,6 +576,30 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
          else {
             return null;
          }
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Searches the {@link Term} with the uninterpreted predicate.
+    * @param term The {@link Term} to start search at.
+    * @param additionalPredicateOperators The operators of the additional uninterpreted predicates.
+    * @return The {@link PosInTerm} of the uninterpreted predicate.
+    */
+   protected PosInTerm findAdditionalUninterpretedPredicateTerm(Term term, Set<Operator> additionalPredicateOperators, PosInTerm current) {
+      if (additionalPredicateOperators.contains(term.op())) {
+         return current;
+      }
+      else if (term.op() == Junctor.AND) {
+         PosInTerm result = null;
+         int i = 0;
+         while (result == null && i < term.arity()) {
+            result = findAdditionalUninterpretedPredicateTerm(term.sub(i), additionalPredicateOperators, current.down(i));
+            i++;
+         }
+         return result;
       }
       else {
          return null;

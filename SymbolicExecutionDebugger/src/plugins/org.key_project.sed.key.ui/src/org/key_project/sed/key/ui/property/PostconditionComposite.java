@@ -13,6 +13,8 @@
 
 package org.key_project.sed.key.ui.property;
 
+import java.util.Set;
+
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.key.core.model.IKeYSENode;
@@ -48,8 +50,8 @@ public class PostconditionComposite extends AbstractTruthValueComposite {
     */
    @Override
    protected Triple<Term, PosInTerm, Term> computeTermToShow(IKeYSENode<?> node,
-                                                     IExecutionNode<?> executionNode, 
-                                                     Node keyNode) {
+                                                             IExecutionNode<?> executionNode, 
+                                                             Node keyNode) {
       Term term = keyNode.getAppliedRuleApp().posInOccurrence().subTerm();
       if (term.op() instanceof Modality) {
          term = term.sub(0);
@@ -58,7 +60,8 @@ public class PostconditionComposite extends AbstractTruthValueComposite {
       Term sfTerm = keyNode.getAppliedRuleApp().posInOccurrence().sequentFormula().formula();
       ImmutableList<Term> updates = TermBuilder.goBelowUpdates2(sfTerm).first;
       if (uninterpretedPredicate != null) {
-         PosInTerm predicatePosition = findUninterpretedPredicateTerm(term, uninterpretedPredicate);
+         Set<Term> additionalPredicates = AbstractOperationPO.getAdditionalUninterpretedPredicates(executionNode.getProof());
+         PosInTerm predicatePosition = findUninterpretedPredicateTerm(node, term, uninterpretedPredicate, additionalPredicates);
          Term termWithoutPredicate = removeUninterpretedPredicate(keyNode, term);
          return new Triple<Term, PosInTerm, Term>(INCLUDE_UPDATES ? keyNode.proof().getServices().getTermBuilder().applySequential(updates, termWithoutPredicate) : termWithoutPredicate, 
                                                   predicatePosition,

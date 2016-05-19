@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
@@ -124,7 +125,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
                                                   Goal goal, 
                                                   Object hint, 
                                                   Term tacletTerm) {
-      if (shouldRefactorSpecificationApplication(goal, hint)) {
+      if (shouldRefactorSpecificationApplication(rule, goal, hint)) {
          return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE;
       }
       else if (isParentRefactroingRequired(state)) {
@@ -143,16 +144,19 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    
    /**
     * Checks if the given hint requires a refactoring.
+    * @param rule The applied {@link Rule}.
     * @param goal The {@link Goal}.
     * @param hint The hint to check.
     * @return {@code true} perform refactoring, {@code false} do not perform refactoring.
     */
-   protected boolean shouldRefactorSpecificationApplication(Goal goal, Object hint) {
+   protected boolean shouldRefactorSpecificationApplication(Rule rule, Goal goal, Object hint) {
       if (goal != null) {
          Proof proof = goal.proof();
-         if (WhileInvariantRule.INITIAL_INVARIANT_ONLY_HINT.equals(hint) ||
-             WhileInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint) ||
-             UseOperationContractRule.FINAL_PRE_TERM_HINT.equals(hint)) {
+         if ((rule instanceof WhileInvariantRule && WhileInvariantRule.INITIAL_INVARIANT_ONLY_HINT.equals(hint)) ||
+             (rule instanceof WhileInvariantRule && WhileInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint)) ||
+             (rule instanceof UseOperationContractRule && UseOperationContractRule.FINAL_PRE_TERM_HINT.equals(hint)) ||
+             (rule instanceof BlockContractRule && BlockContractRule.FULL_PRECONDITION_TERM_HINT.equals(hint)) ||
+             (rule instanceof BlockContractRule && BlockContractRule.NEW_POSTCONDITION_TERM_HINT.equals(hint))) {
             ProofOblInput problem = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
             if (problem instanceof AbstractOperationPO) {
                return ((AbstractOperationPO) problem).isAddSymbolicExecutionLabel();
@@ -184,7 +188,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
                                Term tacletTerm, 
                                Term term, 
                                List<TermLabel> labels) {
-      if (shouldRefactorSpecificationApplication(goal, hint)) {
+      if (shouldRefactorSpecificationApplication(rule, goal, hint)) {
          refactorSpecificationApplication(term, goal ,services, labels);
       }
       else if (isParentRefactroingRequired(state)) {

@@ -88,18 +88,22 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.BlockContract.Terms;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.speclang.BlockWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 
 public class BlockContractRule implements BuiltInRule {
-
+    public static final String FULL_PRECONDITION_TERM_HINT = "fullPrecondition";
+    public static final String NEW_POSTCONDITION_TERM_HINT = "newPostcondition";
+    
     public static final BlockContractRule INSTANCE = new BlockContractRule();
 
     private static final Name NAME = new Name("Block Contract");
@@ -531,7 +535,8 @@ public class BlockContractRule implements BuiltInRule {
                                                                      contract.getLabels(),
                                                                      variables,
                                                                      application.posInOccurrence(),
-                                                                     services);
+                                                                     services,
+                                                                     this);
         if (WellDefinednessCheck.isOn()) {
             result = goal.split(4);
             configurator.setUpWdGoal(result.tail().tail().tail().head(),
@@ -558,7 +563,8 @@ public class BlockContractRule implements BuiltInRule {
                                                        reachableInCondition},
                                            new Term[] {postcondition, frameCondition
                                                        /*, atMostOneFlagSetCondition*/},
-                                           exceptionParameter);
+                                           exceptionParameter,
+                                           conditionsAndClausesBuilder.terms);
         } else {
             Goal validityGoal = result.tail().tail().head();
             validityGoal.setBranchLabel("Information Flow Validity");
@@ -1130,6 +1136,7 @@ public class BlockContractRule implements BuiltInRule {
         private final BlockContract.Variables variables;
         private final PosInOccurrence occurrence;
         private final Services services;
+        private final BlockContractRule rule;
 
         public GoalsConfigurator(final BlockContractBuiltInRuleApp application,
                                  final TermLabelState termLabelState,
@@ -1137,7 +1144,8 @@ public class BlockContractRule implements BuiltInRule {
                                  final List<Label> labels,
                                  final BlockContract.Variables variables,
                                  final PosInOccurrence occurrence,
-                                 final Services services)
+                                 final Services services,
+                                 final BlockContractRule rule)
         {
             this.application = application;
             this.termLabelState = termLabelState;
@@ -1146,6 +1154,7 @@ public class BlockContractRule implements BuiltInRule {
             this.variables = variables;
             this.occurrence = occurrence;
             this.services = services;
+            this.rule = rule;
         }
 
         public void setUpWdGoal(final Goal goal, final BlockContract contract,
@@ -1169,7 +1178,8 @@ public class BlockContractRule implements BuiltInRule {
         public void setUpValidityGoal(final Goal goal, final Term[] updates,
                                       final Term[] assumptions,
                                       final Term[] postconditions,
-                                      final ProgramVariable exceptionParameter) {
+                                      final ProgramVariable exceptionParameter,
+                                      final Terms terms) {
             goal.setBranchLabel("Validity");
             final TermBuilder tb = services.getTermBuilder();
             goal.addFormula(new SequentFormula(
@@ -1182,6 +1192,8 @@ public class BlockContractRule implements BuiltInRule {
             StatementBlock finishedBlock = finishTransactionIfModalityIsTransactional(wrappedBlock);
             JavaBlock newJavaBlock = JavaBlock.createJavaBlock(finishedBlock);
             Term newPost = tb.and(postconditions);
+            newPost = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services, newPost, ImmutableSLList.<LocationVariable>nil().prepend(terms.remembranceLocalVariables.keySet()), terms.exception);
+            newPost = TermLabelManager.refactorTerm(termLabelState, services, null, newPost, rule, goal, BlockContractRule.NEW_POSTCONDITION_TERM_HINT, null);
             goal.changeFormula(new SequentFormula(
                   tb.applySequential(
                     updates,
@@ -1245,7 +1257,9 @@ public class BlockContractRule implements BuiltInRule {
                                           final Term[] preconditions) {
             final TermBuilder tb = services.getTermBuilder();
             goal.setBranchLabel("Precondition");
-            goal.changeFormula(new SequentFormula(tb.apply(update, tb.and(preconditions), null)),
+            Term fullPrecondition = tb.and(preconditions);
+            fullPrecondition = TermLabelManager.refactorTerm(termLabelState, services, null, fullPrecondition, rule, goal, BlockContractRule.FULL_PRECONDITION_TERM_HINT, null);
+            goal.changeFormula(new SequentFormula(tb.apply(update, fullPrecondition, null)),
                                occurrence);
             TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(), goal, null, null);
         }

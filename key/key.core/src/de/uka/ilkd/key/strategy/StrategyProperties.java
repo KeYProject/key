@@ -310,6 +310,7 @@ public final class StrategyProperties extends Properties {
      * @param quantifierInstantiationWithSplitting Instantiate quantifiers?
      * @param methodTreatmentContract Use method contracts or inline method bodies otherwise?
      * @param loopTreatmentInvariant Use loop invariants or unrole loops otherwise?
+     * @param blockTreatmentContract Block contracts or expand otherwise?
      * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
      * @param aliasChecks Do alias checks?
      */
@@ -317,10 +318,11 @@ public final class StrategyProperties extends Properties {
                                                     boolean quantifierInstantiationWithSplitting,
                                                     boolean methodTreatmentContract, 
                                                     boolean loopTreatmentInvariant,
+                                                    boolean blockTreatmentContract,
                                                     boolean nonExecutionBranchHidingSideProofs,
                                                     boolean aliasChecks) {
        sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT : StrategyProperties.LOOP_EXPAND);
-       sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_EXPAND);
+       sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, blockTreatmentContract ? StrategyProperties.BLOCK_CONTRACT : StrategyProperties.BLOCK_EXPAND);
        sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatmentContract ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_RESTRICTED);
        sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);

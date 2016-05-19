@@ -719,7 +719,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false, false, false, false, false, true);
+         env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false, false, false, false, false, false, true);
          setOneStepSimplificationEnabled(null, true);
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDir + symbolicExecutionOracleFileName, testCaseDirectory);
@@ -764,7 +764,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       try {
          // Load proof file
-         env = createSymbolicExecutionEnvironment(testCaseDirectory, proofFilePathInkeyRepDirectory, false, false, false, false, false, false, false, false, false, true);
+         env = createSymbolicExecutionEnvironment(testCaseDirectory, proofFilePathInkeyRepDirectory, false, false, false, false, false, false, false, false, false, false, true);
          // Perform test steps
          doTestSteps(env, oraclePathInBaseDir, symbolicExecutionOracleFileName, initialStatesOraclePrefix, initialStatesOracleFileExtension, currentStatesOraclePrefix, currentStatesOracleFileExtension, precondition, numberOfReturnNodeInMostLeftBranch, expectedNumberOfLayouts, onReturnStatementNode);
       }
