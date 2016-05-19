@@ -223,6 +223,16 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
       public static final String LOOP_TREATMENT_INVARIANT = "Use Loop Invariants";
 
       /**
+       * Shown string for block treatment "Expand".
+       */
+      public static final String BLOCK_TREATMENT_EXPAND = "Expand Blocks";
+
+      /**
+       * Shown string for block treatment "Invariant".
+       */
+      public static final String BLOCK_TREATMENT_INVARIANT = "Use Contracts";
+
+      /**
        * Shown string for alias check "Never".
        */
       public static final String NON_EXECUTION_BRANCH_HIDING_OFF = "Off";
@@ -272,6 +282,10 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
                "Loop Treatment",
                new StrategyPropertyValueDefinition(StrategyProperties.LOOP_EXPAND, LOOP_TREATMENT_EXPAND, null),
                new StrategyPropertyValueDefinition(StrategyProperties.LOOP_INVARIANT, LOOP_TREATMENT_INVARIANT, null));
+         OneOfStrategyPropertyDefinition blockTreatment = new OneOfStrategyPropertyDefinition(StrategyProperties.BLOCK_OPTIONS_KEY,
+               "Block Treatment",
+               new StrategyPropertyValueDefinition(StrategyProperties.BLOCK_EXPAND, BLOCK_TREATMENT_EXPAND, null),
+               new StrategyPropertyValueDefinition(StrategyProperties.BLOCK_CONTRACT, BLOCK_TREATMENT_INVARIANT, null));
          OneOfStrategyPropertyDefinition branchHiding = new OneOfStrategyPropertyDefinition(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
                "Non Execution Branch Hiding",
                new StrategyPropertyValueDefinition(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF, NON_EXECUTION_BRANCH_HIDING_OFF, null),
@@ -289,6 +303,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
                                                new ArrayList<Triple<String,Integer,IDefaultStrategyPropertiesFactory>>(),
                                                methodTreatment,
                                                loopTreatment,
+                                               blockTreatment,
                                                branchHiding,
                                                aliasChecks);
       }

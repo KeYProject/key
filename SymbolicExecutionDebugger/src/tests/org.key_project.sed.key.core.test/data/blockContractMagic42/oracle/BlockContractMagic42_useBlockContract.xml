@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_0d7f3ba9-fcef-487b-b7ed-1a7ff1aa8fb9" name="magic()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_9216fbbf-6c9f-4617-b807-c9d30a8eee51" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_useBlockContract\src\BlockContractMagic42.java">
+         <sedMethodCall xml:id="_63ab6d4a-da93-4db7-9c2c-147d7725de71" name="&lt;call BlockContractMagic42.magic()&gt;" pathCondition="true" lineNumber="-1" charStart="280" charEnd="285" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_useBlockContract\src\BlockContractMagic42.java" groupable="true">
+            <blockContract xml:id="_71cf581c-039d-43cd-a537-f19d94e0891c" name="magic()) catch(exc_0)
+pre true
+post exc_0 = null
+&amp; (  BlockContractMagic42.fourty = 40
+   &amp; BlockContractMagic42.two = 2)
+mod {(null, BlockContractMagic42::$fourty)}
+\cup {(null, BlockContractMagic42::$two)}termination diamond" pathCondition="true" lineNumber="-1" charStart="435" charEnd="486" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_useBlockContract\src\BlockContractMagic42.java" preconditionComplied="true">
+               <sedStatement xml:id="_f7639e49-039e-4cf2-939c-14b53f2b9b76" name="return fourty+two;" pathCondition="true" lineNumber="-1" charStart="494" charEnd="514" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_useBlockContract\src\BlockContractMagic42.java">
+                  <sedMethodReturn xml:id="_8000ca29-5675-48fe-89f8-a02c2573ac4e" name="&lt;return of BlockContractMagic42.magic()&gt;" pathCondition="true" lineNumber="-1" charStart="280" charEnd="285" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_useBlockContract\src\BlockContractMagic42.java" methodReturnConditionRef="_006d0bb0-d996-4f5a-bc8f-3cf90a9e7fd2">
+                     <sedTermination xml:id="_8f10763e-328b-48a0-9bf0-4263528b74d5" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_useBlockContract\src\BlockContractMagic42.java" verified="true">
+                     </sedTermination>
+                     <sedGroupEndConditionReference nodeIdRef="_006d0bb0-d996-4f5a-bc8f-3cf90a9e7fd2"/>
+                  </sedMethodReturn>
+               </sedStatement>
+            </blockContract>
+            <sedMethodCallMethodReturnCondition xml:id="_006d0bb0-d996-4f5a-bc8f-3cf90a9e7fd2" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_useBlockContract\src\BlockContractMagic42.java">
+               <sedChildReference nodeIdRef="_8000ca29-5675-48fe-89f8-a02c2573ac4e"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_006d0bb0-d996-4f5a-bc8f-3cf90a9e7fd2" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_useBlockContract\src\BlockContractMagic42.java">
+               <sedChildReference nodeIdRef="_8000ca29-5675-48fe-89f8-a02c2573ac4e"/>
+            </sedGroupEndCondition>
+         </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_8f10763e-328b-48a0-9bf0-4263528b74d5"/>
+      </sedThread>
+   </sedTarget>
+</launch>

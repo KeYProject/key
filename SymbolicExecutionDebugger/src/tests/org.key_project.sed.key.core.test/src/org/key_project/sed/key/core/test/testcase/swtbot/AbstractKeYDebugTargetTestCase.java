@@ -818,7 +818,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                                               final boolean mergeBranchConditions,
                                                               final boolean useMethodContracts,
                                                               final boolean useLoopInvariants,
-                                                              final boolean nonExecutionBranchHidingSideProofs, final boolean aliasChecks) {
+                                                              final boolean useBlockContracts,
+                                                              final boolean nonExecutionBranchHidingSideProofs, 
+                                                              final boolean aliasChecks) {
       return new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
@@ -848,6 +850,12 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
             }
             else {
                TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.LOOP_TREATMENT_EXPAND, 0));
+            }
+            if (useBlockContracts) {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.BLOCK_TREATMENT_INVARIANT, 1));
+            }
+            else {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.BLOCK_TREATMENT_EXPAND, 0));
             }
             if (nonExecutionBranchHidingSideProofs) {
                TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF));
