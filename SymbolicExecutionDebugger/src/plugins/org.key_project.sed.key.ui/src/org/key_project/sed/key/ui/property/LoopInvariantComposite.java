@@ -93,7 +93,9 @@ public class LoopInvariantComposite extends AbstractTruthValueComposite {
             term = term.sub(1);
          }
          PosInTerm predicatePosition = findUninterpretedPredicateTerm(node, term, AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof()), null);
-         Term termWithoutPredicate = removeUninterpretedPredicate(keyNode, term);
+         Term termWithoutPredicate = predicatePosition != null ?
+                                     removeUninterpretedPredicate(keyNode, term, predicatePosition.getSubTerm(term)) :
+                                     term;
          if (!INCLUDE_UPDATES) {
             termWithoutPredicate = TermBuilder.goBelowUpdates(termWithoutPredicate);
          }

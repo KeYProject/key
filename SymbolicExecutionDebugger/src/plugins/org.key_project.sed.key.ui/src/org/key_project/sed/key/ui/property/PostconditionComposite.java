@@ -62,7 +62,9 @@ public class PostconditionComposite extends AbstractTruthValueComposite {
       if (uninterpretedPredicate != null) {
          Set<Term> additionalPredicates = AbstractOperationPO.getAdditionalUninterpretedPredicates(executionNode.getProof());
          PosInTerm predicatePosition = findUninterpretedPredicateTerm(node, term, uninterpretedPredicate, additionalPredicates);
-         Term termWithoutPredicate = removeUninterpretedPredicate(keyNode, term);
+         Term termWithoutPredicate = predicatePosition != null ? 
+                                     removeUninterpretedPredicate(keyNode, term, predicatePosition.getSubTerm(term)) :
+                                     term;
          return new Triple<Term, PosInTerm, Term>(INCLUDE_UPDATES ? keyNode.proof().getServices().getTermBuilder().applySequential(updates, termWithoutPredicate) : termWithoutPredicate, 
                                                   predicatePosition,
                                                   term);

@@ -622,11 +622,11 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * Removes the uninterpreted predicate if required.
     * @param node The {@link Node}.
     * @param term The {@link Term}.
+    * @param predicate The uninterpreted predicate to remove.
     * @return The {@link Term} without the uninterpreted predicate.
     */
-   protected Term removeUninterpretedPredicate(Node node, Term term) {
+   protected Term removeUninterpretedPredicate(Node node, Term term, Term predicate) {
       Proof proof = node.proof();
-      Term predicate = AbstractOperationPO.getUninterpretedPredicate(proof);
       if (predicate != null) {
          term = removeUninterpretedPredicate(proof.getServices().getTermBuilder(), 
                                              term, 
