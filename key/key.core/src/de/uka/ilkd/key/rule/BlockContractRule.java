@@ -1257,9 +1257,9 @@ public class BlockContractRule implements BuiltInRule {
                                           final Term[] preconditions) {
             final TermBuilder tb = services.getTermBuilder();
             goal.setBranchLabel("Precondition");
-            Term fullPrecondition = tb.and(preconditions);
+            Term fullPrecondition = tb.apply(update, tb.and(preconditions), null);
             fullPrecondition = TermLabelManager.refactorTerm(termLabelState, services, null, fullPrecondition, rule, goal, BlockContractRule.FULL_PRECONDITION_TERM_HINT, null);
-            goal.changeFormula(new SequentFormula(tb.apply(update, fullPrecondition, null)),
+            goal.changeFormula(new SequentFormula(fullPrecondition),
                                occurrence);
             TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(), goal, null, null);
         }
