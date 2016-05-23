@@ -1877,8 +1877,6 @@ public final class SymbolicExecutionUtil {
          }
          else {
             result = services.getTermBuilder().or(relevantConditions);
-            // Add updates
-            result = services.getTermBuilder().applyParallel(search.getUpdatesAndTerm().first, result);
          }
          // Add caller not null to condition
          if (parent.childrenCount() == 4) {
@@ -1912,7 +1910,8 @@ public final class SymbolicExecutionUtil {
                                             StrategyProperties.SPLITTING_OFF);
          }
          else {
-            condition = result;
+            // Add updates (in the simplify branch the updates are added during side proof construction)
+            condition = services.getTermBuilder().applyParallel(search.getUpdatesAndTerm().first, result);
          }
          if (improveReadability) {
             condition = improveReadability(condition, services);
