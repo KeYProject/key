@@ -46,6 +46,33 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: /set/useOperationContractLightweightOperationContractTest
+    */
+   public void testUseOperationContractLightweightOperationContractTest() throws Exception {
+      doSETTest(testCaseDirectory, 
+                "/set/useOperationContractLightweightOperationContractTest/test/LightweightOperationContractTest.java", 
+                "LightweightOperationContractTest", 
+                "main", 
+                null,
+                "/set/useOperationContractLightweightOperationContractTest/oracle/LightweightOperationContractTest.xml",
+                false,
+                false,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
     * Tests example: /set/blockContractAssignableEverything
     */
    public void testBlockContractAssignableEverything() throws Exception {

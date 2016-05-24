@@ -1989,7 +1989,7 @@ public final class SymbolicExecutionUtil {
          }
          else {
             Term rightTerm = term.sub(1);
-            // Check if condition is used for normal and exceptional case
+            // Deal with heavy weight specification cases
             if (rightTerm.op() == Junctor.AND &&
                 rightTerm.sub(0).op() == Junctor.IMP &&
                 rightTerm.sub(0).sub(0).equals(normalExcDefinition)) {
@@ -1998,6 +1998,15 @@ public final class SymbolicExecutionUtil {
             else if (rightTerm.op() == Junctor.AND &&
                      rightTerm.sub(1).op() == Junctor.IMP &&
                      rightTerm.sub(1).sub(0).equals(exceptionalExcDefinition)) {
+               exceptinalConditions.add(leftTerm);
+            }
+            // Deal with light weight specification cases
+            else if (rightTerm.op() == Junctor.IMP &&
+                     rightTerm.sub(0).equals(normalExcDefinition)) {
+               normalConditions.add(leftTerm);
+            }
+            else if (rightTerm.op() == Junctor.IMP &&
+                     rightTerm.sub(0).equals(exceptionalExcDefinition)) {
                exceptinalConditions.add(leftTerm);
             }
             else {
