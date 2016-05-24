@@ -77,7 +77,6 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.BranchResult;
@@ -539,6 +538,13 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
                                                       Term term, 
                                                       Term uninterpretedPredicate,
                                                       Set<Term> additionalPredicates) {
+      // Skip updates
+      PosInTerm pit = PosInTerm.getTopLevel();
+      while (term.op() == UpdateApplication.UPDATE_APPLICATION) {
+         term = term.sub(1);
+         pit = pit.down(1);
+      }
+      // Search predicate
       if (node instanceof KeYBlockContractTermination || node instanceof KeYBlockContractExceptionalTermination) {
          Set<Operator> additionalPredicateOperators = new HashSet<Operator>();
          if (!CollectionUtil.isEmpty(additionalPredicates)) {
@@ -546,10 +552,10 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
                additionalPredicateOperators.add(predicateTerm.op());
             }
          }
-         return findAdditionalUninterpretedPredicateTerm(term, additionalPredicateOperators, PosInTerm.getTopLevel());
+         return findAdditionalUninterpretedPredicateTerm(term, additionalPredicateOperators, pit);
       }
       else {
-         return findMainUninterpretedPredicateTerm(term, uninterpretedPredicate, PosInTerm.getTopLevel());
+         return findMainUninterpretedPredicateTerm(term, uninterpretedPredicate, pit);
       }
    }
 
