@@ -1809,8 +1809,8 @@ public final class SymbolicExecutionUtil {
     * <p>
     * The branch conditions are:
     * <ul>
-    *    <li>Post:    caller != null & (pre1 | .. | preN)</li>
-    *    <li>ExcPost: caller != null & (excPre1 | ... | excPreM)</li>
+    *    <li>Post:    caller != null & exc_0 = null & (pre1 | .. | preN)</li>
+    *    <li>ExcPost: caller != null & exc_0 != null & (excPre1 | ... | excPreM)</li>
     *    <li>Pre:     caller != null & !(pre1 | ... | preN | excPre1 | ... | excPreM) because the branch is only open if all conditions are false</li>
     *    <li>NPE:     caller = null</li>
     * </ul>
@@ -1878,6 +1878,12 @@ public final class SymbolicExecutionUtil {
          else {
             result = services.getTermBuilder().or(relevantConditions);
          }
+         // Add exception equality
+         Term excEquality = search.getExceptionEquality();
+         if (childIndex == 1) { // exception branch
+            excEquality = services.getTermBuilder().not(excEquality);
+         }
+         result = services.getTermBuilder().and(excEquality, result);
          // Add caller not null to condition
          if (parent.childrenCount() == 4) {
             Term callerNotNullTerm = posInOccurrenceInOtherNode(parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(3));
