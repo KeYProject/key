@@ -58,7 +58,7 @@ public class InitConfig {
     private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
 
 
-    private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
+    private ImmutableList<Taclet> taclets = ImmutableSLList.<Taclet>nil();
 
     /**
      * maps categories to their default choice (both represented as Strings),
@@ -214,14 +214,14 @@ public class InitConfig {
     }
 
 
-    public void setTaclets(ImmutableSet<Taclet> taclets){
+    public void setTaclets(ImmutableList<Taclet> taclets){
         this.taclets = taclets;
         // invalidate active taclet cache
         this.activatedTacletCache = null;
     }
 
 
-    public ImmutableSet<Taclet> getTaclets(){
+    public ImmutableList<Taclet> getTaclets(){
         return taclets;
     }
 
@@ -295,24 +295,13 @@ public class InitConfig {
                                                                     isAxiom));
     }
 
-    /** registers a set of rules with the given justification at the
-     * justification managing {@link RuleJustification} object of this
-     * environment. All rules of the set are given the same
-     * justification. 
-     */
-    public void registerRules(ImmutableSet<Taclet> s, RuleJustification j) {
-       for (Taclet r : s) {
-          registerRule(r, j);          
-       }
-    }
-
     /** registers a list of rules with the given justification at the
      * justification managing {@link RuleJustification} object of this
      * environment. All rules of the list are given the same
      * justification. 
      */
-    public void registerRules(ImmutableList<BuiltInRule> s, RuleJustification j) {
-       for (BuiltInRule r : s) {
+    public void registerRules(Iterable<? extends Rule> s, RuleJustification j) {
+       for (Rule r : s) {
           registerRule(r, j);          
        }
     }
