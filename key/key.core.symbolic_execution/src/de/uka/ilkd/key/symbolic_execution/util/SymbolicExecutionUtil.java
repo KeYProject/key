@@ -1992,10 +1992,12 @@ public final class SymbolicExecutionUtil {
             // Check if condition is used for normal and exceptional case
             if (rightTerm.op() == Junctor.AND &&
                 rightTerm.sub(0).op() == Junctor.IMP &&
-                rightTerm.sub(0).sub(0).equals(normalExcDefinition) &&
-                rightTerm.sub(1).op() == Junctor.IMP &&
-                rightTerm.sub(1).sub(0).equals(exceptionalExcDefinition)) {
+                rightTerm.sub(0).sub(0).equals(normalExcDefinition)) {
                normalConditions.add(leftTerm);
+            }
+            else if (rightTerm.op() == Junctor.AND &&
+                     rightTerm.sub(1).op() == Junctor.IMP &&
+                     rightTerm.sub(1).sub(0).equals(exceptionalExcDefinition)) {
                exceptinalConditions.add(leftTerm);
             }
             else {
