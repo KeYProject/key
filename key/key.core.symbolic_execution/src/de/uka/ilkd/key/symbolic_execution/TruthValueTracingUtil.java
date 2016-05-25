@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
@@ -216,7 +217,7 @@ public final class TruthValueTracingUtil {
          List<LabelOccurrence> labels = findInvolvedLabels(node.sequent(), tacletApp, termLabelName);
          if (!labels.isEmpty()) {
             Taclet taclet = ((TacletApp) tacletApp).taclet();
-            if (taclet.goalTemplates().size() >= 1) { // Not a closing taclet
+            if (!isClosingRule(taclet)) { // Not a closing taclet
                childrenAlreadyTreated = true;
                int i = 0;
                for (TacletGoalTemplate tacletGoal : taclet.goalTemplates().reverse()) {
@@ -283,6 +284,15 @@ public final class TruthValueTracingUtil {
    }
    
    /**
+    * Checks if the {@link Taclet} is a closing rule.
+    * @param taclet The {@link Taclet} to check.
+    * @return {@code true} is closing, {@code false} is not closing.
+    */
+   protected static boolean isClosingRule(Taclet taclet) {
+      return taclet.goalTemplates().isEmpty();
+   }
+
+   /**
     * Computes the occurrences of all involved {@link FormulaTermLabel}s.
     * @param sequent The {@link Sequent} on which the given {@link TacletApp} was applied.
     * @param tacletApp The applied {@link TacletApp}.
@@ -302,6 +312,18 @@ public final class TruthValueTracingUtil {
             TermLabel label = term.getLabel(termLabelName);
             if (label instanceof FormulaTermLabel) {
                result.add(new LabelOccurrence((FormulaTermLabel) label, pio.isInAntec()));
+            }
+         }
+      }
+      if (isClosingRule(tacletApp.taclet())) {
+         if (tacletApp.ifInstsComplete() && tacletApp.ifFormulaInstantiations() != null) {
+            for (IfFormulaInstantiation ifInst : tacletApp.ifFormulaInstantiations()) {
+               assert ifInst instanceof IfFormulaInstSeq;
+               Term term = ifInst.getConstrainedFormula().formula();
+               TermLabel label = term.getLabel(termLabelName);
+               if (label instanceof FormulaTermLabel) {
+                  result.add(new LabelOccurrence((FormulaTermLabel) label, ((IfFormulaInstSeq) ifInst).inAntec()));
+               }
             }
          }
       }

@@ -59,7 +59,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
 public class SyntacticalReplaceVisitor extends DefaultVisitor {
-
+    public static final String SUBSTITUTION_WITH_LABELS_HINT = "SUBSTITUTION_WITH_LABELS";
     protected final SVInstantiations svInst;
     protected final Services services;
     private Term computedResult = null;
@@ -370,6 +370,9 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         if (t.op() instanceof SubstOp) {
            Term resolved = ((SubstOp)t.op ()).apply ( t, services );
            resolved = services.getTermBuilder().label(resolved, t.sub(1).getLabels());
+           if (t.hasLabels()) {
+              resolved = TermLabelManager.refactorTerm(termLabelState, services, null, resolved, rule, goal, SUBSTITUTION_WITH_LABELS_HINT, t);
+           }
            return resolved;
         }
         else {

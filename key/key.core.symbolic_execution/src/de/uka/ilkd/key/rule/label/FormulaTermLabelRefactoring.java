@@ -2,6 +2,7 @@ package de.uka.ilkd.key.rule.label;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +26,7 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
@@ -137,6 +139,9 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
       else if (containsSequentFormulasToRefactor(state)) {
          return RefactoringScope.SEQUENT;
       }
+      else if (SyntacticalReplaceVisitor.SUBSTITUTION_WITH_LABELS_HINT.equals(hint)) {
+         return RefactoringScope.APPLICATION_BELOW_UPDATES;
+      }
       else {
          return RefactoringScope.NONE;
       }
@@ -199,6 +204,9 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
       }
       else if (containsSequentFormulasToRefactor(state)) {
          refactorSequentFormulas(state, services, term, labels);
+      }
+      else if (SyntacticalReplaceVisitor.SUBSTITUTION_WITH_LABELS_HINT.equals(hint)) {
+         refactorSubstitution(term, tacletTerm, labels);
       }
    }
 
@@ -299,6 +307,43 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
             beforeIds.add(termLabel.getId());
             int labelSubID = FormulaTermLabel.newLabelSubID(services, termLabel);
             labels.add(new FormulaTermLabel(termLabel.getMajorId(), labelSubID, beforeIds));
+         }
+      }
+   }
+   
+   /**
+    * Refactors the given {@link Term} after a substitiution.
+    * @param term The {@link Term} to refactor.
+    * @param tacletTerm The taclet {@link Term} which provides additional labels to be merged with the other {@link Term}.
+    * @param labels The new labels the {@link Term} will have after the refactoring.
+    */
+   protected void refactorSubstitution(Term term, 
+                                       Term tacletTerm,
+                                       List<TermLabel> labels) {
+      FormulaTermLabel tacletLabel = (FormulaTermLabel) tacletTerm.getLabel(FormulaTermLabel.NAME);
+      if (tacletLabel != null) {
+         FormulaTermLabel existingLabel = (FormulaTermLabel) term.getLabel(FormulaTermLabel.NAME);
+         if (existingLabel == null) {
+            labels.add(tacletLabel);
+         }
+         else {
+            List<String> beforeIds = new LinkedList<String>();
+            CollectionUtil.addAll(beforeIds, existingLabel.getBeforeIds());
+            boolean changed = true;
+            if (!beforeIds.contains(tacletLabel.getId())) {
+               changed = true;
+               beforeIds.add(tacletLabel.getId());
+            }
+            for (String id : tacletLabel.getBeforeIds()) {
+               if (!beforeIds.contains(id)) {
+                  changed = true;
+                  beforeIds.add(id);
+               }
+            }
+            if (changed) {
+               labels.remove(existingLabel);
+               labels.add(new FormulaTermLabel(existingLabel.getMajorId(), existingLabel.getMinorId(), beforeIds));
+            }
          }
       }
    }

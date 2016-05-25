@@ -33,6 +33,106 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: /set/truthValueExceptinalAssignableNothingTest
+    */
+   public void testExceptinalAssignableNothingTest_OSS() throws Exception {
+      // Create expected results
+      ExpectedBranchResult goal374 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedBranchResult goal407 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedBranchResult goal444 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedBranchResult goal475 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedBranchResult goal476 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult exceptionResult = new ExpectedTruthValueEvaluationResult(goal374, goal407, goal444, goal475, goal476);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueExceptinalAssignableNothingTest/test/ExceptinalAssignableNothingTest_OSS.proof", 
+                                 "/set/truthValueExceptinalAssignableNothingTest/oracle/ExceptinalAssignableNothingTest.xml",
+                                 false,
+                                 false,
+                                 false,
+                                 exceptionResult);
+   }
+   
+   /**
+    * Tests example: /set/truthValueExceptinalAssignableNothingTest
+    */
+   public void testExceptinalAssignableNothingTest() throws Exception {
+      // Create expected results
+      ExpectedBranchResult goal374 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedBranchResult goal407 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedBranchResult goal444 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedBranchResult goal475 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedBranchResult goal476 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult exceptionResult = new ExpectedTruthValueEvaluationResult(goal374, goal407, goal444, goal475, goal476);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueExceptinalAssignableNothingTest/test/ExceptinalAssignableNothingTest.proof", 
+                                 "/set/truthValueExceptinalAssignableNothingTest/oracle/ExceptinalAssignableNothingTest.xml",
+                                 false,
+                                 false,
+                                 false,
+                                 exceptionResult);
+   }
+   
+   /**
     * Tests example: /set/truthValueBlockContractMagic42
     */
    public void testBlockContractMagic42() throws Exception {
