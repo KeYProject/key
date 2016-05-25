@@ -56,6 +56,18 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      * @param elementList IList<T> contains all elements of the new Set
      */
     private DefaultImmutableSet(ImmutableList<T> elementList) {
+        // Immutable linear sets are very expensive with O(n) addition
+        // and O(n) lookup.
+        // To create a list with N entries O(N^2) comparisons need to be made
+        // Better restrict this class to very small instances.
+        // The following helps detecting "bad" usages. (MU 2016)
+//        if(elementList.size() > 300) {
+//            StackTraceElement[] st = new Throwable().getStackTrace();
+//            for (int i = 2; i < 6; i++) {
+//                System.err.println(st[i]);
+//            }
+//            System.err.println("TOO LARGE");
+//        }
 	this.elementList=elementList;
     }
 
