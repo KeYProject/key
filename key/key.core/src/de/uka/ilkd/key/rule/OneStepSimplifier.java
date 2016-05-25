@@ -15,8 +15,10 @@ package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -117,10 +119,10 @@ public final class OneStepSimplifier implements BuiltInRule {
         ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
 
         //collect apps present in all open goals
-        ImmutableSet<NoPosTacletApp> allApps
+        Set<NoPosTacletApp> allApps
             = proof.openGoals().head().ruleAppIndex().tacletIndex().allNoPosTacletApps();
         for(Goal goal : proof.openGoals().tail()) {
-            allApps = allApps.intersect(goal.ruleAppIndex()
+            allApps.retainAll(goal.ruleAppIndex()
                             .tacletIndex()
                             .allNoPosTacletApps());
         }
@@ -655,11 +657,11 @@ public final class OneStepSimplifier implements BuiltInRule {
      *
      * @return the captured taclets (as NoPosTacletApps)
      */
-    public ImmutableSet<NoPosTacletApp> getCapturedTaclets() {
-        ImmutableSet<NoPosTacletApp> result = DefaultImmutableSet.nil();
+    public Set<NoPosTacletApp> getCapturedTaclets() {
+        Set<NoPosTacletApp> result = new LinkedHashSet<NoPosTacletApp>();
         synchronized (this) {
             for (int i = 0; i < indices.length; i++) {
-                result = result.union(indices[i].allNoPosTacletApps());
+                result.addAll(indices[i].allNoPosTacletApps());
             }
         }
         return result;

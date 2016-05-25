@@ -194,6 +194,7 @@ public final class Main {
             loadCommandLineFiles(userInterface, fileArguments);
         } catch (ExceptionInInitializerError e) {
             System.err.println("D'oh! It seems that KeY was not built properly!");
+            e.printStackTrace();
             System.exit(777);
         } catch (CommandLineException e) {
             printHeader(); // exception before verbosity option could be read
