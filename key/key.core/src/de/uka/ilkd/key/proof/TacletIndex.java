@@ -203,11 +203,11 @@ public abstract class TacletIndex  {
     }
 
     public static ImmutableSet<NoPosTacletApp> toNoPosTacletApp(Iterable<Taclet> rule) {
-	ImmutableSet<NoPosTacletApp> result = DefaultImmutableSet.<NoPosTacletApp>nil();
+	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	for (Taclet t : rule) {
-	    result = result.add(NoPosTacletApp.createNoPosTacletApp(t));
+	    result = result.prepend(NoPosTacletApp.createNoPosTacletApp(t));
 	}
-	return result;
+	return DefaultImmutableSet.fromImmutableList(result);
     }
 
     /** adds a new Taclet with instantiation information to this index. 

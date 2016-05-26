@@ -16,12 +16,32 @@ package org.key_project.util.collection;
 import java.util.HashSet;
 
 /**
- * TODO!
+ * This class is a collection of methods that operate on immutable collections,
+ * in particular {@link ImmutableSet}s and {@link ImmutableList}s.
  *
- * @author mulbrich
+ * This class cannot be instantiated.
+ *
+ * @author Mattias Ulbrich
  */
-public class Immutables {
+public final class Immutables {
 
+    private Immutables() {
+        throw new Error();
+    }
+
+    /**
+     * Checks whether an immutable list is free of duplicates.
+     *
+     * A list has a duplicate if it during iteration it visits two objects o1
+     * and o2 such that <code>o1==null ? o2 == null : o1.equals(o2)</code> is true.
+     * <code>null</code> may appear in the list.
+     *
+     * The implementation uses a hash set internally and thus runs in O(n).
+     *
+     * @param list
+     *            any list, must not be <code>null</code>
+     * @return true iff every
+     */
     public static <T> boolean isDuplicateFree(ImmutableList<T> list) {
 
         HashSet<T> set = new HashSet<T>();
@@ -35,6 +55,33 @@ public class Immutables {
         return true;
     }
 
+    /**
+     * Removes duplicate entries from an immutable list.
+     *
+     * A list has a duplicate if it during iteration it visits two objects o1
+     * and o2 such that <code>o1==null ? o2 == null : o1.equals(o2)</code> is
+     * true. <code>null</code> may appear in the list.
+     *
+     * If an element occurs duplicated, its first (in order of iteration)
+     * occurrence is kept, while later occurrences are removeed.
+     *
+     * If a list iterates "a", "b", "a" in this order, removeDuplicates returns
+     * a list iterating "a", "b".
+     *
+     * The implementation uses a hash set internally and thus runs in O(n).
+     *
+     * It reuses as much created datastructure as possible. In particular, if
+     * the list is already duplicate-fre, it does not allocate new memory (well,
+     * only temporarily) and returns the argument.
+     *
+     * Sidenote: Would that not make a nice KeY-Verification condition? Eat your
+     * own dogfood.
+     *
+     * @param list
+     *            any list, must not be <code>null</code>
+     *
+     * @return a duplicate-free version of the argument, never <code>null</code>
+     */
     public static <T> ImmutableList<T> removeDuplicates(ImmutableList<T> list) {
 
         if(list.isEmpty()) {

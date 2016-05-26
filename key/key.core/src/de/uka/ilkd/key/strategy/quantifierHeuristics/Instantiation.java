@@ -18,7 +18,9 @@ import java.util.Map;
 
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -84,11 +86,11 @@ class Instantiation {
    }
 
    private static ImmutableSet<Term> sequentToTerms(Sequent seq) {
-      ImmutableSet<Term> res = DefaultImmutableSet.<Term> nil();
+      ImmutableList<Term> res = ImmutableSLList.<Term> nil();
       for (final SequentFormula cf : seq) {
-         res = res.add(cf.formula());
+         res = res.prepend(cf.formula());
       }
-      return res;
+      return DefaultImmutableSet.fromImmutableList(res);
    }
 
    /**
