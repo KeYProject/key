@@ -121,11 +121,11 @@ public class TestImmutables extends TestCase {
                 s2 = s2.add(a[i+1][j]);
             }
 
-            DefaultImmutableSet<String> newUnion = ((DefaultImmutableSet<String>) s1).newUnion(s2);
+            DefaultImmutableSet<String> newUnion = ((DefaultImmutableSet<String>) s1).newUnion((DefaultImmutableSet<String>) s2);
             DefaultImmutableSet<String> oldUnion = ((DefaultImmutableSet<String>) s2).originalUnion(s1);
             assertEquals(oldUnion, newUnion);
 
-            newUnion = ((DefaultImmutableSet<String>) s2).newUnion(s1);
+            newUnion = ((DefaultImmutableSet<String>) s2).newUnion((DefaultImmutableSet<String>) s1);
             oldUnion = ((DefaultImmutableSet<String>) s2).originalUnion(s1);
             assertEquals(oldUnion, newUnion);
         }
