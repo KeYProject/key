@@ -64,13 +64,13 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         // To create a list with N entries O(N^2) comparisons need to be made
         // Better restrict this class to very small instances.
         // The following helps detecting "bad" usages. (MU 2016)
-        if(elementList.size() > 20) {
-            StackTraceElement[] st = new Throwable().getStackTrace();
-            for (int i = 2; i < 6; i++) {
-                System.err.println(st[i]);
-            }
-            System.err.println("TOO LARGE");
-        }
+//        if(elementList.size() > 20) {
+//            StackTraceElement[] st = new Throwable().getStackTrace();
+//            for (int i = 2; i < 6; i++) {
+//                System.err.println(st[i]);
+//            }
+//            System.err.println("TOO LARGE");
+//        }
     }
 
     /** adds an element
@@ -108,11 +108,9 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
 
     /*package visible for testing!*/
-    //@ requires set.size() > 0;
-    DefaultImmutableSet<T> newUnion(ImmutableSet<T> set) {
-        ImmutableList<T> otherList = ((DefaultImmutableSet<T>)set).elementList;
-	    ImmutableList<T> concat = this.elementList.prepend(otherList.reverse());
-	    ImmutableList<T> clean = Immutables.removeDuplicates(concat);
+    DefaultImmutableSet<T> newUnion(DefaultImmutableSet<T> set) {
+        ImmutableList<T> otherList = set.elementList;
+        ImmutableList<T> clean = Immutables.concatDuplicateFreeLists(this.elementList, otherList);
 	    return new DefaultImmutableSet<T>(clean);
     }
 
@@ -121,7 +119,6 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 	if (set.isEmpty()) {
 	    return this;
 	}
-	
 	
 	ImmutableList<T> unionElements = this.elementList;
 	for (T otherEl : set) {	    	    
@@ -145,7 +142,11 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 		intersectElements = intersectElements.removeFirst(el);
 	    }
 	}
+	if(intersectElements.isEmpty()) {
+	    return DefaultImmutableSet.<T>nil();
+	} else {
 	return new DefaultImmutableSet<T>(intersectElements);
+    }
     }
 
     /** @return Iterator<T> of the set */

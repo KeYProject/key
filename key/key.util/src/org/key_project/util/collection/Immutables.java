@@ -14,6 +14,7 @@
 package org.key_project.util.collection;
 
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class is a collection of methods that operate on immutable collections,
@@ -122,6 +123,23 @@ public final class Immutables {
 
         return result;
 
+    }
+
+    public static <T> ImmutableList<T> concatDuplicateFreeLists(ImmutableList<T> l1, ImmutableList<T> l2) {
+
+        Set<T> lookup = new HashSet<>();
+        for (T element : l1) {
+            lookup.add(element);
+        }
+
+        ImmutableList<T> result = l1;
+        for (T element : l2) {
+            if(!lookup.contains(element)) {
+                result = result.prepend(element);
+            }
+        }
+
+        return result;
     }
 
 }
