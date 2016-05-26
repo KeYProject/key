@@ -196,7 +196,7 @@ public abstract class TacletIndex  {
      * adds a set of NoPosTacletApp to this index
      * @param tacletAppList the NoPosTacletApps to be added
      */
-    public void addTaclets(ImmutableSet<NoPosTacletApp> tacletAppList) {
+    public void addTaclets(Iterable<NoPosTacletApp> tacletAppList) {
 	for(NoPosTacletApp taclet : tacletAppList) {
 	    add(taclet);
 	}

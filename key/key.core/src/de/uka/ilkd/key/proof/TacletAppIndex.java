@@ -423,7 +423,7 @@ public class TacletAppIndex  {
      * information has been added to the TacletIndex.
      * @param tacletApps set of partially instantiated {@link Taclet}s to add
      */
-    public void addedNoPosTacletApps(ImmutableSet<NoPosTacletApp> tacletApps) {
+    public void addedNoPosTacletApps(Iterable<NoPosTacletApp> tacletApps) {
         for (TacletApp tacletApp : tacletApps) {
             if ( indexCaches.isRelevantTaclet ( tacletApp.taclet () ) ) {
                 // we must flush the index cache, and we must no longer use a cache
