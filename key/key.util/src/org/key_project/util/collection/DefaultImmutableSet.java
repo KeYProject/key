@@ -99,8 +99,8 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     /** @return union of this set with set */
     public ImmutableSet<T> union(ImmutableSet<T> set) {
-	if(set instanceof DefaultImmutableSet && set.size() > 10) {
-	    return newUnion(set);
+	if(set instanceof DefaultImmutableSet && size() * set.size() > 100) {
+	    return newUnion((DefaultImmutableSet<T>) set);
 	}
 
 	return originalUnion(set);
