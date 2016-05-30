@@ -61,7 +61,7 @@ public class MoveClassRefactoringTest {
    }
 
    @Test
-   public void test1SimpleMove() throws InterruptedException, CoreException {
+   public void test1SimpleMove() throws Exception {
 
       TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test1", srcFolder, oracleFolder,
             bot, CLASS_NAME_MOVE, "test1p1", "test1p2", javaProject);
@@ -69,7 +69,7 @@ public class MoveClassRefactoringTest {
    }
 
    @Test
-   public void test2MoveComplexPackage() throws InterruptedException, CoreException {
+   public void test2MoveComplexPackage() throws Exception {
 
       TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test2", srcFolder, oracleFolder,
             bot, CLASS_NAME_MOVE, "test2p1", "test2p2.complex", javaProject);
@@ -77,7 +77,7 @@ public class MoveClassRefactoringTest {
    }
 
    @Test
-   public void test3MoveUseOps() throws InterruptedException, CoreException {
+   public void test3MoveUseOps() throws Exception {
 
       TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test3", srcFolder, oracleFolder,
             bot, CLASS_NAME_MOVE, "test3p1", "test3p2", javaProject);
@@ -85,7 +85,7 @@ public class MoveClassRefactoringTest {
    }
 
    @Test
-   public void test4MoveComplexUseOpsBackwards() throws InterruptedException, CoreException {
+   public void test4MoveComplexUseOpsBackwards() throws Exception {
 
       TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test4", srcFolder, oracleFolder,
             bot, CLASS_NAME_MOVE, "test4p2.complex", "test4p1", javaProject);
@@ -93,7 +93,7 @@ public class MoveClassRefactoringTest {
    }
 
    @Test
-   public void test5MoveIntoPackWithReferences() throws InterruptedException, CoreException {
+   public void test5MoveIntoPackWithReferences() throws Exception {
 
       TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test5", srcFolder, oracleFolder,
             bot, CLASS_NAME_MOVE, "test1p1", "mainpack", javaProject);
@@ -101,7 +101,7 @@ public class MoveClassRefactoringTest {
    }
 
    @Test
-   public void test6NoChangeBecauseImported() throws InterruptedException, CoreException {
+   public void test6NoChangeBecauseImported() throws Exception {
 
       TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test6", srcFolder, oracleFolder,
             bot, CLASS_NAME_MOVE, "test1p1", "test1p2", javaProject);
@@ -109,7 +109,7 @@ public class MoveClassRefactoringTest {
    }
 
    @Test
-   public void test7MoveIntoAnotherProject() throws InterruptedException, CoreException {
+   public void test7MoveIntoAnotherProject() throws Exception {
       // Create projects and set references
       final IProject projectSrc = TestUtilsRefactoring.createProjectWithFiles("projectSrc",
             "data\\template\\refactoringMoveTest\\moveClassTest\\test7\\projectSrc");

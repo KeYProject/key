@@ -56,7 +56,7 @@ public class SWTBotAllKeywordsHighlightingTest {
    }
 
    @Before
-   public void resetEditor() throws CoreException {
+   public void resetEditor() throws Exception {
       project.restoreClassAndOpen();
       editor = project.getOpenedEditor();
    }

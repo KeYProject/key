@@ -14,7 +14,6 @@
 package org.key_project.keyide.ui.test.testcase.swtbot;
 
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
@@ -56,7 +55,7 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * Tests starting of a proof via the context menu of a selected method in a JDT editor.
     */
    @Test
-   public void testStartProofInEditor() throws CoreException, InterruptedException {
+   public void testStartProofInEditor() throws Exception {
       doStartProofSwitchPerspectiveDialogYesTest("SWTBotStartProofHandlerTest_testStartProofInEditor", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -77,7 +76,7 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * Tests starting of proof via the context menu of a method ({@link IMethod}) in the outline view.
     */
    @Test
-   public void testStartProofInOutline() throws CoreException, InterruptedException {
+   public void testStartProofInOutline() throws Exception {
       doStartProofSwitchPerspectiveDialogYesTest("SWTBotStartProofHandlerTest_testStartProofInOutline", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -95,7 +94,7 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * Tests starting of proof via the context menu of a method ({@link IMethod}) in the project explorer.
     */
    @Test
-   public void testStartProofInProjectExplorer() throws CoreException, InterruptedException {
+   public void testStartProofInProjectExplorer() throws Exception {
       doStartProofSwitchPerspectiveDialogYesTest("SWTBotStartProofHandlerTest_testStartProofInProjectExplorer", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -114,7 +113,7 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * First starting of a proof via the context menu of a selected method in a JDT editor.
     */
    @Test
-   public void testStartProofInEditorPerspectiveNeverChanged() throws CoreException, InterruptedException {
+   public void testStartProofInEditorPerspectiveNeverChanged() throws Exception {
       doStartProofSwitchPerspectiveDialogNoRememberTest("SWTBotStartProofHandlerTest_testStartProofInEditorPerspectiveNeverChanged", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -136,7 +135,7 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * In order to do so, it first starts a proof via the context menu of a method ({@link IMethod}) in the outline view.
     */
    @Test
-   public void testStartProofInOutlinePerspectiveNeverChanged() throws CoreException, InterruptedException {
+   public void testStartProofInOutlinePerspectiveNeverChanged() throws Exception {
       doStartProofSwitchPerspectiveDialogNoRememberTest("SWTBotStartProofHandlerTest_testStartProofInOutlinePerspectiveNeverChanged", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -155,7 +154,7 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * In order to do so, it first starts a proof via the context menu of a method ({@link IMethod}) in the project explorer.
     */
    @Test
-   public void testStartProofInProjectExplorerPerspectiveNeverChanged() throws CoreException, InterruptedException {
+   public void testStartProofInProjectExplorerPerspectiveNeverChanged() throws Exception {
       doStartProofSwitchPerspectiveDialogNoRememberTest("SWTBotStartProofHandlerTest_testStartProofInProjectExplorerPerspectiveNeverChanged", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -174,7 +173,7 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * First starting of a proof via the context menu of a selected method in a JDT editor.
     */
    @Test
-   public void testStartProofInEditorPerspectiveAlwaysChanged() throws CoreException, InterruptedException {
+   public void testStartProofInEditorPerspectiveAlwaysChanged() throws Exception {
       doStartProofSwitchPerspectiveDialogYesRememberTest("SWTBotStartProofHandlerTest_testStartProofInEditorPerspectiveAlwaysChangedPerspectiveAlwaysChanged", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -196,7 +195,7 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * In order to do so, it first starts a proof via the context menu of a method ({@link IMethod}) in the outline view.
     */
    @Test
-   public void testStartProofInOutlinePerspectiveAlwaysChanged() throws CoreException, InterruptedException {
+   public void testStartProofInOutlinePerspectiveAlwaysChanged() throws Exception {
       doStartProofSwitchPerspectiveDialogYesRememberTest("SWTBotStartProofHandlerTest_testStartProofInOutlinePerspectiveAlwaysChanged", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -216,7 +215,7 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * In order to do so, it first starts a proof via the context menu of a method ({@link IMethod}) in the project explorer.
     */
    @Test
-   public void testStartProofInProjectExplorerPerspectiveAlwaysChanged() throws CoreException, InterruptedException {
+   public void testStartProofInProjectExplorerPerspectiveAlwaysChanged() throws Exception {
       doStartProofSwitchPerspectiveDialogYesRememberTest("SWTBotStartProofHandlerTest_testStartProofInProjectExplorerPerspectiveAlwaysChanged", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -234,10 +233,9 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
    /**
     * Tests starting of a proof via the context menu of a selected method in a JDT editor, without the "Confirm perspective switch" dialog.
     * By setting the {@link KeYIDEPreferences#SWITCH_TO_KEY_PERSPECTIVE} to "always".
-    * @throws InterruptedException 
-    * @throws CoreException 
+    * @throws Exception
     */
-   public void testSetPerspectiveChangedPreferencesAlwaysStartProofInEditor() throws CoreException, InterruptedException{
+   public void testSetPerspectiveChangedPreferencesAlwaysStartProofInEditor() throws Exception {
       doStartProofWithoutSwitchToPerspectiveDialogTest("SWTBotStartProofHandlerTest_testSetPerspectiveChangedPreferencesAlwaysStartProofInEditor", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -257,10 +255,9 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
    /**
     * Tests starting of a proof via the context menu of a method ({@link IMethod}) in the outline view, without the "Confirm perspective switch" dialog.
     * By setting the {@link KeYIDEPreferences#SWITCH_TO_KEY_PERSPECTIVE} to "always".
-    * @throws InterruptedException 
-    * @throws CoreException
+    * @throws Exception
     */
-   public void testSetPerspectiveChangedPreferencesAlwaysStartProofInOutline() throws CoreException, InterruptedException{
+   public void testSetPerspectiveChangedPreferencesAlwaysStartProofInOutline() throws Exception {
       doStartProofWithoutSwitchToPerspectiveDialogTest("SWTBotStartProofHandlerTest_testSetPerspectiveChangedPreferencesAlwaysStartProofInOutline", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -277,10 +274,9 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
    /**
     * Tests starting of a proof via the context menu of a method ({@link IMethod}) in the project explorer, without the "Confirm perspective switch" dialog.
     * By setting the {@link KeYIDEPreferences#SWITCH_TO_KEY_PERSPECTIVE} to "always".
-    * @throws InterruptedException 
-    * @throws CoreException
+    * @throws Exception
     */
-   public void testSetPerspectiveChangedPreferencesAlwaysStartProofInProjectExplorer() throws CoreException, InterruptedException{
+   public void testSetPerspectiveChangedPreferencesAlwaysStartProofInProjectExplorer() throws Exception {
       doStartProofWithoutSwitchToPerspectiveDialogTest("SWTBotStartProofHandlerTest_testSetPerspectiveChangedPreferencesAlwaysStartProofInProjectExplorer", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -298,10 +294,9 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
    /**
     * Tests starting of a proof via the context menu of a selected method in a JDT editor, without the "Confirm perspective switch" dialog.
     * By setting the {@link KeYIDEPreferences#SWITCH_TO_KEY_PERSPECTIVE} to "never".
-    * @throws InterruptedException 
-    * @throws CoreException 
+    * @throws Exception
     */
-   public void testSetPerspectiveChangedPreferencesNeverStartProofInEditor() throws CoreException, InterruptedException{
+   public void testSetPerspectiveChangedPreferencesNeverStartProofInEditor() throws Exception {
       doStartProofWithoutSwitchToPerspectiveDialogTest("SWTBotStartProofHandlerTest_testSetPerspectiveChangedPreferencesNeverStartProofInEditor", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -321,10 +316,9 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
    /**
     * Tests starting of a proof via the context menu of a method ({@link IMethod}) in the outline view, without the "Confirm perspective switch" dialog.
     * By setting the {@link KeYIDEPreferences#SWITCH_TO_KEY_PERSPECTIVE} to "never".
-    * @throws InterruptedException 
-    * @throws CoreException
+    * @throws Exception
     */
-   public void testSetPerspectiveChangedPreferencesNeverStartProofInOutline() throws CoreException, InterruptedException{
+   public void testSetPerspectiveChangedPreferencesNeverStartProofInOutline() throws Exception {
       doStartProofWithoutSwitchToPerspectiveDialogTest("SWTBotStartProofHandlerTest_testSetPerspectiveChangedPreferencesNeverStartProofInOutline", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -341,10 +335,9 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
    /**
     * Tests starting of a proof via the context menu of a method ({@link IMethod}) in the project explorer, without the "Confirm perspective switch" dialog.
     * By setting the {@link KeYIDEPreferences#SWITCH_TO_KEY_PERSPECTIVE} to "never".
-    * @throws InterruptedException 
-    * @throws CoreException
+    * @throws Exception
     */
-   public void testSetPerspectiveChangedPreferencesNeverStartProofInProjectExplorer() throws CoreException, InterruptedException{
+   public void testSetPerspectiveChangedPreferencesNeverStartProofInProjectExplorer() throws Exception {
       doStartProofWithoutSwitchToPerspectiveDialogTest("SWTBotStartProofHandlerTest_testSetPerspectiveChangedPreferencesNeverStartProofInProjectExplorer", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -363,10 +356,9 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * Tests canceling the proof in the contract dialog.
     * In order to do so it first sets the {@link KeYIDEPreferences#SWITCH_TO_KEY_PERSPECTIVE} to "always"
     * and starts a proof via the context menu of a selected method in a JDT editor.
-    * @throws InterruptedException 
-    * @throws CoreException
+    * @throws Exception
     */
-   public void testCancelProofPerspectiveChangedPreferencesAlwaysStartProofInEditor() throws CoreException, InterruptedException{
+   public void testCancelProofPerspectiveChangedPreferencesAlwaysStartProofInEditor() throws Exception {
       doStartProofWithoutSwitchToPerspectiveDialogTest("SWTBotStartProofHandlerTest_testCancelProofPerspectiveChangedPreferencesAlwaysStartProofInEditor", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -387,10 +379,9 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * Tests canceling the proof in the contract dialog.
     * In order to do so it first sets the {@link KeYIDEPreferences#SWITCH_TO_KEY_PERSPECTIVE} to "always"
     * and starts a proof via the context menu of a method ({@link IMethod}) in the outline view. 
-    * @throws InterruptedException 
-    * @throws CoreException
+    * @throws Exception
     */
-   public void testCancelProofPerspectiveChangedPreferencesAlwaysStartProofInOutline() throws CoreException, InterruptedException{
+   public void testCancelProofPerspectiveChangedPreferencesAlwaysStartProofInOutline() throws Exception {
       doStartProofWithoutSwitchToPerspectiveDialogTest("SWTBotStartProofHandlerTest_testCancelProofPerspectiveChangedPreferencesAlwaysStartProofInOutline", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -408,10 +399,9 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * Tests canceling the proof in the contract dialog.
     * In order to do so it first sets the {@link KeYIDEPreferences#SWITCH_TO_KEY_PERSPECTIVE} to "always"
     * and starts a proof via the context menu of a method ({@link IMethod}) in the project explorer. 
-    * @throws InterruptedException 
-    * @throws CoreException
+    * @throws Exception
     */
-   public void testCancelProofPerspectiveChangedPreferencesAlwaysStartProofInProjectExplorer() throws CoreException, InterruptedException{
+   public void testCancelProofPerspectiveChangedPreferencesAlwaysStartProofInProjectExplorer() throws Exception {
       doStartProofWithoutSwitchToPerspectiveDialogTest("SWTBotStartProofHandlerTest_testCancelProofPerspectiveChangedPreferencesAlwaysStartProofInProjectExplorer", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -430,10 +420,9 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * Tests canceling the proof in the contract dialog.
     * In order to do so it first sets the {@link KeYIDEPreferences#SWITCH_TO_KEY_PERSPECTIVE} to "never"
     * and starts a proof via the context menu of a selected method in a JDT editor.
-    * @throws InterruptedException 
-    * @throws CoreException
+    * @throws Exception
     */
-   public void testCancelProofPerspectiveChangedPreferencesNeverStartProofInEditor() throws CoreException, InterruptedException{
+   public void testCancelProofPerspectiveChangedPreferencesNeverStartProofInEditor() throws Exception {
       doStartProofWithoutSwitchToPerspectiveDialogTest("SWTBotStartProofHandlerTest_testCancelProofPerspectiveChangedPreferencesNeverStartProofInEditor", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -454,10 +443,9 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * Tests canceling the proof in the contract dialog.
     * In order to do so it first sets the {@link KeYIDEPreferences#SWITCH_TO_KEY_PERSPECTIVE} to "never"
     * and starts a proof via the context menu of a method ({@link IMethod}) in the outline view. 
-    * @throws InterruptedException 
-    * @throws CoreException
+    * @throws Exception
     */
-   public void testCancelProofPerspectiveChangedPreferencesNeverStartProofInOutline() throws CoreException, InterruptedException{
+   public void testCancelProofPerspectiveChangedPreferencesNeverStartProofInOutline() throws Exception {
       doStartProofWithoutSwitchToPerspectiveDialogTest("SWTBotStartProofHandlerTest_testCancelProofPerspectiveChangedPreferencesNeverStartProofInOutline", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -475,10 +463,9 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * Tests canceling the proof in the contract dialog.
     * In order to do so it first sets the {@link KeYIDEPreferences#SWITCH_TO_KEY_PERSPECTIVE} to "always"
     * and starts a proof via the context menu of a method ({@link IMethod}) in the project explorer. 
-    * @throws InterruptedException 
-    * @throws CoreException
+    * @throws Exception
     */
-   public void testCancelProofPerspectiveChangedPreferencesNeverStartProofInProjectExplorer() throws CoreException, InterruptedException{
+   public void testCancelProofPerspectiveChangedPreferencesNeverStartProofInProjectExplorer() throws Exception {
       doStartProofWithoutSwitchToPerspectiveDialogTest("SWTBotStartProofHandlerTest_testCancelProofPerspectiveChangedPreferencesNeverStartProofInProjectExplorer", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -498,7 +485,7 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * First starting the proof via the context menu of a selected method in a JDT editor.
     */
    @Test
-   public void testCancelProofInEditor() throws CoreException, InterruptedException {
+   public void testCancelProofInEditor() throws Exception {
       doStartProofSwitchPerspectiveDialogYesTest("SWTBotStartProofHandlerTest_testCancelProofInEditor", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -520,7 +507,7 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * First starting the proof via the context menu of a method ({@link IMethod}) in the outline view.
     */
    @Test
-   public void testCancelProofInOutline() throws CoreException, InterruptedException {
+   public void testCancelProofInOutline() throws Exception {
       doStartProofSwitchPerspectiveDialogYesTest("SWTBotStartProofHandlerTest_testCancelProofInOutline", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -539,7 +526,7 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * First starting the proof via the context menu of a method ({@link IMethod}) in the project explorer.
     */
    @Test
-   public void testCancelProofInProjectExplorer() throws CoreException, InterruptedException {
+   public void testCancelProofInProjectExplorer() throws Exception {
       doStartProofSwitchPerspectiveDialogYesTest("SWTBotStartProofHandlerTest_testCancelProofInProjectExplorer", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -588,14 +575,13 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * @param contractButton The contract button to click. "OK" or "Cancel".
     * @param switchToPerspective The value to set the {@link KeYIDEPreferences#SWITCH_TO_KEY_PERSPECTIVE}.
     * @param expectedEditor The editor id of the editor you expect to be opened.
-    * @throws CoreException
-    * @throws InterruptedException
+    * @throws Exception
     */
    protected void doStartProofWithoutSwitchToPerspectiveDialogTest(String projectName, 
                                                                    IStartProofTestRunnable startProofRunnable, 
                                                                    String contractButton, 
                                                                    String switchToPerspective, 
-                                                                   String expectedEditor) throws CoreException, InterruptedException {
+                                                                   String expectedEditor) throws Exception {
       // Make sure that given parameters are valid.
       assertNotNull(startProofRunnable);
       assertNotNull(projectName);
@@ -658,13 +644,12 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * @param startProofRunnable The {@link IStartProofTestRunnable} which is executed to start a proof.
     * @param contractButton The contract button to click. "OK" or "Cancel".
     * @param expectedEditor The editor id of the editor you expect to be opened.
-    * @throws CoreException Occurred Exception.
-    * @throws InterruptedException Occurred Exception.
+    * @throws Exception Occurred Exception.
     */
    protected void doStartProofSwitchPerspectiveDialogYesTest(String projectName, 
                                                              IStartProofTestRunnable startProofRunnable, 
                                                              String contractButton, 
-                                                             String expectedEditor) throws CoreException, InterruptedException {
+                                                             String expectedEditor) throws Exception {
       // Make sure that given parameters are valid.
       assertNotNull(startProofRunnable);
       assertNotNull(projectName);
@@ -723,11 +708,10 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * @param startProofRunnable The {@link IStartProofTestRunnable} which is executed to start a proof.
     * @param contractButton The contract button to click. "OK" or "Cancel".
     * @param expectedEditor The editor id of the editor you expect to be opened.
-    * @throws CoreException Occurred Exception.
-    * @throws InterruptedException Occurred Exception.
+    * @throws Exception Occurred Exception.
     */
    protected void doStartProofSwitchPerspectiveDialogYesRememberTest(String projectName, 
-                                   IStartProofTestRunnable startProofRunnable, String contractButton, String expectedEditor) throws CoreException, InterruptedException {
+                                   IStartProofTestRunnable startProofRunnable, String contractButton, String expectedEditor) throws Exception {
       // Make sure that given parameters are valid.
       assertNotNull(startProofRunnable);
       assertNotNull(projectName);
@@ -792,11 +776,10 @@ public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
     * @param startProofRunnable The {@link IStartProofTestRunnable} which is executed to start a proof.
     * @param contractButton The contract button to click. "OK" or "Cancel".
     * @param expectedEditor The editor id of the editor you expect to be opened.
-    * @throws CoreException Occurred Exception.
-    * @throws InterruptedException Occurred Exception.
+    * @throws Exception Occurred Exception.
     */
    protected void doStartProofSwitchPerspectiveDialogNoRememberTest(String projectName, 
-                                   IStartProofTestRunnable startProofRunnable, String contractButton, String expectedEditor) throws CoreException, InterruptedException {
+                                   IStartProofTestRunnable startProofRunnable, String contractButton, String expectedEditor) throws Exception {
       // Make sure that given parameters are valid.
       assertNotNull(startProofRunnable);
       assertNotNull(projectName);

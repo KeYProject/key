@@ -51,109 +51,109 @@ public class RenameFieldsRefactoringTest {
    }
 
    @Test
-   public void test1SimpleAssignableClause() throws CoreException {
+   public void test1SimpleAssignableClause() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test1", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : int", "aVeryLongNewName", javaProject);
    }
 
    @Test
-   public void test2AssignableRequiresAndEnsures() throws CoreException {
+   public void test2AssignableRequiresAndEnsures() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test2", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : int", "tiny", javaProject);
    }
 
    @Test
-   public void test3ThisQualifier() throws CoreException {
+   public void test3ThisQualifier() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test3", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : int", "aNewName", javaProject);
    }
 
    @Test
-   public void test4TwoFilesSamePackageNoChangeInFileTwo() throws CoreException {
+   public void test4TwoFilesSamePackageNoChangeInFileTwo() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test4", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : int", "aNewName", javaProject);
    }
 
    @Test
-   public void test5TwoFilesSamePackageFileTwoAccessingMainClass() throws CoreException {
+   public void test5TwoFilesSamePackageFileTwoAccessingMainClass() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test5", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : int", "aNewName", javaProject);
    }
 
    @Test
-   public void test6TwoFilesOtherPackageFileTwoAccessingMainClass() throws CoreException {
+   public void test6TwoFilesOtherPackageFileTwoAccessingMainClass() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test6", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : int", "aNewName", javaProject);
    }
 
    @Test
-   public void test7TwoFilesMemberAccess() throws CoreException {
+   public void test7TwoFilesMemberAccess() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test7", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : int", "aNewName", javaProject);
    }
 
    @Test
-   public void test8NoJavaChangesInOtherFile() throws CoreException {
+   public void test8NoJavaChangesInOtherFile() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test8", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : int", "aNewName", javaProject);
    }
 
    @Test
-   public void test9NoJavaChangesInTwoOtherFile() throws CoreException {
+   public void test9NoJavaChangesInTwoOtherFile() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test9", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : int", "aNewName", javaProject);
    }
 
    @Test
-   public void test10Invariant() throws CoreException {
+   public void test10Invariant() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test10", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : int", "aNewName", javaProject);
    }
 
    @Test
-   public void test11thisQualifierMethodFieldName() throws CoreException {
+   public void test11thisQualifierMethodFieldName() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test11", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : TestClass", "newName", javaProject);
    }
 
    @Test
-   public void test12thisQualifierMethodFieldNameNested() throws CoreException {
+   public void test12thisQualifierMethodFieldNameNested() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test12", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : TestClass", "newName", javaProject);
    }
 
    @Test
-   public void test13thisQualifierMethodFieldNameNestedChangedOrder() throws CoreException {
+   public void test13thisQualifierMethodFieldNameNestedChangedOrder() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test13", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : TestClass", "newName", javaProject);
    }
 
    @Test
-   public void test14ManyMemberAccesses() throws CoreException {
+   public void test14ManyMemberAccesses() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test14", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : TestClass", "newName", javaProject);
    }
 
    @Test
-   public void test15MethodCallAndCast() throws CoreException {
+   public void test15MethodCallAndCast() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test15", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : int", "newName", javaProject);
    }
 
    @Test
-   public void test16ArrayAccessAndEquals() throws CoreException {
+   public void test16ArrayAccessAndEquals() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test16", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : String", "newName", javaProject);
    }
 
    @Test
-   public void test17LikeTest16WithoutParentheses() throws CoreException {
+   public void test17LikeTest16WithoutParentheses() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test17", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : String", "newName", javaProject);
    }
 
    @Test
-   public void test18ManyMemberAccessesAndMethodCalls() throws CoreException {
+   public void test18ManyMemberAccessesAndMethodCalls() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test18", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : int", "newName", javaProject);
    }
@@ -161,25 +161,25 @@ public class RenameFieldsRefactoringTest {
    // Test 19 and 20 can be found in {@link RenameFieldsSeveralProjectsRefactoringTest}.
 
    @Test
-   public void test21FullyQualifiedAccessOfField() throws CoreException {
+   public void test21FullyQualifiedAccessOfField() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test21", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : int", "newName", javaProject);
    }
 
    @Test
-   public void test22InvariantNotAboveField() throws CoreException {
+   public void test22InvariantNotAboveField() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test22", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : int", "aNewName", javaProject);
    }
 
    @Test
-   public void test23StaticSamePackage() throws CoreException {
+   public void test23StaticSamePackage() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test23", srcFolder, oracleFolder,
             bot, "TestClassOther", "test", "balance : int", "aNewName", javaProject);
    }
 
    @Test
-   public void test24JMLProfile() throws CoreException {
+   public void test24JMLProfile() throws Exception {
       JMLPreferencesHelper.setProjectJMLProfile(javaProject.getProject(),
             new JMLReferenceProfileAE());
 
@@ -188,7 +188,7 @@ public class RenameFieldsRefactoringTest {
    }
    
    @Test
-   public void test25AccessFieldParentClass() throws CoreException {
+   public void test25AccessFieldParentClass() throws Exception {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test25", srcFolder, oracleFolder,
             bot, "TestParent", "test", "fieldToRename : int", "aNewName", javaProject);
    }

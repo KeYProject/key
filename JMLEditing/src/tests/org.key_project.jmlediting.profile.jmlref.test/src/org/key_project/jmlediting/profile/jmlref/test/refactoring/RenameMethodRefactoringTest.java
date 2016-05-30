@@ -50,33 +50,33 @@ public class RenameMethodRefactoringTest {
    }
 
    @Test
-   public void test1SameClassNoOther() throws CoreException {
+   public void test1SameClassNoOther() throws Exception {
       TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test1", srcFolder, oracleFolder,
             bot, "TestClass", "test", "getBalance() : int", "newMethodName", javaProject);
    }
 
    @Test
-   public void test2SameClassOtherMethodWithSameNamePresent() throws CoreException {
+   public void test2SameClassOtherMethodWithSameNamePresent() throws Exception {
       TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test2", srcFolder, oracleFolder,
             bot, "TestClass", "test", "getBalance() : int", "newMethodName", javaProject);
    }
 
    @Test
-   public void test3SameClassOtherMethodWithSameNamePresentCheck() throws CoreException {
+   public void test3SameClassOtherMethodWithSameNamePresentCheck() throws Exception {
       TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test3", srcFolder, oracleFolder,
             bot, "TestClass", "test", "getBalance(boolean) : int", "newMethodName",
             javaProject);
    }
 
    @Test
-   public void test4SameClassOtherTwoMethodsWithSameName() throws CoreException {
+   public void test4SameClassOtherTwoMethodsWithSameName() throws Exception {
       TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test4", srcFolder, oracleFolder,
             bot, "TestClass", "test", "getBalance(boolean) : int", "newMethodName",
             javaProject);
    }
 
    @Test
-   public void test5TwoClassesSamePackage() throws CoreException {
+   public void test5TwoClassesSamePackage() throws Exception {
       TestUtilsRefactoring
             .runMethodRenameTest(TESTPATH + "\\test5", srcFolder, oracleFolder, bot,
                   "TestClassOther", "test", "getBalance() : int", "newMethodName",
@@ -84,7 +84,7 @@ public class RenameMethodRefactoringTest {
    }
 
    @Test
-   public void test6TwoClassesSamePackageTrueNegativeCheck() throws CoreException {
+   public void test6TwoClassesSamePackageTrueNegativeCheck() throws Exception {
       TestUtilsRefactoring
             .runMethodRenameTest(TESTPATH + "\\test6", srcFolder, oracleFolder, bot,
                   "TestClassOther", "test", "getBalance() : int", "newMethodName",
@@ -92,82 +92,82 @@ public class RenameMethodRefactoringTest {
    }
 
    @Test
-   public void test7TwoClassesDifferentPackage() throws CoreException {
+   public void test7TwoClassesDifferentPackage() throws Exception {
       TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test7", srcFolder, oracleFolder,
             bot, "TestClassOther", "otherPackage", "getBalance() : int", "newMethodName",
             javaProject);
    }
 
    @Test
-   public void test8NestedCallsMethodFromClass() throws CoreException {
+   public void test8NestedCallsMethodFromClass() throws Exception {
       TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test8", srcFolder, oracleFolder,
             bot, "TestClass", "test", "getBalance() : int", "newMethodName", javaProject);
    }
 
    @Test
-   public void test9NestedCallsStringValueOf() throws CoreException {
+   public void test9NestedCallsStringValueOf() throws Exception {
       TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test9", srcFolder, oracleFolder,
             bot, "TestClass", "test", "getBalance() : int", "newMethodName", javaProject);
    }
 
    @Test
-   public void test10SuccessiveMethodCalls() throws CoreException {
+   public void test10SuccessiveMethodCalls() throws Exception {
       TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test10", srcFolder,
             oracleFolder, bot, "TestClass", "test", "getBalance() : int", "newMethodName",
             javaProject);
    }
 
    @Test
-   public void test11SuccessiveMethodCallsAsArgument() throws CoreException {
+   public void test11SuccessiveMethodCallsAsArgument() throws Exception {
       TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test11", srcFolder,
             oracleFolder, bot, "TestClass", "test", "getBalance() : int", "newMethodName",
             javaProject);
    }
 
    @Test
-   public void test12ThreeSuccessiveMethodCalls() throws CoreException {
+   public void test12ThreeSuccessiveMethodCalls() throws Exception {
       TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test12", srcFolder,
             oracleFolder, bot, "TestClass", "test", "getBalance() : String", "newMethodName",
             javaProject);
    }
 
    @Test
-   public void test13SuccessiveMethodCallsWithExtraParenthesis() throws CoreException {
+   public void test13SuccessiveMethodCallsWithExtraParenthesis() throws Exception {
       TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test13", srcFolder,
             oracleFolder, bot, "TestClass", "test", "getBalance() : int", "newMethodName",
             javaProject);
    }
 
    @Test
-   public void test14SuccessiveMethodCallsWithArguments() throws CoreException {
+   public void test14SuccessiveMethodCallsWithArguments() throws Exception {
       TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test14", srcFolder,
             oracleFolder, bot, "TestClass", "test", "getBalance() : int", "newMethodName",
             javaProject);
    }
 
    @Test
-   public void test15TwoClassesSamePackageStatic() throws CoreException {
+   public void test15TwoClassesSamePackageStatic() throws Exception {
       TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test15", srcFolder,
             oracleFolder, bot, "TestClassOther", "test", "getBalance() : int",
             "newMethodName", javaProject);
    }
 
    @Test
-   public void test16TwoClassesDifferentPackageStatic() throws CoreException {
+   public void test16TwoClassesDifferentPackageStatic() throws Exception {
       TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test16", srcFolder,
             oracleFolder, bot, "TestClassOther", "otherPackage", "getBalance() : int",
             "newMethodName", javaProject);
    }
    
    @Test
-   public void test17MethodOverride() throws CoreException {
+   public void test17MethodOverride() throws Exception {
       TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test17", srcFolder,
             oracleFolder, bot, "TestParent", "test", "returnAnInteger() : int",
             "aNewMethodName", javaProject);
    }
    
    @Test
-   public void test18Cast() throws CoreException {
+   public void test18Cast() throws Exception {
       TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test18", srcFolder,
             oracleFolder, bot, "TestParent", "test", "returnAnInteger() : int",
             "newMethodName", javaProject);

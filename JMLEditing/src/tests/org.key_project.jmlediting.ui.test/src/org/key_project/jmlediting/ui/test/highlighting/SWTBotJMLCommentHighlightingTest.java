@@ -118,7 +118,7 @@ public class SWTBotJMLCommentHighlightingTest {
     * for Testing
     */
    @Before
-   public void initEditor() throws CoreException {
+   public void initEditor() throws Exception {
       testProject.restoreClassAndOpen();
       editor = testProject.getOpenedEditor();
    }

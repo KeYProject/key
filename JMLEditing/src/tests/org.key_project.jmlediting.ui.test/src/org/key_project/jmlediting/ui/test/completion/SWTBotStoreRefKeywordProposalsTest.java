@@ -6,7 +6,6 @@ import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +13,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.utils.Position;
@@ -43,7 +41,7 @@ public class SWTBotStoreRefKeywordProposalsTest {
    private static List<Integer> testPositions;
 
    @BeforeClass
-   public static void createProject() throws CoreException, InterruptedException, IOException {
+   public static void createProject() throws Exception {
       TestUtilsUtil.closeWelcomeView();
       project = JMLEditingUITestUtils.createProjectWithFile(bot, 
                                                   "StoreRefKeywordProposals", 
@@ -96,7 +94,7 @@ public class SWTBotStoreRefKeywordProposalsTest {
    }
 
    @Before
-   public void cleanEditor() throws CoreException {
+   public void cleanEditor() throws Exception {
       project.restoreClassAndOpen();
       editor = project.getOpenedEditor();
    }

@@ -43,39 +43,39 @@ public class RenameParametersRefactoringTest {
    }
 
    @After
-   public void deleteTestPackage() throws CoreException {
+   public void deleteTestPackage() throws Exception {
       srcFolder.getFolder("test").delete(true, null);
    }
 
    @Test
-   public void test1OneParameter() throws CoreException {
+   public void test1OneParameter() throws Exception {
       TestUtilsRefactoring.runParameterRenameTest(TESTPATH + "\\test1", srcFolder,
             oracleFolder, bot, "TestClass", "test", "setBalance(int) : void", "aNewName", 7);
    }
 
    @Test
-   public void test2TwoParametersFirst() throws CoreException {
+   public void test2TwoParametersFirst() throws Exception {
       TestUtilsRefactoring.runParameterRenameTest(TESTPATH + "\\test2", srcFolder,
             oracleFolder, bot, "TestClass", "test", "setBalance(int, boolean) : void",
             "aNewName", 7);
    }
 
    @Test
-   public void test3TwoParametersSecond() throws CoreException {
+   public void test3TwoParametersSecond() throws Exception {
       TestUtilsRefactoring.runParameterRenameTest(TESTPATH + "\\test3", srcFolder,
             oracleFolder, bot, "TestClass", "test", "setBalance(boolean, int) : void",
             "aNewName", 26);
    }
 
    @Test
-   public void test4FieldAndOtherMethodUsingSameName() throws CoreException {
+   public void test4FieldAndOtherMethodUsingSameName() throws Exception {
       TestUtilsRefactoring.runParameterRenameTest(TESTPATH + "\\test4", srcFolder,
             oracleFolder, bot, "TestClass", "test", "setBalance(boolean, int) : void",
             "aNewName", 26);
    }
 
    @Test
-   public void test5RenameLocalVariableNoParameter() throws CoreException {
+   public void test5RenameLocalVariableNoParameter() throws Exception {
       TestUtilsRefactoring.runParameterRenameTest(TESTPATH + "\\test5", srcFolder,
             oracleFolder, bot, "TestClass", "test", "setBalance(boolean) : void", "aNewName",
             26);

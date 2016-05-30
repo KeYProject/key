@@ -12,7 +12,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
 import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
@@ -190,7 +189,7 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
        * {@inheritDoc}
        */
       @Override
-      public void configureDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+      public void configureDebugPerspective(SWTWorkbenchBot bot) throws Exception {
          TestUtilsUtil.openView(SideProofsView.VIEW_ID);
          if (switchCollecting) {
             SWTBotView view = bot.viewById(SideProofsView.VIEW_ID);
@@ -301,7 +300,7 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
        * {@inheritDoc}
        */
       @Override
-      public void cleanupDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+      public void cleanupDebugPerspective(SWTWorkbenchBot bot) throws Exception {
          TestUtilsUtil.closeView(SideProofsView.VIEW_ID);
       }
    }

@@ -57,11 +57,15 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.viewers.ILazyTreePathContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.results.BoolResult;
+import org.eclipse.swtbot.swt.finder.results.Result;
+import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
@@ -70,12 +74,10 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.resources.ProjectExplorer;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -118,10 +120,6 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
-import org.key_project.util.java.thread.AbstractRunnableWithException;
-import org.key_project.util.java.thread.AbstractRunnableWithResult;
-import org.key_project.util.java.thread.IRunnableWithException;
-import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
@@ -174,7 +172,7 @@ public final class TestSedCoreUtil {
     * @throws CoreException Occurred Exception.
     */
    public static ILaunchConfiguration[] searchFixedExampleLaunchConfigurations() throws CoreException {
-       return DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations(getFixedExampleConfigurationType());
+      return DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations(getFixedExampleConfigurationType());
    }
    
    /**
@@ -197,75 +195,59 @@ public final class TestSedCoreUtil {
     * @throws Exception Occurred Exception.
     */
    public static void launchFixedExample() throws Exception {
-      IRunnableWithException run = new AbstractRunnableWithException() {
+      Result<Exception> run = new Result<Exception>() {
          @Override
-         public void run() {
+         public Exception run() {
             try {
                ILaunchConfiguration config = getFixedExampleLaunchConfiguration();
                DebugUITools.launch(config, FIXED_EXAMPLE_MODE);
+               return null;
             }
             catch (Exception e) {
-               setException(e);
+               return e;
             }
          }
       };
-      Display.getDefault().syncExec(run);
-      if (run.getException() != null) {
-         throw run.getException();
+      Exception exception = UIThreadRunnable.syncExec(run);
+      if (exception != null) {
+         throw exception;
       }
    }
 
    /**
     * Opens the "Symbolic Debug" perspective.
-    * @return The {@link IPerspectiveDescriptor} of "Symbolic Debug" perspective.
     * @throws Exception Occurred Exception.
     */
-   public static IPerspectiveDescriptor openSymbolicDebugPerspective() throws Exception {
-      IRunnableWithResult<IPerspectiveDescriptor> run = new AbstractRunnableWithResult<IPerspectiveDescriptor>() {
+   public static void openSymbolicDebugPerspective(final SWTWorkbenchBot bot) throws Exception {
+      VoidResult toExecute = new VoidResult() {
          @Override
          public void run() {
-            try {
-               // Make sure that the view is not already opened
-               IWorkbenchPage activePage = WorkbenchUtil.getActivePage();
-               TestCase.assertNotNull(activePage);
-               if (activePage.getPerspective() == null || !ObjectUtil.equals(activePage.getPerspective().getId(), SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID)) {
-                  // Make sure that the project explorer is not active to avoid NullPointerException in constructor of org.eclipse.ui.internal.navigator.resources.workbench.TabbedPropertySheetTitleProvider
-                  IWorkbenchPart part = activePage.findView(ProjectExplorer.VIEW_ID);
-                  if (WorkbenchUtil.isActive(part)) {
-                     // Project explorer is active, so select another view if possible
-                     IViewReference[] viewRefs = activePage.getViewReferences();
-                     boolean done = false;
-                     int i = 0;
-                     while (!done && i < viewRefs.length) {
-                        if (!ObjectUtil.equals(viewRefs[i].getId(), ProjectExplorer.VIEW_ID)) {
-                           WorkbenchUtil.activate(viewRefs[i].getView(true));
-                           done = true;
-                        }
-                        i++;
+            // Make sure that the view is not already opened
+            IWorkbenchPage activePage = WorkbenchUtil.getActivePage();
+            TestCase.assertNotNull(activePage);
+            if (activePage.getPerspective() == null || !SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID.equals(activePage.getPerspective().getId())) {
+               // Make sure that the project explorer is not active to avoid NullPointerException in constructor of org.eclipse.ui.internal.navigator.resources.workbench.TabbedPropertySheetTitleProvider
+               IWorkbenchPart part = activePage.findView(ProjectExplorer.VIEW_ID);
+               if (WorkbenchUtil.isActive(part)) {
+                  // Project explorer is active, so select another view if possible
+                  IViewReference[] viewRefs = activePage.getViewReferences();
+                  boolean done = false;
+                  int i = 0;
+                  while (!done && i < viewRefs.length) {
+                     if (!ObjectUtil.equals(viewRefs[i].getId(), ProjectExplorer.VIEW_ID)) {
+                        WorkbenchUtil.activate(viewRefs[i].getView(true));
+                        done = true;
                      }
+                     i++;
                   }
-                  // Change perspective
-                  String perspectiveId = SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID;
-                  IPerspectiveDescriptor perspective = PlatformUI.getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
-                  TestCase.assertNotNull(perspective);
-                  activePage.setPerspective(perspective);
-                  // Make sure that correct perspective is open
-                  TestCase.assertEquals(perspective, activePage.getPerspective());
                }
-            }
-            catch (Exception e) {
-               setException(e);
-            }
-            catch (Throwable t) {
-               setException(new Exception(t));
+               // Change perspective
+               SWTBotPerspective symDebugPerspective = bot.perspectiveById(SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID);
+               symDebugPerspective.activate();
             }
          }
       };
-      Display.getDefault().syncExec(run);
-      if (run.getException() != null) {
-         throw run.getException();
-      }
-      return run.getResult();
+      UIThreadRunnable.syncExec(toExecute);
    }
 
    /**
@@ -596,10 +578,9 @@ public final class TestSedCoreUtil {
        */
       @Override
       public boolean test() throws Exception {
-         IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+         BoolResult run = new BoolResult() {
             @Override
-            public void run() {
-               setResult(Boolean.FALSE);
+            public Boolean run() {
                TreeItem[] rootItems = debugTree.widget.getItems();
                if (rootItems != null && rootItems.length >= 1) {
                   TreeItem[] level1Items = rootItems[0].getItems();
@@ -607,14 +588,14 @@ public final class TestSedCoreUtil {
                      Object data = level1Items[0].getData();
                      if (data instanceof ISEDebugTarget) {
                         target = (ISEDebugTarget)data;
-                        setResult(Boolean.TRUE);
+                        return true;
                      }
                   }
                }
+               return false;
             }
          };
-         debugTree.display.syncExec(run);
-         return run.getResult() != null && run.getResult().booleanValue();
+         return UIThreadRunnable.syncExec(run);
       }
       
       /**

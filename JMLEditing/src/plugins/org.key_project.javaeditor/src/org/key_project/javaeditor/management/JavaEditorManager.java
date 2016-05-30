@@ -362,6 +362,7 @@ public final class JavaEditorManager {
     * @throws IllegalAccessException Occurred Exception.
     * @throws InvocationTargetException Occurred Exception.
     */
+   @SuppressWarnings("unused")
    private static void updateOutline(IPage outlinePage) throws NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
       if (OUTLINE_EXTENSIONS_ENABLED && outlinePage instanceof JavaOutlinePage) {
          JavaOutlinePage joutline = (JavaOutlinePage) outlinePage;

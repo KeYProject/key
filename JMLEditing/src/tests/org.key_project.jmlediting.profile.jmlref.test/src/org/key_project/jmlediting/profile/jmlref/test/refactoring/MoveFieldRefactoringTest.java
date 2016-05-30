@@ -55,7 +55,7 @@ public class MoveFieldRefactoringTest {
    }
 
    @Test
-   public void test1SimpleMove() throws InterruptedException, CoreException {
+   public void test1SimpleMove() throws Exception {
 
       TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test1", srcFolder,
             oracleFolder, bot, CLASS_NAME_MOVE_FROM, "test1p1", FIELD_TO_MOVE,
@@ -63,7 +63,7 @@ public class MoveFieldRefactoringTest {
    }
 
    @Test
-   public void test2MoveComplexPackage() throws InterruptedException, CoreException {
+   public void test2MoveComplexPackage() throws Exception {
 
       TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test2", srcFolder,
             oracleFolder, bot, CLASS_NAME_MOVE_FROM, "test2p1", FIELD_TO_MOVE,
@@ -71,7 +71,7 @@ public class MoveFieldRefactoringTest {
    }
 
    @Test
-   public void test3MoveUseOps() throws InterruptedException, CoreException {
+   public void test3MoveUseOps() throws Exception {
 
       TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test3", srcFolder,
             oracleFolder, bot, CLASS_NAME_MOVE_FROM, "test3p1", FIELD_TO_MOVE,
@@ -79,7 +79,7 @@ public class MoveFieldRefactoringTest {
    }
 
    @Test
-   public void test4MoveComplexUseOpsBackwards() throws InterruptedException, CoreException {
+   public void test4MoveComplexUseOpsBackwards() throws Exception {
 
       TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test4", srcFolder,
             oracleFolder, bot, CLASS_NAME_MOVE_TO, "test4p2\\complex", FIELD_TO_MOVE,
@@ -87,7 +87,7 @@ public class MoveFieldRefactoringTest {
    }
 
    @Test
-   public void test5MoveIntoClassWithReferences() throws InterruptedException, CoreException {
+   public void test5MoveIntoClassWithReferences() throws Exception {
 
       TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test5", srcFolder,
             oracleFolder, bot, CLASS_NAME_MOVE_FROM, "test1p1", FIELD_TO_MOVE, "Main",
@@ -96,7 +96,7 @@ public class MoveFieldRefactoringTest {
 
    @Test
    public void test6MoveIntoAnotherProjectFromSamePackageNoImport()
-         throws InterruptedException, CoreException {
+         throws Exception {
       // Create projects and set references
       final IProject projectSrc = TestUtilsRefactoring.createProjectWithFiles("projectSrc",
             "data\\template\\refactoringMoveTest\\moveFieldTest\\test6\\projectSrc");
@@ -123,8 +123,7 @@ public class MoveFieldRefactoringTest {
    }
 
    @Test
-   public void test7TwoProjectsMoveFieldNotReferences() throws InterruptedException,
-         CoreException {
+   public void test7TwoProjectsMoveFieldNotReferences() throws Exception {
       // Create projects and set references
       final IProject projectSrc = TestUtilsRefactoring.createProjectWithFiles("projectSrc",
             "data\\template\\refactoringMoveTest\\moveFieldTest\\test7\\projectSrc");
@@ -151,8 +150,7 @@ public class MoveFieldRefactoringTest {
    }
 
    @Test
-   public void test8TwoProjectsClassImportedMovedIntoOtherFolder()
-         throws InterruptedException, CoreException {
+   public void test8TwoProjectsClassImportedMovedIntoOtherFolder() throws Exception {
       // Create projects and set references
       final IProject projectSrc = TestUtilsRefactoring.createProjectWithFiles("projectSrc",
             "data\\template\\refactoringMoveTest\\moveFieldTest\\test8\\projectSrc");
@@ -179,8 +177,7 @@ public class MoveFieldRefactoringTest {
    }
 
    @Test
-   public void test9TwoProjectsImportedViaStarOperator() throws InterruptedException,
-         CoreException {
+   public void test9TwoProjectsImportedViaStarOperator() throws Exception {
       // Create projects and set references
       final IProject projectSrc = TestUtilsRefactoring.createProjectWithFiles("projectSrc",
             "data\\template\\refactoringMoveTest\\moveFieldTest\\test9\\projectSrc");
@@ -207,7 +204,7 @@ public class MoveFieldRefactoringTest {
    }
 
    @Test
-   public void test10MoveFieldWithInvariantIntoEmptyClass() throws CoreException {
+   public void test10MoveFieldWithInvariantIntoEmptyClass() throws Exception {
 
       TestUtilsRefactoring.copyFiles(TESTPATH + "\\test10" + "\\src", srcFolder);
       TestUtilsRefactoring.copyFiles(TESTPATH + "\\test10" + "\\oracle", oracleFolder);
@@ -226,7 +223,7 @@ public class MoveFieldRefactoringTest {
    }
 
    @Test
-   public void test11MoveFieldWithInvariantIntoOtherClass() throws CoreException {
+   public void test11MoveFieldWithInvariantIntoOtherClass() throws Exception {
 
       TestUtilsRefactoring.copyFiles(TESTPATH + "\\test11" + "\\src", srcFolder);
       TestUtilsRefactoring.copyFiles(TESTPATH + "\\test11" + "\\oracle", oracleFolder);
@@ -246,8 +243,7 @@ public class MoveFieldRefactoringTest {
    }
 
    @Test
-   public void test12WildcardImportAndClassWithSameNameAsDestinationInSamePackage()
-         throws CoreException {
+   public void test12WildcardImportAndClassWithSameNameAsDestinationInSamePackage() throws Exception {
 
       TestUtilsRefactoring.copyFiles(TESTPATH + "\\test12" + "\\src", srcFolder);
       TestUtilsRefactoring.copyFiles(TESTPATH + "\\test12" + "\\oracle", oracleFolder);

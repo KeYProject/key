@@ -10,11 +10,10 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
 import org.key_project.sed.core.annotation.impl.SliceAnnotation;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.slicing.ISESlicer;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.slicing.KeYThinBackwardSlicer;
@@ -62,11 +61,11 @@ public class SWTBotKeYThinBackwardSlicerTest extends AbstractKeYDebugTargetTestC
          }
          
          @Override
-         public void configureDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+         public void configureDebugPerspective(SWTWorkbenchBot bot) throws Exception {
          }
          
          @Override
-         public void cleanupDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+         public void cleanupDebugPerspective(SWTWorkbenchBot bot) throws Exception {
          }
       };
       doKeYDebugTargetTest("SWTBotKeYThinBackwardSlicerTest_testSimpleLocalVariables", 

@@ -49,49 +49,49 @@ public class RenameClassesRefactoringTest {
    }
 
    @Test
-   public void test1JavaAndJMLOneClass() throws CoreException {
+   public void test1JavaAndJMLOneClass() throws Exception {
       TestUtilsRefactoring.runClassRenameTestBasic(TESTPATH + "\\test1", srcFolder,
             oracleFolder, bot, "TestClass", "test", "NewClassName", javaProject);
    }
 
    @Test
-   public void test2NoJavaOneClass() throws CoreException {
+   public void test2NoJavaOneClass() throws Exception {
       TestUtilsRefactoring.runClassRenameTestBasic(TESTPATH + "\\test2", srcFolder,
             oracleFolder, bot, "TestClass", "test", "NewClassName", javaProject);
    }
 
    @Test
-   public void test3TwoClassesSamePackage() throws CoreException {
+   public void test3TwoClassesSamePackage() throws Exception {
       TestUtilsRefactoring.runClassRenameTestBasic(TESTPATH + "\\test3", srcFolder,
             oracleFolder, bot, "TestClass", "test", "NewClassName", javaProject);
    }
 
    @Test
-   public void test4TwoClassesSamePackageNoJavaChanges() throws CoreException {
+   public void test4TwoClassesSamePackageNoJavaChanges() throws Exception {
       TestUtilsRefactoring.runClassRenameTestBasic(TESTPATH + "\\test4", srcFolder,
             oracleFolder, bot, "TestClass", "test", "NewClassName", javaProject);
    }
 
    @Test
-   public void test5TwoClassesDifferentPackage() throws CoreException {
+   public void test5TwoClassesDifferentPackage() throws Exception {
       TestUtilsRefactoring.runClassRenameTestBasic(TESTPATH + "\\test5", srcFolder,
             oracleFolder, bot, "TestClass", "test", "NewClassName", javaProject);
    }
 
    @Test
-   public void test6FullyQualifiedClassAccess() throws CoreException {
+   public void test6FullyQualifiedClassAccess() throws Exception {
       TestUtilsRefactoring.runClassRenameTestBasic(TESTPATH + "\\test6", srcFolder,
             oracleFolder, bot, "TestClass", "test", "NewClassName", javaProject);
    }
 
    @Test
-   public void test7NoChangesOtherStringClassUsed() throws CoreException {
+   public void test7NoChangesOtherStringClassUsed() throws Exception {
       TestUtilsRefactoring.runClassRenameTestBasic(TESTPATH + "\\test7", srcFolder,
             oracleFolder, bot, "Integer", "test", "NewClassName", javaProject);
    }
 
    @Test
-   public void test8ReferencedInCastExpression() throws CoreException {
+   public void test8ReferencedInCastExpression() throws Exception {
       TestUtilsRefactoring.runClassRenameTestBasic(TESTPATH + "\\test8", srcFolder,
             oracleFolder, bot, "TestClass", "test", "NewClassName", javaProject);
    }

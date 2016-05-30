@@ -51,7 +51,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.SymbolicExecutionE
 @SuppressWarnings("restriction")
 public final class TestBreakpointsUtil {
    
-   public static void addSomeBreakpoints(String path, SWTWorkbenchBot bot, Object... exceptions) {
+   public static void addSomeBreakpoints(String path, SWTWorkbenchBot bot, Object... exceptions) throws Exception {
       IPath callerPath = new Path(path);
       IFile callerFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(callerPath);
       openPerspective("Java", bot);

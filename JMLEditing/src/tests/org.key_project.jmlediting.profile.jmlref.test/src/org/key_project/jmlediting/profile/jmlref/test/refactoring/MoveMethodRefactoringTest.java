@@ -53,7 +53,7 @@ public class MoveMethodRefactoringTest {
    }
 
    @Test
-   public void test1SimpleMove() throws InterruptedException, CoreException {
+   public void test1SimpleMove() throws Exception {
 
       TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test1", srcFolder,
             oracleFolder, bot, CLASS_NAME_MOVE_FROM, "test1p1", METH_TO_MOVE + "() : void",
@@ -61,7 +61,7 @@ public class MoveMethodRefactoringTest {
    }
 
    @Test
-   public void test2MoveComplexPackage() throws InterruptedException, CoreException {
+   public void test2MoveComplexPackage() throws Exception {
 
       TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test2", srcFolder,
             oracleFolder, bot, CLASS_NAME_MOVE_FROM, "test2p1", METH_TO_MOVE + "() : void",
@@ -70,7 +70,7 @@ public class MoveMethodRefactoringTest {
    }
 
    @Test
-   public void test3MoveUseOps() throws InterruptedException, CoreException {
+   public void test3MoveUseOps() throws Exception {
 
       TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test3", srcFolder,
             oracleFolder, bot, CLASS_NAME_MOVE_FROM, "test3p1", METH_TO_MOVE + "() : void",
@@ -79,7 +79,7 @@ public class MoveMethodRefactoringTest {
    }
 
    @Test
-   public void test4MoveComplexUseOpsBackwards() throws InterruptedException, CoreException {
+   public void test4MoveComplexUseOpsBackwards() throws Exception {
 
       TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test4", srcFolder,
             oracleFolder, bot, CLASS_NAME_MOVE_TO, "test4p2\\complex", METH_TO_MOVE

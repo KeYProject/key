@@ -15,7 +15,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IViewPart;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.test.util.DebugTargetResumeSuspendListener;
@@ -98,14 +98,15 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
          }
 
          @Override
-         public void configureDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+         public void configureDebugPerspective(SWTWorkbenchBot bot) throws Exception {
             TestUtilsUtil.openView(ProofView.VIEW_ID);
          }
 
          @Override
-         public void cleanupDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
-            if (TestUtilsUtil.findView(ProofView.VIEW_ID) != null) {
-               TestUtilsUtil.closeView(ProofView.VIEW_ID);
+         public void cleanupDebugPerspective(SWTWorkbenchBot bot) throws Exception {
+            IViewPart view = TestUtilsUtil.findView(ProofView.VIEW_ID);
+            if (view != null) {
+               TestUtilsUtil.closeView(view);
             }
          }
       };

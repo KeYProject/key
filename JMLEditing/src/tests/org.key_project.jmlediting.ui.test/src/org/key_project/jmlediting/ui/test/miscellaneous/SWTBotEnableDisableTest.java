@@ -45,7 +45,7 @@ public class SWTBotEnableDisableTest {
    private Set<RGB> jmlColors = null;
 
    @BeforeClass
-   public static void initializeProjectAndOpenEditor() throws CoreException, InterruptedException {
+   public static void initializeProjectAndOpenEditor() throws Exception {
       TestUtilsUtil.closeWelcomeView();
       final TestProject result = JMLEditingUITestUtils.createProjectWithFile(bot, PROJECT_NAME, PACKAGE_NAME, CLASS_NAME, SaveGuarantee.SAVE_BUT_NO_CHANGES_LATER);
       testProject = result.getProject().getProject();
