@@ -20,7 +20,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Robert Heimbach
  *
  */
-public class RenameFieldsRefactoringTest {
+public class SWTBotRenameFieldsRefactoringTest {
 
    private static final String PROJECT_NAME = "JMLRefactoringRenameTestFields";
 

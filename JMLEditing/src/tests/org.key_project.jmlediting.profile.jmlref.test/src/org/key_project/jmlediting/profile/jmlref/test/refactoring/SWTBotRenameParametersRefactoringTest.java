@@ -19,7 +19,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Robert Heimbach
  *
  */
-public class RenameParametersRefactoringTest {
+public class SWTBotRenameParametersRefactoringTest {
    private static final String PROJECT_NAME = "JMLRefactoringRenameTestParameters";
 
    private static final SWTWorkbenchBot bot = new SWTWorkbenchBot();

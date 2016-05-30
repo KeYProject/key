@@ -15,7 +15,7 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-public class MoveFieldRefactoringTest {
+public class SWTBotMoveFieldRefactoringTest {
 
    private static final String PROJECT_NAME = "MoveFieldRefactoringTest";
 

@@ -6,11 +6,11 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-   TestSuiteMoveRefactoring.class,
-   TestSuiteRenameRefactoring.class
+   SWTBotTestSuiteMoveRefactoring.class,
+   SWTBotTestSuiteRenameRefactoring.class
 })
 
 
-public class TestSuiteRefactoring {
+public class SWTBotTestSuiteRefactoring {
 
 }

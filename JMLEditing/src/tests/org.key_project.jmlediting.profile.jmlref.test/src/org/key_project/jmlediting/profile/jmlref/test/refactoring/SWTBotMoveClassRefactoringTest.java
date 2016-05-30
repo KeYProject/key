@@ -23,7 +23,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * 
  * @author Maksim Melnik, Robert Heimbach
  */
-public class MoveClassRefactoringTest {
+public class SWTBotMoveClassRefactoringTest {
 
    private static final String PROJECT_NAME = "MoveClassRefactoringTest";
 
