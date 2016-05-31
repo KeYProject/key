@@ -53,6 +53,7 @@ public class ExecutionTreeUtilTest extends AbstractSetupTestCase {
    /**
     * Tests {@link ExecutionTreeUtil#getAllDebugTargets(org.eclipse.graphiti.dt.IDiagramTypeProvider)}
     */
+   @SuppressWarnings("deprecation")
    @Test
    public void testGetAllDebugTargets() throws CoreException, IOException {
       // Test null
