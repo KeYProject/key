@@ -17,32 +17,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IfExThenElse;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.op.WarySubstOp;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
@@ -271,10 +251,12 @@ public final class NotationInfo {
 	tbl.put(IProgramMethod.class, new Notation.ObserverNotation());
 	tbl.put(heapLDT.getLength(), new Notation.Postfix(".length"));
 
-        // sequence operators
-        final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
+    // sequence operators
+    final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
 	tbl.put(seqLDT.getSeqLen(), new Notation.Postfix(".length"));
-        tbl.put(SeqLDT.SEQGET_NAME, new Notation.SeqGetNotation());
+    tbl.put(SeqLDT.SEQGET_NAME, new Notation.SeqGetNotation());
+    tbl.put(seqLDT.getSeqConcat(), new Notation.SeqConcatNotation(seqLDT.getSeqConcat(), 
+            seqLDT.getSeqSingleton(), integerLDT.getCharSymbol()));
 	
 	//set operators
 	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
