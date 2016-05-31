@@ -324,9 +324,11 @@ public class LexPathOrdering implements TermOrdering {
 
         private final Set<String> theoryFunctionNames = new LinkedHashSet<String> ();
         {
-            theoryFunctionNames.add("strPool");            
-            theoryFunctionNames.add("seqEmpty");
             theoryFunctionNames.add("C");
+            theoryFunctionNames.add("seqEmpty");
+            theoryFunctionNames.add("empty");
+
+            theoryFunctionNames.add("strPool");            
         }
 
 
@@ -365,8 +367,6 @@ public class LexPathOrdering implements TermOrdering {
             if ( opStr.equals ( "mul" ) ) return Integer.valueOf ( 7 );
             if ( opStr.equals ( "div" ) ) return Integer.valueOf ( 8 );
             if ( opStr.equals ( "jdiv" ) ) return Integer.valueOf ( 9 );
-            
-            if ( opStr.equals ( "empty" ) ) return Integer.valueOf ( 0 );
 
             
             if ( opStr.equals ("intersect")) return Integer.valueOf ( 6 );
