@@ -287,13 +287,6 @@ public final class NotationInfo {
         tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", PRIORITY_ATOM));
         tbl.put(setLDT.getAllFields(), new Notation.Postfix(".*"));
 	
-	//string operators
-	final CharListLDT charListLDT 
-		= services.getTypeConverter().getCharListLDT();
-	tbl.put(charListLDT.getClConcat(), new Notation.Infix("+",PRIORITY_CAST,PRIORITY_ATOM,PRIORITY_ATOM));
-	tbl.put(charListLDT.getClCons(), new CharListNotation());
-	tbl.put(charListLDT.getClEmpty(), new Notation.Constant("\"\"",PRIORITY_BOTTOM));
-
 	return tbl;
     }
     
