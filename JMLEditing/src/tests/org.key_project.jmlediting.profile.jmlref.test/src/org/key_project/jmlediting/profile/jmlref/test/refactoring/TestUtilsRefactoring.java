@@ -50,7 +50,7 @@ public class TestUtilsRefactoring {
 
       IFile fileToRead;
 
-      if (oracleFileName.endsWith(".java"))
+      if (oracleFileName.endsWith(JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT))
          fileToRead = oracleFolder.getFile(oracleFileName);
       else
          fileToRead = oracleFolder.getFile(oracleFileName
@@ -299,7 +299,7 @@ public class TestUtilsRefactoring {
       // select the class to be moved in the package explorer
       SWTBotTree tree = TestUtilsUtil.getProjectExplorer(bot).bot().tree();
       SWTBotTreeItem classToMove = TestUtilsUtil.selectInTree(tree, projectNameSrc, "src",
-            packageFrom, className + ".java");
+            packageFrom, className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT);
 
       classToMove.select().pressShortcut(SWT.ALT | SWT.SHIFT, 'V');
 

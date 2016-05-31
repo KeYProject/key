@@ -17,11 +17,14 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
+import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.key_project.javaeditor.util.PreferenceUtil;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils.TestProject;
@@ -57,44 +60,73 @@ public class SWTBotEnableDisableTest {
 
    @Test
    public void testBasics() throws CoreException {
-      this.jmlColors = new HashSet<RGB>(Arrays.asList(JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.COMMENT), 
-                                                      JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.KEYWORD),
-                                                      JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.TOPLEVEL_KEYWORD)));
-      // Open the JML properties page for the project
-      SWTBotShell preferenceShell = JMLEditingUITestUtils.openJMLPreferencePage(bot);
+      final boolean originalExtensionsEnabled = PreferenceUtil.isExtensionsEnabled();
+      final boolean originalJmlEnabled = PreferenceUtil.isExtensionEnabled(JMLPreferencesHelper.JML_EDITOR_EXTENSION_ID);
+      try {
+         this.jmlColors = new HashSet<RGB>(Arrays.asList(JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.COMMENT), 
+                                           JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.KEYWORD),
+                                           JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.TOPLEVEL_KEYWORD)));
+         // Open the JML properties page for the project
+         SWTBotShell preferenceShell = JMLEditingUITestUtils.openJMLPreferencePage(bot);
 
-      SWTBotCheckBox enableDisableJMLFeature = preferenceShell.bot().checkBox("Enable JML Integration");
+         SWTBotCheckBox enableDisableJMLFeature = preferenceShell.bot().checkBox("Enable JML Integration");
 
-      // Now we are in a profile properties page
-      // Because this project is null, we require that there are no project
-      // specific settings
-      assertTrue("JML Feature was disabled at start",enableDisableJMLFeature.isChecked());
+         // Now we are in a profile properties page
+         // Because this project is null, we require that there are no project
+         // specific settings
+         assertTrue("JML Feature was disabled at start", enableDisableJMLFeature.isChecked());
 
-      preferenceShell.bot().button(IDialogConstants.CANCEL_LABEL).click();
+         preferenceShell.bot().button(IDialogConstants.CANCEL_LABEL).click();
 
-      List<Integer> errorLines = JMLEditingUITestUtils.getAllErrorLines(testFile);
-      assertTrue("Error lines are: " + CollectionUtil.toString(errorLines), errorLines.contains(8));
-      assertTrue("Error lines are: " + CollectionUtil.toString(errorLines), errorLines.contains(11));
-      this.checkColors(6, 5, 10, this.jmlColors, "Colors did not match JMLColors.");
+         List<Integer> errorLines = JMLEditingUITestUtils.getAllErrorLines(testFile);
+         assertTrue("Error lines are: " + CollectionUtil.toString(errorLines), errorLines.contains(8));
+         assertTrue("Error lines are: " + CollectionUtil.toString(errorLines), errorLines.contains(11));
+         this.checkColors(6, 5, 10, this.jmlColors, "Colors did not match JMLColors.");
 
-      preferenceShell = JMLEditingUITestUtils.openJMLPreferencePage(bot);
+         preferenceShell = JMLEditingUITestUtils.openJMLPreferencePage(bot);
 
-      enableDisableJMLFeature = preferenceShell.bot().checkBox("Enable JML Integration");
-      // Disable JML Features
-      enableDisableJMLFeature.deselect();
+         enableDisableJMLFeature = preferenceShell.bot().checkBox("Enable JML Integration");
+         // Disable JML Features
+         enableDisableJMLFeature.deselect();
 
-      // Apply the properties
-      preferenceShell.bot().button("Apply").click();
+         // Apply the properties
+         preferenceShell.bot().button("Apply").click();
 
-      // Want to do the rebuild
-      SWTBotShell confirmationShell = preferenceShell.bot().shell("JML Editing Turned On or Off");
-      confirmationShell.bot().button(IDialogConstants.YES_LABEL).click();
+         // Want to do the rebuild
+         SWTBotShell confirmationShell = preferenceShell.bot().shell("JML Editing Turned On or Off");
+         confirmationShell.bot().button(IDialogConstants.YES_LABEL).click();
 
-      // Rebuild should be done by now.
-      errorLines = JMLEditingUITestUtils.getAllErrorLines(testFile);
-      assertFalse(errorLines.contains(8));
-      assertFalse(errorLines.contains(11));
-      this.checkColors(6, 5, 10, this.javaCommentRGB, "Color did not match JavaCommentColor");
+         // Rebuild should be done by now.
+         errorLines = JMLEditingUITestUtils.getAllErrorLines(testFile);
+         assertFalse(errorLines.contains(8));
+         assertFalse(errorLines.contains(11));
+         this.checkColors(6, 5, 10, this.javaCommentRGB, "Color did not match JavaCommentColor");
+         
+         // Enable JML Features again
+         enableDisableJMLFeature.select();
+         
+         // Apply the properties
+         preferenceShell.bot().button(IDialogConstants.OK_LABEL).click();
+         
+         // Want to do the rebuild
+         confirmationShell = preferenceShell.bot().shell("JML Editing Turned On or Off");
+         confirmationShell.bot().button(IDialogConstants.YES_LABEL).click();
+
+         // Rebuild should be done by now.
+         errorLines = JMLEditingUITestUtils.getAllErrorLines(testFile);
+         assertTrue("Error lines are: " + CollectionUtil.toString(errorLines), errorLines.contains(8));
+         assertTrue("Error lines are: " + CollectionUtil.toString(errorLines), errorLines.contains(11));
+         this.checkColors(6, 5, 10, this.jmlColors, "Colors did not match JMLColors.");
+      }
+      finally {
+         UIThreadRunnable.syncExec(new VoidResult() {
+            @Override
+            public void run() {
+               PreferenceUtil.setExtensionEnabled(JMLPreferencesHelper.JML_EDITOR_EXTENSION_ID, originalJmlEnabled);
+               PreferenceUtil.setExtensionsEnabled(originalExtensionsEnabled);
+            }
+         });
+      }
    }
 
    private void checkColors(final int line, final int column, final int length, final Set<RGB> colors, final String message) {
