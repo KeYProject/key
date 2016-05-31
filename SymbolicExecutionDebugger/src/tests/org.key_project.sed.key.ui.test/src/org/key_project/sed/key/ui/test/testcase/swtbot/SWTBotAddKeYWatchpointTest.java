@@ -23,12 +23,17 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.ui.IPerspectiveDescriptor;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.test.util.TestBreakpointsUtil;
 import org.key_project.sed.key.ui.test.Activator;
 import org.key_project.util.eclipse.BundleUtil;
@@ -38,11 +43,22 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
    public static final String ADD_WATCHPOINT_ID = "org.key_project.sed.key.ui.addWatchpointCommand";
 
    private static boolean projectExists = false;
-
+   
+   private IPerspectiveDescriptor originalPerspective;
+   
    @Before
    @Override
    public void setUp() throws Exception {
       TestUtilsUtil.closeWelcomeView();
+      originalPerspective = TestUtilsUtil.getActivePerspective();
+      TestSedCoreUtil.openSymbolicDebugPerspective(new SWTWorkbenchBot());
+   }
+
+   @After
+   @Override
+   public void tearDown() throws Exception {
+      TestUtilsUtil.openPerspective(originalPerspective);
+      super.tearDown();
    }
 
    @Test
@@ -54,12 +70,11 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       SWTBotView view = TestBreakpointsUtil.openBreakpointView(bot);
       SWTBotToolbarButton addButton = TestUtilsUtil.getToolbarButtonWithId(view, ADD_WATCHPOINT_ID);
       TestUtilsUtil.clickDirectly(addButton);
-      SWTBotShell addWatchpointShell = bot.activeShell();
+      SWTBotShell addWatchpointShell = bot.shell("Add KeY Watchpoint");
       assertEquals("Add KeY Watchpoint", addWatchpointShell.getText());
-      TestUtilsUtil.clickDirectly(bot, "Cancel");
-      // close all shells
-      bot.closeAllShells();
+      TestUtilsUtil.clickDirectly(addWatchpointShell.bot(), "Cancel");
       // Close all editors
+      assertEquals(0, view.bot().tree().getAllItems().length);
       bot.closeAllEditors();
    }
 
@@ -72,13 +87,13 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       SWTBotView view = TestBreakpointsUtil.openBreakpointView(bot);
       SWTBotToolbarButton addButton = TestUtilsUtil.getToolbarButtonWithId(view, ADD_WATCHPOINT_ID);
       TestUtilsUtil.clickDirectly(addButton);
-      bot.text(0).setText("invalidType");
-      assertFalse(bot.button("OK").isEnabled());
-      assertFalse(bot.styledText().isEnabled());
-      TestUtilsUtil.clickDirectly(bot, "Cancel");
-      // close all shells
-      bot.closeAllShells();
+      SWTBotShell addWatchpointShell = bot.shell("Add KeY Watchpoint");
+      addWatchpointShell.bot().text(0).setText("invalidType");
+      assertFalse(addWatchpointShell.bot().button("OK").isEnabled());
+      assertFalse(addWatchpointShell.bot().styledText().isEnabled());
+      TestUtilsUtil.clickDirectly(addWatchpointShell.bot(), "Cancel");
       // Close all editors
+      assertEquals(0, view.bot().tree().getAllItems().length);
       bot.closeAllEditors();
    }
 
@@ -91,13 +106,13 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       SWTBotView view = TestBreakpointsUtil.openBreakpointView(bot);
       SWTBotToolbarButton addButton = TestUtilsUtil.getToolbarButtonWithId(view, ADD_WATCHPOINT_ID);
       TestUtilsUtil.clickDirectly(addButton);
-      bot.text(0).setText("EmptyTestClass");
-      assertFalse(bot.button("OK").isEnabled());
-      assertTrue(bot.styledText().isEnabled());
-      TestUtilsUtil.clickDirectly(bot, "Cancel");
-      // close all shells
-      bot.closeAllShells();
+      SWTBotShell addWatchpointShell = bot.shell("Add KeY Watchpoint");
+      addWatchpointShell.bot().text(0).setText("EmptyTestClass");
+      assertFalse(addWatchpointShell.bot().button("OK").isEnabled());
+      assertTrue(addWatchpointShell.bot().styledText().isEnabled());
+      TestUtilsUtil.clickDirectly(addWatchpointShell.bot(), "Cancel");
       // Close all editors
+      assertEquals(0, view.bot().tree().getAllItems().length);
       bot.closeAllEditors();
    }
 
@@ -110,13 +125,13 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       SWTBotView view = TestBreakpointsUtil.openBreakpointView(bot);
       SWTBotToolbarButton addButton = TestUtilsUtil.getToolbarButtonWithId(view, ADD_WATCHPOINT_ID);
       TestUtilsUtil.clickDirectly(addButton);
-      bot.text(0).setText("EmptyTestClass");
-      SWTBotStyledText styledText = bot.styledText(0);
+      SWTBotShell addWatchpointShell = bot.shell("Add KeY Watchpoint");
+      addWatchpointShell.bot().text(0).setText("EmptyTestClass");
+      SWTBotStyledText styledText = addWatchpointShell.bot().styledText(0);
       styledText.setText("     ");
-      assertFalse(bot.button("OK").isEnabled());
-      TestUtilsUtil.clickDirectly(bot, "Cancel");
-      // close all shells
-      bot.closeAllShells();
+      assertFalse(addWatchpointShell.bot().button("OK").isEnabled());
+      TestUtilsUtil.clickDirectly(addWatchpointShell.bot(), "Cancel");
+      assertEquals(0, view.bot().tree().getAllItems().length);
       // Close all editors
       bot.closeAllEditors();
    }
@@ -130,13 +145,13 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       SWTBotView view = TestBreakpointsUtil.openBreakpointView(bot);
       SWTBotToolbarButton addButton = TestUtilsUtil.getToolbarButtonWithId(view, ADD_WATCHPOINT_ID);
       TestUtilsUtil.clickDirectly(addButton);
-      bot.text(0).setText("EmptyTestClass");
-      SWTBotStyledText styledText = bot.styledText(0);
+      SWTBotShell addWatchpointShell = bot.shell("Add KeY Watchpoint");
+      addWatchpointShell.bot().text(0).setText("EmptyTestClass");
+      SWTBotStyledText styledText = addWatchpointShell.bot().styledText(0);
       styledText.setText("anyNonEmptyCondition");
-      assertTrue(bot.button("OK").isEnabled());
-      TestUtilsUtil.clickDirectly(bot, "Cancel");
-      // close all shells
-      bot.closeAllShells();
+      assertTrue(addWatchpointShell.bot().button("OK").isEnabled());
+      TestUtilsUtil.clickDirectly(addWatchpointShell.bot(), "Cancel");
+      assertEquals(0, view.bot().tree().getAllItems().length);
       // Close all editors
       bot.closeAllEditors();
    }
@@ -153,19 +168,17 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       SWTBotView view = TestBreakpointsUtil.openBreakpointView(bot);
       SWTBotToolbarButton addButton = TestUtilsUtil.getToolbarButtonWithId(view, ADD_WATCHPOINT_ID);
       TestUtilsUtil.clickDirectly(addButton);
-      SWTBotShell addWatchpointShell = bot.activeShell();
-      assertEquals("EmptyTestClass", bot.text().getText());
-      SWTBotStyledText styledText = bot.styledText();
+      SWTBotShell addWatchpointShell = bot.shell("Add KeY Watchpoint");
+      assertEquals("EmptyTestClass", addWatchpointShell.bot().text().getText());
+      SWTBotStyledText styledText = addWatchpointShell.bot().styledText();
       assertTrue(styledText.isEnabled());
-      TestUtilsUtil.clickDirectly(bot, "Browse");
-      SWTBot dialogBot = bot.activeShell().bot();
+      TestUtilsUtil.clickDirectly(addWatchpointShell.bot(), "Browse");
+      SWTBot dialogBot = bot.shell("Select class for KeY Watchpoint").bot();
       assertEquals("EmptyTestClass", dialogBot.text().getText());
       TestUtilsUtil.clickDirectly(dialogBot, "Cancel");
-      addWatchpointShell.setFocus();
-      TestUtilsUtil.clickDirectly(bot, "Cancel");
+      TestUtilsUtil.clickDirectly(addWatchpointShell.bot(), "Cancel");
       bot.activeEditor().toTextEditor().close();
-      // close all shells
-      bot.closeAllShells();
+      assertEquals(0, view.bot().tree().getAllItems().length);
       // Close all editors
       bot.closeAllEditors();
    }
@@ -179,27 +192,25 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       SWTBotView view = TestBreakpointsUtil.openBreakpointView(bot);
       SWTBotToolbarButton addButton = TestUtilsUtil.getToolbarButtonWithId(view, ADD_WATCHPOINT_ID);
       TestUtilsUtil.clickDirectly(addButton);
-      SWTBotShell addWatchpointShell = bot.activeShell();
-      TestUtilsUtil.clickDirectly(bot, "Browse");
-      SWTBotShell dialogShell = bot.activeShell();
+      SWTBotShell addWatchpointShell = bot.shell("Add KeY Watchpoint");
+      TestUtilsUtil.clickDirectly(addWatchpointShell.bot(), "Browse");
+      SWTBotShell dialogShell = bot.shell("Select class for KeY Watchpoint");
       SWTBot dialogBot = dialogShell.bot();
-      bot.sleep(10000);
       assertEquals("Select class for KeY Watchpoint", dialogShell.getText());
-      SWTBotText typeText = bot.text();
+      SWTBotText typeText = dialogBot.text();
       assertEquals("", typeText.getText());
+      dialogBot.waitWhile(Conditions.widgetIsEnabled(dialogBot.button("OK")));
       assertFalse(dialogBot.button("OK").isEnabled());
       typeText.setText(" ");
-      bot.sleep(100);
+      dialogBot.waitWhile(Conditions.widgetIsEnabled(dialogBot.button("OK")));
       assertFalse(dialogBot.button("OK").isEnabled());
       typeText.setText("EmptyTestClass");
-      bot.sleep(100);
+      dialogBot.waitUntil(Conditions.widgetIsEnabled(dialogBot.button("OK")));
       assertTrue(dialogBot.button("OK").isEnabled());
       TestUtilsUtil.clickDirectly(dialogBot, "OK");
-      addWatchpointShell.setFocus();
-      assertEquals("EmptyTestClass", bot.text().getText());
-      TestUtilsUtil.clickDirectly(bot, "Cancel");
-      // close all shells
-      bot.closeAllShells();
+      assertEquals("EmptyTestClass", addWatchpointShell.bot().text().getText());
+      TestUtilsUtil.clickDirectly(addWatchpointShell.bot(), "Cancel");
+      assertEquals(0, view.bot().tree().getAllItems().length);
       // Close all editors
       bot.closeAllEditors();
    }
@@ -214,15 +225,17 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       assertFalse(view.bot().tree().hasItems());
       SWTBotToolbarButton addButton = TestUtilsUtil.getToolbarButtonWithId(view, ADD_WATCHPOINT_ID);
       TestUtilsUtil.clickDirectly(addButton);
-      bot.text().setText("EmptyTestClass");
-      SWTBotStyledText styledText = bot.styledText(0);
+      SWTBotShell addWatchpointShell = bot.shell("Add KeY Watchpoint");
+      addWatchpointShell.bot().text().setText("EmptyTestClass");
+      SWTBotStyledText styledText = addWatchpointShell.bot().styledText(0);
       styledText.setText("anyNonEmptyCondition");
-      TestUtilsUtil.clickDirectly(bot, "OK");
-      TestBreakpointsUtil.openBreakpointView(bot);
-      assertTrue(bot.tree().hasItems());
-      assertEquals(1, bot.tree().getAllItems().length);
-      // close all shells
-      bot.closeAllShells();
+      TestUtilsUtil.clickDirectly(addWatchpointShell.bot(), "OK");
+      assertTrue(view.bot().tree().hasItems());
+      SWTBotTreeItem[] allBreakpointItems = view.bot().tree().getAllItems();
+      assertEquals(1, allBreakpointItems.length);
+      // Remove created breakpoint
+      allBreakpointItems[0].contextMenu("Remove").click();
+      assertEquals(0, view.bot().tree().getAllItems().length);
       // Close all editors
       bot.closeAllEditors();
    }
