@@ -778,7 +778,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermFeature keepChar =
                 or(op(seqLDT.getSeqSingleton()), 
                         or(op(charListLDT.getClIndexOfChar()),
-                           op(charListLDT.getClLastIndexOfChar())));
+                            or (op(charListLDT.getClReplace()),
+                                  op(charListLDT.getClLastIndexOfChar()))));
 
         bindRuleSet(d, "charLiteral_to_intLiteral",
                 ifZero(isBelow(keepChar), inftyConst(), longConst(-100)));
@@ -821,19 +822,18 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "stringsSimplify", longConst(-5000));
 
         final TermFeature charOrIntLiteral =
-                or(tf.charLiteral,
-                        tf.literal,
-                        add(OperatorClassTF.create(SortDependingFunction.class),// XXX:
+                or(tf.charLiteral, tf.literal,
+                   or(add(OperatorClassTF.create(SortDependingFunction.class),// XXX:
                                                                                 // was
                                                                                 // CastFunctionSymbol.class
-                                sub(tf.literal)));
+                                sub(tf.literal)), inftyTermConst()));
 
         bindRuleSet(
                 d,
                 "defOpsReplaceInline",
                 ifZero(add(applyTF("str", seqLiteral),
-                        applyTF("searchChar", charOrIntLiteral),
-                        applyTF("replChar", charOrIntLiteral)), longConst(500)));
+                           applyTF("searchChar", charOrIntLiteral),
+                           applyTF("replChar", charOrIntLiteral)), longConst(-2500), inftyConst()));
 
         bindRuleSet(
                 d,
