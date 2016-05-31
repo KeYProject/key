@@ -196,18 +196,18 @@ public abstract class TacletIndex  {
      * adds a set of NoPosTacletApp to this index
      * @param tacletAppList the NoPosTacletApps to be added
      */
-    public void addTaclets(ImmutableSet<NoPosTacletApp> tacletAppList) {
+    public void addTaclets(Iterable<NoPosTacletApp> tacletAppList) {
 	for(NoPosTacletApp taclet : tacletAppList) {
 	    add(taclet);
 	}
     }
 
     public static ImmutableSet<NoPosTacletApp> toNoPosTacletApp(Iterable<Taclet> rule) {
-	ImmutableSet<NoPosTacletApp> result = DefaultImmutableSet.<NoPosTacletApp>nil();
+	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	for (Taclet t : rule) {
-	    result = result.add(NoPosTacletApp.createNoPosTacletApp(t));
+	    result = result.prepend(NoPosTacletApp.createNoPosTacletApp(t));
 	}
-	return result;
+	return DefaultImmutableSet.fromImmutableList(result);
     }
 
     /** adds a new Taclet with instantiation information to this index. 
