@@ -296,12 +296,11 @@ public final class SpecificationRepository {
 
     private ImmutableSet<Pair<KeYJavaType, IObserverFunction>> getOverridingMethods(
             KeYJavaType kjt, IProgramMethod pm) {
-        ImmutableSet<Pair<KeYJavaType, IObserverFunction>> result = DefaultImmutableSet
-                .<Pair<KeYJavaType, IObserverFunction>> nil();
+        ImmutableList<Pair<KeYJavaType, IObserverFunction>> result = ImmutableSLList.nil();
 
         // static methods and constructors are not overriden
         if (pm.isConstructor() || pm.isStatic()) {
-            return result;
+            return DefaultImmutableSet.fromImmutableList(result);
         }
 
         assert kjt != null;
@@ -310,11 +309,11 @@ public final class SpecificationRepository {
             assert sub != null;
             final IProgramMethod subPM = (IProgramMethod) getCanonicalFormForKJT(
                     pm, sub);
-            result = result.add(new Pair<KeYJavaType, IObserverFunction>(sub,
+            result = result.prepend(new Pair<KeYJavaType, IObserverFunction>(sub,
                     subPM));
         }
 
-        return result;
+        return DefaultImmutableSet.fromImmutableList(result);
     }
 
     public ImmutableSet<Pair<KeYJavaType, IObserverFunction>> getOverridingTargets(
@@ -588,16 +587,16 @@ public final class SpecificationRepository {
      * @return contracts without well-definedness checks
      */
     private static ImmutableSet<Contract> removeWdChecks(ImmutableSet<Contract> contracts) {
-        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+        ImmutableList<Contract> result = ImmutableSLList.nil();
         if (contracts == null) {
             return contracts;
         }
         for (Contract c: contracts) {
             if (!(c instanceof WellDefinednessCheck)) {
-                result = result.add(c);
+                result = result.prepend(c);
             }
         }
-        return result;
+        return DefaultImmutableSet.fromImmutableList(result);
     }
 
     /**
