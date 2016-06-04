@@ -13,11 +13,7 @@
 
 package org.key_project.sed.ui.visualization.test.testcase;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -37,6 +33,7 @@ import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.model.memory.SEMemoryDebugTarget;
+import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramBehavior;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
@@ -53,7 +50,6 @@ public class ExecutionTreeUtilTest extends AbstractSetupTestCase {
    /**
     * Tests {@link ExecutionTreeUtil#getAllDebugTargets(org.eclipse.graphiti.dt.IDiagramTypeProvider)}
     */
-   @SuppressWarnings("deprecation")
    @Test
    public void testGetAllDebugTargets() throws CoreException, IOException {
       // Test null
@@ -68,7 +64,7 @@ public class ExecutionTreeUtilTest extends AbstractSetupTestCase {
       IFile diagramFile = project.getFile("Diagram" + ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT);
       IFile modelFile = project.getFile("Diagram" + ExecutionTreeUtil.DOMAIN_FILE_EXTENSION_WITH_DOT);
       final Diagram diagram = TestVisualizationUtil.createEmptyExecutionTreeDiagram(diagramFile, modelFile);
-      typeProvider.init(diagram, new ExecutionTreeDiagramEditor());
+      typeProvider.init(diagram, new ExecutionTreeDiagramBehavior(new ExecutionTreeDiagramEditor(), false));
       assertSame(diagram, typeProvider.getDiagram());
       targets = ExecutionTreeUtil.getAllDebugTargets(typeProvider);
       assertDebugTargets(targets);
