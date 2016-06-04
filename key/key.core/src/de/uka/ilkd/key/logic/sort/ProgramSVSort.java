@@ -545,8 +545,7 @@ public abstract class ProgramSVSort extends AbstractSort {
         || pe instanceof SeqIndexOf
         || pe instanceof SeqConcat
 		|| pe instanceof SeqSub
-		|| pe instanceof SeqReverse
-		|| pe instanceof DLEmbeddedExpression) {        
+		|| pe instanceof SeqReverse) {		
 	        if (pe instanceof NonTerminalProgramElement) {
 	            final NonTerminalProgramElement npe = (NonTerminalProgramElement) pe;
 	            for (int i = 0, childCount = npe.getChildCount(); i<childCount; i++) {
@@ -556,6 +555,10 @@ public abstract class ProgramSVSort extends AbstractSort {
 	            }
 	        }
 	        return true;
+	    } else if (pe instanceof DLEmbeddedExpression) {        
+	        // this is a not so nice special case (all expressiosn within embedded expressions are considered to 
+	        // be side effect free; to handle it properly we need some meta constructs to decompose these expressions
+	        return true;	        
 	    }
 	    return VARIABLE.canStandFor(pe, services);    
 	}
