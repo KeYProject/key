@@ -19,12 +19,7 @@ import java.util.Map;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.NamedProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -531,7 +526,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 		Services services) {
 	    if (pe instanceof Negative) {
 		return ((Negative)pe).getChildAt(0) instanceof Literal;
-	    }	   
+	    }
 
 	    if (pe instanceof StringLiteral)
 		return false;
@@ -539,24 +534,32 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    if (pe instanceof Literal) {
 		return true;
 	    }
+	    
 	    if (pe instanceof Instanceof) {
-		ProgramElement v = ((Instanceof) pe).getChildAt(0);
-		return VARIABLE.canStandFor(v, services); 
+	        ProgramElement v = ((Instanceof) pe).getChildAt(0);
+	        return VARIABLE.canStandFor(v, services); 
 	    }
 
-	    if(pe instanceof SetUnion 
-		|| pe instanceof Singleton		    
-		|| pe instanceof Intersect 
+	    if(pe instanceof SetUnion
+		|| pe instanceof Singleton
+		|| pe instanceof Intersect
 		|| pe instanceof SetMinus
 		|| pe instanceof AllFields
 		|| pe instanceof SeqSingleton
 		|| pe instanceof SeqConcat
 		|| pe instanceof SeqSub
 		|| pe instanceof SeqReverse
-		|| pe instanceof DLEmbeddedExpression) {
-		return true;
+		|| pe instanceof DLEmbeddedExpression) {        
+	        if (pe instanceof NonTerminalProgramElement) {
+	            final NonTerminalProgramElement npe = (NonTerminalProgramElement) pe;
+	            for (int i = 0, childCount = npe.getChildCount(); i<childCount; i++) {
+	                if (!canStandFor(npe.getChildAt(i), services)) {
+	                    return false;
+	                }
+	            }
+	        }
+	        return true;
 	    }
-	    
 	    return VARIABLE.canStandFor(pe, services);    
 	}
     }
