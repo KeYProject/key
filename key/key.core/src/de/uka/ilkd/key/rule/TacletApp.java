@@ -739,32 +739,6 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
-     * Examine all schema variables of the taclet that are currently not
-     * instantiated, and for each one whose sort is generic add a condition to
-     * the instantiations object <code>insts</code> that requires this sort to
-     * be instantiated
-     * 
-     * @return the instantiations object after adding all the conditions, or
-     *         <code>null</code> if any of the generic sorts found cannot be
-     *         instantiated (at least at the time)
-     */
-    private SVInstantiations forceGenericSortInstantiations(SVInstantiations insts,
-                                                            Services services) {
-	// force all generic sorts to be instantiated
-	try {
-	    for (final SchemaVariable sv : uninstantiatedVars()) {
-		final GenericSortCondition c = GenericSortCondition
-			.forceInstantiation(sv.sort(), true);
-		if (c != null)
-		    insts = insts.add(c, services);
-	    }
-	} catch (GenericSortException e) {
-	    Debug.fail("TacletApp cannot be made complete");
-	}
-	return insts;
-    }
-
-    /**
      * @param services
      *            the Services class allowing access to the type model
      * @return p_s iff p_s is not a generic sort, the concrete sort p_s is
