@@ -23,12 +23,14 @@ class IfInstantiationCache {
     public final HashMap<Long, ImmutableList<IfFormulaInstantiation>> antecCache = new LinkedHashMap<>();
     public final HashMap<Long, ImmutableList<IfFormulaInstantiation>> succCache = new LinkedHashMap<>();
 
-    /**This field causes a memory leak (that is ad-hoc-ly fixed in
-     * QueueRuleApplicationManager.clearCache()) because it is static and it
-     * has a reference to node which has again a reference to proof.
-     * Can this field be made non-static by putting it in some other class?
-     * This field was private before the fix*/
-    public static final IfInstantiationCache ifInstCache = new IfInstantiationCache ();
+    /**
+     * This field causes a memory leak (that is ad-hoc-ly fixed in
+     * QueueRuleApplicationManager.clearCache()) because it is static and it has
+     * a reference to node which has again a reference to proof. Can this field
+     * be made non-static by putting it in some other class? This field was
+     * private before the fix
+     */
+    public static final IfInstantiationCache ifInstCache = new IfInstantiationCache();
 
     public void reset(Node n) {
         cacheKey = n;
