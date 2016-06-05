@@ -66,7 +66,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     public void clearCache() {
         mainQueue = null;
         previousMinimum = null;
-        TacletAppContainer.ifInstCache.reset(null);
+        IfInstantiationCache.ifInstCache.reset(null);
         clearNextRuleApp();
     }
 
