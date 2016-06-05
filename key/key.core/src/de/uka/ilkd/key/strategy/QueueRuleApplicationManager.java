@@ -21,24 +21,22 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.SingletonIterator;
 
-import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import static de.uka.ilkd.key.strategy.QueueRuleApplicationManager.QueueType.*;
 
 public class QueueRuleApplicationManager implements AutomatedRuleApplicationManager {
 
-    /** The goal this manager belongs to */
+    /**
+     * The goal this manager belongs to.
+     */
     private Goal goal = null;
 
     /**
-     * The priority queue containing all possible next rule applications,
-     * ordered by the costs the strategy object has assigned to them
+     * Priority queue containing all {@RuleAppContainer}s that are candidates
+     * for application on a {@link Goal}.
      */
-    private ImmutableHeap<RuleAppContainer> queue = null;
-
-    private ImmutableHeap<RuleAppContainer> secondaryQueue = null;
+    private ImmutableHeap<RuleAppContainer> mainQueue = null;
 
     /**
      * The minimum {@link RuleAppContainer} from a previous round. It is taken
@@ -48,11 +46,12 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      */
     private RuleAppContainer previousMinimum = null;
 
-    public static enum QueueType {
-        PRIMARY_QUEUE, SECONDARY_QUEUE
-    }
-
+    /**
+     * The next automatic {@link RuleApp} determined by the strategy. Aka result
+     * of methods {@link #next()} and {@link #peekNext()}.
+     */
     private RuleApp nextRuleApp = null;
+
     private long nextRuleTime;
 
     @Override
@@ -65,8 +64,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      */
     @Override
     public void clearCache() {
-        queue = null;
-        secondaryQueue = null;
+        mainQueue = null;
         previousMinimum = null;
         TacletAppContainer.ifInstCache.reset(null);
         clearNextRuleApp();
@@ -77,7 +75,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * <code>RuleListener</code> connection
      */
     private void ensureQueueExists() {
-        if (queue != null) {
+        if (mainQueue != null) {
             return;
         }
 
@@ -90,8 +88,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
         }
 
-        queue = ImmutableLeftistHeap.<RuleAppContainer> nilHeap();
-        secondaryQueue = ImmutableLeftistHeap.<RuleAppContainer> nilHeap();
+        mainQueue = ImmutableLeftistHeap.nilHeap();
         previousMinimum = null;
 
         // to support encapsulating rule managers (delegation, like in
@@ -107,7 +104,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      */
     @Override
     public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
-        if (queue == null) {
+        if (mainQueue == null) {
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
             return;
@@ -116,7 +113,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         final Iterator<RuleAppContainer> iterator = new SingletonIterator<RuleAppContainer>(
                 RuleAppContainer.createAppContainer(rule, pos, goal, getStrategy()));
         ensureQueueExists();
-        push(iterator, PRIMARY_QUEUE);
+        mainQueue = push(iterator, mainQueue);
     }
 
     /**
@@ -125,7 +122,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      */
     @Override
     public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
-        if (queue == null) {
+        if (mainQueue == null) {
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
             return;
@@ -135,35 +132,30 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
                 getStrategy());
         ensureQueueExists();
         for (RuleAppContainer rac : containers) {
-            push(new SingletonIterator<RuleAppContainer>(rac), PRIMARY_QUEUE);
+            mainQueue = push(new SingletonIterator<RuleAppContainer>(rac), mainQueue);
         }
     }
 
     /**
      * Add a number of new rule apps to the heap
      */
-    private void push(Iterator<RuleAppContainer> it, QueueType target) {
+    private ImmutableHeap<RuleAppContainer> push(Iterator<RuleAppContainer> it,
+            ImmutableHeap<RuleAppContainer> sourceQueue) {
         while (it.hasNext()) {
-            push(it.next(), target);
+            sourceQueue = push(it.next(), sourceQueue);
         }
+        return sourceQueue;
     }
 
     /**
      * Add a new rule app to the heap, provided that the rule app is not
      * infinitely expensive
      */
-    private void push(RuleAppContainer c, QueueType target) {
+    private ImmutableHeap<RuleAppContainer> push(RuleAppContainer c, ImmutableHeap<RuleAppContainer> sourceQueue) {
         if (c.getCost() instanceof TopRuleAppCost) {
-            return;
-        }
-
-        switch (target) {
-        case PRIMARY_QUEUE:
-            queue = queue.insert(c);
-            break;
-        case SECONDARY_QUEUE:
-            secondaryQueue = secondaryQueue.insert(c);
-            break;
+            return sourceQueue;
+        } else {
+            return sourceQueue.insert(c);
         }
     }
 
@@ -190,17 +182,18 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
 
         goal.ruleAppIndex().fillCache();
 
-        // Create further appcontainers from previous minimum, which was taken
-        // out of queue.
+        /*
+         * Create further appcontainers from previous minimum, which was removed
+         * from queue in a previous round.
+         */
+        ImmutableHeap<RuleAppContainer> furtherAppsQueue = ImmutableLeftistHeap.nilHeap();
         if (previousMinimum != null) {
-            addFurtherAppsToSecondaryQueue(previousMinimum);
+            furtherAppsQueue = addFurtherAppsToQueue(previousMinimum, furtherAppsQueue);
             previousMinimum = null;
         }
 
         clearNextRuleApp();
-        computeNextRuleApp();
-        queue = queue.insert(secondaryQueue);
-        secondaryQueue = ImmutableLeftistHeap.nilHeap();
+        computeNextRuleApp(furtherAppsQueue);
         return nextRuleApp;
     }
 
@@ -224,14 +217,52 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * application, at which the iteration includes all rule app containers that
      * are contained either in primary or secondary queue.
      */
-    private void computeNextRuleApp() {
-        final BooleanContainer secondaryQueueUsed = new BooleanContainer();
-        ImmutableList<RuleAppContainer> workingList = ImmutableSLList.nil();
-        /**
-         * Try to find a rule until both queues are exhausted.
+    private void computeNextRuleApp(ImmutableHeap<RuleAppContainer> furtherAppsQueue) {
+        /*
+         * Working list contains rule apps that cannot be completed in the
+         * current round but will be reconsidered during the next round.
          */
-        while (nextRuleApp == null && !(queue.isEmpty() && secondaryQueue.isEmpty())) {
-            RuleAppContainer minRuleAppContainer = getMinRuleAppContainer(secondaryQueueUsed);
+        ImmutableList<RuleAppContainer> workingList = ImmutableSLList.nil();
+
+        /**
+         * Try to find a rule app that can be completed until both queues are
+         * exhausted.
+         */
+        while (nextRuleApp == null && !(mainQueue.isEmpty() && furtherAppsQueue.isEmpty())) {
+
+            /*
+             * Determine the minimum rule app container, ranging over both
+             * queues. Putting this into a separate method would be convenient.
+             * But since we are using immutable data structures, this cannot be
+             * done very elegantly.
+             */
+            final RuleAppContainer minRuleAppContainer;
+            final boolean furtherAppsQueueUsed;
+            if (mainQueue.isEmpty()) {
+                // Use furtherAppsQueue in case mainQueue is empty.
+                furtherAppsQueueUsed = true;
+                minRuleAppContainer = furtherAppsQueue.findMin();
+                furtherAppsQueue = furtherAppsQueue.deleteMin();
+            } else if (furtherAppsQueue.isEmpty()) {
+                // Use mainQueue in case furtherAppsQueueUsed is empty.
+                furtherAppsQueueUsed = false;
+                minRuleAppContainer = mainQueue.findMin();
+                mainQueue = mainQueue.deleteMin();
+            } else {
+                // Neither queue is empty. Find a minimum that ranges over both
+                // queues.
+                RuleAppContainer mainQueueMin = mainQueue.findMin();
+                RuleAppContainer furtherAppsQueueMin = furtherAppsQueue.findMin();
+                furtherAppsQueueUsed = mainQueueMin.compareTo(furtherAppsQueueMin) > 0;
+                if (furtherAppsQueueUsed) {
+                    furtherAppsQueue = furtherAppsQueue.deleteMin();
+                    minRuleAppContainer = furtherAppsQueueMin;
+                } else {
+                    mainQueue = mainQueue.deleteMin();
+                    minRuleAppContainer = mainQueueMin;
+                }
+            }
+
             nextRuleApp = minRuleAppContainer.completeRuleApp(goal, getStrategy());
             /**
              * The obtained minimum rule app container was removed from the
@@ -244,19 +275,19 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
                  * Cannot complete given {@link TacletAppContainer}, attempt
                  * resulted in null.
                  */
-                if (secondaryQueueUsed.val()) {
+                if (furtherAppsQueueUsed) {
                     /*
-                     * Put into working list if found in secondary queue. The
+                     * Put into working list if found in furtherAppsQueue. The
                      * rule app container will be reused in next round.
                      */
                     workingList = workingList.prepend(minRuleAppContainer);
                 } else {
                     /*
-                     * Create further apps if found in primary queue. Rule apps
+                     * Create further apps if found in main queue. Rule apps
                      * obtained this way will be considered during the current
                      * round.
                      */
-                    addFurtherAppsToSecondaryQueue(minRuleAppContainer);
+                    furtherAppsQueue = addFurtherAppsToQueue(minRuleAppContainer, furtherAppsQueue);
                 }
             } else {
                 /*
@@ -268,57 +299,16 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             }
         }
         /*
-         * Put working list elements into queue, so they can be considered in
-         * the next round.
+         * Put remaining elements into main queue, so they can be considered in
+         * the upcoming rounds.
          */
-        queue = queue.insert(workingList.iterator());
+        mainQueue = mainQueue.insert(workingList.iterator());
+        mainQueue = mainQueue.insert(furtherAppsQueue);
     }
 
-    /**
-     * Return the {@link RuleAppContainer} with minimum costs, at which both
-     * primary and secondary queue entries are considered. The obtained
-     * {@link RuleAppContainer} is removed from the corresponding queue.
-     * 
-     * @param usedSecondary
-     *            The value of this container will indicate whether the returned
-     *            minimum was obtained from first or secondary queue.
-     * @return The rule app with minimum costs from secondary and primary queue.
-     */
-    private RuleAppContainer getMinRuleAppContainer(BooleanContainer usedSecondary) {
-        // Use secondary queue in case normal queue is empty.
-        if (queue.isEmpty()) {
-            usedSecondary.setVal(true);
-            final RuleAppContainer c = secondaryQueue.findMin();
-            secondaryQueue = secondaryQueue.deleteMin();
-            return c;
-        }
-
-        // Use normal queue in case secondary queue is empty.
-        if (secondaryQueue.isEmpty()) {
-            usedSecondary.setVal(false);
-            final RuleAppContainer c = queue.findMin();
-            queue = queue.deleteMin();
-            return c;
-        }
-
-        /*
-         * Neither queue is empty. Find a minimum that ranges over both queues
-         * and return.
-         */
-        RuleAppContainer primaryQueueMin = queue.findMin();
-        RuleAppContainer secondaryQueueMin = secondaryQueue.findMin();
-        usedSecondary.setVal(primaryQueueMin.compareTo(secondaryQueueMin) > 0);
-        if (usedSecondary.val()) {
-            secondaryQueue = secondaryQueue.deleteMin();
-            return secondaryQueueMin;
-        } else {
-            queue = queue.deleteMin();
-            return primaryQueueMin;
-        }
-    }
-
-    private void addFurtherAppsToSecondaryQueue(RuleAppContainer app) {
-        push(app.createFurtherApps(goal, getStrategy()).iterator(), SECONDARY_QUEUE);
+    private ImmutableHeap<RuleAppContainer> addFurtherAppsToQueue(RuleAppContainer app,
+            ImmutableHeap<RuleAppContainer> furtherAppsQueue) {
+        return push(app.createFurtherApps(goal, getStrategy()).iterator(), furtherAppsQueue);
     }
 
     private Strategy getStrategy() {
@@ -333,8 +323,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     @Override
     public Object clone() {
         QueueRuleApplicationManager res = new QueueRuleApplicationManager();
-        res.queue = queue;
-        res.secondaryQueue = secondaryQueue;
+        res.mainQueue = mainQueue;
         res.previousMinimum = previousMinimum;
         return res;
     }
