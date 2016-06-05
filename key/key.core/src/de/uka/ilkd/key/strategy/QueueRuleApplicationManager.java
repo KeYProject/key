@@ -39,12 +39,15 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
 
     private ImmutableHeap<RuleAppContainer> secondaryQueue    = null;
     
-    /** rule apps that have been deferred during the last call
-     * of <code>next</code>, but that could be still relevant */
-    private ImmutableList<RuleAppContainer> workingList = null;
+    /**
+     * The minimum {@link RuleAppContainer} from a previous round. It is taken out of queue
+     * temporarily and is put back in during the next round. After all, the corresponding rule
+     * still needs to be taken into consideration for future rule applications. 
+     */
+    private RuleAppContainer previousMinimum = null;
 
     public static enum QueueType {
-        PRIMARY_QUEUE, SECONDARY_QUEUE, WORKING_LIST
+        PRIMARY_QUEUE, SECONDARY_QUEUE
     }
 
     private RuleApp nextRuleApp = null;
@@ -64,7 +67,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     public void clearCache () {
         queue       = null;
         secondaryQueue    = null;
-        workingList = null;
+        previousMinimum = null;
         TacletAppContainer.ifInstCache.reset(null);
         clearNextRuleApp ();
     }
@@ -90,7 +93,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
 
         queue = ImmutableLeftistHeap.<RuleAppContainer>nilHeap();
         secondaryQueue = ImmutableLeftistHeap.<RuleAppContainer>nilHeap();
-        workingList = ImmutableSLList.<RuleAppContainer>nil();
+        previousMinimum = null;
 
         // to support encapsulating rule managers (delegation, like in
         // <code>FocussedRuleApplicationManager</code>) the rule index
@@ -169,9 +172,6 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         case SECONDARY_QUEUE:
             secondaryQueue = secondaryQueue.insert ( c );
             break;
-        case WORKING_LIST:
-            workingList = workingList.prepend(c);
-            break;
         }
     }
 
@@ -198,14 +198,10 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         
         goal.ruleAppIndex().fillCache ();
         
-        /**
-         * Push all elements of working list onto secondary queue.
-         */
-        System.out.println("WL size: " + workingList.size());
-        final Iterator<RuleAppContainer> it = workingList.iterator();
-        workingList = ImmutableSLList.nil();
-        while (it.hasNext()) {
-            createFurtherApps_PutOnSecondaryQueue(it.next());
+        // Create further appcontainers from previous minimum, which was taken out of queue.
+        if (previousMinimum != null) {
+            addFurtherAppsToSecondaryQueue(previousMinimum);
+            previousMinimum = null;
         }
         
         clearNextRuleApp();
@@ -237,32 +233,45 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      */
     private void computeNextRuleApp() {
         final BooleanContainer secondaryQueueUsed = new BooleanContainer();
-        /*
+        ImmutableList<RuleAppContainer> workingList = ImmutableSLList.nil();
+        /**
          * Try to find a rule until both queues are exhausted.
          */
         while (nextRuleApp == null && !(queue.isEmpty() && secondaryQueue.isEmpty())) {
-            final RuleAppContainer minRuleAppContainer = getMinRuleAppContainer(secondaryQueueUsed);
+            RuleAppContainer minRuleAppContainer = getMinRuleAppContainer(secondaryQueueUsed);
             nextRuleApp = minRuleAppContainer.completeRuleApp(goal, getStrategy());
-            if (nextRuleApp == null) {
-                // Cannot complete rule app (attempt resulted in null).
-                if (minRuleAppContainer instanceof BuiltInRuleAppContainer) {
-                    // Do nothing for BuiltInRuleAppContainers.
-                } else if (secondaryQueueUsed.val()) {
-                    // Push onto working list if found in secondary queue.
-                    push(minRuleAppContainer, WORKING_LIST);
+            /**
+             * The obtained minimum rule app container was removed from the queue it came from.
+             * The following if-then-else block makes sure that {@link TacletAppContainer}s
+             * do not go missing so that further apps can be created from it in future rounds.
+             */
+            if (nextRuleApp == null && minRuleAppContainer instanceof TacletAppContainer) {
+                /**
+                 * Cannot complete given {@link TacletAppContainer}, attempt resulted in null.
+                 */
+                if (secondaryQueueUsed.val()) {
+                    /*
+                     * Put into working list if found in secondary queue.
+                     * The rule app container will be reused in next round.
+                     */
+                    workingList = workingList.prepend(minRuleAppContainer);
                 } else {
-                    // Push onto secondary queue if found in primary queue.
-                    createFurtherApps_PutOnSecondaryQueue(minRuleAppContainer);
+                    /*
+                     * Create further apps if found in primary queue.
+                     * Rule apps obtained this way will be considered during the current round.
+                     */
+                    addFurtherAppsToSecondaryQueue(minRuleAppContainer);
                 }
             } else {
-                // the found rule app will be re-evaluated when calling
-                // <code>next()</code> the next time; all other considered rule
-                // apps can be put into the primary queue immediately
-                queue = queue.insert ( workingList.iterator () );
-                workingList = ImmutableSLList.<RuleAppContainer>nil();
-                push(minRuleAppContainer, WORKING_LIST);
+                /*
+                 *  Found a suitable rule application. It will be memorized
+                 *  so that further apps can be created from it at the beginning of next round.
+                 */
+                previousMinimum = minRuleAppContainer;
             }
         }
+        // Put working list elements into queue, so they can be considered in next round.
+        queue = queue.insert ( workingList.iterator () );
     }
 
     /**
@@ -308,7 +317,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         }
     }
     
-    private void createFurtherApps_PutOnSecondaryQueue (RuleAppContainer app) {
+    private void addFurtherAppsToSecondaryQueue (RuleAppContainer app) {
         push ( app.createFurtherApps ( goal, getStrategy () ).iterator (), SECONDARY_QUEUE);
     }
 
@@ -326,7 +335,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     	QueueRuleApplicationManager res = new QueueRuleApplicationManager ();
     	res.queue                   = queue;
         res.secondaryQueue                = secondaryQueue;
-    	res.workingList             = workingList;
+    	res.previousMinimum             = previousMinimum;
     	return res;
     }
 
