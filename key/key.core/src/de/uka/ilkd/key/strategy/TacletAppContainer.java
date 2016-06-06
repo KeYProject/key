@@ -98,22 +98,21 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * considered for application.
      */
     @Override
-    public final ImmutableList<RuleAppContainer> createFurtherApps (Goal p_goal) {
-        if ( !isStillApplicable ( p_goal )
-             ||
-             getTacletApp ().ifInstsComplete ()
-             && !ifFormulasStillValid ( p_goal ))
-            return ImmutableSLList.<RuleAppContainer>nil();
+    public final ImmutableList<RuleAppContainer> createFurtherApps(Goal p_goal) {
+        if (!isStillApplicable(p_goal)
+                || (getTacletApp().ifInstsComplete() && !ifFormulasStillValid(p_goal))) {
+            return ImmutableSLList.nil();
+        }
 
-        final TacletAppContainer newCont = createContainer ( p_goal );
-        if ( newCont.getCost () instanceof TopRuleAppCost )
-            return ImmutableSLList.<RuleAppContainer>nil();
+        final TacletAppContainer newCont = createContainer(p_goal);
+        if (newCont.getCost() instanceof TopRuleAppCost) {
+            return ImmutableSLList.nil();
+        }
 
-        ImmutableList<RuleAppContainer> res =
-            ImmutableSLList.<RuleAppContainer>nil().prepend ( newCont );
+        ImmutableList<RuleAppContainer> res = ImmutableSLList.<RuleAppContainer>nil().prepend(newCont);
 
-        if ( getTacletApp ().ifInstsComplete () ) {
-            res = addInstances ( getTacletApp (), res, p_goal );
+        if (getTacletApp().ifInstsComplete()) {
+            res = addInstances(getTacletApp(), res, p_goal);
         } else {
             for (NoPosTacletApp tacletApp : incMatchIfFormulas(p_goal)) {
                 final NoPosTacletApp app = tacletApp;
@@ -314,7 +313,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * or <code>null</code>.
      */
     @Override
-    public RuleApp completeRuleApp(Goal p_goal) {
+    public TacletApp completeRuleApp(Goal p_goal) {
         if (!(isStillApplicable(p_goal) && ifFormulasStillValid(p_goal))) {
             return null;
         }

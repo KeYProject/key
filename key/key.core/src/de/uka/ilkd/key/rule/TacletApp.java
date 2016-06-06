@@ -224,6 +224,7 @@ public abstract class TacletApp implements RuleApp {
      * 
      * @return the Rule the application information is collected for
      */
+    @Override
     public Rule rule() {
 	return taclet;
     }
@@ -261,7 +262,7 @@ public abstract class TacletApp implements RuleApp {
 	    					SVInstantiations insts,
 	    					Services services) {
 
-	HashMap<LogicVariable, SchemaVariable> collMap = new LinkedHashMap<LogicVariable, SchemaVariable>();
+	HashMap<LogicVariable, SchemaVariable> collMap = new LinkedHashMap<>();
 
 	final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it = insts
 		.pairIterator();
@@ -432,6 +433,7 @@ public abstract class TacletApp implements RuleApp {
      *            the Services encapsulating all java information
      * @return list of new created goals
      */
+    @Override
     public ImmutableList<Goal> execute(Goal goal, Services services) {
 
         
@@ -691,7 +693,7 @@ public abstract class TacletApp implements RuleApp {
      *         variable name should not fall.
      */
     private Collection<String> collectClashNames(SchemaVariable sv, TermServices services) {
-        Collection<String> result = new LinkedHashSet<String>();
+        Collection<String> result = new LinkedHashSet<>();
         VariableCollectVisitor vcv = new VariableCollectVisitor();
         for (final NotFreeIn nv: taclet().varsNotFreeIn()) {
             if(nv.first() == sv) {
@@ -799,7 +801,6 @@ public abstract class TacletApp implements RuleApp {
 	    }
 	}
     }    
-    
     
     /**
      * adds a new instantiation to this TacletApp
@@ -1082,16 +1083,6 @@ public abstract class TacletApp implements RuleApp {
 		pos,
 		services);
     }
-
-    /**
-     * returns true iff all necessary informations are collected, so that the
-     * Taclet can be applied.
-     * 
-     * @return true iff all necessary informations are collected, so that the
-     *         Taclet can be applied.
-     */
-    public abstract boolean complete();
-
   
     /**
      * @return true iff the if instantiation list is not null or no if sequent
@@ -1102,17 +1093,10 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
-     * returns the PositionInOccurrence (representing a SequentFormula and a
-     * position in the corresponding formula)
-     * 
-     * @return the PosInOccurrence
-     */
-    public abstract PosInOccurrence posInOccurrence();
-
-    /**
      * compares the given Object with this one and returns true iff both are
      * from type TacletApp with equal taclets, instantiations and positions.
      */
+    @Override
     public boolean equals(Object o) {
        if (o == this)
           return true;
@@ -1125,6 +1109,7 @@ public abstract class TacletApp implements RuleApp {
                 ifInstantiations.equals(s.ifInstantiations));
     }
 
+    @Override
     public int hashCode() {
        int result = 17;
        result = 37 * result + taclet.hashCode();
@@ -1133,6 +1118,7 @@ public abstract class TacletApp implements RuleApp {
        return result;
     }
 
+    @Override
     public String toString() {
 	return "Application of Taclet " + taclet() + " with "
 		+ instantiations() + " and " + ifFormulaInstantiations();
@@ -1231,7 +1217,7 @@ public abstract class TacletApp implements RuleApp {
             SchemaVariable sv = schemaVariable;
 	    if (sv instanceof TermSV || sv instanceof FormulaSV) {
 		TacletPrefix prefix = taclet().getPrefix(sv);
-		HashSet<Name> names = new LinkedHashSet<Name>();
+		HashSet<Name> names = new LinkedHashSet<>();
                 if (prefix.context()) {
                     for (QuantifiableVariable quantifiableVariable : contextVars(sv)) {
                         names.add(quantifiableVariable.name());

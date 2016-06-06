@@ -52,9 +52,9 @@ public class Node  {
 
     private Sequent              seq                 = Sequent.EMPTY_SEQUENT;
 
-    private ArrayList<Node>      children            = new ArrayList<Node>(1);
+    private final ArrayList<Node>      children            = new ArrayList<>(1);
 
-    private Node                 parent              = null;
+    Node                 parent              = null;
 
     private RuleApp              appliedRuleApp;
 
@@ -87,8 +87,8 @@ public class Node  {
      * Holds the undo methods for the information added by rules to the
      * {@link Goal#strategyInfos}.
      */
-    private List<StrategyInfoUndoMethod>  undoInfoForStrategyInfo =
-            new ArrayList<StrategyInfoUndoMethod>();
+    private final List<StrategyInfoUndoMethod>  undoInfoForStrategyInfo =
+            new ArrayList<>();
 
     /** creates an empty node that is root and leaf.
      */
@@ -235,7 +235,7 @@ public class Node  {
 	if ( p_node.root () )
 	    return p_node;
 
-	HashSet<Node> paths = new LinkedHashSet<Node> ();
+	HashSet<Node> paths = new LinkedHashSet<> ();
 	Node    n     = this;
 
 	while ( true ) {
@@ -332,9 +332,9 @@ public class Node  {
     /**
      * computes the leaves of the current subtree and returns them
      */
-    public List<Node> getLeaves() {
-	final List<Node> leaves = new LinkedList<Node>();
-	final LinkedList<Node> nodesToCheck = new LinkedList<Node>();
+    List<Node> getLeaves() {
+	final List<Node> leaves = new LinkedList<>();
+	final LinkedList<Node> nodesToCheck = new LinkedList<>();
 	nodesToCheck.add(this);
 	do {
 	    final Node n = nodesToCheck.poll();
@@ -346,6 +346,7 @@ public class Node  {
 	} while (!nodesToCheck.isEmpty());
     	return leaves;
     }
+
 
     /**
      * returns an iterator for the leaves of the subtree below this
@@ -491,6 +492,7 @@ public class Node  {
     }
 
 
+    @Override
     public String toString() {
 	StringBuffer tree=new StringBuffer();
 	return "\n"+toString("",tree,"",0,0,1);
@@ -654,20 +656,23 @@ public class Node  {
 
     // inner iterator class
     private static class NodeIterator implements Iterator<Node> {
-	private Iterator<Node> it;
+	private final Iterator<Node> it;
 
 	NodeIterator(Iterator<Node> it) {
 	    this.it=it;
 	}
 
+        @Override
 	public boolean hasNext() {
 	    return it.hasNext();
 	}
 
+        @Override
 	public Node next() {
 	    return it.next();
 	}
 
+        @Override
 	public void remove() {
 	    throw new UnsupportedOperationException("Changing the proof tree " +
 	    		"structure this way is not allowed.");
@@ -728,6 +733,7 @@ public class Node  {
             return n;
         }
 
+        @Override
         public void remove() {
             throw new UnsupportedOperationException("Changing the proof tree "
                     + "structure this way is not allowed.");

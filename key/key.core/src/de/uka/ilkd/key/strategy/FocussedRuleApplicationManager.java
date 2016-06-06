@@ -72,14 +72,17 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
         clearCache ();
     }
 
+    @Override
     public void clearCache () {
         delegate.clearCache ();
     }
 
+    @Override
     public AutomatedRuleApplicationManager copy () {
         return (AutomatedRuleApplicationManager)clone ();
     }
 
+    @Override
     public Object clone () {
         return new FocussedRuleApplicationManager ( delegate.copy (),
                                             null,
@@ -88,21 +91,25 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
                                             onlyModifyFocussedFormula );
     }
     
+    @Override
     public RuleApp peekNext () {   
 	return delegate.peekNext();
     } 
 
+    @Override
     public RuleApp next () {
         final RuleApp app = delegate.next ();
         onlyModifyFocussedFormula = false;
         return app;
     }
 
+    @Override
     public void setGoal (Goal p_goal) {
         goal = p_goal;
         delegate.setGoal ( p_goal );
     }
 
+    @Override
     public void ruleAdded (RuleApp rule, PosInOccurrence pos) {
         if ( isRuleApplicationForFocussedFormula(rule, pos) ) {            
             delegate.ruleAdded ( rule, pos );
@@ -136,6 +143,7 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     }
 
     
+    @Override
     public void rulesAdded (ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
         ImmutableList<RuleApp> applicableRules = ImmutableSLList.<RuleApp>nil();
         for (RuleApp r : rules) {
