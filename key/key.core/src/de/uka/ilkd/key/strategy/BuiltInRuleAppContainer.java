@@ -118,9 +118,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     static RuleAppContainer createAppContainer( 
 	    					IBuiltInRuleApp bir,
 	    					PosInOccurrence pio,
-	    					Goal goal,
-	    					Strategy strategy ) {
-        final RuleAppCost cost = strategy.computeCost(bir, pio, goal);
+	    					Goal goal ) {
+        final RuleAppCost cost = goal.getGoalStrategy().computeCost(bir, pio, goal);
 
         final BuiltInRuleAppContainer container 
         	= new BuiltInRuleAppContainer(bir, pio, cost, goal);
@@ -137,11 +136,10 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
                             ImmutableList<IBuiltInRuleApp> birs,
                             PosInOccurrence pio,
                             Goal goal ) {
-        Strategy strategy = goal.getGoalStrategy();
         ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
         
         for (IBuiltInRuleApp bir : birs) {
-            result = result.prepend(createAppContainer(bir, pio, goal, strategy));
+            result = result.prepend(createAppContainer(bir, pio, goal));
         }
         
         return result;
@@ -151,14 +149,13 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
 
     @Override
     public ImmutableList<RuleAppContainer> createFurtherApps(Goal goal) {
-        Strategy strategy = goal.getGoalStrategy();
         if(!isStillApplicable(goal)) {
             return ImmutableSLList.<RuleAppContainer>nil();
         }
         
         final PosInOccurrence pio = getPosInOccurrence(goal);
         
-        RuleAppContainer container = createAppContainer(bir, pio, goal, strategy);
+        RuleAppContainer container = createAppContainer(bir, pio, goal);
         if(container.getCost() instanceof TopRuleAppCost) {
             return ImmutableSLList.<RuleAppContainer>nil();
         }
@@ -168,13 +165,12 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
 
     @Override
     public RuleApp completeRuleApp(Goal goal) {
-        Strategy strategy = goal.getGoalStrategy();
         if(!isStillApplicable(goal)) {
             return null;
         }
         
         final PosInOccurrence pio = getPosInOccurrence (goal);
-        if(!strategy.isApprovedApp(bir, pio, goal)) {
+        if(!goal.getGoalStrategy().isApprovedApp(bir, pio, goal)) {
             return null;
         }                
         

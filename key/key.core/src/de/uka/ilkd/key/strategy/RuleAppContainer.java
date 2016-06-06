@@ -77,15 +77,12 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * may be an instance of <code>TopRuleAppCost</code>.
      */
     public static RuleAppContainer createAppContainer( RuleApp p_app, PosInOccurrence p_pio, Goal p_goal ) {
-        Strategy p_strategy = p_goal.getGoalStrategy();
         
 	if ( p_app instanceof NoPosTacletApp )
-	    return TacletAppContainer.createAppContainers
-		( (NoPosTacletApp)p_app, p_pio, p_goal, p_strategy );
+	    return TacletAppContainer.createAppContainers( (NoPosTacletApp)p_app, p_pio, p_goal );
 
 	if ( p_app instanceof IBuiltInRuleApp )
-	    return BuiltInRuleAppContainer.createAppContainer
-		( (IBuiltInRuleApp)p_app, p_pio, p_goal, p_strategy );
+	    return BuiltInRuleAppContainer.createAppContainer( (IBuiltInRuleApp)p_app, p_pio, p_goal );
 
 	Debug.fail ( "Unexpected kind of rule." );
 
