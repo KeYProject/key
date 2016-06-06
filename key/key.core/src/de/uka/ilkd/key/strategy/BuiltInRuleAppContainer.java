@@ -136,8 +136,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     static ImmutableList<RuleAppContainer> createInitialAppContainers( 
                             ImmutableList<IBuiltInRuleApp> birs,
                             PosInOccurrence pio,
-                            Goal goal,
-                            Strategy strategy ) {
+                            Goal goal ) {
+        Strategy strategy = goal.getGoalStrategy();
         ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
         
         for (IBuiltInRuleApp bir : birs) {
@@ -150,9 +150,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     
 
     @Override
-    public ImmutableList<RuleAppContainer> createFurtherApps(
-	    					Goal goal,
-	    					Strategy strategy) {
+    public ImmutableList<RuleAppContainer> createFurtherApps(Goal goal) {
+        Strategy strategy = goal.getGoalStrategy();
         if(!isStillApplicable(goal)) {
             return ImmutableSLList.<RuleAppContainer>nil();
         }

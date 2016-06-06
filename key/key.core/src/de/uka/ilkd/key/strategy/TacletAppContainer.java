@@ -102,8 +102,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * considered for application.
      */
     @Override
-    public final ImmutableList<RuleAppContainer> createFurtherApps (Goal p_goal,
-                                                     Strategy p_strategy) {
+    public final ImmutableList<RuleAppContainer> createFurtherApps (Goal p_goal) {
+        Strategy p_strategy = p_goal.getGoalStrategy();
         if ( !isStillApplicable ( p_goal )
              ||
              getTacletApp ().ifInstsComplete ()
@@ -240,7 +240,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     }
     
     protected static ImmutableList<RuleAppContainer> createInitialAppContainers(ImmutableList<NoPosTacletApp> p_app, 
-            PosInOccurrence p_pio, Goal p_goal, Strategy p_strategy) {
+            PosInOccurrence p_pio, Goal p_goal) {
+        Strategy p_strategy = p_goal.getGoalStrategy();
         
         List<RuleAppCost> costs = new LinkedList<>();
         

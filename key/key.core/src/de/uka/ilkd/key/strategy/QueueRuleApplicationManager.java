@@ -110,8 +110,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
         }
 
-        final Iterator<RuleAppContainer> iterator = new SingletonIterator<>(
-                RuleAppContainer.createAppContainer(rule, pos, goal, getStrategy()));
+        final Iterator<RuleAppContainer> iterator = new SingletonIterator<>(RuleAppContainer.createAppContainer(rule, pos, goal));
         ensureQueueExists();
         mainQueue = push(iterator, mainQueue);
     }
@@ -128,8 +127,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
         }
 
-        final ImmutableList<RuleAppContainer> containers = RuleAppContainer.createAppContainers(rules, pos, goal,
-                getStrategy());
+        final ImmutableList<RuleAppContainer> containers = RuleAppContainer.createAppContainers(rules, pos, goal);
         ensureQueueExists();
         for (RuleAppContainer rac : containers) {
             mainQueue = push(new SingletonIterator<>(rac), mainQueue);
@@ -188,7 +186,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
          */
         ImmutableHeap<RuleAppContainer> furtherAppsQueue = ImmutableLeftistHeap.nilHeap();
         if (previousMinimum != null) {
-            furtherAppsQueue = push(previousMinimum.createFurtherApps(goal, getStrategy()).iterator(), furtherAppsQueue);
+            furtherAppsQueue = push(previousMinimum.createFurtherApps(goal).iterator(), furtherAppsQueue);
             previousMinimum = null;
         }
 
@@ -287,7 +285,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
                      * obtained this way will be considered during the current
                      * round.
                      */
-                    furtherAppsQueue = push(minRuleAppContainer.createFurtherApps(goal, getStrategy()).iterator(), furtherAppsQueue);
+                    furtherAppsQueue = push(minRuleAppContainer.createFurtherApps(goal).iterator(), furtherAppsQueue);
                 }
             } else {
                 /*
@@ -304,10 +302,6 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
          */
         mainQueue = mainQueue.insert(workingList.iterator());
         mainQueue = mainQueue.insert(furtherAppsQueue);
-    }
-
-    private Strategy getStrategy() {
-        return goal.getGoalStrategy();
     }
 
     @Override
