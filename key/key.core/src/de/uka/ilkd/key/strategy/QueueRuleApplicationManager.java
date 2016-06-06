@@ -110,7 +110,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
         }
 
-        final Iterator<RuleAppContainer> iterator = new SingletonIterator<RuleAppContainer>(
+        final Iterator<RuleAppContainer> iterator = new SingletonIterator<>(
                 RuleAppContainer.createAppContainer(rule, pos, goal, getStrategy()));
         ensureQueueExists();
         mainQueue = push(iterator, mainQueue);
@@ -132,7 +132,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
                 getStrategy());
         ensureQueueExists();
         for (RuleAppContainer rac : containers) {
-            mainQueue = push(new SingletonIterator<RuleAppContainer>(rac), mainQueue);
+            mainQueue = push(new SingletonIterator<>(rac), mainQueue);
         }
     }
 
@@ -188,7 +188,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
          */
         ImmutableHeap<RuleAppContainer> furtherAppsQueue = ImmutableLeftistHeap.nilHeap();
         if (previousMinimum != null) {
-            furtherAppsQueue = addFurtherAppsToQueue(previousMinimum, furtherAppsQueue);
+            furtherAppsQueue = push(previousMinimum.createFurtherApps(goal, getStrategy()).iterator(), furtherAppsQueue);
             previousMinimum = null;
         }
 
@@ -287,7 +287,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
                      * obtained this way will be considered during the current
                      * round.
                      */
-                    furtherAppsQueue = addFurtherAppsToQueue(minRuleAppContainer, furtherAppsQueue);
+                    furtherAppsQueue = push(minRuleAppContainer.createFurtherApps(goal, getStrategy()).iterator(), furtherAppsQueue);
                 }
             } else {
                 /*
@@ -304,11 +304,6 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
          */
         mainQueue = mainQueue.insert(workingList.iterator());
         mainQueue = mainQueue.insert(furtherAppsQueue);
-    }
-
-    private ImmutableHeap<RuleAppContainer> addFurtherAppsToQueue(RuleAppContainer app,
-            ImmutableHeap<RuleAppContainer> furtherAppsQueue) {
-        return push(app.createFurtherApps(goal, getStrategy()).iterator(), furtherAppsQueue);
     }
 
     private Strategy getStrategy() {
