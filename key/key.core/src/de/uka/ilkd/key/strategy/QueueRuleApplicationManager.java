@@ -33,7 +33,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     private Goal goal = null;
 
     /**
-     * Priority queue containing all {@RuleAppContainer}s that are candidates
+     * Priority queue containing all {@link RuleAppContainer}s that are candidates
      * for application on a {@link Goal}.
      */
     private ImmutableHeap<RuleAppContainer> mainQueue = null;

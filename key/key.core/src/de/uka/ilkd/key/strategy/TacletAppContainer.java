@@ -101,6 +101,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * Create a list of new RuleAppContainers that are to be
      * considered for application.
      */
+    @Override
     public final ImmutableList<RuleAppContainer> createFurtherApps (Goal p_goal,
                                                      Strategy p_strategy) {
         if ( !isStillApplicable ( p_goal )
@@ -158,6 +159,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
         final RuleAppCostCollector collector =
             new RuleAppCostCollector () {
+                @Override
                 public void collect(RuleApp newApp, RuleAppCost cost) {
                     if (cost instanceof TopRuleAppCost) return;
                     resA[0] = addContainer ( (TacletApp)newApp,
@@ -327,6 +329,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * Create a <code>RuleApp</code> that is suitable to be applied
      * or <code>null</code>.
      */
+    @Override
     public RuleApp completeRuleApp(Goal p_goal, Strategy strategy) {
         if ( !isStillApplicable ( p_goal ) )
             return null;
