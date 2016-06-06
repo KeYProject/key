@@ -22,7 +22,6 @@ import de.uka.ilkd.key.rule.IfMatchResult;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 import static de.uka.ilkd.key.strategy.IfInstantiationCache.ifInstCache;
 
@@ -35,7 +34,7 @@ public class IfInstantiator {
     private ImmutableList<IfFormulaInstantiation> allAntecFormulas;
     private ImmutableList<IfFormulaInstantiation> allSuccFormulas;
 
-    private ImmutableList<TacletApp> results = ImmutableSLList.<TacletApp> nil();
+    private ImmutableList<NoPosTacletApp> results = ImmutableSLList.nil();
 
     private final TacletAppContainer tacletAppContainer;
 
@@ -44,7 +43,7 @@ public class IfInstantiator {
         this.tacletAppContainer = tacletAppContainer;
     }
 
-    private void addResult(TacletApp app) {
+    private void addResult(NoPosTacletApp app) {
         if (app == null)
             return;
         results = results.prepend(app);
@@ -272,7 +271,7 @@ public class IfInstantiator {
     /**
      * @return Returns the results.
      */
-    public ImmutableList<TacletApp> getResults() {
+    public ImmutableList<NoPosTacletApp> getResults() {
         return results;
     }
 }

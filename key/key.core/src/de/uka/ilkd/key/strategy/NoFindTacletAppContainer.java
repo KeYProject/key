@@ -10,11 +10,10 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 
 /**
  * Instances of this class are immutable
@@ -25,8 +24,8 @@ public class NoFindTacletAppContainer extends TacletAppContainer {
      * @param p_app
      * @param p_cost
      */
-    NoFindTacletAppContainer( RuleApp p_app, RuleAppCost p_cost, long p_age ) {
-        super( p_app, p_cost, p_age );
+    NoFindTacletAppContainer(NoPosTacletApp p_app, RuleAppCost p_cost, long p_age) {
+        super(p_app, p_cost, p_age);
     }
 
     /**
@@ -34,8 +33,9 @@ public class NoFindTacletAppContainer extends TacletAppContainer {
      * i.e. always true since NoFindTaclets are not bound to a find-position
      * (if-formulas are not considered)
      */
+    @Override
     protected boolean isStillApplicable(Goal p_goal) {
-    	return true;
+        return true;
     }
 
 }

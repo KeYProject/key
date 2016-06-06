@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -43,7 +43,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
     private final FormulaTag      positionTag;
     private final PosInOccurrence applicationPosition;
 
-    FindTacletAppContainer ( RuleApp         p_app,
+    FindTacletAppContainer ( NoPosTacletApp         p_app,
 			     PosInOccurrence p_pio,
 			     RuleAppCost     p_cost,
 			     Goal            p_goal,
@@ -173,14 +173,10 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * @return non-null for FindTaclets
      */
     @Override
-    protected PosInOccurrence getPosInOccurrence ( Goal p_goal ) {
-    	final PosInOccurrence topPos =
-    	    p_goal.getFormulaTagManager().getPosForTag(positionTag);
-
-	assert topPos != null;
-	
-	return applicationPosition.replaceConstrainedFormula
-	    ( topPos.sequentFormula () );
+    protected PosInOccurrence getPosInOccurrence(Goal p_goal) {
+        final PosInOccurrence topPos = p_goal.getFormulaTagManager().getPosForTag(positionTag);
+        assert topPos != null;
+        return applicationPosition.replaceConstrainedFormula(topPos.sequentFormula());
     }
 
 }

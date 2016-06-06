@@ -64,13 +64,13 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         return age;
     }
 
-    private ImmutableList<TacletApp> incMatchIfFormulas (Goal p_goal) {
+    private ImmutableList<NoPosTacletApp> incMatchIfFormulas (Goal p_goal) {
         final IfInstantiator instantiator = new IfInstantiator (this, p_goal );
         instantiator.findIfFormulaInstantiations ();
         return instantiator.getResults ();
     }
 
-    protected static TacletAppContainer createContainer(RuleApp p_app,
+    protected static TacletAppContainer createContainer(NoPosTacletApp p_app,
                                                         PosInOccurrence p_pio,
                                                         Goal p_goal,
                                                         boolean p_initial) {
@@ -79,7 +79,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                                  p_initial );
     }
 
-    private static TacletAppContainer createContainer(RuleApp p_app,
+    private static TacletAppContainer createContainer(NoPosTacletApp p_app,
                                                       PosInOccurrence p_pio,
                                                       Goal p_goal,
                                                       RuleAppCost p_cost,
@@ -115,8 +115,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         if ( getTacletApp ().ifInstsComplete () ) {
             res = addInstances ( getTacletApp (), res, p_goal );
         } else {
-            for (TacletApp tacletApp : incMatchIfFormulas(p_goal)) {
-                final TacletApp app = tacletApp;
+            for (NoPosTacletApp tacletApp : incMatchIfFormulas(p_goal)) {
+                final NoPosTacletApp app = tacletApp;
                 res = addContainer(app, res, p_goal);
                 res = addInstances(app, res, p_goal);
             }
@@ -130,7 +130,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * using method <code>instantiateApp</code> of the strategy) to
      * <code>targetList</code>
      */
-    private ImmutableList<RuleAppContainer> addInstances( TacletApp app,
+    private ImmutableList<RuleAppContainer> addInstances( NoPosTacletApp app,
                                                  ImmutableList<RuleAppContainer> targetList,
                                                  Goal p_goal) {
         if ( app.uninstantiatedVars ().size () == 0 ) return targetList;
@@ -141,7 +141,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * Use the method <code>instantiateApp</code> of the strategy for choosing
      * the values of schema variables that have not been instantiated so far
      */
-    private ImmutableList<RuleAppContainer> instantiateApp(TacletApp app,
+    private ImmutableList<RuleAppContainer> instantiateApp(NoPosTacletApp app,
                                                   ImmutableList<RuleAppContainer> targetList,
                                                   final Goal p_goal) {
         // just for being able to modify the result-list in an
@@ -154,7 +154,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                 @Override
                 public void collect(RuleApp newApp, RuleAppCost cost) {
                     if (cost instanceof TopRuleAppCost) return;
-                    resA[0] = addContainer ( (TacletApp)newApp,
+                    resA[0] = addContainer ( (NoPosTacletApp)newApp,
                                              resA[0],
                                              p_goal,
                                              cost );
@@ -173,7 +173,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * is <code>sufficientlyComplete</code>, and add the container to
      * <code>targetList</code>
      */
-    private ImmutableList<RuleAppContainer> addContainer(TacletApp app,
+    private ImmutableList<RuleAppContainer> addContainer(NoPosTacletApp app,
                                                 ImmutableList<RuleAppContainer> targetList,
                                                 Goal p_goal) {
         return targetList.prepend ( TacletAppContainer
@@ -188,7 +188,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * is <code>sufficientlyComplete</code>, and add the container to
      * <code>targetList</code>
      */
-    private ImmutableList<RuleAppContainer> addContainer(TacletApp app,
+    private ImmutableList<RuleAppContainer> addContainer(NoPosTacletApp app,
                                                 ImmutableList<RuleAppContainer> targetList,
                                                 Goal p_goal,
                                                 RuleAppCost cost) {
@@ -201,7 +201,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                                                        false ) );
     }
 
-    private static boolean sufficientlyCompleteApp(TacletApp app) {
+    private static boolean sufficientlyCompleteApp(NoPosTacletApp app) {
         final ImmutableSet<SchemaVariable> needed = app.uninstantiatedVars ();
         if ( needed.size () == 0 ) return true;
         for (SchemaVariable aNeeded : needed) {
@@ -231,7 +231,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         
         List<RuleAppCost> costs = new LinkedList<>();
         
-        for (TacletApp app : p_app) {
+        for (NoPosTacletApp app : p_app) {
             costs.add(p_goal.getGoalStrategy().computeCost ( app, p_pio, p_goal ));
         }
         
