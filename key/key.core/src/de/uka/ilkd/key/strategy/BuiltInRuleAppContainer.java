@@ -165,25 +165,25 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
 
     @Override
     public RuleApp completeRuleApp(Goal goal) {
-        if(!isStillApplicable(goal)) {
+        if (!isStillApplicable(goal)) {
             return null;
         }
-        
-        final PosInOccurrence pio = getPosInOccurrence (goal);
-        if(!goal.getGoalStrategy().isApprovedApp(bir, pio, goal)) {
+
+        final PosInOccurrence pio = getPosInOccurrence(goal);
+        if (!goal.getGoalStrategy().isApprovedApp(bir, pio, goal)) {
             return null;
-        }                
-        
+        }
+
         final BuiltInRule rule = bir.rule();
         IBuiltInRuleApp app = rule.createApp(pio, goal.proof().getServices());
-	        
-		if (!app.complete()) {
-		    app = app.setIfInsts(bir.ifInsts());
-		    // TODO: check for force ?
-		    final boolean force = true;
-			app = force? app.forceInstantiate(goal): app.tryToInstantiate(goal);
-		}
 
-		return app.complete() ? app : null;
+        if (!app.complete()) {
+            app = app.setIfInsts(bir.ifInsts());
+            // TODO: check for force ?
+            final boolean force = true;
+            app = force ? app.forceInstantiate(goal) : app.tryToInstantiate(goal);
+        }
+
+        return app.complete() ? app : null;
     }
 }

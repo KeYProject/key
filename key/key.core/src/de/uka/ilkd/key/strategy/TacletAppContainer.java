@@ -56,7 +56,6 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 	age = p_age;
     }
 
-
     protected NoPosTacletApp getTacletApp () {
 	return (NoPosTacletApp)getRuleApp();
     }
@@ -94,7 +93,6 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             return new FindTacletAppContainer ( p_app, p_pio, p_cost, p_goal, localage );
     }
 
-
     /**
      * Create a list of new RuleAppContainers that are to be
      * considered for application.
@@ -126,7 +124,6 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
         return res;
     }
-
 
     /**
      * Add all instances of the given taclet app (that are possibly produced
@@ -222,7 +219,6 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                                  false );
     }
 
-
     /**
      * Create containers for NoFindTaclets.
      */
@@ -309,11 +305,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      */
     protected abstract boolean isStillApplicable ( Goal p_goal );
 
-
     protected PosInOccurrence getPosInOccurrence ( Goal p_goal ) {
     	return null;
     }
-
 
     /**
      * Create a <code>RuleApp</code> that is suitable to be applied
@@ -321,28 +315,30 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      */
     @Override
     public RuleApp completeRuleApp(Goal p_goal) {
-        if ( !isStillApplicable ( p_goal ) )
+        if (!(isStillApplicable(p_goal) && ifFormulasStillValid(p_goal))) {
             return null;
-
-        if ( !ifFormulasStillValid ( p_goal ) )
-            return null;
-
-        TacletApp app = getTacletApp ();
-
-        final PosInOccurrence pio = getPosInOccurrence ( p_goal );
-        if ( !p_goal.getGoalStrategy().isApprovedApp(app, pio, p_goal) ) return null;
-
-        Services services = p_goal.proof().getServices();
-        if ( pio != null ) {
-            app = app.setPosInOccurrence ( pio, services );
-            if ( app == null ) return null;
         }
 
-        if ( !app.complete() )
-            app = app.tryToInstantiate ( services );
-        else if (!app.isExecutable(services)) {
+        TacletApp app = getTacletApp();
+        PosInOccurrence pio = getPosInOccurrence(p_goal);
+        if (!p_goal.getGoalStrategy().isApprovedApp(app, pio, p_goal)) {
             return null;
-        }        
-        return app;
+        }
+
+        Services services = p_goal.proof().getServices();
+        if (pio != null) {
+            app = app.setPosInOccurrence(pio, services);
+            if (app == null) {
+                return null;
+            }
+        }
+
+        if (!app.complete()) {
+            return app.tryToInstantiate(services);
+        } else if (!app.isExecutable(services)) {
+            return null;
+        } else {
+            return app;
+        }
     }
 }
