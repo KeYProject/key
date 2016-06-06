@@ -168,7 +168,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     
 
     @Override
-    public RuleApp completeRuleApp(Goal goal, Strategy strategy) {
+    public RuleApp completeRuleApp(Goal goal) {
+        Strategy strategy = goal.getGoalStrategy();
         if(!isStillApplicable(goal)) {
             return null;
         }

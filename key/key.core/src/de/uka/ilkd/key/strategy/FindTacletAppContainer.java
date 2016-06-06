@@ -65,15 +65,13 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * i.e. if the find-position does still exist (if-formulas are not
      * considered)
      */
-    protected boolean isStillApplicable ( Goal p_goal ) {
-    	final PosInOccurrence topPos =
-    	    p_goal.getFormulaTagManager().getPosForTag(positionTag);
-	if ( topPos == null )
-	    // the formula does not exist anymore, bail out
-	    return false;	
-	if ( subformulaOrPreceedingUpdateHasChanged ( p_goal ) )
-	    return false;
-	return true;
+    @Override
+    protected boolean isStillApplicable(Goal p_goal) {
+        PosInOccurrence topPos = p_goal.getFormulaTagManager().getPosForTag(positionTag);
+        if (topPos == null || subformulaOrPreceedingUpdateHasChanged(p_goal)) {
+            return false;
+        }
+        return true;
     }
 
 
@@ -174,6 +172,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
     /**
      * @return non-null for FindTaclets
      */
+    @Override
     protected PosInOccurrence getPosInOccurrence ( Goal p_goal ) {
     	final PosInOccurrence topPos =
     	    p_goal.getFormulaTagManager().getPosForTag(positionTag);

@@ -330,7 +330,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * or <code>null</code>.
      */
     @Override
-    public RuleApp completeRuleApp(Goal p_goal, Strategy strategy) {
+    public RuleApp completeRuleApp(Goal p_goal) {
+        Strategy strategy = p_goal.getGoalStrategy();
         if ( !isStillApplicable ( p_goal ) )
             return null;
 

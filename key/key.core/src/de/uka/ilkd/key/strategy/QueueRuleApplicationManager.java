@@ -263,7 +263,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
                 }
             }
 
-            nextRuleApp = minRuleAppContainer.completeRuleApp(goal, getStrategy());
+            nextRuleApp = minRuleAppContainer.completeRuleApp(goal);
             /**
              * The obtained minimum rule app container was removed from the
              * queue it came from. The following if-then-else block makes sure
