@@ -967,6 +967,7 @@ public class TestCaseGenerator {
 						&& o.getSort().name().toString().endsWith("[]")) {
 
 					String safeType = getSafeType(o.getSort());
+					String elementType = safeType.substring(0, safeType.length()-2);
 					rflCreator.addSort(safeType);
 					//System.out.println("Added sort (init array fields):"+safeType);					
 
@@ -980,7 +981,7 @@ public class TestCaseGenerator {
 						if(junitFormat && isInPrestate(prestate, o)){
 							
 
-							if(isInPrestate(prestate, val) && !val.equals("null")){
+							if(!elementType.equals("int") && !elementType.equals("boolean") && isInPrestate(prestate, val) && !val.equals("null")){
 								val = getPreName(val);
 							}
 							
