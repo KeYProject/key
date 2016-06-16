@@ -36,7 +36,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * Priority queue containing all {@link RuleAppContainer}s that are candidates
      * for application on a {@link Goal}.
      */
-    private ImmutableHeap<RuleAppContainer> mainQueue = null;
+    private ImmutableHeap<RuleAppContainer> queue = null;
 
     /**
      * The minimum {@link RuleAppContainer} from a previous round. It is taken
@@ -64,7 +64,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      */
     @Override
     public void clearCache() {
-        mainQueue = null;
+        queue = null;
         previousMinimum = null;
         IfInstantiationCache.ifInstCache.reset(null);
         clearNextRuleApp();
@@ -75,7 +75,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * <code>RuleListener</code> connection
      */
     private void ensureQueueExists() {
-        if (mainQueue != null) {
+        if (queue != null) {
             return;
         }
 
@@ -88,7 +88,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
         }
 
-        mainQueue = ImmutableLeftistHeap.nilHeap();
+        queue = ImmutableLeftistHeap.nilHeap();
         previousMinimum = null;
 
         // to support encapsulating rule managers (delegation, like in
@@ -104,7 +104,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      */
     @Override
     public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
-        if (mainQueue == null) {
+        if (queue == null) {
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
             return;
@@ -112,7 +112,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
 
         final Iterator<RuleAppContainer> iterator = new SingletonIterator<>(RuleAppContainer.createAppContainer(rule, pos, goal));
         ensureQueueExists();
-        mainQueue = push(iterator, mainQueue);
+        queue = push(iterator, queue);
     }
 
     /**
@@ -121,7 +121,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      */
     @Override
     public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
-        if (mainQueue == null) {
+        if (queue == null) {
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
             return;
@@ -130,7 +130,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         final ImmutableList<RuleAppContainer> containers = RuleAppContainer.createAppContainers(rules, pos, goal);
         ensureQueueExists();
         for (RuleAppContainer rac : containers) {
-            mainQueue = push(new SingletonIterator<>(rac), mainQueue);
+            queue = push(new SingletonIterator<>(rac), queue);
         }
     }
 
@@ -226,7 +226,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
          * Try to find a rule app that can be completed until both queues are
          * exhausted.
          */
-        while (nextRuleApp == null && !(mainQueue.isEmpty() && furtherAppsQueue.isEmpty())) {
+        while (nextRuleApp == null && !(queue.isEmpty() && furtherAppsQueue.isEmpty())) {
 
             /*
              * Determine the minimum rule app container, ranging over both
@@ -236,28 +236,28 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
              */
             final RuleAppContainer minRuleAppContainer;
             final boolean furtherAppsQueueUsed;
-            if (mainQueue.isEmpty()) {
-                // Use furtherAppsQueue in case mainQueue is empty.
+            if (queue.isEmpty()) {
+                // Use furtherAppsQueue in case queue is empty.
                 furtherAppsQueueUsed = true;
                 minRuleAppContainer = furtherAppsQueue.findMin();
                 furtherAppsQueue = furtherAppsQueue.deleteMin();
             } else if (furtherAppsQueue.isEmpty()) {
-                // Use mainQueue in case furtherAppsQueueUsed is empty.
+                // Use queue in case furtherAppsQueueUsed is empty.
                 furtherAppsQueueUsed = false;
-                minRuleAppContainer = mainQueue.findMin();
-                mainQueue = mainQueue.deleteMin();
+                minRuleAppContainer = queue.findMin();
+                queue = queue.deleteMin();
             } else {
                 // Neither queue is empty. Find a minimum that ranges over both
                 // queues.
-                RuleAppContainer mainQueueMin = mainQueue.findMin();
+                RuleAppContainer queueMin = queue.findMin();
                 RuleAppContainer furtherAppsQueueMin = furtherAppsQueue.findMin();
-                furtherAppsQueueUsed = mainQueueMin.compareTo(furtherAppsQueueMin) > 0;
+                furtherAppsQueueUsed = queueMin.compareTo(furtherAppsQueueMin) > 0;
                 if (furtherAppsQueueUsed) {
                     furtherAppsQueue = furtherAppsQueue.deleteMin();
                     minRuleAppContainer = furtherAppsQueueMin;
                 } else {
-                    mainQueue = mainQueue.deleteMin();
-                    minRuleAppContainer = mainQueueMin;
+                    queue = queue.deleteMin();
+                    minRuleAppContainer = queueMin;
                 }
             }
 
@@ -300,8 +300,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
          * Put remaining elements into main queue, so they can be considered in
          * the upcoming rounds.
          */
-        mainQueue = mainQueue.insert(workingList.iterator());
-        mainQueue = mainQueue.insert(furtherAppsQueue);
+        queue = queue.insert(workingList.iterator());
+        queue = queue.insert(furtherAppsQueue);
     }
 
     @Override
@@ -312,7 +312,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     @Override
     public Object clone() {
         QueueRuleApplicationManager res = new QueueRuleApplicationManager();
-        res.mainQueue = mainQueue;
+        res.queue = queue;
         res.previousMinimum = previousMinimum;
         return res;
     }
