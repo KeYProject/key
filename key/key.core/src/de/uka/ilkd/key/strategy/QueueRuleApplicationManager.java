@@ -25,6 +25,17 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
+/**
+ * Implementation of {@link AutomatedRuleApplicationManager} that stores
+ * possible {@link RuleApp}s in a priority queue. The element with highest
+ * priority in the queue can be obtained via {@link #next()}. This operation
+ * will remove the element from the queue. The priority of a given
+ * {@link RuleApp} corresponds to its {@link RuleAppCost}. A {@link RuleApp} can
+ * be equipped with a {@link RuleAppCost} by converting it into a
+ * {@link RuleAppContainer}. The cost of a {@link RuleApp} is computed according
+ * to a given {@link Strategy} (see
+ * {@link Strategy#computeCost(RuleApp, PosInOccurrence, Goal)}).
+ */
 public class QueueRuleApplicationManager implements AutomatedRuleApplicationManager {
 
     /**
