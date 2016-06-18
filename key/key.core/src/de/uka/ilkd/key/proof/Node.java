@@ -332,7 +332,7 @@ public class Node  {
     /**
      * computes the leaves of the current subtree and returns them
      */
-    private List<Node> leaves() {
+    public List<Node> getLeaves() {
 	final List<Node> leaves = new LinkedList<Node>();
 	final LinkedList<Node> nodesToCheck = new LinkedList<Node>();
 	nodesToCheck.add(this);
@@ -347,13 +347,12 @@ public class Node  {
     	return leaves;
     }
 
-
     /**
      * returns an iterator for the leaves of the subtree below this
      * node. The computation is called at every call!
      */
     public Iterator<Node> leavesIterator() {
-	return new NodeIterator(leaves().iterator());
+	return new NodeIterator(getLeaves().iterator());
     }
 
     /** returns an iterator for the direct children of this node.
@@ -621,7 +620,7 @@ public class Node  {
      * retrieves number of branches
      */
     public int countBranches() {
-	return leaves().size();
+	return getLeaves().size();
     }
 
     public int serialNr() {
