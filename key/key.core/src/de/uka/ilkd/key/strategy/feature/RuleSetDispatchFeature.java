@@ -37,12 +37,6 @@ public class RuleSetDispatchFeature implements Feature {
 
     private final Map<RuleSet, Feature> rulesetToFeature = new LinkedHashMap<> ();
     
-    private RuleSetDispatchFeature() {}
-    
-    public static RuleSetDispatchFeature create() {
-        return new RuleSetDispatchFeature ();
-    }
-    
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         if ( ! ( app instanceof TacletApp ) ) return NumberRuleAppCost.getZeroCost();
 

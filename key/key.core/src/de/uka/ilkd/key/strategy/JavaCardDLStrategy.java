@@ -153,7 +153,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     }
 
-    protected final Feature setupGlobalF(Feature dispatcher) {//
+    protected Feature setupGlobalF(Feature dispatcher) {//
         final Feature ifMatchedF =
                 ifZero(MatchedIfFeature.INSTANCE, longConst(+1));
 
@@ -273,7 +273,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final LocSetLDT locSetLDT =
                 getServices().getTypeConverter().getLocSetLDT();
 
-        final RuleSetDispatchFeature d = RuleSetDispatchFeature.create();
+        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
         bindRuleSet(d, "semantics_blasting", inftyConst());
         bindRuleSet(d, "simplify_heap_high_costs", inftyConst());
@@ -2533,7 +2533,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
 
-    protected final Feature setupApprovalF() {
+    protected Feature setupApprovalF() {
         final Feature depSpecF;
         final String depProp =
                 strategyProperties
@@ -2557,7 +2557,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private RuleSetDispatchFeature setupApprovalDispatcher() {
-        final RuleSetDispatchFeature d = RuleSetDispatchFeature.create();
+        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
         final IntegerLDT numbers =
                 getServices().getTypeConverter().getIntegerLDT();
@@ -2703,7 +2703,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private RuleSetDispatchFeature setupInstantiationF() {
         enableInstantiate();
 
-        final RuleSetDispatchFeature d = RuleSetDispatchFeature.create();
+        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
         setupQuantifierInstantiation(d);
 

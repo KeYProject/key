@@ -52,7 +52,7 @@ import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 /**
  * Collection of strategy features that can be accessed statically. This class
- * is essentially a collection of constructors.
+ * is essentially a collection of constructors for various features.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
