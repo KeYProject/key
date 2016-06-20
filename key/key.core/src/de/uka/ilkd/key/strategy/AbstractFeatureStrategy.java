@@ -426,23 +426,19 @@ public abstract class AbstractFeatureStrategy implements Strategy {
 
     
     private final BackTrackingManager btManager = new BackTrackingManager ();
-    
-    protected BackTrackingManager getBtManager() {
-        return btManager;
-    }
 
     public final void instantiateApp ( RuleApp              app,
                                        PosInOccurrence      pio,
                                        Goal                 goal,
                                        RuleAppCostCollector collector ) {
-        getBtManager ().setup ( app );
+        btManager.setup ( app );
         do {
             final RuleAppCost cost = instantiateApp ( app, pio, goal );
             if ( cost instanceof TopRuleAppCost ) continue;
-            final RuleApp res = getBtManager ().getResultingapp ();
+            final RuleApp res = btManager.getResultingapp ();
             if ( res == app || res == null ) continue;
             collector.collect ( res, cost );
-        } while ( getBtManager ().backtrack () );
+        } while ( btManager.backtrack () );
     }
  
     protected abstract RuleAppCost instantiateApp (RuleApp              app,
@@ -450,11 +446,11 @@ public abstract class AbstractFeatureStrategy implements Strategy {
                                                    Goal                 goal);
     
     protected Feature forEach(TermBuffer x, TermGenerator gen, Feature body) {
-        return ForEachCP.create ( x, gen, body, getBtManager () );
+        return ForEachCP.create ( x, gen, body, btManager );
     }
 
     protected Feature oneOf(Feature[] features) {
-        return OneOfCP.create ( features, getBtManager () );
+        return OneOfCP.create ( features, btManager );
     }
     
     protected Feature oneOf(Feature feature0, Feature feature1) {
@@ -479,14 +475,14 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     
     protected Feature instantiate(Name sv, ProjectionToTerm value) {
         if ( instantiateActive )
-            return SVInstantiationCP.create ( sv, value, getBtManager () );
+            return SVInstantiationCP.create ( sv, value, btManager);
         else
             return longConst ( 0 );
     }
 
     protected Feature instantiateTriggeredVariable(ProjectionToTerm value) {
         if ( instantiateActive )
-            return SVInstantiationCP.createTriggeredVarCP( value, getBtManager () );
+            return SVInstantiationCP.createTriggeredVarCP( value, btManager );
         else
             return longConst ( 0 );
     }
