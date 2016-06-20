@@ -24,7 +24,6 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -102,7 +101,6 @@ import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.ConstantTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsInductionVariable;
 import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
@@ -158,7 +156,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         this.tf =
                 new ArithTermFeatures(getServices().getTypeConverter()
                         .getIntegerLDT());
-        this.ff = new FormulaTermFeatures();
+        this.ff = new FormulaTermFeatures(this.tf);
         this.vf = new ValueTermFeature();
 
         costComputationDispatcher = setupCostComputationF();
@@ -171,7 +169,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     }
 
-    protected Feature setupGlobalF(Feature dispatcher) {//
+    protected final Feature setupGlobalF(Feature dispatcher) {//
         final Feature ifMatchedF =
                 ifZero(MatchedIfFeature.INSTANCE, longConst(+1));
 
@@ -2426,7 +2424,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 not(applyTF(succFor, tf.intEquation))));
     }
 
-    protected Services getServices() {
+    protected final Services getServices() {
         return getProof().getServices();
     }
 
@@ -2655,7 +2653,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return setupApprovalF();
     }
 
-    protected Feature setupApprovalF() {
+    protected final Feature setupApprovalF() {
         final Feature depSpecF;
         final String depProp =
                 strategyProperties
@@ -2925,9 +2923,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private final FormulaTermFeatures ff;
     private final ValueTermFeature vf;
 
-    private class FormulaTermFeatures {
+    private static class FormulaTermFeatures {
 
-        public FormulaTermFeatures() {
+        public FormulaTermFeatures(ArithTermFeatures tf) {
             forF = extendsTrans(Sort.FORMULA);            
             orF = op(Junctor.OR);
             andF = op(Junctor.AND);
