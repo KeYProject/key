@@ -109,19 +109,19 @@ public abstract class AbstractFeatureStrategy implements Strategy {
                                                       elseFeature );
     }
 
-    protected Feature longConst (long a) {
+    protected static Feature longConst (long a) {
         return ConstFeature.createConst ( c ( a ) );
     }
 
-    protected Feature inftyConst () {
+    protected static Feature inftyConst () {
         return ConstFeature.createConst ( infty () );
     }
     
-    protected TermFeature any() {
+    protected static TermFeature any() {
         return longTermConst ( 0 );
     }
     
-    protected TermFeature longTermConst(long a) {
+    protected static TermFeature longTermConst(long a) {
         return ConstTermFeature.createConst ( c ( a ) );
     }
 
@@ -141,7 +141,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
         return SumFeature.createSum ( features );
     }
 
-    protected TermFeature add (TermFeature a, TermFeature b) {
+    protected static TermFeature add (TermFeature a, TermFeature b) {
         return BinarySumTermFeature.createSum ( a, b );
     }
 
@@ -150,15 +150,15 @@ public abstract class AbstractFeatureStrategy implements Strategy {
         return add ( a, add ( b, c ) );
     }
 
-    protected TermFeature or(TermFeature a, TermFeature b) {
+    protected static TermFeature or(TermFeature a, TermFeature b) {
         return ifZero ( a, longTermConst ( 0 ), b );
     }
 
-    protected TermFeature or(TermFeature a, TermFeature b, TermFeature c) {
+    protected static TermFeature or(TermFeature a, TermFeature b, TermFeature c) {
         return or ( a, or ( b, c ) );
     }
 
-    protected Feature or(Feature a, Feature b) {
+    protected static Feature or(Feature a, Feature b) {
         return ifZero ( a, longConst ( 0 ), b );
     }
     
@@ -178,17 +178,17 @@ public abstract class AbstractFeatureStrategy implements Strategy {
         return ShannonFeature.createConditionalBinary ( cond, thenFeature );
     }
 
-    protected Feature ifZero (Feature cond, Feature thenFeature, Feature elseFeature) {
+    protected static Feature ifZero (Feature cond, Feature thenFeature, Feature elseFeature) {
         return ShannonFeature.createConditionalBinary ( cond,
                                                         thenFeature,
                                                         elseFeature );
     }
 
-    protected TermFeature ifZero (TermFeature cond, TermFeature thenFeature) {
+    protected static TermFeature ifZero (TermFeature cond, TermFeature thenFeature) {
         return ShannonTermFeature.createConditionalBinary ( cond, thenFeature );
     }
 
-    protected TermFeature ifZero (TermFeature cond,
+    protected static TermFeature ifZero (TermFeature cond,
                                   TermFeature thenFeature,
                                   TermFeature elseFeature) {
         return ShannonTermFeature.createConditionalBinary ( cond,
@@ -200,7 +200,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
         return ifZero ( f, inftyConst (), longConst ( 0 ) );
     }
     
-    protected TermFeature not(TermFeature f) {
+    protected static TermFeature not(TermFeature f) {
         return ifZero ( f,
                         ConstTermFeature.createConst(TopRuleAppCost.INSTANCE),
                         longTermConst(0) );
@@ -227,11 +227,11 @@ public abstract class AbstractFeatureStrategy implements Strategy {
                 c ( priority ), c ( 0 ) );
     }
 
-    private RuleAppCost c (long p) {
+    private static RuleAppCost c (long p) {
         return NumberRuleAppCost.create ( p );
     }
 
-    private RuleAppCost infty () {
+    private static RuleAppCost infty () {
         return TopRuleAppCost.INSTANCE;
     }
 
@@ -344,36 +344,36 @@ public abstract class AbstractFeatureStrategy implements Strategy {
         return TriggerVarInstantiatedFeature.INSTANCE;
     }
     
-    protected TermFeature op(Operator op) {
+    protected static TermFeature op(Operator op) {
         return OperatorTF.create ( op );
     }
 
-    protected TermFeature rec(TermFeature cond, TermFeature summand) {
+    protected static TermFeature rec(TermFeature cond, TermFeature summand) {
         return RecSubTermFeature.create ( cond, summand );
     }
     
-    protected TermFeature sub(TermFeature sub0) {
+    protected static TermFeature sub(TermFeature sub0) {
         return SubTermFeature.create ( new TermFeature[] { sub0 } );
     }
     
-    protected TermFeature sub(TermFeature sub0, TermFeature sub1) {
+    protected static TermFeature sub(TermFeature sub0, TermFeature sub1) {
         return SubTermFeature.create ( new TermFeature[] { sub0, sub1 } );
     }
     
-    protected TermFeature opSub(Operator op, TermFeature sub0) {
+    protected static TermFeature opSub(Operator op, TermFeature sub0) {
         return add ( op ( op ), sub ( sub0 ) );
     }    
     
-    protected TermFeature opSub(Operator op,
+    protected static TermFeature opSub(Operator op,
                                 TermFeature sub0, TermFeature sub1) {
         return add ( op ( op ), sub ( sub0, sub1 ) );
     }    
 
-    protected TermFeature eq(TermBuffer t) {
+    protected static TermFeature eq(TermBuffer t) {
         return EqTermFeature.create ( t );
     }
     
-    protected Feature eq(ProjectionToTerm t1, ProjectionToTerm t2) {
+    protected static Feature eq(ProjectionToTerm t1, ProjectionToTerm t2) {
         final TermBuffer buf = new TermBuffer ();
         return let ( buf, t1, applyTF ( t2, eq ( buf ) ) );
     }
@@ -390,7 +390,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
         return applyTF ( t, PrintTermFeature.INSTANCE );
     }
     
-    protected TermFeature extendsTrans(Sort s) {
+    protected static TermFeature extendsTrans(Sort s) {
         return SortExtendsTransTermFeature.create ( s );
     }
     
@@ -419,7 +419,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
      * projection <code>term</code>. If <code>term</code> is undefined for
      * a particular rule app, an exception is raised
      */
-    protected Feature applyTF(ProjectionToTerm term, TermFeature tf) {
+    protected static Feature applyTF(ProjectionToTerm term, TermFeature tf) {
         return ApplyTFFeature.create ( term, tf );
     }
 
@@ -499,7 +499,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
             return longConst ( 0 );
     }
 
-    protected Feature let(TermBuffer x, ProjectionToTerm value, Feature body) {
+    protected static Feature let(TermBuffer x, ProjectionToTerm value, Feature body) {
         return LetFeature.create ( x, value, body );
     }    
     

@@ -2925,7 +2925,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private final FormulaTermFeatures ff;
     private final ValueTermFeature vf;
 
-    private class ArithTermFeatures {
+    private static class ArithTermFeatures {
 
         public ArithTermFeatures(IntegerLDT numbers) {
             Z = numbers.getNumberSymbol();
