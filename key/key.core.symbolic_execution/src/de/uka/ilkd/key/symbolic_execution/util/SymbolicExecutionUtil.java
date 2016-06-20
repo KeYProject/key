@@ -134,6 +134,7 @@ import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.ExecutionVariableExtractor;
@@ -4164,7 +4165,7 @@ public final class SymbolicExecutionUtil {
          proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
       }
       else {
-         proof.setActiveStrategy(new JavaCardDLStrategy.Factory().create(proof, strategyProperties));
+         proof.setActiveStrategy(new JavaCardDLStrategyFactory().create(proof, strategyProperties));
       }
    }
 
