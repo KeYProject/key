@@ -260,25 +260,25 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 ifMatchedF, dispatcher);
     }
 
-    private Feature loopInvFeature(Feature cost) {
+    private static Feature loopInvFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(WhileInvariantRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 
-    private Feature blockContractFeature(Feature cost) {
+    private static Feature blockContractFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(BlockContractRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 
-    private Feature methodSpecFeature(Feature cost) {
+    private static Feature methodSpecFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(UseOperationContractRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 
-    private Feature querySpecFeature(Feature cost) {
+    private static Feature querySpecFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(QueryExpand.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
@@ -290,22 +290,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return ConditionalFeature.createConditional(filter, cost);
     }
 
-    private Feature setupJoinRule() {
+    private static Feature setupJoinRule() {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(JoinRule.INSTANCE);
-
         return ConditionalFeature.createConditional(filter, inftyConst());
     }
-
-    // private Feature smtFeature(Feature cost) {
-    // ClassRuleFilter filter = new ClassRuleFilter(SMTRule.class);
-    // return ConditionalFeature.createConditional(filter, cost);
-    // }
-
-    // private Feature smtMultiFeature(Feature cost) {
-    // ClassRuleFilter filter = new ClassRuleFilter(SMTRuleMulti.class);
-    // return ConditionalFeature.createConditional(filter, cost);
-    // }
 
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
@@ -960,7 +949,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return inftyConst();
     }
 
-    private Feature sequentContainsNoPrograms() {
+    private static Feature sequentContainsNoPrograms() {
         return not(SeqContainsExecutableCodeFeature.PROGRAMS);
     }
 
@@ -1117,7 +1106,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                                 longConst(100)) })) }));
     }
 
-    private Feature countOccurrences(ProjectionToTerm cutFormula) {
+    private static Feature countOccurrences(ProjectionToTerm cutFormula) {
         TermBuffer sf = new TermBuffer();
         TermBuffer sub = new TermBuffer();
 
@@ -1793,23 +1782,23 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                 not(add(columnOpEq, biggerLeftSide)))));
     }
 
-    private Feature termSmallerThan(String smaller, String bigger) {
+    private static Feature termSmallerThan(String smaller, String bigger) {
         return TermSmallerThanFeature.create(instOf(smaller), instOf(bigger));
     }
 
-    private Feature monSmallerThan(String smaller, String bigger,
+    private static Feature monSmallerThan(String smaller, String bigger,
             IntegerLDT numbers) {
         return MonomialsSmallerThanFeature.create(instOf(smaller),
                 instOf(bigger), numbers);
     }
 
-    private Feature atomSmallerThan(String smaller, String bigger,
+    private static Feature atomSmallerThan(String smaller, String bigger,
             IntegerLDT numbers) {
         return AtomsSmallerThanFeature.create(instOf(smaller), instOf(bigger),
                 numbers);
     }
 
-    private Feature literalsSmallerThan(String smaller, String bigger,
+    private static Feature literalsSmallerThan(String smaller, String bigger,
             IntegerLDT numbers) {
         return LiteralsSmallerThanFeature.create(instOf(smaller),
                 instOf(bigger), numbers);
@@ -2637,13 +2626,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     //
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
-
-    /**
-     * @deprecated Use {@link #setupApprovalF()} instead
-     */
-    protected Feature setupApprovalF(Services services) {
-        return setupApprovalF();
-    }
 
     protected final Feature setupApprovalF() {
         final Feature depSpecF;
