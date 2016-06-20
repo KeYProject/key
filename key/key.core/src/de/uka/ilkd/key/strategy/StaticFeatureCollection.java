@@ -1,22 +1,35 @@
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
+import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.QueryExpand;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.join.JoinRule;
 import static de.uka.ilkd.key.strategy.AbstractFeatureStrategy.let;
 import de.uka.ilkd.key.strategy.feature.ApplyTFFeature;
+import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.CompareCostsFeature;
 import de.uka.ilkd.key.strategy.feature.ComprehendedSumFeature;
+import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
 import de.uka.ilkd.key.strategy.feature.ConstFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.ImplicitCastNecessary;
 import de.uka.ilkd.key.strategy.feature.InstantiatedSVFeature;
 import de.uka.ilkd.key.strategy.feature.LetFeature;
+import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
 import de.uka.ilkd.key.strategy.feature.ShannonFeature;
 import de.uka.ilkd.key.strategy.feature.SortComparisonFeature;
 import de.uka.ilkd.key.strategy.feature.SumFeature;
+import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.TriggerVarInstantiatedFeature;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 import de.uka.ilkd.key.strategy.termProjection.SubtermProjection;
@@ -33,14 +46,102 @@ import de.uka.ilkd.key.strategy.termfeature.ShannonTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.SortExtendsTransTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.SubTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 /**
- * Collection of strategy features that can be accessed statically.
+ * Collection of strategy features that can be accessed statically. This class
+ * is essentially a collection of constructors.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class StaticFeatureCollection {
+
+    protected static Feature loopInvFeature(Feature cost) {
+        SetRuleFilter filter = new SetRuleFilter();
+        filter.addRuleToSet(WhileInvariantRule.INSTANCE);
+        return ConditionalFeature.createConditional(filter, cost);
+    }
+
+    protected static Feature blockContractFeature(Feature cost) {
+        SetRuleFilter filter = new SetRuleFilter();
+        filter.addRuleToSet(BlockContractRule.INSTANCE);
+        return ConditionalFeature.createConditional(filter, cost);
+    }
+
+    protected static Feature methodSpecFeature(Feature cost) {
+        SetRuleFilter filter = new SetRuleFilter();
+        filter.addRuleToSet(UseOperationContractRule.INSTANCE);
+        return ConditionalFeature.createConditional(filter, cost);
+    }
+
+    protected static Feature querySpecFeature(Feature cost) {
+        SetRuleFilter filter = new SetRuleFilter();
+        filter.addRuleToSet(QueryExpand.INSTANCE);
+        return ConditionalFeature.createConditional(filter, cost);
+    }
+
+    protected static Feature setupJoinRule() {
+        SetRuleFilter filter = new SetRuleFilter();
+        filter.addRuleToSet(JoinRule.INSTANCE);
+        return ConditionalFeature.createConditional(filter, inftyConst());
+    }
+
+    protected static Feature sequentContainsNoPrograms() {
+        return not(SeqContainsExecutableCodeFeature.PROGRAMS);
+    }
+
+    protected static Feature countOccurrences(ProjectionToTerm cutFormula) {
+        TermBuffer sf = new TermBuffer();
+        TermBuffer sub = new TermBuffer();
+
+        Feature countOccurrencesInSeq
+                = sum(sf,
+                        SequentFormulasGenerator.sequent(),
+                        sum(sub,
+                                SubtermGenerator
+                                .leftTraverse(sf, any()), // instead
+                                // of
+                                // any
+                                // a
+                                // condition
+                                // which
+                                // stops
+                                // traversal
+                                // when
+                                // depth(cutF)
+                                // >
+                                // depth(sub)
+                                // would
+                                // be
+                                // better
+                                ifZero(applyTF(cutFormula, eq(sub)),
+                                        longConst(1), longConst(0))));
+        return countOccurrencesInSeq;
+    }
+
+    protected static Feature termSmallerThan(String smaller, String bigger) {
+        return TermSmallerThanFeature.create(instOf(smaller), instOf(bigger));
+    }
+
+    protected static Feature monSmallerThan(String smaller, String bigger,
+            IntegerLDT numbers) {
+        return MonomialsSmallerThanFeature.create(instOf(smaller),
+                instOf(bigger), numbers);
+    }
+
+    protected static Feature atomSmallerThan(String smaller, String bigger,
+            IntegerLDT numbers) {
+        return AtomsSmallerThanFeature.create(instOf(smaller), instOf(bigger),
+                numbers);
+    }
+
+    protected static Feature literalsSmallerThan(String smaller, String bigger,
+            IntegerLDT numbers) {
+        return LiteralsSmallerThanFeature.create(instOf(smaller),
+                instOf(bigger), numbers);
+    }
 
     protected static Feature longConst(long a) {
         return ConstFeature.createConst(c(a));

@@ -25,16 +25,10 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
-import de.uka.ilkd.key.rule.BlockContractRule;
-import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
-import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
 import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
@@ -68,7 +62,6 @@ import de.uka.ilkd.key.strategy.feature.ReducibleMonomialsFeature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.SVNeedsInstantiation;
 import de.uka.ilkd.key.strategy.feature.ScaleFeature;
-import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
 import de.uka.ilkd.key.strategy.feature.SetsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.SumFeature;
 import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
@@ -81,7 +74,6 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCost;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCostScalerFeature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.SplittableQuantifiedFormulaFeature;
 import de.uka.ilkd.key.strategy.termProjection.AssumptionProjection;
 import de.uka.ilkd.key.strategy.termProjection.CoeffGcdProjection;
@@ -260,40 +252,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 ifMatchedF, dispatcher);
     }
 
-    private static Feature loopInvFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(WhileInvariantRule.INSTANCE);
-        return ConditionalFeature.createConditional(filter, cost);
-    }
-
-    private static Feature blockContractFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(BlockContractRule.INSTANCE);
-        return ConditionalFeature.createConditional(filter, cost);
-    }
-
-    private static Feature methodSpecFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(UseOperationContractRule.INSTANCE);
-        return ConditionalFeature.createConditional(filter, cost);
-    }
-
-    private static Feature querySpecFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(QueryExpand.INSTANCE);
-        return ConditionalFeature.createConditional(filter, cost);
-    }
-
     private Feature oneStepSimplificationFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(MiscTools.findOneStepSimplifier(getProof()));
         return ConditionalFeature.createConditional(filter, cost);
-    }
-
-    private static Feature setupJoinRule() {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(JoinRule.INSTANCE);
-        return ConditionalFeature.createConditional(filter, inftyConst());
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -949,10 +911,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return inftyConst();
     }
 
-    private static Feature sequentContainsNoPrograms() {
-        return not(SeqContainsExecutableCodeFeature.PROGRAMS);
-    }
-
     private boolean quantifierInstantiatedEnabled() {
         return !StrategyProperties.QUANTIFIERS_NONE.equals(strategyProperties
                 .getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY));
@@ -1105,36 +1063,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                                 longConst(0),
                                                                 longConst(100)) })) }));
     }
-
-    private static Feature countOccurrences(ProjectionToTerm cutFormula) {
-        TermBuffer sf = new TermBuffer();
-        TermBuffer sub = new TermBuffer();
-
-        Feature countOccurrencesInSeq =
-                sum(sf,
-                        SequentFormulasGenerator.sequent(),
-                        sum(sub,
-                                SubtermGenerator
-                                        .leftTraverse(sf, any()), // instead
-                                                                          // of
-                                                                          // any
-                                                                          // a
-                                                                          // condition
-                                                                          // which
-                                                                          // stops
-                                                                          // traversal
-                                                                          // when
-                                                                          // depth(cutF)
-                                                                          // >
-                                                                          // depth(sub)
-                                                                          // would
-                                                                          // be
-                                                                          // better
-                                ifZero(applyTF(cutFormula, eq(sub)),
-                                        longConst(1), longConst(0))));
-        return countOccurrencesInSeq;
-    }
-
     
     private void setupSplittingApproval(RuleSetDispatchFeature d) {
         bindRuleSet(d, "beta", allowSplitting(FocusFormulaProjection.INSTANCE));
@@ -1780,28 +1708,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 add(isInstantiated("newSymDef"),
                         sum(antecFor, SequentFormulasGenerator.antecedent(),
                                 not(add(columnOpEq, biggerLeftSide)))));
-    }
-
-    private static Feature termSmallerThan(String smaller, String bigger) {
-        return TermSmallerThanFeature.create(instOf(smaller), instOf(bigger));
-    }
-
-    private static Feature monSmallerThan(String smaller, String bigger,
-            IntegerLDT numbers) {
-        return MonomialsSmallerThanFeature.create(instOf(smaller),
-                instOf(bigger), numbers);
-    }
-
-    private static Feature atomSmallerThan(String smaller, String bigger,
-            IntegerLDT numbers) {
-        return AtomsSmallerThanFeature.create(instOf(smaller), instOf(bigger),
-                numbers);
-    }
-
-    private static Feature literalsSmallerThan(String smaller, String bigger,
-            IntegerLDT numbers) {
-        return LiteralsSmallerThanFeature.create(instOf(smaller),
-                instOf(bigger), numbers);
     }
 
     private void setupPullOutGcd(RuleSetDispatchFeature d, String ruleSet,
