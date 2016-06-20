@@ -78,7 +78,7 @@ public class QueryExpandCost implements Feature {
 	}
     
 	@Override
-	public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
+	public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
 		final Services services = goal.proof().getServices();
 		final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
 		final Term t = pos.subTerm();

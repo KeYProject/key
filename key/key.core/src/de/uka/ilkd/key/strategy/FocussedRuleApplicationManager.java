@@ -128,8 +128,7 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
         if ( focFormula != null && pos != null ) {
             if ( isSameFormula ( pos, focFormula ) ) {
                 if ( !isBelow ( focFormula, pos ) || 
-                		NonDuplicateAppModPositionFeature.INSTANCE.
-                		  compute(rule, pos, goal).equals(BinaryFeature.TOP_COST))
+                		NonDuplicateAppModPositionFeature.INSTANCE.computeCost(rule, pos, goal).equals(BinaryFeature.TOP_COST))
                     // rule app within the focussed formula, but not within the
                     // focussed subterm
                     return false;

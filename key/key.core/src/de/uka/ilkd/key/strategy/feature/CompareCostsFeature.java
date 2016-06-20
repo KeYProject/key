@@ -29,8 +29,8 @@ public abstract class CompareCostsFeature extends BinaryFeature {
     public static Feature less (Feature a, Feature b) {
         return new CompareCostsFeature(a,b) {
             protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-                return a.compute ( app, pos, goal ).compareTo (
-                       b.compute ( app, pos, goal ) ) < 0;
+                return a.computeCost ( app, pos, goal ).compareTo (
+                       b.computeCost ( app, pos, goal ) ) < 0;
             }            
         };
     }
@@ -38,8 +38,8 @@ public abstract class CompareCostsFeature extends BinaryFeature {
     public static Feature leq (Feature a, Feature b) {
         return new CompareCostsFeature(a,b) {
             protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-                return a.compute ( app, pos, goal ).compareTo (
-                       b.compute ( app, pos, goal ) ) <= 0;
+                return a.computeCost ( app, pos, goal ).compareTo (
+                       b.computeCost ( app, pos, goal ) ) <= 0;
             }            
         };
     }
@@ -47,8 +47,8 @@ public abstract class CompareCostsFeature extends BinaryFeature {
     public static Feature eq (Feature a, Feature b) {
         return new CompareCostsFeature(a,b) {
             protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-                return a.compute ( app, pos, goal ).equals (
-                       b.compute ( app, pos, goal ) );
+                return a.computeCost ( app, pos, goal ).equals (
+                       b.computeCost ( app, pos, goal ) );
             }            
         };
     }

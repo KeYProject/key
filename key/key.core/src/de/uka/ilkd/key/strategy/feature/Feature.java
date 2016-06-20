@@ -19,8 +19,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
 /**
- * Interface for computing the cost of a RuleApp with regard to a specific
- * feature. 
+ * A {@link Feature} is a class that is able to compute the cost of a
+ * {@link RuleApp}.
  */
 public interface Feature {
     /**
@@ -30,5 +30,5 @@ public interface Feature {
      * @param goal the goal on which <code>app</code> is to be applied
      * @return the cost of <code>app</code>
      */
-    RuleAppCost compute ( RuleApp app, PosInOccurrence pos, Goal goal );
+    RuleAppCost computeCost ( RuleApp app, PosInOccurrence pos, Goal goal );
 }
