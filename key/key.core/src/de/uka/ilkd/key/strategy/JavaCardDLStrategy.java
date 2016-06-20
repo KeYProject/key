@@ -149,7 +149,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 new ArithTermFeatures(getServices().getTypeConverter()
                         .getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
-        this.vf = new ValueTermFeature();
+        this.vf = new ValueTermFeature(op(heapLDT.getNull()));
 
         costComputationDispatcher = setupCostComputationF();
         approvalDispatcher = setupApprovalDispatcher();
@@ -2914,21 +2914,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private final ArithTermFeatures tf;
     private final FormulaTermFeatures ff;
     private final ValueTermFeature vf;
-
-    private class ValueTermFeature {
-
-        public ValueTermFeature() {
-            equals = op(Equality.EQUALS);
-            tt = op(Junctor.TRUE);
-            ff = op(Junctor.FALSE);
-            nullTerm = op(heapLDT.getNull());
-        }
-
-        final TermFeature equals;
-        final TermFeature tt;
-        final TermFeature ff;
-        final TermFeature nullTerm;
-    }
 
     @Override
     public boolean isStopAtFirstNonCloseableGoal() {
