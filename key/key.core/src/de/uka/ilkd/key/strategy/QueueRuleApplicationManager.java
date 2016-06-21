@@ -327,13 +327,4 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         return res;
     }
 
-    /**
-     * this rule app manager has no manager to delegate to but is the "base"
-     * manager.
-     */
-    @Override
-    public AutomatedRuleApplicationManager getDelegate() {
-        return null;
-    }
-
 }

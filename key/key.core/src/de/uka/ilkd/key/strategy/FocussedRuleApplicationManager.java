@@ -33,6 +33,7 @@ import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
 public class FocussedRuleApplicationManager implements AutomatedRuleApplicationManager {
 
     private final AutomatedRuleApplicationManager delegate;
+    public final QueueRuleApplicationManager rootManager;
 
     private final FormulaTag              focussedFormula;
     private final PosInOccurrence         focussedSubterm;
@@ -53,6 +54,9 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
                                     PosInOccurrence focussedSubterm,
                                     boolean onlyModifyFocussedFormula) {
         this.delegate = delegate;
+        this.rootManager = delegate instanceof QueueRuleApplicationManager
+                ? (QueueRuleApplicationManager) delegate
+                : ((FocussedRuleApplicationManager) delegate).rootManager;
         this.focussedFormula = focussedFormula;
         this.focussedSubterm = focussedSubterm;
         this.goal = goal;
@@ -184,7 +188,6 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
         }
     }
 
-    @Override
     public AutomatedRuleApplicationManager getDelegate () {
         return delegate;
     }
