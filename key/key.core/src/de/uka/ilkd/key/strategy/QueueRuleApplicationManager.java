@@ -19,7 +19,6 @@ import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.SingletonIterator;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -121,9 +120,9 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
         }
 
-        final Iterator<RuleAppContainer> iterator = new SingletonIterator<>(RuleAppContainer.createAppContainer(rule, pos, goal));
+        RuleAppContainer c = RuleAppContainer.createAppContainer(rule, pos, goal);
         ensureQueueExists();
-        queue = push(iterator, queue);
+        queue = push(c, queue);
     }
 
     /**
@@ -141,7 +140,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         final ImmutableList<RuleAppContainer> containers = RuleAppContainer.createAppContainers(rules, pos, goal);
         ensureQueueExists();
         for (RuleAppContainer rac : containers) {
-            queue = push(new SingletonIterator<>(rac), queue);
+            queue = push(rac, queue);
         }
     }
 
