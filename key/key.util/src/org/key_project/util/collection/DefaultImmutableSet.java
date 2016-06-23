@@ -28,6 +28,11 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      */
     private static final long serialVersionUID = -5000602574000532257L;
 
+    /**
+     * Constant defining the set size at which an optimized union operation will be executed.
+     */
+    public static final int UNION_OPTIMIZATION_SIZE = 100;
+
     /** list containing the elements */
     private final ImmutableList<T> elementList;
 
@@ -99,7 +104,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     /** @return union of this set with set */
     public ImmutableSet<T> union(ImmutableSet<T> set) {
-	if(set instanceof DefaultImmutableSet && size() * set.size() > 100) {
+	if(set instanceof DefaultImmutableSet && size() * set.size() > UNION_OPTIMIZATION_SIZE) {
 	    return newUnion((DefaultImmutableSet<T>) set);
 	}
 
@@ -107,15 +112,13 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     }
 
 
-    /*package visible for testing!*/
-    DefaultImmutableSet<T> newUnion(DefaultImmutableSet<T> set) {
+    private DefaultImmutableSet<T> newUnion(DefaultImmutableSet<T> set) {
         ImmutableList<T> otherList = set.elementList;
         ImmutableList<T> clean = Immutables.concatDuplicateFreeLists(this.elementList, otherList);
 	    return new DefaultImmutableSet<T>(clean);
     }
 
-    /*package visible for testing!*/
-    DefaultImmutableSet<T> originalUnion(ImmutableSet<T> set) {
+    private DefaultImmutableSet<T> originalUnion(ImmutableSet<T> set) {
 	if (set.isEmpty()) {
 	    return this;
 	}
