@@ -16,6 +16,7 @@ options {
     import de.uka.ilkd.key.java.Services;
     import de.uka.ilkd.key.java.abstraction.*;
     import de.uka.ilkd.key.java.expression.literal.StringLiteral;
+    import de.uka.ilkd.key.java.expression.literal.CharLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.ldt.*;
     import de.uka.ilkd.key.logic.*;
@@ -1240,7 +1241,7 @@ postfixexpr returns [SLExpression ret=null] throws SLTranslationException
 @after { ret = result; }
 :
 	expr=primaryexpr
-	{
+	{  
 	    fullyQualifiedName = input.LT(-1).getText();
 	}
 	(
@@ -1452,9 +1453,12 @@ javaliteral returns [SLExpression ret=null] throws SLTranslationException
 	                            javaInfo.getKeYJavaType("java.lang.String"));
 	}
     |
-	CHAR_LITERAL
+	c=CHAR_LITERAL
 	{
-	    raiseNotSupported("character literals");
+       Term charLit = 
+         services.getTypeConverter().getIntegerLDT().translateLiteral(new CharLiteral(c.getText()), services);
+        	   
+	    return new SLExpression(charLit, javaInfo.getKeYJavaType("char"));
 	}
     ;
 

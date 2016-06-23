@@ -41,6 +41,7 @@
 	
    <target name="generateproofcollectionparser" unless="generateproofcollectionparser.required">
    	<echo message="Generating proof collection parser."/>
+      <mkdir dir="${gen.dir}"/>
       <java jar="${lib.dir}/antlr.jar" fork="true" failonerror="true">
          <arg value="-o" />
 		   <arg value="${gen.dir}/de/uka/ilkd/key/proof/runallproofs/proofcollection/" />

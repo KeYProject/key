@@ -30,6 +30,7 @@ final class ArrayList {
       @   requires arrayDep == \singleton(array);
       @   requires sizeDep == \singleton(size);
       @   requires (\forall int i; arraySlotDep[i] == \singleton(array[i]));
+      @   requires (\forall int i; arraySlotDep.length == array.length);
       @   ensures \subset(ArrayList.resultDep, \old(footprint));
       @   diverges true;
       @*/    
@@ -73,7 +74,8 @@ final class ArrayList {
       @   requires 0 <= index && index < size();
       @   requires arrayDep == \singleton(array);
       @   requires sizeDep == \singleton(size);
-      @   requires (\forall int i; arraySlotDep[i] == \singleton(array[i]));      
+      @   requires (\forall int i; arraySlotDep[i] == \singleton(array[i]));
+      @   requires (\forall int i; arraySlotDep.length == array.length);                                                                                                                                                                
       @   ensures \subset(ArrayList.resultDep, \old(footprint));
       @*/    
     public /*@nullable helper@*/ Object get(int index) {
@@ -96,7 +98,8 @@ final class ArrayList {
       @   requires \inv;
       @   requires arrayDep == \singleton(array);
       @   requires sizeDep == \singleton(size);
-      @   requires (\forall int i; arraySlotDep[i] == \singleton(array[i]));      
+      @   requires (\forall int i; arraySlotDep[i] == \singleton(array[i]));
+      @   requires (\forall int i; arraySlotDep.length == array.length);                                                                                                                                               
       @   ensures \subset(ArrayList.resultDep, \old(footprint));
       @*/
     public /*@helper@*/ int size() {

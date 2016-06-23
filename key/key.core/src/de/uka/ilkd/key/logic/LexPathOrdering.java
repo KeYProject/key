@@ -324,10 +324,11 @@ public class LexPathOrdering implements TermOrdering {
 
         private final Set<String> theoryFunctionNames = new LinkedHashSet<String> ();
         {
-            theoryFunctionNames.add("strPool");            
-            theoryFunctionNames.add("clEmpty");
-            theoryFunctionNames.add("clCons");
             theoryFunctionNames.add("C");
+            theoryFunctionNames.add("seqEmpty");
+            theoryFunctionNames.add("empty");
+
+            theoryFunctionNames.add("strPool");            
         }
 
 
@@ -350,7 +351,7 @@ public class LexPathOrdering implements TermOrdering {
             } else if (opStr.equals("freshLocs")) {
                 return Integer.valueOf(5);
             }
-
+            
             if ( opStr.equals ( "neg" ) ) return Integer.valueOf ( 1 );
 
             if ( p_op.name ().equals ( IntegerLDT.CHAR_ID_NAME ) )
@@ -366,15 +367,17 @@ public class LexPathOrdering implements TermOrdering {
             if ( opStr.equals ( "mul" ) ) return Integer.valueOf ( 7 );
             if ( opStr.equals ( "div" ) ) return Integer.valueOf ( 8 );
             if ( opStr.equals ( "jdiv" ) ) return Integer.valueOf ( 9 );
-            
-            if ( opStr.equals ( "empty" ) ) return Integer.valueOf ( 0 );
 
             
             if ( opStr.equals ("intersect")) return Integer.valueOf ( 6 );
             if ( opStr.equals ("union")) return Integer.valueOf ( 7 );
             if ( opStr.equals ("infiniteUnion")) return Integer.valueOf ( 8 );            
             if ( opStr.equals ("setMinus")) return Integer.valueOf ( 9 );
+
             
+            if ( opStr.equals ("seqSingleton")) return Integer.valueOf ( 6 );
+            if ( opStr.equals ("seqConcat")) return Integer.valueOf ( 7 );
+
             return null;
         }
     }
