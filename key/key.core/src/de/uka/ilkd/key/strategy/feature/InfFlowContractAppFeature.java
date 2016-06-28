@@ -233,7 +233,7 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     @Override
-    public RuleAppCost compute(RuleApp ruleApp,
+    public RuleAppCost computeCost(RuleApp ruleApp,
                                PosInOccurrence pos,
                                Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";

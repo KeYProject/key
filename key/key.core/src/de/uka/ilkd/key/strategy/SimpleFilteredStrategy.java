@@ -63,7 +63,7 @@ public class SimpleFilteredStrategy implements Strategy {
 	     !ruleFilter.filter ( app.rule () ) )
 	    return TopRuleAppCost.INSTANCE;
     
-	RuleAppCost res = NonDuplicateAppFeature.INSTANCE.compute(app, pio, goal);
+	RuleAppCost res = NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal);
 	if (res == TopRuleAppCost.INSTANCE)
 	    return res;
 
@@ -85,7 +85,7 @@ public class SimpleFilteredStrategy implements Strategy {
 	                           Goal            goal ) {
     	// do not apply a rule twice
     	if ( app instanceof TacletApp &&
-            NonDuplicateAppFeature.INSTANCE.compute(app, pio, goal) == TopRuleAppCost.INSTANCE)
+            NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal) == TopRuleAppCost.INSTANCE)
 	    return false;
 	
 	return true;

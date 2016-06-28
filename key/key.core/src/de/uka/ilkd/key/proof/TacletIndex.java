@@ -74,15 +74,15 @@ public abstract class TacletIndex  {
    
     /** contains rewrite Taclets */
     protected HashMap<Object, ImmutableList<NoPosTacletApp>> rwList 
-	= new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();
+	= new LinkedHashMap<>();
 
     /** contains antecedent Taclets */
     protected HashMap<Object, ImmutableList<NoPosTacletApp>> antecList
-	= new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();
+	= new LinkedHashMap<>();
 
     /** contains succedent Taclets */
     protected HashMap<Object, ImmutableList<NoPosTacletApp>> succList
-	= new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();
+	= new LinkedHashMap<>();
 
     /** contains NoFind-Taclets */
     protected ImmutableList<NoPosTacletApp> noFindList
@@ -93,11 +93,11 @@ public abstract class TacletIndex  {
      * instantiations 
      */
     protected HashSet<NoPosTacletApp> partialInstantiatedRuleApps = 
-        new LinkedHashSet<NoPosTacletApp>(); 
+        new LinkedHashSet<>(); 
 
     // reused object to store prefix occurrences when retrieving
     // taclets with java blocks.
-    private PrefixOccurrences prefixOccurrences = new PrefixOccurrences();
+    private final PrefixOccurrences prefixOccurrences = new PrefixOccurrences();
 
 
     /** constructs empty rule index */
@@ -108,9 +108,9 @@ public abstract class TacletIndex  {
      * creates a new TacletIndex with the given Taclets as initial contents.
      */
     TacletIndex(Iterable<Taclet> tacletSet) {
-        rwList     = new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();
-        antecList  = new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();    
-        succList   = new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();
+        rwList     = new LinkedHashMap<>();
+        antecList  = new LinkedHashMap<>();    
+        succList   = new LinkedHashMap<>();
         noFindList = ImmutableSLList.<NoPosTacletApp>nil();
         addTaclets(toNoPosTacletApp(tacletSet));
     }
@@ -223,14 +223,14 @@ public abstract class TacletIndex  {
      * @param tacletApp the Taclet and its instantiation info to be added
      */
     public void add(NoPosTacletApp tacletApp) {
-	Taclet rule=tacletApp.taclet();
-	if (rule instanceof RewriteTaclet) {	    
+	Taclet taclet = tacletApp.taclet();
+	if (taclet  instanceof RewriteTaclet) {	    
 	    insertToMap(tacletApp, rwList);
-	} else if (rule instanceof AntecTaclet) {
+	} else if (taclet  instanceof AntecTaclet) {
 	    insertToMap(tacletApp, antecList);
-	} else if (rule instanceof SuccTaclet) {
+	} else if (taclet  instanceof SuccTaclet) {
 	    insertToMap(tacletApp, succList);
-	} else if (rule instanceof NoFindTaclet) {
+	} else if (taclet  instanceof NoFindTaclet) {
 	    noFindList = noFindList.prepend(tacletApp);
 	} else {	
 	    // should never be reached
@@ -297,7 +297,7 @@ public abstract class TacletIndex  {
 	
 
     public Set<NoPosTacletApp> allNoPosTacletApps() {
-	Set<NoPosTacletApp> result = new LinkedHashSet<NoPosTacletApp>();
+	Set<NoPosTacletApp> result = new LinkedHashSet<>();
 	for(ImmutableList<NoPosTacletApp> tacletApps : rwList.values()) {
 	    addToSet(tacletApps, result);
 	}
@@ -595,7 +595,7 @@ public abstract class TacletIndex  {
 
     @Override
     public String toString() {
-	StringBuffer sb=new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 	sb.append("TacletIndex with applicable rules: ");
 	sb.append("ANTEC\n "+antecList);
 	sb.append("\nSUCC\n "+succList);
@@ -628,15 +628,13 @@ public abstract class TacletIndex  {
 	/**
 	 * field that marks iff the prefix elements have already occurred
 	 */
-	private boolean[] occurred = new boolean[PREFIXTYPES];
+	private final boolean[] occurred = new boolean[PREFIXTYPES];
 	
 	/**
 	 * fields to indicate the position of the next relevant child (the next
 	 * possible prefix element or real statement
 	 */
 	static final int[] nextChild = new int[]{0,1,0,1,1};
-
-
 
 	PrefixOccurrences() {
 	    reset();

@@ -10,7 +10,6 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -19,16 +18,21 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
 /**
- * Interface for computing the cost of a RuleApp with regard to a specific
- * feature. 
+ * A {@link Feature} is a class that is able to compute the cost of a
+ * {@link RuleApp}.
  */
 public interface Feature {
+
     /**
-     * Compute the cost of a RuleApp.
+     * Evaluate the cost of a <code>RuleApp</code>.
+     *
      * @param app the RuleApp
      * @param pos position where <code>app</code> is to be applied
      * @param goal the goal on which <code>app</code> is to be applied
-     * @return the cost of <code>app</code>
+     * @return the cost of the rule application expressed as a
+     * <code>RuleAppCost</code> object. <code>TopRuleAppCost.INSTANCE</code>
+     * indicates that the rule shall not be applied at all (it is discarded by
+     * the strategy).
      */
-    RuleAppCost compute ( RuleApp app, PosInOccurrence pos, Goal goal );
+    RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal);
 }

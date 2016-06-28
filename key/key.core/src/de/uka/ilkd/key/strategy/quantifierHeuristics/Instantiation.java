@@ -162,20 +162,20 @@ class Instantiation {
     *         succedent
     */
    private ImmutableSet<Term> initAssertLiterals(Sequent seq, TermServices services) {
-      ImmutableSet<Term> assertLits = DefaultImmutableSet.<Term> nil();
+      ImmutableList<Term> assertLits = ImmutableSLList.nil();
       for (final SequentFormula cf : seq.antecedent()) {
          final Term atom = cf.formula();
          final Operator op = atom.op();
          if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )
-            assertLits = assertLits.add(atom);
+            assertLits = assertLits.prepend(atom);
       }
       for (final SequentFormula cf : seq.succedent()) {
          final Term atom = cf.formula();
          final Operator op = atom.op();
          if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )
-            assertLits = assertLits.add(services.getTermBuilder().not(atom));
+            assertLits = assertLits.prepend(services.getTermBuilder().not(atom));
       }
-      return assertLits;
+      return DefaultImmutableSet.fromImmutableList(assertLits);
    }
 
    /**
