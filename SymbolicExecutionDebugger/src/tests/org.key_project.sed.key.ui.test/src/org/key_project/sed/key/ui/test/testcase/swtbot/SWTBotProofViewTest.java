@@ -210,8 +210,10 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
                String targetName, SWTBotView debugView, SWTBotTree debugTree,
                ISEDebugTarget target, ILaunch launch) throws Exception {
             //test if manual rule application functions before stepping into the proof
+            TestSedCoreUtil.waitForDebugTreeInterface();
             SWTBotView proofView = getProofBotView(bot);
             int count = proofView.bot().tree().rowCount();
+            assertEquals(1, count);
             proofView.bot().tree().select(count - 1);
             final SWTBotStyledText styledText0 = proofView.bot().styledText();
             Point point0 = TestUtilsUtil.selectText(styledText0, "well");
