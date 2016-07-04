@@ -10,6 +10,7 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 import java.util.Map.Entry;
 import static de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings.getSettingsEntry;
+import java.util.Date;
 }
 
 /*
@@ -18,6 +19,9 @@ import static de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection
 
 // see also: http://stackoverflow.com/questions/2445008/how-to-get-antlr-3-2-to-exit-upon-first-error
 @parser::members {
+
+  public final Date runStart = new Date(System.currentTimeMillis());
+
   @Override
   protected Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet follow) throws RecognitionException {
     throw new MismatchedTokenException(ttype, input);
@@ -26,6 +30,14 @@ import static de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection
   @Override
   public Object recoverFromMismatchedSet(IntStream input, RecognitionException e, BitSet follow) throws RecognitionException {
     throw e;
+  }
+  
+  /*
+   * This method just calls a constructor. We need this method so we can call a different constructor
+   * in a parser subclass.
+   */
+  public TestFile getTestFile(TestProperty testProperty, String path, ProofCollectionSettings settings) {
+    return TestFile.createInstance(testProperty, path, settings);
   }
 }
 
@@ -51,7 +63,7 @@ parserEntryPoint returns [ProofCollection proofCollection]
     {
         // Create global settings.
         final ProofCollectionSettings globalSettings =
-            new ProofCollectionSettings(getTokenStream().getSourceName(), settingsEntries);
+            new ProofCollectionSettings(getTokenStream().getSourceName(), settingsEntries, runStart);
         $proofCollection = new ProofCollection(globalSettings);
     }
     (
@@ -123,7 +135,7 @@ testFile[ProofCollectionSettings settings]  returns [TestFile file]
     ':'? // double colon is optional (doesn't hurt if omitted)
     path = valueDeclaration
     {
-        file = new TestFile(testProperty, path, settings);
+        file = getTestFile(testProperty, path, settings);
     }
 ;
 

@@ -129,7 +129,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     
     private final BackTrackingManager btManager = new BackTrackingManager ();
 
-    public final void instantiateApp ( RuleApp              app,
+    public void instantiateApp ( RuleApp              app,
                                        PosInOccurrence      pio,
                                        Goal                 goal,
                                        RuleAppCostCollector collector ) {

@@ -45,7 +45,7 @@ public class RunAllProofsFunctional extends RunAllProofsTest {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<Object[]> data() throws IOException, RecognitionException {
+    public static Collection<RunAllProofsTestUnit[]> data() throws IOException, RecognitionException {
         proofCollection = parseIndexFile(INDEX_FILE);
         return data(proofCollection);
     }

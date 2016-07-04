@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -29,13 +30,15 @@ import static org.junit.Assert.*;
  * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class TestFile implements Serializable {
+public class TestFile<Directories extends RunAllProofsDirectories> implements Serializable {
 
    private static final long serialVersionUID = 7779439078807127045L;
 
    private final TestProperty testProperty;
    private final String path;
    private final ProofCollectionSettings settings;
+   
+   public final Directories directories;
 
    /**
     * In order to ensure that the implementation is independent of working
@@ -80,12 +83,20 @@ public class TestFile implements Serializable {
       return ret;
    }
 
-   public TestFile(TestProperty testProperty, String path,
-         ProofCollectionSettings settings) {
-      this.path = path;
-      this.testProperty = testProperty;
-      this.settings = settings;
-   }
+    protected TestFile(TestProperty testProperty, String path,
+            ProofCollectionSettings settings, Directories directories) {
+        this.path = path;
+        this.testProperty = testProperty;
+        this.settings = settings;
+        this.directories = directories;
+    }
+
+    public static TestFile<RunAllProofsDirectories> createInstance(
+            TestProperty testProperty, String path,
+            ProofCollectionSettings settings) {
+        return new TestFile<>(testProperty, path,
+                settings, new RunAllProofsDirectories(settings.runStart));
+    }
 
    /**
     * Returns a {@link File} object that points to the .key file that will be
@@ -175,15 +186,7 @@ public class TestFile implements Serializable {
             return getRunAllProofsTestResult(true, settings);
          }
 
-         // Run KeY prover.
-         if(script == null) {
-             // auto mode
-         env.getProofControl().startAndWaitForAutoMode(loadedProof);
-         } else {
-             // ... script
-             ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
-             pse.execute(env.getUi(), env.getLoadedProof());
-         }
+         autoMode(env, loadedProof, script);
 
          success = (testProperty == TestProperty.PROVABLE) == loadedProof
                .closed();
@@ -201,15 +204,7 @@ public class TestFile implements Serializable {
           * Testing proof reloading now. Saving and reloading proof only in case
           * it was closed and test property is PROVABLE.
           */
-         if (settings.reloadEnabled()
-               && (testProperty == TestProperty.PROVABLE) && success) {
-            // Save the available proof to a temporary file.
-            loadedProof.saveToFile(proofFile);
-            reloadProof(proofFile);
-            if(verbose) {
-                System.err.println("... success: reloaded.");
-            }
-         }
+         reload(verbose, proofFile, loadedProof, success);
       }
       catch (Throwable t) {
          if(verbose) {
@@ -229,6 +224,38 @@ public class TestFile implements Serializable {
       return getRunAllProofsTestResult(success, settings);
    }
 
+    /**
+     * Override this method in order to change reload behaviour.
+     */
+    protected void reload(boolean verbose, File proofFile, Proof loadedProof, boolean success)
+            throws IOException, Exception {
+        if (settings.reloadEnabled() && (testProperty == TestProperty.PROVABLE) && success) {
+            // Save the available proof to a temporary file.
+            loadedProof.saveToFile(proofFile);
+            reloadProof(proofFile);
+            if (verbose) {
+                System.err.println("... success: reloaded.");
+            }
+        }
+    }
+
+    /**
+     * By overriding this method we can change the way how we invoke automode,
+     * for instance if we want to use a different strategy.
+     */
+    protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
+            Pair<String, Location> script) throws Exception {
+        // Run KeY prover.
+        if (script == null) {
+            // auto mode
+            env.getProofControl().startAndWaitForAutoMode(loadedProof);
+        } else {
+            // ... script
+            ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+            pse.execute(env.getUi(), env.getLoadedProof());
+        }
+    }
+
    /*
     * has resemblances with KeYEnvironment.load ...
     */
@@ -237,10 +264,10 @@ public class TestFile implements Serializable {
        AbstractProblemLoader loader = ui.load(null, keyFile, null, null, null, null, false);
        InitConfig initConfig = loader.getInitConfig();
        KeYEnvironment<DefaultUserInterfaceControl> env =
-               new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig,
+               new KeYEnvironment<>(ui, initConfig,
                        loader.getProof(), loader.getResult());
        Pair<String, Location> proofScript = loader.hasProofScript() ? loader.readProofScript() : null;
-       return new Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>>(env, proofScript);
+       return new Pair<>(env, proofScript);
    }
 
    /**
