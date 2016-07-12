@@ -496,18 +496,17 @@ public class SymbolicExecutionTreeBuilder {
     * @return The {@link AbstractExecutionNode}'s which where deleted.
     */
    public HashSet<AbstractExecutionNode<?>> prune(Node node) { 
-      HashSet<AbstractExecutionNode<?>> exNodesToDelete = new HashSet<AbstractExecutionNode<?>>(proof.countNodes());
-      IExecutionNode<?> firstFather = getExecutionNode(node);
-      boolean pruneOnExNode = false;
-      
       // search for the first node in the parent hierarchy (including the node itself) who is an AbstractExecutionNode
+      boolean pruneOnExNode = false;
+      IExecutionNode<?> firstFather = getExecutionNode(node);
       if (firstFather != null && firstFather != startNode) {
          pruneOnExNode = true;
-      } else {
-    	  while (firstFather == null) {
-    		  node = node.parent();
-    	      firstFather = getExecutionNode(node);
-    	  }
+      }
+      else {
+         while (firstFather == null) {
+            node = node.parent();
+            firstFather = getExecutionNode(node);
+         }
       }
       // determine which nodes should be pruned
       ExecutionNodePreorderIterator subtreeToBePruned = new ExecutionNodePreorderIterator(firstFather);
@@ -515,6 +514,7 @@ public class SymbolicExecutionTreeBuilder {
       if (!pruneOnExNode) {
          subtreeToBePruned.next();
       }
+      HashSet<AbstractExecutionNode<?>> exNodesToDelete = new HashSet<AbstractExecutionNode<?>>(proof.countNodes());
       while (subtreeToBePruned.hasNext()) {
          AbstractExecutionNode<?> exNode = (AbstractExecutionNode<?>) subtreeToBePruned.next();
          exNodesToDelete.add(exNode);  
@@ -533,8 +533,11 @@ public class SymbolicExecutionTreeBuilder {
       Iterator<AbstractExecutionNode<?>> prunedExNodes = exNodesToDelete.iterator();
       while (prunedExNodes.hasNext()) {
          AbstractExecutionNode<?> exNode = prunedExNodes.next();
-         exNode.getParent().removeChild(exNode);
-         exNode.setParent(null);       
+         AbstractExecutionNode<?> exParent = exNode.getParent();
+         if (exParent != null) {
+            exParent.removeChild(exNode);
+            exNode.setParent(null);       
+         }
       } 
       // remove all other references to deleted nodes
       ExecutionNodePreorderIterator remainingExNodes = new ExecutionNodePreorderIterator(startNode);
