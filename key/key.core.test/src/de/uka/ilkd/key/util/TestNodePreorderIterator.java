@@ -120,7 +120,9 @@ public class TestNodePreorderIterator extends TestCase {
    protected void assertRoot(Node element, 
                              ExpectedNode[] expectedRoots) {
       NodePreorderIterator iter = new NodePreorderIterator(element);
-      assertExpectedNodes(iter, expectedRoots, false);
+      assertEquals(computeChildIndexOnParent(element), iter.getChildIndexOnParent());
+      assertExpectedNodes(iter, expectedRoots, false, 0);
+      assertEquals(-1, iter.getChildIndexOnParent());
       assertFalse(iter.hasNext());
    }
    
@@ -130,25 +132,46 @@ public class TestNodePreorderIterator extends TestCase {
     * @param iter The {@link NodePreorderIterator} to test.
     * @param expectedRoots The expected model.
     * @param iterateOverSubtree Start new sub tree iteration at the current node?
+    * @param expectedParentReturns The number of expected parent returns.
     */
-   protected void assertExpectedNodes(NodePreorderIterator iter, 
-                                      ExpectedNode[] expectedRoots,
-                                      boolean iterateOverSubtree) {
+   protected int assertExpectedNodes(NodePreorderIterator iter, 
+                                     ExpectedNode[] expectedRoots,
+                                     boolean iterateOverSubtree,
+                                     int expectedParentReturns) {
       if (expectedRoots != null) {
          assertNotNull(iter);
+         int previousChildrenDepth = 0;
          for (ExpectedNode node : expectedRoots) {
             assertTrue(iter.hasNext());
+            int childIndexOnParent = iter.getChildIndexOnParent();
+            int returnedParents = iter.getReturnedParents();
+            assertEquals(previousChildrenDepth, returnedParents);
             Node next = iter.next();
+            assertEquals(computeChildIndexOnParent(next), childIndexOnParent);
             assertNotNull(next);
             assertEquals(node.getExpectedSerialNr(), next.serialNr());
             if (iterateOverSubtree) {
                assertRoot(next, new ExpectedNode[] {node});
             }
-            assertExpectedNodes(iter, node.getExpectedChildren(), true);
+            previousChildrenDepth = assertExpectedNodes(iter, node.getExpectedChildren(), true, expectedParentReturns + 1);
          }
+         return 1 + previousChildrenDepth;
+      }
+      else {
+         return 1;
       }
    }
    
+   protected int computeChildIndexOnParent(Node node) {
+      Node parent = node.parent();
+      if (parent != null) {
+         return parent.getChildNr(node);
+      }
+      else {
+         return -1;
+      }
+   }
+
    /**
     * Forms the expected tree.
     * @author Martin Hentschel
@@ -196,6 +219,14 @@ public class TestNodePreorderIterator extends TestCase {
        */
       public ExpectedNode[] getExpectedChildren() {
          return expectedChildren;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String toString() {
+         return expectedSerialNr + " with " + (expectedChildren != null ? expectedChildren.length : 0) + " children";
       }
    }
 
