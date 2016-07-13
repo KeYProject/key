@@ -20,6 +20,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;
+import java.util.Set;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
@@ -391,8 +392,7 @@ class LeafPanel extends TreePanel {
                                         JOptionPane.CLOSED_OPTION);
                         return;
                 }
-                final ImmutableSet<NoPosTacletApp> apps = index
-                                .allNoPosTacletApps();
+                final Set<NoPosTacletApp> apps = index.allNoPosTacletApps();
                 for (final NoPosTacletApp app : apps) {
                         if (app.taclet().name().toString()
                                         .equals(item.toString())) {

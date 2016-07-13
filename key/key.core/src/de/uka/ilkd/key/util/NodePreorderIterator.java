@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.util;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.proof.Node;
 
 /**
@@ -38,12 +36,22 @@ public class NodePreorderIterator {
     * The element at that the iteration has started used as end condition
     * to make sure that only over the subtree of the element is iterated.
     */
-   private Node start;
+   private final Node start;
 
    /**
     * The next element or {@code null} if no more elements exists.
     */
    private Node next;
+   
+   /**
+    * The child index of {@link #next} on its parent.
+    */
+   private int childIndexOnParent;
+   
+   /**
+    * The number of previously returned parents.
+    */
+   private int returnedParents;
    
    /**
     * Constructor.
@@ -52,6 +60,19 @@ public class NodePreorderIterator {
    public NodePreorderIterator(Node start) {      
       this.start = start;
       this.next = start;
+      this.returnedParents = 0;
+      if (start != null) {
+         Node parent = start.parent();
+         if (parent != null) {
+            this.childIndexOnParent = parent.getChildNr(start);
+         }
+         else {
+            this.childIndexOnParent = -1;
+         }
+      }
+      else {
+         this.childIndexOnParent = -1;
+      }
    }
    
    /**
@@ -73,14 +94,37 @@ public class NodePreorderIterator {
    }
 
    /**
+    * Returns the child index of {@link #next()} on its parent.
+    * <p>
+    * <b>Attention:</b> Needs to be called before {@link #next()} is called.
+    * @return The child index of {@link #next()} on its parent or {@code -1} if no parent is available.
+    */
+   public int getChildIndexOnParent() {
+      return childIndexOnParent;
+   }
+
+   /**
+    * Returns the number of returned parent after the previous {@link #next()}
+    * call which where required in order to find the next {@link Node} which
+    * will be returned by the next call of {@link #next()}.
+    * @return The number of returned parents.
+    */
+   public int getReturnedParents() {
+      return returnedParents;
+   }
+
+   /**
     * Computes the next element and updates {@link #next()}.
     */
    protected void updateNext() {
       Node newNext = null;
       if (next.childrenCount() >= 1) {
+         this.childIndexOnParent = 0;
+         this.returnedParents = 0;
          newNext = next.child(0);
       }
       else {
+         this.returnedParents = 1;
          newNext = getNextOnParent(next);
       }
       this.next = newNext;
@@ -96,14 +140,15 @@ public class NodePreorderIterator {
       Node parent = node.parent();
       while (parent != null) {
          boolean nodeFound = false; // Indicates that node was found on the parent.
-         Iterator<Node> parentChildIter = parent.childrenIterator();
          Node nextChildOnParent = null; // The next child on the parent or the last child after iteration has finished
-         while (parentChildIter.hasNext()) {
-            nextChildOnParent = parentChildIter.next();
+         for (int i = 0; i < parent.childrenCount(); i++) {
+            nextChildOnParent = parent.child(i);
             if (nextChildOnParent == start) {
+               childIndexOnParent = -1;
                return null;
             }
             if (nodeFound) {
+               childIndexOnParent = i;
                return nextChildOnParent;
             }
             if (nextChildOnParent == node) {
@@ -113,11 +158,14 @@ public class NodePreorderIterator {
          if (nextChildOnParent != start) {
             node = parent; // Continue search on parent without recursive call!
             parent = parent.parent(); 
+            returnedParents++;
          }
          else {
+            childIndexOnParent = -1;
             return null;
          }
       }
+      childIndexOnParent = -1;
       return null; // No more parents available.
    }
 }

@@ -141,7 +141,6 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		this.environment = environment;
 		this.selectionModel = selectionModel;
 		selectionModel.addKeYSelectionListener(listener);
-		environment.getProofControl().addAutoModeListener(autoModeListener);
 		
 		ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
 	      if (service != null) {
@@ -226,33 +225,27 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		// Create TreeViewer
 		super.createControl(parent);
 		getTreeViewer().setUseHashlookup(true);
-		contentProvider = new LazyProofTreeContentProvider();
+		contentProvider = new LazyProofTreeContentProvider(environment.getProofControl());
 		// initialize boolean flags for hideIntermediateProofSteps and showSymbolicExecutionTree outline filter
 		contentProvider.setHideState((boolean) hideState.getValue());
 		contentProvider.setSymbolicState((boolean) symbolicState.getValue());
 		getTreeViewer().setContentProvider(contentProvider);
-		labelProvider = new ProofTreeLabelProvider(getTreeViewer(),
-				environment.getProofControl(), proof);
+		labelProvider = new ProofTreeLabelProvider(getTreeViewer(), environment.getProofControl(), proof);
 		getTreeViewer().setLabelProvider(labelProvider);
 		getTreeViewer().setInput(proof);
 		contentProvider.injectTopLevelElements();
+      environment.getProofControl().addAutoModeListener(autoModeListener); // IMPORTANT: Needs to be registered after label provider is created. Otherwise, injecting elements during selection update fails.
 		// Create context menu of TreeViewer
-		MenuManager menuManager = new MenuManager("Outline popup",
-				"org.key_project.keyide.ui.view.outline.popup");
+		MenuManager menuManager = new MenuManager("Outline popup", "org.key_project.keyide.ui.view.outline.popup");
 		Menu menu = menuManager.createContextMenu(getTreeViewer().getControl());
 		getTreeViewer().getControl().setMenu(menu);
-		getSite().registerContextMenu(
-				"org.key_project.keyide.ui.view.outline.popup", menuManager,
-				getTreeViewer());
-		
+		getSite().registerContextMenu("org.key_project.keyide.ui.view.outline.popup", menuManager, getTreeViewer());
 		updateSelectedNode();
 	}
 
 	/**
 	 * When the auto mode starts.
-	 * 
-	 * @param e
-	 *            The event.
+	 * @param e The event.
 	 */
 	protected void handleAutoModeStarted(ProofEvent e) {
 		// Ignore mediator selection changes while auto mode is running
@@ -263,9 +256,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 
 	/**
 	 * When the auto mode stops.
-	 * 
-	 * @param e
-	 *            The event.
+	 * @param e The event.
 	 */
 	protected void handleAutoModeStopped(ProofEvent e) {
 		if (e.getSource() == proof) {

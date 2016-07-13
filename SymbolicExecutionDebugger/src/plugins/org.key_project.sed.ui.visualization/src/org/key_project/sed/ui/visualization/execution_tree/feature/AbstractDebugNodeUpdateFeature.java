@@ -654,7 +654,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                if (bos[i] instanceof ISEDebugElement) {
                   final boolean groupingSupported = ExecutionTreeUtil.isGroupingSupported((ISEDebugElement)bos[i]);
                   // Add all children left aligned
-                  Set<ISENode> leafs = updateChildrenLeftAligned((ISEDebugElement)bos[i], groupingSupported, monitor, maxX);
+                  Set<ISENode> leafs = updateChildrenLeftAligned((ISEDebugElement)bos[i], groupingSupported, monitor);
                   maxX += OFFSET;
                   monitor.worked(1);
 
@@ -738,14 +738,12 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * @param bo The business object to create graphical representations for.
     * @param groupingSupported Is grouping supported?
     * @param monitor The {@link IProgressMonitor} to use.
-    * @param initialX The initial X value which is used if no parentPE is defined.
     * @return The found leaf {@link ISENode}s.
     * @throws DebugException Occurred Exception.
     */
    protected Set<ISENode> updateChildrenLeftAligned(ISEDebugElement bo, 
-                                                          boolean groupingSupported,
-                                                          IProgressMonitor monitor,
-                                                          int initialX) throws DebugException {
+                                                    boolean groupingSupported,
+                                                    IProgressMonitor monitor) throws DebugException {
       Set<ISENode> leafs = new LinkedHashSet<ISENode>();
       ISEIterator iter = new SEPreorderIterator(bo);
 
@@ -753,16 +751,22 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          ISEDebugElement next = iter.next();
          
          // Ignore the bo, because either it is ISEDDebugTarget (the very first bo)
-         // which has no graphical representation or its a parentnode which
+         // which has no graphical representation or its a parent node which
          // already has a graphical representation
-         if(next == bo) {
+         if (next == bo) {
             continue;
+         }
+         // Add an additional offset in case a new thread (separate tree) is found.
+         if (next instanceof ISEThread) {
+            if (maxX > 0) {
+               maxX += OFFSET;
+            }
          }
 
          ISENode nextNode = (ISENode)next;
          PictogramElement nextPE = getPictogramElementForBusinessObject(next, groupingSupported);
          if (nextPE == null) {          
-            createGraphicalRepresentationForNode(nextNode, groupingSupported, initialX);
+            createGraphicalRepresentationForNode(nextNode, groupingSupported, maxX);
             nextPE = getPictogramElementForBusinessObject(nextNode, groupingSupported);
             if (nextPE != null) {
                // Update maxX to make sure that ISEDDebugTargets don't overlap each other.
@@ -774,11 +778,12 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                   rectGA.setWidth(rectGA.getWidth() + 2 * METOFF);
                }
 
-               if(nextGA.getX() + nextGA.getWidth() > maxX)
+               if (nextGA.getX() + nextGA.getWidth() > maxX) {
                   maxX = nextGA.getX() + nextGA.getWidth();
+               }
                
                // If a node in a group is added, the height of the parent group rect has to be checked
-               if(groupingSupported && NodeUtil.getGroupStartNode(nextNode) != null) {
+               if (groupingSupported && NodeUtil.getGroupStartNode(nextNode) != null) {
                   updateGroupRectHeights(nextNode, groupingSupported, monitor);
                }
             }

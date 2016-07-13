@@ -746,7 +746,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       boolean restorePropertiesView = false;
       List<? extends SWTBotEditor> oldEditors = bot.editors();
       // Open symbolic debug perspective
-      IPerspectiveDescriptor debugPerspective = TestSedCoreUtil.openSymbolicDebugPerspective();
+      TestSedCoreUtil.openSymbolicDebugPerspective(bot);
       try {
          // Configure debug perspective
          if (closeExecutionTreeViews) {
@@ -756,7 +756,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          if (closePropertiesView) {
             restorePropertiesView = TestUtilsUtil.closeView(IPageLayout.ID_PROP_SHEET);
          }
-         executor.configureDebugPerspective(bot, debugPerspective);
+         executor.configureDebugPerspective(bot);
          // Get method
          assertNotNull(selector);
          IMethod method = selector.getMethod(project);
@@ -793,7 +793,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
             }
          }
          // Restore closed views if required
-         executor.cleanupDebugPerspective(bot, debugPerspective);
+         executor.cleanupDebugPerspective(bot);
          if (restorePropertiesView) {
             TestUtilsUtil.openView(IPageLayout.ID_PROP_SHEET);
          }
@@ -818,7 +818,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                                               final boolean mergeBranchConditions,
                                                               final boolean useMethodContracts,
                                                               final boolean useLoopInvariants,
-                                                              final boolean nonExecutionBranchHidingSideProofs, final boolean aliasChecks) {
+                                                              final boolean useBlockContracts,
+                                                              final boolean nonExecutionBranchHidingSideProofs, 
+                                                              final boolean aliasChecks) {
       return new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
@@ -848,6 +850,12 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
             }
             else {
                TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.LOOP_TREATMENT_EXPAND, 0));
+            }
+            if (useBlockContracts) {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.BLOCK_TREATMENT_INVARIANT, 1));
+            }
+            else {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.BLOCK_TREATMENT_EXPAND, 0));
             }
             if (nonExecutionBranchHidingSideProofs) {
                TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF));
@@ -957,11 +965,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       /**
        * Can be used to initialize the debug perspective.
        * @param bot The {@link SWTWorkbenchBot} to use.
-       * @param debugPerspective The currently shown debug perspective.
        * @throws Exception Occurred Exception.
        */
-      public void configureDebugPerspective(SWTWorkbenchBot bot, 
-                                            IPerspectiveDescriptor debugPerspective) throws Exception;
+      public void configureDebugPerspective(SWTWorkbenchBot bot) throws Exception;
       
       /**
        * Does the test.
@@ -987,11 +993,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       /**
        * Reverts all changes done on the debug perspective.
        * @param bot The {@link SWTWorkbenchBot} to use.
-       * @param debugPerspective The currently shown debug perspective.
        * @throws Exception Occurred Exception.
        */
-      public void cleanupDebugPerspective(SWTWorkbenchBot bot, 
-                                          IPerspectiveDescriptor debugPerspective) throws Exception;
+      public void cleanupDebugPerspective(SWTWorkbenchBot bot) throws Exception;
    }
 
    /**
@@ -1003,7 +1007,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
        * {@inheritDoc}
        */
       @Override
-      public void configureDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+      public void configureDebugPerspective(SWTWorkbenchBot bot) throws Exception {
       }
 
       /**
@@ -1017,7 +1021,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
        * {@inheritDoc}
        */
       @Override
-      public void cleanupDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+      public void cleanupDebugPerspective(SWTWorkbenchBot bot) throws Exception {
       }
    }
    
@@ -1070,7 +1074,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       List<? extends SWTBotEditor> oldEditors = bot.editors();
       try {
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
+         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
          if (closeExecutionTreeViews) {
             restoreExecutionTreeView = TestUtilsUtil.closeView(ExecutionTreeView.VIEW_ID);
             restoreThumbinalExecutionTreeView = TestUtilsUtil.closeView(ExecutionTreeThumbNailView.VIEW_ID);

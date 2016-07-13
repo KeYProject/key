@@ -28,6 +28,7 @@ import org.xml.sax.SAXException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeWriter;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBlockContract;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessConstraint;
@@ -205,6 +206,8 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       mr.addCallStackEntry(mc);
       mc.addChild(mr);
       mc.addMethodReturn(mr);
+      KeYlessBlockContract blockContract = new KeYlessBlockContract(mr, "blockContract", "formatedPathCondition", true, true);
+      mr.addChild(blockContract);
       
       KeYlessVariable mrVar1 = new KeYlessVariable(null, true, "2", "mrVar1");
       mr.addCallStateVariable(mrVar1);

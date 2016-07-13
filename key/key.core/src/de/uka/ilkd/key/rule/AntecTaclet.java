@@ -74,6 +74,7 @@ public class AntecTaclet extends FindTaclet{
 
         
     /** toString for the find part */
+    @Override
     protected StringBuffer toStringFind(StringBuffer sb) {
 	return sb.append("\\find(").
 	    append(find().toString()).append("==>)\n");
@@ -82,7 +83,7 @@ public class AntecTaclet extends FindTaclet{
 
     @Override
     protected void createAndInitializeExecutor() {
-        executor = new AntecTacletExecutor<AntecTaclet>(this);
+        executor = new AntecTacletExecutor<>(this);
     }
 
     @Override

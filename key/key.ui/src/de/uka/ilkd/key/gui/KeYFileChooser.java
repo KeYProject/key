@@ -30,11 +30,12 @@ public class KeYFileChooser {
     private static final File HOME_DIR = IOUtil.getHomeDirectory();
     private static final FileFilter FILTER = new FileFilter() {
         public boolean accept(File f) {
+           
             return 
                             f.isDirectory()
-                            || f.toString().endsWith(".java")
-                            || f.toString().endsWith(".key") 
-                            || f.toString().endsWith(".proof");
+                            || "java".equals(IOUtil.getFileExtension(f))
+                            || "key".equals(IOUtil.getFileExtension(f))
+                            || "proof".equals(IOUtil.getFileExtension(f));
         }
 
         public String getDescription() {

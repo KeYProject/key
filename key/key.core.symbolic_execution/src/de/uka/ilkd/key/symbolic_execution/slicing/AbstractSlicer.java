@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -447,7 +448,7 @@ public abstract class AbstractSlicer {
       }
       else if (term.op() instanceof ElementaryUpdate) {
          UpdateableOperator target = ((ElementaryUpdate) term.op()).lhs();
-         if (SymbolicExecutionUtil.isHeap(target, heapLDT)) {
+         if (SymbolicExecutionUtil.isBaseHeap(target, heapLDT)) {
             listModifiedHeapLocations(term.sub(0), services, heapLDT, listToFill, thisReference, relevantLocations, node);
          }
          else {
@@ -547,6 +548,61 @@ public abstract class AbstractSlicer {
             }
             finally {
                SymbolicExecutionSideProofUtil.disposeOrStore("Analyze Anon Update", info);
+            }
+         }
+      }
+      else if (SymbolicExecutionUtil.isHeap(term.op(), heapLDT)) {
+         if (!relevantLocations.isEmpty()) { // Nothing to do if relevant locations are empty
+            // Idea: Compute all values of relevant locations in a side proof. Modified locations are anonymized.
+            ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(node.proof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
+            ApplyStrategyInfo info = null;
+            try {
+               // Create location terms
+               List<Location> resultLocations = new ArrayList<Location>(relevantLocations.size());
+               List<Term> resultTerms = new ArrayList<Term>(relevantLocations.size());
+               List<Sort> resultSorts = new ArrayList<Sort>(relevantLocations.size());
+               for (Location location : relevantLocations) {
+                  Term locationTerm = location.toTerm(sideProofEnv.getServicesForEnvironment());
+                  if (!(locationTerm.op() instanceof IProgramVariable)) { // Ignore local variables.
+                     resultLocations.add(location);
+                     resultTerms.add(locationTerm);
+                     resultSorts.add(locationTerm.sort());
+                  }
+               }
+               if (!resultTerms.isEmpty()) {
+                  // Create predicate which will be used in formulas to store the value interested in.
+                  Function newPredicate = new Function(new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, new ImmutableArray<Sort>(resultSorts));
+                  // Create formula which contains the value interested in.
+                  TermBuilder tb = sideProofEnv.getServicesForEnvironment().getTermBuilder();
+                  Term newTerm = tb.func(newPredicate, resultTerms.toArray(new Term[resultTerms.size()]));
+                  newTerm = tb.apply(tb.elementary(heapLDT.getHeapForName(HeapLDT.BASE_HEAP_NAME), term), newTerm);
+                  Sequent sequentToProve = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, null, newTerm);
+                  ProofStarter starter = SideProofUtil.createSideProof(sideProofEnv, sequentToProve, "Analyze Anon Update");
+                  info = SymbolicExecutionSideProofUtil.startSideProof(node.proof(), 
+                                                                       starter, 
+                                                                       StrategyProperties.METHOD_CONTRACT,
+                                                                       StrategyProperties.LOOP_INVARIANT,
+                                                                       StrategyProperties.QUERY_ON,
+                                                                       StrategyProperties.SPLITTING_NORMAL);
+                  // Check for anonymized values in the side proof goals
+                  assert !info.getProof().closed();
+                  for (Goal goal : info.getProof().openGoals()) {
+                     Term operatorTerm = SymbolicExecutionSideProofUtil.extractOperatorTerm(goal, newPredicate);
+                     assert operatorTerm != null;
+                     for (int i = 0; i < operatorTerm.arity(); i++) {
+                        Term valueTerm = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), operatorTerm.sub(i), services);
+                        if (valueTerm.arity() >= 1) {
+                           Term heap = valueTerm.sub(0);
+                           if (heap.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL)) {
+                              listToFill.add(resultLocations.get(i));
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+            finally {
+               SymbolicExecutionSideProofUtil.disposeOrStore("Analyze Heap Assignment", info);
             }
          }
       }

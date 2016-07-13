@@ -17,6 +17,7 @@ import java.util.HashMap;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaReader;
@@ -33,14 +34,14 @@ public class KeYParserF extends KeYParser {
 
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF,
             ParserConfig schemaConfig, ParserConfig normalConfig,
-            HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder, ImmutableSet<Taclet> taclets) {
+            HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder, ImmutableList<Taclet> immutableList) {
         super(mode, new CommonTokenStream(keYLexerF), schemaConfig,
-                normalConfig, taclet2Builder, taclets);
+                normalConfig, taclet2Builder, immutableList);
     }
 
     public KeYParserF(ParserMode mode, TokenStream lexer,
             ParserConfig schemaConfig, ParserConfig normalConfig,
-            HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder, ImmutableSet<Taclet> taclets) {
+            HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder, ImmutableList<Taclet> taclets) {
         super(mode, lexer, schemaConfig, normalConfig, taclet2Builder, taclets);
     }
 

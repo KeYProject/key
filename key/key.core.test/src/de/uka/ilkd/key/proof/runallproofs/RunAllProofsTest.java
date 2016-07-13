@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,14 +25,11 @@ import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
-import org.junit.AfterClass;
 import org.junit.Test;
-import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 
 /**
  * <p>
@@ -80,35 +76,10 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
  * @see ListRunAllProofsTestCases
  */
 public class RunAllProofsTest {
-   /**
-    * The path to the KeY repository. Configurable via system property
-    * {@code key.home}.
-    */
-   public static final File KEY_HOME;
-
-   public static final File EXAMPLE_DIR;
-
-   public static final File KEY_CORE_TEST;
 
    public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
 
    public static final String IGNORE_KEY = "ignore";
-
-   /**
-    * Computes the constant values.
-    */
-   static {
-      KEY_HOME = IOUtil.getProjectRoot(RunAllProofsTest.class).getParentFile();
-      EXAMPLE_DIR = new File(KEY_HOME, "key.ui" + File.separator + "examples");
-      KEY_CORE_TEST = new File(KEY_HOME, "key.core.test");
-   }
-
-   private static void assertDirectoryExists(File dir) {
-      if (!dir.exists()) {
-         throw new RuntimeException("Cannot run tests, directory " + dir
-               + " does not exist.");
-      }
-   }
 
    private final RunAllProofsTestUnit unit;
 
@@ -150,16 +121,13 @@ public class RunAllProofsTest {
      *             file
      */
 
-   public static Collection<Object[]> data(ProofCollection proofCollection) throws IOException {
-      assertDirectoryExists(KEY_HOME);
-      assertDirectoryExists(KEY_CORE_TEST);
-      assertDirectoryExists(EXAMPLE_DIR);
+   public static List<RunAllProofsTestUnit[]> data(ProofCollection proofCollection) throws IOException {
 
       /*
        * Create list of constructor parameters that will be returned by this
        * method. Suitable constructor is automatically determined by JUnit.
        */
-      Collection<Object[]> data = new LinkedList<Object[]>();
+      List<RunAllProofsTestUnit[]> data = new LinkedList<>();
       List<RunAllProofsTestUnit> units = proofCollection.createRunAllProofsTestUnits();
       for (RunAllProofsTestUnit unit : units) {
          data.add(new RunAllProofsTestUnit[] { unit });
@@ -173,11 +141,21 @@ public class RunAllProofsTest {
     * parse result that is received from main parser entry point.
     */
    public static ProofCollection parseIndexFile(final String index) throws IOException {
-      File automaticJAVADL = new File(EXAMPLE_DIR, index);
+      return parseIndexFile(index, new Function<TokenStream, ProofCollectionParser>() {
+         @Override
+         public ProofCollectionParser apply(TokenStream t) {
+            return new ProofCollectionParser(t);
+         }
+      });
+   }
+
+   public static ProofCollection parseIndexFile(final String index,
+            Function<TokenStream, ProofCollectionParser> stream2Parser) throws IOException {
+      File automaticJAVADL = new File(RunAllProofsDirectories.EXAMPLE_DIR, index);
       CharStream charStream = new ANTLRFileStream(automaticJAVADL.getAbsolutePath());
       ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
       TokenStream tokenStream = new CommonTokenStream(lexer);
-      ProofCollectionParser parser = new ProofCollectionParser(tokenStream);
+      ProofCollectionParser parser = stream2Parser.apply(tokenStream);
       try {
          return parser.parserEntryPoint();
       } catch (RecognitionException e) {

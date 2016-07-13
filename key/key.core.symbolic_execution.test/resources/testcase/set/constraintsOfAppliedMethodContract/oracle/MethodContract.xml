@@ -167,7 +167,7 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                      <value name="var_1 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <branchCondition name="true" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (mod)">
+                  <branchCondition name="equals(exc_0,null)" pathCondition="and(equals(exc_0,null),geq(m,Z(1(1(#)))))" pathConditionChanged="true" branchCondition="equals(exc_0,null)" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (mod)">
                      <constraint name="geq(m,Z(1(1(#))))"/>
                      <constraint name="wellFormed(heap)"/>
                      <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
@@ -222,7 +222,7 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                         <value name="heap {true}" typeString="Heap" valueString="heapAfter_mod" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of self.magic(m)&gt;" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="gt(m,Z(0(1(#))))">
+                     <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of self.magic(m)&gt;" pathCondition="and(equals(exc_0,null),geq(m,Z(1(1(#)))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(equals(exc_0,null),geq(m,Z(1(1(#)))))">
                         <constraint name="geq(m,Z(1(1(#))))"/>
                         <constraint name="wellFormed(heap)"/>
                         <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
@@ -262,7 +262,7 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <termination name="&lt;end&gt;" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <termination name="&lt;end&gt;" pathCondition="and(equals(exc_0,null),geq(m,Z(1(1(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            <constraint name="geq(m,Z(1(1(#))))"/>
                            <constraint name="wellFormed(heap)"/>
                            <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>

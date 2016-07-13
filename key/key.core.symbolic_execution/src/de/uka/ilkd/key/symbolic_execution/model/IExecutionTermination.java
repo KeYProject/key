@@ -91,6 +91,16 @@ public interface IExecutionTermination extends IExecutionNode<SourceElement> {
       /**
        * Partial termination of a loop body.
        */
-      LOOP_BODY
+      LOOP_BODY,
+      
+      /**
+       * Normal termination without any exceptions of the block contract validity branch.
+       */
+      BLOCK_CONTRACT_NORMAL,
+      
+      /**
+       * Termination with uncaught exception of the block contract validity branch.
+       */
+      BLOCK_CONTRACT_EXCEPTIONAL
    }
 }

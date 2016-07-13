@@ -46,7 +46,7 @@ public class SWTBotDebugViewHierarchyTest extends AbstractSetupTestCase {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
+         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
          // Launch fixed example
          TestSedCoreUtil.launchFixedExample();
          // Find the launched ILaunch in the debug view
@@ -101,7 +101,7 @@ public class SWTBotDebugViewHierarchyTest extends AbstractSetupTestCase {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
+         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
          // Launch fixed example
          TestSedCoreUtil.launchFixedExample();
          // Find the launched ILaunch in the debug view
@@ -139,7 +139,7 @@ public class SWTBotDebugViewHierarchyTest extends AbstractSetupTestCase {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
+         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
          // Launch fixed example
          TestSedCoreUtil.launchFixedExample();
          // Find the launched ILaunch in the debug view

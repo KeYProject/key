@@ -13,6 +13,7 @@
 
 package org.key_project.util.collection;
 
+import java.util.HashSet;
 import java.util.Iterator;
 
 
@@ -28,10 +29,13 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      */
     private static final long serialVersionUID = -5000602574000532257L;
 
+    /**
+     * Constant defining the set size at which an optimized union operation will be executed.
+     */
+    public static final int UNION_OPTIMIZATION_SIZE = 100;
+
     /** list containing the elements */
     private final ImmutableList<T> elementList;
-
-
 
     /** the empty set */
     @SuppressWarnings("unchecked")
@@ -59,10 +63,31 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 	this.elementList=elementList;
     }
 
+
+//    private static HashSet<String> previousComplains = new HashSet<>();
+    private void complainAboutSize() {
+//        // Immutable linear sets are very expensive with O(n) addition
+//        // and O(n) lookup.
+//        // To create a list with N entries O(N^2) comparisons need to be made
+//        // Better restrict this class to very small instances.
+//        // The following helps detecting "bad" usages. (MU 2016)
+//        if(elementList.size() > 20) {
+//            StackTraceElement[] st = new Throwable().getStackTrace();
+//            String complain = "TOO LARGE: " + st[2];
+//            if(previousComplains.add(complain)) {
+//                System.err.println(complain);
+////                for (int i = 2; i < 6; i++) {
+////                    System.err.println(st[i]);
+////                }
+//            }
+//        }
+    }
+
     /** adds an element
      * @param element of type <T> that has to be added to this set
      */
     public ImmutableSet<T> add(T element) {
+        complainAboutSize();
 	if (elementList.contains(element)) {
 	    return this;
 	}
@@ -74,6 +99,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      * @throws org.key_project.utils.collection.NotUniqueException if the element is already present
      */
     public ImmutableSet<T> addUnique(T element) throws NotUniqueException {
+        complainAboutSize();
 	if (elementList.contains(element)) {
 	    throw new NotUniqueException(element);
 	} else {
@@ -83,10 +109,24 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     /** @return union of this set with set */
     public ImmutableSet<T> union(ImmutableSet<T> set) {
+	if(set instanceof DefaultImmutableSet && size() * set.size() > UNION_OPTIMIZATION_SIZE) {
+	    return newUnion((DefaultImmutableSet<T>) set);
+	}
+
+	return originalUnion(set);
+    }
+
+
+    private DefaultImmutableSet<T> newUnion(DefaultImmutableSet<T> set) {
+        ImmutableList<T> otherList = set.elementList;
+        ImmutableList<T> clean = Immutables.concatDuplicateFreeLists(this.elementList, otherList);
+	    return new DefaultImmutableSet<T>(clean);
+    }
+
+    private DefaultImmutableSet<T> originalUnion(ImmutableSet<T> set) {
 	if (set.isEmpty()) {
 	    return this;
 	}
-	
 	
 	ImmutableList<T> unionElements = this.elementList;
 	for (T otherEl : set) {	    	    
@@ -99,6 +139,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     
     /** @return intersection of this set with set */
     public ImmutableSet<T> intersect(ImmutableSet<T> set) {
+        complainAboutSize();
 	if (set.isEmpty()) {
 	    return set;
 	}
@@ -109,7 +150,11 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 		intersectElements = intersectElements.removeFirst(el);
 	    }
 	}
+	if(intersectElements.isEmpty()) {
+	    return DefaultImmutableSet.<T>nil();
+	} else {
 	return new DefaultImmutableSet<T>(intersectElements);
+    }
     }
 
     /** @return Iterator<T> of the set */
@@ -119,6 +164,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     /** @return true iff obj in set */
     public boolean contains(T obj) {
+        complainAboutSize();
 	return elementList.contains(obj);
     }
 
@@ -179,7 +225,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
         while (!crt.isEmpty()) {
             final T element = crt.head();
-            hashCode = 17*(element == null ? 0 : element.hashCode()) + hashCode;                
+            hashCode = (element == null ? 0 : element.hashCode()) + hashCode;
             crt = crt.tail();
         }
         return hashCode;
@@ -202,7 +248,11 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      * @return a fresh immutable set with the same iteration order.
      */
     public static<T> ImmutableSet<T> fromImmutableList(ImmutableList<T> list) {
-        return new DefaultImmutableSet<T>(list);
+        if(list.isEmpty()) {
+            return nil();
+        } else {
+            return new DefaultImmutableSet<T>(Immutables.removeDuplicates(list));
+        }
     }
 
 

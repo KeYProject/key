@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.swing.tree.DefaultTreeModel;
 
@@ -137,10 +138,10 @@ public class InfoTreeModel extends DefaultTreeModel {
                 for (final BuiltInRule br : goal.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex().rules()) {
                     insertAsLast(new InfoTreeNode(br.displayName(), ruleExplanations), builtInRoot);
                 }
-                ImmutableSet<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
+                Set<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
                 OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(goal.proof());
                 if (simplifier != null && !simplifier.isShutdown()) {
-                    set = set.union(simplifier.getCapturedTaclets());
+                    set.addAll(simplifier.getCapturedTaclets());
                 }
 
                 for (final NoPosTacletApp app : sort(set)) {
@@ -212,13 +213,9 @@ public class InfoTreeModel extends DefaultTreeModel {
             }
         }
 
-        private List<NoPosTacletApp> sort(ImmutableSet<NoPosTacletApp> apps) {
+        private List<NoPosTacletApp> sort(Set<NoPosTacletApp> set) {
             final ArrayList<NoPosTacletApp> l
-                    = new ArrayList<NoPosTacletApp>(apps.size());
-
-            for (final NoPosTacletApp app : apps) {
-                l.add(app);
-            }
+                    = new ArrayList<NoPosTacletApp>(set);
 
             Collections.sort(l, new Comparator<NoPosTacletApp>() {
                 @Override

@@ -381,7 +381,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       //create tree viewer
       this.treeViewer = new TreeViewer(parentComposite, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL | SWT.BORDER);
       treeViewer.setUseHashlookup(true);
-      this.contentProvider = new LazyProofTreeContentProvider();
+      this.contentProvider = new LazyProofTreeContentProvider(environment != null ? environment.getProofControl() : null);
       contentProvider.setHideState((boolean) hideState.getValue());
       contentProvider.setSymbolicState((boolean) symbolicState.getValue());
       treeViewer.setContentProvider(contentProvider);
@@ -578,6 +578,9 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
          // Add listener to new proof
          proof = newProof;
          environment = newEnvironment;
+         if (contentProvider != null) { // Might be null when view is opened and a proof is already defined.
+            contentProvider.setProofControl(environment != null ? environment.getProofControl() : null);
+         }
          if (environment != null) {
             environment.getProofControl().addAutoModeListener(autoModeListener);
             environment.getProofControl().setMinimizeInteraction(true);

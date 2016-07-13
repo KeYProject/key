@@ -3,7 +3,6 @@ package org.key_project.jmlediting.ui.test.highlighting;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
@@ -100,7 +99,7 @@ public class SWTBotKeywordHighlightingTest {
     * with all kinds of Comments to test AutoCompletion in and open it.
     */
    @BeforeClass
-   public static void initProject() throws CoreException, InterruptedException {
+   public static void initProject() throws Exception {
       final JMLEditingUITestUtils.TestProject result = JMLEditingUITestUtils.createProjectWithFile(
             bot, PROJECT_NAME, PACKAGE_NAME, CLASS_NAME, SaveGuarantee.NO_SAVE);
       JMLPreferencesHelper.setProjectJMLProfile(result.getProject()

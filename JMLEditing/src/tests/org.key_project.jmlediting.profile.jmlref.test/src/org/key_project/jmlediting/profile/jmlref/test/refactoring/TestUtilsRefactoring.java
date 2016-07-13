@@ -50,7 +50,7 @@ public class TestUtilsRefactoring {
 
       IFile fileToRead;
 
-      if (oracleFileName.endsWith(".java"))
+      if (oracleFileName.endsWith(JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT))
          fileToRead = oracleFolder.getFile(oracleFileName);
       else
          fileToRead = oracleFolder.getFile(oracleFileName
@@ -112,7 +112,7 @@ public class TestUtilsRefactoring {
     */
    public static void selectElementInOutlineAndExecuteRenaming(String fieldToChange,
          String className, String packageName, IFolder srcFolder, String newName,
-         SWTWorkbenchBot bot, String nameOfShell) {
+         SWTWorkbenchBot bot, String nameOfShell) throws Exception {
 
       TestUtilsUtil.openEditor(srcFolder.getFolder(packageName).getFile(
             className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
@@ -144,7 +144,7 @@ public class TestUtilsRefactoring {
     */
    public static void selectParameterAndExecuteRenaming(String methodName, String className,
          String packageName, IFolder srcFolder, String newName, SWTWorkbenchBot bot,
-         int offset) {
+         int offset) throws Exception {
 
       TestUtilsUtil.openEditor(srcFolder.getFolder(packageName).getFile(
             className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
@@ -227,7 +227,7 @@ public class TestUtilsRefactoring {
     * @param bot {@link SWTWorkbenchBot} to select the outline view from.
     */
    public static void selectClassAndExecuteRenaming(String className, String packageName,
-         IFolder srcFolder, String newClassName, SWTWorkbenchBot bot) {
+         IFolder srcFolder, String newClassName, SWTWorkbenchBot bot) throws Exception {
 
       TestUtilsUtil.openEditor(srcFolder.getFolder(packageName).getFile(
             className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
@@ -261,7 +261,7 @@ public class TestUtilsRefactoring {
     */
    public static void selectElementInOutlineAndMove(IFolder srcFolder, String fromclass,
          String fromPackage, String destclass, String destpackage, String elementDescription,
-         SWTWorkbenchBot bot) {
+         SWTWorkbenchBot bot) throws Exception {
 
       // open the class with the field to be moved in the editor
       TestUtilsUtil.openEditor(srcFolder.getFolder(fromPackage).getFile(
@@ -299,7 +299,7 @@ public class TestUtilsRefactoring {
       // select the class to be moved in the package explorer
       SWTBotTree tree = TestUtilsUtil.getProjectExplorer(bot).bot().tree();
       SWTBotTreeItem classToMove = TestUtilsUtil.selectInTree(tree, projectNameSrc, "src",
-            packageFrom, className + ".java");
+            packageFrom, className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT);
 
       classToMove.select().pressShortcut(SWT.ALT | SWT.SHIFT, 'V');
 
@@ -354,7 +354,7 @@ public class TestUtilsRefactoring {
    public static void runFieldRenameTest(String path, IFolder srcFolder,
          IFolder oracleFolder, SWTWorkbenchBot bot, String className, String packageName,
          String outlineAppearance, String newName, IJavaProject javaProject)
-         throws CoreException {
+         throws Exception {
 
       copyFiles(path + "\\src", srcFolder);
       copyFiles(path + "\\oracle", oracleFolder);
@@ -385,7 +385,7 @@ public class TestUtilsRefactoring {
    public static void runMethodRenameTest(String path, IFolder srcFolder,
          IFolder oracleFolder, SWTWorkbenchBot bot, String className, String packageName,
          String outlineAppearance, String newName, IJavaProject javaProject)
-         throws CoreException {
+         throws Exception {
 
       copyFiles(path + "\\src", srcFolder);
       copyFiles(path + "\\oracle", oracleFolder);
@@ -418,7 +418,7 @@ public class TestUtilsRefactoring {
     */
    public static void runClassRenameTestBasic(String path, IFolder srcFolder,
          IFolder oracleFolder, SWTWorkbenchBot bot, String className, String packageName,
-         String newClassName, IJavaProject javaProject) throws CoreException {
+         String newClassName, IJavaProject javaProject) throws Exception {
 
       copyFiles(path + "\\src", srcFolder);
       copyFiles(path + "\\oracle", oracleFolder);
@@ -451,7 +451,7 @@ public class TestUtilsRefactoring {
     */
    public static void runParameterRenameTest(String path, IFolder srcFolder,
          IFolder oracleFolder, SWTWorkbenchBot bot, String className, String packageName,
-         String methodName, String newName, int offset) throws CoreException {
+         String methodName, String newName, int offset) throws Exception {
 
       copyFiles(path + "\\src", srcFolder);
       copyFiles(path + "\\oracle", oracleFolder);
@@ -510,7 +510,7 @@ public class TestUtilsRefactoring {
    public static void runMoveOutlineElementTest(String path, IFolder srcFolder,
          IFolder oracleFolder, SWTWorkbenchBot bot, String classNameMoveFrom,
          String packageName, String elementDescription, String classNameMoveTo,
-         String packageTo, IJavaProject javaProject) throws CoreException {
+         String packageTo, IJavaProject javaProject) throws Exception {
 
       copyFiles(path + "\\src", srcFolder);
       copyFiles(path + "\\oracle", oracleFolder);
@@ -538,11 +538,11 @@ public class TestUtilsRefactoring {
     * @param packageFrom name of the package the class is in.
     * @param packageTo destination package.
     * @param javaProject project the classes are in.
-    * @throws CoreException
+    * @throws Exception
     */
    public static void runMoveClassTest(String path, IFolder srcFolder, IFolder oracleFolder,
          SWTWorkbenchBot bot, String classNameMoveFrom, String packageFrom, String packageTo,
-         IJavaProject javaProject) throws CoreException {
+         IJavaProject javaProject) throws Exception {
 
       copyFiles(path + "\\src", srcFolder);
       copyFiles(path + "\\oracle", oracleFolder);
@@ -563,11 +563,11 @@ public class TestUtilsRefactoring {
     * @param packageName the package the class is in.
     * @param classNameToCompare the name of the class to be compared.
     * @param bot a workbench bot.
-    * @throws CoreException
+    * @throws Exception
     */
    public static void compareFileToOracle(IFolder srcFolder, IFolder oracleFolder,
          String packageName, String classNameToCompare, SWTWorkbenchBot bot)
-         throws CoreException {
+         throws Exception {
 
       TestUtilsUtil.openEditor(srcFolder.getFolder(packageName).getFile(
             classNameToCompare + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));

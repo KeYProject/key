@@ -28,6 +28,8 @@ import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Font;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
+import org.eclipse.graphiti.mm.algorithms.styles.Style;
+import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
 import org.eclipse.graphiti.mm.pictograms.ChopboxAnchor;
 import org.eclipse.graphiti.mm.pictograms.Connection;
@@ -41,13 +43,15 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.util.ColorConstant;
 import org.key_project.sed.core.annotation.ISEAnnotation;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEGroupable;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.util.NodeUtil;
 import org.key_project.sed.core.util.SEGroupPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.StringUtil;
 
 /**
@@ -204,36 +208,17 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
       int height = context.getHeight() <= 0 ? computeInitialHeight(targetDiagram, text.getValue(), text.getFont()) : context.getHeight();
       gaService.setLocationAndSize(roundedRectangle, context.getX(), context.getY(), width, height);
 
-      try
-      {
-         ChopboxAnchor anchor = peCreateService.createChopboxAnchor(nodeContainer);
-         
+      ChopboxAnchor anchor = peCreateService.createChopboxAnchor(nodeContainer);
+      try {
          ISENode parentNode = NodeUtil.getParent(addedNode);
-
-         if(parentNode != null)
-         {
-            // Since the first pe of a group startnode is always the rec
-            // we need to get the second pe.
-            PictogramElement pe = getFeatureProvider().getAllPictogramElementsForBusinessObject(parentNode)
-                  [groupingSupported && NodeUtil.canBeGrouped(parentNode) ? 1 : 0];
-               
-            if (pe == null) {
-               throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't find PictogramElement for \"" + pe + "\"."));
-            }
-            
-            if (!(pe instanceof AnchorContainer)) {
-               throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent PictogramElement \"" + pe + "\" is no AnchorContainer."));
-            }
-            AnchorContainer anchorContainer = (AnchorContainer)pe;
-            if (anchorContainer.getAnchors() == null || anchorContainer.getAnchors().isEmpty()) {
-               throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent AnchorContainer \"" + pe + "\" has no Anchors."));
-            }
+         if (parentNode != null) {
+            AnchorContainer anchorContainer = findAnchorContainer(parentNode, groupingSupported);
             Connection connection = peCreateService.createFreeFormConnection(getDiagram());
             connection.setStart(anchorContainer.getAnchors().get(0));
             connection.setEnd(anchor);
             
             ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
-            createArrow(gaService, cd);
+            createArrow(gaService, cd, ExecutionTreeStyleUtil.getStyleForParentConnection(getDiagram()));
      
             Polyline polyline = gaService.createPolyline(connection);
             polyline.setStyle(ExecutionTreeStyleUtil.getStyleForParentConnection(getDiagram()));
@@ -242,6 +227,9 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
       catch (DebugException e) {
          LogUtil.getLogger().logError(e);
       }
+      // Create links
+      createOutgoingLinks(addedNode, groupingSupported, anchor, gaService, peCreateService);
+      createIncomingLinks(addedNode, groupingSupported, anchor, gaService, peCreateService);
       // call the layout feature to compute real heights and widths
       layoutPictogramElement(nodeContainer);
 
@@ -249,14 +237,139 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
    }
    
    /**
+    * Creates outgoing links if not already present.
+    * @param addedNode The {@link ISENode} to add.
+    * @param groupingSupported Is grouping supported?
+    * @param anchor The {@link ChopboxAnchor} of the added {@link ISENode}.
+    * @param gaService The {@link IGaService} to use.
+    * @param peCreateService The {@link IPeCreateService} to use.
+    */
+   protected void createOutgoingLinks(ISENode addedNode, boolean groupingSupported, ChopboxAnchor anchor, IGaService gaService, IPeCreateService peCreateService) {
+      try {
+         ISENodeLink[] outgoingLinks = addedNode.getOutgoingLinks();
+         if (!ArrayUtil.isEmpty(outgoingLinks)) {
+            for (ISENodeLink link : outgoingLinks) {
+               PictogramElement[] linkPEs = getFeatureProvider().getAllPictogramElementsForBusinessObject(link);
+               if (ArrayUtil.isEmpty(linkPEs)) {
+                  ISENode target = link.getTarget();
+                  if (target != null) {
+                     AnchorContainer anchorContainer = findAnchorContainer(target, groupingSupported);
+                     if (anchorContainer != null) { // In case target is not yet visualized, the link will be created later as incoming link of the target.
+                        createLink(link, anchor, anchorContainer.getAnchors().get(0), gaService, peCreateService);
+                     }
+                  }
+               }
+            }
+         }
+      }
+      catch (DebugException e) {
+         LogUtil.getLogger().logError(e);
+      }
+   }
+   
+   /**
+    * Creates incoming links if not already present.
+    * @param addedNode The {@link ISENode} to add.
+    * @param groupingSupported Is grouping supported?
+    * @param anchor The {@link ChopboxAnchor} of the added {@link ISENode}.
+    * @param gaService The {@link IGaService} to use.
+    * @param peCreateService The {@link IPeCreateService} to use.
+    */
+   protected void createIncomingLinks(ISENode addedNode, boolean groupingSupported, ChopboxAnchor anchor, IGaService gaService, IPeCreateService peCreateService) {
+      try {
+         ISENodeLink[] incomingLinks = addedNode.getIncomingLinks();
+         if (!ArrayUtil.isEmpty(incomingLinks)) {
+            for (ISENodeLink link : incomingLinks) {
+               PictogramElement[] linkPEs = getFeatureProvider().getAllPictogramElementsForBusinessObject(link);
+               if (ArrayUtil.isEmpty(linkPEs)) {
+                  ISENode source = link.getSource();
+                  if (source != null) {
+                     AnchorContainer anchorContainer = findAnchorContainer(source, groupingSupported);
+                     if (anchorContainer != null) { // In case target is not yet visualized, the link will be created later as outgoing link of the target.
+                        createLink(link, anchorContainer.getAnchors().get(0), anchor, gaService, peCreateService);
+                     }
+                  }
+               }
+            }
+         }
+      }
+      catch (DebugException e) {
+         LogUtil.getLogger().logError(e);
+      }
+   }
+   
+   /**
+    * Creates a link.
+    * @param link The {@link ISENodeLink} to add.
+    * @param start The start {@link Anchor}.
+    * @param end The end {@link Anchor}.
+    * @param gaService The {@link IGaService} to use.
+    * @param peCreateService The {@link IPeCreateService} to use.
+    */
+   protected void createLink(ISENodeLink link, Anchor start, Anchor end, IGaService gaService, IPeCreateService peCreateService) {
+      Connection connection = peCreateService.createFreeFormConnection(getDiagram());
+      connection.setStart(start);
+      connection.setEnd(end);
+      
+      ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
+      createArrow(gaService, cd, ExecutionTreeStyleUtil.getStyleForLinkConnection(getDiagram()));
+
+      if (!StringUtil.isTrimmedEmpty(link.getName())) {
+         ConnectionDecorator textDecorator = peCreateService.createConnectionDecorator(connection, true, 0.5, true);
+         Text text = gaService.createDefaultText(getDiagram(), textDecorator);
+         text.setStyle(ExecutionTreeStyleUtil.getStyleForLinkConnection(getDiagram()));
+         text.setValue(link.getName());
+         text.setX(GraphitiUtil.calculateTextSize(text.getValue(), text.getFont()).getWidth() / -2); // Center text
+         link(text.getPictogramElement(), link);
+      }
+      
+      Polyline polyline = gaService.createPolyline(connection);
+      polyline.setStyle(ExecutionTreeStyleUtil.getStyleForLinkConnection(getDiagram()));
+      link(polyline.getPictogramElement(), link);
+   }
+   
+   /**
+    * Returns the {@link AnchorContainer} of the given {@link ISENode}.
+    * @param node The {@link ISENode} for which the {@link AnchorContainer} is requested.
+    * @param groupingSupported Is grouping supported?
+    * @return The found {@link AnchorContainer} or {@code null} if not available.
+    * @throws DebugException In case something went wrong.
+    */
+   protected AnchorContainer findAnchorContainer(ISENode node, boolean groupingSupported) throws DebugException {
+      // Since the first pe of a group startnode is always the rec
+      // we need to get the second pe.
+      PictogramElement[] pes = getFeatureProvider().getAllPictogramElementsForBusinessObject(node);
+      if (!ArrayUtil.isEmpty(pes)) {
+         PictogramElement pe = pes[groupingSupported && NodeUtil.canBeGrouped(node) ? 1 : 0];
+         
+         if (pe == null) {
+            throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't find PictogramElement for \"" + pe + "\"."));
+         }
+         
+         if (!(pe instanceof AnchorContainer)) {
+            throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent PictogramElement \"" + pe + "\" is no AnchorContainer."));
+         }
+         AnchorContainer anchorContainer = (AnchorContainer)pe;
+         if (anchorContainer.getAnchors() == null || anchorContainer.getAnchors().isEmpty()) {
+            throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent AnchorContainer \"" + pe + "\" has no Anchors."));
+         }
+         return anchorContainer;
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
     * Creates an arrow used in {@link ConnectionDecorator}s.
     * @param gaService The {@link IGaService} to use.
     * @param gaContainer The {@link GraphicsAlgorithmContainer} to use.
+    * @param style The {@link Style} to use.
     * @return The created arrow {@link Polyline}.
     */
-   protected Polyline createArrow(IGaService gaService, GraphicsAlgorithmContainer gaContainer) {
+   protected Polyline createArrow(IGaService gaService, GraphicsAlgorithmContainer gaContainer, Style style) {
       Polyline polyline = gaService.createPolyline(gaContainer, new int[] {-10, 5, 0, 0, -10, -5});
-      polyline.setStyle(ExecutionTreeStyleUtil.getStyleForParentConnection(getDiagram()));
+      polyline.setStyle(style);
       return polyline;
    }
 

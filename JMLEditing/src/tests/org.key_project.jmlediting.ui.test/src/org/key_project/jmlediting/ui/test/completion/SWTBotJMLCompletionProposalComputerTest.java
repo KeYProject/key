@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
@@ -93,7 +92,7 @@ public class SWTBotJMLCompletionProposalComputerTest {
     * with all kinds of Comments to test AutoCompletion in and open it.
     */
    @BeforeClass
-   public static void initProject() throws CoreException, InterruptedException {
+   public static void initProject() throws Exception {
       TestUtilsUtil.closeWelcomeView();
       final IJavaProject project = TestUtilsUtil.createJavaProject(PROJECT_NAME);
       final IFolder srcFolder = project.getProject().getFolder("src");

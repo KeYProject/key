@@ -46,14 +46,12 @@ public class SWTBotCallStackTabTest extends AbstractSWTBotPropertyTabTest {
       return new AbstractTestSteps() {
          @Override
          public void assertThread(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEThread thread) throws Exception {
-            assertTrue(tabs.selectTabItem("Call Stack"));
-            assertEquals(0, propertiesView.bot().tree().getAllItems().length);
+            assertFalse(tabs.selectTabItem("Call Stack"));
          }
          
          @Override
          public void assertStatement(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEStatement statement) throws Exception {
-            assertTrue(tabs.selectTabItem("Call Stack"));
-            assertEquals(0, propertiesView.bot().tree().getAllItems().length);
+            assertFalse(tabs.selectTabItem("Call Stack"));
          }
          
          @Override
@@ -74,8 +72,7 @@ public class SWTBotCallStackTabTest extends AbstractSWTBotPropertyTabTest {
 
          @Override
          public void assertMethodCall(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEMethodCall methodCall) throws Exception {
-            assertTrue(tabs.selectTabItem("Call Stack"));
-            assertEquals(0, propertiesView.bot().tree().getAllItems().length);
+            assertFalse(tabs.selectTabItem("Call Stack"));
          }
       };
    }

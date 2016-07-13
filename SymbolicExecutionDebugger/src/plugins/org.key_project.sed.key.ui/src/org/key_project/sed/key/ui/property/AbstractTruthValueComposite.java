@@ -15,8 +15,10 @@ package org.key_project.sed.key.ui.property;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -50,6 +52,9 @@ import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorato
 import org.key_project.key4eclipse.common.ui.decorator.TruthValueTracingViewerDecorator;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.sed.key.core.model.IKeYSENode;
+import org.key_project.sed.key.core.model.KeYBlockContractExceptionalTermination;
+import org.key_project.sed.key.core.model.KeYBlockContractTermination;
+import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.ui.preference.page.KeYColorsPreferencePage;
 import org.key_project.sed.key.ui.view.ProofView;
@@ -57,8 +62,11 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 
+import de.uka.ilkd.key.control.AutoModeListener;
+import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -67,11 +75,14 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.BranchResult;
@@ -139,6 +150,79 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * The currently shown {@link IKeYSENode}.
     */
    private IKeYSENode<?> currentNode;
+   
+   /**
+    * The currently observed proof.
+    */
+   private Proof proof;
+
+   /**
+    * Listens for changes on {@link #proof}.
+    */
+   private final ProofTreeListener proofTreeListener = new ProofTreeListener() {
+      @Override
+      public void smtDataUpdate(ProofTreeEvent e) {
+      }
+      
+      @Override
+      public void proofStructureChanged(ProofTreeEvent e) {
+         handleProofStructureChanged(e);
+      }
+      
+      @Override
+      public void proofPruned(ProofTreeEvent e) {
+         handleProofPruned(e);
+      }
+      
+      @Override
+      public void proofIsBeingPruned(ProofTreeEvent e) {
+      }
+      
+      @Override
+      public void proofGoalsChanged(ProofTreeEvent e) {
+         handleProofGoalsChanged(e);
+      }
+      
+      @Override
+      public void proofGoalsAdded(ProofTreeEvent e) {
+         handleProofGoalsAdded(e);
+      }
+      
+      @Override
+      public void proofGoalRemoved(ProofTreeEvent e) {
+         handleProofGoalRemoved(e);
+      }
+      
+      @Override
+      public void proofExpanded(ProofTreeEvent e) {
+         handleProofExpanded(e);
+      }
+      
+      @Override
+      public void proofClosed(ProofTreeEvent e) {
+         handleProofClosed(e);
+      }
+   };
+
+   /**
+    * The currently observed {@link ProofControl}.
+    */
+   private ProofControl proofControl;
+
+   /**
+    * Listens for changes on {@link #proofControl}.
+    */
+   private final AutoModeListener autoModeListener = new AutoModeListener() {
+      @Override
+      public void autoModeStopped(ProofEvent e) {
+         handleAutoModeStopped(e);
+      }
+      
+      @Override
+      public void autoModeStarted(ProofEvent e) {
+         handleAutoModeStarted(e);
+      }
+   };
    
    /**
     * Listens for color changes
@@ -209,6 +293,14 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     */
    @Override
    public void dispose() {
+      if (proofControl != null) {
+         proofControl.removeAutoModeListener(autoModeListener);
+         proofControl = null;
+      }
+      if (proof != null) {
+         proof.removeProofTreeListener(proofTreeListener);
+         proof = null;
+      }
       KeYSEDPreferences.getStore().removePropertyChangeListener(colorPropertyListener);
       SWTUtil.getEditorsPreferenceStore().removePropertyChangeListener(editorsListener);
       JFaceResources.getFontRegistry().removeListener(editorsListener);
@@ -235,11 +327,129 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     */
    public void updateContent(final IKeYSENode<?> node) {
       if (!ObjectUtil.equals(currentNode, node)) {
+         // Remove old listener
+         if (proofControl != null) {
+            proofControl.removeAutoModeListener(autoModeListener);
+            proofControl = null;
+         }
+         if (proof != null) {
+            proof.removeProofTreeListener(proofTreeListener);
+            proof = null;
+         }
+         // Change node
          currentNode = node;
+         // Add new listener
+         if (node != null) {
+            proof = node.getExecutionNode().getProof();
+            if (proof != null) {
+               proof.addProofTreeListener(proofTreeListener);
+            }
+            KeYDebugTarget debugTarget = node.getDebugTarget();
+            if (debugTarget != null) {
+               proofControl = debugTarget.getEnvironment().getProofControl();
+               if (proofControl != null) {
+                  proofControl.addAutoModeListener(autoModeListener);
+               }
+            }
+         }
+         // Update shown content
          recreateContent();
       }
    }
-   
+
+   /**
+    * When the auto mode has started.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleAutoModeStarted(ProofEvent e) {
+      if (proof != null) {
+         proof.removeProofTreeListener(proofTreeListener);
+      }
+   }
+
+   /**
+    * When the auto mode has stopped.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleAutoModeStopped(ProofEvent e) {
+      if (proof != null) {
+         proof.addProofTreeListener(proofTreeListener);
+      }
+      recreateContentThreadSave();
+   }
+
+   /**
+    * When the {@link Proof} was expanded.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleProofExpanded(ProofTreeEvent e) {
+      recreateContentThreadSave();
+   }
+
+   /**
+    * When the {@link Proof} was pruned.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleProofPruned(ProofTreeEvent e) {
+      recreateContentThreadSave();
+   }
+
+   /**
+    * When the {@link Proof} structure has changed.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleProofStructureChanged(ProofTreeEvent e) {
+      recreateContentThreadSave();
+   }
+
+   /**
+    * When the {@link Proof} {@link Goal}s have changed.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleProofGoalsChanged(ProofTreeEvent e) {
+      recreateContentThreadSave();
+   }
+
+   /**
+    * When the {@link Proof} {@link Goal}s were added.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleProofGoalsAdded(ProofTreeEvent e) {
+      recreateContentThreadSave();
+   }
+
+   /**
+    * When a {@link Proof} {@link Goal} was removed.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleProofGoalRemoved(ProofTreeEvent e) {
+      recreateContentThreadSave();
+   }
+
+   /**
+    * When the {@link Proof} was closed.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleProofClosed(ProofTreeEvent e) {
+      recreateContentThreadSave();
+   }
+
+   /**
+    * Recreates the shown content thread save.
+    */
+   protected void recreateContentThreadSave() {
+      if (!root.isDisposed()) {
+         root.getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               if (!root.isDisposed()) {
+                  recreateContent();
+               }
+            }
+         });
+      }
+   }
+
    /**
     * Recreates the shown content.
     */
@@ -523,21 +733,44 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    
    /**
     * Searches the {@link Term} with the uninterpreted predicate.
+    * @param node The {@link IKeYSENode} which provides the current {@link Sequent} to search the uninterpreted predicate in.
     * @param term The {@link Term} to start search at.
     * @param uninterpretedPredicate The {@link Term} of the proof obligation which specifies the uninterpreted predicate.
+    * @param additionalPredicates The additional uninterpreted predicates.
     * @return The {@link PosInTerm} of the uninterpreted predicate.
     */
-   protected PosInTerm findUninterpretedPredicateTerm(Term term, Term uninterpretedPredicate) {
-      return findUninterpretedPredicateTerm(term, uninterpretedPredicate, PosInTerm.getTopLevel());
+   protected PosInTerm findUninterpretedPredicateTerm(IKeYSENode<?> node, 
+                                                      Term term, 
+                                                      Term uninterpretedPredicate,
+                                                      Set<Term> additionalPredicates) {
+      // Skip updates
+      PosInTerm pit = PosInTerm.getTopLevel();
+      while (term.op() == UpdateApplication.UPDATE_APPLICATION) {
+         term = term.sub(1);
+         pit = pit.down(1);
+      }
+      // Search predicate
+      if (node instanceof KeYBlockContractTermination || node instanceof KeYBlockContractExceptionalTermination) {
+         Set<Operator> additionalPredicateOperators = new HashSet<Operator>();
+         if (!CollectionUtil.isEmpty(additionalPredicates)) {
+            for (Term predicateTerm : additionalPredicates) {
+               additionalPredicateOperators.add(predicateTerm.op());
+            }
+         }
+         return findAdditionalUninterpretedPredicateTerm(term, additionalPredicateOperators, pit);
+      }
+      else {
+         return findMainUninterpretedPredicateTerm(term, uninterpretedPredicate, pit);
+      }
    }
-      
+
    /**
     * Searches the {@link Term} with the uninterpreted predicate.
     * @param term The {@link Term} to start search at.
     * @param uninterpretedPredicate The {@link Term} of the proof obligation which specifies the uninterpreted predicate.
     * @return The {@link PosInTerm} of the uninterpreted predicate.
     */
-   protected PosInTerm findUninterpretedPredicateTerm(Term term, Term uninterpretedPredicate, PosInTerm current) {
+   protected PosInTerm findMainUninterpretedPredicateTerm(Term term, Term uninterpretedPredicate, PosInTerm current) {
       if (uninterpretedPredicate != null) {
          if (term.op() == uninterpretedPredicate.op()) {
             return current;
@@ -546,7 +779,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
             PosInTerm result = null;
             int i = 0;
             while (result == null && i < term.arity()) {
-               result = findUninterpretedPredicateTerm(term.sub(i), uninterpretedPredicate, current.down(i));
+               result = findMainUninterpretedPredicateTerm(term.sub(i), uninterpretedPredicate, current.down(i));
                i++;
             }
             return result;
@@ -554,6 +787,30 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
          else {
             return null;
          }
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Searches the {@link Term} with the uninterpreted predicate.
+    * @param term The {@link Term} to start search at.
+    * @param additionalPredicateOperators The operators of the additional uninterpreted predicates.
+    * @return The {@link PosInTerm} of the uninterpreted predicate.
+    */
+   protected PosInTerm findAdditionalUninterpretedPredicateTerm(Term term, Set<Operator> additionalPredicateOperators, PosInTerm current) {
+      if (additionalPredicateOperators.contains(term.op())) {
+         return current;
+      }
+      else if (term.op() == Junctor.AND) {
+         PosInTerm result = null;
+         int i = 0;
+         while (result == null && i < term.arity()) {
+            result = findAdditionalUninterpretedPredicateTerm(term.sub(i), additionalPredicateOperators, current.down(i));
+            i++;
+         }
+         return result;
       }
       else {
          return null;
@@ -576,11 +833,11 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * Removes the uninterpreted predicate if required.
     * @param node The {@link Node}.
     * @param term The {@link Term}.
+    * @param predicate The uninterpreted predicate to remove.
     * @return The {@link Term} without the uninterpreted predicate.
     */
-   protected Term removeUninterpretedPredicate(Node node, Term term) {
+   protected Term removeUninterpretedPredicate(Node node, Term term, Term predicate) {
       Proof proof = node.proof();
-      Term predicate = AbstractOperationPO.getUninterpretedPredicate(proof);
       if (predicate != null) {
          term = removeUninterpretedPredicate(proof.getServices().getTermBuilder(), 
                                              term, 

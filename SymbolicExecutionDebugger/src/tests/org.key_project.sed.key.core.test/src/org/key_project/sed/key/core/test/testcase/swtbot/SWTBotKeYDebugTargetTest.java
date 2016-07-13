@@ -25,7 +25,9 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.key_project.core.test.util.SuspendingStopCondition;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDebugTarget;
@@ -42,11 +44,62 @@ import de.uka.ilkd.key.proof.Proof;
  * Tests for the functionality of a {@link KeYDebugTarget}.
  * @author Martin Hentschel
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
    /**
     * If the fast mode is enabled the step wise creation of models is disabled.
     */
    private static final boolean FAST_MODE = true;
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testBlockContractMagic42_useBlockContract() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_useBlockContract",
+                     "data/blockContractMagic42/test",
+                     false,
+                     createMethodSelector("BlockContractMagic42", "magic"),
+                     "data/blockContractMagic42/oracle/BlockContractMagic42_useBlockContract.xml",
+                     false,
+                     14,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     true,
+                     false, 
+                     false);
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testBlockContractMagic42_expandBlock() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_expandBlock",
+                     "data/blockContractMagic42/test",
+                     false,
+                     createMethodSelector("BlockContractMagic42", "magic"),
+                     "data/blockContractMagic42/oracle/BlockContractMagic42_expandBlock.xml",
+                     false,
+                     14,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false, 
+                     false);
+   }
    
    /**
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
@@ -60,6 +113,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      "data/groupStartOccurrenceTest/oracle/GroupStartOccurrenceTest.xml",
                      false,
                      14,
+                     false,
                      false,
                      false,
                      false,
@@ -92,6 +146,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      true,
                      false,
+                     false,
                      false, 
                      false);
    }
@@ -116,6 +171,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      true,
                      true,
+                     false,
                      true, 
                      false);
    }
@@ -140,6 +196,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      true,
                      true,
+                     false,
                      false, 
                      false);
    }
@@ -156,6 +213,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      "data/aliasTest/oracle/AliasTest_Immediately.xml",
                      false,
                      14,
+                     false,
                      false,
                      false,
                      false,
@@ -188,6 +246,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      false, 
                      false);
    }
@@ -212,6 +271,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      true,
+                     false,
                      false, 
                      false);
    }
@@ -235,6 +295,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      true,
+                     false,
                      false,
                      false, 
                      false);
@@ -260,6 +321,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      true,
                      false,
+                     false,
                      false, 
                      false);
    }
@@ -283,6 +345,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      true,
+                     false,
                      false,
                      false, 
                      false);
@@ -308,6 +371,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      true,
                      false,
+                     false,
                      false, 
                      false);
    }
@@ -331,6 +395,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      true,
+                     false,
                      false,
                      false, 
                      false);
@@ -356,6 +421,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      true,
                      false,
+                     false,
                      false, 
                      false);
    }
@@ -379,6 +445,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      true,
+                     false,
                      false,
                      false, 
                      false);
@@ -404,6 +471,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      true,
                      false,
+                     false,
                      false, 
                      false);
    }
@@ -427,6 +495,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      true,
+                     false,
                      false,
                      false, 
                      false);
@@ -452,6 +521,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      true,
                      false,
+                     false,
                      false, 
                      false);
    }
@@ -475,6 +545,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      true,
+                     false,
                      false,
                      false, 
                      false);
@@ -517,6 +588,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      true,
                      14,
                      true,
+                     false,
                      false,
                      false,
                      false,
@@ -612,6 +684,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      false, 
                      false);
    }
@@ -629,6 +702,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      8,
                      true,
+                     false,
                      false,
                      false,
                      false,
@@ -660,6 +734,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      false, 
                      false);
    }
@@ -677,6 +752,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      8,
                      true,
+                     false,
                      false,
                      false,
                      false,
@@ -1136,6 +1212,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false, 
+                     false,
                      false);
    }
    
@@ -1160,6 +1237,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false, 
+                     false,
                      false);
    }
    
@@ -1302,9 +1380,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                                String expectedModelPathInBundle,
                                                boolean includeCallStack,
                                                boolean mergeBranchConditions) throws Exception {
-      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, false, false, false, mergeBranchConditions, false, false, false, false);
+      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, false, false, false, mergeBranchConditions, false, false, false, false, false);
       if (!FAST_MODE) {
-         assertSEDModel(projectName + "stepInto", pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, false, true, false, mergeBranchConditions, false, false, false, false);
+         assertSEDModel(projectName + "stepInto", pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, false, true, false, mergeBranchConditions, false, false, false, false, false);
       }
    }
    
@@ -1361,7 +1439,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                  String expectedModelPathInBundle,
                                  boolean showMethodReturnValues,
                                  boolean stepIntoInsteadOfRun) throws Exception {
-      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, showMethodReturnValues, 10, false, false, false, stepIntoInsteadOfRun, false, false, false, false, false, false);
+      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, showMethodReturnValues, 10, false, false, false, stepIntoInsteadOfRun, false, false, false, false, false, false, false);
    }
    
    /**
@@ -1389,6 +1467,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useMethodContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @param useBlockContracts Use Block Contracts?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @param includeConstraints Include constraints?
@@ -1409,9 +1488,10 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                  final boolean mergeBranchConditions,
                                  final boolean useMethodContracts,
                                  final boolean useLoopInvariants,
+                                 final boolean useBlockContracts,
                                  final boolean nonExecutionBranchHidingSideProofs, 
                                  final boolean aliasChecks) throws Exception {
-      IKeYDebugTargetTestExecutor executor = createResumeExecutor(clearProofListInKeYBeforeResume, Activator.PLUGIN_ID, expectedModelPathInBundle, includeVariables, includeCallstack, includeConstraints, stepIntoInsteadOfRun, mergeBranchConditions, useMethodContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks);
+      IKeYDebugTargetTestExecutor executor = createResumeExecutor(clearProofListInKeYBeforeResume, Activator.PLUGIN_ID, expectedModelPathInBundle, includeVariables, includeCallstack, includeConstraints, stepIntoInsteadOfRun, mergeBranchConditions, useMethodContracts, useLoopInvariants, useBlockContracts, nonExecutionBranchHidingSideProofs, aliasChecks);
       doKeYDebugTargetTest(projectName, 
                            pathInBundle, 
                            true,

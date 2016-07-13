@@ -13,7 +13,7 @@ package org.key_project.jmlediting.all.test.suite.swtbot;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.key_project.jmlediting.profile.jmlref.test.refactoring.suite.TestSuiteRefactoring;
+import org.key_project.jmlediting.profile.jmlref.test.refactoring.suite.SWTBotTestSuiteRefactoring;
 import org.key_project.jmlediting.ui.test.suite.SWTBotJMLEditingAllUITests;
 import org.key_project.util.test.suite.swtbot.SWTBotAllUtilTests;
 
@@ -35,7 +35,7 @@ import org.key_project.util.test.suite.swtbot.SWTBotAllUtilTests;
 @Suite.SuiteClasses({ 
    SWTBotAllUtilTests.class, 
    SWTBotJMLEditingAllUITests.class,
-   TestSuiteRefactoring.class
+   SWTBotTestSuiteRefactoring.class
 })
 public class SWTBotJMLEditingAllTests {
 }

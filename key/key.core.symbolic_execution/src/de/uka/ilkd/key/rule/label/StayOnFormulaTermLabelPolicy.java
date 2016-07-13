@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
@@ -125,6 +126,9 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
             }
          }
          return null;
+      }
+      else if (newTermOp instanceof SubstOp) { // Such operations perform for instance skolemization (e.g. rule allRight)
+         return label;
       }
       else {
          return null;

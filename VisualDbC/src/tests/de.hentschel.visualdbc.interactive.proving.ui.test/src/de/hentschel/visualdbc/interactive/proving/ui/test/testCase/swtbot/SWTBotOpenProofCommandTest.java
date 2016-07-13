@@ -121,7 +121,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
     * </ul>
     */
    @Test
-   public void testOpenProofs_ModelEditor_withResets() {
+   public void testOpenProofs_ModelEditor_withResets() throws Exception {
       doTestOpenProofs_ModelEditor(true);
    }
    
@@ -141,7 +141,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
     * </ul>
     */
    @Test
-   public void testOpenProofs_ModelEditor_noResets() {
+   public void testOpenProofs_ModelEditor_noResets() throws Exception {
       doTestOpenProofs_ModelEditor(false);
    }
 
@@ -150,7 +150,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
     * and {@link #testOpenProofs_ModelEditor_withResets()}
     * @param allowProofResets Allow proof resets?
     */   
-   protected void doTestOpenProofs_ModelEditor(boolean allowProofResets) {
+   protected void doTestOpenProofs_ModelEditor(boolean allowProofResets) throws Exception {
       boolean oldAutomatedMode = ErrorDialog.AUTOMATED_MODE;
       boolean oldResetProofs = InteractiveProvingPreferences.isResetProofIfNewOpened();
       try {
@@ -525,7 +525,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
     * </ul>
     */
    @Test
-   public void testOpenProofs_DiagramEditor_withResets() {
+   public void testOpenProofs_DiagramEditor_withResets() throws Exception {
       doTestOpenProofs_DiagramEditor(true);
    }
    
@@ -545,7 +545,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
     * </ul>
     */
    @Test
-   public void testOpenProofs_DiagramEditor_noResets() {
+   public void testOpenProofs_DiagramEditor_noResets() throws Exception {
       doTestOpenProofs_DiagramEditor(false);
    }
 
@@ -554,7 +554,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
     * and {@link #testOpenProofs_DiagramEditor_withResets()}
     * @param allowProofResets Allow proof resets?
     */
-   protected void doTestOpenProofs_DiagramEditor(boolean allowProofResets) {
+   protected void doTestOpenProofs_DiagramEditor(boolean allowProofResets) throws Exception {
       boolean oldAutomatedMode = ErrorDialog.AUTOMATED_MODE;
       boolean oldResetProofs = InteractiveProvingPreferences.isResetProofIfNewOpened();
       try {

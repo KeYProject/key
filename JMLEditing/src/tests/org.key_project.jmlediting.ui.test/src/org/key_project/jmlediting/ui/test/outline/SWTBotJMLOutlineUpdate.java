@@ -12,6 +12,7 @@ import org.eclipse.ui.IPageLayout;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.key_project.javaeditor.management.JavaEditorManager;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils.TestProject;
@@ -47,7 +48,7 @@ public class SWTBotJMLOutlineUpdate {
       editor = testProject.getOpenedEditor();
 
       TestUtilsUtil.openView(IPageLayout.ID_OUTLINE);
-      SWTBotView view = bot.viewByTitle("Outline");
+      SWTBotView view = bot.viewById(IPageLayout.ID_OUTLINE);
       tree = view.bot().tree();
    }
 
@@ -93,7 +94,7 @@ public class SWTBotJMLOutlineUpdate {
    public static void testbehavior(String method, String itemSource, String itemName,
             boolean reloadtree) {
       if (reloadtree) {
-         tree = bot.viewByTitle("Outline").bot().tree();
+         tree = bot.viewById(IPageLayout.ID_OUTLINE).bot().tree();
       }
       for (SWTBotTreeItem item : tree.getAllItems()) {
          if (item.getItems() != null) {
@@ -133,20 +134,26 @@ public class SWTBotJMLOutlineUpdate {
 
    @Test
    public void outlineUpdateMethod() {
-      addTextSeriell(getLine("public void ab") - 1, 0, textToAddMethod);
-      testbehavior("ab() : void", "//@behavior", "behavior", true);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         addTextSeriell(getLine("public void ab") - 1, 0, textToAddMethod);
+         testbehavior("ab() : void", "//@behavior", "behavior", true);
+      }
    }
 
    @Test
    public void outlinePureType() {
-      addTextSeriell(getLine("public void a"), 9, " /*@pure@*/");
-      testbehavior("a() : void", "/*@pure@*/", "pure", true);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         addTextSeriell(getLine("public void a"), 9, " /*@pure@*/");
+         testbehavior("a() : void", "/*@pure@*/", "pure", true);
+      }
    }
 
    @Test
    public void outlineSpecType() {
-      addTextSeriell(getLine("private int i"), 10, "/*@spec_public@*/ ");
-      testbehavior("i : int", "/*@spec_public@*/", "spec_public", true);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         addTextSeriell(getLine("private int i"), 10, "/*@spec_public@*/ ");
+         testbehavior("i : int", "/*@spec_public@*/", "spec_public", true);
+      }
    }
 
 }

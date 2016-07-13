@@ -92,8 +92,10 @@ public class LoopInvariantComposite extends AbstractTruthValueComposite {
          if (term.op() == Junctor.IMP) {
             term = term.sub(1);
          }
-         PosInTerm predicatePosition = findUninterpretedPredicateTerm(term, AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof()));
-         Term termWithoutPredicate = removeUninterpretedPredicate(keyNode, term);
+         PosInTerm predicatePosition = findUninterpretedPredicateTerm(node, term, AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof()), null);
+         Term termWithoutPredicate = predicatePosition != null ?
+                                     removeUninterpretedPredicate(keyNode, term, predicatePosition.getSubTerm(term)) :
+                                     term;
          if (!INCLUDE_UPDATES) {
             termWithoutPredicate = TermBuilder.goBelowUpdates(termWithoutPredicate);
          }

@@ -59,7 +59,16 @@ public abstract class LDT implements Named {
 	                "It seems that there are definitions missing from the .key files.");
         this.name = name;
     }
+
     
+    protected LDT(Name name, Sort targetSort, TermServices services) {
+        sort = targetSort;
+        if (sort == null)
+            throw new RuntimeException("LDT "+name+" not found.\n"+
+                    "It seems that there are definitions missing from the .key files.");
+        this.name = name;
+    }
+
     //-------------------------------------------------------------------------
     // protected methods
     //-------------------------------------------------------------------------

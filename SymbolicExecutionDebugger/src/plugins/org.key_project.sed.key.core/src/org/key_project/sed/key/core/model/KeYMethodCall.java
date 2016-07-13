@@ -27,6 +27,7 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEMethodCall;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.impl.AbstractSEMethodCall;
 import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
@@ -518,5 +519,21 @@ public class KeYMethodCall extends AbstractSEMethodCall implements IKeYSENode<IE
     */
    public void removeMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
 	   knownMethodReturns.remove(methodReturn);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getOutgoingLinks() throws DebugException {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getIncomingLinks() throws DebugException {
+      return null;
    }
 }

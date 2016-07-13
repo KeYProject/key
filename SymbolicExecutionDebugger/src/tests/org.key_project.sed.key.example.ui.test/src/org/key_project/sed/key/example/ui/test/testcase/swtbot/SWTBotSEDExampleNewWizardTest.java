@@ -54,6 +54,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
                           null,
                           "data/oracle/example1/Number.xml",
                           false,
+                          false,
                           false);
    }
    
@@ -94,6 +95,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
                           "example3.ArrayUtil[example3.ArrayUtil::indexOf([Ljava.lang.Object,example3.ArrayUtil.Filter)].JML normal_behavior operation contract.0",
                           "data/oracle/example3/ArrayUtil.xml",
                           true,
+                          true,
                           true);
    }
    
@@ -107,6 +109,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
                           false,
                           null,
                           "data/oracle/example4/AVLTree.xml",
+                          false,
                           false,
                           false);
       // TODO: Test symbolic memory configuration visualization
@@ -156,6 +159,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
     * @param expectedModelPathInBundle The path to the oracle file.
     * @param useMethodContracts Use method contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @param useBlockContracts Use Block Contracts?
     * @throws Exception Occurred Exception.
     */
    protected void doExampleResumeTest(String projectName, 
@@ -164,11 +168,12 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
                                       final String preconditionOrExistingContract,
                                       final String expectedModelPathInBundle,
                                       final boolean useMethodContracts,
-                                      final boolean useLoopInvariants) throws Exception {
+                                      final boolean useLoopInvariants,
+                                      final boolean useBlockContracts) throws Exception {
       IExampleTestSteps steps = new IExampleTestSteps() {
          @Override
          public void doTest(IJavaProject javaProject) throws Exception {
-            IKeYDebugTargetTestExecutor executor = createResumeExecutor(false, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false, false, false, false, useMethodContracts, useLoopInvariants, false, false);
+            IKeYDebugTargetTestExecutor executor = createResumeExecutor(false, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false, false, false, false, useMethodContracts, useLoopInvariants, useBlockContracts, false, false);
             doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, false, true, false, false, true, false, 10, executor);
          }
       };

@@ -24,10 +24,9 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdate;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.key_project.sed.core.model.ISEBaseMethodReturn;
 import org.key_project.sed.core.model.ISEBranchCondition;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEGroupable;
 import org.key_project.sed.core.model.ISEMethodCall;
-import org.key_project.sed.core.model.ISEThread;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.util.ISEConstants;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
 import org.key_project.util.java.ArrayUtil;
@@ -298,17 +297,20 @@ public class SEDebugNodeContentProvider extends ElementContentProvider {
     * @throws DebugException Occurred Exception
     */
    public Object getDebugNodeParent(Object element) throws DebugException {
-      if (element instanceof ISEThread) {
-         return ((ISEThread)element).getDebugTarget();
-      }
-      else if (element instanceof ISENode) {
-         ISENode parent = getShownParent((ISENode) element);
+      if (element instanceof ISENode) {
+    	 ISENode node = (ISENode) element;
+         ISENode parent = getShownParent(node);
          if (SEDPreferenceUtil.isShowCompactExecutionTree()) {
             while (isCompactNode(parent)) {
                parent = getShownParent(parent);
             }
          }
-         return parent;
+         if (parent == null) {
+        	 return node.getDebugTarget();
+         }
+         else {
+             return parent;
+         }
       }
       else {
          return null;
@@ -431,3 +433,4 @@ public class SEDebugNodeContentProvider extends ElementContentProvider {
       }
    }
 }
+

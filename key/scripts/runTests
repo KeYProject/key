@@ -56,24 +56,18 @@ if [ -z "$KEY_HOME" ] ; then
 fi
 echo "Using KeY installation from:      $KEY_HOME"
 
-
-if [ -z "$KEY_LIB" ] ; then
-   KEY_LIB="$KEY_HOME/key-ext-jars"
-else
-echo "Using libraries from:             $KEY_LIB"
-fi
-
-export PATH
-
 #
 # KeY CLASSPATH
 #
 
-key_ext_jars="antlr.jar recoderKey.jar junit.jar"
-keyclasspath="$KEY_HOME/system/binary/"
+jar_files="key.core/lib/antlr.jar
+key.core/lib/recoderKey.jar
+key.util.test/lib/hamcrest-core-1.3.jar
+key.util.test/lib/junit-4.12.jar"
+keyclasspath=""
 
-for i in $key_ext_jars ; do
-    current_jar="$KEY_LIB/$i"
+for i in $jar_files ; do
+    current_jar="$KEY_HOME/$i"
     if [ ! -f "$current_jar" ]
     then
        echo Cannot find $current_jar. 
@@ -85,10 +79,36 @@ for i in $key_ext_jars ; do
     fi
 done
 
+included_projects="key.util
+key.util.test
+key.core
+key.core.test
+key.core.testgen
+key.core.testgen.test
+key.core.proof_references
+key.core.proof_references.test
+key.removegenerics
+key.removegenerics.test
+key.core.proof_references
+key.core.proof_references.test       
+key.core.symbolic_execution
+key.core.symbolic_execution.test"
 
-
-## jcoverage (stuff; optional)
-keyclasspath="$KEY_HOME/system/instrumented/:${keyclasspath}:$KEY_LIB/jcoverage.jar"
+for i in $included_projects ; do
+    current_project="$KEY_HOME/$i"
+    if [ ! -d "$current_project/bin" ]
+    then
+       echo Directory $current_project/bin not found.
+       echo Building project $current_project
+       cd "$current_project"
+       ant
+       if [ $? -ne 0 ]; then
+           exit # in case build fails
+       fi
+       cd -
+    fi
+    keyclasspath="${keyclasspath}:$current_project/bin"
+done
 
 #
 #Function prints help message
@@ -160,21 +180,14 @@ keysysprops="${keysysprops}-DKeyDebugClassLoader=on
 	  *) break;;
 
     esac
-done	
-
-
-if [ ! -d "$HOME/.key" ]
-then
-mkdir "$HOME/.key"
-fi
+done
 
 PATH=${PATH}:$KEY_LIB
-
 
 if [ "" = "$1" ] 
 then
     echo "No particular test case specified. All tests will be run."
-    testcase=TestKey
+    testcase=de.uka.ilkd.key.suite.TestKey
 else
     testcase=`echo $1 | tr '/' '.'`
 fi
@@ -184,5 +197,4 @@ $JAVA $JAVA_OPTIONS $keysysprops \
 -Dkey.home="$KEY_HOME" \
 -Djava.awt.headless=true \
 -classpath "$keyclasspath" junit.textui.TestRunner $testcase 
-
 

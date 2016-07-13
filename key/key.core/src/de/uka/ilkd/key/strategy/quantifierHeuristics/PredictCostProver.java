@@ -78,7 +78,7 @@ public class PredictCostProver {
     }
 
     private ImmutableSet<ImmutableSet<Term>> createClause(ImmutableSet<Term> set)  {
-	final DefaultImmutableSet<ImmutableSet<Term>> nil = 
+	final ImmutableSet<ImmutableSet<Term>> nil =
 	    DefaultImmutableSet.<ImmutableSet<Term>>nil();	
 	ImmutableSet<ImmutableSet<Term>> res = nil.add(DefaultImmutableSet.<Term>nil());
 	for (Term t : set) {	    

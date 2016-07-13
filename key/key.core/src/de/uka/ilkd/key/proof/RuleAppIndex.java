@@ -329,7 +329,7 @@ public final class RuleAppIndex  {
      * of this TacletAppIndex.
      * @param tacletApp the NoPosTacletApp describing a partial instantiated Taclet to add
      */
-    public void addNoPosTacletApp(ImmutableSet<NoPosTacletApp> tacletApps) {
+    public void addNoPosTacletApp(Iterable<NoPosTacletApp> tacletApps) {
         tacletIndex.addTaclets ( tacletApps );
 
         if ( autoMode )

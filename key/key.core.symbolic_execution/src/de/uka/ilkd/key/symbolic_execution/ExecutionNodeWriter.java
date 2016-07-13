@@ -26,6 +26,7 @@ import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
@@ -280,6 +281,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String TAG_OPERATION_CONTRACT = "operationContract";
 
    /**
+    * Tag name to store {@link IExecutionBlockContract}s.
+    */
+   public static final String TAG_BLOCK_CONTRACT = "blockContract";
+
+   /**
     * Tag name to store {@link IExecutionLoopInvariant}s.
     */
    public static final String TAG_LOOP_INVARIANT = "loopInvariant";
@@ -464,6 +470,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
       }
       else if (node instanceof IExecutionLoopInvariant) {
          appendExecutionLoopInvariant(level, (IExecutionLoopInvariant)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      }
+      else if (node instanceof IExecutionBlockContract) {
+         appendExecutionBlockContract(level, (IExecutionBlockContract)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
       else {
          throw new IllegalArgumentException("Not supported node \"" + node + "\".");
@@ -886,6 +895,40 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendCompletedBlocks(level + 1, node, sb);
       appendEndTag(level, TAG_LOOP_INVARIANT, sb);
+   }
+
+   /**
+    * Converts the given {@link IExecutionBlockContract} into XML and appends it to the {@link StringBuffer}.
+    * @param level The current child level.
+    * @param node The {@link IExecutionLoopInvariant} to convert.
+    * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendExecutionBlockContract(int level, 
+                                               IExecutionBlockContract node, 
+                                               boolean saveVariables, 
+                                               boolean saveCallStack, 
+                                               boolean saveReturnValues,
+                                               boolean saveConstraints,
+                                               StringBuffer sb) throws ProofInputException {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_NAME, node.getName());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
+
+      attributeValues.put(ATTRIBUTE_PRECONDITION_COMPLIED, node.isPreconditionComplied() + "");
+
+      appendStartTag(level, TAG_BLOCK_CONTRACT, attributeValues, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
+      appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendCompletedBlocks(level + 1, node, sb);
+      appendEndTag(level, TAG_BLOCK_CONTRACT, sb);
    }
 
    /**

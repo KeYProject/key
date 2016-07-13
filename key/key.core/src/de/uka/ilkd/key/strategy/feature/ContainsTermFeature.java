@@ -64,7 +64,7 @@ public class ContainsTermFeature implements Feature {
 
 
     @Override
-    public RuleAppCost compute(RuleApp app,
+    public RuleAppCost computeCost(RuleApp app,
                                PosInOccurrence pos,
                                Goal goal) {
         final Term t1 = proj1.toTerm(app, pos, goal);

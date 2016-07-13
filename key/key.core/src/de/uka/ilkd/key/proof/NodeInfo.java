@@ -30,6 +30,9 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.AbstractContractRuleApp;
+import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -176,6 +179,32 @@ public class NodeInfo {
         determineFirstAndActiveStatement();
     }
 
+
+    /**
+     * Checks if a rule is applied on the given {@link Node} which performs symbolic execution.
+     * @param node The {@link Node} to check.
+     * @return {@code true} symbolic execution is performed, {@code false} otherwise.
+     */
+    public static boolean isSymbolicExecutionRuleApplied(Node node) {
+       if (node != null) {
+          return isSymbolicExecutionRuleApplied(node.getAppliedRuleApp());
+       }
+       else {
+          return false;
+       }
+    }
+
+    /**
+     * Checks if the given {@link RuleApp} performs symbolic execution.
+     * @param node The {@link Node} to check.
+     * @return {@code true} symbolic execution is performed, {@code false} otherwise.
+     */
+    public static boolean isSymbolicExecutionRuleApplied(RuleApp app) {
+       return app instanceof BlockContractBuiltInRuleApp ||
+              app instanceof AbstractContractRuleApp ||
+              app instanceof LoopInvariantBuiltInRuleApp ||
+              app instanceof TacletApp && NodeInfo.isSymbolicExecution(((TacletApp) app).taclet());
+    }
 
     public static boolean isSymbolicExecution(Taclet t) {
         ImmutableList<RuleSet> list = t.getRuleSets();

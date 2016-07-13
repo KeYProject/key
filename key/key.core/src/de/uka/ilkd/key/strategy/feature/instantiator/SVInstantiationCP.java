@@ -66,7 +66,7 @@ public class SVInstantiationCP implements Feature {
         this.manager = manager;
     }
 
-    public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         manager.passChoicePoint ( new CP (app, pos, goal), this );
         return NumberRuleAppCost.getZeroCost();
     }

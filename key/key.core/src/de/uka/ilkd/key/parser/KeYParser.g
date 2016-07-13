@@ -197,7 +197,7 @@ options {
 
    private LinkedHashMap<RuleKey, Taclet> taclets = new LinkedHashMap<RuleKey, Taclet>();
             
-   private ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
+   private ImmutableList<Contract> contracts = ImmutableSLList.nil();
    private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.<ClassInvariant>nil();
 
    private ParserConfig schemaConfig;
@@ -299,7 +299,7 @@ options {
                      ParserConfig schemaConfig,
                      ParserConfig normalConfig, 
                      HashMap taclet2Builder,
-                     ImmutableSet<Taclet> taclets) { 
+                     ImmutableList<Taclet> taclets) { 
         this(lexer, null, null, mode);
         if (normalConfig!=null)
         scm = new AbbrevMap();
@@ -450,24 +450,22 @@ options {
         return namespaces().choices();
     }
 
-    public ImmutableSet<Taclet> getTaclets(){
-	ImmutableSet<Taclet> tacletSet = DefaultImmutableSet.<Taclet>nil(); 
+    public ImmutableList<Taclet> getTaclets(){
+        ImmutableList<Taclet> result = ImmutableSLList.<Taclet>nil();
 	
-	/** maintain correct order for taclet lemma proofs */
-	final List<Taclet> l = new LinkedList<Taclet>();	
+        /* maintain correct order for taclet lemma proofs */
 	for (Taclet t : taclets.values()) {
-		l.add(0,t);
+            result = result.prepend(t);
 	}
 	
+        // restore the order
+        result = result.reverse();
 	
-	for (Taclet t : l) {
-		tacletSet = tacletSet.add(t);
-	}
-        return tacletSet;
+        return result;
     }
 
     public ImmutableSet<Contract> getContracts(){
-        return contracts;
+        return DefaultImmutableSet.fromImmutableList(contracts);
     }
     
     public ImmutableSet<ClassInvariant> getInvariants(){
@@ -4447,7 +4445,7 @@ one_contract
      {
        DLSpecFactory dsf = new DLSpecFactory(getServices());
        try {
-         contracts = contracts.add(dsf.createDLOperationContract(contractName,
+         contracts = contracts.prepend(dsf.createDLOperationContract(contractName,
        					                         fma, 
            				                         modifiesClause));
        } catch(ProofInputException e) {

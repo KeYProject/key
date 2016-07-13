@@ -27,55 +27,61 @@ public class SWTBotProfilePropertiesTest {
 
    @Test
    public void testBasics() throws CoreException, InterruptedException {
-      TestUtilsUtil.closeWelcomeView();
-      final IProject project = TestUtilsUtil.createJavaProject(PROJECT_NAME).getProject();
+      IJMLProfile originalDefaultProfile = JMLPreferencesHelper.getDefaultDefaultJMLProfile();
+      try {
+         TestUtilsUtil.closeWelcomeView();
+         final IProject project = TestUtilsUtil.createJavaProject(PROJECT_NAME).getProject();
 
-      // Set the first one as global default
-      final int gloablDefaultIndex = 0;
-      final IJMLProfile globalDefault = ALL_PROFILES.get(gloablDefaultIndex);
-      JMLPreferencesHelper.setDefaultJMLProfile(globalDefault);
+         // Set the first one as global default
+         final int gloablDefaultIndex = 0;
+         final IJMLProfile globalDefault = ALL_PROFILES.get(gloablDefaultIndex);
+         JMLPreferencesHelper.setDefaultJMLProfile(globalDefault);
 
-      // Open the JML properties page for the project
-      SWTBotShell propertiesShell = JMLEditingUITestUtils.openJMLProfileProperties(bot, project);
+         // Open the JML properties page for the project
+         SWTBotShell propertiesShell = JMLEditingUITestUtils.openJMLProfileProperties(bot, project);
 
-      final SWTBotCheckBox enableProjectSettingsBox = propertiesShell.bot().checkBox();
-      final SWTBotTable profileList = propertiesShell.bot().table();
+         final SWTBotCheckBox enableProjectSettingsBox = propertiesShell.bot().checkBox();
+         final SWTBotTable profileList = propertiesShell.bot().table();
 
-      // Now we are in a profile properties page
-      // Because this project is null, we require that there are no project
-      // specific settings
-      assertTrue("Project specific settings enabled on a new project", !enableProjectSettingsBox.isChecked());
-      assertTrue("Can select profiles without project specific settings", !profileList.isEnabled());
+         // Now we are in a profile properties page
+         // Because this project is null, we require that there are no project
+         // specific settings
+         assertTrue("Project specific settings enabled on a new project", !enableProjectSettingsBox.isChecked());
+         assertTrue("Can select profiles without project specific settings", !profileList.isEnabled());
 
-      // Check that all profiles are shown to the user
-      final String[] items = new String[profileList.rowCount()];
-      for (int i = 0; i < profileList.rowCount(); i++) {
-         items[i] = profileList.getTableItem(i).getText(0);
+         // Check that all profiles are shown to the user
+         final String[] items = new String[profileList.rowCount()];
+         for (int i = 0; i < profileList.rowCount(); i++) {
+            items[i] = profileList.getTableItem(i).getText(0);
+         }
+         assertTrue("List of profiles does not contain all profiles", items.length == ALL_PROFILES.size());
+         for (int i = 0; i < ALL_PROFILES.size(); i++) {
+            assertTrue("List does not contain profiles in sorted order", items[i].equals(ALL_PROFILES.get(i).getName()));
+         }
+
+         // Enable project specific settings
+         enableProjectSettingsBox.select();
+         assertTrue("Cannot select profiles with project specific settings", profileList.isEnabled());
+
+         JMLEditingUITestUtils.validateProfileListSelection(globalDefault, profileList);
+
+         // Lets select a new one
+         final int newIndex = ALL_PROFILES.size() - 1;
+         profileList.getTableItem(newIndex).check();
+
+         // Apply the properties
+         propertiesShell.bot().button(IDialogConstants.OK_LABEL).click();
+
+         // Want to do the rebuild
+         SWTBotShell confirmationShell = propertiesShell.bot().shell("Active JML Profile Changed");
+         confirmationShell.bot().button(IDialogConstants.YES_LABEL).click();
+
+         // Now check that this is ok
+         final IJMLProfile projectProfile = JMLPreferencesHelper.getProjectJMLProfile(project);
+         assertTrue("Project profile not changed properly", projectProfile == ALL_PROFILES.get(newIndex));
       }
-      assertTrue("List of profiles does not contain all profiles", items.length == ALL_PROFILES.size());
-      for (int i = 0; i < ALL_PROFILES.size(); i++) {
-         assertTrue("List does not contain profiles in sorted order", items[i].equals(ALL_PROFILES.get(i).getName()));
+      finally {
+         JMLPreferencesHelper.setDefaultJMLProfile(originalDefaultProfile);
       }
-
-      // Enable project specific settings
-      enableProjectSettingsBox.select();
-      assertTrue("Cannot select profiles with project specific settings", profileList.isEnabled());
-
-      JMLEditingUITestUtils.validateProfileListSelection(globalDefault, profileList);
-
-      // Lets select a new one
-      final int newIndex = ALL_PROFILES.size() - 1;
-      profileList.getTableItem(newIndex).check();
-
-      // Apply the properties
-      propertiesShell.bot().button(IDialogConstants.OK_LABEL).click();
-
-      // Want to do the rebuild
-      SWTBotShell confirmationShell = propertiesShell.bot().shell("Active JML Profile Changed");
-      confirmationShell.bot().button(IDialogConstants.YES_LABEL).click();
-
-      // Now check that this is ok
-      final IJMLProfile projectProfile = JMLPreferencesHelper.getProjectJMLProfile(project);
-      assertTrue("Project profile not changed properly", projectProfile == ALL_PROFILES.get(newIndex));
    }
 }

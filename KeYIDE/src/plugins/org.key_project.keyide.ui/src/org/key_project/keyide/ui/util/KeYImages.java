@@ -167,6 +167,36 @@ public final class KeYImages {
    public static final String THREAD = "org.key_project.keyide.ui.images.thread";
    
    /**
+    * The key for the image that is used for block contracts.
+    */
+   public static final String BLOCK_CONTRACT = "org.key_project.keyide.ui.images.blockContract";
+   
+   /**
+    * The key for the image that is used for block contracts.
+    */
+   public static final String BLOCK_CONTRACT_NOT_PRE = "org.key_project.keyide.ui.images.blockContractNotPre";
+   
+   /**
+    * The key for the image that is used for loop body termination.
+    */
+   public static final String BLOCK_CONTRACT_TERMINATION = "org.key_project.keyide.ui.images.blockContractTermination";
+   
+   /**
+    * The key for the image that is used for loop body termination.
+    */
+   public static final String BLOCK_CONTRACT_TERMINATION_NOT_VERIFIED = "org.key_project.keyide.ui.images.blockContractTerminationNotVerified";
+   
+   /**
+    * The key for the image that is used for exceptional loop body termination.
+    */
+   public static final String BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION = "org.key_project.keyide.ui.images.blockContractExceptionalTermination";
+   
+   /**
+    * The key for the image that is used for exceptional loop body termination.
+    */
+   public static final String BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION_NOT_VERIFIED = "org.key_project.keyide.ui.images.blockContractExceptinalTerminationNotVerified";
+   
+   /**
     * Forbid instances.
     */
    private KeYImages(){
@@ -282,6 +312,24 @@ public final class KeYImages {
        }
        else if (THREAD.equals(key)) {
     	  path = "icons/SEDIcons/thread.gif";
+       }
+       else if (BLOCK_CONTRACT.equals(key)) {
+          path = "icons/SEDIcons/block_contract.gif";
+       }
+       else if (BLOCK_CONTRACT_NOT_PRE.equals(key)) {
+          path = "icons/SEDIcons/block_contract_not_pre.gif";
+       }
+       else if (BLOCK_CONTRACT_TERMINATION.equals(key)) {
+          path = "icons/SEDIcons/block_contract_termination.gif";
+       }
+       else if (BLOCK_CONTRACT_TERMINATION_NOT_VERIFIED.equals(key)) {
+          path = "icons/SEDIcons/block_contract_termination_not_verified.gif";
+       }
+       else if (BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION.equals(key)) {
+          path = "icons/SEDIcons/block_contract_exceptional_termination.gif";
+       }
+       else if (BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION_NOT_VERIFIED.equals(key)) {
+          path = "icons/SEDIcons/block_contract_exceptional_termination_not_verified.gif";
        }
        // Load image if possible
        if (path != null) {

@@ -31,6 +31,7 @@ import org.eclipse.ui.handlers.RegistryToggleState;
 import org.key_project.keyide.ui.handlers.BreakpointToggleHandler;
 import org.key_project.sed.core.model.ISEDebugElement;
 import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.ISETermination;
 import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.model.impl.AbstractSEThread;
@@ -1026,5 +1027,21 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    @Override
    public boolean isTruthValueTracingEnabled() {
       return SymbolicExecutionJavaProfile.isTruthValueTracingEnabled(getExecutionNode().getProof());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getOutgoingLinks() throws DebugException {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getIncomingLinks() throws DebugException {
+      return null;
    }
 }

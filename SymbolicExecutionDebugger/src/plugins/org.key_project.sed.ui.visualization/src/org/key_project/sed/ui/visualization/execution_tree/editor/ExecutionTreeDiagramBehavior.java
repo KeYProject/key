@@ -46,8 +46,8 @@ import org.key_project.sed.core.annotation.ISEAnnotation;
 import org.key_project.sed.core.annotation.ISEAnnotationLink;
 import org.key_project.sed.core.annotation.event.ISEAnnotationLinkListener;
 import org.key_project.sed.core.annotation.event.SEAnnotationLinkEvent;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.event.ISEAnnotationListener;
 import org.key_project.sed.core.model.event.SEAnnotationEvent;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
@@ -273,7 +273,7 @@ public class ExecutionTreeDiagramBehavior extends DiagramBehavior {
       boolean updateRequired = false;
       int i = 0;
       while (!updateRequired && i < events.length) {
-         if (DebugEvent.SUSPEND == events[i].getKind() || DebugEvent.SUSPEND == events[i].getKind()) {
+         if (DebugEvent.SUSPEND == events[i].getKind()) {
             if (events[i].getSource() instanceof IDebugElement) {
                IDebugTarget target = ((IDebugElement) events[i].getSource()).getDebugTarget();
                if (target instanceof ISEDebugTarget) {
@@ -621,6 +621,20 @@ public class ExecutionTreeDiagramBehavior extends DiagramBehavior {
             @Override
             public void execute(ICustomContext context) {
                ExecutionTreeStyleUtil.getStyleForParentConnection(diagram);
+            }
+         };
+      }
+      else if (VisualizationPreferences.EXECUTION_TREE_NODE_LINK_COLOR.equals(event.getProperty())) {
+         final Diagram diagram = getDiagram();
+         feature = new AbstractCustomFeature(getDiagramTypeProvider().getFeatureProvider()) {
+            @Override
+            public boolean canExecute(ICustomContext context) {
+               return true;
+            }
+            
+            @Override
+            public void execute(ICustomContext context) {
+               ExecutionTreeStyleUtil.getStyleForLinkConnection(diagram);
             }
          };
       }

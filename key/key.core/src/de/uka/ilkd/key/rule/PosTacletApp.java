@@ -25,8 +25,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -163,6 +161,7 @@ public class PosTacletApp extends TacletApp {
     }
 
 
+    @Override
     protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
 	if (!taclet().getPrefix(sv).context()) {
 	    return DefaultImmutableSet.<QuantifiableVariable>nil();
@@ -207,6 +206,7 @@ public class PosTacletApp extends TacletApp {
      * @param term the Term the SchemaVariable is instantiated with
      * @return the new TacletApp
      */
+    @Override
     public TacletApp addInstantiation(SchemaVariable sv,
 	    			      Term term,
                                       boolean interesting,
@@ -232,6 +232,7 @@ public class PosTacletApp extends TacletApp {
      * @param pe the ProgramElement the SV is instantiated with
      * @return the new TacletApp
      */
+    @Override
     public TacletApp addInstantiation(SchemaVariable sv,
 	    			      ProgramElement pe,
                                       boolean interesting,
@@ -254,6 +255,7 @@ public class PosTacletApp extends TacletApp {
 
 
 
+    @Override
     public TacletApp addInstantiation(SchemaVariable sv,
 	    			      Object[] list,
 	    			      boolean interesting,
@@ -283,6 +285,7 @@ public class PosTacletApp extends TacletApp {
      * instantiations
      * @return the new Taclet application
      */
+    @Override
     public TacletApp addInstantiation(SVInstantiations svi, Services services) {
 	return createPosTacletApp((FindTaclet)taclet(),
 				  svi.union(instantiations(), services),
@@ -300,6 +303,7 @@ public class PosTacletApp extends TacletApp {
      * instantiations
      * @return the new Taclet application
      */
+    @Override
     protected TacletApp setInstantiation(SVInstantiations svi,
 	    			         Services services) {
 	return createPosTacletApp((FindTaclet)taclet(),
@@ -315,6 +319,7 @@ public class PosTacletApp extends TacletApp {
      * instantiations, constraints and new metavariables given
      * by the mc object and forget the old ones
      */
+    @Override
     public TacletApp setMatchConditions(MatchConditions mc,
 	    				Services services) {
 	return createPosTacletApp( (FindTaclet)taclet(),
@@ -330,6 +335,7 @@ public class PosTacletApp extends TacletApp {
      * instantiations, constraints, new metavariables and if formula
      * instantiations given and forget the old ones
      */
+    @Override
     protected TacletApp setAllInstantiations ( MatchConditions              mc,
 					       ImmutableList<IfFormulaInstantiation> ifInstantiations,
 					       Services                     services) {
@@ -346,6 +352,7 @@ public class PosTacletApp extends TacletApp {
      * @return true iff all necessary informations are collected, so
      * that the Taclet can be applied.
      */
+    @Override
     public boolean complete() {
 	return posInOccurrence() != null &&
 	    uninstantiatedVars().isEmpty() &&
@@ -357,10 +364,12 @@ public class PosTacletApp extends TacletApp {
      * a position in the corresponding formula)
      * @return the PosInOccurrence
      */
+    @Override
     public PosInOccurrence posInOccurrence() {
 	return pos;
     }
 
+    @Override
     public boolean equals(Object o) {
        if (!super.equals(o)) {
           return false;
@@ -368,11 +377,13 @@ public class PosTacletApp extends TacletApp {
        return ((PosTacletApp)o).posInOccurrence().equals(posInOccurrence());
     }
 
+    @Override
     public int hashCode(){
     	return super.hashCode() + 13 * posInOccurrence().hashCode();
     }
 
+    @Override
     public String toString() {
-	return super.toString()+" at "+posInOccurrence();
+        return super.toString() + " at " + posInOccurrence();
     }
 }

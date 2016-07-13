@@ -24,6 +24,7 @@ import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Debug;
 
@@ -154,7 +155,7 @@ public class StrategySettings implements Settings, Cloneable {
      */
     public void writeSettings (Object sender, Properties props ) {
 	if (getStrategy()==null) {
-	    setStrategy(JavaCardDLStrategy.Factory.NAME); // It would be bedder to return the name of the default factory defined by the profile used by the proof in which this strategysettings is used or just not to save the strategy because it is not defined.
+	    setStrategy(JavaCardDLStrategyFactory.NAME); // It would be bedder to return the name of the default factory defined by the profile used by the proof in which this strategysettings is used or just not to save the strategy because it is not defined.
 	}
 	if (maxSteps<0) {
 	    setMaxSteps(10000);

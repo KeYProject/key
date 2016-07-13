@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -423,7 +422,7 @@ public class TacletAppIndex  {
      * information has been added to the TacletIndex.
      * @param tacletApps set of partially instantiated {@link Taclet}s to add
      */
-    public void addedNoPosTacletApps(ImmutableSet<NoPosTacletApp> tacletApps) {
+    public void addedNoPosTacletApps(Iterable<NoPosTacletApp> tacletApps) {
         for (TacletApp tacletApp : tacletApps) {
             if ( indexCaches.isRelevantTaclet ( tacletApp.taclet () ) ) {
                 // we must flush the index cache, and we must no longer use a cache

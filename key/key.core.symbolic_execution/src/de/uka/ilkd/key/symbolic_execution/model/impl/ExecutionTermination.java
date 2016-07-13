@@ -68,6 +68,8 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
       switch (getTerminationKind()) {
          case EXCEPTIONAL : return INTERNAL_NODE_NAME_START + "uncaught " + exceptionSort + INTERNAL_NODE_NAME_END;
          case LOOP_BODY : return LOOP_BODY_TERMINATION_NODE_NAME;
+         case BLOCK_CONTRACT_NORMAL : return INTERNAL_NODE_NAME_START + "block contract end" + INTERNAL_NODE_NAME_END;
+         case BLOCK_CONTRACT_EXCEPTIONAL : return INTERNAL_NODE_NAME_START + "block contract uncaught " + exceptionSort + INTERNAL_NODE_NAME_END;
          default : return NORMAL_TERMINATION_NODE_NAME;
       }
    }
@@ -86,9 +88,22 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
    @Override
    public TerminationKind getTerminationKind() {
       if (terminationKind == null) {
-         terminationKind = isExceptionalTermination() ? TerminationKind.EXCEPTIONAL : TerminationKind.NORMAL;
+         if (isBlockContractTermination()) {
+            terminationKind = isExceptionalTermination() ? TerminationKind.BLOCK_CONTRACT_EXCEPTIONAL : TerminationKind.BLOCK_CONTRACT_NORMAL;
+         }
+         else {
+            terminationKind = isExceptionalTermination() ? TerminationKind.EXCEPTIONAL : TerminationKind.NORMAL;
+         }
       }
       return terminationKind;
+   }
+   
+   /**
+    * Checks if a block contract terminates.
+    * @return {@code true} A block contract terminates, {@code false} normal execution terminates.
+    */
+   protected boolean isBlockContractTermination() {
+      return SymbolicExecutionUtil.isBlockContractValidityBranch(getModalityPIO());
    }
 
    /**
@@ -127,6 +142,8 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
       switch (getTerminationKind()) {
          case EXCEPTIONAL : return "Exceptional Termination";
          case LOOP_BODY : return "Loop Body Termination";
+         case BLOCK_CONTRACT_NORMAL : return "Block Contract Termination";
+         case BLOCK_CONTRACT_EXCEPTIONAL : return "Block Contract Exceptional Termination";
          default : return "Termination";
       }
    }
@@ -136,6 +153,12 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
     */
    @Override
    public boolean isBranchVerified() {
-      return SymbolicExecutionUtil.lazyComputeIsBranchVerified(getProofNode());
+      if (TerminationKind.BLOCK_CONTRACT_NORMAL.equals(terminationKind) ||
+          TerminationKind.BLOCK_CONTRACT_EXCEPTIONAL.equals(terminationKind)) {
+         return SymbolicExecutionUtil.lazyComputeIsAdditionalBranchVerified(getProofNode());
+      }
+      else {
+         return SymbolicExecutionUtil.lazyComputeIsMainBranchVerified(getProofNode());
+      }
    }
 }

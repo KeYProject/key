@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
@@ -40,6 +41,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.util.NodePreorderIterator;
 
 /**
  * Provides functionality to evaluate the truth value of labeled formulas
@@ -184,104 +186,125 @@ public final class TruthValueTracingUtil {
       TruthValueTracingResult result = new TruthValueTracingResult();
       Deque<Map<String, MultiEvaluationResult>> evaluationStack = new LinkedList<Map<String, MultiEvaluationResult>>();
       evaluationStack.addFirst(new HashMap<String, MultiEvaluationResult>());
-      evaluateNode(node, useUnicode, usePrettyPrinting, node, termLabelName, evaluationStack, result, node.proof().getServices());
+      Services services = node.proof().getServices();
+      NodePreorderIterator iterator = new NodePreorderIterator(node);
+      while (iterator.hasNext()) {
+         // Get next node
+         int childIndexOnParnt = iterator.getChildIndexOnParent(); // Needs to be called before next is called.
+         Node next = iterator.next();
+         // Create child result for current node
+         final Map<String, MultiEvaluationResult> topResults = evaluationStack.getFirst();
+         Map<String, MultiEvaluationResult> nodeResults = new HashMap<String, MultiEvaluationResult>(topResults);
+         evaluationStack.addFirst(nodeResults);
+         // Analyze node
+         evaluateNode(node, 
+                      useUnicode, 
+                      usePrettyPrinting, 
+                      next, 
+                      childIndexOnParnt, 
+                      termLabelName, 
+                      nodeResults, 
+                      result, 
+                      services);
+         // Remove no longer needed child result of returned nodes
+         for (int i = 0; i < iterator.getReturnedParents(); i++) {
+            evaluationStack.removeFirst();
+         }
+      }
       return result;
    }
-
+   
    /**
-    * Utility method used by {@link #evaluate(Node, Name)} for recursive evaluation.
-    * @param node The current {@link Node}.
+    * Evaluates the truth statuses changed from the parent {@link Node} to its child {@link Node}.
+    * @param evaluationNode The {@link Node} where the truth status tracing started.
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
+    * @param child The current child {@link Node} to analyze.
+    * @param childIndexOnParent The index of the child {@link Node} on its parent {@link Node}.
     * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
-    * @param evaluationStack The not empty stack with evaluation results.
-    * @param result The {@link TruthValueTracingResult} to fill with leaf nodes.
+    * @param nodeResult The to child {@link Node} related result {@link Map} to update.
+    * @param result The overall {@link TruthValueTracingResult} to update.
     * @param services The {@link Services} to use.
-    * @throws ProofInputException Occurred Exception
+    * @throws ProofInputException Occurred exception.
     */
    protected static void evaluateNode(final Node evaluationNode,
                                       final boolean useUnicode,
                                       final boolean usePrettyPrinting,
-                                      final Node node, 
+                                      final Node child, 
+                                      final int childIndexOnParent, 
                                       final Name termLabelName, 
-                                      final Deque<Map<String, MultiEvaluationResult>> evaluationStack, 
+                                      Map<String, MultiEvaluationResult> nodeResult,
                                       final TruthValueTracingResult result,
                                       final Services services) throws ProofInputException {
-      // Create new stack entry
-      final Map<String, MultiEvaluationResult> currentResults = evaluationStack.getFirst();
-      // Analyze applied rule
-      boolean childrenAlreadyTreated = false;
-      if (node.getAppliedRuleApp() instanceof TacletApp) {
-         TacletApp tacletApp = (TacletApp) node.getAppliedRuleApp();
-         List<LabelOccurrence> labels = findInvolvedLabels(node.sequent(), tacletApp, termLabelName);
-         if (!labels.isEmpty()) {
-            Taclet taclet = ((TacletApp) tacletApp).taclet();
-            if (taclet.goalTemplates().size() >= 1) { // Not a closing taclet
-               childrenAlreadyTreated = true;
-               int i = 0;
-               for (TacletGoalTemplate tacletGoal : taclet.goalTemplates().reverse()) {
-                  Map<String, MultiEvaluationResult> childResults = new HashMap<String, MultiEvaluationResult>(currentResults);
-                  // Check for new minor ids created by parent rule application
-                  updatePredicateResultBasedOnNewMinorIds(node.child(i), termLabelName, services.getTermBuilder(), childResults);
-                  analyzeTacletGoal(node, tacletApp, tacletGoal, labels, services, childResults);
-                  // Evaluate children with branch specific Taclet result
-                  evaluationStack.addFirst(childResults);
-                  evaluateNode(evaluationNode, useUnicode, usePrettyPrinting, node.child(i), termLabelName, evaluationStack, result, services);
-                  evaluationStack.removeFirst();
-                  i++;
-               }
-            }
-            else if (tacletApp.posInOccurrence() != null){
-               for (LabelOccurrence occurrence : labels) {
-                  updatePredicateResult(occurrence.getLabel(), !occurrence.isInAntecedent(), currentResults);
-               }
-            }
-         }
-      }
-      else if (node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
-         OneStepSimplifierRuleApp app = (OneStepSimplifierRuleApp) node.getAppliedRuleApp();
-         PosInOccurrence parentPio = null;
-         for (RuleApp protocolApp : app.getProtocol()) {
-            if (parentPio != null) {
-               updatePredicateResultBasedOnNewMinorIdsOSS(protocolApp.posInOccurrence(), parentPio, termLabelName, services.getTermBuilder(), currentResults);
-            }
-            assert protocolApp instanceof TacletApp;
-            TacletApp tacletApp = (TacletApp) protocolApp;
-            Taclet taclet = tacletApp.taclet();
-            assert taclet.goalTemplates().size() == 1;
-            List<LabelOccurrence> labels = findInvolvedLabels(node.sequent(), tacletApp, termLabelName);
+      // Analyze parent rule application
+      boolean checkPerformed = false;
+      if (childIndexOnParent >= 0) {
+         Node parent = child.parent();
+         if (parent.getAppliedRuleApp() instanceof TacletApp) {
+            TacletApp tacletApp = (TacletApp) parent.getAppliedRuleApp();
+            List<LabelOccurrence> labels = findInvolvedLabels(parent.sequent(), tacletApp, termLabelName);
             if (!labels.isEmpty()) {
-               analyzeTacletGoal(node, tacletApp, taclet.goalTemplates().head(), labels, services, currentResults);
+               Taclet taclet = ((TacletApp) tacletApp).taclet();
+               if (!isClosingRule(taclet)) { // Not a closing taclet
+                  checkPerformed = true;
+                  TacletGoalTemplate tacletGoal = taclet.goalTemplates().reverse().take(childIndexOnParent).head();
+                  // Check for new minor ids created by parent rule application
+                  updatePredicateResultBasedOnNewMinorIds(child, termLabelName, services.getTermBuilder(), nodeResult);
+                  analyzeTacletGoal(parent, tacletApp, tacletGoal, labels, services, nodeResult);
+               }
+               else if (tacletApp.posInOccurrence() != null) {
+                  for (LabelOccurrence occurrence : labels) {
+                     updatePredicateResult(occurrence.getLabel(), !occurrence.isInAntecedent(), nodeResult);
+                  }
+               }
             }
-            parentPio = protocolApp.posInOccurrence();
          }
-         // Compare last PIO with PIO in child sequent (Attention: Child PIO is computed with help of the PIO of the OSS)
-         if (parentPio != null) {
-            assert 1 == node.childrenCount() : "Implementaton of the OneStepSimplifierRule has changed.";
-            PosInOccurrence childPio = SymbolicExecutionUtil.posInOccurrenceToOtherSequent(node, node.getAppliedRuleApp().posInOccurrence(), node.child(0));
-            updatePredicateResultBasedOnNewMinorIdsOSS(childPio, parentPio, termLabelName, services.getTermBuilder(), currentResults);
+         else if (parent.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
+            OneStepSimplifierRuleApp app = (OneStepSimplifierRuleApp) parent.getAppliedRuleApp();
+            PosInOccurrence parentPio = null;
+            for (RuleApp protocolApp : app.getProtocol()) {
+               if (parentPio != null) {
+                  updatePredicateResultBasedOnNewMinorIdsOSS(protocolApp.posInOccurrence(), parentPio, termLabelName, services.getTermBuilder(), nodeResult);
+               }
+               assert protocolApp instanceof TacletApp;
+               TacletApp tacletApp = (TacletApp) protocolApp;
+               Taclet taclet = tacletApp.taclet();
+               assert taclet.goalTemplates().size() == 1;
+               List<LabelOccurrence> labels = findInvolvedLabels(parent.sequent(), tacletApp, termLabelName);
+               if (!labels.isEmpty()) {
+                  analyzeTacletGoal(parent, tacletApp, taclet.goalTemplates().head(), labels, services, nodeResult);
+               }
+               parentPio = protocolApp.posInOccurrence();
+            }
+            // Compare last PIO with PIO in child sequent (Attention: Child PIO is computed with help of the PIO of the OSS)
+            if (parentPio != null) {
+               assert 1 == parent.childrenCount() : "Implementaton of the OneStepSimplifierRule has changed.";
+               PosInOccurrence childPio = SymbolicExecutionUtil.posInOccurrenceToOtherSequent(parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(0));
+               updatePredicateResultBasedOnNewMinorIdsOSS(childPio, parentPio, termLabelName, services.getTermBuilder(), nodeResult);
+            }
          }
       }
-      // Analyze children
-      int childCount = node.childrenCount();
+      // If goal reached, update final result
+      int childCount = child.childrenCount();
       if (childCount == 0) {
-         Term condition = SymbolicExecutionUtil.computePathCondition(evaluationNode, node, false, true);
+         Term condition = SymbolicExecutionUtil.computePathCondition(evaluationNode, child, false, true);
          String conditionString = SymbolicExecutionUtil.formatTerm(condition, services, useUnicode, usePrettyPrinting);
-         result.addBranchResult(new BranchResult(node, currentResults, condition, conditionString, termLabelName));
+         result.addBranchResult(new BranchResult(child, nodeResult, condition, conditionString, termLabelName));
       }
-      else if (!childrenAlreadyTreated) {
-         // Evaluate children in case that branch specific Taclet results are not available and thus not evaluated yet.
-         for (int i = 0; i < childCount; i++) {
-            Map<String, MultiEvaluationResult> childResults = new HashMap<String, MultiEvaluationResult>(currentResults);
-            // Check for new minor ids created by parent rule application
-            updatePredicateResultBasedOnNewMinorIds(node.child(i), termLabelName, services.getTermBuilder(), childResults);
-            evaluationStack.addFirst(childResults);
-            evaluateNode(evaluationNode, useUnicode, usePrettyPrinting, node.child(i), termLabelName, evaluationStack, result, services);
-            evaluationStack.removeFirst();
-         }
+      else if (!checkPerformed) {
+         updatePredicateResultBasedOnNewMinorIds(child, termLabelName, services.getTermBuilder(), nodeResult);
       }
    }
    
+   /**
+    * Checks if the {@link Taclet} is a closing rule.
+    * @param taclet The {@link Taclet} to check.
+    * @return {@code true} is closing, {@code false} is not closing.
+    */
+   protected static boolean isClosingRule(Taclet taclet) {
+      return taclet.goalTemplates().isEmpty();
+   }
+
    /**
     * Computes the occurrences of all involved {@link FormulaTermLabel}s.
     * @param sequent The {@link Sequent} on which the given {@link TacletApp} was applied.
@@ -302,6 +325,18 @@ public final class TruthValueTracingUtil {
             TermLabel label = term.getLabel(termLabelName);
             if (label instanceof FormulaTermLabel) {
                result.add(new LabelOccurrence((FormulaTermLabel) label, pio.isInAntec()));
+            }
+         }
+      }
+      if (isClosingRule(tacletApp.taclet())) {
+         if (tacletApp.ifInstsComplete() && tacletApp.ifFormulaInstantiations() != null) {
+            for (IfFormulaInstantiation ifInst : tacletApp.ifFormulaInstantiations()) {
+               assert ifInst instanceof IfFormulaInstSeq;
+               Term term = ifInst.getConstrainedFormula().formula();
+               TermLabel label = term.getLabel(termLabelName);
+               if (label instanceof FormulaTermLabel) {
+                  result.add(new LabelOccurrence((FormulaTermLabel) label, ((IfFormulaInstSeq) ifInst).inAntec()));
+               }
             }
          }
       }

@@ -45,6 +45,274 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
+   /**
+    * Tests example: /set/useOperationContractLightweightOperationContractTest
+    */
+   public void testUseOperationContractLightweightOperationContractTest() throws Exception {
+      doSETTest(testCaseDirectory, 
+                "/set/useOperationContractLightweightOperationContractTest/test/LightweightOperationContractTest.java", 
+                "LightweightOperationContractTest", 
+                "main", 
+                null,
+                "/set/useOperationContractLightweightOperationContractTest/oracle/LightweightOperationContractTest.xml",
+                false,
+                false,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractAssignableEverything
+    */
+   public void testBlockContractAssignableEverything() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractAssignableEverything/test/BlockContractAssignableEverything.proof",
+                          "/set/blockContractAssignableEverything/oracle/BlockContractAssignableEverything.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractAssignableLocationNotRequested
+    */
+   public void testBlockContractAssignableLocationNotRequested() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractAssignableLocationNotRequested/test/BlockContractAssignableLocationNotRequested.proof",
+                          "/set/blockContractAssignableLocationNotRequested/oracle/BlockContractAssignableLocationNotRequested.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractAssignableRequestedLocation
+    */
+   public void testBlockContractAssignableRequestedLocation() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractAssignableRequestedLocation/test/BlockContractAssignableRequestedLocation.proof",
+                          "/set/blockContractAssignableRequestedLocation/oracle/BlockContractAssignableRequestedLocation.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractParamRemaned
+    */
+   public void testBlockContractParamRemaned() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractParamRemaned/test/BlockContractParamRemaned.proof",
+                          "/set/blockContractParamRemaned/oracle/BlockContractParamRemaned.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractPreconditionNotVerified
+    */
+   public void testBlockContractPreconditionNotVerified() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractPreconditionNotVerified/test/BlockContractPreconditionNotVerified.proof",
+                          "/set/blockContractPreconditionNotVerified/oracle/BlockContractPreconditionNotVerified.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractThisTest
+    */
+   public void testBlockContractThisTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractThisTest/test/BlockContractThisTest.proof",
+                          "/set/blockContractThisTest/oracle/BlockContractThisTest.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractVarRenamedLater
+    */
+   public void testBlockContractVarRenamedLater() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractVarRenamedLater/test/BlockContractVarRenamedLater.proof",
+                          "/set/blockContractVarRenamedLater/oracle/BlockContractVarRenamedLater.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractWithException
+    */
+   public void testBlockContractWithException() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractWithException/test/BlockContractWithException.proof",
+                          "/set/blockContractWithException/oracle/BlockContractWithException.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractWithExceptionPostconditionNotVerified
+    */
+   public void testBlockContractWithExceptionPostconditionNotVerified() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractWithExceptionPostconditionNotVerified/test/BlockContractWithExceptionPostconditionNotVerified.proof",
+                          "/set/blockContractWithExceptionPostconditionNotVerified/oracle/BlockContractWithExceptionPostconditionNotVerified.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractWithReturn
+    */
+   public void testBlockContractWithReturn() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractWithReturn/test/BlockContractWithReturn.proof",
+                          "/set/blockContractWithReturn/oracle/BlockContractWithReturn.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractWithReturnPostconditionNotVerified
+    */
+   public void testBlockContractWithReturnPostconditionNotVerified() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/blockContractWithReturnPostconditionNotVerified/test/BlockContractWithReturnPostconditionNotVerified.proof",
+                          "/set/blockContractWithReturnPostconditionNotVerified/oracle/BlockContractWithReturnPostconditionNotVerified.xml",
+                          false,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
    
    /**
     * Tests example: /set/useLoopInvariantWithoutDecreasing
@@ -53,6 +321,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
       doSETTestAndDispose(testCaseDirectory,
                           "/set/useLoopInvariantWithoutDecreasing/test/LoopInvArrayExample.proof",
                           "/set/useLoopInvariantWithoutDecreasing/oracle/LoopInvArrayExample.xml",
+                          false,
                           false,
                           false,
                           false,
@@ -90,6 +359,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -112,6 +382,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -144,6 +415,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -166,6 +438,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -198,6 +471,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -217,6 +491,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                                                                         false,
                                                                         false,
                                                                         ALL_IN_ONE_RUN,
+                                                                        false,
                                                                         false,
                                                                         false,
                                                                         false,
@@ -256,6 +531,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false, 
                 false, 
                 false, 
+                false,
                 false);
    }
    
@@ -281,6 +557,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                false, 
                false, 
                false, 
+               false,
                false, 
                false, 
                false, 
@@ -321,6 +598,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                false, 
                false, 
                false, 
+               false,
                false, 
                false, 
                false, 
@@ -371,6 +649,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                ALL_IN_ONE_RUN, 
                false, 
                false, 
+               false,
                false, 
                false, 
                false, 
@@ -421,7 +700,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
          originalTacletOptions = setDefaultTacletOptions(testCaseDirectory, javaPathInBaseDir, containerTypeName, methodFullName);
          setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInBaseDir, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false, true);
+         env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInBaseDir, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false, false, true);
          IExecutionStart start = env.getBuilder().getStartNode();
          // Perform step into
          SymbolicExecutionCompletions completions = stepInto(env.getUi(), env.getBuilder(), "/set/symbolicExecutionCompletionsTest/oracle/SymbolicExecutionCompletionsTest", 1, ".xml", testCaseDirectory);
@@ -516,6 +795,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false, 
                 false, 
                 false, 
+                false,
                 false, 
                 false, 
                 false, 
@@ -530,6 +810,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false, 
                 false, 
                 false, 
+                false,
                 false, 
                 false, 
                 false, 
@@ -554,6 +835,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false, 
                 false, 
                 false, 
+                false,
                 false, 
                 false, 
                 false);
@@ -574,6 +856,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -608,6 +891,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -626,6 +910,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -660,6 +945,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -678,6 +964,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -712,6 +999,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -730,6 +1018,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -764,6 +1053,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -782,6 +1072,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -816,6 +1107,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -834,6 +1126,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -868,6 +1161,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -894,6 +1188,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -912,6 +1207,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 true,
                 true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -946,6 +1242,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -964,6 +1261,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -998,6 +1296,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -1024,6 +1323,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -1034,6 +1334,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
       doSETTestAndDispose(testCaseDirectory,
                 "/set/verificationProofFile_VerifyNumber/test/VerifyNumberNormal.proof",
                 "/set/verificationProofFile_VerifyNumber/oracle/VerifyNumberNormal.xml",
+                false,
                 false,
                 false,
                 false,
@@ -1066,6 +1367,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1080,6 +1382,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 true,
                 true,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -1105,6 +1408,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 true,
                 true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1139,6 +1443,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -1160,6 +1465,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -1186,6 +1492,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 true,
+                false,
                 false,
                 false,
                 true,
@@ -1217,6 +1524,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -1238,6 +1546,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -1269,6 +1578,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
 
@@ -1289,6 +1599,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -1321,6 +1632,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -1341,6 +1653,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -1373,6 +1686,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -1393,6 +1707,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -1425,6 +1740,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -1445,6 +1761,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -1477,6 +1794,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -1497,6 +1815,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -1529,6 +1848,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -1549,6 +1869,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -1581,6 +1902,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -1601,6 +1923,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -1633,6 +1956,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -1653,6 +1977,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -1685,6 +2010,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -1705,6 +2031,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -1737,6 +2064,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -1757,6 +2085,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -1789,6 +2118,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -1809,6 +2139,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -1841,6 +2172,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -1861,6 +2193,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -1893,6 +2226,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -1912,6 +2246,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -1943,6 +2278,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
 
@@ -1959,6 +2295,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 ALL_IN_ONE_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1993,6 +2330,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2018,6 +2356,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2034,6 +2373,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 ALL_IN_ONE_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -2069,6 +2409,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2095,6 +2436,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2115,6 +2457,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -2152,6 +2495,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2178,6 +2522,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -2214,6 +2559,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2240,6 +2586,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -2276,6 +2623,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2299,6 +2647,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 true,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -2338,6 +2687,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2364,6 +2714,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -2400,6 +2751,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2426,6 +2778,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -2462,6 +2815,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2488,6 +2842,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -2524,6 +2879,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2550,6 +2906,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -2586,6 +2943,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2612,6 +2970,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -2648,6 +3007,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2674,6 +3034,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -2710,6 +3071,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2736,6 +3098,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -2772,6 +3135,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2798,6 +3162,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -2834,6 +3199,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2854,6 +3220,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -2886,6 +3253,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2905,6 +3273,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                                                                                false,
                                                                                false,
                                                                                ALL_IN_ONE_RUN,
+                                                                               false,
                                                                                false,
                                                                                false,
                                                                                false,
@@ -2971,6 +3340,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -2989,6 +3359,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -3023,6 +3394,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3043,6 +3415,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -3075,6 +3448,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3095,6 +3469,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -3127,6 +3502,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3147,6 +3523,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -3179,6 +3556,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3199,6 +3577,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -3231,6 +3610,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3251,6 +3631,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -3283,6 +3664,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3301,6 +3683,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 true,
                 true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -3335,6 +3718,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3353,6 +3737,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,
@@ -3387,6 +3772,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3406,6 +3792,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -3439,6 +3826,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3457,6 +3845,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -3491,6 +3880,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3509,6 +3899,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -3543,6 +3934,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           false,
+                          false,
                           true);
    }
    
@@ -3561,6 +3953,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,
@@ -3595,6 +3988,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           false,
+                          false,
                           true);
    }
    
@@ -3613,6 +4007,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,
@@ -3647,6 +4042,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3665,6 +4061,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -3699,6 +4096,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3717,6 +4115,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -3751,6 +4150,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3769,6 +4169,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -3803,6 +4204,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3821,6 +4223,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -3855,6 +4258,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3873,6 +4277,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -3907,6 +4312,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3925,6 +4331,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -3959,6 +4366,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -3977,6 +4385,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -4011,6 +4420,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -4029,6 +4439,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -4063,6 +4474,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -4081,6 +4493,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -4115,6 +4528,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -4133,6 +4547,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 true,
                 true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -4167,6 +4582,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -4193,6 +4609,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -4211,6 +4628,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -4251,6 +4669,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           false,
+                          false,
                           true);
    }
    
@@ -4269,6 +4688,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -4303,6 +4723,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -4321,6 +4742,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -4355,6 +4777,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -4373,6 +4796,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -4407,6 +4831,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -4425,6 +4850,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -4459,6 +4885,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -4477,6 +4904,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -4511,6 +4939,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 true);
    }
    
@@ -4529,6 +4958,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,

@@ -62,7 +62,7 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
     */
    @Test
    public void testInitialStructure() throws Exception {
-	  KeYEnvironment<DefaultUserInterfaceControl> environment = getEnvironment("OutlineContentAndLabelProviderTest_testInitialStructure", "src", "data/paycard");
+	   KeYEnvironment<DefaultUserInterfaceControl> environment = getEnvironment("OutlineContentAndLabelProviderTest_testInitialStructure", "src", "data/paycard");
       Proof proof = getProof(environment, "PayCard", "isValid");
       assertNotNull(proof);
       // Close proof automatically
@@ -75,7 +75,7 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
          shell.setLayout(new FillLayout());
          TreeViewer viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
          viewer.setUseHashlookup(true);
-         viewer.setContentProvider(new LazyProofTreeContentProvider());
+         viewer.setContentProvider(new LazyProofTreeContentProvider(environment.getProofControl()));
          viewer.setLabelProvider(new ProofTreeLabelProvider(viewer, environment.getProofControl(), proof));
          viewer.setInput(proof);
          shell.setVisible(true);
@@ -115,7 +115,7 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 	      shell.setLayout(new FillLayout());
 	      TreeViewer viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
 	      viewer.setUseHashlookup(true);
-	      LazyProofTreeContentProvider lazyContentProvider = new LazyProofTreeContentProvider();
+	      LazyProofTreeContentProvider lazyContentProvider = new LazyProofTreeContentProvider(environment.getProofControl());
 	      // deactivate hiding intermediate proofsteps filter and show symbolic execution tree filter
 	      lazyContentProvider.setHideState(false);
 	      lazyContentProvider.setSymbolicState(false);
@@ -186,7 +186,7 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 		      shell.setLayout(new FillLayout());
 		      TreeViewer viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
 		      viewer.setUseHashlookup(true);
-		      LazyProofTreeContentProvider lazyContentProvider = new LazyProofTreeContentProvider();
+		      LazyProofTreeContentProvider lazyContentProvider = new LazyProofTreeContentProvider(environment.getProofControl());
 		      // deactivate hiding intermediate proofsteps filter and show symbolic execution tree filter
 		      lazyContentProvider.setHideState(false);
 		      lazyContentProvider.setSymbolicState(false);
@@ -258,7 +258,7 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 	      shell.setLayout(new FillLayout());
 	      TreeViewer viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
 	      viewer.setUseHashlookup(true);
-	      LazyProofTreeContentProvider lazyContentProvider = new LazyProofTreeContentProvider();
+	      LazyProofTreeContentProvider lazyContentProvider = new LazyProofTreeContentProvider(environment.getProofControl());
 	      // deactivate hiding intermediate proofsteps filter and show symbolic execution tree filter
 	      lazyContentProvider.setHideState(false);
 	      lazyContentProvider.setSymbolicState(false);
@@ -342,7 +342,7 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
          TreeViewer viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL
                | SWT.V_SCROLL | SWT.VIRTUAL);
          viewer.setUseHashlookup(true);
-         LazyProofTreeContentProvider lazyContentProvider = new LazyProofTreeContentProvider();
+         LazyProofTreeContentProvider lazyContentProvider = new LazyProofTreeContentProvider(environment.getProofControl());
          // deactivate hiding intermediate proofsteps filter and show symbolic
          // execution tree filter
          lazyContentProvider.setHideState(false);

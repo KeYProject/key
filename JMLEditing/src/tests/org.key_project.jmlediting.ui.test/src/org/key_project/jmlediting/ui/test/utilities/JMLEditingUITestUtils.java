@@ -218,7 +218,7 @@ public class JMLEditingUITestUtils {
          TestUtilsUtil.waitForBuild();
       }
 
-      public void restoreClassAndOpen() throws CoreException {
+      public void restoreClassAndOpen() throws Exception {
          // Check what to do in order to restore the content of the editor to
          // the given class
          // No editor -> copy class and restore

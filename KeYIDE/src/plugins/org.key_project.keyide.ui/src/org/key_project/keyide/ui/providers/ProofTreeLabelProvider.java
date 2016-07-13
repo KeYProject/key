@@ -29,6 +29,10 @@ import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -229,8 +233,14 @@ public class ProofTreeLabelProvider extends LabelProvider {
 				if (statement != null) {
 					posInfo = statement.getPositionInfo();
 				}
-
-				if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement)) {
+				if (SymbolicExecutionUtil.isBlockContract(node, node.getAppliedRuleApp())) {
+				   if (node.childrenCount() >= 3 && node.child(1).isClosed()) {
+				      return KeYImages.getImage(KeYImages.BLOCK_CONTRACT);
+				   }
+				   else {
+                  return KeYImages.getImage(KeYImages.BLOCK_CONTRACT_NOT_PRE);
+				   }
+				} else if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement)) {
 					return KeYImages.getImage(KeYImages.METHOD_CALL);
 
 				} else if (SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp())) {
@@ -240,24 +250,41 @@ public class ProofTreeLabelProvider extends LabelProvider {
 					return KeYImages.getImage(KeYImages.EXCEPTIONAL_METHOD_RETURN);
 
 				} else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
-					if (SymbolicExecutionUtil.isLoopBodyTermination(node, node.getAppliedRuleApp())) {
-						if (SymbolicExecutionUtil.lazyComputeIsBranchVerified(node)) {
+               if (SymbolicExecutionUtil.isBlockContractValidityBranch(node.getAppliedRuleApp())) {
+                  Term modalityTerm = TermBuilder.goBelowUpdates(node.getAppliedRuleApp().posInOccurrence().subTerm());
+                  BlockContractValidityTermLabel bcLabel = (BlockContractValidityTermLabel) modalityTerm.getLabel(BlockContractValidityTermLabel.NAME);
+                  if (SymbolicExecutionUtil.lazyComputeIsExceptionalTermination(node, (IProgramVariable) proof.getServices().getNamespaces().programVariables().lookup(bcLabel.getExceptionVariableName()))) {
+                     if (SymbolicExecutionUtil.lazyComputeIsAdditionalBranchVerified(node)) {
+                        return KeYImages.getImage(KeYImages.BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION);
+                     } else {
+                        return KeYImages.getImage(KeYImages.BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
+                     }
+                  }
+                  else {
+                     if (SymbolicExecutionUtil.lazyComputeIsAdditionalBranchVerified(node)) {
+                        return KeYImages.getImage(KeYImages.BLOCK_CONTRACT_TERMINATION);
+                     } else {
+                        return KeYImages.getImage(KeYImages.BLOCK_CONTRACT_TERMINATION_NOT_VERIFIED);
+                     }
+                  }
+               } else if (SymbolicExecutionUtil.isLoopBodyTermination(node, node.getAppliedRuleApp())) {
+						if (SymbolicExecutionUtil.lazyComputeIsMainBranchVerified(node)) {
 							return KeYImages.getImage(KeYImages.LOOP_BODY_TERMINATION);
 						} else {
 							return KeYImages.getImage(KeYImages.LOOP_BODY_TERMINATION_NOT_VERIFIED);
 						}
 					} else if (SymbolicExecutionUtil.lazyComputeIsExceptionalTermination(node, SymbolicExecutionUtil.extractExceptionVariable(node.proof()))) {
-						if (SymbolicExecutionUtil.lazyComputeIsBranchVerified(node)) {
-							return KeYImages.getImage(KeYImages.EXCEPTIONAL_TERMINATION);
-						} else {
-							return KeYImages.getImage(KeYImages.EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
-						}
+                  if (SymbolicExecutionUtil.lazyComputeIsMainBranchVerified(node)) {
+                     return KeYImages.getImage(KeYImages.EXCEPTIONAL_TERMINATION);
+                  } else {
+                     return KeYImages.getImage(KeYImages.EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
+                  }
 					} else {
-						if (SymbolicExecutionUtil.lazyComputeIsBranchVerified(node)) {
-							return KeYImages.getImage(KeYImages.TERMINATION);
-						} else {
-							return KeYImages.getImage(KeYImages.TERMINATION_NOT_VERIFIED);
-						}
+                  if (SymbolicExecutionUtil.lazyComputeIsMainBranchVerified(node)) {
+                     return KeYImages.getImage(KeYImages.TERMINATION);
+                  } else {
+                     return KeYImages.getImage(KeYImages.TERMINATION_NOT_VERIFIED);
+                  }
 					}
 				} else if (SymbolicExecutionUtil.isBranchStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
 					return KeYImages.getImage(KeYImages.BRANCH_STATEMENT);

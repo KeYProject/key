@@ -32,7 +32,7 @@ public class SWTBotMultilineCommentEditingTest {
    }
 
    @Before
-   public void refreshEditor() throws CoreException {
+   public void refreshEditor() throws Exception {
       testProject.restoreClassAndOpen();
       editor = testProject.getOpenedEditor();
    }

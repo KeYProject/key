@@ -36,10 +36,12 @@ import org.key_project.sed.core.annotation.ISEAnnotation;
 import org.key_project.sed.core.annotation.ISEAnnotationLink;
 import org.key_project.sed.core.annotation.ISEAnnotationType;
 import org.key_project.sed.core.model.ISEBaseMethodReturn;
+import org.key_project.sed.core.model.ISEBlockContract;
+import org.key_project.sed.core.model.ISEBlockContractExceptionalTermination;
+import org.key_project.sed.core.model.ISEBlockContractTermination;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEBranchStatement;
 import org.key_project.sed.core.model.ISEConstraint;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalTermination;
@@ -52,6 +54,8 @@ import org.key_project.sed.core.model.ISELoopStatement;
 import org.key_project.sed.core.model.ISEMethodCall;
 import org.key_project.sed.core.model.ISEMethodContract;
 import org.key_project.sed.core.model.ISEMethodReturn;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.ISEStatement;
 import org.key_project.sed.core.model.ISETermination;
 import org.key_project.sed.core.model.ISEThread;
@@ -237,6 +241,26 @@ public class SEXMLWriter {
    public static final String TAG_RELEVANT_CONSTRAINT = "relevantConstraint";
 
    /**
+    * Tag name to store {@link ISEBlockContract}s.
+    */
+   public static final String TAG_BLOCK_CONTRACT = "blockContract";
+
+   /**
+    * Tag name to store {@link ISEBlockContractExceptionalTermination}s.
+    */
+   public static final String TAG_BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION = "blockContractExceptionalTermination";
+   
+   /**
+    * Tag name to store {@link ISEBlockContractTermination}s.
+    */
+   public static final String TAG_BLOCK_CONTRACT_TERMINATION = "blockContractTermination";
+
+   /**
+    * Tag name to store outgoing {@link ISENodeLink} instances.
+    */
+   public static final String TAG_OUTGOING_LINK = "outgoingLink";
+
+   /**
     * Attribute name to define namespaces.
     */
    public static final String ATTRIBUTE_NAMESPACE = "xmlns";
@@ -391,6 +415,11 @@ public class SEXMLWriter {
     * Attribute name to store {@link ISEGroupable#isGroupable()}.
     */
    public static final String ATTRIBUTE_GROUPABLE = "groupable";
+
+   /**
+    * Attribute name to store {@link ISENodeLink#getTarget()}.
+    */
+   public static final String ATTRIBUTE_LINK_TARGET = "targetId";
    
    /**
     * Writes the given {@link ISEDebugTarget}s into the {@link OutputStream} with the defined encoding.
@@ -698,8 +727,17 @@ public class SEXMLWriter {
       else if (node instanceof ISEMethodCall) {
          return toXML(level, (ISEMethodCall)node, saveVariables, saveCallStack, saveConstraints, monitor);
       }
+      else if (node instanceof ISEBlockContract) {
+         return toXML(level, (ISEBlockContract)node, saveVariables, saveCallStack, saveConstraints, monitor);
+      }
       else if (node instanceof ISEMethodReturn) {
          return toXML(level, (ISEMethodReturn)node, saveVariables, saveCallStack, saveConstraints, monitor);
+      }
+      else if (node instanceof ISEBlockContractExceptionalTermination) {
+         return toXML(level, (ISEBlockContractExceptionalTermination)node, saveVariables, saveCallStack, saveConstraints, monitor);
+      }
+      else if (node instanceof ISEBlockContractTermination) {
+         return toXML(level, (ISEBlockContractTermination)node, saveVariables, saveCallStack, saveConstraints, monitor);
       }
       else if (node instanceof ISEExceptionalMethodReturn) {
          return toXML(level, (ISEExceptionalMethodReturn)node, saveVariables, saveCallStack, saveConstraints, monitor);
@@ -883,6 +921,30 @@ public class SEXMLWriter {
    }
    
    /**
+    * Serializes the given {@link ISEBlockContract} into a {@link String}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param blockContract The {@link ISEBlockContract} to serialize.
+    * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
+    * @param saveConstraints Save constraints?
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @return The serialized {@link String}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected String toXML(int level, 
+                          ISEBlockContract blockContract, 
+                          boolean saveVariables,
+                          boolean saveCallStack,
+                          boolean saveConstraints,
+                          IProgressMonitor monitor) throws DebugException {
+      StringBuffer sb = new StringBuffer();
+      Map<String, String> attributeValues = createDefaultNodeAttributes(blockContract);
+      attributeValues.put(ATTRIBUTE_PRECONDITION_COMPLIED, blockContract.isPreconditionComplied() + "");
+      appendNode(level, TAG_BLOCK_CONTRACT, blockContract, saveVariables, saveCallStack, saveConstraints, false, attributeValues, sb, monitor);
+      return sb.toString();
+   }
+   
+   /**
     * Serializes the given {@link ISEMethodReturn} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
     * @param methodReturn The {@link ISEMethodReturn} to serialize.
@@ -923,6 +985,54 @@ public class SEXMLWriter {
                           IProgressMonitor monitor) throws DebugException {
       StringBuffer sb = new StringBuffer();
       appendNode(level, TAG_EXCEPTIONAL_METHOD_RETURN, methodReturn, saveVariables, saveCallStack, saveConstraints, false, sb, monitor);
+      return sb.toString();
+   }
+   
+   /**
+    * Serializes the given {@link ISEBlockContractTermination} into a {@link String}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param termination The {@link ISEBlockContractTermination} to serialize.
+    * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
+    * @param saveConstraints Save constraints?
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @return The serialized {@link String}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected String toXML(int level, 
+                          ISEBlockContractTermination termination, 
+                          boolean saveVariables,
+                          boolean saveCallStack,
+                          boolean saveConstraints,
+                          IProgressMonitor monitor) throws DebugException {
+      Map<String, String> attributeValues = createDefaultNodeAttributes(termination);
+      attributeValues.put(ATTRIBUTE_VERIFIED, termination.isVerified() + "");
+      StringBuffer sb = new StringBuffer();
+      appendNode(level, TAG_BLOCK_CONTRACT_TERMINATION, termination, saveVariables, saveCallStack, saveConstraints, false, attributeValues, sb, monitor);
+      return sb.toString();
+   }
+   
+   /**
+    * Serializes the given {@link ISEBlockContractExceptionalTermination} into a {@link String}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param termination The {@link ISEBlockContractExceptionalTermination} to serialize.
+    * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
+    * @param saveConstraints Save constraints?
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @return The serialized {@link String}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected String toXML(int level, 
+                          ISEBlockContractExceptionalTermination termination, 
+                          boolean saveVariables,
+                          boolean saveCallStack,
+                          boolean saveConstraints,
+                          IProgressMonitor monitor) throws DebugException {
+      Map<String, String> attributeValues = createDefaultNodeAttributes(termination);
+      attributeValues.put(ATTRIBUTE_VERIFIED, termination.isVerified() + "");
+      StringBuffer sb = new StringBuffer();
+      appendNode(level, TAG_BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION, termination, saveVariables, saveCallStack, saveConstraints, false, attributeValues, sb, monitor);
       return sb.toString();
    }
    
@@ -1131,9 +1241,16 @@ public class SEXMLWriter {
          XMLUtil.appendStartTag(level, tagName, attributeValues, sb);
          // Append constraints
          appendConstraints(level + 1, node, saveConstraints, sb, monitor);
+         // Append outgoing links
+         ISENodeLink[] outgoingLinks = node.getOutgoingLinks();
+         if (!ArrayUtil.isEmpty(outgoingLinks)) {
+            for (ISENodeLink link : outgoingLinks) {
+               appendOutgoingLink(level + 1, link, sb);
+            }
+         }
          // Append annotation links
-         ISEAnnotationLink[] links = node.getAnnotationLinks();
-         for (ISEAnnotationLink link : links) {
+         ISEAnnotationLink[] annotationLinks = node.getAnnotationLinks();
+         for (ISEAnnotationLink link : annotationLinks) {
             sb.append(toXML(level + 1, link));
          }
          // Append variables
@@ -1177,6 +1294,23 @@ public class SEXMLWriter {
          // Append end tag
          XMLUtil.appendEndTag(level, tagName, sb);
       }
+   }
+
+   /**
+    * Appends the outgoing {@link ISENodeLink}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param link The {@link ISENodeLink} to append.
+    * @param sb The {@link StringBuffer} to write to.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void appendOutgoingLink(int level, ISENodeLink link, StringBuffer sb) throws DebugException {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_ID, link.getId());
+      attributeValues.put(ATTRIBUTE_NAME, link.getName());
+      if (link.getTarget() != null) {
+         attributeValues.put(ATTRIBUTE_LINK_TARGET, link.getTarget().getId());
+      }
+      XMLUtil.appendEmptyTag(level, TAG_OUTGOING_LINK, attributeValues, sb);
    }
 
    /**

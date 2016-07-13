@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -104,15 +105,16 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
 
     private ImmutableSet<Term> addEqualDefs(ImmutableSet<Term> terms, Goal g) {
-	ImmutableSet<Term> result = terms;
+	ImmutableList<Term> result = ImmutableSLList.nil();
+	
 	for(SequentFormula cf : g.sequent().antecedent()) {
 	    final Term formula = cf.formula();
 	    if(formula.op() instanceof Equality
 	        && terms.contains(formula.sub(1))) {
-		result = result.add(formula.sub(0));
+		result = result.prepend(formula.sub(0));
 	    }
 	}
-	return result;
+	return terms.union(DefaultImmutableSet.fromImmutableList(result));
     }
 
 

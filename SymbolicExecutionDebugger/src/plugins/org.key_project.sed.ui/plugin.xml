@@ -234,7 +234,7 @@
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.property.CallStackPropertySection"
-                    filter="org.key_project.sed.ui.property.SENodeTreeFilter"
+                    filter="org.key_project.sed.ui.property.SECallStackFilter"
                     id="org.key_project.sed.ui.property.CallStackPropertySection"
                     tab="org.key_project.sed.ui.callStack.tab">
               </propertySection>

@@ -11,7 +11,6 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
 import org.junit.Test;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
@@ -45,8 +44,7 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
       IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
 
          @Override
-         public void configureDebugPerspective(SWTWorkbenchBot bot,
-               IPerspectiveDescriptor debugPerspective) throws Exception {
+         public void configureDebugPerspective(SWTWorkbenchBot bot) throws Exception {
             TestUtilsUtil.openView(ProofView.VIEW_ID);
          }
 
@@ -78,10 +76,10 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
          }
 
          @Override
-         public void cleanupDebugPerspective(SWTWorkbenchBot bot,
-               IPerspectiveDescriptor debugPerspective) throws Exception {
-            if (TestUtilsUtil.findView(ProofView.VIEW_ID) != null) {
-               TestUtilsUtil.closeView(ProofView.VIEW_ID);
+         public void cleanupDebugPerspective(SWTWorkbenchBot bot) throws Exception {
+            IViewPart view = TestUtilsUtil.findView(ProofView.VIEW_ID);
+            if (view != null) {
+               TestUtilsUtil.closeView(view);
             }
          }
          
@@ -167,12 +165,12 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
 			}
 
 			@Override
-			public void configureDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+			public void configureDebugPerspective(SWTWorkbenchBot bot) throws Exception {
 				TestUtilsUtil.openView(ProofView.VIEW_ID);
 			}
 
 			@Override
-			public void cleanupDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+			public void cleanupDebugPerspective(SWTWorkbenchBot bot) throws Exception {
 				TestUtilsUtil.closeView(ProofView.VIEW_ID);
 			}
 		};
@@ -212,8 +210,10 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
                String targetName, SWTBotView debugView, SWTBotTree debugTree,
                ISEDebugTarget target, ILaunch launch) throws Exception {
             //test if manual rule application functions before stepping into the proof
+            TestSedCoreUtil.waitForDebugTreeInterface();
             SWTBotView proofView = getProofBotView(bot);
             int count = proofView.bot().tree().rowCount();
+            assertEquals(1, count);
             proofView.bot().tree().select(count - 1);
             final SWTBotStyledText styledText0 = proofView.bot().styledText();
             Point point0 = TestUtilsUtil.selectText(styledText0, "well");
@@ -244,14 +244,12 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
          }
          
          @Override
-         public void configureDebugPerspective(SWTWorkbenchBot bot,
-               IPerspectiveDescriptor debugPerspective) throws Exception {
+         public void configureDebugPerspective(SWTWorkbenchBot bot) throws Exception {
             TestUtilsUtil.openView(ProofView.VIEW_ID);
          }
          
          @Override
-         public void cleanupDebugPerspective(SWTWorkbenchBot bot,
-               IPerspectiveDescriptor debugPerspective) throws Exception {
+         public void cleanupDebugPerspective(SWTWorkbenchBot bot) throws Exception {
             TestUtilsUtil.closeView(ProofView.VIEW_ID);
          }
       };
@@ -286,8 +284,7 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
          IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
 
             @Override
-            public void configureDebugPerspective(SWTWorkbenchBot bot,
-                  IPerspectiveDescriptor debugPerspective) throws Exception {
+            public void configureDebugPerspective(SWTWorkbenchBot bot) throws Exception {
                TestUtilsUtil.openView(ProofView.VIEW_ID);
             }
 
@@ -308,10 +305,10 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
             }
 
             @Override
-            public void cleanupDebugPerspective(SWTWorkbenchBot bot,
-                  IPerspectiveDescriptor debugPerspective) throws Exception {
-               if (TestUtilsUtil.findView(ProofView.VIEW_ID) != null) {
-                  TestUtilsUtil.closeView(ProofView.VIEW_ID);
+            public void cleanupDebugPerspective(SWTWorkbenchBot bot) throws Exception {
+               IViewPart view = TestUtilsUtil.findView(ProofView.VIEW_ID);
+               if (view != null) {
+                  TestUtilsUtil.closeView(view);
                }
             }
             
@@ -347,8 +344,7 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
       IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
 
          @Override
-         public void configureDebugPerspective(SWTWorkbenchBot bot,
-               IPerspectiveDescriptor debugPerspective) throws Exception {
+         public void configureDebugPerspective(SWTWorkbenchBot bot) throws Exception {
             TestUtilsUtil.openView(ProofView.VIEW_ID);
          }
 
@@ -380,10 +376,10 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
          }
 
          @Override
-         public void cleanupDebugPerspective(SWTWorkbenchBot bot,
-               IPerspectiveDescriptor debugPerspective) throws Exception {
-            if (TestUtilsUtil.findView(ProofView.VIEW_ID) != null) {
-               TestUtilsUtil.closeView(ProofView.VIEW_ID);
+         public void cleanupDebugPerspective(SWTWorkbenchBot bot) throws Exception {
+            IViewPart view = TestUtilsUtil.findView(ProofView.VIEW_ID);
+            if (view != null) {
+               TestUtilsUtil.closeView(view);
             }
          }
          

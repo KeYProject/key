@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
@@ -41,7 +40,7 @@ public class SWTBotJMLHoverTest {
    private static SWTBotEclipseEditor editor;
 
    @BeforeClass
-   public static void createProject() throws CoreException, InterruptedException {
+   public static void createProject() throws Exception {
       TestUtilsUtil.closeWelcomeView();
       final IJavaProject project = TestUtilsUtil.createJavaProject(PROJECT_NAME);
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(), JMLEditingUITestUtils.findReferenceProfile());
