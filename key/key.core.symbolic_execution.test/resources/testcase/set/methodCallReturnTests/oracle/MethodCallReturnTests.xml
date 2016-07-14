@@ -213,8 +213,8 @@
                                                    <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                    </value>
                                                 </variable>
-                                                <variable name="x_8" isArrayIndex="false">
-                                                   <value name="x_8 {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                <variable name="x_6" isArrayIndex="false">
+                                                   <value name="x_6 {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                    </value>
                                                 </variable>
                                                 <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
@@ -292,8 +292,8 @@
                                                                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                   </value>
                                                                </variable>
-                                                               <variable name="x_9" isArrayIndex="false">
-                                                                  <value name="x_9 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                               <variable name="x_7" isArrayIndex="false">
+                                                                  <value name="x_7 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                   </value>
                                                                </variable>
                                                                <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
@@ -538,8 +538,8 @@
                                                                                                             <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                             </value>
                                                                                                          </variable>
-                                                                                                         <variable name="x_22" isArrayIndex="false">
-                                                                                                            <value name="x_22 {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                         <variable name="x_19" isArrayIndex="false">
+                                                                                                            <value name="x_19 {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                             </value>
                                                                                                          </variable>
                                                                                                          <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
@@ -633,8 +633,8 @@
                                                                                                                            <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                            </value>
                                                                                                                         </variable>
-                                                                                                                        <variable name="x_23" isArrayIndex="false">
-                                                                                                                           <value name="x_23 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                        <variable name="x_20" isArrayIndex="false">
+                                                                                                                           <value name="x_20 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                                                            </value>
                                                                                                                         </variable>
                                                                                                                         <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
