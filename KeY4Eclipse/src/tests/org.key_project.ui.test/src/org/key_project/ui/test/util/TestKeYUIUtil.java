@@ -108,7 +108,7 @@ public final class TestKeYUIUtil {
     */
    public static SwingBotJFrame keyGetMainWindow() {
        SwingBot bot = new SwingBot();
-       SwingBotJFrame frame = bot.jFrame("KeY " + KeYResourceManager.getManager().getVersion());
+       SwingBotJFrame frame = bot.jFrame(KeYResourceManager.getManager().getUserInterfaceTitle());
        TestCase.assertNotNull(frame);
        TestCase.assertTrue(frame.isOpen());
        return frame;

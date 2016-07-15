@@ -184,7 +184,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testLoopInvariantNestedListFieldsTest() throws Exception {
       doSlicingTest("/slicing/loopInvariantNestedListFieldsTest/LoopInvariantNestedListFieldsTest.proof", 
-                    new ReturnSelector(422),
+                    new ReturnSelector(424),
                     true,
                     67);
    }
@@ -195,7 +195,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testLoopInvariantNotInListFieldsTest() throws Exception {
       doSlicingTest("/slicing/loopInvariantNotInListFieldsTest/LoopInvariantNotInListFieldsTest.proof", 
-                    new ReturnSelector(282),
+                    new ReturnSelector(278),
                     true,
                     13);
    }
@@ -206,7 +206,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testLoopInvariantInListFieldsTest() throws Exception {
       doSlicingTest("/slicing/loopInvariantInListFieldsTest/LoopInvariantInListFieldsTest.proof", 
-                    new ReturnSelector(282),
+                    new ReturnSelector(278),
                     true,
                     15);
    }
@@ -217,7 +217,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testLoopInvariantStarFieldsTest() throws Exception {
       doSlicingTest("/slicing/loopInvariantStarFieldsTest/LoopInvariantStarFieldsTest.proof", 
-                    new ReturnSelector(233),
+                    new ReturnSelector(229),
                     true,
                     13);
    }
@@ -294,9 +294,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testSimpleMultidimensionArrayTest() throws Exception {
       doSlicingTest("/slicing/simpleMultidimensionArrayTest/SimpleMultidimensionArrayTest.proof", 
-                    new ReturnSelector(461),
+                    new ReturnSelector(456),
                     true,
-                    445, 441, 416, 353, 172, 133);
+                    440, 436, 411, 348, 172, 133);
    }
 
    /**
@@ -305,9 +305,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testSimpleArrayTest() throws Exception {
       doSlicingTest("/slicing/simpleArrayTest/SimpleArrayTest.proof", 
-                    new ReturnSelector(202),
+                    new ReturnSelector(163),
                     false,
-                    182, 36, 21);
+                    143, 36, 21);
    }
 
    /**
@@ -338,9 +338,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testFigure2Instance_right() throws Exception {
       doSlicingTest("/slicing/figure2Instance/Figure2Instance.proof", 
-                    new RightAssignmentSelector(269),
+                    new RightAssignmentSelector(256),
                     true,
-                    231, 171, 169, 154, 150, 133, 99);
+                    218, 171, 169, 154, 150, 133, 99);
    }
 
    /**
@@ -371,9 +371,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testAliasChanged() throws Exception {
       doSlicingTest("/slicing/aliasChanged/AliasChanged.proof", 
-                    new ReturnSelector(225),
+                    new ReturnSelector(203),
                     false,
-                    220, 216, 86, 57);
+                    198, 194, 86, 57);
    }
 
    /**
@@ -382,9 +382,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testAliasNotAvailable() throws Exception {
       doSlicingTest("/slicing/aliasNotAvailable/AliasNotAvailable.proof", 
-                    new ReturnSelector(200),
+                    new ReturnSelector(178),
                     false,
-                    195, 191, 107, 86);
+                    173, 169, 98, 77);
    }
 
    /**
@@ -415,9 +415,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testInstanceFieldsAliased() throws Exception {
       doSlicingTest("/slicing/instanceFieldsAliased/InstanceFieldsAliased.proof", 
-                    new ReturnSelector(194),
+                    new ReturnSelector(185),
                     false,
-                    189, 185, 68);
+                    180, 176, 68);
    }
    
    /**
@@ -426,9 +426,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testNestedInstanceFields() throws Exception {
       doSlicingTest("/slicing/nestedInstanceFields/NestedInstanceFields.proof", 
-                    new ReturnSelector(153),
+                    new ReturnSelector(142),
                     false,
-                    148, 144, 41, 27);
+                    137, 133, 41, 27);
    }
    
    /**
@@ -437,9 +437,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testMethodCallTest() throws Exception {
       doSlicingTest("/slicing/methodCallTest/MethodCallTest.proof", 
-                    new ReturnSelector(164),
+                    new ReturnSelector(138),
                     false,
-                    111, 39, 15);
+                    98, 39, 15);
    }
 
    /**
@@ -470,9 +470,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testFigure2_right() throws Exception {
       doSlicingTest("/slicing/figure2/Figure2.proof", 
-                    new RightAssignmentSelector(271),
+                    new RightAssignmentSelector(258),
                     false,
-                    231, 168);
+                    218, 168);
    }
 
    /**
@@ -481,9 +481,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testFigure2_left() throws Exception {
       doSlicingTest("/slicing/figure2/Figure2.proof", 
-                    new LeftAssignmentSelector(271),
+                    new LeftAssignmentSelector(258),
                     false,
-                    271, 231, 168);
+                    258, 218, 168);
    }
 
    /**
@@ -492,9 +492,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testSimpleInstanceFields() throws Exception {
       doSlicingTest("/slicing/simpleInstanceFields/SimpleInstanceFields.proof", 
-                    new ReturnSelector(87),
+                    new ReturnSelector(74),
                     false,
-                    82, 78, 18, 13);
+                    69, 65, 18, 13);
    }
    
    /**

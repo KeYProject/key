@@ -656,7 +656,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
 	             
 	             //make sure that the macro was applied.
 	             assertEquals(proof.root().childrenCount(), 1);
-	             assertEquals(proof.root().countNodes(), 472);
+	             assertEquals(proof.root().countNodes(), 468);
 	          }
 	       };
 	       

@@ -1888,7 +1888,9 @@ public class TestUtilsUtil {
          TestCase.assertTrue(current instanceof IFile);
          String expectedContent = IOUtil.readFrom(((IFile) expected).getContents());
          String currentContent = IOUtil.readFrom(((IFile) current).getContents());
-         assertEquals(expectedContent, currentContent);
+         if (!StringUtil.equalIgnoreWhiteSpace(expectedContent, currentContent)) {
+            assertEquals(expectedContent, currentContent); // Let the test fail
+         }
       }
       else {
          TestCase.assertFalse(current instanceof IFile);
