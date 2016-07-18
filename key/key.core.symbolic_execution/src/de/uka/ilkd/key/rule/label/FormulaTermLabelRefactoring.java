@@ -266,7 +266,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    protected void refactorBewlowUpdates(PosInOccurrence applicationPosInOccurrence, 
                                         Term term, 
                                         List<TermLabel> labels) {
-      FormulaTermLabel applicationLabel = (FormulaTermLabel)applicationPosInOccurrence.subTerm().getLabel(FormulaTermLabel.NAME);
+      Term applicationTerm = applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
+      FormulaTermLabel applicationLabel = applicationTerm != null ? (FormulaTermLabel) applicationTerm.getLabel(FormulaTermLabel.NAME) : null;
       if (applicationLabel != null) {
          FormulaTermLabel termLabel = (FormulaTermLabel)term.getLabel(FormulaTermLabel.NAME);
          if (termLabel == null) {
