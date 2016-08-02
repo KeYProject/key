@@ -1118,7 +1118,7 @@ public class JDTUtil {
          ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
          parser.setResolveBindings(true);
          parser.setSource(compilationUnit);
-         Map<?, ?> options = JavaCore.getOptions();
+         Map<String, String> options = JavaCore.getOptions();
          JavaCore.setComplianceOptions(JavaModelUtil.VERSION_LATEST, options);
          parser.setCompilerOptions(options);
          ASTNode result = parser.createAST(null);
@@ -1139,7 +1139,7 @@ public class JDTUtil {
          ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
          parser.setResolveBindings(true);
          parser.setSource(classFile);
-         Map<?, ?> options = JavaCore.getOptions();
+         Map<String, String> options = JavaCore.getOptions();
          JavaCore.setComplianceOptions(JavaModelUtil.VERSION_LATEST, options);
          parser.setCompilerOptions(options);
          ASTNode result = parser.createAST(null);
@@ -1181,7 +1181,7 @@ public class JDTUtil {
          parser.setKind(kind);
          parser.setResolveBindings(true);
          parser.setSource(content.toCharArray());
-         Map<?, ?> options = JavaCore.getOptions();
+         Map<String, String> options = JavaCore.getOptions();
          JavaCore.setComplianceOptions(JavaModelUtil.VERSION_LATEST, options);
          parser.setCompilerOptions(options);
          ASTNode result = parser.createAST(null);
