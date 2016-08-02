@@ -13,7 +13,6 @@
 
 package org.key_project.util.test.util;
 
-import static org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable.syncExec;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -68,6 +67,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.ArrayResult;
 import org.eclipse.swtbot.swt.finder.results.BoolResult;
 import org.eclipse.swtbot.swt.finder.results.IntResult;
@@ -113,9 +113,7 @@ import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
-import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
-import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.Activator;
@@ -137,7 +135,7 @@ public class TestUtilsUtil {
     * Closes the welcome view if it is opened. Otherwise nothing is done.
     */
    public static void closeWelcomeView() {
-      Display.getDefault().syncExec(new Runnable() {
+      UIThreadRunnable.syncExec(new VoidResult() {
          @Override
          public void run() {
             WorkbenchUtil.closeWelcomeView();
@@ -192,30 +190,31 @@ public class TestUtilsUtil {
    public static IJavaProject createJavaProjectNoBinSourceFolders(String name) throws CoreException, InterruptedException {
       final IProject project = createProject(name);
       final IJavaProject javaProject = JavaCore.create(project); 
-      IRunnableWithException run = new AbstractRunnableWithException() {
+      Result<Exception> run = new Result<Exception>() {
          @Override
-         public void run() {
+         public Exception run() {
             try {
                JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
                IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(project.getFullPath())};
                entries = ArrayUtil.addAll(entries, JDTUtil.getDefaultJRELibrary());
                page.init(javaProject, project.getFullPath(), entries, false);
                page.configureJavaProject(null);
+               return null;
             }
             catch (Exception e) {
-               setException(e);
+               return e;
             }
          }
       };
-      Display.getDefault().syncExec(run);
-      if (run.getException() instanceof CoreException) {
-         throw (CoreException)run.getException();
+      Exception exception = UIThreadRunnable.syncExec(run);
+      if (exception instanceof CoreException) {
+         throw (CoreException) exception;
       }
-      else if (run.getException() instanceof InterruptedException) {
-         throw (InterruptedException)run.getException();
+      else if (exception instanceof InterruptedException) {
+         throw (InterruptedException) exception;
       }
-      else if (run.getException() != null) {
-         throw new CoreException(new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(run.getException()));
+      else if (exception != null) {
+         throw new CoreException(new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(exception));
       }
       return javaProject;
    }
@@ -320,11 +319,11 @@ public class TestUtilsUtil {
    public static SWTBotView getProjectExplorer(SWTWorkbenchBot bot) {
       SWTBotView viewBot = null;
       try {
-         viewBot = bot.viewByTitle("Package Explorer");
+         viewBot = bot.viewById(JavaUI.ID_PACKAGES);
          viewBot.show();
       }
       catch (WidgetNotFoundException e) {
-         viewBot = bot.viewByTitle("Project Explorer");
+         viewBot = bot.viewById(IPageLayout.ID_PROJECT_EXPLORER);
          viewBot.show();
       }
       return viewBot;
@@ -442,7 +441,7 @@ public class TestUtilsUtil {
     */
    public static SWTBotShell openPreferencePage(SWTWorkbenchBot bot, String... preferencePagePath) {
       // Open preference dialog (Usage of TestUtilsUtil.menuClick(bot, "Window", "Preferences") is not possible because Mac OS has entry in special menu)
-      Display.getDefault().asyncExec(new Runnable() {
+      UIThreadRunnable.asyncExec(new VoidResult() {
          @Override
          public void run() {
             Shell shell = WorkbenchUtil.getActiveShell();
@@ -478,7 +477,7 @@ public class TestUtilsUtil {
     */
    public static SWTBotShell openPropertiesPage(SWTWorkbenchBot bot, final IAdaptable element, String elementName, String... preferencePagePath) {
       // Open preference dialog
-      Display.getDefault().asyncExec(new Runnable() {
+      UIThreadRunnable.asyncExec(new VoidResult() {
          @Override
          public void run() {
             Shell shell = WorkbenchUtil.getActiveShell();
@@ -497,38 +496,83 @@ public class TestUtilsUtil {
     * @param file The file to open.
     * @return The opened {@link IEditorPart}.
     */
-   public static IEditorPart openEditor(final IFile file) {
-      IRunnableWithResult<IEditorPart> run = new AbstractRunnableWithResult<IEditorPart>() {
+   public static IEditorPart openEditor(final IFile file) throws Exception {
+      ResultWithException<IEditorPart> run = new ResultWithException<IEditorPart>() {
          @Override
-         public void run() {
-            try {
-               IEditorPart result = WorkbenchUtil.openEditor(file);
-               setResult(result);
-            }
-            catch (Exception e) {
-               setException(e);
-            }
+         public IEditorPart doRun() throws Exception {
+            return WorkbenchUtil.openEditor(file);
          }
       };
-      Display.getDefault().syncExec(run);
-      if (run.getException() != null) {
-         TestCase.fail(run.getException().getMessage());
-      }
-      IEditorPart result = run.getResult();
+      IEditorPart result = ResultWithException.syncExec(run);
       assertNotNull(result);
       return result;
+   }
+   
+   /**
+    * A {@link Result} which allows to throw {@link Exception}s.
+    * @author Martin Hentschel
+    */
+   public abstract static class ResultWithException<T> implements Result<T> {
+      /**
+       * The caught exception.
+       */
+      private Exception exception;
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public T run() {
+         try {
+            return doRun();
+         }
+         catch (Exception e) {
+            exception = e;
+            return null;
+         }
+      }
+
+      /**
+       * Performs the operation.
+       * @return The result.
+       * @throws Exception The occurred exception.
+       */
+      public abstract T doRun() throws Exception;
+      
+      /**
+       * Returns the caught exception.
+       * @return The caught exception.
+       */
+      public Exception getException() {
+         return exception;
+      }
+      
+      /**
+       * Executes the given {@link ResultWithException} synchronously in the UI thread.
+       * @param run The {@link ResultWithException} to execute.
+       * @return The result.
+       * @throws Exception The occurred exception.
+       */
+      public static <T> T syncExec(ResultWithException<T> run) throws Exception {
+         T result = UIThreadRunnable.syncExec(run);
+         if (run.getException() != null) {
+            throw run.getException();
+         }
+         else {
+            return result;
+         }
+      }
    }
 
    public static Object getObjectInTree(SWTBotTree treeBot, String... toSelects) {
       final SWTBotTreeItem item = selectInTree(treeBot, toSelects);
-      IRunnableWithResult<Object> run = new AbstractRunnableWithResult<Object>() {
+      Result<Object> run = new Result<Object>() {
          @Override
-         public void run() {
-            setResult(item.widget.getData());
+         public Object run() {
+            return item.widget.getData();
          }
       };
-      Display.getDefault().syncExec(run);
-      return run.getResult();
+      return UIThreadRunnable.syncExec(run);
    }
    
    /**
@@ -587,14 +631,13 @@ public class TestUtilsUtil {
       return new DefaultCondition() {
          @Override
          public boolean test() throws Exception {
-            IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+            BoolResult result = new BoolResult() {
                @Override
-               public void run() {
-                  setResult(tree.widget.getSelectionCount() >= 1);
+               public Boolean run() {
+                  return tree.widget.getSelectionCount() >= 1;
                }
             };
-            Display.getDefault().syncExec(run);
-            return run.getResult() != null && run.getResult().booleanValue();
+            return UIThreadRunnable.syncExec(result);
          }
         
          @Override
@@ -832,7 +875,7 @@ public class TestUtilsUtil {
     */
    public static void activateView(final SWTBotView view) {
       TestCase.assertNotNull(view);
-      Display.getDefault().syncExec(new Runnable() {
+      UIThreadRunnable.syncExec(new VoidResult() {
          @Override
          public void run() {
             view.getReference().getPage().activate(view.getReference().getPart(true));
@@ -848,23 +891,15 @@ public class TestUtilsUtil {
     * @throws Exception Occurred Exception.
     */
    public static IViewPart openView(final String viewId) throws Exception {
-      IRunnableWithResult<IViewPart> run = new AbstractRunnableWithResult<IViewPart>() {
+      ResultWithException<IViewPart> run = new ResultWithException<IViewPart>() {
          @Override
-         public void run() {
-            try {
-               setResult(WorkbenchUtil.openView(viewId));
-            }
-            catch (Exception e) {
-               setException(e);
-            }
+         public IViewPart doRun() throws Exception {
+            return WorkbenchUtil.openView(viewId);
          }
       };
-      Display.getDefault().syncExec(run);
-      if (run.getException() != null) {
-         throw run.getException();
-      }
-      TestCase.assertNotNull(run.getResult());
-      return run.getResult();
+      IViewPart result = ResultWithException.syncExec(run);
+      TestCase.assertNotNull(result);
+      return result;
    }
 
    /**
@@ -873,18 +908,20 @@ public class TestUtilsUtil {
     * @return {@code true} view was closed, {@code false} view was not opened.
     */
    public static boolean closeView(final String viewId) {
-      IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+      BoolResult run = new BoolResult() {
          @Override
-         public void run() {
+         public Boolean run() {
             IViewPart view = WorkbenchUtil.findView(viewId);
             if (view != null) {
                WorkbenchUtil.closeView(view);
-               setResult(Boolean.TRUE);
+               return Boolean.TRUE;
+            }
+            else {
+               return Boolean.FALSE;
             }
          }
       };
-      Display.getDefault().syncExec(run);
-      return run.getResult() != null && run.getResult().booleanValue();
+      return UIThreadRunnable.syncExec(run);
    }
 
    /**
@@ -892,17 +929,19 @@ public class TestUtilsUtil {
     * @return The active perspective.
     */
    public static IPerspectiveDescriptor getActivePerspective() {
-      IRunnableWithResult<IPerspectiveDescriptor> run = new AbstractRunnableWithResult<IPerspectiveDescriptor>() {
+      Result<IPerspectiveDescriptor> run = new Result<IPerspectiveDescriptor>() {
          @Override
-         public void run() {
+         public IPerspectiveDescriptor run() {
             IWorkbenchPage page = WorkbenchUtil.getActivePage();
             if (page != null) {
-               setResult(page.getPerspective());
+               return page.getPerspective();
+            }
+            else {
+               return null;
             }
          }
       };
-      Display.getDefault().syncExec(run);
-      return run.getResult();
+      return UIThreadRunnable.syncExec(run);
    }
 
    /**
@@ -911,7 +950,7 @@ public class TestUtilsUtil {
     */
    public static void openPerspective(final IPerspectiveDescriptor perspectiveDescriptor) {
       TestCase.assertNotNull(perspectiveDescriptor);
-      Display.getDefault().syncExec(new Runnable() {
+      UIThreadRunnable.syncExec(new VoidResult() {
          @Override
          public void run() {
             IWorkbenchPage page = WorkbenchUtil.getActivePage();
@@ -1034,7 +1073,7 @@ public class TestUtilsUtil {
        */
       @Override
       public boolean test() throws Exception {
-         return syncExec(new BoolResult() {
+         return UIThreadRunnable.syncExec(new BoolResult() {
             @Override
             public Boolean run() {
                boolean containsElement = false;
@@ -1242,6 +1281,7 @@ public class TestUtilsUtil {
        * {@inheritDoc}
        */
 //      @Override
+      @SuppressWarnings("unused")
       public SWTBotToolbarButton click(int stateMask) {
          log.debug(MessageFormat.format("Clicking on {0}", SWTUtils.getText(widget)));
          waitForEnabled();
@@ -1301,14 +1341,13 @@ public class TestUtilsUtil {
     * @return The found {@link IViewPart} or {@code null} if no one was found.
     */
    public static IViewPart findView(final String viewId) {
-      IRunnableWithResult<IViewPart> run = new AbstractRunnableWithResult<IViewPart>() {
+      Result<IViewPart> run = new Result<IViewPart>() {
          @Override
-         public void run() {
-            setResult(WorkbenchUtil.findView(viewId));
+         public IViewPart run() {
+            return WorkbenchUtil.findView(viewId);
          }
       };
-      Display.getDefault().syncExec(run);
-      return run.getResult();
+      return UIThreadRunnable.syncExec(run);
    }
 
    /**
@@ -1471,6 +1510,30 @@ public class TestUtilsUtil {
    }
 
    /**
+    * Returns the selection of the given {@link SWTBotTable}.
+    * @param table The {@link SWTBotTable}.
+    * @return The selected {@link Object}s.
+    * @throws Exception Occurred Exception.
+    */
+   public static Object[] getSelectedObjects(final SWTBotTable table) throws Exception {
+      IRunnableWithResult<Object[]> run = new AbstractRunnableWithResult<Object[]>() {
+         @Override
+         public void run() {
+            List<Object> result = new LinkedList<Object>();
+            for (TableItem item : table.widget.getSelection()) {
+               result.add(item.getData());
+            }
+            setResult(result.toArray(new Object[result.size()]));
+         }
+      };
+      table.widget.getDisplay().syncExec(run);
+      if (run.getException() != null) {
+         throw run.getException();
+      }
+      return run.getResult();
+   }
+
+   /**
     * Waits until the {@link SWTBotTreeItem} is expanded.
     * @param bot The {@link SWTWorkbenchBot} to use. 
     * @param item The {@link SWTBotTreeItem} to wait for.
@@ -1553,7 +1616,7 @@ public class TestUtilsUtil {
        */
       @Override
       public boolean test() throws Exception {
-         TreeItem[] selection = syncExec(new ArrayResult<TreeItem>() {
+         TreeItem[] selection = UIThreadRunnable.syncExec(new ArrayResult<TreeItem>() {
             @Override
             public TreeItem[] run() {
                return item.widget.getParent().getSelection();
@@ -1586,7 +1649,7 @@ public class TestUtilsUtil {
     */
    public static Point selectText(final SWTBotStyledText styledText, 
                                   final String text) {
-      return syncExec(new Result<Point>() {
+      return UIThreadRunnable.syncExec(new Result<Point>() {
          @Override
          public Point run() {
             int index = styledText.widget.getText().indexOf(text);
@@ -1621,7 +1684,7 @@ public class TestUtilsUtil {
     * @param file The {@link IFile} to select.
     */
    public static void selectAndReveal(final IFile file) {
-      Display.getDefault().syncExec(new Runnable() {
+      UIThreadRunnable.syncExec(new VoidResult() {
          @Override
          public void run() {
             WorkbenchUtil.selectAndReveal(file);
@@ -1635,7 +1698,7 @@ public class TestUtilsUtil {
     * @return The foreground {@link Color} of the given {@link SWTBotTreeItem}.
     */
    public static Color getForeground(final SWTBotTreeItem item) {
-      return syncExec(new Result<Color>() {
+      return UIThreadRunnable.syncExec(new Result<Color>() {
          @Override
          public Color run() {
             return item.widget.getForeground();
@@ -1650,7 +1713,7 @@ public class TestUtilsUtil {
     * @return The read data.
     */
    public static Object getData(final AbstractSWTBotControl<?> control) {
-      return syncExec(new Result<Object>() {
+      return UIThreadRunnable.syncExec(new Result<Object>() {
          @Override
          public Object run() {
             return control.widget.getData();
@@ -1777,7 +1840,7 @@ public class TestUtilsUtil {
     */
    public static boolean isEditable(final SWTBotText text) {
       assertNotNull(text);
-      int style = syncExec(new IntResult() {
+      int style = UIThreadRunnable.syncExec(new IntResult() {
          @Override
          public Integer run() {
             return text.widget.getStyle();
@@ -1825,7 +1888,9 @@ public class TestUtilsUtil {
          TestCase.assertTrue(current instanceof IFile);
          String expectedContent = IOUtil.readFrom(((IFile) expected).getContents());
          String currentContent = IOUtil.readFrom(((IFile) current).getContents());
-         assertEquals(expectedContent, currentContent);
+         if (!StringUtil.equalIgnoreWhiteSpace(expectedContent, currentContent)) {
+            assertEquals(expectedContent, currentContent); // Let the test fail
+         }
       }
       else {
          TestCase.assertFalse(current instanceof IFile);

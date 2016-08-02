@@ -197,7 +197,7 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
       SWTBotTree debugTree = null;
       try {
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
+         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
          // Open editor
          IEditorPart part = TestUtilsUtil.openEditor(project.getProject().getFile(new Path(pathInProjectToFileToOpen)));
          editor = bot.editorById(part.getSite().getId());

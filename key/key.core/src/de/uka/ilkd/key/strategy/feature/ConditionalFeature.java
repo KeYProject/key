@@ -34,11 +34,11 @@ public class ConditionalFeature implements Feature {
         elseFeature = p_elseFeature;
     }
     
-    public RuleAppCost compute (RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost (RuleApp app, PosInOccurrence pos, Goal goal) {
         if ( cond.filter ( app.rule() ) )
-            return thenFeature.compute ( app, pos, goal );
+            return thenFeature.computeCost ( app, pos, goal );
         else
-            return elseFeature.compute ( app, pos, goal );
+            return elseFeature.computeCost ( app, pos, goal );
     }
 
     /**

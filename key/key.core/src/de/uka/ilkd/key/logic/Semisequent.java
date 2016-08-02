@@ -166,7 +166,7 @@ public class Semisequent implements Iterable<SequentFormula> {
 
 	    if (sequentFormula != null && cf.formula().equalsModRenaming(sequentFormula.formula())) {
 
-	    semiCI.rejectedFormula( cf );
+	    semiCI.rejectedFormula( sequentFormula );
 		return semiCI; // semisequent already contains formula
 
 	    }
@@ -273,7 +273,7 @@ public class Semisequent implements Iterable<SequentFormula> {
      */
     public SemisequentChangeInfo replace(PosInOccurrence pos,
 					 SequentFormula sequentFormula) {	
-	final int idx = indexOf(pos.constrainedFormula());
+	final int idx = indexOf(pos.sequentFormula());
 	final FormulaChangeInfo fci = new FormulaChangeInfo ( pos, sequentFormula );
 	return complete(insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), fci));
     }
@@ -302,7 +302,7 @@ public class Semisequent implements Iterable<SequentFormula> {
      */
     public SemisequentChangeInfo replace(PosInOccurrence pos,
 					 ImmutableList<SequentFormula> replacements) {	
-	final int idx = indexOf(pos.constrainedFormula());
+	final int idx = indexOf(pos.sequentFormula());
 	return insertAndRemoveRedundancy(idx, replacements, remove(idx));
     }
 

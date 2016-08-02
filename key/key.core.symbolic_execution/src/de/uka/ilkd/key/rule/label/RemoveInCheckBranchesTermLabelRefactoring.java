@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
@@ -34,6 +35,7 @@ import de.uka.ilkd.key.rule.WhileInvariantRule;
  * This {@link TermLabelRefactoring} removes the supported {@link TermLabel}
  * in check branches. These are:
  * <ul>
+ *    <li>{@link BlockContractRule}: Pre</li>
  *    <li>{@link UseOperationContractRule}: Pre</li>
  *    <li>{@link UseOperationContractRule}: Null reference</li>
  *    <li>{@link WhileInvariantRule}: Invariant Initially Valid</li>
@@ -60,8 +62,9 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     */
    @Override
    public ImmutableList<Name> getSupportedRuleNames() {
-      return ImmutableSLList.<Name>nil().append(UseOperationContractRule.INSTANCE.name())
-                                        .append(WhileInvariantRule.INSTANCE.name());
+      return ImmutableSLList.<Name>nil().prepend(UseOperationContractRule.INSTANCE.name())
+                                        .prepend(WhileInvariantRule.INSTANCE.name())
+                                        .prepend(BlockContractRule.INSTANCE.name());
    }
 
    /**
@@ -82,10 +85,14 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
                 goal.node().getNodeInfo().getBranchLabel().startsWith("Null reference"))) {
             return RefactoringScope.SEQUENT;
          }
-         if (rule instanceof WhileInvariantRule &&
-             goal.node().getNodeInfo().getBranchLabel().startsWith("Invariant Initially Valid")) {
+         else if (rule instanceof WhileInvariantRule &&
+                  goal.node().getNodeInfo().getBranchLabel().startsWith("Invariant Initially Valid")) {
             return RefactoringScope.SEQUENT;
          }
+         else if (rule instanceof BlockContractRule &&
+                  goal.node().getNodeInfo().getBranchLabel().startsWith("Precondition")) {
+              return RefactoringScope.SEQUENT;
+           }
          else {
             return RefactoringScope.NONE;
          }

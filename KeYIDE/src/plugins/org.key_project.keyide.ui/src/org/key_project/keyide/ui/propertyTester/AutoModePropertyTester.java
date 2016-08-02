@@ -14,6 +14,7 @@
 package org.key_project.keyide.ui.propertyTester;
 
 import org.eclipse.core.expressions.PropertyTester;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
@@ -48,22 +49,37 @@ public class AutoModePropertyTester extends PropertyTester {
                        final String property, 
                        final Object[] args, 
                        final Object expectedValue) {
-      if (receiver instanceof KeYEditor) {
-         KeYEditor editor = (KeYEditor) receiver;
-         ProofControl proofControl = editor.getProofControl();
-         if (proofControl != null) {
-            if (PROPERTY_IS_NOT_AUTO_MODE.equals(property)) {
-               return !proofControl.isInAutoMode();
-            }
-            if (PROPERTY_IS_AUTO_MODE.equals(property)) {
-               return proofControl.isInAutoMode();
-            }
+      if (receiver instanceof IProofProvider) {
+         return testProofProvider((IProofProvider) receiver, property);
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Tests the given {@link IProofProvider}.
+    * @param provider The {@link IProofProvider} to test.
+    * @param property The property to test.
+    * @return The result.
+    */
+   public static boolean testProofProvider(IProofProvider provider, String property) {
+      IProofProvider proofProvider = (IProofProvider) provider;
+      ProofControl proofControl = proofProvider.getProofControl();
+      if (proofControl != null) {
+         if (PROPERTY_IS_NOT_AUTO_MODE.equals(property)) {
+            return !proofControl.isInAutoMode();
+         }
+         if (PROPERTY_IS_AUTO_MODE.equals(property)) {
+            return proofControl.isInAutoMode();
          }
          else {
             return false;
          }
       }
-      return false;
+      else {
+         return false;
+      }
    }
 
    /**

@@ -64,7 +64,7 @@ public class ContainsTermFeature implements Feature {
 
 
     @Override
-    public RuleAppCost compute(RuleApp app,
+    public RuleAppCost computeCost(RuleApp app,
                                PosInOccurrence pos,
                                Goal goal) {
         final Term t1 = proj1.toTerm(app, pos, goal);
@@ -86,6 +86,11 @@ public class ContainsTermFeature implements Feature {
 
         public ContainsTermVisitor(Term term) {
             this.term = term;
+        }
+
+        @Override
+        public boolean visitSubtree(Term visited) {
+            return true;
         }
 
         @Override

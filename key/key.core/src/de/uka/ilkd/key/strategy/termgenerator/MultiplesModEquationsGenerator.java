@@ -167,8 +167,8 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
 
             final Term t = cfm.formula();
             if ( t.op () != Equality.EQUALS
-                 || !t.sub ( 0 ).sort ().extendsTrans ( numbers.targetSort () )
-                 || !t.sub ( 1 ).sort ().extendsTrans ( numbers.targetSort () ) )
+                 || t.sub ( 0 ).sort () != numbers.targetSort () 
+                 || t.sub ( 1 ).sort () != numbers.targetSort () )
                 continue;
 
             final Polynomial left = Polynomial.create ( t.sub ( 0 ), services );

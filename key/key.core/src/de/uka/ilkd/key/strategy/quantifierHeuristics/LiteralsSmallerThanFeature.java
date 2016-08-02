@@ -165,7 +165,8 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         final Operator op = t.op ();
         if ( op == numbers.getLessOrEquals () ) return 1;
         if ( op == numbers.getGreaterOrEquals () ) return 2;
-        if ( op == Equality.EQUALS ) return 3;
+        if ( op == Equality.EQUALS && 
+                t.sub(0).sort() == numbers.targetSort() && t.sub(1).sort() == numbers.targetSort() ) return 3;
         return -1;
     }
 

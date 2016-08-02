@@ -175,7 +175,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
          // Compute sequent for side proof to compute query in.
          final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(goal.proof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
          final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
-         Sequent sequentToProve = SymbolicExecutionSideProofUtil.computeGeneralSequentToProve(goal.sequent(), pio.constrainedFormula());
+         Sequent sequentToProve = SymbolicExecutionSideProofUtil.computeGeneralSequentToProve(goal.sequent(), pio.sequentFormula());
          Function newPredicate = createResultFunction(sideProofServices, varTerm.sort());
          final TermBuilder tb = sideProofServices.getTermBuilder();
          Term newTerm = tb.func(newPredicate, varTerm);

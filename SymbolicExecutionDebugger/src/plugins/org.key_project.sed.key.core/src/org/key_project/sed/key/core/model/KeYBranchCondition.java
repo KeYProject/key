@@ -17,11 +17,13 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.ISourcePathProvider;
 import org.key_project.sed.core.model.impl.AbstractSEBranchCondition;
 import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
@@ -140,8 +142,13 @@ public class KeYBranchCondition extends AbstractSEBranchCondition implements IKe
       try {
          if (executionNode.isBranchConditionComputed() || !executionNode.isDisposed()) {
             String additionalBranchLabel = executionNode.getAdditionalBranchLabel();
-            if (additionalBranchLabel != null) {
-               return additionalBranchLabel + ": " + executionNode.getName();
+            if (!StringUtil.isTrimmedEmpty(additionalBranchLabel)) {
+               if (getDebugTarget().getLaunchSettings().isHideFullBranchConditionIfAdditionalLabelIsAvailable()) {
+                  return additionalBranchLabel;
+               }
+               else {
+                  return additionalBranchLabel + ": " + executionNode.getName();
+               }
             }
             else {
                return executionNode.getName();
@@ -304,7 +311,23 @@ public class KeYBranchCondition extends AbstractSEBranchCondition implements IKe
     * {@inheritDoc}
     */
    @Override
-   public boolean isTruthValueEvaluationEnabled() {
-      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
+   public boolean isTruthValueTracingEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueTracingEnabled(getExecutionNode().getProof());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getOutgoingLinks() throws DebugException {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISENodeLink[] getIncomingLinks() throws DebugException {
+      return null;
    }
 }

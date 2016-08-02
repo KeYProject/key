@@ -16,7 +16,9 @@ package org.key_project.sed.key.ui.property;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.IKeYTerminationNode;
+import org.key_project.sed.key.core.model.KeYBlockContract;
 import org.key_project.sed.key.core.model.KeYMethodContract;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
@@ -29,7 +31,7 @@ public class PreconditionPropertySection extends AbstractTruthValuePropertySecti
     * {@inheritDoc}
     */
    @Override
-   protected KeYMethodContract getDebugNode() {
+   protected IKeYSENode<?> getDebugNode() {
       Object object = SWTUtil.getFirstElement(getSelection());
       return getDebugNode(object);
    }
@@ -39,8 +41,10 @@ public class PreconditionPropertySection extends AbstractTruthValuePropertySecti
     * @param object The given {@link Object}.
     * @return The {@link IKeYTerminationNode} or {@code null} if conversion is not possible.
     */
-   public static KeYMethodContract getDebugNode(Object object) {
-      return object instanceof KeYMethodContract ? (KeYMethodContract)object : null;
+   public static IKeYSENode<?> getDebugNode(Object object) {
+      return object instanceof KeYMethodContract || object instanceof KeYBlockContract ?
+             (IKeYSENode<?>) object : 
+             null;
    }
 
    /**

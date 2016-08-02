@@ -65,8 +65,9 @@ public final class TestSEDKeyCoreUtil {
     * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
     * @param mergeBranchConditions Merge branch conditions?
     * @param usePrettyPrinting Use pretty printing?
-    * @param truthValueEvaluationEnabled Truth value evaluation enabled?
+    * @param truthValueTracingEnabled Truth value tracing enabled?
     * @param simplifyConditions Simplify conditions?
+    * @param hideFullBranchConditionIfAdditionalLabelIsAvailable Hide full branch conditions if additional label is available?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IFile file,
@@ -75,8 +76,9 @@ public final class TestSEDKeyCoreUtil {
                                 final Boolean showKeYMainWindow,
                                 final Boolean mergeBranchConditions,
                                 final Boolean usePrettyPrinting,
-                                final Boolean truthValueEvaluationEnabled,
-                                final Boolean simplifyConditions) throws Exception {
+                                final Boolean truthValueTracingEnabled,
+                                final Boolean simplifyConditions,
+                                final Boolean hideFullBranchConditionIfAdditionalLabelIsAvailable) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -93,8 +95,9 @@ public final class TestSEDKeyCoreUtil {
                                                   usePrettyPrinting, 
                                                   Boolean.FALSE, 
                                                   Boolean.FALSE,
-                                                  truthValueEvaluationEnabled,
-                                                  simplifyConditions);
+                                                  truthValueTracingEnabled,
+                                                  simplifyConditions,
+                                                  hideFullBranchConditionIfAdditionalLabelIsAvailable);
                DebugUITools.launch(config, KeySEDUtil.MODE);
             }
             catch (Exception e) {
@@ -139,7 +142,7 @@ public final class TestSEDKeyCoreUtil {
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param higlightReachedSourceCode Highlight reached source code?
-    * @param truthValueEvaluationEnabled Truth value evaluation enabled?
+    * @param truthValueTracingEnabled Truth value tracing enabled?
     * @param simplifyConditions Simplify conditions?
     * @throws Exception Occurred Exception.
     */
@@ -154,8 +157,9 @@ public final class TestSEDKeyCoreUtil {
                                 final Boolean usePrettyPrinting,
                                 final Boolean showSignatureOnMethodReturnNodes,
                                 final Boolean higlightReachedSourceCode,
-                                final Boolean truthValueEvaluationEnabled,
-                                final Boolean simplifyConditions) throws Exception {
+                                final Boolean truthValueTracingEnabled,
+                                final Boolean simplifyConditions,
+                                final Boolean hideFullBranchConditionIfAdditionalLabelIsAvailable) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -172,8 +176,9 @@ public final class TestSEDKeyCoreUtil {
                                                   usePrettyPrinting, 
                                                   showSignatureOnMethodReturnNodes, 
                                                   higlightReachedSourceCode,
-                                                  truthValueEvaluationEnabled,
-                                                  simplifyConditions);
+                                                  truthValueTracingEnabled,
+                                                  simplifyConditions,
+                                                  hideFullBranchConditionIfAdditionalLabelIsAvailable);
                DebugUITools.launch(config, KeySEDUtil.MODE);
             }
             catch (Exception e) {
@@ -198,8 +203,9 @@ public final class TestSEDKeyCoreUtil {
                                                                    Boolean usePrettyPrinting,
                                                                    Boolean showSignatureOnMethodReturnNodes,
                                                                    Boolean higlightReachedSourceCode,
-                                                                   Boolean truthValueEvaluationEnabled,
-                                                                   Boolean simplifyConditions) throws CoreException {
+                                                                   Boolean truthValueTracingEnabled,
+                                                                   Boolean simplifyConditions,
+                                                                   Boolean hideFullBranchConditionIfAdditionalLabelIsAvailable) throws CoreException {
       ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
       if (useExistingContract != null) {
          wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, useExistingContract);
@@ -241,11 +247,14 @@ public final class TestSEDKeyCoreUtil {
       if (higlightReachedSourceCode != null) {
          wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, higlightReachedSourceCode);
       }
-      if (truthValueEvaluationEnabled != null) {
-         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, truthValueEvaluationEnabled);
+      if (truthValueTracingEnabled != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_TRACING_ENABLED, truthValueTracingEnabled);
       }
       if (simplifyConditions != null) {
          wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SIMPLIFY_CONDITIONS, simplifyConditions);
+      }
+      if (hideFullBranchConditionIfAdditionalLabelIsAvailable != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS, hideFullBranchConditionIfAdditionalLabelIsAvailable);
       }
       config = wc.doSave();
       return config;

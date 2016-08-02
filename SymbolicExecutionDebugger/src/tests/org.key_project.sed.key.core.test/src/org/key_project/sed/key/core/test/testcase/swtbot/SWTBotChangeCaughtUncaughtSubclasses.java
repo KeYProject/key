@@ -41,13 +41,11 @@ public class SWTBotChangeCaughtUncaughtSubclasses extends AbstractKeYDebugTarget
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
             resume(bot, item, target);
             assertTrue(TestBreakpointsUtil.checkTargetCaughtUncaughtSubclass(target, 3,3,0));
-            assertTrue(TestBreakpointsUtil.checkProofCaughtUncaughtSubclass(target,  3,3,0));
             assertTrue(TestBreakpointsUtil.changeCaughtUncaughtSubclass(bot, "NullPointerException: caught and uncaught", false, true, false));
             assertTrue(TestBreakpointsUtil.changeCaughtUncaughtSubclass(bot, "ClassCastException: caught and uncaught", true, false, false));
             assertTrue(TestBreakpointsUtil.changeCaughtUncaughtSubclass(bot, "Exception: caught and uncaught", true, true, true));
             TestUtilsUtil.sleep(2000);
             assertTrue(TestBreakpointsUtil.checkTargetCaughtUncaughtSubclass(target, 2,2,1));
-            assertTrue(TestBreakpointsUtil.checkProofCaughtUncaughtSubclass(target,  2,2,1));
             TestBreakpointsUtil.removeAllBreakpoints();
          }
       };
@@ -68,6 +66,7 @@ public class SWTBotChangeCaughtUncaughtSubclasses extends AbstractKeYDebugTarget
             Boolean.FALSE,
             Boolean.FALSE,
             Boolean.TRUE, 
+            Boolean.FALSE,
             8, 
             executor);   
    } 

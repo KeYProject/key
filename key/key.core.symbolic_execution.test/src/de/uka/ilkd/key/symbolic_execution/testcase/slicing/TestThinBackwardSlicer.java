@@ -2,7 +2,10 @@ package de.uka.ilkd.key.symbolic_execution.testcase.slicing;
 
 import java.io.File;
 
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.SourceElement;
@@ -14,15 +17,22 @@ import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeSymbolicLayoutExtractor;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.slicing.ThinBackwardSlicer;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 
 /**
  * Tests for {@link ThinBackwardSlicer}.
  * @author Martin Hentschel
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
    /**
     * Flag to print found slices in the console.
@@ -30,12 +40,151 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
    public static final boolean PRINT_SLICE = false;
 
    /** 
+    * Tests slicing on the example {@code blockContractAssignableLocationNotRequested}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testBlockContractAssignableLocationNotRequested() throws Exception {
+      doSlicingTest("/slicing/blockContractAssignableLocationNotRequested/BlockContractAssignableLocationNotRequested.proof", 
+                    new ReturnSelector(122),
+                    true,
+                    109,
+                    14,
+                    12);
+   }
+
+   /** 
+    * Tests slicing on the example {@code blockContractAssignableRequestedLocation}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testBlockContractAssignableRequestedLocation() throws Exception {
+      doSlicingTest("/slicing/blockContractAssignableRequestedLocation/BlockContractAssignableRequestedLocation.proof", 
+                    new ReturnSelector(111),
+                    true,
+                    23);
+   }
+
+   /** 
+    * Tests slicing on the example {@code blockContractAssignableEverything}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testBlockContractAssignableEverything() throws Exception {
+      doSlicingTest("/slicing/blockContractAssignableEverything/BlockContractAssignableEverything.proof", 
+                    new ReturnSelector(97),
+                    true,
+                    23);
+   }
+
+   /** 
+    * Tests slicing on the example {@code methodContractAssignableLocationNotRequested}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testMethodContractAssignableLocationNotRequested() throws Exception {
+      doSlicingTest("/slicing/methodContractAssignableLocationNotRequested/MethodContractAssignableLocationNotRequested.proof", 
+                    new ReturnSelector(29),
+                    true,
+                    14,
+                    12);
+   }
+
+   /** 
+    * Tests slicing on the example {@code methodContractAssignableRequestedLocation}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testMethodContractAssignableRequestedLocation() throws Exception {
+      doSlicingTest("/slicing/methodContractAssignableRequestedLocation/MethodContractAssignableRequestedLocation.proof", 
+                    new ReturnSelector(29),
+                    true,
+                    23);
+   }
+
+   /** 
+    * Tests slicing on the example {@code methodContractAssignableEverything}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testMethodContractAssignableEverything() throws Exception {
+      doSlicingTest("/slicing/methodContractAssignableEverything/MethodContractAssignableExample.proof", 
+                    new ReturnSelector(29),
+                    true,
+                    23);
+   }
+
+   /** 
+    * Tests slicing on the example {@code equivalenceClassesTest} with equivalence classes at index {@code 0}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testEquivalenceClasses_Index_1_no_OSS() throws Exception {
+      doSlicingTest("/slicing/equivalenceClassesTest/Example_NoOSS.proof", 
+                    new ReturnSelector(55),
+                    new EquivalenceClassByIndexSelector(1), // [Equivalence Class [a,b]]
+                    true,
+                    38);
+   }
+
+   /** 
+    * Tests slicing on the example {@code equivalenceClassesTest} with equivalence classes at index {@code 0}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testEquivalenceClasses_Index_0_no_OSS() throws Exception {
+      doSlicingTest("/slicing/equivalenceClassesTest/Example_NoOSS.proof", 
+                    new ReturnSelector(55 ),
+                    new EquivalenceClassByIndexSelector(0), // []
+                    true,
+                    24);
+   }
+
+   /** 
+    * Tests slicing on the example {@code equivalenceClassesTest} with equivalence classes at index {@code 0}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testEquivalenceClasses_Index_1() throws Exception {
+      doSlicingTest("/slicing/equivalenceClassesTest/Example.proof", 
+                    new ReturnSelector(27),
+                    new EquivalenceClassByIndexSelector(1), // [Equivalence Class [a,b]]
+                    true,
+                    22);
+   }
+
+   /** 
+    * Tests slicing on the example {@code equivalenceClassesTest} with equivalence classes at index {@code 0}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testEquivalenceClasses_Index_0() throws Exception {
+      doSlicingTest("/slicing/equivalenceClassesTest/Example.proof", 
+                    new ReturnSelector(27),
+                    new EquivalenceClassByIndexSelector(0), // []
+                    true,
+                    17);
+   }
+
+   /** 
+    * Tests slicing on the example {@code aliasedByExecutionTest}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testAliasedByExecutionTest() throws Exception {
+      doSlicingTest("/slicing/aliasedByExecutionTest/AliasedByExecution.proof", 
+                    new ReturnSelector(41),
+                    true,
+                    31);
+   }
+
+   /** 
+    * Tests slicing on the example {@code aliasedByExecutionTest}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testNotAliasedByExecutionTest() throws Exception {
+      doSlicingTest("/slicing/aliasedByExecutionTest/AliasedByExecution.proof", 
+                    new ReturnSelector(72),
+                    true,
+                    17);
+   }
+
+   /** 
     * Tests slicing on the example {@code loopInvariantNestedListFieldsTest}.
     * @throws Exception Occurred Exception.
     */
    public void testLoopInvariantNestedListFieldsTest() throws Exception {
       doSlicingTest("/slicing/loopInvariantNestedListFieldsTest/LoopInvariantNestedListFieldsTest.proof", 
-                    new ReturnSelector(422),
+                    new ReturnSelector(424),
                     true,
                     67);
    }
@@ -46,7 +195,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testLoopInvariantNotInListFieldsTest() throws Exception {
       doSlicingTest("/slicing/loopInvariantNotInListFieldsTest/LoopInvariantNotInListFieldsTest.proof", 
-                    new ReturnSelector(282),
+                    new ReturnSelector(278),
                     true,
                     13);
    }
@@ -57,7 +206,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testLoopInvariantInListFieldsTest() throws Exception {
       doSlicingTest("/slicing/loopInvariantInListFieldsTest/LoopInvariantInListFieldsTest.proof", 
-                    new ReturnSelector(282),
+                    new ReturnSelector(278),
                     true,
                     15);
    }
@@ -68,7 +217,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testLoopInvariantStarFieldsTest() throws Exception {
       doSlicingTest("/slicing/loopInvariantStarFieldsTest/LoopInvariantStarFieldsTest.proof", 
-                    new ReturnSelector(233),
+                    new ReturnSelector(229),
                     true,
                     13);
    }
@@ -145,9 +294,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testSimpleMultidimensionArrayTest() throws Exception {
       doSlicingTest("/slicing/simpleMultidimensionArrayTest/SimpleMultidimensionArrayTest.proof", 
-                    new ReturnSelector(461),
+                    new ReturnSelector(456),
                     true,
-                    445, 441, 416, 353, 172, 133);
+                    440, 436, 411, 348, 172, 133);
    }
 
    /**
@@ -156,9 +305,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testSimpleArrayTest() throws Exception {
       doSlicingTest("/slicing/simpleArrayTest/SimpleArrayTest.proof", 
-                    new ReturnSelector(202),
+                    new ReturnSelector(163),
                     false,
-                    182, 36, 21);
+                    143, 36, 21);
    }
 
    /**
@@ -189,9 +338,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testFigure2Instance_right() throws Exception {
       doSlicingTest("/slicing/figure2Instance/Figure2Instance.proof", 
-                    new RightAssignmentSelector(269),
+                    new RightAssignmentSelector(256),
                     true,
-                    231, 171, 169, 154, 150, 133, 99);
+                    218, 171, 169, 154, 150, 133, 99);
    }
 
    /**
@@ -222,9 +371,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testAliasChanged() throws Exception {
       doSlicingTest("/slicing/aliasChanged/AliasChanged.proof", 
-                    new ReturnSelector(225),
+                    new ReturnSelector(203),
                     false,
-                    220, 216, 86, 57);
+                    198, 194, 86, 57);
    }
 
    /**
@@ -233,9 +382,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testAliasNotAvailable() throws Exception {
       doSlicingTest("/slicing/aliasNotAvailable/AliasNotAvailable.proof", 
-                    new ReturnSelector(200),
+                    new ReturnSelector(178),
                     false,
-                    195, 191, 107, 86);
+                    173, 169, 98, 77);
    }
 
    /**
@@ -266,9 +415,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testInstanceFieldsAliased() throws Exception {
       doSlicingTest("/slicing/instanceFieldsAliased/InstanceFieldsAliased.proof", 
-                    new ReturnSelector(194),
+                    new ReturnSelector(185),
                     false,
-                    189, 185, 68);
+                    180, 176, 68);
    }
    
    /**
@@ -277,9 +426,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testNestedInstanceFields() throws Exception {
       doSlicingTest("/slicing/nestedInstanceFields/NestedInstanceFields.proof", 
-                    new ReturnSelector(153),
+                    new ReturnSelector(142),
                     false,
-                    148, 144, 41, 27);
+                    137, 133, 41, 27);
    }
    
    /**
@@ -288,9 +437,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testMethodCallTest() throws Exception {
       doSlicingTest("/slicing/methodCallTest/MethodCallTest.proof", 
-                    new ReturnSelector(164),
+                    new ReturnSelector(138),
                     false,
-                    111, 39, 15);
+                    98, 39, 15);
    }
 
    /**
@@ -321,9 +470,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testFigure2_right() throws Exception {
       doSlicingTest("/slicing/figure2/Figure2.proof", 
-                    new RightAssignmentSelector(271),
+                    new RightAssignmentSelector(258),
                     false,
-                    231, 168);
+                    218, 168);
    }
 
    /**
@@ -332,9 +481,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testFigure2_left() throws Exception {
       doSlicingTest("/slicing/figure2/Figure2.proof", 
-                    new LeftAssignmentSelector(271),
+                    new LeftAssignmentSelector(258),
                     false,
-                    271, 231, 168);
+                    258, 218, 168);
    }
 
    /**
@@ -343,9 +492,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testSimpleInstanceFields() throws Exception {
       doSlicingTest("/slicing/simpleInstanceFields/SimpleInstanceFields.proof", 
-                    new ReturnSelector(87),
+                    new ReturnSelector(74),
                     false,
-                    82, 78, 18, 13);
+                    69, 65, 18, 13);
    }
    
    /**
@@ -393,6 +542,26 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
                                 ISeedLocationSelector selector,
                                 boolean fullSlize,
                                 int... expectedSlice) throws Exception {
+      doSlicingTest(proofFileInRepository, 
+                    selector, 
+                    new NoEquivalenceClassSelector(), 
+                    fullSlize, 
+                    expectedSlice);
+   }
+   
+   /**
+    * Performs a slicing test.
+    * @param proofFileInRepository The path to the proof file.
+    * @param selector The {@link ISeedLocationSelector} to use.
+    * @param fullSlize {@code true} if the he full slice is given as expected slice and {@code false} if only a part of the slice is given as expected slice.
+    * @param expectedSlice The serial IDs of the expected slices.
+    * @throws Exception Occurred Exception
+    */
+   protected void doSlicingTest(String proofFileInRepository,
+                                ISeedLocationSelector selector,
+                                IEquivalenceClassSelector eqSelector,
+                                boolean fullSlize,
+                                int... expectedSlice) throws Exception {
       // Load proof
       File proofFile = new File(testCaseDirectory, proofFileInRepository);
       assertTrue(proofFile.exists());
@@ -403,9 +572,15 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
          assertNotNull(proof);
          // Find seed
          Pair<Node, ReferencePrefix> seed = selector.findSeed(proof);
+         // Select equivalence class
+         assertNotNull(eqSelector);
+         ImmutableList<ISymbolicEquivalenceClass> sec = eqSelector.selectEquivalenceClass(environment, proof, seed);
+         if (PRINT_SLICE) {
+            System.out.println("Equivalence Class: " + sec);
+         }
          // Perform slicing
          ThinBackwardSlicer slicer = new ThinBackwardSlicer();
-         ImmutableArray<Node> slices = slicer.slice(seed.first, seed.second);
+         ImmutableArray<Node> slices = slicer.slice(seed.first, seed.second, sec);
          // Print slice if requested
          if (PRINT_SLICE) {
             System.out.println("Found Slices: " + slices.size());
@@ -441,6 +616,72 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
       }
       finally {
          environment.dispose();
+      }
+   }
+   
+   /**
+    * Implementations are used to select an {@link ISymbolicEquivalenceClass}.
+    * @author Martin Hentschel
+    */
+   protected static interface IEquivalenceClassSelector {
+      /**
+       * Selects the {@link ISymbolicEquivalenceClass}.
+       * @param environment The current {@link KeYEnvironment}.
+       * @param proof The current {@link Proof}.
+       * @param seed The current seed.
+       * @return The {@link ISymbolicEquivalenceClass}es or {@code null} to select.
+       */
+      public ImmutableList<ISymbolicEquivalenceClass> selectEquivalenceClass(KeYEnvironment<?> environment, 
+                                                                             Proof proof, 
+                                                                             Pair<Node, ReferencePrefix> seed) throws Exception;
+   }
+   
+   /**
+    * An {@link IEquivalenceClassSelector} which selects no {@link ISymbolicEquivalenceClass}.
+    * @author Martin Hentschel
+    */
+   protected static class NoEquivalenceClassSelector implements IEquivalenceClassSelector {
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<ISymbolicEquivalenceClass> selectEquivalenceClass(KeYEnvironment<?> environment, Proof proof, Pair<Node, ReferencePrefix> seed) {
+         return null;
+      }
+   }
+   
+   /**
+    * An {@link IEquivalenceClassSelector} which selects an {@link ISymbolicEquivalenceClass} by index.
+    * @author Martin Hentschel
+    */
+   protected static class EquivalenceClassByIndexSelector implements IEquivalenceClassSelector {
+      /**
+       * The index of the {@link ISymbolicEquivalenceClass}es.
+       */
+      private final int index;
+      
+      /**
+       * Constructor.
+       * @param index The index of the {@link ISymbolicEquivalenceClass}es.
+       */
+      public EquivalenceClassByIndexSelector(int index) {
+         this.index = index;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<ISymbolicEquivalenceClass> selectEquivalenceClass(KeYEnvironment<?> environment, 
+                                                                             Proof proof, 
+                                                                             Pair<Node, ReferencePrefix> seed) throws Exception {
+         SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, false, false, false, false, false);
+         SymbolicExecutionUtil.initializeStrategy(builder);
+         builder.analyse();
+         IExecutionNode<?> node = builder.getExecutionNode(seed.first);
+         assert node instanceof AbstractExecutionNode<?>;
+         ExecutionNodeSymbolicLayoutExtractor extractor = ((AbstractExecutionNode<?>) node).getLayoutExtractor();
+         return extractor.getEquivalenceClasses(index);
       }
    }
    

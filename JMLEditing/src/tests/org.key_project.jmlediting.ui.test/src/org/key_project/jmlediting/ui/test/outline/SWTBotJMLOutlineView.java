@@ -12,6 +12,7 @@ import org.eclipse.ui.IPageLayout;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.key_project.javaeditor.management.JavaEditorManager;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils.TestProject;
@@ -44,7 +45,7 @@ public class SWTBotJMLOutlineView {
       editor = testProject.getOpenedEditor();
 
       TestUtilsUtil.openView(IPageLayout.ID_OUTLINE);
-      SWTBotView view = bot.viewByTitle("Outline");
+      SWTBotView view = bot.viewById(IPageLayout.ID_OUTLINE);
       tree = view.bot().tree();
    }
 
@@ -53,10 +54,9 @@ public class SWTBotJMLOutlineView {
       editor.close();
    }
 
-   public static void testbehavior(String method, String itemSource, String itemName,
-            boolean reloadtree) {
+   public static void testbehavior(String method, String itemSource, String itemName, boolean reloadtree) {
       if (reloadtree) {
-         tree = bot.viewByTitle("Outline").bot().tree();
+         tree = bot.viewById(IPageLayout.ID_OUTLINE).bot().tree();
       }
       for (SWTBotTreeItem item : tree.getAllItems()) {
          if (item.getItems() != null) {
@@ -105,56 +105,71 @@ public class SWTBotJMLOutlineView {
 
    @Test
    public void invariantTestClickSelectionMultiLine() {
-      test("/*@\r\n   @ invariant 4 = 4;\r\n   @\r\n   @*/", "invariant 4 = 4", 1, 0);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         test("/*@\r\n   @ invariant 4 = 4;\r\n   @\r\n   @*/", "invariant 4 = 4", 1, 0);
+      }
    }
 
    @Test
    public void invariantTestClickSelectionSingleLine1() {
-      test("//@ public invariant 4 = 4;", "public invariant 4 = 4", 1, 1);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         test("//@ public invariant 4 = 4;", "public invariant 4 = 4", 1, 1);
+      }
    }
 
    @Test
    public void invariantTestClickSelectionSingleLine2() {
-      test("//@ private invariant 4 = 4;", "private invariant 4 = 4", 1, 2);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         test("//@ private invariant 4 = 4;", "private invariant 4 = 4", 1, 2);
+      }
    }
 
    @Test
    public void invariantTestClickSelectionSingleLine3() {
-      test("//@ protected invariant 4 = 4;", "protected invariant 4 = 4", 1, 3);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         test("//@ protected invariant 4 = 4;", "protected invariant 4 = 4", 1, 3);
+      }
    }
 
    @Test
    public void invariantTestClickSelectionSingleLine4() {
-      test("//@invariant 1 == 1;", "invariant 1 == 1", 1, 4);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         test("//@invariant 1 == 1;", "invariant 1 == 1", 1, 4);
+      }
    }
 
    @Test
    public void behaviorTest1Normal() {
-      testbehavior("a() : void", "/*@ normal_behavior\r\n   @  requires x > y;\r\n   @*/",
-               "normal_behavior requires x > y", false);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         testbehavior("a() : void", "/*@ normal_behavior\r\n   @  requires x > y;\r\n   @*/", "normal_behavior requires x > y", false);
+      }
    }
 
    @Test
    public void behaviorTest2() {
-      testbehavior("ab() : void", "/*@ behavior\r\n   @ requires x > y;\r\n   @*/",
-               "behavior requires x > y", false);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         testbehavior("ab() : void", "/*@ behavior\r\n   @ requires x > y;\r\n   @*/", "behavior requires x > y", false);
+      }
    }
 
    @Test
    public void behaviorTest3Exceptional() {
-      testbehavior("acb() : void",
-               "/*@ exceptional_behavior\r\n   @ requires x > y;\r\n   @*/",
-               "exceptional_behavior requires x > y", false);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         testbehavior("acb() : void", "/*@ exceptional_behavior\r\n   @ requires x > y;\r\n   @*/", "exceptional_behavior requires x > y", false);
+      }
    }
 
    @Test
    public void testGhost() {
-      test("//@ ghost int a = 1;", "ghost int a = 1", 1, 5);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         test("//@ ghost int a = 1;", "ghost int a = 1", 1, 5);
+      }
    }
 
    @Test
    public void testSet() {
-      test("//@ set a = \"a\";", "set a = \"a\"", 1, 6);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         test("//@ set a = \"a\";", "set a = \"a\"", 1, 6);
+      }
    }
-
 }

@@ -334,4 +334,16 @@ public final class StringUtil {
          return text;
       }
    }
+   
+   /**
+    * Checks if the given {@link Object} is a {@link String} which starts with the given prefix.
+    * @param obj The {@link Object} to check.
+    * @param prefix The prefix to check for.
+    * @return {@code true} {@link Object} is {@link String} with given prefix, {@code false} otherwise.
+    */
+   public static boolean startsWith(Object obj, String prefix) {
+      return obj instanceof String 
+             && prefix != null 
+             && ((String) obj).startsWith(prefix);
+   }
 }

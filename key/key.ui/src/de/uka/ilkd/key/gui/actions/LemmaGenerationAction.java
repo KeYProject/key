@@ -19,6 +19,7 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.gui.ExceptionDialog;
@@ -324,10 +325,10 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                         if(p != null || addAxioms){
                             // add only the taclets to the goals if
                             // the proof obligations were added successfully.
-                            ImmutableSet<Taclet> base =
+                            ImmutableList<Taclet> base =
                                     proof.getInitConfig()
                                     .getTaclets();
-                            base = base.union(taclets);
+                            base = base.prepend(taclets);
                             proof.getInitConfig().setTaclets(base);
                             for (Taclet taclet : taclets) {
                                 for (Goal goal : proof.openGoals()) {

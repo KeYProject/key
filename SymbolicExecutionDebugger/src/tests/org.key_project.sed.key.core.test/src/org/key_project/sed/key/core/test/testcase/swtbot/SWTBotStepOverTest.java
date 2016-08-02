@@ -95,6 +95,7 @@ public class SWTBotStepOverTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE,
+                           Boolean.FALSE,
                            14, 
                            executor);
    }
@@ -155,6 +156,7 @@ public class SWTBotStepOverTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE,
+                           Boolean.FALSE,
                            4, 
                            executor);
    }

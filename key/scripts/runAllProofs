@@ -65,6 +65,11 @@ while [ "$#" -ne 0 ]
         shift
         continue
         ;;
+      -D*)
+        JAVA_ARGS="$JAVA_ARGS $1"
+        shift
+        continue
+        ;;
       $LIST_TESTS_FLAG)
         $SCRIPTFOLDER/tools/testRunner.sh de.uka.ilkd.key.proof.runallproofs.ListRunAllProofsTestCases
         exit

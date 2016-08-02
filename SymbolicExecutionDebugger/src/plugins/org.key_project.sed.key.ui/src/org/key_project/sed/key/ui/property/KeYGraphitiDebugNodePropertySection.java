@@ -45,6 +45,17 @@ public class KeYGraphitiDebugNodePropertySection extends GFPropertySection {
       super.createControls(parent, tabbedPropertySheetPage);
       contentComposite = new KeYTabComposite(parent, SWT.NONE, getWidgetFactory());
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      if (contentComposite != null) {
+         contentComposite.dispose();
+      }
+      super.dispose();
+   }
 
    /**
     * {@inheritDoc}

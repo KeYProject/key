@@ -84,6 +84,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -111,11 +112,13 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
+import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
@@ -130,8 +133,12 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
+import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.ExecutionVariableExtractor;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -139,6 +146,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -195,8 +203,7 @@ public final class SymbolicExecutionUtil {
     * "Body Preserves Invariant" of applied "Loop Invariant" rules to show the
     * loop invariant.
     */
-   public static final TermLabel LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL =
-           new ParameterlessTermLabel(LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME);
+   public static final TermLabel LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL = new ParameterlessTermLabel(LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME);
 
    /**
     * Forbid instances.
@@ -534,7 +541,7 @@ public final class SymbolicExecutionUtil {
       // Combine method frame with value formula in a modality.
       Term modalityTerm = services.getTermBuilder().dia(newJavaBlock, newTerm);
       // Get the updates from the return node which includes the value interested in.
-      Term originalModifiedFormula = methodReturnNode.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+      Term originalModifiedFormula = methodReturnNode.getAppliedRuleApp().posInOccurrence().sequentFormula().formula();
       ImmutableList<Term> originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
       // Create Sequent to prove with new succedent.
       Sequent sequentToProve = createSequentToProveWithNewSuccedent(methodCallEmptyNode, null, modalityTerm, originalUpdates, false);
@@ -1148,6 +1155,16 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
+    * Checks if the given node should be represented as block contract.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @return {@code true} represent node as block contract, {@code false} represent node as something else. 
+    */
+   public static boolean isBlockContract(Node node, RuleApp ruleApp) {
+      return ruleApp instanceof BlockContractBuiltInRuleApp;
+   }
+
+   /**
     * Checks if the given node should be represented as loop invariant.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
@@ -1559,6 +1576,9 @@ public final class SymbolicExecutionUtil {
          else if (isLoopInvariant(node, ruleApp)) {
             return true;
          }
+         else if (isBlockContract(node, ruleApp)) {
+            return true;
+         }
          else {
             return false;
          }
@@ -1776,11 +1796,13 @@ public final class SymbolicExecutionUtil {
       else if (parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
          return computeLoopInvariantBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability);
       }
+      else if (parent.getAppliedRuleApp() instanceof BlockContractBuiltInRuleApp) {
+         return computeBlockContractBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability);
+      }
       else {
          throw new ProofInputException("Unsupported RuleApp in branch computation \"" + parent.getAppliedRuleApp() + "\".");
       }
    }
-
    /**
     * <p>
     * Computes the branch condition of the given {@link Node} which was constructed by a {@link ContractRuleApp}.
@@ -1788,8 +1810,8 @@ public final class SymbolicExecutionUtil {
     * <p>
     * The branch conditions are:
     * <ul>
-    *    <li>Post:    caller != null & (pre1 | .. | preN)</li>
-    *    <li>ExcPost: caller != null & (excPre1 | ... | excPreM)</li>
+    *    <li>Post:    caller != null & exc_0 = null & (pre1 | .. | preN)</li>
+    *    <li>ExcPost: caller != null & exc_0 != null & (excPre1 | ... | excPreM)</li>
     *    <li>Pre:     caller != null & !(pre1 | ... | preN | excPre1 | ... | excPreM) because the branch is only open if all conditions are false</li>
     *    <li>NPE:     caller = null</li>
     * </ul>
@@ -1856,9 +1878,13 @@ public final class SymbolicExecutionUtil {
          }
          else {
             result = services.getTermBuilder().or(relevantConditions);
-            // Add updates
-            result = services.getTermBuilder().applyParallel(search.getUpdatesAndTerm().first, result);
          }
+         // Add exception equality
+         Term excEquality = search.getExceptionEquality();
+         if (childIndex == 1) { // exception branch
+            excEquality = services.getTermBuilder().not(excEquality);
+         }
+         result = services.getTermBuilder().and(excEquality, result);
          // Add caller not null to condition
          if (parent.childrenCount() == 4) {
             Term callerNotNullTerm = posInOccurrenceInOtherNode(parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(3));
@@ -1891,7 +1917,8 @@ public final class SymbolicExecutionUtil {
                                             StrategyProperties.SPLITTING_OFF);
          }
          else {
-            condition = result;
+            // Add updates (in the simplify branch the updates are added during side proof construction)
+            condition = services.getTermBuilder().applyParallel(search.getUpdatesAndTerm().first, result);
          }
          if (improveReadability) {
             condition = improveReadability(condition, services);
@@ -1969,13 +1996,24 @@ public final class SymbolicExecutionUtil {
          }
          else {
             Term rightTerm = term.sub(1);
-            // Check if condition is used for normal and exceptional case
+            // Deal with heavy weight specification cases
             if (rightTerm.op() == Junctor.AND &&
                 rightTerm.sub(0).op() == Junctor.IMP &&
-                rightTerm.sub(0).sub(0).equals(normalExcDefinition) &&
-                rightTerm.sub(1).op() == Junctor.IMP &&
-                rightTerm.sub(1).sub(0).equals(exceptionalExcDefinition)) {
+                rightTerm.sub(0).sub(0).equals(normalExcDefinition)) {
                normalConditions.add(leftTerm);
+            }
+            else if (rightTerm.op() == Junctor.AND &&
+                     rightTerm.sub(1).op() == Junctor.IMP &&
+                     rightTerm.sub(1).sub(0).equals(exceptionalExcDefinition)) {
+               exceptinalConditions.add(leftTerm);
+            }
+            // Deal with light weight specification cases
+            else if (rightTerm.op() == Junctor.IMP &&
+                     rightTerm.sub(0).equals(normalExcDefinition)) {
+               normalConditions.add(leftTerm);
+            }
+            else if (rightTerm.op() == Junctor.IMP &&
+                     rightTerm.sub(0).equals(exceptionalExcDefinition)) {
                exceptinalConditions.add(leftTerm);
             }
             else {
@@ -2237,6 +2275,60 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
+    * <p>
+    * Computes the branch condition of the given {@link Node} which was constructed by a {@link BlockContractBuiltInRuleApp}.
+    * </p>
+    * <p>
+    * The branch conditions are:
+    * <ul>
+    *    <li>Validity: true</li>
+    *    <li>Usage: Postcondition (added antecedent top level formula)</li>
+    * </ul>
+    * </p>
+    * @param parent The parent {@link Node} of the given one.
+    * @param node The {@link Node} to compute its branch condition.
+    * @param simplify {@code true} simplify condition in a side proof, {@code false} do not simplify condition.
+    * @param improveReadability {@code true} improve readability, {@code false} do not improve readability.
+    * @return The computed branch condition.
+    * @throws ProofInputException Occurred Exception.
+    */
+   private static Term computeBlockContractBuiltInRuleAppBranchCondition(Node parent, Node node, boolean simplify, boolean improveReadability) throws ProofInputException {
+      // Make sure that a computation is possible
+      if (!(parent.getAppliedRuleApp() instanceof BlockContractBuiltInRuleApp)) {
+         throw new ProofInputException("Only BlockContractBuiltInRuleApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
+      }
+      // Make sure that branch is supported
+      int childIndex = CollectionUtil.indexOf(parent.childrenIterator(), node);
+      if (childIndex == 0) { // Validity branch
+         return parent.proof().getServices().getTermBuilder().tt();
+      }
+      else if (childIndex == 2) { // Usage branch
+         // Compute invariant (last antecedent formula of the use branch)
+         Services services = parent.proof().getServices();
+         Semisequent antecedent = node.sequent().antecedent();
+         Term condition = antecedent.get(antecedent.size() - 1).formula();
+         if (simplify) {
+            final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
+            Sequent newSequent = createSequentToProveWithNewSuccedent(parent, (Term)null, condition, null, true);
+            condition = evaluateInSideProof(services, 
+                                            parent.proof(), 
+                                            sideProofEnv,
+                                            newSequent, 
+                                            RESULT_LABEL, 
+                                            "Block contract branch condition computation on node " + parent.serialNr() + " for branch " + node.serialNr() + ".",
+                                            StrategyProperties.SPLITTING_OFF);
+         }
+         if (improveReadability) {
+            condition = improveReadability(condition, services);
+         }
+         return condition;
+      }
+      else {
+         throw new ProofInputException("Branch condition of precondition check is not supported."); 
+      }
+   }
+
+   /**
     * Returns the {@link Term} described by the given {@link PosInOccurrence} of the original {@link Node}
     * in the {@link Node} to apply on.
     * @param original The original {@link Node} on which the given {@link PosInOccurrence} works.
@@ -2245,8 +2337,9 @@ public final class SymbolicExecutionUtil {
     * @return The {@link Term} in the other {@link Node} described by the {@link PosInOccurrence} or {@code null} if not available.
     */
    public static Term posInOccurrenceInOtherNode(Node original, PosInOccurrence pio, Node toApplyOn) {
-      if (original != null && toApplyOn != null) {
-         return posInOccurrenceInOtherNode(original.sequent(), pio, toApplyOn.sequent());
+      PosInOccurrence appliedPIO = posInOccurrenceToOtherSequent(original, pio, toApplyOn);
+      if (appliedPIO != null) {
+         return appliedPIO.subTerm();
       }
       else {
          return null;
@@ -2261,11 +2354,46 @@ public final class SymbolicExecutionUtil {
     * @param toApplyOn The new {@link Sequent} to apply the {@link PosInOccurrence} on.
     * @return The {@link Term} in the other {@link Sequent} described by the {@link PosInOccurrence} or {@code null} if not available.
     */
-   public static Term posInOccurrenceInOtherNode(Sequent original, PosInOccurrence pio,
-                                                 Sequent toApplyOn) {
-      if (original != null && pio != null && toApplyOn != null) {
+   public static Term posInOccurrenceInOtherNode(Sequent original, PosInOccurrence pio, Sequent toApplyOn) {
+      PosInOccurrence appliedPIO = posInOccurrenceToOtherSequent(original, pio, toApplyOn);
+      if (appliedPIO != null) {
+         return appliedPIO.subTerm();
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Returns the {@link PosInOccurrence} described by the given {@link PosInOccurrence} of the original {@link Node}
+    * in the {@link Node} to apply too.
+    * @param original The original {@link Node} on which the given {@link PosInOccurrence} works.
+    * @param pio The given {@link PosInOccurrence}.
+    * @param toApplyTo The new {@link Node} to apply the {@link PosInOccurrence} to.
+    * @return The {@link PosInOccurrence} in the other {@link Node} described by the {@link PosInOccurrence} or {@code null} if not available.
+    */
+   public static PosInOccurrence posInOccurrenceToOtherSequent(Node original, PosInOccurrence pio, Node toApplyTo) {
+      if (original != null && toApplyTo != null) {
+         return posInOccurrenceToOtherSequent(original.sequent(), pio, toApplyTo.sequent());
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Returns the {@link PosInOccurrence} described by the given {@link PosInOccurrence} of the original {@link Sequent}
+    * in the {@link Sequent} to apply too.
+    * @param original The original {@link Sequent} on which the given {@link PosInOccurrence} works.
+    * @param pio The given {@link PosInOccurrence}.
+    * @param toApplyTo The new {@link Sequent} to apply the {@link PosInOccurrence} to.
+    * @return The {@link PosInOccurrence} in the other {@link Sequent} described by the {@link PosInOccurrence} or {@code null} if not available.
+    */
+   public static PosInOccurrence posInOccurrenceToOtherSequent(Sequent original, PosInOccurrence pio,
+                                                               Sequent toApplyTo) {
+      if (original != null && pio != null && toApplyTo != null) {
          // Search index of formula in original sequent
-         SequentFormula originalSF = pio.constrainedFormula();
+         SequentFormula originalSF = pio.sequentFormula();
          boolean antecendet = pio.isInAntec();
          int index;
          if (antecendet) {
@@ -2275,9 +2403,8 @@ public final class SymbolicExecutionUtil {
             index = original.succedent().indexOf(originalSF);
          }
          if (index >= 0) {
-            SequentFormula toApplyOnSF =
-                    (antecendet ? toApplyOn.antecedent() : toApplyOn.succedent()).get(index);
-            return toApplyOnSF.formula().subAt(pio.posInTerm());
+            final SequentFormula toApplyToSF = (antecendet ? toApplyTo.antecedent() : toApplyTo.succedent()).get(index);
+            return new PosInOccurrence(toApplyToSF, pio.posInTerm(), antecendet);
          }
          else {
             return null;
@@ -2705,7 +2832,7 @@ public final class SymbolicExecutionUtil {
             originalUpdates = computeRootElementaryUpdates(node);
          }
          else {
-            Term originalModifiedFormula = pio.constrainedFormula().formula();
+            Term originalModifiedFormula = pio.sequentFormula().formula();
             originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
          }
          // Create new sequent
@@ -2805,7 +2932,7 @@ public final class SymbolicExecutionUtil {
          newSuccedentToProve = newSuccedent;
       }
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
-      Sequent originalSequentWithoutMethodFrame = SymbolicExecutionSideProofUtil.computeGeneralSequentToProve(node.sequent(), pio != null ? pio.constrainedFormula() : null);
+      Sequent originalSequentWithoutMethodFrame = SymbolicExecutionSideProofUtil.computeGeneralSequentToProve(node.sequent(), pio != null ? pio.sequentFormula() : null);
       Set<Term> skolemTerms = newSuccedentToProve != null ? 
                               collectSkolemConstants(originalSequentWithoutMethodFrame, newSuccedentToProve) :
                               collectSkolemConstants(originalSequentWithoutMethodFrame, tb.parallel(updates));
@@ -2826,7 +2953,7 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Labels all specified skolem equalities with the {@link ParameterlessTermLabel#RESULT_LABEL}.
+    * Labels all specified skolem equalities with the {@link SymbolicExecutionUtil#RESULT_LABEL}.
     * @param sequent The {@link Sequent} to modify.
     * @param constantsToLabel The skolem constants to label.
     * @param factory The {@link TermFactory} to use.
@@ -3538,6 +3665,16 @@ public final class SymbolicExecutionUtil {
          return false;
       }
    }
+
+   /**
+    * Checks if the given {@link Operator} is the base heap.
+    * @param op The {@link Operator} to check.
+    * @param heapLDT The {@link HeapLDT} which provides the available heaps.
+    * @return {@code true} {@link Operator} is the base heap, {@code false} {@link Operator} is something else.
+    */
+   public static boolean isBaseHeap(Operator op, HeapLDT heapLDT) {
+      return op == heapLDT.getHeapForName(HeapLDT.BASE_HEAP_NAME);
+   }
    
    /**
     * Returns the path to the source file defined by the given {@link PositionInfo}.
@@ -3872,5 +4009,187 @@ public final class SymbolicExecutionUtil {
          notationInfo.setAbbrevMap(proof.abbreviations());
       }
       return notationInfo;
+   }
+   
+   /**
+    * Checks if this branch would be closed without the uninterpreted predicate
+    * and thus be treated as valid/closed in a regular proof.
+    * @return {@code true} verified/closed, {@code false} not verified/still open
+    */
+   public static boolean lazyComputeIsMainBranchVerified(Node node) {
+      if (!node.proof().isDisposed()) {
+         // Find uninterpreted predicate
+         Term predicate = AbstractOperationPO.getUninterpretedPredicate(node.proof());
+         // Check if node can be treated as verified/closed
+         if (predicate != null) {
+            boolean verified = true;
+            Iterator<Node> leafsIter = node.leavesIterator();
+            while (verified && leafsIter.hasNext()) {
+               Node leaf = leafsIter.next();
+               if (!leaf.isClosed()) {
+                  final Term toSearch = predicate;
+                  SequentFormula topLevelPredicate = CollectionUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
+                     @Override
+                     public boolean select(SequentFormula element) {
+                        return toSearch.op() == element.formula().op();
+                     }
+                  });
+                  if (topLevelPredicate == null) {
+                     verified = false;
+                  }
+               }
+            }
+            return verified;
+         }
+         else {
+            return node.isClosed();
+         }
+      }
+      else {
+         return false;
+      }
+	}
+   
+   /**
+    * Checks if this branch would be closed without the uninterpreted predicate
+    * and thus be treated as valid/closed in a regular proof.
+    * @return {@code true} verified/closed, {@code false} not verified/still open
+    */
+   public static boolean lazyComputeIsAdditionalBranchVerified(Node node) {
+      if (!node.proof().isDisposed()) {
+         // Find uninterpreted predicate
+         Set<Term> additinalPredicates = AbstractOperationPO.getAdditionalUninterpretedPredicates(node.proof());
+         // Check if node can be treated as verified/closed
+         if (!CollectionUtil.isEmpty(additinalPredicates)) {
+            boolean verified = true;
+            Iterator<Node> leafsIter = node.leavesIterator();
+            while (verified && leafsIter.hasNext()) {
+               Node leaf = leafsIter.next();
+               if (!leaf.isClosed()) {
+                  final Set<Operator> additinalOperatos = new HashSet<Operator>();
+                  for (Term term : additinalPredicates) {
+                     additinalOperatos.add(term.op());
+                  }
+                  SequentFormula topLevelPredicate = CollectionUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
+                     @Override
+                     public boolean select(SequentFormula element) {
+                        return additinalOperatos.contains(element.formula().op());
+                     }
+                  });
+                  if (topLevelPredicate == null) {
+                     verified = false;
+                  }
+               }
+            }
+            return verified;
+         }
+         else {
+            return node.isClosed();
+         }
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Checks if is an exceptional termination.
+    * @param node the node which is used for computation.
+    * @param exceptionVariable the exception variable which is used to check if the executed program in proof terminates normally.
+    * @return {@code true} exceptional termination, {@code false} normal termination.
+    */
+   public static boolean lazyComputeIsExceptionalTermination(Node node, IProgramVariable exceptionVariable) {
+      Sort result = lazyComputeExceptionSort(node, exceptionVariable);
+      return result != null && !(result instanceof NullSort);
+	}
+   
+   /**
+    * Computes the exception {@link Sort} lazily when {@link #getExceptionSort()}
+    * is called the first time. 
+    * @param node the node which is user for computation.
+    * @param exceptionVariable the exception variable which is used to check if the executed program in proof terminates normally.
+    * @return The exception {@link Sort}.
+    */
+   public static Sort lazyComputeExceptionSort(Node node, IProgramVariable exceptionVariable) {
+      Sort result = null;
+      if (exceptionVariable != null) {
+         // Search final value of the exceptional variable which is used to check if the verified program terminates normally
+         ImmutableArray<Term> value = null;
+         for (SequentFormula f : node.sequent().succedent()) {
+            Pair<ImmutableList<Term>,Term> updates = TermBuilder.goBelowUpdates2(f.formula());
+            Iterator<Term> iter = updates.first.iterator();
+            while (value == null && iter.hasNext()) {
+               value = extractValueFromUpdate(iter.next(), exceptionVariable);
+            }
+         }
+         // An exceptional termination is found if the exceptional variable is not null
+         if (value != null && value.size() == 1) {
+            result = value.get(0).sort();
+         }
+      }
+      return result;
+	}
+   
+   /**
+    * Utility method to extract the value of the {@link IProgramVariable}
+    * from the given update term.
+    * @param term The given update term.
+    * @param variable The {@link IProgramVariable} for that the value is needed.
+    * @return The found value or {@code null} if it is not defined in the given update term.
+    */
+	protected static ImmutableArray<Term> extractValueFromUpdate(Term term, IProgramVariable variable) {
+		ImmutableArray<Term> result = null;
+		if (term.op() instanceof ElementaryUpdate) {
+			ElementaryUpdate update = (ElementaryUpdate) term.op();
+			if (ObjectUtil.equals(variable, update.lhs())) {
+				result = term.subs();
+			}
+		} else if (term.op() instanceof UpdateJunctor) {
+			Iterator<Term> iter = term.subs().iterator();
+			while (result == null && iter.hasNext()) {
+				result = extractValueFromUpdate(iter.next(), variable);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Initializes the {@link Proof} of the given {@link SymbolicExecutionTreeBuilder}
+	 * so that the correct {@link Strategy} is used.
+	 * @param builder The {@link SymbolicExecutionTreeBuilder} to initialize.
+	 */
+   public static void initializeStrategy(SymbolicExecutionTreeBuilder builder) {
+      Proof proof = builder.getProof();
+      StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+      if (builder.isUninterpretedPredicateUsed()) {
+         proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
+      }
+      else {
+         proof.setActiveStrategy(new JavaCardDLStrategyFactory().create(proof, strategyProperties));
+      }
+   }
+
+   /**
+    * Checks if the modality at the applied rule represents the validity branch of an applied block contract.
+    * @param appliedRuleApp The {@link RuleApp} to check.
+    * @return {@code true} validitiy branch, {@code false} otherwise.
+    */
+   public static boolean isBlockContractValidityBranch(RuleApp appliedRuleApp) {
+      return appliedRuleApp != null && isBlockContractValidityBranch(appliedRuleApp.posInOccurrence());
+   }
+
+   /**
+    * Checks if the modality at the given {@link PosInOccurrence} represents the validity branch of an applied block contract.
+    * @param pio The {@link PosInOccurrence} to check.
+    * @return validitiy branch, {@code false} otherwise.
+    */
+   public static boolean isBlockContractValidityBranch(PosInOccurrence pio) {
+      if (pio != null) {
+         Term applicationTerm = TermBuilder.goBelowUpdates(pio.subTerm());
+         return applicationTerm.getLabel(BlockContractValidityTermLabel.NAME) != null;
+      }
+      else {
+         return false;
+      }
    }
 }

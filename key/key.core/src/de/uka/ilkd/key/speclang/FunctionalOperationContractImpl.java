@@ -1507,6 +1507,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 (FunctionalOperationContract) contract);
     }
 
+    @Override
+    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract, boolean addSymbolicExecutionLabel) {
+        return new FunctionalOperationContractPO(initConfig,
+                (FunctionalOperationContract) contract, false, addSymbolicExecutionLabel);
+    }
+
 
     @Override
     public String getDisplayName() {

@@ -8,6 +8,8 @@ public abstract class AbstractQuestion {
    
    private final String label;
    
+   private final String latexLabel;
+   
    private final String description;
    
    private final String defaultValue;
@@ -33,8 +35,13 @@ public abstract class AbstractQuestion {
    }
 
    public AbstractQuestion(String name, String label, String description, String defaultValue, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, boolean enabled) {
+      this(name, label, label, description, defaultValue, validator, askForTrust, relatedTools, enabled);
+   }
+
+   public AbstractQuestion(String name, String label, String latexLabel, String description, String defaultValue, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, boolean enabled) {
       this.name = name;
       this.label = label;
+      this.latexLabel = latexLabel;
       this.description = description;
       this.defaultValue = defaultValue;
       this.validator = validator;
@@ -49,6 +56,10 @@ public abstract class AbstractQuestion {
 
    public String getLabel() {
       return label;
+   }
+
+   public String getLatexLabel() {
+      return latexLabel;
    }
 
    public String getDescription() {

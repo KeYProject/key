@@ -13,31 +13,16 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
-
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * The default implementation of {@link IExecutionTermination}.
@@ -58,11 +43,6 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
     * The {@link TerminationKind}.
     */
    private TerminationKind terminationKind;
-   
-   /**
-    * Is the branch verified?
-    */
-   private Boolean branchVerified;
    
    /**
     * Constructor.
@@ -88,6 +68,8 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
       switch (getTerminationKind()) {
          case EXCEPTIONAL : return INTERNAL_NODE_NAME_START + "uncaught " + exceptionSort + INTERNAL_NODE_NAME_END;
          case LOOP_BODY : return LOOP_BODY_TERMINATION_NODE_NAME;
+         case BLOCK_CONTRACT_NORMAL : return INTERNAL_NODE_NAME_START + "block contract end" + INTERNAL_NODE_NAME_END;
+         case BLOCK_CONTRACT_EXCEPTIONAL : return INTERNAL_NODE_NAME_START + "block contract uncaught " + exceptionSort + INTERNAL_NODE_NAME_END;
          default : return NORMAL_TERMINATION_NODE_NAME;
       }
    }
@@ -106,9 +88,22 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
    @Override
    public TerminationKind getTerminationKind() {
       if (terminationKind == null) {
-         terminationKind = isExceptionalTermination() ? TerminationKind.EXCEPTIONAL : TerminationKind.NORMAL;
+         if (isBlockContractTermination()) {
+            terminationKind = isExceptionalTermination() ? TerminationKind.BLOCK_CONTRACT_EXCEPTIONAL : TerminationKind.BLOCK_CONTRACT_NORMAL;
+         }
+         else {
+            terminationKind = isExceptionalTermination() ? TerminationKind.EXCEPTIONAL : TerminationKind.NORMAL;
+         }
       }
       return terminationKind;
+   }
+   
+   /**
+    * Checks if a block contract terminates.
+    * @return {@code true} A block contract terminates, {@code false} normal execution terminates.
+    */
+   protected boolean isBlockContractTermination() {
+      return SymbolicExecutionUtil.isBlockContractValidityBranch(getModalityPIO());
    }
 
    /**
@@ -126,61 +121,11 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
    @Override
    public Sort getExceptionSort() {
       if (exceptionSort == null) {
-         exceptionSort = lazyComputeExceptionSort();
+         exceptionSort = SymbolicExecutionUtil.lazyComputeExceptionSort(getProofNode(), exceptionVariable);
       }
       return exceptionSort;
    }
    
-   /**
-    * Computes the exception {@link Sort} lazily when {@link #getExceptionSort()}
-    * is called the first time. 
-    * @return The exception {@link Sort}.
-    */
-   protected Sort lazyComputeExceptionSort() {
-      Sort result = null;
-      if (exceptionVariable != null) {
-         // Search final value of the exceptional variable which is used to check if the verified program terminates normally
-         ImmutableArray<Term> value = null;
-         for (SequentFormula f : getProofNode().sequent().succedent()) {
-            Pair<ImmutableList<Term>,Term> updates = TermBuilder.goBelowUpdates2(f.formula());
-            Iterator<Term> iter = updates.first.iterator();
-            while (value == null && iter.hasNext()) {
-               value = extractValueFromUpdate(iter.next(), exceptionVariable);
-            }
-         }
-         // An exceptional termination is found if the exceptional variable is not null
-         if (value != null && value.size() == 1) {
-            result = value.get(0).sort();
-         }
-      }
-      return result;
-   }
-   
-   /**
-    * Utility method to extract the value of the {@link IProgramVariable}
-    * from the given update term.
-    * @param term The given update term.
-    * @param variable The {@link IProgramVariable} for that the value is needed.
-    * @return The found value or {@code null} if it is not defined in the given update term.
-    */
-   protected ImmutableArray<Term> extractValueFromUpdate(Term term,
-                                                         IProgramVariable variable) {
-      ImmutableArray<Term> result = null;
-      if (term.op() instanceof ElementaryUpdate) {
-         ElementaryUpdate update = (ElementaryUpdate)term.op();
-          if (ObjectUtil.equals(variable, update.lhs())) {
-            result = term.subs();
-         }
-      }
-      else if (term.op() instanceof UpdateJunctor) {
-         Iterator<Term> iter = term.subs().iterator();
-         while (result == null && iter.hasNext()) {
-            result = extractValueFromUpdate(iter.next(), variable);
-         }
-      }
-      return result;
-   }
-
    /**
     * {@inheritDoc}
     */
@@ -197,6 +142,8 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
       switch (getTerminationKind()) {
          case EXCEPTIONAL : return "Exceptional Termination";
          case LOOP_BODY : return "Loop Body Termination";
+         case BLOCK_CONTRACT_NORMAL : return "Block Contract Termination";
+         case BLOCK_CONTRACT_EXCEPTIONAL : return "Block Contract Exceptional Termination";
          default : return "Termination";
       }
    }
@@ -206,47 +153,12 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
     */
    @Override
    public boolean isBranchVerified() {
-      if (branchVerified == null) {
-         branchVerified = Boolean.valueOf(lazyComputeBranchVerified());
-      }
-      return branchVerified.booleanValue();
-   }
-   
-   /**
-    * Computes the value of {@link #isBranchVerified()} lazily.
-    * @return The branch verified state.
-    */
-   protected boolean lazyComputeBranchVerified() {
-      if (!isDisposed()) {
-         // Find uninterpreted predicate
-         Term predicate = AbstractOperationPO.getUninterpretedPredicate(getProof());
-         // Check if node can be treated as verified/closed
-         if (predicate != null) {
-            boolean verified = true;
-            Iterator<Node> leafsIter = getProofNode().leavesIterator();
-            while (verified && leafsIter.hasNext()) {
-               Node leaf = leafsIter.next();
-               if (!leaf.isClosed()) {
-                  final Term toSearch = predicate;
-                  SequentFormula topLevelPredicate = CollectionUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
-                     @Override
-                     public boolean select(SequentFormula element) {
-                        return toSearch.op() == element.formula().op();
-                     }
-                  });
-                  if (topLevelPredicate == null) {
-                     verified = false;
-                  }
-               }
-            }
-            return verified;
-         }
-         else {
-            return getProofNode().isClosed();
-         }
+      if (TerminationKind.BLOCK_CONTRACT_NORMAL.equals(terminationKind) ||
+          TerminationKind.BLOCK_CONTRACT_EXCEPTIONAL.equals(terminationKind)) {
+         return SymbolicExecutionUtil.lazyComputeIsAdditionalBranchVerified(getProofNode());
       }
       else {
-         return false;
+         return SymbolicExecutionUtil.lazyComputeIsMainBranchVerified(getProofNode());
       }
    }
 }

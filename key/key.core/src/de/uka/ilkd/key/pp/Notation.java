@@ -21,14 +21,7 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
@@ -89,7 +82,7 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printConstant(name);
+	    sp.printConstant(t, name);
 	}
     }
 
@@ -107,7 +100,7 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printPrefixTerm(name, t.sub(0), ass);
+	    sp.printPrefixTerm(name, t, t.sub(0), ass);
 	}
 
     }
@@ -127,7 +120,7 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printInfixTerm(t.sub(0), assLeft, name, t.sub(1), assRight);
+	    sp.printInfixTerm(t.sub(0), assLeft, name, t, t.sub(1), assRight);
 	}
 
 	/**
@@ -136,7 +129,7 @@ public abstract class Notation {
          */
 	public void printContinuingBlock(Term t, LogicPrinter sp)
 		throws IOException {
-	    sp.printInfixTermContinuingBlock(t.sub(0), assLeft, name, t.sub(1), assRight);
+	    sp.printInfixTermContinuingBlock(t.sub(0), assLeft, name, t, t.sub(1), assRight);
 	}
 
     }
@@ -664,31 +657,7 @@ public abstract class Notation {
     }
     
 
-    /**
-     * The standard concrete syntax for the string literal indicator `cat'
-     * or `epsilon'.
-     */
-    static final class StringLiteral extends Notation {
-
-	public StringLiteral() {
-	    super(1000);
-	}
-
-	public static String printStringTerm(Term t) {
-	    String result = "\"";
-	    Term term = t;
-	    while (term.op().arity() != 0) {
-		result = result
-			+ CharLiteral.printCharTerm(term.sub(0)).charAt(1);
-		term = term.sub(1);
-	    }
-	    return (result + "\"");
-	}
-
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printConstant(printStringTerm(t));
-	}
-    }
+  
 
     /**
      * The standard concrete syntax for sequence singletons.
@@ -705,6 +674,65 @@ public abstract class Notation {
 	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printSeqSingleton(t, lDelimiter, rDelimiter);
 	}
+    }
+    
+    public static final class SeqConcatNotation extends Notation {
+
+        private final Function seqSingleton;
+        private final Function seqConcat;
+        private final Function charLiteral;
+
+
+        public SeqConcatNotation(Function seqConcat, Function seqSingleton, Function charLiteral) {           
+            super(130);
+            this.seqConcat = seqConcat;
+            this.seqSingleton = seqSingleton;
+            this.charLiteral = charLiteral;
+        }
+
+        
+        private String printStringTerm(Term t) {
+            String result = "\"";
+            Term term = t;
+            while (term.op().arity() == 2) {
+              result = result
+                + CharLiteral.printCharTerm(term.sub(0).sub(0)).charAt(1);
+              term = term.sub(1);
+            }
+            result = result
+                    + CharLiteral.printCharTerm(term.sub(0)).charAt(1);            
+            return (result + "\"");
+        }
+        
+        @Override
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            if (isCharLiteralSequence(t)) {
+                final String sLit;
+                try {
+                    sLit = printStringTerm(t);
+                } catch (Exception e) {
+                    sp.printFunctionTerm(t);                    
+                    return;
+                }                
+                sp.printConstant(sLit);
+            } else {
+                sp.printFunctionTerm(t);
+            }
+        }
+
+
+        private boolean isCharLiteralSequence(Term t) {            
+            if (t.op() == seqConcat && isCharLiteralSequenceHelp(t.sub(0))) {
+                return isCharLiteralSequenceHelp(t.sub(1)) || isCharLiteralSequence(t.sub(1));
+            } 
+            return false;
+        }
+
+
+        private boolean isCharLiteralSequenceHelp(Term t) {
+            return (t.op() == seqSingleton && t.sub(0).op() == charLiteral);
+        }
+
     }
     
     public static final class SeqGetNotation extends Notation {

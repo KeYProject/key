@@ -61,3 +61,17 @@ InformationFlow/NewObjects/README.txt
 InformationFlow/LoopInvariants/README.txt
 InformationFlow/BlockContracts/README.txt
 
+newBook/Using_KeY/Building_Propositional_Proofs/README.txt
+newBook/Using_KeY/Building_First-Order_Proofs/README.txt
+newBook/Using_KeY/Building_Dynamic_Logic_Proofs/01-exchange/README.txt
+newBook/Using_KeY/Building_Dynamic_Logic_Proofs/02-executeByProving/README.txt
+newBook/Using_KeY/Building_Dynamic_Logic_Proofs/09-methodCall/README.txt
+newBook/Using_KeY/Building_Dynamic_Logic_Proofs/09-methodCall/README2.txt
+newBook/Using_KeY/Building_Dynamic_Logic_Proofs/03-updates/README.txt
+newBook/Using_KeY/Building_Dynamic_Logic_Proofs/04-activeStmt/README.txt
+newBook/Using_KeY/Building_Dynamic_Logic_Proofs/05-symbolicExecution/README.txt
+newBook/Using_KeY/Building_Dynamic_Logic_Proofs/06-postIncrement/README.txt
+newBook/Using_KeY/Building_Dynamic_Logic_Proofs/07-quantifyProgVals/README.txt
+newBook/Using_KeY/Building_Dynamic_Logic_Proofs/08-postIncrNoUpdate/README.txt
+newBook/Using_KeY/Understanding_Proof_Situations/README.txt
+newBook/Using_KeY/Further-Features/README.txt

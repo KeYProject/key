@@ -34,7 +34,7 @@ public class SemisequentChangeInfo {
      * contains formulas that have been tried to add, but which have been rejected due to
      * already existing formulas in the sequent subsuming these formulas 
      */
-    public ImmutableList<SequentFormula> rejected = ImmutableSLList.<SequentFormula>nil(); 
+    private ImmutableList<SequentFormula> rejected = ImmutableSLList.<SequentFormula>nil(); 
     
     /** */
     private int lastFormulaIndex = -1;
@@ -86,7 +86,7 @@ public class SemisequentChangeInfo {
 	// This information can overwrite older records about removed
 	// formulas
 	removed  = removed.removeAll
-	    ( fci.getPositionOfModification ().constrainedFormula () );
+	    ( fci.getPositionOfModification ().sequentFormula () );
 	modified = modified.prepend ( fci );
 	lastFormulaIndex = idx;
     }

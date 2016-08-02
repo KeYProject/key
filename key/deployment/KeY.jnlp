@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- JNLP file for KeY -->
-<jnlp spec="1.0+" codebase="http://i12www.iti.kit.edu/~bubel/nightly/webstart/" href="KeY.jnlp">
+<jnlp spec="1.0+" codebase="http://www.key-project.org/download/nightly/webstart/" href="KeY.jnlp">
 <information> 
 <title>KeY 2.5 Nightly Build</title>
 <vendor>KeY Project, Karlsruhe Institute of Technology, Chalmers

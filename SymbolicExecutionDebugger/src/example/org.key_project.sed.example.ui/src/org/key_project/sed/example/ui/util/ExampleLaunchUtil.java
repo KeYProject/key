@@ -37,6 +37,16 @@ public class ExampleLaunchUtil {
     * The supported launch mode.
     */
    public static final String MODE = "debug";
+   
+   /**
+    * The alternatively supported launch mode.
+    */
+   public static final String SED_EXAMPLES_MODE = "sedExamples";
+   
+   /**
+    * The ID of the launch group with the SED examples.
+    */
+   public static final String SED_EXAMPLES_LAUNCH_GROUP_ID = "org.key_project.sed.example.ui.sedExamplesLaunchGroup";
 
    /**
     * Launches the example symbolic execution engine.

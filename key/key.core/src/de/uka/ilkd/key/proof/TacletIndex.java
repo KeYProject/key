@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -73,15 +74,15 @@ public abstract class TacletIndex  {
    
     /** contains rewrite Taclets */
     protected HashMap<Object, ImmutableList<NoPosTacletApp>> rwList 
-	= new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();
+	= new LinkedHashMap<>();
 
     /** contains antecedent Taclets */
     protected HashMap<Object, ImmutableList<NoPosTacletApp>> antecList
-	= new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();
+	= new LinkedHashMap<>();
 
     /** contains succedent Taclets */
     protected HashMap<Object, ImmutableList<NoPosTacletApp>> succList
-	= new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();
+	= new LinkedHashMap<>();
 
     /** contains NoFind-Taclets */
     protected ImmutableList<NoPosTacletApp> noFindList
@@ -92,11 +93,11 @@ public abstract class TacletIndex  {
      * instantiations 
      */
     protected HashSet<NoPosTacletApp> partialInstantiatedRuleApps = 
-        new LinkedHashSet<NoPosTacletApp>(); 
+        new LinkedHashSet<>(); 
 
     // reused object to store prefix occurrences when retrieving
     // taclets with java blocks.
-    private PrefixOccurrences prefixOccurrences = new PrefixOccurrences();
+    private final PrefixOccurrences prefixOccurrences = new PrefixOccurrences();
 
 
     /** constructs empty rule index */
@@ -107,9 +108,9 @@ public abstract class TacletIndex  {
      * creates a new TacletIndex with the given Taclets as initial contents.
      */
     TacletIndex(Iterable<Taclet> tacletSet) {
-        rwList     = new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();
-        antecList  = new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();    
-        succList   = new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();
+        rwList     = new LinkedHashMap<>();
+        antecList  = new LinkedHashMap<>();    
+        succList   = new LinkedHashMap<>();
         noFindList = ImmutableSLList.<NoPosTacletApp>nil();
         addTaclets(toNoPosTacletApp(tacletSet));
     }
@@ -195,18 +196,18 @@ public abstract class TacletIndex  {
      * adds a set of NoPosTacletApp to this index
      * @param tacletAppList the NoPosTacletApps to be added
      */
-    public void addTaclets(ImmutableSet<NoPosTacletApp> tacletAppList) {
+    public void addTaclets(Iterable<NoPosTacletApp> tacletAppList) {
 	for(NoPosTacletApp taclet : tacletAppList) {
 	    add(taclet);
 	}
     }
 
     public static ImmutableSet<NoPosTacletApp> toNoPosTacletApp(Iterable<Taclet> rule) {
-	ImmutableSet<NoPosTacletApp> result = DefaultImmutableSet.<NoPosTacletApp>nil();
+	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	for (Taclet t : rule) {
-	    result = result.add(NoPosTacletApp.createNoPosTacletApp(t));
+	    result = result.prepend(NoPosTacletApp.createNoPosTacletApp(t));
 	}
-	return result;
+	return DefaultImmutableSet.fromImmutableList(result);
     }
 
     /** adds a new Taclet with instantiation information to this index. 
@@ -222,14 +223,14 @@ public abstract class TacletIndex  {
      * @param tacletApp the Taclet and its instantiation info to be added
      */
     public void add(NoPosTacletApp tacletApp) {
-	Taclet rule=tacletApp.taclet();
-	if (rule instanceof RewriteTaclet) {	    
+	Taclet taclet = tacletApp.taclet();
+	if (taclet  instanceof RewriteTaclet) {	    
 	    insertToMap(tacletApp, rwList);
-	} else if (rule instanceof AntecTaclet) {
+	} else if (taclet  instanceof AntecTaclet) {
 	    insertToMap(tacletApp, antecList);
-	} else if (rule instanceof SuccTaclet) {
+	} else if (taclet  instanceof SuccTaclet) {
 	    insertToMap(tacletApp, succList);
-	} else if (rule instanceof NoFindTaclet) {
+	} else if (taclet  instanceof NoFindTaclet) {
 	    noFindList = noFindList.prepend(tacletApp);
 	} else {	
 	    // should never be reached
@@ -287,31 +288,29 @@ public abstract class TacletIndex  {
         return this.copy();
     }
     
-    private ImmutableSet<NoPosTacletApp> addToSet(ImmutableList<NoPosTacletApp> list,
-				       ImmutableSet<NoPosTacletApp> set) {	
+    private void addToSet(ImmutableList<NoPosTacletApp> list, Set<NoPosTacletApp> result) {
 	for(NoPosTacletApp tacletApp : list) {
-	    set = set.add(tacletApp);
+            result.add(tacletApp);
 	}
-	return set;
     }
 
 	
 
-    public ImmutableSet<NoPosTacletApp> allNoPosTacletApps() {
-	ImmutableSet<NoPosTacletApp> result = DefaultImmutableSet.<NoPosTacletApp>nil();
+    public Set<NoPosTacletApp> allNoPosTacletApps() {
+	Set<NoPosTacletApp> result = new LinkedHashSet<>();
 	for(ImmutableList<NoPosTacletApp> tacletApps : rwList.values()) {
-	    result = addToSet(tacletApps, result);
+	    addToSet(tacletApps, result);
 	}
 
 	for(ImmutableList<NoPosTacletApp> tacletApps : antecList.values()) {
-	    result = addToSet(tacletApps, result);
+	    addToSet(tacletApps, result);
 	}
 
 	for(ImmutableList<NoPosTacletApp> tacletApps : succList.values()) {
-	    result = addToSet(tacletApps, result);
+	    addToSet(tacletApps, result);
 	}
 	
-	result = addToSet(noFindList, result);
+	addToSet(noFindList, result);
 
 	return result;
     }
@@ -596,7 +595,7 @@ public abstract class TacletIndex  {
 
     @Override
     public String toString() {
-	StringBuffer sb=new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 	sb.append("TacletIndex with applicable rules: ");
 	sb.append("ANTEC\n "+antecList);
 	sb.append("\nSUCC\n "+succList);
@@ -629,15 +628,13 @@ public abstract class TacletIndex  {
 	/**
 	 * field that marks iff the prefix elements have already occurred
 	 */
-	private boolean[] occurred = new boolean[PREFIXTYPES];
+	private final boolean[] occurred = new boolean[PREFIXTYPES];
 	
 	/**
 	 * fields to indicate the position of the next relevant child (the next
 	 * possible prefix element or real statement
 	 */
 	static final int[] nextChild = new int[]{0,1,0,1,1};
-
-
 
 	PrefixOccurrences() {
 	    reset();

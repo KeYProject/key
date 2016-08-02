@@ -21,6 +21,7 @@ import org.key_project.key4eclipse.resources.io.ProofMetaReferences;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.StringUtil;
 
@@ -39,10 +40,13 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.testgen.MemoryTestGenerationLog;
 import de.uka.ilkd.key.smt.testgen.StopRequest;
+import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -214,15 +218,24 @@ public class ProofRunnable implements Runnable {
      */
     private Proof createProof(ProofElement pe) throws ProofInputException {
         Proof proof = pe.getKeYEnvironment().createProof(pe.getProofObl());
-
-        StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+        // Set default strategy settings
+        StrategyFactory factory = proof.getActiveStrategyFactory();
+        StrategySettingsDefinition model = factory != null ? factory.getSettingsDefinition() : null;
+        StrategyProperties strategyProperties;
+        if (model != null) {
+           strategyProperties = model.getDefaultPropertiesFactory().createDefaultStrategyProperties();
+           proof.getSettings().getStrategySettings().setMaxSteps(model.getDefaultMaxRuleApplications());
+        }
+        else {
+           strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties(); 
+        }
         strategyProperties.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);
         proof.getSettings().getStrategySettings().setActiveStrategyProperties(strategyProperties);
-
+        // Run auto mode
         ProofStarter ps = new ProofStarter(false);
         ps.init(proof);
         ps.start();
-
+        // Update one step simplifier
         OneStepSimplifier.refreshOSS(proof);
         return proof;
     }
@@ -252,6 +265,20 @@ public class ProofRunnable implements Runnable {
             if (proof != null) {
                 if (error || loadEnv.getReplayResult().hasErrors()) {
                     loadEnv.getProofControl().startAndWaitForAutoMode(proof);
+                }
+                else {
+                   // Collect goals at which a specification would be applied next
+                   ImmutableList<Goal> specGoals = ImmutableSLList.nil();
+                   for (Goal goal : proof.openEnabledGoals()) {
+                      RuleApp nextRule = goal.getRuleAppManager().peekNext();
+                      if (profile.isSpecificationInvolvedInRuleApp(nextRule)) {
+                         specGoals = specGoals.prepend(goal);
+                      }
+                   }
+                   
+                   if (!specGoals.isEmpty()) {
+                      loadEnv.getProofControl().startAndWaitForAutoMode(proof, specGoals);
+                   }
                 }
             }
         }

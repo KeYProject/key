@@ -2,6 +2,7 @@ package org.key_project.sed.key.evaluation.server.report.html;
 
 import java.io.File;
 import java.text.DateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -24,6 +25,7 @@ import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.Trust;
+import org.key_project.sed.key.evaluation.server.report.AdditionalFile;
 import org.key_project.sed.key.evaluation.server.report.EvaluationAnswers;
 import org.key_project.sed.key.evaluation.server.report.EvaluationResult;
 import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
@@ -39,7 +41,7 @@ public class HTMLAnswersSectionAppender implements IHTMLSectionAppender {
     * {@inheritDoc}
     */
    @Override
-   public void appendSection(File storageLocation, AbstractEvaluation evaluation, EvaluationResult result, Statistics statistics, StringBuffer sb) {
+   public Collection<AdditionalFile> appendSection(File storageLocation, AbstractEvaluation evaluation, EvaluationResult result, Statistics statistics, StringBuffer sb) {
       // Append table header
       sb.append("<h1><a name=\"answers\">Received Answers</a></h1>");
       sb.append("<table border=\"1\">");
@@ -123,7 +125,7 @@ public class HTMLAnswersSectionAppender implements IHTMLSectionAppender {
                      if (!StringUtil.isTrimmedEmpty(questionInput.getValue())) {
                         Boolean correct = questionInput.checkCorrectness();
                         appendReceivedAnswersTableCellValue(questionInput.getValue(), correct, questionInput.getValueSetAt(), sb);
-                        Integer correctessScore = questionInput.computeCorrectnessScore();
+                        Integer correctessScore = questionInput.computeCorrectWrongDifference();
                         if (correctessScore != null) {
                            appendReceivedAnswersTableCellValue(" {score:&nbsp;" + correctessScore + "}", correctessScore > 0, -1, sb);
                         }
@@ -224,6 +226,7 @@ public class HTMLAnswersSectionAppender implements IHTMLSectionAppender {
       }
       // Append table footer
       sb.append("</table>");
+      return null;
    }
    
    /**

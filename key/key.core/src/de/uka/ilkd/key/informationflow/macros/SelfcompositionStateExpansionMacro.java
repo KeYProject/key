@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
@@ -68,7 +69,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
         String ruleName = ruleApp.rule().name().toString();
         if ("andLeft".equals(ruleName) &&
-            pio.constrainedFormula().formula().op() instanceof UpdateApplication) {
+            pio.sequentFormula().formula().op() instanceof UpdateApplication) {
             return false;
         } else {
             return true;
@@ -134,8 +135,8 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
             if (    (   admittedRuleNames.contains(name)
                      || name.startsWith(INF_FLOW_UNFOLD_PREFIX))
                  && ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
-                JavaCardDLStrategy.Factory strategyFactory =
-                        new JavaCardDLStrategy.Factory();
+                JavaCardDLStrategyFactory strategyFactory =
+                        new JavaCardDLStrategyFactory();
                 Strategy javaDlStrategy =
                         strategyFactory.create(goal.proof(),
                                                new StrategyProperties());

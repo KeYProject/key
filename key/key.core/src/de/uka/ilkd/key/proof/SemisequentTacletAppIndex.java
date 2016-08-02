@@ -245,7 +245,7 @@ public class SemisequentTacletAppIndex {
      * Get term index for the formula to which position <code>pos</code> points
      */ 
     private TermTacletAppIndex getTermIndex(PosInOccurrence pos) {
-        return termIndices.get ( pos.constrainedFormula () );
+        return termIndices.get ( pos.sequentFormula () );
     }
 
     /**

@@ -37,7 +37,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 public class InfFlowContractAppTaclet extends RewriteTaclet {
 
     public static final String USE_IF = "Use information flow contract for ";
-    private static ImmutableSet<Name> alreadyRegistered = DefaultImmutableSet.<Name>nil();
+    private static ImmutableSet<Name> alreadyRegistered = DefaultImmutableSet.nil();
 
   
 

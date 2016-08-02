@@ -188,4 +188,24 @@ public final class ExecutionTreeStyleUtil {
       style.setForeground(gaService.manageColor(diagram, new ColorConstant(rgb.red, rgb.green, rgb.blue)));
       return style;
    }
+
+   /**
+    * Returns the {@link Style} used for text in {@link ISENode}s.
+    * @param node The {@link ISENode} for which the {@link Style} will be used.
+    * @param diagram The {@link Diagram} to use the {@link Style} in.
+    * @return The {@link Style} for text in {@link ISENode}s.
+    */
+   public static Style getStyleForLinkConnection(Diagram diagram) {
+      final String STYLE_ID = "linkConnection";
+      Style style = GraphitiUtil.findStyle(diagram, STYLE_ID);
+      IGaService gaService = Graphiti.getGaService();
+      if (style == null) { // style not found - create new style
+         style = gaService.createStyle(diagram, STYLE_ID);
+         style.setLineWidth(2);
+         style.setFont(GraphitiUtil.getDefaultFont(diagram));
+      }
+      RGB rgb = VisualizationPreferences.getExecutionTreeNodeLinkColor();
+      style.setForeground(gaService.manageColor(diagram, new ColorConstant(rgb.red, rgb.green, rgb.blue)));
+      return style;
+   }
 }

@@ -36,7 +36,7 @@ public class SWTBotFormatterTest {
    }
 
    @Before
-   public void openEditor() throws CoreException {
+   public void openEditor() throws Exception {
       project.restoreClassAndOpen();
       editor = project.getOpenedEditor();
    }

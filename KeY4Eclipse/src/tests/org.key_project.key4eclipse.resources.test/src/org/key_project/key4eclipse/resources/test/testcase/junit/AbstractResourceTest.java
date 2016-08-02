@@ -81,7 +81,7 @@ public class AbstractResourceTest extends AbstractSetupTestCase {
       spToRestore = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
       maxStepsToRestore = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
       // Update settings
-      StrategyProperties sp = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(false, true, true, false, false);
+      StrategyProperties sp = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(false, true, true, false, false, false);
       ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
       ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(1000);
    }

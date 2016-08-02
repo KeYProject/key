@@ -141,7 +141,7 @@ public class TestTermLabelManager extends TestCase {
       two = TB.label(two, new ParameterlessTermLabel(new Name("APPLICATION")));
       Sequent sequent = Sequent.EMPTY_SEQUENT;
       sequent = sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
-      sequent = sequent.addFormula(pos.constrainedFormula(), true, false).sequent();
+      sequent = sequent.addFormula(pos.sequentFormula(), true, false).sequent();
       sequent = sequent.addFormula(new SequentFormula(TB.inInt(two)), false, true).sequent();
       // Test supported rule
       Rule rule = new DummyRule("rule");
@@ -602,11 +602,11 @@ public class TestTermLabelManager extends TestCase {
    }
 
    protected InitConfig createTestServices(final TermLabelPolicy applicationTermPolicy,
-                                         final TermLabelPolicy modalityTermPolicy,
-                                         final ChildTermLabelPolicy directChildPolicy,
-                                         final ChildTermLabelPolicy childAndGrandchildPolicy,
-                                         final TermLabelUpdate update,
-                                         final TermLabelRefactoring refactoring) 
+                                           final TermLabelPolicy modalityTermPolicy,
+                                           final ChildTermLabelPolicy directChildPolicy,
+                                           final ChildTermLabelPolicy childAndGrandchildPolicy,
+                                           final TermLabelUpdate update,
+                                           final TermLabelRefactoring refactoring) 
    throws ProblemLoaderException {
       KeYEnvironment<?> env = null;
       try {
@@ -640,11 +640,11 @@ public class TestTermLabelManager extends TestCase {
                }
 
                ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
-               result = result.prepend(new TermLabelConfiguration(new Name("ONE"), new LoggingFactory(new Name("ONE")), applicationTermPolicies, modalityTermPolicies, directChildTermLabelPolicies, childAndGrandchildTermLabelPolicies, termLabelUpdates, termLabelRefactorings));
-               result = result.prepend(new TermLabelConfiguration(new Name("TWO"), new LoggingFactory(new Name("TWO")), applicationTermPolicies, modalityTermPolicies, directChildTermLabelPolicies, childAndGrandchildTermLabelPolicies, termLabelUpdates, termLabelRefactorings));
-               result = result.prepend(new TermLabelConfiguration(new Name("THREE"), new LoggingFactory(new Name("THREE")), applicationTermPolicies, modalityTermPolicies, directChildTermLabelPolicies, childAndGrandchildTermLabelPolicies, termLabelUpdates, termLabelRefactorings));
-               result = result.prepend(new TermLabelConfiguration(new Name("ADD"), new LoggingFactory(new Name("ADD")), applicationTermPolicies, modalityTermPolicies, directChildTermLabelPolicies, childAndGrandchildTermLabelPolicies, termLabelUpdates, termLabelRefactorings));
-               result = result.prepend(new TermLabelConfiguration(new Name("APPLICATION"), new LoggingFactory(new Name("APPLICATION")), applicationTermPolicies, modalityTermPolicies, directChildTermLabelPolicies, childAndGrandchildTermLabelPolicies, termLabelUpdates, termLabelRefactorings));
+               result = result.prepend(new TermLabelConfiguration(new Name("ONE"), new LoggingFactory(new Name("ONE")), applicationTermPolicies, modalityTermPolicies, directChildTermLabelPolicies, childAndGrandchildTermLabelPolicies, termLabelUpdates, termLabelRefactorings, null));
+               result = result.prepend(new TermLabelConfiguration(new Name("TWO"), new LoggingFactory(new Name("TWO")), applicationTermPolicies, modalityTermPolicies, directChildTermLabelPolicies, childAndGrandchildTermLabelPolicies, termLabelUpdates, termLabelRefactorings, null));
+               result = result.prepend(new TermLabelConfiguration(new Name("THREE"), new LoggingFactory(new Name("THREE")), applicationTermPolicies, modalityTermPolicies, directChildTermLabelPolicies, childAndGrandchildTermLabelPolicies, termLabelUpdates, termLabelRefactorings, null));
+               result = result.prepend(new TermLabelConfiguration(new Name("ADD"), new LoggingFactory(new Name("ADD")), applicationTermPolicies, modalityTermPolicies, directChildTermLabelPolicies, childAndGrandchildTermLabelPolicies, termLabelUpdates, termLabelRefactorings, null));
+               result = result.prepend(new TermLabelConfiguration(new Name("APPLICATION"), new LoggingFactory(new Name("APPLICATION")), applicationTermPolicies, modalityTermPolicies, directChildTermLabelPolicies, childAndGrandchildTermLabelPolicies, termLabelUpdates, termLabelRefactorings, null));
                return result;
             }
          };

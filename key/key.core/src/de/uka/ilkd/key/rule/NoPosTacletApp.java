@@ -193,6 +193,7 @@ public class NoPosTacletApp extends TacletApp {
      * @param term the Term the SchemaVariable is instantiated with
      * @return the new TacletApp
      */
+    @Override
     public TacletApp addInstantiation(SchemaVariable sv, 
 	    			      Term term,
 				      boolean interesting,
@@ -212,6 +213,7 @@ public class NoPosTacletApp extends TacletApp {
 
 
     
+    @Override
     public TacletApp addInstantiation(SchemaVariable sv, 
 	    			      Object[] list,
 	    			      boolean interesting,
@@ -240,6 +242,7 @@ public class NoPosTacletApp extends TacletApp {
      *            the ProgramElement the SV is instantiated with
      * @return the new TacletApp
      */
+    @Override
     public TacletApp addInstantiation(SchemaVariable sv, 
 	    			      ProgramElement pe,
 				      boolean interesting,
@@ -267,6 +270,7 @@ public class NoPosTacletApp extends TacletApp {
      * instantiations 
      * @return the new Taclet application
      */
+    @Override
     public TacletApp addInstantiation(SVInstantiations svi,
 	    			      Services services) {
 	return new NoPosTacletApp(taclet(),
@@ -296,6 +300,7 @@ public class NoPosTacletApp extends TacletApp {
      * instantiations, constraints and new metavariables given 
      * by the mc object and forget the old ones
      */
+    @Override
     public TacletApp setMatchConditions(MatchConditions mc,
 	    				Services services) {
 	return createNoPosTacletApp( taclet(),
@@ -310,6 +315,7 @@ public class NoPosTacletApp extends TacletApp {
      * instantiations, constraints, new metavariables and if formula
      * instantiations given and forget the old ones
      */
+    @Override
     protected TacletApp setAllInstantiations ( MatchConditions              mc,
 					       ImmutableList<IfFormulaInstantiation> ifInstantiations,
 					       Services                     services) {
@@ -325,6 +331,7 @@ public class NoPosTacletApp extends TacletApp {
      * @return true iff all necessary informations are collected, so
      * that the Taclet can be applied.
      */
+    @Override
     public boolean complete() {
 	return ( uninstantiatedVars().isEmpty()
 		 && taclet() instanceof NoFindTaclet
@@ -332,6 +339,7 @@ public class NoPosTacletApp extends TacletApp {
 
     }
 
+    @Override
     protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
 	return DefaultImmutableSet.<QuantifiableVariable>nil();
     }
@@ -342,6 +350,7 @@ public class NoPosTacletApp extends TacletApp {
      * a position in the corresponding formula)
      * @return the PosInOccurrence
      */
+    @Override
     public PosInOccurrence posInOccurrence() {
 	return null;
     }
@@ -374,7 +383,7 @@ public class NoPosTacletApp extends TacletApp {
             return null;
         }
         
-        MatchConditions res = null;
+        MatchConditions res;
 	if (taclet() instanceof FindTaclet) {
 		res = ((FindTaclet)taclet())
 		    .getMatcher().matchFind ( t, mc, services );

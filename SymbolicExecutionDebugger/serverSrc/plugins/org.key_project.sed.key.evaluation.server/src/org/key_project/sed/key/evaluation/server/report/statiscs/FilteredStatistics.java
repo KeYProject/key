@@ -60,7 +60,7 @@ public class FilteredStatistics {
    protected void update(QuestionInput questionInput, Tool tool) {
       if (questionInput.getValue() != null) {
          Boolean correct = questionInput.checkCorrectness();
-         Integer correctnessScore = questionInput.computeCorrectnessScore();
+         Integer correctnessScore = questionInput.computeCorrectWrongDifference();
          Integer trustScore = questionInput.computeTrustScore();
          long time = questionInput.getValueSetAt();
          long trustTime = questionInput.getTrustSetAt();

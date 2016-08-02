@@ -184,7 +184,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
          // Extract required Terms from goal
          PosInOccurrence pio = ruleApp.posInOccurrence();
          Sequent goalSequent = goal.sequent();
-         SequentFormula equalitySF = pio.constrainedFormula();
+         SequentFormula equalitySF = pio.sequentFormula();
          Term equalityTerm = pio.subTerm();
          Term queryTerm;
          Term varTerm;

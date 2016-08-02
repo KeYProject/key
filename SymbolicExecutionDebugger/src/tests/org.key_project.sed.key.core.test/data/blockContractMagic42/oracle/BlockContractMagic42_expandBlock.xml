@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_2930608f-f34a-47a6-8a99-ad042ee5078d" name="magic()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_74f5fc1a-9d48-4c9b-a2ff-a80f15bb3be6" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_expandBlock\src\BlockContractMagic42.java">
+         <sedMethodCall xml:id="_d816f7e5-f2d3-4d44-81a0-1e10c0e9057e" name="&lt;call BlockContractMagic42.magic()&gt;" pathCondition="true" lineNumber="-1" charStart="280" charEnd="285" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_expandBlock\src\BlockContractMagic42.java" groupable="true">
+            <sedStatement xml:id="_644c6efc-4ced-40c4-865f-b5d7a0940b43" name="fourty=40;" pathCondition="true" lineNumber="-1" charStart="446" charEnd="458" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_expandBlock\src\BlockContractMagic42.java">
+               <sedStatement xml:id="_6f75e01c-0881-4906-9950-d6a68a214179" name="two=2;" pathCondition="true" lineNumber="-1" charStart="469" charEnd="477" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_expandBlock\src\BlockContractMagic42.java">
+                  <sedStatement xml:id="_5e6e253b-8f71-4668-9ffa-e69962dbf3b6" name="return fourty+two;" pathCondition="true" lineNumber="-1" charStart="494" charEnd="514" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_expandBlock\src\BlockContractMagic42.java">
+                     <sedMethodReturn xml:id="_ad2d8308-d9b9-4d37-9d51-fce589bd1d8c" name="&lt;return of BlockContractMagic42.magic()&gt;" pathCondition="true" lineNumber="-1" charStart="280" charEnd="285" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_expandBlock\src\BlockContractMagic42.java" methodReturnConditionRef="_8ed20a22-7bb8-4151-b8e3-54ae6477e6ad">
+                        <sedTermination xml:id="_ed99b8ae-3301-4f85-8039-07599cf65a82" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_expandBlock\src\BlockContractMagic42.java" verified="true">
+                        </sedTermination>
+                        <sedGroupEndConditionReference nodeIdRef="_8ed20a22-7bb8-4151-b8e3-54ae6477e6ad"/>
+                     </sedMethodReturn>
+                  </sedStatement>
+               </sedStatement>
+            </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_8ed20a22-7bb8-4151-b8e3-54ae6477e6ad" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_expandBlock\src\BlockContractMagic42.java">
+               <sedChildReference nodeIdRef="_ad2d8308-d9b9-4d37-9d51-fce589bd1d8c"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_8ed20a22-7bb8-4151-b8e3-54ae6477e6ad" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testBlockContractMagic42_expandBlock\src\BlockContractMagic42.java">
+               <sedChildReference nodeIdRef="_ad2d8308-d9b9-4d37-9d51-fce589bd1d8c"/>
+            </sedGroupEndCondition>
+         </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_ed99b8ae-3301-4f85-8039-07599cf65a82"/>
+      </sedThread>
+   </sedTarget>
+</launch>

@@ -14,7 +14,7 @@ import org.key_project.sed.key.evaluation.server.report.EvaluationAnswers;
  * to filter answers by the KeY experience.
  * @author Martin Hentschel
  */
-public class UnderstandingProofAttemptsKeYExperienceFilter implements IStatisticsFilter {
+public class UnderstandingProofAttemptsKeYExperienceFilter extends AbstractStatisticsFilter {
    /**
     * The {@link Choice} with the KeY experience of interest.
     */
@@ -34,6 +34,25 @@ public class UnderstandingProofAttemptsKeYExperienceFilter implements IStatistic
    @Override
    public String getName() {
       return choice.getText();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getLatexName() {
+      if (UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE.equals(choice.getValue())) {
+         return "None";
+      }
+      else if (UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_LESS_THAN_2_YEARS_VALUE.equals(choice.getValue())) {
+         return "$<$ 2 y.";
+      }
+      else if (UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_MORE_THAN_2_YEARS_VALUE.equals(choice.getValue())) {
+         return "$\\geq$ 2 y.";
+      }
+      else {
+         return getName();
+      }
    }
 
    /**

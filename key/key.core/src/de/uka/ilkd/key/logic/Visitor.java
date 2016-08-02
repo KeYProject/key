@@ -15,6 +15,13 @@ package de.uka.ilkd.key.logic;
 
 public interface Visitor {
     /**
+     * Checks if the subtree below the visited {@link Term} should be traversed.
+     * @param visited The currently visited {@link Term}.
+     * @return {@code true} visit sub tree, {@code false} skip sub tree.
+     */
+    public boolean visitSubtree(Term visited);
+   
+    /**
      * the entry method for the visitor pattern
      * @param visited the Term to be visited
      */

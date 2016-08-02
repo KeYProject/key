@@ -14,7 +14,7 @@
 package org.key_project.keyide.ui.propertyTester;
 
 import org.eclipse.core.expressions.PropertyTester;
-import org.key_project.keyide.ui.editor.KeYEditor;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -42,15 +42,29 @@ public class ProofPropertyTester extends PropertyTester {
                        final String property, 
                        final Object[] args, 
                        final Object expectedValue) {
-      // Find proof
-      Proof proof = null;
-      if (receiver instanceof KeYEditor) {
-         KeYEditor editor = (KeYEditor) receiver;
-         proof = editor.getCurrentProof();
+      if (receiver instanceof IProofProvider) {
+         return testProofProvider((IProofProvider) receiver, property);
       }
-      // Test proof
-      if (PROPERTY_IS_NOT_CLOSED.equals(property)) {
-         return proof != null && !proof.isDisposed() && !proof.closed();
+      else {
+         return false;
+      }
+   }
+
+   /**
+    * Tests the given {@link IProofProvider}.
+    * @param provider The {@link IProofProvider} to test.
+    * @param property The property.
+    * @return The result.
+    */
+   public static boolean testProofProvider(IProofProvider provider, String property) {
+      if (provider != null) {
+         Proof proof = provider.getCurrentProof();
+         if (PROPERTY_IS_NOT_CLOSED.equals(property)) {
+            return proof != null && !proof.isDisposed() && !proof.closed();
+         }
+         else {
+            return false;
+         }
       }
       else {
          return false;

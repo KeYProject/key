@@ -67,6 +67,7 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeWriter;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
@@ -487,6 +488,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertEquals(((IExecutionLoopInvariant)expected).isInitiallyValid(), ((IExecutionLoopInvariant)current).isInitiallyValid());
          assertVariables((IExecutionLoopInvariant)expected, (IExecutionLoopInvariant)current, compareVariables, compareConstraints);
          assertConstraints((IExecutionLoopInvariant)expected, (IExecutionLoopInvariant)current, compareConstraints);
+      }
+      else if (expected instanceof IExecutionBlockContract) {
+         assertTrue("Expected IExecutionBlockContract but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBlockContract);
+         assertEquals(((IExecutionBlockContract)expected).isPreconditionComplied(), ((IExecutionBlockContract)current).isPreconditionComplied());
+         assertVariables((IExecutionBlockContract)expected, (IExecutionBlockContract)current, compareVariables, compareConstraints);
+         assertConstraints((IExecutionBlockContract)expected, (IExecutionBlockContract)current, compareConstraints);
       }
       else {
          fail("Unknown execution node \"" + expected + "\".");
@@ -1151,6 +1158,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvarints Use loop invariants?
+    * @param blockTreatmentContract Block contracts or expand otherwise?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
@@ -1168,6 +1176,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                  boolean mergeBranchConditions,
                                                                                                                  boolean useOperationContracts,
                                                                                                                  boolean useLoopInvarints,
+                                                                                                                 boolean blockTreatmentContract,
                                                                                                                  boolean nonExecutionBranchHidingSideProofs,
                                                                                                                  boolean aliasChecks,
                                                                                                                  boolean useUnicode,
@@ -1187,9 +1196,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
+      SymbolicExecutionUtil.initializeStrategy(builder);
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
@@ -1207,6 +1217,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvarints Use loop invariants?
+    * @param blockTreatmentContract Block contracts or expand otherwise?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
@@ -1225,6 +1236,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                  boolean mergeBranchConditions,
                                                                                                                  boolean useOperationContracts,
                                                                                                                  boolean useLoopInvarints,
+                                                                                                                 boolean blockTreatmentContract,
                                                                                                                  boolean nonExecutionBranchHidingSideProofs,
                                                                                                                  boolean aliasChecks,
                                                                                                                  boolean useUnicode,
@@ -1243,9 +1255,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
+      SymbolicExecutionUtil.initializeStrategy(builder);
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
@@ -1259,6 +1272,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvarints Use loop invariants?
+    * @param blockTreatmentContract Block contracts or expand otherwise?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
@@ -1274,6 +1288,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                  boolean mergeBranchConditions,
                                                                                                                  boolean useOperationContracts,
                                                                                                                  boolean useLoopInvarints,
+                                                                                                                 boolean blockTreatmentContract,
                                                                                                                  boolean nonExecutionBranchHidingSideProofs,
                                                                                                                  boolean aliasChecks,
                                                                                                                  boolean useUnicode,
@@ -1289,9 +1304,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       Proof proof = environment.getLoadedProof();
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
+      SymbolicExecutionUtil.initializeStrategy(builder);
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
@@ -1311,6 +1327,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvarints Use loop invariants?
+    * @param blockTreatmentContract Block contracts or expand otherwise?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
@@ -1331,6 +1348,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                  boolean mergeBranchConditions,
                                                                                                                  boolean useOperationContracts,
                                                                                                                  boolean useLoopInvarints,
+                                                                                                                 boolean blockTreatmentContract,
                                                                                                                  boolean nonExecutionBranchHidingSideProofs,
                                                                                                                  boolean aliasChecks,
                                                                                                                  boolean useUnicode,
@@ -1349,9 +1367,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
+      SymbolicExecutionUtil.initializeStrategy(builder);
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
@@ -1411,6 +1430,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertNotSame(env.getProof(), reloadedProof);
          // Recreate symbolic execution tree
          reloadedBuilder = new SymbolicExecutionTreeBuilder(reloadedProof, false, false, false, false, true);
+         SymbolicExecutionUtil.initializeStrategy(reloadedBuilder);
          reloadedBuilder.analyse();
          assertSetTreeAfterStep(reloadedBuilder, oraclePathInBaseDirFile, baseDir);
       }
@@ -1453,6 +1473,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @param blockTreatmentContract Block contracts or expand otherwise?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
@@ -1479,6 +1500,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                             boolean mergeBranchConditions,
                             boolean useOperationContracts,
                             boolean useLoopInvariants,
+                            boolean blockTreatmentContract,
                             boolean nonExecutionBranchHidingSideProofs,
                             boolean aliasChecks,
                             boolean useUnicode,
@@ -1501,6 +1523,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                    mergeBranchConditions,
                                                                                    useOperationContracts,
                                                                                    useLoopInvariants,
+                                                                                   blockTreatmentContract,
                                                                                    nonExecutionBranchHidingSideProofs,
                                                                                    aliasChecks,
                                                                                    useUnicode,
@@ -1527,6 +1550,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @param blockTreatmentContract Block contracts or expand otherwise?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
@@ -1554,13 +1578,14 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                       boolean mergeBranchConditions,
                                       boolean useOperationContracts,
                                       boolean useLoopInvariants,
+                                      boolean blockTreatmentContract,
                                       boolean nonExecutionBranchHidingSideProofs,
                                       boolean aliasChecks,
                                       boolean useUnicode,
                                       boolean usePrettyPrinting,
                                       boolean variablesAreOnlyComputedFromUpdates,
                                       boolean simplifyConditions) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack, includeReturnValues, maximalNumberOfExecutedSetNodes, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack, includeReturnValues, maximalNumberOfExecutedSetNodes, mergeBranchConditions, useOperationContracts, useLoopInvariants, blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
       env.dispose();
    }
 
@@ -1585,6 +1610,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @param blockTreatmentContract Block contracts or expand otherwise?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
@@ -1607,12 +1633,13 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                       boolean mergeBranchConditions,
                                       boolean useOperationContracts,
                                       boolean useLoopInvariants,
+                                      boolean blockTreatmentContract,
                                       boolean nonExecutionBranchHidingSideProofs,
                                       boolean aliasChecks,
                                       boolean useUnicode,
                                       boolean usePrettyPrinting,
                                       boolean variablesAreOnlyComputedFromUpdates) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(baseDir, proofFilePathInBaseDir, oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack, includeReturnValues, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, false, true);
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(baseDir, proofFilePathInBaseDir, oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack, includeReturnValues, mergeBranchConditions, useOperationContracts, useLoopInvariants, blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, false, true);
       if (env != null) {
          env.dispose();
       }
@@ -1639,6 +1666,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @param blockTreatmentContract Block contracts or expand otherwise?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
@@ -1663,6 +1691,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                  boolean mergeBranchConditions,
                                                                                  boolean useOperationContracts,
                                                                                  boolean useLoopInvariants,
+                                                                                 boolean blockTreatmentContract,
                                                                                  boolean nonExecutionBranchHidingSideProofs,
                                                                                  boolean aliasChecks,
                                                                                  boolean useUnicode,
@@ -1683,7 +1712,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          // Make sure that the correct taclet options are defined.
          setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(baseDir, proofFilePathInBaseDir, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, truthValueEvaluationEnabled, simplifyConditions);
+         env = createSymbolicExecutionEnvironment(baseDir, proofFilePathInBaseDir, mergeBranchConditions, useOperationContracts, useLoopInvariants, blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, truthValueEvaluationEnabled, simplifyConditions);
          // Create new oracle file if required in a temporary directory
          createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack, includeReturnValues);
          // Read oracle file
@@ -1725,6 +1754,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @param blockTreatmentContract Block contracts or expand otherwise?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
@@ -1752,6 +1782,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                  boolean mergeBranchConditions,
                                                                                  boolean useOperationContracts,
                                                                                  boolean useLoopInvariants,
+                                                                                 boolean blockTreatmentContract,
                                                                                  boolean nonExecutionBranchHidingSideProofs,
                                                                                  boolean aliasChecks,
                                                                                  boolean useUnicode,
@@ -1775,7 +1806,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, containerTypeName, methodFullName);
          setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
-         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
+         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
          internalDoSETTest(oracleFile, env, oraclePathInBaseDirFile, maximalNumberOfExecutedSetNodes, includeConstraints, includeVariables, includeCallStack, includeReturnValues);
          return env;
       }
@@ -1809,6 +1840,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @param blockTreatmentContract Block contracts or expand otherwise?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
@@ -1835,6 +1867,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                  boolean mergeBranchConditions,
                                                                                  boolean useOperationContracts,
                                                                                  boolean useLoopInvariants,
+                                                                                 boolean blockTreatmentContract,
                                                                                  boolean nonExecutionBranchHidingSideProofs,
                                                                                  boolean aliasChecks,
                                                                                  boolean useUnicode,
@@ -1856,7 +1889,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, baseContractName);
          // Create proof environment for symbolic execution
-         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, baseContractName, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, truthValueEvaluationEnabled, simplifyConditions);
+         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, baseContractName, mergeBranchConditions, useOperationContracts, useLoopInvariants, blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, truthValueEvaluationEnabled, simplifyConditions);
          internalDoSETTest(oracleFile, env, oraclePathInBaseDirFile, maximalNumberOfExecutedSetNodes, includeConstraints, includeVariables, includeCallStack, includeReturnValues);
          return env;
       }
@@ -1914,7 +1947,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                  String javaPathInBaseDir,
                                                                  String baseContractName) throws ProblemLoaderException, ProofInputException {
       if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInBaseDir, baseContractName, false, false, false, false, false, false, false, false, false, false);
+         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInBaseDir, baseContractName, false, false, false, false, false, false, false, false, false, false, false);
          env.dispose();
       }
       return setDefaultTacletOptions();
@@ -1935,7 +1968,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                  String containerTypeName,
                                                                  String methodFullName) throws ProblemLoaderException, ProofInputException {
       if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false, false);
+         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false, false, false);
          env.dispose();
       }
       return setDefaultTacletOptions();

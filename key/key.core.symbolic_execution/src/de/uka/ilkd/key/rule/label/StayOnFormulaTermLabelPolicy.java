@@ -18,12 +18,13 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
 /**
  * This {@link TermLabelPolicy} maintains a {@link FormulaTermLabel} on predicates.
@@ -49,8 +50,8 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
                               ImmutableArray<TermLabel> newTermOriginalLabels,
                               TermLabel label) {
       // Maintain label if new Term is a predicate
-      if (TruthValueEvaluationUtil.isPredicate(newTermOp) || 
-          TruthValueEvaluationUtil.isLogicOperator(newTermOp, newTermSubs)) {
+      if (TruthValueTracingUtil.isPredicate(newTermOp) || 
+          TruthValueTracingUtil.isLogicOperator(newTermOp, newTermSubs)) {
          assert label instanceof FormulaTermLabel;
          FormulaTermLabel formulaLabel = (FormulaTermLabel) label;
          FormulaTermLabel originalLabel = searchFormulaTermLabel(newTermOriginalLabels);
@@ -66,20 +67,22 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
             if (TacletOperation.ADD_ANTECEDENT.equals(tacletHint.getTacletOperation()) ||
                 TacletOperation.ADD_SUCCEDENT.equals(tacletHint.getTacletOperation()) ||
                 TacletOperation.REPLACE_TO_ANTECEDENT.equals(tacletHint.getTacletOperation()) ||
-                TacletOperation.REPLACE_TO_SUCCEDENT.equals(tacletHint.getTacletOperation())) {
+                TacletOperation.REPLACE_TO_SUCCEDENT.equals(tacletHint.getTacletOperation()) ||
+                TacletOperation.REPLACE_AT_ANTECEDENT.equals(tacletHint.getTacletOperation()) ||
+                TacletOperation.REPLACE_AT_SUCCEDENT.equals(tacletHint.getTacletOperation())) {
                if (originalLabel == null) { // Do not give a new ID if the term has already one (see rule: impRight)
                   newLabelIdRequired = true;
                   originalLabelIds.add(mostImportantLabel.getId());
                }
             }
             if (tacletHint.getSequentFormula() != null) {
-               if (!TruthValueEvaluationUtil.isPredicate(tacletHint.getSequentFormula())) {
+               if (!TruthValueTracingUtil.isPredicate(tacletHint.getSequentFormula())) {
                   newLabelIdRequired = true;
                }
             }
             else if (tacletHint.getTerm() != null) {
                boolean topLevel = isTopLevel(tacletHint, tacletTerm);
-               if (!topLevel && !TruthValueEvaluationUtil.isPredicate(tacletHint.getTerm())) {
+               if (!topLevel && !TruthValueTracingUtil.isPredicate(tacletHint.getTerm())) {
                   newLabelIdRequired = true;
                }
             }
@@ -123,6 +126,9 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
             }
          }
          return null;
+      }
+      else if (newTermOp instanceof SubstOp) { // Such operations perform for instance skolemization (e.g. rule allRight)
+         return label;
       }
       else {
          return null;

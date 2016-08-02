@@ -30,7 +30,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
 /**
  * The {@link TermLabelUpdate} used to label predicates with a
@@ -69,8 +69,8 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
          TacletLabelHint tacletHint = (TacletLabelHint) hint;
          if ((TacletOperation.ADD_ANTECEDENT.equals(tacletHint.getTacletOperation()) ||
               TacletOperation.ADD_SUCCEDENT.equals(tacletHint.getTacletOperation())) &&
-             (TruthValueEvaluationUtil.isPredicate(newTermOp) ||
-              TruthValueEvaluationUtil.isLogicOperator(newTermOp, newTermSubs))) {
+             (TruthValueTracingUtil.isPredicate(newTermOp) ||
+              TruthValueTracingUtil.isLogicOperator(newTermOp, newTermSubs))) {
             if (getTermLabel(labels, FormulaTermLabel.NAME) == null) {
                TermLabel label = TermLabelManager.findInnerMostParentLabel(applicationPosInOccurrence, FormulaTermLabel.NAME);
                if (label instanceof FormulaTermLabel) {
@@ -95,7 +95,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                }
             }
             if (!ifLabels.isEmpty()) {
-               if (TruthValueEvaluationUtil.isLogicOperator(newTermOp, newTermSubs)
+               if (TruthValueTracingUtil.isLogicOperator(newTermOp, newTermSubs)
 //                   || TruthValueEvaluationUtil.isPredicate(newTermOp)
                    ) {
                   for (Entry<SequentFormula, FormulaTermLabel> ifEntry : ifLabels.entrySet()) {

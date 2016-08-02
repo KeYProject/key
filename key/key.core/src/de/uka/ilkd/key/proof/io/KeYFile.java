@@ -346,7 +346,7 @@ public class KeYFile implements EnvInput {
                 problemParser.problem(); 
                 initConfig.addCategory2DefaultChoices(problemParser.
                         getCategory2Default());
-                ImmutableSet<Taclet> st = problemParser.getTaclets();
+                ImmutableList<Taclet> st = problemParser.getTaclets();
                 initConfig.setTaclets(st);
 
                 SpecificationRepository specRepos 

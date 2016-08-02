@@ -535,8 +535,8 @@ public class JMLSpecFactory {
             return null;
         }
         
-        // Extract the name of the join procedure: Remove beginning "join_proc " and trailing ";".
-        String joinProcName = originalClauses.head().text.substring(10, originalClauses.head().text.length() - 1);
+        // Extract the name of the join procedure: Remove beginning <code>"join_proc<code> and trailing <code>;"</code>.
+        String joinProcName = originalClauses.head().text.substring(11, originalClauses.head().text.length() - 2);
         JoinProcedure chosenProc = JoinProcedure.getProcedureByName(joinProcName);
         
         if (chosenProc == null) {

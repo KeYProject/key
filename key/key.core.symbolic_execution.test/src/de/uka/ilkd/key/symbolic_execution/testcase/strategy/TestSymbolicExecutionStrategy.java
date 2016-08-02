@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.symbolic_execution.testcase.strategy;
 
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
+
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 
@@ -20,7 +23,143 @@ import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTest
  * Tests for {@link SymbolicExecutionStrategy}
  * @author Martin Hentschel
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTestCase {
+   /**
+    * Tests example: /set/blockContractPreconditionNotVerified
+    */
+   public void testBlockContractPreconditionNotVerified_SymbolicExecution() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/blockContractPreconditionNotVerified/test/BlockContractPreconditionNotVerified.java", 
+                          "BlockContractPreconditionNotVerified",
+                          "main", 
+                          null,
+                          "/set/blockContractPreconditionNotVerified/oracle/BlockContractPreconditionNotVerified_symbolicExecution.xml",
+                          false,
+                          false,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractWithExceptionPostconditionNotVerified
+    */
+   public void testBlockContractWithExceptionPostconditionNotVerified_SymbolicExecution() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/blockContractWithExceptionPostconditionNotVerified/test/BlockContractWithExceptionPostconditionNotVerified.java", 
+                          "BlockContractWithExceptionPostconditionNotVerified",
+                          "main", 
+                          null,
+                          "/set/blockContractWithExceptionPostconditionNotVerified/oracle/BlockContractWithExceptionPostconditionNotVerified_symbolicExecution.xml",
+                          false,
+                          false,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractWithException
+    */
+   public void testBlockContractWithException_SymbolicExecution() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/blockContractWithException/test/BlockContractWithException.java", 
+                          "BlockContractWithException",
+                          "main", 
+                          null,
+                          "/set/blockContractWithException/oracle/BlockContractWithException_symbolicExecution.xml",
+                          false,
+                          false,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractWithReturnPostconditionNotVerified
+    */
+   public void testBlockContractWithReturnPostconditionNotVerified_SymbolicExecution() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/blockContractWithReturnPostconditionNotVerified/test/BlockContractWithReturnPostconditionNotVerified.java", 
+                          "BlockContractWithReturnPostconditionNotVerified",
+                          "main", 
+                          null,
+                          "/set/blockContractWithReturnPostconditionNotVerified/oracle/BlockContractWithReturnPostconditionNotVerified_symbolicExecution.xml",
+                          false,
+                          false,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/blockContractWithReturn
+    */
+   public void testBlockContractWithReturn_SymbolicExecution() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/blockContractWithReturn/test/BlockContractWithReturn.java", 
+                          "BlockContractWithReturn",
+                          "main", 
+                          null,
+                          "/set/blockContractWithReturn/oracle/BlockContractWithReturn_symbolicExecution.xml",
+                          false,
+                          false,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          true,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+
    /**
     * Tests example: /set/nonExecutionBranchHidingArraysIndexOf
     */
@@ -39,6 +178,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           true,
                           false,
                           false,
@@ -69,6 +209,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
+                          false,
                           true);
    }
    
@@ -90,6 +231,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           true,
                           false,
                           false,
@@ -121,6 +263,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
+                          false,
                           true);
    }
    
@@ -142,6 +285,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           true,
                           false,
                           false,
@@ -173,6 +317,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
+                          false,
                           true);
    }
 
@@ -194,6 +339,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           true,
                           false,
                           false,
@@ -225,6 +371,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
+                          false,
                           true);
    }
 
@@ -246,6 +393,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           true,
                           false,
                           false,
@@ -277,6 +425,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
+                          false,
                           true);
    }
 
@@ -298,6 +447,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           true,
                           false,
                           false,
@@ -329,6 +479,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
+                          false,
                           true);
    }
 
@@ -350,6 +501,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           true,
                           false,
                           false,
@@ -381,6 +533,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
+                          false,
                           true);
    }
 
@@ -402,6 +555,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           true,
                           false,
                           false,
@@ -433,6 +587,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
+                          false,
                           true);
    }
 
@@ -454,6 +609,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           true,
                           false,
                           false,
@@ -480,6 +636,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           true,
                           false,
                           false,
@@ -506,6 +663,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           true,
                           false,
                           false,
@@ -537,6 +695,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
+                          false,
                           true);
    }
 
@@ -563,6 +722,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
+                          false,
                           true);
    }
 
@@ -581,6 +741,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,
@@ -615,6 +776,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
+                          false,
                           true);
    }
 
@@ -633,6 +795,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,

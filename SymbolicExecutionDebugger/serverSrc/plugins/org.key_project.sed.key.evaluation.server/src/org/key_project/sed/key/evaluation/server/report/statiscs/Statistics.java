@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractChoicesQuestion;
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
@@ -19,6 +18,7 @@ import org.key_project.sed.key.evaluation.server.report.AbstractReportEngine;
 import org.key_project.sed.key.evaluation.server.report.EvaluationAnswers;
 import org.key_project.sed.key.evaluation.server.report.EvaluationResult;
 import org.key_project.sed.key.evaluation.server.report.filter.IStatisticsFilter;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
@@ -27,6 +27,11 @@ import org.key_project.util.java.IFilter;
  * @author Martin Hentschel
  */
 public class Statistics {
+   /**
+    * The available {@link IStatisticsFilter}.
+    */
+   private final IStatisticsFilter[] filters;
+   
    /**
     * The contained {@link FilteredStatistics}.
     */
@@ -43,6 +48,7 @@ public class Statistics {
     * @param result The {@link EvaluationResult} to analyze.
     */
    public Statistics(IStatisticsFilter[] filters, EvaluationResult result) {
+      this.filters = filters;
       for (IStatisticsFilter filter : filters) {
          filteredStatiscs.put(filter, new FilteredStatistics());
       }
@@ -140,8 +146,8 @@ public class Statistics {
     * Returns the available {@link IStatisticsFilter}s.
     * @return The available {@link IStatisticsFilter}s.
     */
-   public Set<IStatisticsFilter> getFilters() {
-      return filteredStatiscs.keySet();
+   public IStatisticsFilter[] getFilters() {
+      return filters;
    }
    
    /**
@@ -168,7 +174,7 @@ public class Statistics {
     * @return {@code true} {@link PageStatistics} available, {@code false} {@link PageStatistics} not available.
     */
    public boolean containsToolPageStatistics(final AbstractPage page) {
-      return CollectionUtil.search(getFilters(), new IFilter<IStatisticsFilter>() {
+      return ArrayUtil.search(getFilters(), new IFilter<IStatisticsFilter>() {
          @Override
          public boolean select(IStatisticsFilter element) {
             FilteredStatistics fs = filteredStatiscs.get(element);
@@ -192,7 +198,7 @@ public class Statistics {
     * @return {@code true} {@link QuestionStatistics} available, {@code false} {@link QuestionStatistics} not available.
     */
    public boolean containsToolQuestionStatistics(final AbstractQuestion question) {
-      return CollectionUtil.search(getFilters(), new IFilter<IStatisticsFilter>() {
+      return ArrayUtil.search(getFilters(), new IFilter<IStatisticsFilter>() {
          @Override
          public boolean select(IStatisticsFilter element) {
             FilteredStatistics fs = filteredStatiscs.get(element);
@@ -216,7 +222,7 @@ public class Statistics {
     */
    public boolean containsChoiceStatistics(final AbstractQuestion question) {
       if (question instanceof AbstractChoicesQuestion) {
-         return CollectionUtil.search(getFilters(), new IFilter<IStatisticsFilter>() {
+         return ArrayUtil.search(getFilters(), new IFilter<IStatisticsFilter>() {
             @Override
             public boolean select(IStatisticsFilter element) {
                FilteredStatistics fs = filteredStatiscs.get(element);

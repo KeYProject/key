@@ -26,6 +26,28 @@ import org.key_project.util.java.StringUtil;
  */
 public class StringUtilTest extends TestCase {
    /**
+    * Tests {@link StringUtil#startsWith(Object, String)}
+    */
+   @Test
+   public void testStartsWith() {
+      assertTrue(StringUtil.startsWith("Hello", "Hello"));
+      assertTrue(StringUtil.startsWith("Hello", "Hell"));
+      assertTrue(StringUtil.startsWith("Hello", "Hel"));
+      assertTrue(StringUtil.startsWith("Hello", "He"));
+      assertTrue(StringUtil.startsWith("Hello", "H"));
+      assertTrue(StringUtil.startsWith("Hello", ""));
+      assertFalse(StringUtil.startsWith("Hello", null));
+      assertFalse(StringUtil.startsWith(null, ""));
+      assertFalse(StringUtil.startsWith(null, "H"));
+      assertFalse(StringUtil.startsWith(new Object() {
+         @Override
+         public String toString() {
+            return "Hello";
+         }
+      }, "H"));
+   }
+   
+   /**
     * Tests {@link StringUtil#chop(String, int)}
     */
    @Test

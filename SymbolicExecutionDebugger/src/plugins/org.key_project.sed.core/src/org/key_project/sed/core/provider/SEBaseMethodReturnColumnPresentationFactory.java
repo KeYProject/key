@@ -4,6 +4,7 @@ import org.eclipse.debug.internal.ui.elements.adapters.VariableColumnFactoryAdap
 import org.eclipse.debug.internal.ui.elements.adapters.VariableColumnPresentation;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IColumnPresentation;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.key_project.sed.core.util.ISEConstants;
 
 /**
@@ -31,7 +32,7 @@ public class SEBaseMethodReturnColumnPresentationFactory extends VariableColumnF
    @Override
    public String getColumnPresentationId(IPresentationContext context, Object element) {
       if (ISEConstants.ID_CALL_STATE.equals(context.getId())) {
-         return VariableColumnPresentation.DEFAULT_VARIABLE_COLUMN_PRESENTATION;
+         return IDebugUIConstants.COLUMN_PRESENTATION_ID_VARIABLE;
       }
       else {
          return super.getColumnPresentationId(context, element);

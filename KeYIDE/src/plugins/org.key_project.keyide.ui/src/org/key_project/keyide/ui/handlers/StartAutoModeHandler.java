@@ -19,10 +19,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandler;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
-import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.job.AbstractKeYEnvironmentJob;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -38,19 +38,36 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
     */
    @Override
    protected Object doExecute(ExecutionEvent event) throws Exception {
-      //initialize values for execution
       IEditorPart editorPart = HandlerUtil.getActiveEditor(event);
-      if (editorPart != null && editorPart instanceof KeYEditor) {
-         final IProofProvider proofProvider = (IProofProvider)editorPart.getAdapter(IProofProvider.class);
-         if (proofProvider != null && 
-             proofProvider.getProofControl().isAutoModeSupported(proofProvider.getCurrentProof()) && 
-             !proofProvider.getProofControl() .isInAutoMode()) {
+      startAutoMode(editorPart);
+      return null;
+   }
+
+   /**
+    * Starts the auto mode in case the given {@link IWorkbenchPart} is a {@link IProofProvider}.
+    * @param workbenchPart The {@link IWorkbenchPart} to treat.
+    */
+   public static void startAutoMode(IWorkbenchPart workbenchPart) {
+      final IProofProvider proofProvider;
+      if (workbenchPart instanceof IProofProvider) {
+         proofProvider = (IProofProvider) workbenchPart;
+      }
+      else if (workbenchPart != null) {
+         proofProvider = (IProofProvider) workbenchPart.getAdapter(IProofProvider.class);
+      }
+      else {
+         proofProvider = null;
+      }
+      if (proofProvider != null) {
+         final Proof proof = proofProvider.getCurrentProof();
+         if (proof != null &&
+             proofProvider.getProofControl().isAutoModeSupported(proof) && 
+             !proofProvider.getProofControl().isInAutoMode()) {
             new AbstractKeYEnvironmentJob("Auto Mode", proofProvider.getEnvironment()) {
                // job that starts the automode in KeY
                @Override
                protected IStatus run(IProgressMonitor monitor) {
                   monitor.beginTask("Proving with KeY", IProgressMonitor.UNKNOWN);
-                  Proof proof = proofProvider.getCurrentProof();
                   proof.getActiveStrategy(); // Make sure that the strategy is initialized correctly, otherwise the used settings are different to the one defined by the strategysettings which are shown in the UI.
                   proofProvider.getProofControl().startAndWaitForAutoMode(proof);
                   monitor.done();
@@ -59,6 +76,5 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
             }.schedule();
          }
       }
-      return null;
    }
 }

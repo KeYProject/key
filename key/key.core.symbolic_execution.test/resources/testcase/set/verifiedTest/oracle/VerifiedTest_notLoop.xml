@@ -6,8 +6,7 @@
             <statement name="_x=-_x;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
                <loopInvariant name="invariant: _x &gt;= 0;
 variant: _x
-mod: allLocs
-mod[savedHeap]: allLocs" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initiallyValid="true">
+mod: allLocs" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initiallyValid="true">
                   <branchCondition name="gt(_x_1,Z(0(#)))" pathCondition="and(geq(_x_1,Z(1(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="gt(_x_1,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                      <loopCondition name="_x&gt;0" pathCondition="and(geq(_x_1,Z(1(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false" blockOpened="false">
                         <statement name="_x-=2;" pathCondition="and(geq(_x_1,Z(1(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false">
@@ -31,8 +30,7 @@ mod[savedHeap]: allLocs" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="fal
          <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <loopInvariant name="invariant: _x &gt;= 0;
 variant: _x
-mod: allLocs
-mod[savedHeap]: allLocs" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" initiallyValid="true">
+mod: allLocs" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" initiallyValid="true">
                <branchCondition name="gt(_x_0,Z(0(#)))" pathCondition="and(geq(_x_0,Z(1(#))),geq(x,Z(0(#))))" pathConditionChanged="true" branchCondition="gt(_x_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <loopCondition name="_x&gt;0" pathCondition="and(geq(_x_0,Z(1(#))),geq(x,Z(0(#))))" pathConditionChanged="false" blockOpened="false">
                      <statement name="_x-=2;" pathCondition="and(geq(_x_0,Z(1(#))),geq(x,Z(0(#))))" pathConditionChanged="false">

@@ -47,17 +47,17 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (max)">
+            <branchCondition name="equals(exc_0,null)" pathCondition="equals(exc_0,null)" pathConditionChanged="true" branchCondition="equals(exc_0,null)" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (max)">
+               <variable name="exc_0" isArrayIndex="false">
+                  <value name="exc_0 {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
                <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="VariableMethodContractTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="l2" isArrayIndex="false">
                         <value name="l2 {true}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                  </value>
-               </variable>
-               <variable name="exc_0" isArrayIndex="false">
-                  <value name="exc_0 {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="result" isArrayIndex="false">
@@ -68,7 +68,11 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <methodReturn name="&lt;return of findMax&gt;" signature="&lt;return of self.findMax()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+               <methodReturn name="&lt;return of findMax&gt;" signature="&lt;return of self.findMax()&gt;" pathCondition="equals(exc_0,null)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(exc_0,null)">
+                  <variable name="exc_0" isArrayIndex="false">
+                     <value name="exc_0 {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
                   <variable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="VariableMethodContractTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="l2" isArrayIndex="false">
@@ -81,15 +85,15 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
                         </variable>
                      </value>
                   </variable>
-                  <variable name="exc_0" isArrayIndex="false">
-                     <value name="exc_0 {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                     </value>
-                  </variable>
                   <variable name="exc" isArrayIndex="false">
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  <termination name="&lt;end&gt;" pathCondition="equals(exc_0,null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                     <variable name="exc_0" isArrayIndex="false">
+                        <value name="exc_0 {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
                      <variable name="self" isArrayIndex="false">
                         <value name="self {true}" typeString="VariableMethodContractTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="l2" isArrayIndex="false">
@@ -102,15 +106,15 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
                            </variable>
                         </value>
                      </variable>
-                     <variable name="exc_0" isArrayIndex="false">
-                        <value name="exc_0 {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                        </value>
-                     </variable>
                      <variable name="exc" isArrayIndex="false">
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </termination>
+                  <callStateVariable name="exc_0" isArrayIndex="false">
+                     <value name="exc_0 {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
                   <callStateVariable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="VariableMethodContractTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      </value>
@@ -121,7 +125,11 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
                   </callStateVariable>
                </methodReturn>
             </branchCondition>
-            <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (max)">
+            <branchCondition name="not(equals(exc_0,null))" pathCondition="not(equals(exc_0,null))" pathConditionChanged="true" branchCondition="not(equals(exc_0,null))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (max)">
+               <variable name="exc_0" isArrayIndex="false">
+                  <value name="exc_0 {true}" typeString="java.lang.Throwable" valueString="exc_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
                <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="VariableMethodContractTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="l2" isArrayIndex="false">
@@ -130,15 +138,15 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
                      </variable>
                   </value>
                </variable>
-               <variable name="exc_0" isArrayIndex="false">
-                  <value name="exc_0 {true}" typeString="java.lang.Throwable" valueString="exc_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                  </value>
-               </variable>
                <variable name="exc" isArrayIndex="false">
                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call self.findMax()&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+               <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call self.findMax()&gt;&gt;" pathCondition="not(equals(exc_0,null))" pathConditionChanged="false" methodReturnCondition="not(equals(exc_0,null))">
+                  <variable name="exc_0" isArrayIndex="false">
+                     <value name="exc_0 {true}" typeString="java.lang.Throwable" valueString="exc_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
                   <variable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="VariableMethodContractTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="l2" isArrayIndex="false">
@@ -147,15 +155,15 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
                         </variable>
                      </value>
                   </variable>
-                  <variable name="exc_0" isArrayIndex="false">
-                     <value name="exc_0 {true}" typeString="java.lang.Throwable" valueString="exc_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                     </value>
-                  </variable>
                   <variable name="exc" isArrayIndex="false">
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="not(equals(exc_0,null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                     <variable name="exc_0" isArrayIndex="false">
+                        <value name="exc_0 {true}" typeString="java.lang.Throwable" valueString="exc_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
                      <variable name="self" isArrayIndex="false">
                         <value name="self {true}" typeString="VariableMethodContractTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="l2" isArrayIndex="false">
@@ -164,15 +172,15 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
                            </variable>
                         </value>
                      </variable>
-                     <variable name="exc_0" isArrayIndex="false">
-                        <value name="exc_0 {true}" typeString="java.lang.Throwable" valueString="exc_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                        </value>
-                     </variable>
                      <variable name="exc" isArrayIndex="false">
                         <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </termination>
+                  <callStateVariable name="exc_0" isArrayIndex="false">
+                     <value name="exc_0 {true}" typeString="java.lang.Throwable" valueString="exc_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
                   <callStateVariable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="VariableMethodContractTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      </value>

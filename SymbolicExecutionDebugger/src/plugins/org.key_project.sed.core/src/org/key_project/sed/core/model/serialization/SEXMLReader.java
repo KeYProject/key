@@ -43,17 +43,21 @@ import org.key_project.sed.core.annotation.ISEAnnotationType;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEConstraint;
 import org.key_project.sed.core.model.ISEDebugElement;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.ISETermination;
 import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.model.ISEValue;
 import org.key_project.sed.core.model.ISEVariable;
 import org.key_project.sed.core.model.impl.AbstractSEBaseMethodReturn;
 import org.key_project.sed.core.model.memory.ISEMemoryBaseMethodReturn;
-import org.key_project.sed.core.model.memory.ISEMemoryNode;
 import org.key_project.sed.core.model.memory.ISEMemoryGroupable;
+import org.key_project.sed.core.model.memory.ISEMemoryNode;
 import org.key_project.sed.core.model.memory.ISEMemoryStackFrameCompatibleDebugNode;
+import org.key_project.sed.core.model.memory.SEMemoryBlockContract;
+import org.key_project.sed.core.model.memory.SEMemoryBlockContractExceptionalTermination;
+import org.key_project.sed.core.model.memory.SEMemoryBlockContractTermination;
 import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEMemoryBranchStatement;
 import org.key_project.sed.core.model.memory.SEMemoryConstraint;
@@ -67,6 +71,7 @@ import org.key_project.sed.core.model.memory.SEMemoryLoopStatement;
 import org.key_project.sed.core.model.memory.SEMemoryMethodCall;
 import org.key_project.sed.core.model.memory.SEMemoryMethodContract;
 import org.key_project.sed.core.model.memory.SEMemoryMethodReturn;
+import org.key_project.sed.core.model.memory.SEMemoryNodeLink;
 import org.key_project.sed.core.model.memory.SEMemoryStatement;
 import org.key_project.sed.core.model.memory.SEMemoryTermination;
 import org.key_project.sed.core.model.memory.SEMemoryThread;
@@ -259,6 +264,19 @@ public class SEXMLReader {
                   throw new SAXException("Unsupported method return \"" + entry.getKey() + "\".");
                }
             }
+            // Set link targets
+            Set<Entry<SEMemoryNodeLink, String>> outgoingLinkTargetEntries = handler.getOutgoingLinksMap().entrySet();
+            for (Entry<SEMemoryNodeLink, String> entry : outgoingLinkTargetEntries) {
+               ISEDebugElement element = handler.getElementById(entry.getValue());
+               if (element == null) {
+                  throw new SAXException("Referenced constraint with ID \"" + entry.getValue() + "\" is not available in model.");
+               }
+               if (!(element instanceof ISENode)) {
+                  throw new SAXException("Referenced constraint with ID \"" + entry.getValue() + "\" refers to wrong model object \"" + element + "\".");
+               }
+               entry.getKey().setTarget((ISENode) element);
+               ((ISEMemoryNode) element).addIncomingLink(entry.getKey());
+            }            
             // Return result
             return handler.getResult();
          }
@@ -345,6 +363,11 @@ public class SEXMLReader {
       private Map<SEMemoryValue, List<String>> relevantConstraintsMap = new HashMap<SEMemoryValue, List<String>>();
       
       /**
+       * Maps {@link SEMemoryNodeLink}s to the target IDs.
+       */
+      private Map<SEMemoryNodeLink, String> outgoingLinksMap = new HashMap<SEMemoryNodeLink, String>();
+      
+      /**
        * {@inheritDoc}
        */
       @Override
@@ -406,7 +429,10 @@ public class SEXMLReader {
                ISEDebugElement element = (ISEDebugElement)obj;
                elementIdMapping.put(element.getId(), element);
             }
-            if (obj instanceof ChildReference) {
+            if (obj instanceof SEMemoryNodeLink) {
+               outgoingLinksMap.put((SEMemoryNodeLink) obj, getLinkTargetId(attributes));
+            }
+            else if (obj instanceof ChildReference) {
                List<ChildReference> refs = nodeChildReferences.get(parent);
                if (refs == null) {
                   refs = new LinkedList<ChildReference>();
@@ -537,13 +563,13 @@ public class SEXMLReader {
          else if (isAnnotationLink(uri, localName, qName)) {
             // Nothing to do
          }
-         else if (isAnnotationLink(uri, localName, qName)) {
-            // Nothing to do
-         }
          else if (isChildReferences(uri, localName, qName)) {
             // Nothing to do
          }
          else if (isGroupEndConditionReference(uri, localName, qName)) {
+            // Nothing to do
+         }
+         else if (isOutgoingLink(uri, localName, qName)) {
             // Nothing to do
          }
          else {
@@ -622,6 +648,14 @@ public class SEXMLReader {
       }
 
       /**
+       * Returns the outgoing links map.
+       * @return The outgoing links map.
+       */
+      public Map<SEMemoryNodeLink, String> getOutgoingLinksMap() {
+         return outgoingLinksMap;
+      }
+
+      /**
        * Returns the instantiated {@link ISEDebugElement} with the give ID.
        * @param id The ID.
        * @return The instantiated {@link ISEDebugElement} or {@code null} if not available.
@@ -695,6 +729,17 @@ public class SEXMLReader {
     */
    protected boolean isAnnotationLink(String uri, String localName, String qName) {
       return SEXMLWriter.TAG_ANNOTATION_LINK.equals(qName);
+   }
+   
+   /**
+    * Checks if the given tag name represents an {@link ISENodeLink}.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @return {@code true} represents an {@link ISENodeLink}, {@code false} represents something else.
+    */
+   protected boolean isOutgoingLink(String uri, String localName, String qName) {
+      return SEXMLWriter.TAG_OUTGOING_LINK.equals(qName);
    }
    
    /**
@@ -809,6 +854,12 @@ public class SEXMLReader {
       else if (SEXMLWriter.TAG_BRANCH_STATEMENT.equals(qName)) {
          return createBranchStatement(target, parent, thread, uri, localName, qName, attributes);
       }
+      else if (SEXMLWriter.TAG_BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION.equals(qName)) {
+         return createBlockContractExceptionalTermination(target, parent, thread, uri, localName, qName, attributes);
+      }
+      else if (SEXMLWriter.TAG_BLOCK_CONTRACT_TERMINATION.equals(qName)) {
+         return createBlockContractTermination(target, parent, thread, uri, localName, qName, attributes);
+      }
       else if (SEXMLWriter.TAG_EXCEPTIONAL_TERMINATION.equals(qName)) {
          return createExceptionalTermination(target, parent, thread, uri, localName, qName, attributes);
       }
@@ -848,6 +899,9 @@ public class SEXMLReader {
       else if (SEXMLWriter.TAG_METHOD_CONTRACT.equals(qName)) {
          return createMethodContract(target, parent, thread, uri, localName, qName, attributes);
       }
+      else if (SEXMLWriter.TAG_BLOCK_CONTRACT.equals(qName)) {
+         return createBlockContract(target, parent, thread, uri, localName, qName, attributes);
+      }
       else if (SEXMLWriter.TAG_LOOP_INVARIANT.equals(qName)) {
          return createLoopInvariant(target, parent, thread, uri, localName, qName, attributes);
       }
@@ -860,11 +914,23 @@ public class SEXMLReader {
       else if (SEXMLWriter.TAG_CONSTRAINT.equals(qName)) {
          return createConstraint(target, parent, thread, uri, localName, qName, attributes);
       }
+      else if (SEXMLWriter.TAG_OUTGOING_LINK.equals(qName)) {
+         return createOutgoingLink(target, parent, thread, uri, localName, qName, attributes);
+      }
       else {
          throw new SAXException("Unknown tag \"" + qName + "\".");
       }
    }
    
+   protected SEMemoryNodeLink createOutgoingLink(ISEDebugTarget target, ISENode parent, ISEThread thread, String uri, String localName, String qName, Attributes attributes) {
+      SEMemoryNodeLink link = new SEMemoryNodeLink(target);
+      link.setSource(parent);
+      link.setId(getId(attributes));
+      link.setName(getName(attributes));
+      ((ISEMemoryNode) parent).addOutgoingLink(link);
+      return link;
+   }
+
    protected SEMemoryConstraint createConstraint(ISEDebugTarget target, ISENode parent, ISEThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEMemoryConstraint constraint = new SEMemoryConstraint(target, getName(attributes));
       constraint.setId(getId(attributes));
@@ -1007,6 +1073,44 @@ public class SEXMLReader {
     */   
    protected SEMemoryExceptionalTermination createExceptionalTermination(ISEDebugTarget target, ISENode parent, ISEThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEMemoryExceptionalTermination termination = new SEMemoryExceptionalTermination(target, parent, thread, isVerified(attributes));
+      fillDebugNode(termination, attributes);
+      fillStackFrame(termination, attributes);
+      return termination;
+   }
+
+   /**
+    * Creates a {@link SEMemoryBlockContractExceptionalTermination} instance for the content in the given tag.
+    * @param target The parent {@link ISEDebugTarget} or {@code null} if not available.
+    * @param parent The parent {@link ISENode} or {@code null} if not available.
+    * @param thread The parent {@link ISEThread} or {@code null} if not available.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
+    * @return The created {@link SEMemoryBlockContractExceptionalTermination}.
+    * @throws SAXException Occurred Exception.
+    */   
+   protected SEMemoryBlockContractExceptionalTermination createBlockContractExceptionalTermination(ISEDebugTarget target, ISENode parent, ISEThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      SEMemoryBlockContractExceptionalTermination termination = new SEMemoryBlockContractExceptionalTermination(target, parent, thread, isVerified(attributes));
+      fillDebugNode(termination, attributes);
+      fillStackFrame(termination, attributes);
+      return termination;
+   }
+
+   /**
+    * Creates a {@link SEMemoryBlockContractTermination} instance for the content in the given tag.
+    * @param target The parent {@link ISEDebugTarget} or {@code null} if not available.
+    * @param parent The parent {@link ISENode} or {@code null} if not available.
+    * @param thread The parent {@link ISEThread} or {@code null} if not available.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
+    * @return The created {@link SEMemoryBlockContractTermination}.
+    * @throws SAXException Occurred Exception.
+    */   
+   protected SEMemoryBlockContractTermination createBlockContractTermination(ISEDebugTarget target, ISENode parent, ISEThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      SEMemoryBlockContractTermination termination = new SEMemoryBlockContractTermination(target, parent, thread, isVerified(attributes));
       fillDebugNode(termination, attributes);
       fillStackFrame(termination, attributes);
       return termination;
@@ -1183,6 +1287,27 @@ public class SEXMLReader {
    }
    
    /**
+    * Creates a {@link SEMemoryBlockContract} instance for the content in the given tag.
+    * @param target The parent {@link ISEDebugTarget} or {@code null} if not available.
+    * @param parent The parent {@link ISENode} or {@code null} if not available.
+    * @param thread The parent {@link ISEThread} or {@code null} if not available.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
+    * @return The created {@link SEMemoryBlockContract}.
+    * @throws SAXException Occurred Exception.
+    */   
+   protected SEMemoryBlockContract createBlockContract(ISEDebugTarget target, ISENode parent, ISEThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      SEMemoryBlockContract blockContract = new SEMemoryBlockContract(target, parent, thread);
+      blockContract.setSourcePath(getSourcePath(attributes));
+      fillDebugNode(blockContract, attributes);
+      fillStackFrame(blockContract, attributes);
+      blockContract.setPreconditionComplied(isPreconditionComplied(attributes));
+      return blockContract;
+   }
+   
+   /**
     * Creates a {@link SEMemoryLoopInvariant} instance for the content in the given tag.
     * @param target The parent {@link ISEDebugTarget} or {@code null} if not available.
     * @param parent The parent {@link ISENode} or {@code null} if not available.
@@ -1270,6 +1395,15 @@ public class SEXMLReader {
     */   
    protected String getId(Attributes attributes) {
       return attributes.getValue(SEXMLWriter.ATTRIBUTE_ID);
+   }
+
+   /**
+    * Returns the ID value of the target {@link ISENode}.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value of the target {@link ISENode}.
+    */   
+   protected String getLinkTargetId(Attributes attributes) {
+      return attributes.getValue(SEXMLWriter.ATTRIBUTE_LINK_TARGET);
    }
    
    /**

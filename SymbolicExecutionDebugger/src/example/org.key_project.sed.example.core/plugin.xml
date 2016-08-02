@@ -2,6 +2,13 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
+         point="org.eclipse.debug.core.launchModes">
+      <launchMode
+            label="SED Examples"
+            mode="sedExamples">
+      </launchMode>
+   </extension>
+   <extension
          point="org.eclipse.debug.core.sourceLocators">
       <sourceLocator
             class="org.key_project.sed.example.launch.ExampleSourceLookupDirector"
@@ -21,7 +28,7 @@
       <launchConfigurationType
             delegate="org.key_project.sed.example.launch.ExampleLaunchConfigurationDelegate"
             id="org.key_project.sed.example.core.exampleLaunchType"
-            modes="debug"
+            modes="debug, sedExamples"
             name="Symbolic Execution Debugger (SED) - Example"
             sourceLocatorId="org.key_project.sed.example.launch.ExampleSourceLookupDirector"
             sourcePathComputerId="org.key_project.sed.example.launch.ExampleSourcePathComputerDelegate">

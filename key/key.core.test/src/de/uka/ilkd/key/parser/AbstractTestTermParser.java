@@ -9,6 +9,7 @@ import junit.framework.TestCase;
 
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
@@ -86,7 +87,7 @@ public class AbstractTestTermParser extends TestCase {
                     new ParserConfig(services, nss),
                     new ParserConfig(services, nss),
                     null,
-                    DefaultImmutableSet.<Taclet>nil()).problem();
+                    ImmutableSLList.<Taclet>nil()).problem();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);

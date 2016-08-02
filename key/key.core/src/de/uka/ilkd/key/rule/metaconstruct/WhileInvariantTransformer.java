@@ -53,9 +53,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -258,7 +256,7 @@ public final class WhileInvariantTransformer {
         
         resultSubterms.add
         (normalCaseAndContinue(termLabelState, services, applicationPos, rule, ruleApp, goal, applicationSequent, contFlagTerm, returnFlagTerm,
-                               breakFlagTerm, excFlagTerm, addUninterpretedPredicateIfRequired(services, inv)));
+                               breakFlagTerm, excFlagTerm, AbstractOperationPO.addUninterpretedPredicateIfRequired(services, inv)));
         
         Term result = createLongJunctorTerm(Junctor.AND, resultSubterms);
         
@@ -284,29 +282,9 @@ public final class WhileInvariantTransformer {
     }
     
     /**
-     * This method adds the uninterpreted predicate to the given {@link Term}
-     * if the used {@link ProofOblInput} is an instance of {@link AbstractOperationPO}
-     * and {@link AbstractOperationPO#isAddUninterpretedPredicate()} is {@code true}.
-     * Otherwise the given {@link Term} is returned.  
-     * @param services The {@link Services} which provides the {@link Proof} and its {@link ProofOblInput}.
-     * @param term The {@link Term} to modify.
-     * @return The modified or original {@link Term}.
-     */
-    private Term addUninterpretedPredicateIfRequired(Services services, Term term) {
-       ProofOblInput problem = services.getSpecificationRepository().getProofOblInput(services.getProof());
-       if (problem instanceof AbstractOperationPO) {
-          AbstractOperationPO operationPO = (AbstractOperationPO)problem;
-          if (operationPO.isAddUninterpretedPredicate()) {
-             term = services.getTermBuilder().and(term, operationPO.getUninterpretedPredicate());
-          }
-       }
-       return term;
-    }
-    
-    /**
      * Computes the {@link TermLabel} which should be added to the created
      * loop body modality {@link Term}.
-    * @param termLabelState The {@link TermLabelState} of the current rule application.
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param services The {@link Services}.
      * @param applicationPos The {@link PosInOccurrence} in the {@link Sequent} to rewrite.
      * @param rule The {@link Rule} to apply.

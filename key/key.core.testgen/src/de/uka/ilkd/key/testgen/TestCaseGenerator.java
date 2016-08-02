@@ -73,7 +73,7 @@ public class TestCaseGenerator {
 	public static final String ALL_SEQ = "allSeq";
 	public static final String ALL_LOCSETS = "allLocSets";
 
-	public static final String OBJENESIS_NAME = "objenesis-2.1.jar";
+	public static final String OBJENESIS_NAME = "objenesis-2.2.jar";
 
 	public static final String OLDMap = "old";
 
@@ -127,7 +127,7 @@ public class TestCaseGenerator {
 				+ "   then" + NEW_LINE
 				+ "      java -jar "+openJMLPath+File.separator+"openjml.jar -cp \"."+objenesisPath+File.separator+OBJENESIS_NAME+"\" -rac *" + JAVA_FILE_EXTENSION_WITH_DOT + NEW_LINE
 				+ "   else" + NEW_LINE
-				+ "      echo \"objenesis-2.1.jar not found!\"" + NEW_LINE
+				+ "      echo \"objenesis-2.2.jar not found!\"" + NEW_LINE
 				+ "   fi" + NEW_LINE
 				+ "else" + NEW_LINE
 				+ "   echo \"openjml.jar not found!\"" + NEW_LINE
@@ -158,7 +158,7 @@ public class TestCaseGenerator {
 				+ "           java -cp "+objenesisPath+File.separator+OBJENESIS_NAME+":"+path+File.separator+"jmlruntime.jar:"+path+File.separator+"jmlspecs.jar:. $1" + NEW_LINE
 				+ "        fi" + NEW_LINE
 				+ "      else" + NEW_LINE
-				+ "         echo \"objenesis-2.1.jar not found!\"" + NEW_LINE
+				+ "         echo \"objenesis-2.2.jar not found!\"" + NEW_LINE
 				+ "      fi" + NEW_LINE
 				+ "else" + NEW_LINE
 				+ "  echo \"jmlspecs.jar not found!\"" + NEW_LINE
@@ -929,7 +929,7 @@ public class TestCaseGenerator {
 		// init fields
 		if (heap != null) {
 			for (final ObjectVal o : heap.getObjects()) {
-				if (o.getName().equals("#o0")) {
+				if (o.getName().equals("#o0") || o.getSort().name().toString().endsWith("Exception")) {
 					continue;
 				}
 				final String receiverObject = createObjectName(o);
@@ -967,6 +967,7 @@ public class TestCaseGenerator {
 						&& o.getSort().name().toString().endsWith("[]")) {
 
 					String safeType = getSafeType(o.getSort());
+					String elementType = safeType.substring(0, safeType.length()-2);
 					rflCreator.addSort(safeType);
 					//System.out.println("Added sort (init array fields):"+safeType);					
 
@@ -980,7 +981,7 @@ public class TestCaseGenerator {
 						if(junitFormat && isInPrestate(prestate, o)){
 							
 
-							if(isInPrestate(prestate, val) && !val.equals("null")){
+							if(!elementType.equals("int") && !elementType.equals("boolean") && isInPrestate(prestate, val) && !val.equals("null")){
 								val = getPreName(val);
 							}
 							

@@ -7,15 +7,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.BranchResult;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.MultiEvaluationResult;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValue;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValueEvaluationResult;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.BranchResult;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.MultiEvaluationResult;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValueTracingResult;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
@@ -23,10 +27,270 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 
 /**
- * Tests for {@link TruthValueEvaluationUtil}.
+ * Tests for {@link TruthValueTracingUtil}.
  * @author Martin Hentschel
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestCase {
+   /**
+    * Tests example: /set/truthValueExceptinalAssignableNothingTest
+    */
+   public void testExceptinalAssignableNothingTest_OSS() throws Exception {
+      // Create expected results
+      ExpectedBranchResult goal374 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedBranchResult goal407 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedBranchResult goal444 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedBranchResult goal475 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedBranchResult goal476 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult exceptionResult = new ExpectedTruthValueEvaluationResult(goal374, goal407, goal444, goal475, goal476);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueExceptinalAssignableNothingTest/test/ExceptinalAssignableNothingTest_OSS.proof", 
+                                 "/set/truthValueExceptinalAssignableNothingTest/oracle/ExceptinalAssignableNothingTest.xml",
+                                 false,
+                                 false,
+                                 false,
+                                 exceptionResult);
+   }
+   
+   /**
+    * Tests example: /set/truthValueExceptinalAssignableNothingTest
+    */
+   public void testExceptinalAssignableNothingTest() throws Exception {
+      // Create expected results
+      ExpectedBranchResult goal374 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedBranchResult goal407 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedBranchResult goal444 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedBranchResult goal475 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedBranchResult goal476 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult exceptionResult = new ExpectedTruthValueEvaluationResult(goal374, goal407, goal444, goal475, goal476);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueExceptinalAssignableNothingTest/test/ExceptinalAssignableNothingTest.proof", 
+                                 "/set/truthValueExceptinalAssignableNothingTest/oracle/ExceptinalAssignableNothingTest.xml",
+                                 false,
+                                 false,
+                                 false,
+                                 exceptionResult);
+   }
+   
+   /**
+    * Tests example: /set/truthValueBlockContractMagic42
+    */
+   public void testBlockContractMagic42() throws Exception {
+      // Create expected results
+      ExpectedBranchResult goal66 = new ExpectedBranchResult(new ExpectedTruthValueResult("9.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("11.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("11.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult preconditionResult = new ExpectedTruthValueEvaluationResult(goal66);
+      ExpectedBranchResult goal62 = new ExpectedBranchResult(new ExpectedTruthValueResult("13.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("14.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("19.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("20.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("21.0", TruthValue.TRUE));
+      ExpectedBranchResult goal64 = new ExpectedBranchResult(new ExpectedTruthValueResult("13.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("14.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("21.0", TruthValue.FALSE));
+      ExpectedTruthValueEvaluationResult validitiyResult = new ExpectedTruthValueEvaluationResult(goal62, goal64);
+      ExpectedBranchResult goal152 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("7.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("8.0", TruthValue.TRUE));
+      ExpectedBranchResult goal154 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("5.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("8.0", TruthValue.FALSE));
+      ExpectedTruthValueEvaluationResult usageResult = new ExpectedTruthValueEvaluationResult(goal152, goal154);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueBlockContractMagic42/test/BlockContractMagic42.proof", 
+                                 "/set/truthValueBlockContractMagic42/oracle/BlockContractMagic42.xml",
+                                 false,
+                                 false,
+                                 true,
+                                 preconditionResult,
+                                 validitiyResult,
+                                 usageResult);
+   }
+   
+   /**
+    * Tests example: /set/truthValueRejectedFormula
+    */
+   public void testValueRejectedFormula() throws Exception {
+      // Create expected results
+      ExpectedBranchResult goal31 = new ExpectedBranchResult(new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("7.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("8.0", TruthValue.TRUE));
+      ExpectedBranchResult goal33 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("2.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("7.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("8.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult result = new ExpectedTruthValueEvaluationResult(goal31, goal33);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueRejectedFormula/test/LabelLostVerification.proof", 
+                                 "/set/truthValueRejectedFormula/oracle/LabelLostVerification.xml",
+                                 false,
+                                 false,
+                                 false,
+                                 result);
+   }
+   
+   /**
+    * Tests example: /set/truthValueAddingOfLabeledSubtree
+    */
+   public void testAddingOfLabeledSubtree() throws Exception {
+      // Create expected results
+      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedTruthValueResult("13.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("14.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("15.0", TruthValue.FALSE),
+                                                             new ExpectedTruthValueResult("16.0", TruthValue.UNKNOWN),
+                                                             new ExpectedTruthValueResult("17.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult resultInvInitial = new ExpectedTruthValueEvaluationResult(goal53);
+      ExpectedBranchResult goal141 = new ExpectedBranchResult();
+      ExpectedTruthValueEvaluationResult resultInvTermination = new ExpectedTruthValueEvaluationResult(goal141);
+      ExpectedBranchResult goal214 = new ExpectedBranchResult();
+      ExpectedBranchResult goal229 = new ExpectedBranchResult();
+      ExpectedBranchResult goal233 = new ExpectedBranchResult();
+      ExpectedBranchResult goal231 = new ExpectedBranchResult();
+      ExpectedBranchResult goal216 = new ExpectedBranchResult();
+      ExpectedTruthValueEvaluationResult resultNormalTermination = new ExpectedTruthValueEvaluationResult(goal214, goal229, goal233, goal231, goal216);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueAddingOfLabeledSubtree/test/ImmutableList.proof", 
+                                 "/set/truthValueAddingOfLabeledSubtree/oracle/ImmutableList.xml",
+                                 false,
+                                 false,
+                                 false,
+                                 resultInvInitial,
+                                 resultInvTermination,
+                                 resultNormalTermination);
+   }
+   
+   /**
+    * Tests example: /set/truthValueAssignableAndLoop
+    */
+   public void testAssignableAndLoop() throws Exception {
+      // Create expected results
+      ExpectedBranchResult goal430 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("4.0", TruthValue.FALSE),
+                                                              new ExpectedTruthValueResult("6.0", TruthValue.FALSE));
+      ExpectedTruthValueEvaluationResult resultExceptionBranch = new ExpectedTruthValueEvaluationResult(goal430);
+      ExpectedBranchResult goal478 = new ExpectedBranchResult(new ExpectedTruthValueResult("7.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("8.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult resultInvInitial = new ExpectedTruthValueEvaluationResult(goal478);
+      ExpectedBranchResult goal922 = new ExpectedBranchResult(new ExpectedTruthValueResult("19.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("20.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult resultPrecondition = new ExpectedTruthValueEvaluationResult(goal922);
+      ExpectedBranchResult goal886 = new ExpectedBranchResult();
+      ExpectedBranchResult goal869 = new ExpectedBranchResult(new ExpectedTruthValueResult("9.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("14.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("15.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("16.0", TruthValue.TRUE));
+      ExpectedBranchResult goal868 = new ExpectedBranchResult(new ExpectedTruthValueResult("9.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("14.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("15.0", TruthValue.TRUE),
+                                                              new ExpectedTruthValueResult("16.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult resultLoopEnd = new ExpectedTruthValueEvaluationResult(goal868, goal869, goal886);
+      ExpectedBranchResult goal1113 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("2.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("5.0", TruthValue.UNKNOWN),
+                                                               new ExpectedTruthValueResult("6.0", TruthValue.UNKNOWN));
+      ExpectedBranchResult goal1134 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("2.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("6.0", TruthValue.TRUE));
+      ExpectedBranchResult goal1137 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("2.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                               new ExpectedTruthValueResult("4.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult result5 = new ExpectedTruthValueEvaluationResult(goal1113, goal1134, goal1137);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueAssignableAndLoop/test/MagicProofNoOSS.proof", 
+                                 "/set/truthValueAssignableAndLoop/oracle/MagicProofNoOSS.xml",
+                                 true,
+                                 true,
+                                 false,
+                                 resultExceptionBranch,
+                                 resultInvInitial,
+                                 resultPrecondition,
+                                 resultLoopEnd,
+                                 result5);
+   }
    
    /**
     * Tests example: /set/truthValueAnd
@@ -51,6 +315,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       // Perform test
       doTruthValueEvaluationTest("/set/truthValueAnd/test/And3_replaceKnown.proof", 
                                  "/set/truthValueAnd/oracle/And3_replaceKnown.xml",
+                                 false,
                                  false,
                                  false,
                                  result1);
@@ -84,6 +349,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       // Perform test
       doTruthValueEvaluationTest("/set/truthValueUnderstandingProofsMyInteger/test/MyInteger.proof", 
                                  "/set/truthValueUnderstandingProofsMyInteger/oracle/MyInteger.xml",
+                                 false,
                                  false,
                                  false,
                                  result1);
@@ -200,6 +466,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueUnderstandingProofsArrayUtil/oracle/ArrayUtil.xml",
                                  false,
                                  false,
+                                 false,
                                  result1, 
                                  result2, 
                                  result3, 
@@ -264,6 +531,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueUnderstandingProofsAccount/oracle/Account.xml",
                                  false,
                                  false,
+                                 false,
                                  result1, 
                                  result2,
                                  result3,
@@ -309,6 +577,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueUnderstandingProofsCalendar/oracle/Calendar.xml",
                                  false,
                                  false,
+                                 false,
                                  result1, 
                                  result2);
    }
@@ -325,6 +594,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       // Perform test
       doTruthValueEvaluationTest("/set/truthValueMyInteger/test/MyInteger.proof", 
                                  "/set/truthValueMyInteger/oracle/MyInteger.xml",
+                                 false,
                                  false,
                                  false,
                                  result);
@@ -345,6 +615,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueEquivExample/oracle/EquivExample.xml",
                                  false,
                                  true,
+                                 false,
                                  result);
    }
    
@@ -363,6 +634,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueEquivExample/oracle/EquivExample.xml",
                                  false,
                                  false,
+                                 false,
                                  result);
    }
    
@@ -377,6 +649,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       doTruthValueEvaluationTest("/set/truthValueIfThenElseIntegerTest/test/IfThenElseIntegerTest.java", 
                                  "IfThenElseIntegerTest[IfThenElseIntegerTest::magic(int,int)].JML normal_behavior operation contract.0", 
                                  "/set/truthValueIfThenElseIntegerTest/oracle/IfThenElseIntegerTest.xml",
+                                 false,
                                  false,
                                  false,
                                  thenResult,
@@ -396,6 +669,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueIfThenElseNotFormulaTest/oracle/IfThenElseNotFormulaTest.xml",
                                  false,
                                  false,
+                                 false,
                                  thenResult,
                                  elseResult);
    }
@@ -411,6 +685,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       doTruthValueEvaluationTest("/set/truthValueIfThenElseFormulaTest/test/IfThenElseFormulaTest.java", 
                                  "IfThenElseFormulaTest[IfThenElseFormulaTest::magic(int,int)].JML normal_behavior operation contract.0", 
                                  "/set/truthValueIfThenElseFormulaTest/oracle/IfThenElseFormulaTest.xml",
+                                 false,
                                  false,
                                  false,
                                  thenResult,
@@ -432,6 +707,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueNotLastEvaluationGivesTruthValue/oracle/NotLastEvaluationGivesTruthValue.xml",
                                  false,
                                  true,
+                                 false,
                                  result);
    }
    
@@ -448,6 +724,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueArraySumWhile/oracle/ArraySumWhile.xml",
                                  false,
                                  true,
+                                 false,
                                  initialResult,
                                  preservesResult,
                                  terminationResult);
@@ -466,6 +743,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueArraySumWhile/oracle/ArraySumWhile.xml",
                                  false,
                                  true,
+                                 false,
                                  initialResult,
                                  preservesResult,
                                  terminationResult);
@@ -487,6 +765,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueArrayUtil/oracle/ArrayUtil.xml",
                                  true,
                                  true,
+                                 false,
                                  goal97,
                                  goal826,
                                  goal630,
@@ -511,6 +790,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueArrayUtil/oracle/ArrayUtil.xml",
                                  true,
                                  true,
+                                 false,
                                  goal97,
                                  goal826,
                                  goal630,
@@ -531,6 +811,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
                                  true,
                                  false,
+                                 false,
                                  preResult,
                                  terminationResult);
    }
@@ -546,6 +827,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       doTruthValueEvaluationTest("/set/truthValueSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication.proof", 
                                  "/set/truthValueSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
                                  true,
+                                 false,
                                  false,
                                  preResult,
                                  terminationResult);
@@ -563,6 +845,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
                                  true,
                                  false,
+                                 false,
                                  preResult,
                                  terminationResult);
    }
@@ -578,6 +861,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       doTruthValueEvaluationTest("/set/truthValueSimpleMethodContractApplication/test/SimpleMethodContractApplication.proof", 
                                  "/set/truthValueSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
                                  true,
+                                 false,
                                  false,
                                  preResult,
                                  terminationResult);
@@ -595,6 +879,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       // Perform test
       doTruthValueEvaluationTest("/set/truthValueDifferentBranchesTest/test/DifferentBranchesTest.proof", 
                                  "/set/truthValueDifferentBranchesTest/oracle/DifferentBranchesTest.xml",
+                                 false,
                                  false,
                                  false,
                                  firstResult,
@@ -617,16 +902,18 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  "/set/truthValueMultiplePredicateResults/oracle/MultiplePredicateResultsTest.xml",
                                  false,
                                  false,
+                                 false,
                                  expectedResult);
    }
    
    /**
-    * Performs an {@link TruthValueEvaluationUtil} test.
+    * Performs an {@link TruthValueTracingUtil} test.
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param baseContractName The name of the contract.
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @param blockTreatmentContract Block contracts or expand otherwise?
     * @param expectedResults The expected results.
     * @throws Exception Occurred Exception.
     */
@@ -634,6 +921,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                             String oraclePathInBaseDirFile,
                                             boolean useOperationContracts,
                                             boolean useLoopInvariants,
+                                            boolean blockTreatmentContract,
                                             ExpectedTruthValueEvaluationResult... expectedResults) throws Exception {
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       try {
@@ -648,6 +936,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                          false, 
                          useOperationContracts, 
                          useLoopInvariants, 
+                         blockTreatmentContract,
                          false, 
                          false, 
                          false, 
@@ -667,12 +956,13 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Performs an {@link TruthValueEvaluationUtil} test.
+    * Performs an {@link TruthValueTracingUtil} test.
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param baseContractName The name of the contract.
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @param blockTreatmentContract Block contracts or expand otherwise?
     * @param expectedResults The expected results.
     * @throws Exception Occurred Exception.
     */
@@ -681,6 +971,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                             String oraclePathInBaseDirFile,
                                             boolean useOperationContracts,
                                             boolean useLoopInvariants,
+                                            boolean blockTreatmentContract,
                                             ExpectedTruthValueEvaluationResult... expectedResults) throws Exception {
       SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       try {
@@ -697,6 +988,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                          false,
                          useOperationContracts,
                          useLoopInvariants,
+                         blockTreatmentContract,
                          false,
                          false,
                          false,
@@ -715,7 +1007,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Performs an {@link TruthValueEvaluationUtil} test.
+    * Performs an {@link TruthValueTracingUtil} test.
     * @param env The {@link SymbolicExecutionEnvironment} to use.
     * @param expectedResults The expected results.
     * @throws Exception Occurred Exception.
@@ -723,7 +1015,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    protected void doTruthValueEvaluationTest(SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env, 
                                              ExpectedTruthValueEvaluationResult... expectedResults) throws Exception {
       // Compute current results
-      List<TruthValueEvaluationResult> currentResults = new LinkedList<TruthValueEvaluationResult>();
+      List<TruthValueTracingResult> currentResults = new LinkedList<TruthValueTracingResult>();
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(env.getBuilder().getStartNode());
       while (iter.hasNext()) {
          IExecutionNode<?> next = iter.next();
@@ -737,11 +1029,14 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
          else if (next instanceof IExecutionLoopInvariant) {
             nodeToEvaluate = next.getProofNode().child(0); // Initial
          }
+         else if (next instanceof IExecutionBlockContract) {
+            nodeToEvaluate = next.getProofNode().child(1); // Precondition branch
+         }
          else {
             nodeToEvaluate = null;
          }
          if (nodeToEvaluate != null) {
-            TruthValueEvaluationResult result = TruthValueEvaluationUtil.evaluate(nodeToEvaluate, FormulaTermLabel.NAME, false, false);
+            TruthValueTracingResult result = TruthValueTracingUtil.evaluate(nodeToEvaluate, FormulaTermLabel.NAME, false, false);
             currentResults.add(result);
             if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
                System.out.println("\nFound Result:");
@@ -758,10 +1053,10 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * @param expected The expected results.
     * @param current The current results.
     */
-   protected void assertResults(ExpectedTruthValueEvaluationResult[] expected, List<TruthValueEvaluationResult> current) {
+   protected void assertResults(ExpectedTruthValueEvaluationResult[] expected, List<TruthValueTracingResult> current) {
       assertEquals(expected.length, current.size());
       int i = 0;
-      Iterator<TruthValueEvaluationResult> currentIter = current.iterator();
+      Iterator<TruthValueTracingResult> currentIter = current.iterator();
       while (i < expected.length && currentIter.hasNext()) {
          assertTruthValueResults(expected[i], currentIter.next());
          i++;
@@ -775,7 +1070,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * @param expected The expected results.
     * @param current The current results.
     */
-   protected void assertTruthValueResults(ExpectedTruthValueEvaluationResult expected, TruthValueEvaluationResult current) {
+   protected void assertTruthValueResults(ExpectedTruthValueEvaluationResult expected, TruthValueTracingResult current) {
       BranchResult[] currentResults = current.getBranchResults();
       assertEquals(expected.branchResults.length, currentResults.length);
       for (int i = 0; i < currentResults.length; i++) {
@@ -790,18 +1085,18 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    protected void assertBranchResult(ExpectedBranchResult expected, BranchResult current) {
       Map<String, MultiEvaluationResult> currentResults = current.getResults();
-      assertTrue(expected.labelResults.size() <= currentResults.size());
+      assertTrue("To many expected results at goal " + current.getLeafNode().serialNr(), expected.labelResults.size() <= currentResults.size());
       for (Entry<String, TruthValue> expectedEntry : expected.labelResults.entrySet()) {
          MultiEvaluationResult currentInstruction = currentResults.get(expectedEntry.getKey());
-         assertNotNull(currentInstruction);
+         assertNotNull("Current result of " + expectedEntry.getKey() + " is missing at goal " + current.getLeafNode().serialNr() + ".", currentInstruction);
          TruthValue currentResult = currentInstruction.evaluate(current.getTermLabelName(), currentResults);
          TruthValue expectedValue = expectedEntry.getValue();
          if (expectedValue == null) {
             assertNull(currentResult);
          }
          else {
-            assertNotNull(currentResult);
-            assertEquals(expectedEntry.getKey(), expectedValue, currentResult);
+            assertNotNull("Current result of " + expectedEntry.getKey() + " at goal " + current.getLeafNode().serialNr() + " is not available.", currentResult);
+            assertEquals("Wrong truth value of " + expectedEntry.getKey() + " at goal " + current.getLeafNode().serialNr() + ".", expectedValue, currentResult);
          }
       }
    }

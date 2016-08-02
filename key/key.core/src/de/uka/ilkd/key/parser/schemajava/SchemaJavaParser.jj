@@ -47,6 +47,7 @@ import recoder.io.*;
 import recoder.abstraction.TypeArgument.WildcardMode;
 
 import de.uka.ilkd.key.java.recoderext.*;
+import de.uka.ilkd.key.java.recoderext.adt.*;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -411,6 +412,12 @@ public class SchemaJavaParser {
 	static final int QUALIFIED_NAME   =  6;
 	/** production was <pre>"@(" Expression ")"</pre> */
 	static final int PASSIVE_EXPR =  7;
+
+   /** production was something like <pre>"&93;seq_reverse(" Expression ")"</pre>.
+    * Extension to Java/JML with ADTs.
+    * @since 1.7.2118
+    */
+   static final int ADT_CONSTRUCT = 42;
 
 	/** indicates the type of the result */
 	int           type    = UNDEFINED;
@@ -2720,6 +2727,8 @@ Expression UnaryExpression() :
      |
      result = UnaryExpressionNotPlusMinus()
      |
+     result = ADTGetter()
+     |
      ("#create-object" "(" expr = ExpressionSV()  ")"
 	 {
 	     result = factory.createRKeYMetaConstructExpression();
@@ -2808,6 +2817,35 @@ Expression UnaryExpressionNotPlusMinus() :
 	    return result;
 	}
 
+}
+
+
+Expression ADTGetter() :
+{
+    Expression result;
+    Expression expr;
+}
+{
+    (
+    "\\indexOf" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SeqIndexOf(expr,result);
+    }
+    |
+    "\\seq_length" "(" expr = Expression() ")"
+    {
+        result = new SeqLength(expr);
+    }
+    |
+    "\\seq_get" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SeqGet(expr, result);
+    }
+    )
+    {
+        checkConstruction(result);
+        return result;
+    }
 }
 
 // This production is to determine lookahead only. The LOOKAHEAD specifications
@@ -2942,6 +2980,9 @@ Expression PrimaryExpression() :
 	    case PrimaryPrefixReturnValue.QUALIFIED_NAME:
 	    tmpResult = prefix.name;
 	    break;
+	    case PrimaryPrefixReturnValue.ADT_CONSTRUCT:
+       tmpResult = (ADTPrefixConstruct) prefix.expr;
+       break;	    
 	    default:
 	    throw new ParseException("Unknown prefix");
 	}
@@ -3190,6 +3231,13 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
 	    prefix.type    = PrimaryPrefixReturnValue.CLASS_REF;
 	    prefix.typeref = tr;
 	}
+      |
+      expr = ADTConstructor()
+    {
+        // XXX now primary expression (otherwise could not use expressions like \seq_reverse(x).length
+        prefix.type = PrimaryPrefixReturnValue.ADT_CONSTRUCT;
+        prefix.expr = expr;
+    }
       |
       qn = Name()
 	{
@@ -4755,6 +4803,91 @@ Try TryStatement() :
 	    return result;
 	}
 
+}
+
+Expression ADTConstructor() :
+{
+    Expression result;
+    Expression expr, expr2;
+}
+
+{
+    (
+    "\\singleton" "(" expr = Expression() ")"
+    {
+        result = new Singleton(expr);
+        setPrefixInfo(result);
+    }
+    |
+    "\\set_union" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SetUnion(expr, result);
+        setPrefixInfo(result);
+    }
+    |
+    "\\intersect" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new Intersect(expr, result);
+        setPrefixInfo(result);
+    }
+    |
+    "\\set_minus" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SetMinus(expr, result);
+        setPrefixInfo(result);
+    }
+    |
+    "\\all_fields" "(" expr = Expression() ")"
+    {
+        result = new AllFields(expr);
+        setPrefixInfo(result);
+    }
+    |
+    "\\all_objects" "(" expr = Expression() ")"
+    {
+        result = new AllObjects(expr);
+        setPrefixInfo(result);
+    }
+    |
+    "\\seq_singleton" "(" expr = Expression() ")"
+    {
+        result = new SeqSingleton(expr);
+        setPrefixInfo(result);
+    }
+    |
+    "\\seq_concat" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SeqConcat(expr, result);
+        setPrefixInfo(result);
+    }
+    |
+    "\\seq_sub" "(" expr = Expression() "," expr2 = Expression() "," result = Expression() ")"
+    {
+        result = new SeqSub(expr, expr2, result);
+        setPrefixInfo(result);
+    }
+    |
+    "\\seq_reverse" "(" expr = Expression() ")"
+    {
+        result = new SeqReverse(expr);
+        setPrefixInfo(result);
+    }
+    |
+    "\\seq_put" "(" expr = Expression() "," expr2 = Expression() "," result = Expression() ")"
+    {
+        // desugaring
+        final Expression one = factory.createIntLiteral(1);
+        final Expression first = new SeqSub(expr, factory.createIntLiteral(0), factory.createMinus(expr2, one));
+        final Expression second = new SeqSingleton(result);
+        final Expression third = new SeqSub(expr, factory.createPlus(expr2,one), factory.createMinus(new SeqLength(expr),one));
+        result = new SeqConcat(first, new SeqConcat(second, third));
+        setPrefixInfo(result);
+    }
+    )
+    {
+      checkConstruction(result);      
+      return result;
+  }
 }
 
 

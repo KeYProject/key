@@ -68,8 +68,8 @@ public interface IKeYSENode<E extends IExecutionNode<?>> extends ISENode {
    public void setParent(ISENode parent);
    
    /**
-    * Checks if truth value evaluation is enabled or not.
+    * Checks if truth value tracing is enabled or not.
     * @return {@code true} enabled, {@code false} disabled.
     */
-   public boolean isTruthValueEvaluationEnabled();
+   public boolean isTruthValueTracingEnabled();
 }

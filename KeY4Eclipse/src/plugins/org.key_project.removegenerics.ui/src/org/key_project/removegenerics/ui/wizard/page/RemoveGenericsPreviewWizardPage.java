@@ -7,9 +7,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaSourceViewer;
 import org.eclipse.jdt.internal.ui.text.SimpleJavaSourceViewerConfiguration;
-import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -20,6 +18,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -63,6 +62,11 @@ public class RemoveGenericsPreviewWizardPage extends WizardPage {
     * The available new content.
     */
    private Map<IFile, String> contentMap;
+   
+   /**
+    * The {@link Font} of {@link #sourceViewer} to dispose.
+    */
+   private Font sourceViewerFont;
 
    /**
     * Constructor.
@@ -107,7 +111,7 @@ public class RemoveGenericsPreviewWizardPage extends WizardPage {
                                                                      null,
                                                                      null,
                                                                      false));
-      sourceViewer.getControl().setFont(JFaceResources.getFont(PreferenceConstants.EDITOR_TEXT_FONT));
+      sourceViewerFont = SWTUtil.initializeViewerFont(sourceViewer);
       sourceViewer.setEditable(false);
       updateShownSourceContent();
    }
@@ -117,6 +121,9 @@ public class RemoveGenericsPreviewWizardPage extends WizardPage {
     */
    @Override
    public void dispose() {
+      if (sourceViewerFont != null) {
+         sourceViewerFont.dispose();
+      }
       resourceViewerContentProvider.dispose();
       resourceViewerLabelProvider.dispose();
       super.dispose();

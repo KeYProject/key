@@ -65,6 +65,8 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
 /**
  * Provides utility method for the KeYIDE.
@@ -96,7 +98,7 @@ public final class KeYIDEUtil {
                        try {
                           SWTUtil.checkCanceled(monitor);
                           monitor.beginTask("Loading Proof Environment", IProgressMonitor.UNKNOWN);
-                          final KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, classPaths, bootClassPath, includes, EclipseUserInterfaceCustomization.getInstance());
+                          final KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(false), location, classPaths, bootClassPath, includes, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), EclipseUserInterfaceCustomization.getInstance(), true);
                           if (environment.getInitConfig() != null) {
                              // Get method to proof in KeY
                              final IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getJavaInfo());
@@ -156,7 +158,7 @@ public final class KeYIDEUtil {
    public static void openEditor(Contract contract, KeYEnvironment<?> environment, IMethod method)throws PartInitException{
       Assert.isNotNull(contract);
       Assert.isNotNull(environment);
-      ProofOblInput problem = contract.createProofObl(environment.getInitConfig(), contract);
+      ProofOblInput problem = contract.createProofObl(environment.getInitConfig(), contract, true);
       IStorageEditorInput input = new ProofOblInputEditorInput(problem, environment, method);
       WorkbenchUtil.getActivePage().openEditor(input, KeYEditor.EDITOR_ID);
    }
@@ -246,26 +248,21 @@ public final class KeYIDEUtil {
     * @param pos - the {@link PosInOccurrence} to find the {@link TacletApp}s for.
     * @return {@link ImmutableList} - the {@link ImmutableList} with all applicable {@link TacletApp}s.
     */
-   public static ImmutableList<TacletApp> findTaclets(UserInterfaceControl ui, Goal goal, PosInOccurrence pos) {
-      if (pos != null) {
-         ImmutableList<TacletApp> findList = ui.getProofControl().getFindTaclet(goal, pos);
-         ImmutableList<TacletApp> rewriteList = ui.getProofControl().getRewriteTaclet(goal, pos);
-         ImmutableList<TacletApp> noFindList = ui.getProofControl().getNoFindTaclet(goal);
-         
-         ImmutableList<TacletApp> find = TacletMenu.removeRewrites(findList).prepend(rewriteList);
-         
-         TacletMenu.TacletAppComparator comp = new TacletMenu.TacletAppComparator();
-         ImmutableList<TacletApp> allTaclets = TacletMenu.sort(find, comp);
-         
-         if (pos != null) {
-            allTaclets = allTaclets.prepend(noFindList);
-         }
-         
-         return allTaclets;
+   public static ImmutableList<TacletApp> findTaclets(UserInterfaceControl ui, Goal goal, PosInSequent pos) {
+      ImmutableList<TacletApp> findList = ui.getProofControl().getFindTaclet(goal, pos != null ? pos.getPosInOccurrence() : null);
+      ImmutableList<TacletApp> rewriteList = ui.getProofControl().getRewriteTaclet(goal, pos != null ? pos.getPosInOccurrence() : null);
+      ImmutableList<TacletApp> noFindList = ui.getProofControl().getNoFindTaclet(goal);
+      
+      ImmutableList<TacletApp> find = TacletMenu.removeRewrites(findList).prepend(rewriteList);
+      
+      TacletMenu.TacletAppComparator comp = new TacletMenu.TacletAppComparator();
+      ImmutableList<TacletApp> allTaclets = TacletMenu.sort(find, comp);
+      
+      if (pos != null && pos.isSequent()) {
+         allTaclets = allTaclets.prepend(noFindList);
       }
-      else{ 
-         return null;
-      }
+      
+      return allTaclets;
    }
    
    /**

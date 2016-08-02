@@ -62,7 +62,7 @@ public class SliceWizard extends Wizard {
     */
    @Override
    public void addPages() {
-      sliceWizardPage = new SliceWizardPage("sliceWizardPage", slicer);
+      sliceWizardPage = new SliceWizardPage("sliceWizardPage", slicer, seedNode, seedVariable);
       addPage(sliceWizardPage);
    }
 
@@ -74,12 +74,13 @@ public class SliceWizard extends Wizard {
       try {
          final ISESlicer slicer = sliceWizardPage.getSlicer();
          final ISEAnnotationAppearance appearance = sliceWizardPage.getAnnotationAppearance();
+         final Object settings = sliceWizardPage.getSettings(slicer);
          getContainer().run(true, true, new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                try {
                   monitor.beginTask("Slicing Symbolic Execution Tree", IProgressMonitor.UNKNOWN);
-                  slicer.slice(seedNode, seedVariable, appearance, monitor);
+                  slicer.slice(seedNode, seedVariable, settings, appearance, monitor);
                }
                catch (DebugException e) {
                   throw new InvocationTargetException(e);

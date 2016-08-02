@@ -6,13 +6,21 @@ import org.key_project.sed.key.evaluation.server.report.EvaluationAnswers;
  * An {@link IStatisticsFilter} which includes all {@link EvaluationAnswers}.
  * @author Martin Hentschel
  */
-public class AllStatisticsFilter implements IStatisticsFilter {
+public class AllStatisticsFilter extends AbstractStatisticsFilter {
    /**
     * {@inheritDoc}
     */
    @Override
    public String getName() {
       return "All Answers";
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getLatexName() {
+      return "All";
    }
 
    /**

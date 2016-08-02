@@ -129,7 +129,9 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
                tacletApp.posInOccurrence(),
                services,
                   mc);
-                               
+       
+       TermLabelManager.mergeLabels(currentSequent, services);
+       
        currentGoal.setSequent(currentSequent);              
         
        currentGoal.setBranchLabel(gt.name());

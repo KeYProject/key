@@ -21,7 +21,9 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.test.Activator;
@@ -31,7 +33,178 @@ import org.key_project.sed.key.core.test.Activator;
  * *.proof file is loaded.
  * @author Martin Hentschel
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SWTBotKeYDebugTargetProofFileTest extends AbstractKeYDebugTargetTestCase {
+   /**
+    * Tests the step over functionality on each branch separately.
+    */
+   @Test
+   public void testBlockContractWithReturnPostconditionNotVerified() throws Exception {
+      IKeYDebugTargetProofFileTestExecutor executor = new IKeYDebugTargetProofFileTestExecutor() {
+         @Override
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IFile file, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
+            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/blockContractWithReturnPostconditionNotVerified/oracle/BlockContractWithReturnPostconditionNotVerified.xml", false, true, false);
+         }
+      };
+      doKeYDebugTargetTest("SWTBotKeYDebugTargetProofFileTest_testBlockContractWithReturnPostconditionNotVerified", 
+                           Activator.PLUGIN_ID, 
+                           "data/blockContractWithReturnPostconditionNotVerified/test", 
+                           true, 
+                           true, 
+                           new IFileSelector() {
+                              @Override
+                              public IFile getFile(IJavaProject project) throws Exception {
+                                 return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path("SWTBotKeYDebugTargetProofFileTest_testBlockContractWithReturnPostconditionNotVerified/src/BlockContractWithReturnPostconditionNotVerified.proof"));
+                              }
+                           },
+                           Boolean.TRUE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           14, 
+                           executor);
+   }
+   
+   /**
+    * Tests the step over functionality on each branch separately.
+    */
+   @Test
+   public void testBlockContractWithReturn() throws Exception {
+      IKeYDebugTargetProofFileTestExecutor executor = new IKeYDebugTargetProofFileTestExecutor() {
+         @Override
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IFile file, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
+            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/blockContractWithReturn/oracle/BlockContractWithReturn.xml", false, true, false);
+         }
+      };
+      doKeYDebugTargetTest("SWTBotKeYDebugTargetProofFileTest_testBlockContractWithReturn", 
+                           Activator.PLUGIN_ID, 
+                           "data/blockContractWithReturn/test", 
+                           true, 
+                           true, 
+                           new IFileSelector() {
+                              @Override
+                              public IFile getFile(IJavaProject project) throws Exception {
+                                 return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path("SWTBotKeYDebugTargetProofFileTest_testBlockContractWithReturn/src/BlockContractWithReturn.proof"));
+                              }
+                           },
+                           Boolean.TRUE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           14, 
+                           executor);
+   }
+   
+   /**
+    * Tests the step over functionality on each branch separately.
+    */
+   @Test
+   public void testBlockContractWithExceptionPostconditionNotVerified() throws Exception {
+      IKeYDebugTargetProofFileTestExecutor executor = new IKeYDebugTargetProofFileTestExecutor() {
+         @Override
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IFile file, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
+            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/blockContractWithExceptionPostconditionNotVerified/oracle/BlockContractWithExceptionPostconditionNotVerified.xml", false, true, false);
+         }
+      };
+      doKeYDebugTargetTest("SWTBotKeYDebugTargetProofFileTest_testBlockContractWithExceptionPostconditionNotVerified", 
+                           Activator.PLUGIN_ID, 
+                           "data/blockContractWithExceptionPostconditionNotVerified/test", 
+                           true, 
+                           true, 
+                           new IFileSelector() {
+                              @Override
+                              public IFile getFile(IJavaProject project) throws Exception {
+                                 return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path("SWTBotKeYDebugTargetProofFileTest_testBlockContractWithExceptionPostconditionNotVerified/src/BlockContractWithExceptionPostconditionNotVerified.proof"));
+                              }
+                           },
+                           Boolean.TRUE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           14, 
+                           executor);
+   }
+   
+   /**
+    * Tests the step over functionality on each branch separately.
+    */
+   @Test
+   public void testBlockContractWithException() throws Exception {
+      IKeYDebugTargetProofFileTestExecutor executor = new IKeYDebugTargetProofFileTestExecutor() {
+         @Override
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IFile file, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
+            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/blockContractWithException/oracle/BlockContractWithException.xml", false, true, false);
+         }
+      };
+      doKeYDebugTargetTest("SWTBotKeYDebugTargetProofFileTest_testBlockContractWithException", 
+                           Activator.PLUGIN_ID, 
+                           "data/blockContractWithException/test", 
+                           true, 
+                           true, 
+                           new IFileSelector() {
+                              @Override
+                              public IFile getFile(IJavaProject project) throws Exception {
+                                 return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path("SWTBotKeYDebugTargetProofFileTest_testBlockContractWithException/src/BlockContractWithException.proof"));
+                              }
+                           },
+                           Boolean.TRUE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           14, 
+                           executor);
+   }
+   
+   /**
+    * Tests the step over functionality on each branch separately.
+    */
+   @Test
+   public void testBlockContractPreconditionNotVerified() throws Exception {
+      IKeYDebugTargetProofFileTestExecutor executor = new IKeYDebugTargetProofFileTestExecutor() {
+         @Override
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IFile file, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
+            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/blockContractPreconditionNotVerified/oracle/BlockContractPreconditionNotVerified.xml", false, true, false);
+         }
+      };
+      doKeYDebugTargetTest("SWTBotKeYDebugTargetProofFileTest_testBlockContractPreconditionNotVerified", 
+                           Activator.PLUGIN_ID, 
+                           "data/blockContractPreconditionNotVerified/test", 
+                           true, 
+                           true, 
+                           new IFileSelector() {
+                              @Override
+                              public IFile getFile(IJavaProject project) throws Exception {
+                                 return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path("SWTBotKeYDebugTargetProofFileTest_testBlockContractPreconditionNotVerified/src/BlockContractPreconditionNotVerified.proof"));
+                              }
+                           },
+                           Boolean.TRUE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           14, 
+                           executor);
+   }
+   
    /**
     * Tests the step over functionality on each branch separately.
     */
@@ -61,10 +234,10 @@ public class SWTBotKeYDebugTargetProofFileTest extends AbstractKeYDebugTargetTes
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE,
+                           Boolean.FALSE,
                            14, 
                            executor);
    }
-
    
    /**
     * Tests the step over functionality on each branch separately.
@@ -95,6 +268,7 @@ public class SWTBotKeYDebugTargetProofFileTest extends AbstractKeYDebugTargetTes
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE,
+                           Boolean.FALSE,
                            14, 
                            executor);
    }

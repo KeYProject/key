@@ -349,10 +349,10 @@ public abstract class AbstractBetaFeature implements Feature {
      * @param goal the goal on which <code>app</code> is to be applied
      * @return the cost of <code>app</code>
      */
-    public RuleAppCost compute (RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost (RuleApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
     
-        final Term findTerm = pos.constrainedFormula ().formula ();
+        final Term findTerm = pos.sequentFormula ().formula ();
         
         return doComputation ( pos, findTerm, goal.proof().getServices().getCaches() );
     }

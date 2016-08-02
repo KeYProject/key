@@ -35,22 +35,16 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
  */
 public class RuleSetDispatchFeature implements Feature {
 
-    private final Map<RuleSet, Feature> rulesetToFeature = new LinkedHashMap<RuleSet, Feature> ();
+    private final Map<RuleSet, Feature> rulesetToFeature = new LinkedHashMap<> ();
     
-    private RuleSetDispatchFeature() {}
-    
-    public static RuleSetDispatchFeature create() {
-        return new RuleSetDispatchFeature ();
-    }
-    
-    public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         if ( ! ( app instanceof TacletApp ) ) return NumberRuleAppCost.getZeroCost();
 
         RuleAppCost res = NumberRuleAppCost.getZeroCost();
         for (RuleSet rs : ( (TacletApp)app ).taclet ().getRuleSets ()) {
             final Feature partialF = rulesetToFeature.get ( rs );
             if ( partialF != null ) {
-        	res = res.add ( partialF.compute ( app, pos, goal ) );
+                res = res.add (partialF.computeCost ( app, pos, goal ) );
                 if ( res instanceof TopRuleAppCost ) {
                     break;
                 }

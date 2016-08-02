@@ -58,7 +58,7 @@ public class InitConfig {
     private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
 
 
-    private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
+    private ImmutableList<Taclet> taclets = ImmutableSLList.<Taclet>nil();
 
     /**
      * maps categories to their default choice (both represented as Strings),
@@ -191,13 +191,14 @@ public class InitConfig {
             c2DC.remove(c.category());
         }
 
+        ImmutableList<Choice> category2DefaultChoiceList = ImmutableSLList.nil();
         for (final String s : c2DC.values()) {
             final Choice c = (Choice) choiceNS().lookup(new Name(s));
             if(c!=null){
-                activatedChoices = activatedChoices.add(c);
+                category2DefaultChoiceList = category2DefaultChoiceList.prepend(c);
             }
         }
-        this.activatedChoices = activatedChoices;
+        this.activatedChoices = activatedChoices.union(DefaultImmutableSet.fromImmutableList(category2DefaultChoiceList));
 
         // invalidate active taclet cache
         activatedTacletCache = null;
@@ -214,14 +215,14 @@ public class InitConfig {
     }
 
 
-    public void setTaclets(ImmutableSet<Taclet> taclets){
+    public void setTaclets(ImmutableList<Taclet> taclets){
         this.taclets = taclets;
         // invalidate active taclet cache
         this.activatedTacletCache = null;
     }
 
 
-    public ImmutableSet<Taclet> getTaclets(){
+    public ImmutableList<Taclet> getTaclets(){
         return taclets;
     }
 
@@ -295,24 +296,13 @@ public class InitConfig {
                                                                     isAxiom));
     }
 
-    /** registers a set of rules with the given justification at the
-     * justification managing {@link RuleJustification} object of this
-     * environment. All rules of the set are given the same
-     * justification. 
-     */
-    public void registerRules(ImmutableSet<Taclet> s, RuleJustification j) {
-       for (Taclet r : s) {
-          registerRule(r, j);          
-       }
-    }
-
     /** registers a list of rules with the given justification at the
      * justification managing {@link RuleJustification} object of this
      * environment. All rules of the list are given the same
      * justification. 
      */
-    public void registerRules(ImmutableList<BuiltInRule> s, RuleJustification j) {
-       for (BuiltInRule r : s) {
+    public void registerRules(Iterable<? extends Rule> s, RuleJustification j) {
+       for (Rule r : s) {
           registerRule(r, j);          
        }
     }

@@ -35,18 +35,105 @@ import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
+import org.key_project.sed.key.ui.view.SymbolicExecutionSettingsView;
 import org.key_project.sed.ui.text.SymbolicallyReachedAnnotation;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 
 /**
  * Tests the launch configuration default values.
  * @author Martin Hentschel
  */
 public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTestCase {
+   
+   /**
+    * Tests the launch where full branch conditions are hidden.
+    */
+   @Test
+   public void testHidingOfFullBranchConditions() throws Exception {
+      doHidingOfFullBranchConditionsTest("SWTBotLaunchDefaultPreferencesTest_testHidingOfFullBranchConditions", true);
+   }
+
+   /**
+    * Tests the launch where full branch conditions are not hidden.
+    */
+   @Test
+   public void testDoNotHidingOfFullBranchConditions() throws Exception {
+      doHidingOfFullBranchConditionsTest("SWTBotLaunchDefaultPreferencesTest_testDoNotHidingOfFullBranchConditions", false);
+   }
+   
+   /**
+    * Does the test steps of {@link #testSimplifyConditions()}
+    * and {@link #testDoNotSimplifyConditions()}.
+    * @param projectName The project name to use.
+    * @param hideFullBranchConditions Hide full branch conditions?
+    * @throws Exception Occurred Exception
+    */
+   protected void doHidingOfFullBranchConditionsTest(String projectName, 
+                                                     final boolean hideFullBranchConditions) throws Exception {
+      boolean originalSimplifyConditions = KeYSEDPreferences.isHideFullBranchConditionIfAdditionalLabelIsAvailable();
+      try {
+         // Set preference
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
+         if (hideFullBranchConditions) {
+            preferenceShell.bot().checkBox("Hide full branch conditions when an alternative label is available").select();
+         }
+         else {
+            preferenceShell.bot().checkBox("Hide full branch conditions when an alternative label is available").deselect();
+         }
+         preferenceShell.bot().button("OK").click();
+         assertEquals(hideFullBranchConditions, KeYSEDPreferences.isHideFullBranchConditionIfAdditionalLabelIsAvailable());
+         // Launch something
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
+            @Override
+            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
+               SWTBotView symbolicSettingsView = bot.viewById(SymbolicExecutionSettingsView.VIEW_ID);
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.LOOP_TREATMENT_INVARIANT));
+               // Get debug target TreeItem
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
+               // Do run
+               resume(bot, item, target);
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.LOOP_TREATMENT_EXPAND, 0));
+               if (hideFullBranchConditions) {
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/useLoopInvariantArraySumWhile/oracle/ArraySumWhileHideFullBranchConditions.xml", false, false, false);
+               }
+               else {
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/useLoopInvariantArraySumWhile/oracle/ArraySumWhileDoNotHideFullBranchConditions.xml", false, false, false);
+               }
+            }
+         };
+         doKeYDebugTargetTest(projectName,
+                              "data/useLoopInvariantArraySumWhile/test",
+                              true,
+                              true,
+                              createMethodSelector("ArraySumWhile", "sum", "[I"),
+                              null,
+                              null,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              null,
+                              14, 
+                              executor);
+      }
+      finally {
+         // Restore original value
+         KeYSEDPreferences.setHideFullBranchConditionIfAdditionalLabelIsAvailable(originalSimplifyConditions);
+         assertEquals(originalSimplifyConditions, KeYSEDPreferences.isHideFullBranchConditionIfAdditionalLabelIsAvailable());
+      }
+   }
    
    /**
     * Tests the launch where branch conditions are simplified.
@@ -119,6 +206,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               null,
+                              Boolean.FALSE,
                               8, 
                               executor);
       }
@@ -209,6 +297,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               null,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               executor);
       }
@@ -220,44 +309,44 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
    }
    
    /**
-    * Tests the launch where truth value evaluation is enabled.
+    * Tests the launch where truth value tracing is enabled.
     */
    @Test
-   public void testTruthValueEvaluationEnabled() throws Exception {
-      doTruthValueEvaluationTest("SWTBotLaunchDefaultPreferencesTest_testTruthValueEvaluationEnabled", true);
+   public void testTruthValueTracingEnabled() throws Exception {
+      doTruthValueTracingTest("SWTBotLaunchDefaultPreferencesTest_testTruthValueTracingEnabled", true);
    }
 
    /**
-    * Tests the launch where truth value evaluation is disabled.
+    * Tests the launch where truth value tracing is disabled.
     */
    @Test
-   public void testTruthValueEvaluationDisabled() throws Exception {
-      doTruthValueEvaluationTest("SWTBotLaunchDefaultPreferencesTest_testTruthValueEvaluationDisabled", false);
+   public void testTruthValueTracingDisabled() throws Exception {
+      doTruthValueTracingTest("SWTBotLaunchDefaultPreferencesTest_testTruthValueTracingDisabled", false);
    }
    
    /**
-    * Does the test steps of {@link #testTruthValueEvaluationEnabled()}
-    * and {@link #testTruthValueEvaluationDisabled()}.
+    * Does the test steps of {@link #testTruthValueTracingEnabled()}
+    * and {@link #testTruthValueTracingDisabled()}.
     * @param projectName The project name to use.
-    * @param truthValueEvaluationEnabled Is truth value evaluation enabled?
+    * @param truthValueTracingEnabled Is truth value tracing enabled?
     * @throws Exception Occurred Exception
     */
-   protected void doTruthValueEvaluationTest(String projectName, 
-                                             final boolean truthValueEvaluationEnabled) throws Exception {
-      boolean originalTruthValueEvaluationEnabled = KeYSEDPreferences.isTruthValueEvaluationEnabled();
+   protected void doTruthValueTracingTest(String projectName, 
+                                          final boolean truthValueTracingEnabled) throws Exception {
+      boolean originalTruthValueTracingEnabled = KeYSEDPreferences.isTruthValueTracingEnabled();
       try {
          KeYSEDPreferences.setUsePrettyPrinting(true);
          // Set preference
          SWTWorkbenchBot bot = new SWTWorkbenchBot();
          SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
-         if (truthValueEvaluationEnabled) {
-            preferenceShell.bot().checkBox("Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)").select();
+         if (truthValueTracingEnabled) {
+            preferenceShell.bot().checkBox("Truth status tracing enabled").select();
          }
          else {
-            preferenceShell.bot().checkBox("Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)").deselect();
+            preferenceShell.bot().checkBox("Truth status tracing enabled").deselect();
          }
          preferenceShell.bot().button("OK").click();
-         assertEquals(truthValueEvaluationEnabled, KeYSEDPreferences.isTruthValueEvaluationEnabled());
+         assertEquals(truthValueTracingEnabled, KeYSEDPreferences.isTruthValueTracingEnabled());
          // Launch something
          IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
@@ -267,7 +356,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Check launch
                Object threadObject = TestUtilsUtil.getTreeItemData(item);
                assertTrue(threadObject instanceof IKeYSENode);
-               assertEquals(truthValueEvaluationEnabled, ((IKeYSENode<?>) threadObject).isTruthValueEvaluationEnabled());
+               assertEquals(truthValueTracingEnabled, ((IKeYSENode<?>) threadObject).isTruthValueTracingEnabled());
             }
          };
          doKeYDebugTargetTest(projectName,
@@ -287,13 +376,14 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               null,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               executor);
       }
       finally {
          // Restore original value
-         KeYSEDPreferences.setTruthValueEvaluationEnabled(originalTruthValueEvaluationEnabled);
-         assertEquals(originalTruthValueEvaluationEnabled, KeYSEDPreferences.isTruthValueEvaluationEnabled());
+         KeYSEDPreferences.setTruthValueTracingEnabled(originalTruthValueTracingEnabled);
+         assertEquals(originalTruthValueTracingEnabled, KeYSEDPreferences.isTruthValueTracingEnabled());
       }
    }
    
@@ -369,6 +459,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               executor);
       }
@@ -450,6 +541,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               executor);
       }
@@ -531,6 +623,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               executor);
       }
@@ -621,6 +714,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               executor);
       }
@@ -707,6 +801,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               executor);
       }
@@ -817,6 +912,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               executor);
       }
@@ -900,6 +996,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               executor);
       }

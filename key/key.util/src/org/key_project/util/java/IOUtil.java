@@ -743,8 +743,8 @@ public final class IOUtil {
    }
 
    public static File toFile(URL url) {
-      URI uri = toURI(url);
-      return uri != null ? new File(uri) : null;
+       URI uri = toURI(url);
+       return uri != null ? new File(uri) : null;
    }
    
    public static String toFileString(URL url) {
@@ -758,6 +758,8 @@ public final class IOUtil {
             String protocol = url.getProtocol();
             String userInfo = url.getUserInfo();
             String host = url.getHost();
+            // A '+' in file names is not supported, since it is converted
+            // into a space ('%20') according to the URI standard.
             String path = URLDecoder.decode(url.getPath(), "UTF-8");
             String query = url.getQuery();
             String ref = url.getRef();

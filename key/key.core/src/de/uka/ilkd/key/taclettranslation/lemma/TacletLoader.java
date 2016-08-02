@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -62,7 +63,7 @@ public abstract class TacletLoader {
      * get the set of taclets to examine
      * (either from the system or from a file)
      */
-    public abstract ImmutableSet<Taclet> loadTaclets();
+    public abstract ImmutableList<Taclet> loadTaclets();
 
     /**
      * get the taclet base which is considered fix (?) 
@@ -97,9 +98,9 @@ public abstract class TacletLoader {
      */
 
     public void manageAvailableTaclets(InitConfig initConfig, Taclet tacletToProve) {
-        List<Taclet> sysTaclets = toList(initConfig.getTaclets());
+        ImmutableList<Taclet> sysTaclets = initConfig.getTaclets();
 
-        ImmutableSet<Taclet> newTaclets = DefaultImmutableSet.nil();
+        ImmutableList<Taclet> newTaclets = ImmutableSLList.<Taclet>nil();
         HashMap<Taclet, TacletBuilder<? extends Taclet>> map = initConfig.getTaclet2Builder();
         boolean tacletfound = false;
         for (Taclet taclet : sysTaclets) {
@@ -108,13 +109,13 @@ public abstract class TacletLoader {
             }
 
             if(!tacletfound) {
-                newTaclets = newTaclets.add(taclet);
+                newTaclets = newTaclets.prepend(taclet);
             } else {
                 map.remove(taclet);
             }
         }
 
-        initConfig.setTaclets(newTaclets);
+        initConfig.setTaclets(newTaclets.reverse());
     }
 
     public ProofEnvironment getProofEnvForTaclets() {
@@ -200,10 +201,7 @@ public abstract class TacletLoader {
         }
 
         @Override
-        public ImmutableSet<Taclet> loadTaclets() {
-
-            // Here we silently assume that immutable sets are DefaultImmutableSets.
-            // Otherwise this will fail utterly. ...
+        public ImmutableList<Taclet> loadTaclets() {
 
             // No axioms file:
             if(initConfig == null) {
@@ -214,10 +212,9 @@ public abstract class TacletLoader {
 
             prepareKeYFile(fileForTaclets);
 
-            ImmutableList<Taclet> listAfter =
-                    ((DefaultImmutableSet<Taclet>)initConfig.getTaclets()).toImmutableList();
+            ImmutableList<Taclet> listAfter = initConfig.getTaclets();
 
-            return DefaultImmutableSet.fromImmutableList(listAfter.take(sizeBefore));
+            return listAfter.take(sizeBefore);
         }
 
         @Override
@@ -263,7 +260,7 @@ public abstract class TacletLoader {
         }
 
         @Override
-        public ImmutableSet<Taclet> loadTaclets() {
+        public ImmutableList<Taclet> loadTaclets() {
             try {
                 return getProofEnvForTaclets().getInitConfigForEnvironment().getTaclets();
             } catch (Throwable e) {

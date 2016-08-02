@@ -42,14 +42,14 @@ public class InstantiationCostScalerFeature implements Feature {
         return new InstantiationCostScalerFeature ( costFeature, allowSplitting );
     }
 
-    public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         
-        final RuleAppCost cost = costFeature.compute ( app, pos, goal );
+        final RuleAppCost cost = costFeature.computeCost ( app, pos, goal );
         
         if ( cost.equals ( NumberRuleAppCost.getZeroCost() ) ) return MINUS_3000_COST;
         if ( cost.equals ( ONE_COST ) ) return NumberRuleAppCost.getZeroCost();
         
-        final RuleAppCost as = allowSplitting.compute ( app, pos, goal );
+        final RuleAppCost as = allowSplitting.computeCost ( app, pos, goal );
         if ( !as.equals ( NumberRuleAppCost.getZeroCost() ) ) return TopRuleAppCost.INSTANCE;
         
         assert cost instanceof NumberRuleAppCost : "Can only handle LongRuleAppCost";

@@ -21,6 +21,7 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.proof.CompoundProof;
@@ -48,7 +49,7 @@ public class TacletSoundnessPOLoader {
          */
         private final InitConfig originalConfig;
 
-        private List<LoaderListener> listeners = new LinkedList<LoaderListener>();
+        private final List<LoaderListener> listeners = new LinkedList<LoaderListener>();
         private ProofAggregate resultingProof;
         private ImmutableSet<Taclet> resultingTaclets = DefaultImmutableSet
                         .nil();
@@ -58,7 +59,7 @@ public class TacletSoundnessPOLoader {
         private final boolean isOnlyUsedForProvingTaclets;
 
         private final TacletLoader       tacletLoader;
-        private TacletFilter tacletFilter;
+        private final TacletFilter tacletFilter;
 
 
         static public interface LoaderListener {
@@ -207,7 +208,7 @@ public class TacletSoundnessPOLoader {
 
 
         private Vector<TacletInfo> createTacletInfo(
-                        ImmutableSet<Taclet> taclets, ImmutableSet<Taclet> base) {
+                        ImmutableList<Taclet> taclets, ImmutableSet<Taclet> base) {
                 Vector<TacletInfo> collectionOfTacletInfo = new Vector<TacletInfo>();
                 TreeSet<Taclet> treeSet = new TreeSet<Taclet>(
                                 new Comparator<Taclet>() {
@@ -241,7 +242,7 @@ public class TacletSoundnessPOLoader {
                 // Axioms can only be loaded when the taclets are loaded as lemmata.
                 ImmutableSet<Taclet> axioms = tacletLoader.loadAxioms();
 
-                ImmutableSet<Taclet> taclets = tacletLoader.loadTaclets();
+                ImmutableList<Taclet> taclets = tacletLoader.loadTaclets();
 
 
                 Vector<TacletInfo> collectionOfTacletInfo = createTacletInfo(
@@ -263,7 +264,7 @@ public class TacletSoundnessPOLoader {
 
 
         private ImmutableSet<Taclet> computeCommonTaclets(
-                        ImmutableSet<Taclet> taclets, ImmutableSet<Taclet> reference) {
+                        ImmutableList<Taclet> taclets, ImmutableSet<Taclet> reference) {
                 TreeSet<Taclet> treeSet = new TreeSet<Taclet>(
                                 new Comparator<Taclet>() {
                                         @Override
@@ -295,7 +296,7 @@ public class TacletSoundnessPOLoader {
                         TacletLoader loader =
                                         new TacletLoader.TacletFromFileLoader((TacletLoader.TacletFromFileLoader)
                                                         tacletLoader,originalConfig.copy());
-                        ImmutableSet<Taclet> unfilteredResult = loader.loadTaclets();
+                        ImmutableList<Taclet> unfilteredResult = loader.loadTaclets();
                         resultingTacletsForOriginalProof = computeCommonTaclets(unfilteredResult, resultingTaclets);
                 }
 
@@ -316,7 +317,7 @@ public class TacletSoundnessPOLoader {
         private ProofAggregate createProof(ProofEnvironment proofEnvForTaclets,
                         ImmutableSet<Taclet> tacletsToProve,
                         ImmutableSet<Taclet> axioms, 
-                        ImmutableSet<Taclet> loadedTaclets) {
+                        ImmutableList<Taclet> loadedTaclets) {
 
 
                 ProofObligationCreator creator = new ProofObligationCreator();

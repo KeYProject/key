@@ -32,7 +32,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.keyide.ui;bundle-version="1.0.0",
  org.key_project.core;bundle-version="1.0.0",
  org.key_project.core.symbolic_execution;bundle-version="1.0.0",
- org.key_project.ui;bundle-version="1.0.0"
+ org.key_project.ui;bundle-version="1.0.0",
+ org.key_project.ui.test
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.key_project.sed.key.ui.test.suite,

@@ -14,6 +14,8 @@
 package org.key_project.sed.key.core.util;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.swt.graphics.RGB;
 import org.key_project.sed.core.model.ISEGroupable;
 import org.key_project.sed.key.core.Activator;
 
@@ -74,9 +76,9 @@ public class KeYSEDPreferences {
    public static final String VARIABLES_ARE_COMPUTED_FROM_UPDATES = "org.key_project.sed.key.core.preference.variablesAreOnlyComputedFromUpdates";
 
    /**
-    * Preference key to enable truth value evaluation.
+    * Preference key to enable truth value tracing.
     */
-   public static final String TRUTH_VALUE_EVALUATION_ENABLED = "org.key_project.sed.key.core.preference.truthValueEvaluationEnabled";
+   public static final String TRUTH_VALUE_TRACING_ENABLED = "org.key_project.sed.key.core.preference.truthValueTracingEnabled";
 
    /**
     * Preference key to enable or disable highlighting of reached source code.
@@ -92,6 +94,26 @@ public class KeYSEDPreferences {
     * Preference key to enable or disable simplification of conditions.
     */
    public static final String SIMPLIFY_CONDITIONS = "org.key_project.sed.key.core.preference.simplifyConditions";
+
+   /**
+    * Preference key for the color of true in the truth value tracing.
+    */
+   public static final String TRUTH_VALUE_TRACING_TRUE = "org.key_project.sed.key.core.preference.truthValueTracing.true";
+
+   /**
+    * Preference key for the color of false in the truth value tracing.
+    */
+   public static final String TRUTH_VALUE_TRACING_FALSE = "org.key_project.sed.key.core.preference.truthValueTracing.false";
+
+   /**
+    * Preference key for the color of unknown in the truth value tracing.
+    */
+   public static final String TRUTH_VALUE_TRACING_UNKNOWN = "org.key_project.sed.key.core.preference.truthValueTracing.unknown";
+
+   /**
+    * Preference key for the hiding of full branch conditions in case of alternative labels.
+    */
+   public static final String HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS = "org.key_project.sed.key.core.preference.hideFullBranchConditionIfAdditionalLabelIsAvailable";
    
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -390,35 +412,35 @@ public class KeYSEDPreferences {
    }
    
    /**
-    * Checks if truth value evaluation is enabled.
-    * @return Is truth value evaluation enabled?
+    * Checks if truth value tracing is enabled.
+    * @return Is truth value tracing enabled?
     */
-   public static boolean isTruthValueEvaluationEnabled() {
-      return getStore().getBoolean(TRUTH_VALUE_EVALUATION_ENABLED);
+   public static boolean isTruthValueTracingEnabled() {
+      return getStore().getBoolean(TRUTH_VALUE_TRACING_ENABLED);
    }
    
    /**
-    * Checks if truth value evaluation is enabled by default.
-    * @return Is truth value evaluation enabled?
+    * Checks if truth value tracing is enabled by default.
+    * @return Is truth value tracing enabled?
     */
-   public static boolean isDefaultTruthValueEvaluationEnabled() {
-      return getStore().getDefaultBoolean(TRUTH_VALUE_EVALUATION_ENABLED);
+   public static boolean isDefaultTruthValueTracingEnabled() {
+      return getStore().getDefaultBoolean(TRUTH_VALUE_TRACING_ENABLED);
    }
    
    /**
-    * Sets if truth value evaluation is enabled.
-    * @param value Enable truth value evaluation?
+    * Sets if truth value tracing is enabled.
+    * @param value Enable truth value tracing?
     */
-   public static void setTruthValueEvaluationEnabled(boolean value) {
-      getStore().setValue(TRUTH_VALUE_EVALUATION_ENABLED, value);
+   public static void setTruthValueTracingEnabled(boolean value) {
+      getStore().setValue(TRUTH_VALUE_TRACING_ENABLED, value);
    }
    
    /**
-    * Sets if truth value evaluation is enabled by default.
-    * @param defaultValue Enable truth value evaluation?
+    * Sets if truth value tracing is enabled by default.
+    * @param defaultValue Enable truth value tracing?
     */
-   public static void setDefaultTruthValueEvaluationEnabled(boolean defaultValue) {
-      getStore().setDefault(TRUTH_VALUE_EVALUATION_ENABLED, defaultValue);
+   public static void setDefaultTruthValueTracingEnabled(boolean defaultValue) {
+      getStore().setDefault(TRUTH_VALUE_TRACING_ENABLED, defaultValue);
    }
    
    /**
@@ -438,7 +460,7 @@ public class KeYSEDPreferences {
    }
    
    /**
-    * Sets if truth value evaluation is enabled.
+    * Sets if reached source code should be highlighted
     * @param value Enable source code highlighting.
     */
    public static void setHighlightReachedSourceCode(boolean value) {
@@ -515,5 +537,133 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultSimplifyConditions(boolean defaultValue) {
       getStore().setDefault(SIMPLIFY_CONDITIONS, defaultValue);
+   }
+   
+   /**
+    * Returns the color of true in the truth value tracing.
+    * @return The color.
+    */
+   public static RGB getTruthValueTracingTrue() {
+      return PreferenceConverter.getColor(getStore(), TRUTH_VALUE_TRACING_TRUE);
+   }
+   
+   /**
+    * Returns the default color of true in the truth value tracing.
+    * @return The color.
+    */
+   public static RGB getDefaultTruthValueTracingTrue() {
+      return PreferenceConverter.getDefaultColor(getStore(), TRUTH_VALUE_TRACING_TRUE);
+   }
+   
+   /**
+    * Sets the color of true in the truth value tracing.
+    * @param value The color.
+    */
+   public static void setTruthValueTracingTrue(RGB value) {
+      PreferenceConverter.setValue(getStore(), TRUTH_VALUE_TRACING_TRUE, value);
+   }
+   
+   /**
+    * Sets the default color of true in the truth value tracing.
+    * @param defaultValue The color.
+    */
+   public static void setDefaultTruthValueTracingTrue(RGB defaultValue) {
+      PreferenceConverter.setDefault(getStore(), TRUTH_VALUE_TRACING_TRUE, defaultValue);
+   }
+   
+   /**
+    * Returns the color of false in the truth value tracing.
+    * @return The color.
+    */
+   public static RGB getTruthValueTracingFalse() {
+      return PreferenceConverter.getColor(getStore(), TRUTH_VALUE_TRACING_FALSE);
+   }
+   
+   /**
+    * Returns the default color of false in the truth value tracing.
+    * @return The color.
+    */
+   public static RGB getDefaultTruthValueTracingFalse() {
+      return PreferenceConverter.getDefaultColor(getStore(), TRUTH_VALUE_TRACING_FALSE);
+   }
+   
+   /**
+    * Sets the color of false in the truth value tracing.
+    * @param value The color.
+    */
+   public static void setTruthValueTracingFalse(RGB value) {
+      PreferenceConverter.setValue(getStore(), TRUTH_VALUE_TRACING_FALSE, value);
+   }
+   
+   /**
+    * Sets the default color of false in the truth value tracing.
+    * @param defaultValue The color.
+    */
+   public static void setDefaultTruthValueTracingFalse(RGB defaultValue) {
+      PreferenceConverter.setDefault(getStore(), TRUTH_VALUE_TRACING_FALSE, defaultValue);
+   }
+   
+   /**
+    * Returns the color of unknown in the truth value tracing.
+    * @return The color.
+    */
+   public static RGB getTruthValueTracingUnknown() {
+      return PreferenceConverter.getColor(getStore(), TRUTH_VALUE_TRACING_UNKNOWN);
+   }
+   
+   /**
+    * Returns the default color of unknown in the truth value tracing.
+    * @return The color.
+    */
+   public static RGB getDefaultTruthValueTracingUnknown() {
+      return PreferenceConverter.getDefaultColor(getStore(), TRUTH_VALUE_TRACING_UNKNOWN);
+   }
+   
+   /**
+    * Sets the color of unknown in the truth value tracing.
+    * @param value The color.
+    */
+   public static void setTruthValueTracingUnknown(RGB value) {
+      PreferenceConverter.setValue(getStore(), TRUTH_VALUE_TRACING_UNKNOWN, value);
+   }
+   
+   /**
+    * Sets the default color of unknown in the truth value tracing.
+    * @param defaultValue The color.
+    */
+   public static void setDefaultTruthValueTracingUnknown(RGB defaultValue) {
+      PreferenceConverter.setDefault(getStore(), TRUTH_VALUE_TRACING_UNKNOWN, defaultValue);
+   }
+   
+   /**
+    * Checks if full branch conditions might be hidden in case of alternative labels.
+    * @return Hide conditions?
+    */
+   public static boolean isHideFullBranchConditionIfAdditionalLabelIsAvailable() {
+      return getStore().getBoolean(HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS);
+   }
+   
+   /**
+    * Checks if full branch conditions might be hidden in case of alternative labels by default.
+    * @return Hide conditions?
+    */
+   public static boolean isDefaultHideFullBranchConditionIfAdditionalLabelIsAvailable() {
+      return getStore().getDefaultBoolean(HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS);
+   }
+   
+   /**
+    * Sets if full branch conditions might be hidden in case of alternative labels.
+    * @param value Hide conditions?
+    */
+   public static void setHideFullBranchConditionIfAdditionalLabelIsAvailable(boolean value) {
+      getStore().setValue(HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS, value);
+   }
+   
+   /**
+    * Sets if full branch conditions might be hidden in case of alternative labels by default.
+    * @param defaultValue Hide conditions?
+    */
+   public static void setDefaultHideFullBranchConditionIfAdditionalLabelIsAvailable(boolean defaultValue) {
+      getStore().setDefault(HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS, defaultValue);
    }
 }

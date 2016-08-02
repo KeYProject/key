@@ -550,12 +550,10 @@ public class OutputStreamProofSaver {
     }
 
     public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence pos) {
-        if (pos == null)
-            return "";
-        return " (formula \""
-                + seq.formulaNumberInSequent(pos.isInAntec(),
-                        pos.constrainedFormula()) + "\")"
-                + posInTerm2Proof(pos.posInTerm());
+        if (pos == null) return "";
+        return " (formula \""+seq.formulaNumberInSequent(pos.isInAntec(),
+                pos.sequentFormula())+"\")"+
+                posInTerm2Proof(pos.posInTerm());
     }
 
     public static String posInTerm2Proof(PosInTerm pos) {

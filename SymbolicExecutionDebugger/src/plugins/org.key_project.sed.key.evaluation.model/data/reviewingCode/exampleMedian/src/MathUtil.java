@@ -4,7 +4,7 @@
 public class MathUtil {
    /**
     * Computes the median value between the given start and end index of a 
-    * sorted array without modifying it. The relation between start and index
+    * sorted array without modifying it. The relation between start and end
     * is not important. This means that the median is computed in case that
     * {@code start <= end} holds but also in case that {@code start > end} holds.
     * <p>

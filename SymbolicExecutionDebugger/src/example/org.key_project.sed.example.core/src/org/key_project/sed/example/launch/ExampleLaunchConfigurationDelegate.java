@@ -13,8 +13,14 @@
 
 package org.key_project.sed.example.launch;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IProcess;
@@ -22,9 +28,9 @@ import org.eclipse.debug.core.model.IStep;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.key_project.sed.core.annotation.impl.BreakpointAnnotation;
 import org.key_project.sed.core.annotation.impl.BreakpointAnnotationLink;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.model.ISEMethodCall;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.model.ISEValue;
 import org.key_project.sed.core.model.ISEVariable;
@@ -37,11 +43,15 @@ import org.key_project.sed.core.model.memory.SEMemoryExceptionalMethodReturn;
 import org.key_project.sed.core.model.memory.SEMemoryExceptionalTermination;
 import org.key_project.sed.core.model.memory.SEMemoryMethodCall;
 import org.key_project.sed.core.model.memory.SEMemoryMethodReturn;
+import org.key_project.sed.core.model.memory.SEMemoryNodeLink;
 import org.key_project.sed.core.model.memory.SEMemoryStatement;
 import org.key_project.sed.core.model.memory.SEMemoryTermination;
 import org.key_project.sed.core.model.memory.SEMemoryThread;
 import org.key_project.sed.core.model.memory.SEMemoryValue;
 import org.key_project.sed.core.model.memory.SEMemoryVariable;
+import org.key_project.sed.example.Activator;
+import org.key_project.sed.example.model.CustomStreamsProxy;
+import org.key_project.sed.example.model.SameJVMProcess;
 
 /**
  * A {@link LaunchConfigurationDelegate} is responsible to start the symbolic 
@@ -83,6 +93,15 @@ public class ExampleLaunchConfigurationDelegate extends LaunchConfigurationDeleg
        // Construct the initial symbolic execution tree.
        ISEDebugTarget target = createTarget(launch);
        launch.addDebugTarget(target);
+       
+       // Add a process to make the console available. If no console is needed, just add no process.
+       try {
+          InputStream outContent = new ByteArrayInputStream("Hello SED Example!".getBytes(CustomStreamsProxy.DEFAULT_ENCODING));
+          launch.addProcess(new SameJVMProcess(launch, "Current JVM Wrapper", outContent, null, null));
+       }
+       catch (UnsupportedEncodingException e) {
+          throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+       }
     }
     
     /**
@@ -112,7 +131,6 @@ public class ExampleLaunchConfigurationDelegate extends LaunchConfigurationDeleg
        statement.setPathCondition("true");
        statement.setCallStack(createCallStack(call));
        call.addChild(statement);
-       
        // Not Null Branch Condition
        SEMemoryBranchCondition notNullBC = new SEMemoryBranchCondition(target, statement, thread);
        notNullBC.setName("other != null");
@@ -147,6 +165,13 @@ public class ExampleLaunchConfigurationDelegate extends LaunchConfigurationDeleg
        nullBC.setPathCondition("other == null");
        nullBC.setCallStack(createCallStack(call));
        statement.addChild(nullBC);
+       // Link between both branch conditions
+       SEMemoryNodeLink bcsLink = new SEMemoryNodeLink(target);
+       bcsLink.setSource(nullBC);
+       bcsLink.setTarget(notNullBC);
+       bcsLink.setName("Sibling");
+       nullBC.addOutgoingLink(bcsLink);
+       notNullBC.addIncomingLink(bcsLink);
        // Exceptional method return
        SEMemoryExceptionalMethodReturn exceptionalReturn = new SEMemoryExceptionalMethodReturn(target, nullBC, thread);
        exceptionalReturn.setName("<throw java.lang.NullPointerException>");
@@ -168,6 +193,12 @@ public class ExampleLaunchConfigurationDelegate extends LaunchConfigurationDeleg
        exceptionalTermination.setName("<uncaught java.lang.NullPointerException>");
        exceptionalTermination.setPathCondition("other == null");
        exceptionalReturn.addChild(exceptionalTermination);
+       // Link between both terminations
+       SEMemoryNodeLink terminationLink = new SEMemoryNodeLink(target);
+       terminationLink.setSource(termination);
+       terminationLink.setTarget(exceptionalTermination);
+       termination.addOutgoingLink(terminationLink);       
+       exceptionalTermination.addIncomingLink(terminationLink);       
        
        // May add ISEDVariable with ISEDValue to each ISEDDebugNode
        SEMemoryVariable variable = new SEMemoryVariable(target, thread);

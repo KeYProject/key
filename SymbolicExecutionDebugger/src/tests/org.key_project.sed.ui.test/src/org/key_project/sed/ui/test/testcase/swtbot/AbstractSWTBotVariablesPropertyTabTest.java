@@ -47,7 +47,7 @@ public class AbstractSWTBotVariablesPropertyTabTest extends AbstractSetupTestCas
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
+         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
          // Launch fixed example
          TestSedCoreUtil.launchFixedExample();
          // Find the launched ILaunch in the debug view

@@ -137,7 +137,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
         }
         Term rep = services.getTermBuilder().convertToFormula(originalRep);
         TacletGenerator TG = TacletGenerator.getInstance();
-        DefaultImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
+        ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
         final int c = services.getCounter("classAxiom").getCountPlusPlus();
         final String namePP = "Class axiom " + c + " in " + kjt.getFullName();
         final Name tacletName = MiscTools.toValidTacletName(namePP);

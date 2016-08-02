@@ -150,6 +150,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE,
+                           Boolean.FALSE,
                            14, 
                            executor);
    }

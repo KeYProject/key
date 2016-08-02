@@ -26,6 +26,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.sed.core.annotation.ISEAnnotation;
 import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.model.ISEBlockContract;
+import org.key_project.sed.core.model.ISEBlockContractExceptionalTermination;
+import org.key_project.sed.core.model.ISEBlockContractTermination;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEBranchStatement;
 import org.key_project.sed.core.model.ISENode;
@@ -235,6 +238,36 @@ public final class SEDImages {
     public static final String COMMENT_WIZARD = "org.key_project.sed.ui.images.commentWizard";
     
     /**
+     * The key for the image that is used for block contract.
+     */
+    public static final String BLOCK_CONTRACT = "org.key_project.sed.ui.images.blockContract";
+    
+    /**
+     * The key for the image that is used for block contract.
+     */
+    public static final String BLOCK_CONTRACT_NOT_PRE = "org.key_project.sed.ui.images.blockContractNotPre";
+    
+    /**
+     * The key for the image that is used for loop body termination.
+     */
+    public static final String BLOCK_CONTRACT_TERMINATION = "org.key_project.sed.ui.images.blockContractTermination";
+    
+    /**
+     * The key for the image that is used for loop body termination.
+     */
+    public static final String BLOCK_CONTRACT_TERMINATION_NOT_VERIFIED = "org.key_project.sed.ui.images.blockContractTerminationNotVerified";
+    
+    /**
+     * The key for the image that is used for exceptional loop body termination.
+     */
+    public static final String BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION = "org.key_project.sed.ui.images.blockContractExceptionalTermination";
+    
+    /**
+     * The key for the image that is used for exceptional loop body termination.
+     */
+    public static final String BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION_NOT_VERIFIED = "org.key_project.sed.ui.images.blockContractExceptinalTerminationNotVerified";
+    
+    /**
      * Forbid instances.
      */
     private SEDImages() {
@@ -343,7 +376,7 @@ public final class SEDImages {
            path = "icons/loop_invariant.gif";
         }
         else if (LOOP_INVARIANT_INITIALLY_INVALID.equals(key)) {
-           path = "icons/loop_invariant _initially_invalid.gif";
+           path = "icons/loop_invariant_initially_invalid.gif";
         }
         else if (LOOP_BODY_TERMINATION.equals(key)) {
            path = "icons/loop_body_termination.gif";
@@ -400,6 +433,24 @@ public final class SEDImages {
         }
         else if (COMMENT_WIZARD.equals(key)) {
            path = "icons/comment_wizard.png";
+        }
+        else if (BLOCK_CONTRACT.equals(key)) {
+           path = "icons/block_contract.gif";
+        }
+        else if (BLOCK_CONTRACT_NOT_PRE.equals(key)) {
+           path = "icons/block_contract_not_pre.gif";
+        }
+        else if (BLOCK_CONTRACT_TERMINATION.equals(key)) {
+           path = "icons/block_contract_termination.gif";
+        }
+        else if (BLOCK_CONTRACT_TERMINATION_NOT_VERIFIED.equals(key)) {
+           path = "icons/block_contract_termination_not_verified.gif";
+        }
+        else if (BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION.equals(key)) {
+           path = "icons/block_contract_exceptional_termination.gif";
+        }
+        else if (BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION_NOT_VERIFIED.equals(key)) {
+           path = "icons/block_contract_exceptional_termination_not_verified.gif";
         }
         // Load image if possible
         if (path != null) {
@@ -459,6 +510,24 @@ public final class SEDImages {
           }
           else {
              return getImage(SEDImages.LOOP_BODY_TERMINATION_NOT_VERIFIED);
+          }
+       }
+       else if (element instanceof ISEBlockContractExceptionalTermination) {
+          ISEBlockContractExceptionalTermination node = (ISEBlockContractExceptionalTermination)element;
+          if (node.isVerified()) {
+             return getImage(SEDImages.BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION);
+          }
+          else {
+             return getImage(SEDImages.BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
+          }
+       }
+       else if (element instanceof ISEBlockContractTermination) {
+          ISEBlockContractTermination node = (ISEBlockContractTermination)element;
+          if (node.isVerified()) {
+             return getImage(SEDImages.BLOCK_CONTRACT_TERMINATION);
+          }
+          else {
+             return getImage(SEDImages.BLOCK_CONTRACT_TERMINATION_NOT_VERIFIED);
           }
        }
        else if (element instanceof ISETermination) {
@@ -521,6 +590,15 @@ public final class SEDImages {
           }
           else {
              return DebugPluginImages.getImage(IDebugUIConstants.IMG_OBJS_THREAD_RUNNING);
+          }
+       }
+       else if (element instanceof ISEBlockContract) {
+          ISEBlockContract bc = (ISEBlockContract) element;
+          if (bc.isPreconditionComplied()) {
+             return getImage(SEDImages.BLOCK_CONTRACT);
+          }
+          else {
+             return getImage(SEDImages.BLOCK_CONTRACT_NOT_PRE);
           }
        }
        else {

@@ -19,7 +19,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.key_project.sed.core.model.ISENode;
-import org.key_project.sed.key.core.model.KeYMethodContract;
+import org.key_project.sed.key.core.model.IKeYSENode;
 
 /**
  * {@link ISection} implementation to show the properties of {@link ISENode}s.
@@ -30,8 +30,8 @@ public class PreconditionGraphitiPropertySection extends AbstractTruthValueGraph
     * {@inheritDoc}
     */
    @Override
-   public KeYMethodContract getDebugNode(PictogramElement pe) {
-      KeYMethodContract node = null;
+   public IKeYSENode<?> getDebugNode(PictogramElement pe) {
+      IKeYSENode<?> node = null;
       if (pe != null) {
          IDiagramTypeProvider diagramProvider = getDiagramTypeProvider();
          if (diagramProvider != null) {

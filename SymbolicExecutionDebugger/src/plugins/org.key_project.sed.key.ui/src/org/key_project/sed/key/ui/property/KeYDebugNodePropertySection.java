@@ -45,6 +45,17 @@ public class KeYDebugNodePropertySection extends AbstractPropertySection {
     * {@inheritDoc}
     */
    @Override
+   public void dispose() {
+      if (contentComposite != null) {
+         contentComposite.dispose();
+      }
+      super.dispose();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public void refresh() {
       contentComposite.updateContent(getDebugNode());
    }

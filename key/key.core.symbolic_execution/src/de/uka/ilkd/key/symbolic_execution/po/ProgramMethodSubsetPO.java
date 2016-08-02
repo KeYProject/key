@@ -256,13 +256,13 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     * {@inheritDoc}
     */
    @Override
-   protected Term buildUninterpretedPredicate(ImmutableList<ProgramVariable> paramVars,
+   protected Term ensureUninterpretedPredicateExists(ImmutableList<ProgramVariable> paramVars,
                                               ImmutableList<LocationVariable> formalParamVars,
                                               ProgramVariable exceptionVar,
                                               String name,
                                               Services proofServices) {
       ImmutableList<ProgramVariable> paramVarsList = convert(undeclaredVariableCollector.result());
-      return super.buildUninterpretedPredicate(paramVarsList, formalParamVars, exceptionVar, name, proofServices);
+      return super.ensureUninterpretedPredicateExists(paramVarsList, formalParamVars, exceptionVar, name, proofServices);
    }
 
    /**

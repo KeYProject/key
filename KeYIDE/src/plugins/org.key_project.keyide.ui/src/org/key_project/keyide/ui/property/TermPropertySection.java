@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
-import org.key_project.keyide.ui.editor.KeYEditor;
+import org.key_project.keyide.ui.editor.IPosInSequentProvider;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
@@ -42,12 +42,12 @@ import de.uka.ilkd.key.proof.Node;
  */
 public class TermPropertySection extends AbstractNodePropertySection {
    /**
-    * The observed {@link KeYEditor} which provides the {@link PosInSequent}.
+    * The observed {@link IPosInSequentProvider} which provides the {@link PosInSequent}.
     */
-   private KeYEditor editor;
+   private IPosInSequentProvider pisProvider;
    
    /**
-    * The listener to observe {@link #editor}.
+    * The listener to observe {@link #pisProvider}.
     */
    private PropertyChangeListener listener = new PropertyChangeListener() {
       @Override
@@ -144,14 +144,14 @@ public class TermPropertySection extends AbstractNodePropertySection {
     */
    @Override
    public void setInput(IWorkbenchPart part, ISelection selection) {
-      if (editor != null) {
-         editor.removePropertyChangeListener(listener);
-         editor = null;
+      if (pisProvider != null) {
+         pisProvider.removePropertyChangeListener(IPosInSequentProvider.PROP_SELECTED_POS_IN_SEQUENT, listener);
+         pisProvider = null;
       }
       part = updatePart(part);
-      if (part instanceof KeYEditor) {
-         editor = (KeYEditor)part;
-         editor.addPropertyChangeListener(listener);
+      if (part instanceof IPosInSequentProvider) {
+         pisProvider = (IPosInSequentProvider)part;
+         pisProvider.addPropertyChangeListener(IPosInSequentProvider.PROP_SELECTED_POS_IN_SEQUENT, listener);
       }
       super.setInput(part, selection);
    }
@@ -162,7 +162,7 @@ public class TermPropertySection extends AbstractNodePropertySection {
    @Override
    protected void updateShownContent(Node node) {
       // Show position
-      PosInSequent pis = editor != null ? editor.getSelectedPosInSequent() : null;
+      PosInSequent pis = pisProvider != null ? pisProvider.getSelectedPosInSequent() : null;
       pioText.setText(posInSequentToString(pis));
       // Show term information
       Term term = pis != null && pis.getPosInOccurrence() != null ? pis.getPosInOccurrence().subTerm() : null;
@@ -228,7 +228,7 @@ public class TermPropertySection extends AbstractNodePropertySection {
                         ;
                      }
                   }
-                  sb.append(" of " + pio.constrainedFormula());
+                  sb.append(" of " + pio.sequentFormula());
                }
             }
          }
@@ -241,8 +241,8 @@ public class TermPropertySection extends AbstractNodePropertySection {
     */
    @Override
    public void dispose() {
-      if (editor != null) {
-         editor.removePropertyChangeListener(listener);
+      if (pisProvider != null) {
+         pisProvider.removePropertyChangeListener(IPosInSequentProvider.PROP_SELECTED_POS_IN_SEQUENT, listener);
       }
       super.dispose();
    }

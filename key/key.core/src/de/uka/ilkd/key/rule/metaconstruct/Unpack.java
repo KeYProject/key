@@ -41,7 +41,7 @@ public class Unpack extends ProgramTransformer {
 	    Services services,
 	    SVInstantiations svInst) {
 	Debug.assertTrue(pe instanceof For, 
-		"Unpack cannot handle " + pe);
+		"Unpack cannot handle ", pe);
 	final For astFor  = (For)pe;
 	final Statement[] loopInitStatementList = 
 	    new Statement[astFor.getInitializers().size() + 1];

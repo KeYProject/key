@@ -59,6 +59,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Triple;
 
@@ -81,7 +82,7 @@ public class Proof implements Named {
     /**
      * The time when the {@link Proof} instance was created.
      */
-    final long creationTime = System.nanoTime();
+    final long creationTime = System.currentTimeMillis();
 
     /** name of the proof */
     private final Name name;
@@ -956,20 +957,19 @@ public class Proof implements Named {
     }
 
 
-    /** returns the list of goals of the subtree starting with node
+    /** returns the list of goals of the subtree starting with node.
      *
      * @param node the Node where to start from
      * @return the list of goals of the subtree starting with node
      */
+    
     public ImmutableList<Goal> getSubtreeGoals(Node node) {
         ImmutableList<Goal> result = ImmutableSLList.<Goal>nil();
+        List<Node> leaves = node.getLeaves();
         for (final Goal goal : openGoals) {
-            final Iterator<Node> leavesIt = node.leavesIterator();
-            while (leavesIt.hasNext()) {
-                if (leavesIt.next() == goal.node()) {
-                    result = result.prepend(goal);
-                }
-            }
+        	if (leaves.remove(goal.node())) { //if list contains node, remove it to make the list faster later
+        		result = result.prepend(goal);
+        	}
         }
         return result;
     }
@@ -1167,4 +1167,11 @@ public class Proof implements Named {
       return null;
    }
 
+   public StrategyFactory getActiveStrategyFactory() {
+      Name activeStrategyName = getActiveStrategy() != null ? getActiveStrategy().name() : null;
+      return activeStrategyName != null ?
+             getServices().getProfile().getStrategyFactory(activeStrategyName) :
+             getServices().getProfile().getDefaultStrategyFactory();
+      
+   }
 }

@@ -43,15 +43,12 @@ public class SWTBotChangeConditonWithErrorCancel extends AbstractKeYDebugTargetT
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
             resume(bot, item, target);
             assertTrue(TestBreakpointsUtil.checkTargetConditiondofAllBreakpoints(target, null, false));
-            assertTrue(TestBreakpointsUtil.checkProofConditionofAllBreakpoints(target,  null, false));
             assertTrue(TestBreakpointsUtil.changeCondition(bot, "BreakpointStopCallerAndLoop [entry] - main(int)", "abcdefg"));
             TestUtilsUtil.sleep(2000);
             TestUtilsUtil.clickDirectly(bot,"Cancel");
             assertTrue(TestBreakpointsUtil.checkTargetContainsSomeBreakpoints(target, 0, 0, 1, 0));
-            assertTrue(TestBreakpointsUtil.checkProofContainsSomeBreakpoints(target, 0, 0, 1, 0));
             TestUtilsUtil.sleep(2000);
             assertTrue(TestBreakpointsUtil.checkTargetConditiondofAllBreakpoints(target, null, false));
-            assertTrue(TestBreakpointsUtil.checkProofConditionofAllBreakpoints(target, null, false));
             TestBreakpointsUtil.removeAllBreakpoints();
          }
       };
@@ -72,6 +69,7 @@ public class SWTBotChangeConditonWithErrorCancel extends AbstractKeYDebugTargetT
             Boolean.FALSE,
             Boolean.FALSE,
             Boolean.TRUE,
+            Boolean.FALSE,
             8, 
             executor);   
    } 

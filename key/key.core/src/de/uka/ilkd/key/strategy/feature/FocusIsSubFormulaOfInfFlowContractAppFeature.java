@@ -41,7 +41,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
 
     @Override
-    public RuleAppCost compute(RuleApp ruleApp,
+    public RuleAppCost computeCost(RuleApp ruleApp,
                                PosInOccurrence pos,
                                Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
@@ -53,7 +53,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
             return NumberRuleAppCost.getZeroCost();
         }
 
-        final Term focusFor = pos.constrainedFormula().formula();
+        final Term focusFor = pos.sequentFormula().formula();
         ImmutableList<Term> contractAppls =
                 goal.getStrategyInfo(InfFlowContractAppTacletExecutor.INF_FLOW_CONTRACT_APPL_PROPERTY);
         if (contractAppls == null) {

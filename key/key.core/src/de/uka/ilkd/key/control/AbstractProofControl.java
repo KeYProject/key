@@ -353,7 +353,7 @@ public abstract class AbstractProofControl implements ProofControl {
        progVars.add(goal.getGlobalProgVars());
        
        return new TacletInstantiationModel(
-            app, goal.sequent(), proof.getServices(),
+            app, goal.sequent(),
        new NamespaceSet(ns.variables(),
               ns.functions(),
               ns.sorts(),
@@ -562,6 +562,15 @@ public abstract class AbstractProofControl implements ProofControl {
      * {@inheritDoc}
      */
     @Override
+    public void startAndWaitForAutoMode(Proof proof, ImmutableList<Goal> goals) {
+       startAutoMode(proof, goals);
+       waitWhileAutoMode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void stopAndWaitAutoMode() {
        stopAutoMode();
        waitWhileAutoMode();
@@ -618,8 +627,8 @@ public abstract class AbstractProofControl implements ProofControl {
               // remove any filtering rule app managers that are left in the proof
               // goals
               if (goal.getRuleAppManager() instanceof FocussedRuleApplicationManager) {
-                  final AutomatedRuleApplicationManager focusManager
-                          = (AutomatedRuleApplicationManager) goal.getRuleAppManager();
+                  final FocussedRuleApplicationManager focusManager
+                          = (FocussedRuleApplicationManager) goal.getRuleAppManager();
                   goal.setRuleAppManager(null);
                   final AutomatedRuleApplicationManager realManager
                           = focusManager.getDelegate();

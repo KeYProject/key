@@ -516,6 +516,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param higlightReachedSourceCode Highlight reached source code?
     * @param simplifyConditions Simplify conditions?
+    * @param hideFullBranchConditionIfAdditionalLabelIsAvailable Hide full branch conditions if additional label is available?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -535,8 +536,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean usePrettyPrinting,
                                        Boolean showSignatureOnMethodReturnNodes,
                                        Boolean higlightReachedSourceCode,
-                                       Boolean truthValueEvaluationEnabled,
+                                       Boolean truthValueTracingEnabled,
                                        Boolean simplifyConditions,
+                                       Boolean hideFullBranchConditionIfAdditionalLabelIsAvailable,
                                        int timeoutFactor, 
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       doKeYDebugTargetTest(projectName,
@@ -555,8 +557,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            usePrettyPrinting,
                            showSignatureOnMethodReturnNodes,
                            higlightReachedSourceCode,
-                           truthValueEvaluationEnabled,
+                           truthValueTracingEnabled,
                            simplifyConditions,
+                           hideFullBranchConditionIfAdditionalLabelIsAvailable,
                            timeoutFactor, 
                            executor);
    }
@@ -582,6 +585,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param higlightReachedSourceCode Highlight reached source code?
     * @param simplifyConditions Simplify conditions?
+    * @param hideFullBranchConditionIfAdditionalLabelIsAvailable Hide full branch conditions if additional label is available?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -602,8 +606,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean usePrettyPrinting,
                                        Boolean showSignatureOnMethodReturnNodes,
                                        Boolean higlightReachedSourceCode,
-                                       Boolean truthValueEvaluationEnabled,
+                                       Boolean truthValueTracingEnabled,
                                        Boolean simplifyConditions,
+                                       Boolean hideFullBranchConditionIfAdditionalLabelIsAvailable,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       doKeYDebugTargetTest(projectName, 
@@ -623,8 +628,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            usePrettyPrinting,
                            showSignatureOnMethodReturnNodes,
                            higlightReachedSourceCode,
-                           truthValueEvaluationEnabled,
+                           truthValueTracingEnabled,
                            simplifyConditions,
+                           hideFullBranchConditionIfAdditionalLabelIsAvailable,
                            timeoutFactor, 
                            executor);
    }
@@ -650,6 +656,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param higlightReachedSourceCode Highlight reached source code?
     * @param simplifyConditions Simplify conditions?
+    * @param hideFullBranchConditionIfAdditionalLabelIsAvailable Hide full branch conditions if additional label is available?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -671,8 +678,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean usePrettyPrinting,
                                        Boolean showSignatureOnMethodReturnNodes,
                                        Boolean higlightReachedSourceCode,
-                                       Boolean truthValueEvaluationEnabled,
+                                       Boolean truthValueTracingEnabled,
                                        Boolean simplifyConditions,
+                                       Boolean hideFullBranchConditionIfAdditionalLabelIsAvailable,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create test project
@@ -682,7 +690,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          projectConfigurator.configure(project);
       }
       // Do test steps
-      doKeYDebugTargetTest(project, closePropertiesView, closeExecutionTreeViews, selector, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, higlightReachedSourceCode, truthValueEvaluationEnabled, simplifyConditions, timeoutFactor, executor);
+      doKeYDebugTargetTest(project, closePropertiesView, closeExecutionTreeViews, selector, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, higlightReachedSourceCode, truthValueTracingEnabled, simplifyConditions, hideFullBranchConditionIfAdditionalLabelIsAvailable, timeoutFactor, executor);
    }
    
    /**
@@ -703,6 +711,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param higlightReachedSourceCode Highlight reached source code?
     * @param simplifyConditions Simplify conditions?
+    * @param hideFullBranchConditionIfAdditionalLabelIsAvailable Hide full branch conditions if additional label is available?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -721,8 +730,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean usePrettyPrinting,
                                        Boolean showSignatureOnMethodReturnNodes,
                                        Boolean higlightReachedSourceCode,
-                                       Boolean truthValueEvaluationEnabled,
+                                       Boolean truthValueTracingEnabled,
                                        Boolean simplifyConditions,
+                                       Boolean hideFullBranchConditionIfAdditionalLabelIsAvailable,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create bot
@@ -736,7 +746,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       boolean restorePropertiesView = false;
       List<? extends SWTBotEditor> oldEditors = bot.editors();
       // Open symbolic debug perspective
-      IPerspectiveDescriptor debugPerspective = TestSedCoreUtil.openSymbolicDebugPerspective();
+      TestSedCoreUtil.openSymbolicDebugPerspective(bot);
       try {
          // Configure debug perspective
          if (closeExecutionTreeViews) {
@@ -746,7 +756,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          if (closePropertiesView) {
             restorePropertiesView = TestUtilsUtil.closeView(IPageLayout.ID_PROP_SHEET);
          }
-         executor.configureDebugPerspective(bot, debugPerspective);
+         executor.configureDebugPerspective(bot);
          // Get method
          assertNotNull(selector);
          IMethod method = selector.getMethod(project);
@@ -759,7 +769,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          assertEquals(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, higlightReachedSourceCode, truthValueEvaluationEnabled, simplifyConditions);
+         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, higlightReachedSourceCode, truthValueTracingEnabled, simplifyConditions, hideFullBranchConditionIfAdditionalLabelIsAvailable);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
@@ -783,7 +793,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
             }
          }
          // Restore closed views if required
-         executor.cleanupDebugPerspective(bot, debugPerspective);
+         executor.cleanupDebugPerspective(bot);
          if (restorePropertiesView) {
             TestUtilsUtil.openView(IPageLayout.ID_PROP_SHEET);
          }
@@ -808,7 +818,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                                               final boolean mergeBranchConditions,
                                                               final boolean useMethodContracts,
                                                               final boolean useLoopInvariants,
-                                                              final boolean nonExecutionBranchHidingSideProofs, final boolean aliasChecks) {
+                                                              final boolean useBlockContracts,
+                                                              final boolean nonExecutionBranchHidingSideProofs, 
+                                                              final boolean aliasChecks) {
       return new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
@@ -837,7 +849,13 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.LOOP_TREATMENT_INVARIANT));
             }
             else {
-               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.LOOP_TREATMENT_EXPAND, 1));
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.LOOP_TREATMENT_EXPAND, 0));
+            }
+            if (useBlockContracts) {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.BLOCK_TREATMENT_INVARIANT, 1));
+            }
+            else {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.BLOCK_TREATMENT_EXPAND, 0));
             }
             if (nonExecutionBranchHidingSideProofs) {
                TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF));
@@ -947,11 +965,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       /**
        * Can be used to initialize the debug perspective.
        * @param bot The {@link SWTWorkbenchBot} to use.
-       * @param debugPerspective The currently shown debug perspective.
        * @throws Exception Occurred Exception.
        */
-      public void configureDebugPerspective(SWTWorkbenchBot bot, 
-                                            IPerspectiveDescriptor debugPerspective) throws Exception;
+      public void configureDebugPerspective(SWTWorkbenchBot bot) throws Exception;
       
       /**
        * Does the test.
@@ -977,11 +993,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       /**
        * Reverts all changes done on the debug perspective.
        * @param bot The {@link SWTWorkbenchBot} to use.
-       * @param debugPerspective The currently shown debug perspective.
        * @throws Exception Occurred Exception.
        */
-      public void cleanupDebugPerspective(SWTWorkbenchBot bot, 
-                                          IPerspectiveDescriptor debugPerspective) throws Exception;
+      public void cleanupDebugPerspective(SWTWorkbenchBot bot) throws Exception;
    }
 
    /**
@@ -993,7 +1007,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
        * {@inheritDoc}
        */
       @Override
-      public void configureDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+      public void configureDebugPerspective(SWTWorkbenchBot bot) throws Exception {
       }
 
       /**
@@ -1007,7 +1021,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
        * {@inheritDoc}
        */
       @Override
-      public void cleanupDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+      public void cleanupDebugPerspective(SWTWorkbenchBot bot) throws Exception {
       }
    }
    
@@ -1025,8 +1039,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
     * @param usePrettyPrinting Use pretty printing?
-    * @param truthValueEvaluationEnabled Truth value evaluation enabled?
+    * @param truthValueTracingEnabled Truth value tracing enabled?
     * @param simplifyConditions Simplify conditions?
+    * @param hideFullBranchConditionIfAdditionalLabelIsAvailable Hide full branch conditions if additional label is available?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetProofFileTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -1042,8 +1057,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
                                        Boolean usePrettyPrinting,
-                                       Boolean truthValueEvaluationEnabled,
+                                       Boolean truthValueTracingEnabled,
                                        Boolean simplifyConditions,
+                                       Boolean hideFullBranchConditionIfAdditionalLabelIsAvailable,
                                        int timeoutFactor,
                                        IKeYDebugTargetProofFileTestExecutor executor) throws Exception {
       // Create bot
@@ -1058,7 +1074,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       List<? extends SWTBotEditor> oldEditors = bot.editors();
       try {
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
+         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
          if (closeExecutionTreeViews) {
             restoreExecutionTreeView = TestUtilsUtil.closeView(ExecutionTreeView.VIEW_ID);
             restoreThumbinalExecutionTreeView = TestUtilsUtil.closeView(ExecutionTreeThumbNailView.VIEW_ID);
@@ -1076,7 +1092,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(file, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting, truthValueEvaluationEnabled, simplifyConditions);
+         TestSEDKeyCoreUtil.launchKeY(file, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting, truthValueTracingEnabled, simplifyConditions, hideFullBranchConditionIfAdditionalLabelIsAvailable);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();

@@ -3,6 +3,7 @@ package org.key_project.sed.key.evaluation.server.report.html;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +17,7 @@ import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.definition.IQuestionWithCildren;
 import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
+import org.key_project.sed.key.evaluation.server.report.AdditionalFile;
 import org.key_project.sed.key.evaluation.server.report.EvaluationResult;
 import org.key_project.sed.key.evaluation.server.report.filter.IStatisticsFilter;
 import org.key_project.sed.key.evaluation.server.report.statiscs.FilteredStatistics;
@@ -32,7 +34,7 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
     * {@inheritDoc}
     */
    @Override
-   public void appendSection(File storageLocation, AbstractEvaluation evaluation, EvaluationResult result, Statistics statistics, StringBuffer sb) {
+   public Collection<AdditionalFile> appendSection(File storageLocation, AbstractEvaluation evaluation, EvaluationResult result, Statistics statistics, StringBuffer sb) {
       sb.append("<h1><a name=\"statistics\">Tool Comparison</a></h1>");
       sb.append("<table border=\"1\">");
       // Append header
@@ -80,7 +82,7 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
             sb.append("<td rowspan=\"" + (2 + formSpan + formPagesSpan) + "\" valign=\"top\"><b>");
             sb.append(form.getName());
             sb.append("</b></td>");
-            sb.append("<td colspan=\"" + (2 + ((evaluation.getTools().length) * 8 * statistics.getFilters().size())) + "\">&nbsp;</td>");
+            sb.append("<td colspan=\"" + (2 + ((evaluation.getTools().length) * 8 * statistics.getFilters().length)) + "\">&nbsp;</td>");
             sb.append("</tr>");
             for (AbstractPage page : form.getPages()) {
                int pageSpan = questionCount.get(page);
@@ -157,6 +159,7 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
       if (statistics.isMultipleValuedAnswersIgnored()) {
          sb.append("<p><a href=\"#answers\">Answers with multiple values (gray colored) are ignored.</a></p>");
       }
+      return null;
    }
    
    /**

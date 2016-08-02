@@ -31,7 +31,7 @@ public class SWTBotParseErrorMarkerTest {
    private static IFile testFile;
 
    @BeforeClass
-   public static void initializeProjectAndOpenEditor() throws CoreException, InterruptedException {
+   public static void initializeProjectAndOpenEditor() throws Exception {
       TestUtilsUtil.closeWelcomeView();
       final TestProject result = JMLEditingUITestUtils.createProjectWithFile(bot, 
                                                                    PROJECT_NAME, 

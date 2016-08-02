@@ -69,7 +69,7 @@ public class ProofObligationCreator {
 
               for (Taclet taclet : taclets) {
                  InitConfig initConfig = initConfigs[i];
-                 initConfig.setTaclets(initConfig.getTaclets().union(axioms));
+                 initConfig.setTaclets(initConfig.getTaclets().prepend(axioms));
                  UserDefinedSymbols symbolsForAxioms = analyzeTaclets(axioms, initConfig.namespaces());
 
                  symbolsForAxioms.addSymbolsToNamespaces(initConfig.namespaces());

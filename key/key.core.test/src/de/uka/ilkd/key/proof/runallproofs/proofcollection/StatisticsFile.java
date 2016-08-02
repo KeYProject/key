@@ -1,12 +1,6 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -72,14 +66,14 @@ public class StatisticsFile implements Serializable {
 
             @Override
             long getLongValueFromStatistics(Statistics statistics) {
-               return statistics.timeInNano / 1000000;
+               return statistics.timeInMillis;
             }
 
          }, new LongColumn("Automode time") {
 
             @Override
             long getLongValueFromStatistics(Statistics statistics) {
-               return statistics.autoModeTimeInNano / 1000000;
+               return statistics.autoModeTimeInMillis;
             }
 
          }, new Column<Integer>("Closed") {
@@ -105,7 +99,7 @@ public class StatisticsFile implements Serializable {
             @Override
             Double addEntry(Statistics statistics, File keyFile,
                   boolean proofClosed) {
-               double value = statistics.timePerStepInNano / 1000000;
+               double value = statistics.timePerStepInMillis;
                return value;
             }
 

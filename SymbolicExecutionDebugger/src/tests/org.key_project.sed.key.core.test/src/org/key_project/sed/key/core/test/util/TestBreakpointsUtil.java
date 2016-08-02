@@ -51,7 +51,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.SymbolicExecutionE
 @SuppressWarnings("restriction")
 public final class TestBreakpointsUtil {
    
-   public static void addSomeBreakpoints(String path, SWTWorkbenchBot bot, Object... exceptions) {
+   public static void addSomeBreakpoints(String path, SWTWorkbenchBot bot, Object... exceptions) throws Exception {
       IPath callerPath = new Path(path);
       IFile callerFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(callerPath);
       openPerspective("Java", bot);
@@ -153,13 +153,6 @@ public final class TestBreakpointsUtil {
       }
       return lineBreakpoints;
    }
-   
-   public static boolean checkProofContainsSomeBreakpoints(ISEDebugTarget target,
-         int numberOfLines, int numberOfExceptions, int numberOfMethods, int numberOfWatchpoints) {
-      KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-      IStopCondition stopCondition = keyTarget.getProof().getSettings().getStrategySettings().getCustomApplyStrategyStopCondition();
-      return checkListContainsSomeBreakpoints(getBreakpointStopConditions(stopCondition), numberOfLines, numberOfExceptions, numberOfMethods, numberOfWatchpoints);
-   }
 
    public static boolean checkTargetContainsSomeBreakpoints(ISEDebugTarget target,
          int numberOfLines, int numberOfExceptions, int numberOfMethods, int numberOfWatchpoints) {
@@ -199,13 +192,6 @@ public final class TestBreakpointsUtil {
       KeYDebugTarget keyTarget = (KeYDebugTarget)target;
       SymbolicExecutionBreakpointStopCondition stopCondition = keyTarget.getBreakpointStopCondition();
       return checkListHitCountOfAllBreakpoints(stopCondition.getBreakpoints(), hitCount);
-   }
-
-   public static boolean checkProofHitCountofAllBreakpoints(
-         ISEDebugTarget target, int hitCount) {
-      KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-      IStopCondition stopCondition = keyTarget.getProof().getSettings().getStrategySettings().getCustomApplyStrategyStopCondition();
-      return checkListHitCountOfAllBreakpoints(getBreakpointStopConditions(stopCondition), hitCount);
    }
 
    private static boolean checkListHitCountOfAllBreakpoints(
@@ -261,13 +247,6 @@ public final class TestBreakpointsUtil {
       return checkListEnabledOfAllBreakpoints(stopCondition.getBreakpoints(), enabled);
    }
 
-   public static boolean checkProofEnabledofAllBreakpoints(
-         ISEDebugTarget target, boolean enabled) {
-      KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-      IStopCondition stopCondition = keyTarget.getProof().getSettings().getStrategySettings().getCustomApplyStrategyStopCondition();
-      return checkListEnabledOfAllBreakpoints(getBreakpointStopConditions(stopCondition), enabled);
-   }
-
    private static boolean checkListEnabledOfAllBreakpoints(
          Set<de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint> list, boolean enabled) {
       for(de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint breakpoint : list){
@@ -320,13 +299,6 @@ public final class TestBreakpointsUtil {
       KeYDebugTarget keyTarget = (KeYDebugTarget)target;
       SymbolicExecutionBreakpointStopCondition stopCondition = keyTarget.getBreakpointStopCondition();
       return checkListConditionOfAllBreakpoints(stopCondition.getBreakpoints(), condition, enabled);
-   }
-
-   public static boolean checkProofConditionofAllBreakpoints(
-         ISEDebugTarget target, String condition, boolean enabled) {
-      KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-      IStopCondition stopCondition = keyTarget.getProof().getSettings().getStrategySettings().getCustomApplyStrategyStopCondition();
-      return checkListConditionOfAllBreakpoints(getBreakpointStopConditions(stopCondition), condition, enabled);
    }
 
    private static boolean checkListConditionOfAllBreakpoints(
@@ -421,13 +393,6 @@ public final class TestBreakpointsUtil {
       return checkListAccessAndModificationofAllBreakpoints(stopCondition.getBreakpoints(), numberOfAccesses, numberOfModifications);
    }
 
-   public static boolean checkProofAccessAndModificationofAllBreakpoints(
-         ISEDebugTarget target, int numberOfAccesses, int numberOfModifications) {
-      KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-      IStopCondition stopCondition = keyTarget.getProof().getSettings().getStrategySettings().getCustomApplyStrategyStopCondition();
-      return checkListAccessAndModificationofAllBreakpoints(getBreakpointStopConditions(stopCondition), numberOfAccesses, numberOfModifications);
-   }
-
    private static boolean checkListAccessAndModificationofAllBreakpoints(
          Set<de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint> list, int numberOfAccesses,
          int numberOfModifications) {
@@ -446,13 +411,6 @@ public final class TestBreakpointsUtil {
       }
       return numberOfAccesses==localNumberOfAccesses
             &&numberOfModifications==localNumberOfModifications;
-   }
-
-   public static boolean checkProofEntryAndExitofAllBreakpoints(
-         ISEDebugTarget target, int entries, int exits) {
-      KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-      IStopCondition stopCondition = keyTarget.getProof().getSettings().getStrategySettings().getCustomApplyStrategyStopCondition();
-      return checkListEntryAndExitofAllBreakpoints(getBreakpointStopConditions(stopCondition), entries, exits);
    }
 
    public static boolean checkTargetEntryAndExitofAllBreakpoints(
@@ -533,12 +491,5 @@ public final class TestBreakpointsUtil {
       return numberOfCaught==localNumberOfCaught
             &&numberOfUncaught==localNumberOfUncaught
             &&numberOfSubclass==localNumberOfSubclass;
-   }
-
-   public static boolean checkProofCaughtUncaughtSubclass(
-         ISEDebugTarget target, int numberOfCaught, int numberOfUncaught, int numberOfSubclass) {
-      KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-      IStopCondition stopCondition = keyTarget.getProof().getSettings().getStrategySettings().getCustomApplyStrategyStopCondition();
-      return checkListCaughtUncaughtSubclassofAllBreakpoints(getBreakpointStopConditions(stopCondition), numberOfCaught, numberOfUncaught, numberOfSubclass);
    }
 }

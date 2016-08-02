@@ -58,6 +58,15 @@ public abstract class AbstractExecutionBlockStartNode<S extends SourceElement> e
    }
    
    /**
+    * Removes the given block completion.
+    * @param completion The block completion to be removed.
+    * @author Anna Filighera
+    */
+   public void removeBlockCompletion(IExecutionNode<?> completion) {
+      blockCompletions = blockCompletions.removeAll(completion);
+   }
+   
+   /**
     * Registers the given {@link IExecutionNode}.
     * @param blockCompletion The {@link IExecutionNode} to register.
     */

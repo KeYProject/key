@@ -41,6 +41,7 @@ import org.key_project.sed.core.model.memory.SEMemoryLoopCondition;
 import org.key_project.sed.core.model.memory.SEMemoryLoopStatement;
 import org.key_project.sed.core.model.memory.SEMemoryMethodCall;
 import org.key_project.sed.core.model.memory.SEMemoryMethodReturn;
+import org.key_project.sed.core.model.memory.SEMemoryNodeLink;
 import org.key_project.sed.core.model.memory.SEMemoryStatement;
 import org.key_project.sed.core.model.memory.SEMemoryTermination;
 import org.key_project.sed.core.model.memory.SEMemoryThread;
@@ -182,6 +183,13 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        bnotzero.setName("z != 0");
        bnotzero.setPathCondition("pc10");
        s3.addChild(bnotzero);
+       
+       SEMemoryNodeLink zBranchLink = new SEMemoryNodeLink(target);
+       zBranchLink.setName("z branch conditions");
+       zBranchLink.setSource(bzero);
+       zBranchLink.setTarget(bnotzero);
+       bzero.addOutgoingLink(zBranchLink);       
+       bnotzero.addIncomingLink(zBranchLink);
 
        SEMemoryMethodCall call = new SEMemoryMethodCall(target, bnotzero, thread);
        call.setName("foo(result)");

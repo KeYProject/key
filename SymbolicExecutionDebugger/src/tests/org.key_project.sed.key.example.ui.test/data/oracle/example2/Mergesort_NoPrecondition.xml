@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_ac0b64eb-d766-4584-87a5-c7b0d5e7902e" name="sort(int[])" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_943d0e3b-ce3e-484b-927a-3e3d27a0e0cf" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSEDExampleNewWizardTest_testExample2_noPrecondition\src\example2\Mergesort.java">
+         <sedMethodCall xml:id="_93a5993a-2429-4a7c-b310-0eefdbdf42d5" name="&lt;call example2.Mergesort.sort(intArr)&gt;" pathCondition="true" lineNumber="-1" charStart="2447" charEnd="2451" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSEDExampleNewWizardTest_testExample2_noPrecondition\src\example2\Mergesort.java" groupable="true">
+            <sedStatement xml:id="_79346730-e9e2-47a9-b590-c79376186032" name="sortRange(intArr,0,intArr.length-1);" pathCondition="true" lineNumber="-1" charStart="2474" charEnd="2514" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSEDExampleNewWizardTest_testExample2_noPrecondition\src\example2\Mergesort.java">
+               <sedBranchCondition xml:id="_8c8f9d0b-7a98-4009-a070-77c595161253" name="not(equals(intArr,null))" pathCondition="not(equals(intArr,null))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSEDExampleNewWizardTest_testExample2_noPrecondition\src\example2\Mergesort.java">
+                  <sedMethodCall xml:id="_de023191-d994-435e-8c82-ce00827d700d" name="&lt;call example2.Mergesort.sortRange(intArr_1,l,r)&gt;" pathCondition="not(equals(intArr,null))" lineNumber="-1" charStart="2543" charEnd="2552" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSEDExampleNewWizardTest_testExample2_noPrecondition\src\example2\Mergesort.java" groupable="true">
+                  </sedMethodCall>
+               </sedBranchCondition>
+               <sedBranchCondition xml:id="_0ce775aa-36cd-49db-b994-30f6560edb42" name="equals(intArr,null)" pathCondition="equals(intArr,null)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSEDExampleNewWizardTest_testExample2_noPrecondition\src\example2\Mergesort.java">
+                  <sedExceptionalMethodReturn xml:id="_0c2ede41-129c-4f81-9236-ea43f3937e0f" name="&lt;exceptional return of &lt;call example2.Mergesort.sort(intArr)&gt;&gt;" pathCondition="equals(intArr,null)" lineNumber="-1" charStart="2447" charEnd="2451" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSEDExampleNewWizardTest_testExample2_noPrecondition\src\example2\Mergesort.java" methodReturnConditionRef="_8a1c4f89-ca1c-403b-9478-da6302fcf552">
+                     <sedGroupEndConditionReference nodeIdRef="_8a1c4f89-ca1c-403b-9478-da6302fcf552"/>
+                  </sedExceptionalMethodReturn>
+               </sedBranchCondition>
+            </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_8a1c4f89-ca1c-403b-9478-da6302fcf552" name="equals(intArr,null)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSEDExampleNewWizardTest_testExample2_noPrecondition\src\example2\Mergesort.java">
+               <sedChildReference nodeIdRef="_0c2ede41-129c-4f81-9236-ea43f3937e0f"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_8a1c4f89-ca1c-403b-9478-da6302fcf552" name="equals(intArr,null)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSEDExampleNewWizardTest_testExample2_noPrecondition\src\example2\Mergesort.java">
+               <sedChildReference nodeIdRef="_0c2ede41-129c-4f81-9236-ea43f3937e0f"/>
+            </sedGroupEndCondition>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

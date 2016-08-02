@@ -3,8 +3,10 @@ package de.uka.ilkd.key.control;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -139,8 +141,25 @@ public interface ProofControl {
     * in this user interface and blocks the current thread until it
     * has finished.
     * @param proof The {@link Proof} to start auto mode and to wait for.
+    * @param goals The {@link Goal}s to close.
+    */
+   void startAndWaitForAutoMode(Proof proof, ImmutableList<Goal> goals);
+   
+   /**
+    * Starts the auto mode for the given proof which must be contained
+    * in this user interface and blocks the current thread until it
+    * has finished.
+    * @param proof The {@link Proof} to start auto mode and to wait for.
     */
    void startAndWaitForAutoMode(Proof proof);
    
    public void startFocussedAutoMode(PosInOccurrence focus, Goal goal);
+   
+   /**
+    * Runs the given {@link ProofMacro} at the given {@link PosInOccurrence} on the given {@link Node}.
+    * @param node The {@link Node} to start macro at.
+    * @param macro The {@link ProofMacro} to execute.
+    * @param posInOcc The exact {@link PosInOccurrence} at which the {@link ProofMacro} is started at.
+    */
+   public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc);
 }

@@ -83,14 +83,14 @@ public class NodeReplacement {
         it2 = p_sci.modifiedFormulas ( true ).iterator ();
         while ( it2.hasNext () )
             addRemovedChange ( it2.next ().getPositionOfModification ()
-                    .constrainedFormula (),
+                    .sequentFormula (),
                     true );
 
         // Information about modified formulas is currently not used
         it2 = p_sci.modifiedFormulas ( false ).iterator ();
         while ( it2.hasNext () )
             addRemovedChange ( it2.next ().getPositionOfModification ()
-                    .constrainedFormula (),
+                    .sequentFormula (),
                     false );
 
         it = p_sci.addedFormulas ( true ).iterator ();
@@ -199,7 +199,7 @@ public class NodeReplacement {
 	    if ( oldNC instanceof NodeChangeARFormula ) {
 		oldPio = ((NodeChangeARFormula)oldNC).getPos ();
 		if ( oldPio.isInAntec () == p_inAntec &&
-		     oldPio.constrainedFormula ().equals ( p_cf ) )
+		     oldPio.sequentFormula ().equals ( p_cf ) )
 		    continue;
 	    }
 	    

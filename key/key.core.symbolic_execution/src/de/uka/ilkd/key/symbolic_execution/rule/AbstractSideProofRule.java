@@ -117,7 +117,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
    protected static SequentFormula replace(PosInOccurrence pio, Term newTerm, Services services) {
       // Iterate along the PosInOccurrence and collect the parents and indices
       Deque<Pair<Integer, Term>> indexAndParents = new LinkedList<Pair<Integer, Term>>();
-      Term root = pio.constrainedFormula().formula();
+      Term root = pio.sequentFormula().formula();
       final PosInTerm pit = pio.posInTerm();
       for (int i = 0, sz=pit.depth(); i<sz; i++) { 
          int next = pit.getIndexAt(i);

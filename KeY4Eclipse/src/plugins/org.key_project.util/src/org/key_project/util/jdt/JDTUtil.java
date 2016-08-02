@@ -960,7 +960,7 @@ public class JDTUtil {
                            boolean parametersMatches = true;
                            int i = 0;
                            while (parametersMatches && i < parameters.length) {
-                              String resolvedType = JavaModelUtil.getResolvedTypeName(parameters[i], jdtType);
+                              String resolvedType = resolveTypeSignature(parameters[i], jdtType);
                               if (!ObjectUtil.equals(resolvedType, parameterTypes[i])) {
                                  parametersMatches = false;
                               }
@@ -989,6 +989,24 @@ public class JDTUtil {
       catch (RuntimeException e) {
          throw (JavaModelException)e.getCause();
       }
+   }
+   
+   /**
+    * Resolves the given type signature.
+    * @param refTypeSig The type signature to resolve.
+    * @param declaringType The declaring {@link IType}.
+    * @return The full qualified name of the type signature.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static String resolveTypeSignature(String refTypeSig, IType declaringType) throws JavaModelException {
+      String type = JavaModelUtil.getResolvedTypeName(refTypeSig, declaringType);
+      int arrayCount = Signature.getArrayCount(refTypeSig);
+      StringBuffer sb = new StringBuffer();
+      sb.append(type);
+      for (int i = 0; i < arrayCount; i++) {
+         sb.append("[]");
+      }
+      return sb.toString();
    }
 
    /**
@@ -1118,7 +1136,7 @@ public class JDTUtil {
          ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
          parser.setResolveBindings(true);
          parser.setSource(compilationUnit);
-         Map<?, ?> options = JavaCore.getOptions();
+         Map<String, String> options = JavaCore.getOptions(); // Map<String, String> is needed for Eclipse 4.6 Neon compatibility
          JavaCore.setComplianceOptions(JavaModelUtil.VERSION_LATEST, options);
          parser.setCompilerOptions(options);
          ASTNode result = parser.createAST(null);
@@ -1139,7 +1157,7 @@ public class JDTUtil {
          ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
          parser.setResolveBindings(true);
          parser.setSource(classFile);
-         Map<?, ?> options = JavaCore.getOptions();
+         Map<String, String> options = JavaCore.getOptions(); // Map<String, String> is needed for Eclipse 4.6 Neon compatibility
          JavaCore.setComplianceOptions(JavaModelUtil.VERSION_LATEST, options);
          parser.setCompilerOptions(options);
          ASTNode result = parser.createAST(null);
@@ -1181,7 +1199,7 @@ public class JDTUtil {
          parser.setKind(kind);
          parser.setResolveBindings(true);
          parser.setSource(content.toCharArray());
-         Map<?, ?> options = JavaCore.getOptions();
+         Map<String, String> options = JavaCore.getOptions(); // Map<String, String> is needed for Eclipse 4.6 Neon compatibility
          JavaCore.setComplianceOptions(JavaModelUtil.VERSION_LATEST, options);
          parser.setCompilerOptions(options);
          ASTNode result = parser.createAST(null);

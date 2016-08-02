@@ -22,6 +22,7 @@ public interface ISESlicer {
     * Performs the slicing.
     * @param seedNode The seed {@link ISENode}.
     * @param seedVariable The seed {@link IVariable}.
+    * @param settings The additional settings if available or {@code null} otherwise.
     * @param appearance An optional {@link ISEAnnotationAppearance} specific how the created {@link SliceAnnotation} should look like.
     * @param monitor The {@link IProgressMonitor} to use.
     * @return The {@link SliceAnnotation} representing the computed slice.
@@ -29,6 +30,7 @@ public interface ISESlicer {
     */
    public SliceAnnotation slice(ISENode seedNode, 
                                 IVariable seedVariable, 
+                                Object settings,
                                 ISEAnnotationAppearance appearance,
                                 IProgressMonitor monitor) throws DebugException;
 }

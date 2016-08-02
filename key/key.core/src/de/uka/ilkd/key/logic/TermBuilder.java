@@ -31,6 +31,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -910,14 +911,16 @@ public class TermBuilder {
                                 "It seems that there are definitions missing from the .key files.");
         return func(f, mby);
     }
-
+    public Function getMeasuredByEmpty(){
+       final Namespace funcNS = services.getNamespaces().functions();
+       final Function f = (Function)funcNS.lookup(new Name("measuredByEmpty"));
+       if (f == null)
+               throw new RuntimeException("LDT: Function measuredByEmpty not found.\n" +
+                               "It seems that there are definitions missing from the .key files.");
+       return f;
+    }
     public Term measuredByEmpty() {
-        final Namespace funcNS = services.getNamespaces().functions();
-        final Function f = (Function)funcNS.lookup(new Name("measuredByEmpty"));
-        if (f == null)
-                throw new RuntimeException("LDT: Function measuredByEmpty not found.\n" +
-                                "It seems that there are definitions missing from the .key files.");
-        return func(f);
+        return func(getMeasuredByEmpty());
     }
 
     /**
@@ -1292,7 +1295,7 @@ public class TermBuilder {
      * @param number an integer
      * @return Term in Z-Notation representing the given number
      */
-    public Term zTerm(int number) {
+    public Term zTerm(long number) {
         return zTerm(""+number);
     }
 
@@ -1607,8 +1610,7 @@ public class TermBuilder {
     }
 
     public Term wellFormed(Term heap) {
-        return func(services.getTypeConverter().getHeapLDT().getWellFormed(heap.sort()),
-                heap);
+        return func(services.getTypeConverter().getHeapLDT().getWellFormed(), heap);
     }
 
     public Term wellFormed(LocationVariable heap) {
@@ -1921,7 +1923,7 @@ public class TermBuilder {
         final Sort s = t.sort() instanceof ProgramSVSort ? kjt.getSort() : t.sort();
         final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
-        if(s.extendsTrans(services.getJavaInfo().objectSort())) {
+        if (s.extendsTrans(services.getJavaInfo().objectSort())) {
             return orSC(equals(t, NULL()), created(h, t));
         } else if(s.equals(setLDT.targetSort())) {
             return createdInHeap(t, h);
@@ -2217,13 +2219,9 @@ public class TermBuilder {
     * @return The created {@link Term}.
     */
    public Term impPreserveLabels(Term t1, Term t2) {
-      if (t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
-         if (!t1.hasLabels()) {
-            return t2;
-         }
-         else {
-            return tf.createTerm(Junctor.IMP, t1, t2);
-         }
+      if ((t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) &&
+          (!t1.hasLabels() && !t2.hasLabels())) {
+         return tt();
       }
       else if (t1.op() == Junctor.TRUE && !t1.hasLabels()) {
          return t2;
@@ -2279,16 +2277,9 @@ public class TermBuilder {
     * @return The created {@link Term}.
     */
    public Term andPreserveLabels(Term t1, Term t2) {
-      if (t1.op() == Junctor.FALSE || t2.op() == Junctor.FALSE) {
-         if (!t1.hasLabels() && !t2.hasLabels()) {
-            return ff();
-         }
-         else if (!t1.hasLabels()) {
-            return t2;
-         }
-         else {
-            return t1;
-         }
+      if ((t1.op() == Junctor.FALSE || t2.op() == Junctor.FALSE) &&
+          (!t1.hasLabels() && !t2.hasLabels())) {
+         return ff();
       }
       else if (t1.op() == Junctor.TRUE && !t1.hasLabels()) {
          return t2;
@@ -2323,16 +2314,9 @@ public class TermBuilder {
     * @return The created {@link Term}.
     */
    public Term orPreserveLabels(Term t1, Term t2) {
-      if (t1.op() == Junctor.TRUE || t2.op() == Junctor.TRUE) {
-         if (!t1.hasLabels() && !t2.hasLabels()) {
-            return tt();
-         }
-         else if (!t1.hasLabels()) {
-            return t2;
-         }
-         else {
-            return t1;
-         }
+      if ((t1.op() == Junctor.TRUE || t2.op() == Junctor.TRUE) &&
+          (!t1.hasLabels() && !t2.hasLabels())) {
+         return tt();
       }
       else if (t1.op() == Junctor.FALSE && !t1.hasLabels()) {
          return t2;

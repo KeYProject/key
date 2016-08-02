@@ -193,12 +193,6 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
    private Set<ExtractLocationParameter> currentLocations;
    
    /**
-    * The term with the result predicate used to compute the values of locations
-    * shown in a current memory layout.
-    */
-   private Term currentLocationTerm;
-   
-   /**
     * Contains the initial memory layouts accessible via {@link #getInitialLayout(int)}.
     */
    private Map<Integer, ISymbolicLayout> initialLayouts;
@@ -207,12 +201,6 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * The {@link ExtractLocationParameter} instances used to compute an initial memory layout.
     */
    private Set<ExtractLocationParameter> initialLocations;
-   
-   /**
-    * The term with the result predicate used to compute the values of locations
-    * shown in an initial memory layout.
-    */
-   private Term initialLocationTerm;
    
    /**
     * Contains the equivalent classes accessible via {@link #getEquivalenceClasses(int)}.
@@ -300,9 +288,6 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                                                    StrategyProperties.SPLITTING_NORMAL);
                // Compute the available instance memory layout via the opened goals of the equivalent proof.
                appliedCutsPerLayout = extractAppliedCutsFromGoals(equivalentClassesProofStarter.getProof());
-               // Create predicate required for state computation
-               initialLocationTerm = createLocationPredicateAndTerm(initialLocations);
-               currentLocationTerm = createLocationPredicateAndTerm(currentLocations);
                // Create memory layout maps which are filled lazily
                initialLayouts = new LinkedHashMap<Integer, ISymbolicLayout>(appliedCutsPerLayout.size());
                currentLayouts = new LinkedHashMap<Integer, ISymbolicLayout>(appliedCutsPerLayout.size());
@@ -531,7 +516,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * @throws ProofInputException Occurred Exception
     */
    public ISymbolicLayout getInitialLayout(int layoutIndex) throws ProofInputException {
-      return getLayout(initialLayouts, layoutIndex, initialLocationTerm, initialLocations, computeInitialStateName(), false);
+      return getLayout(initialLayouts, layoutIndex, initialLocations, computeInitialStateName(), false);
    }
 
    /**
@@ -554,7 +539,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * @throws ProofInputException Occurred Exception
     */
    public ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException {
-      return getLayout(currentLayouts, layoutIndex, currentLocationTerm, currentLocations, computeCurrentStateName(), true);
+      return getLayout(currentLayouts, layoutIndex, currentLocations, computeCurrentStateName(), true);
    }
    
    /**
@@ -570,7 +555,6 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * {@link #getCurrentLayout(int)} to lazily compute and get a memory layout.
     * @param confiurationsMap The map which contains already computed memory layouts.
     * @param layoutIndex The index of the memory layout to lazily compute and return.
-    * @param layoutTerm The result term to use in side proof.
     * @param locations The locations to compute in side proof.
     * @param stateName The name of the state.
     * @param currentLayout {@code true} current layout, {@code false} initial layout.
@@ -579,7 +563,6 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     */
    protected ISymbolicLayout getLayout(Map<Integer, ISymbolicLayout> confiurationsMap, 
                                        int layoutIndex,
-                                       Term layoutTerm,
                                        Set<ExtractLocationParameter> locations,
                                        String stateName,
                                        boolean currentLayout) throws ProofInputException {
@@ -592,7 +575,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             // Get memory layout
             ImmutableSet<Term> layout = appliedCutsPerLayout.get(layoutIndex);
             ImmutableList<ISymbolicEquivalenceClass> equivalentClasses = getEquivalenceClasses(layoutIndex);
-            result = lazyComputeLayout(layout, layoutTerm, locations, equivalentClasses, stateName, currentLayout);
+            result = lazyComputeLayout(layout, locations, equivalentClasses, stateName, currentLayout);
             confiurationsMap.put(Integer.valueOf(layoutIndex), result);
          }
          return result;
@@ -609,7 +592,6 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * and to fill it with the values/associations defined by {@link ExecutionVariableValuePair} instances.
     * </p>
     * @param layout The memory layout terms.
-    * @param layoutTerm The result term to use in side proof.
     * @param locations The locations to compute in side proof.
     * @param equivalentClasses The equivalence classes defined by the memory layout terms.
     * @param stateName The name of the state.
@@ -618,7 +600,6 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * @throws ProofInputException Occurred Exception.
     */
    protected ISymbolicLayout lazyComputeLayout(ImmutableSet<Term> layout, 
-                                               Term layoutTerm,
                                                Set<ExtractLocationParameter> locations,
                                                ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
                                                String stateName,
@@ -630,12 +611,37 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             updateConditions.add(tb.applyParallel(updates, term));
          }
          Term layoutCondition = tb.and(updateConditions);
-         Set<ExecutionVariableValuePair> pairs = computeVariableValuePairs(layoutCondition, layoutTerm, locations, currentLayout, settings.isSimplifyConditions());
+         Set<ExtractLocationParameter> locationsAccordingToEquivalentClass = updateLocationsAccordingtoEquivalentClass(locations, equivalentClasses);
+         Term layoutTerm = createLocationPredicateAndTerm(locationsAccordingToEquivalentClass);
+         Set<ExecutionVariableValuePair> pairs = computeVariableValuePairs(layoutCondition, layoutTerm, locationsAccordingToEquivalentClass, currentLayout, settings.isSimplifyConditions());
          return createLayoutFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
       }
       else {
          return createLayoutFromExecutionVariableValuePairs(equivalentClasses, new LinkedHashSet<ExecutionVariableValuePair>(), stateName);
       }
+   }
+
+   /**
+    * Replaces the parent of each {@link ExtractLocationParameter} according 
+    * to the {@link ISymbolicEquivalenceClass}es, because there is no guarantee
+    * that the strategy evaluates each aliased location to the same symbolic value.
+    * @param locations The available {@link ExtractLocationParameter}s.
+    * @param equivalentClasses The available {@link ISymbolicEquivalenceClass}es.
+    * @return The updated {@link ExtractLocationParameter}s.
+    */
+   protected Set<ExtractLocationParameter> updateLocationsAccordingtoEquivalentClass(Set<ExtractLocationParameter> locations, ImmutableList<ISymbolicEquivalenceClass> equivalentClasses) {
+      Set<ExtractLocationParameter> newLocations = new LinkedHashSet<ExtractLocationParameter>(locations.size());
+      for (ExtractLocationParameter location : locations) {
+         Term parent = location.getParentTerm();
+         ISymbolicEquivalenceClass eq = findEquivalentClass(equivalentClasses, parent);
+         if (eq != null) {
+            newLocations.add(new ExtractLocationParameter(location, eq.getRepresentative()));
+         }
+         else {
+            newLocations.add(location);
+         }
+      }
+      return newLocations;
    }
 
    /**

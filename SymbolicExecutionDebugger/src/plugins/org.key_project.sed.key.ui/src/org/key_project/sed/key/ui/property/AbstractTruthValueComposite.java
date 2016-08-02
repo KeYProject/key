@@ -15,17 +15,27 @@ package org.key_project.sed.key.ui.property;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -34,17 +44,30 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
-import org.key_project.key4eclipse.common.ui.decorator.TruthValueEvaluationViewerDecorator;
+import org.key_project.key4eclipse.common.ui.decorator.TruthValueTracingViewerDecorator;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.sed.key.core.model.IKeYSENode;
+import org.key_project.sed.key.core.model.KeYBlockContractExceptionalTermination;
+import org.key_project.sed.key.core.model.KeYBlockContractTermination;
+import org.key_project.sed.key.core.model.KeYDebugTarget;
+import org.key_project.sed.key.core.util.KeYSEDPreferences;
+import org.key_project.sed.key.ui.preference.page.KeYColorsPreferencePage;
+import org.key_project.sed.key.ui.view.ProofView;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
+import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 
+import de.uka.ilkd.key.control.AutoModeListener;
+import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -52,19 +75,25 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.BranchResult;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValue;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValueEvaluationResult;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.BranchResult;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.MultiEvaluationResult;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValueTracingResult;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * This composite provides the content shown in {@link AbstractTruthValuePropertySection}
@@ -98,29 +127,122 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    private final List<Control> controls = new LinkedList<Control>();
    
    /**
-    * The used {@link TruthValueEvaluationViewerDecorator}s.
+    * The used {@link TruthValueTracingViewerDecorator}s.
     */
-   private final List<TruthValueEvaluationViewerDecorator> decorators = new LinkedList<TruthValueEvaluationViewerDecorator>();
+   private final List<TruthValueTracingViewerDecorator> decorators = new LinkedList<TruthValueTracingViewerDecorator>();
 
    /**
     * The {@link Color} to highlight {@link TruthValue#TRUE}.
     */
-   private final Color trueColor;
+   private Color trueColor;
 
    /**
     * The {@link Color} to highlight {@link TruthValue#FALSE}.
     */
-   private final Color falseColor;
+   private Color falseColor;
 
    /**
     * The {@link Color} to highlight {@link TruthValue#UNKNOWN} or {@code null}.
     */
-   private final Color unknownColor;
+   private Color unknownColor;
    
    /**
     * The currently shown {@link IKeYSENode}.
     */
    private IKeYSENode<?> currentNode;
+   
+   /**
+    * The currently observed proof.
+    */
+   private Proof proof;
+
+   /**
+    * Listens for changes on {@link #proof}.
+    */
+   private final ProofTreeListener proofTreeListener = new ProofTreeListener() {
+      @Override
+      public void smtDataUpdate(ProofTreeEvent e) {
+      }
+      
+      @Override
+      public void proofStructureChanged(ProofTreeEvent e) {
+         handleProofStructureChanged(e);
+      }
+      
+      @Override
+      public void proofPruned(ProofTreeEvent e) {
+         handleProofPruned(e);
+      }
+      
+      @Override
+      public void proofIsBeingPruned(ProofTreeEvent e) {
+      }
+      
+      @Override
+      public void proofGoalsChanged(ProofTreeEvent e) {
+         handleProofGoalsChanged(e);
+      }
+      
+      @Override
+      public void proofGoalsAdded(ProofTreeEvent e) {
+         handleProofGoalsAdded(e);
+      }
+      
+      @Override
+      public void proofGoalRemoved(ProofTreeEvent e) {
+         handleProofGoalRemoved(e);
+      }
+      
+      @Override
+      public void proofExpanded(ProofTreeEvent e) {
+         handleProofExpanded(e);
+      }
+      
+      @Override
+      public void proofClosed(ProofTreeEvent e) {
+         handleProofClosed(e);
+      }
+   };
+
+   /**
+    * The currently observed {@link ProofControl}.
+    */
+   private ProofControl proofControl;
+
+   /**
+    * Listens for changes on {@link #proofControl}.
+    */
+   private final AutoModeListener autoModeListener = new AutoModeListener() {
+      @Override
+      public void autoModeStopped(ProofEvent e) {
+         handleAutoModeStopped(e);
+      }
+      
+      @Override
+      public void autoModeStarted(ProofEvent e) {
+         handleAutoModeStarted(e);
+      }
+   };
+   
+   /**
+    * Listens for color changes
+    */
+   private final IPropertyChangeListener colorPropertyListener = new IPropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent event) {
+         handleColorPropertyChange(event);
+      }
+   };
+   
+   /**
+    * Listens for editor changes.
+    */
+   private IPropertyChangeListener editorsListener = new IPropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent event) {
+         handleEditorPropertyChange(event);
+      }
+   };
    
    /**
     * Constructor.
@@ -133,9 +255,37 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
       this.layoutListener = layoutListener;
       root = factory.createFlatFormComposite(parent);
       root.setLayout(new GridLayout(1, false));
-      trueColor = new Color(parent.getDisplay(), TruthValueEvaluationViewerDecorator.trueRGB);
-      falseColor = new Color(parent.getDisplay(), TruthValueEvaluationViewerDecorator.falseRGB);
-      unknownColor = new Color(parent.getDisplay(), TruthValueEvaluationViewerDecorator.unknownRGB);
+      updateColors();
+      KeYSEDPreferences.getStore().addPropertyChangeListener(colorPropertyListener);
+      SWTUtil.getEditorsPreferenceStore().addPropertyChangeListener(editorsListener);
+      JFaceResources.getFontRegistry().addListener(editorsListener);
+   }
+
+   protected void handleColorPropertyChange(PropertyChangeEvent event) {
+      if (KeYSEDPreferences.TRUTH_VALUE_TRACING_TRUE.equals(event.getProperty())
+          || KeYSEDPreferences.TRUTH_VALUE_TRACING_FALSE.equals(event.getProperty())
+          || KeYSEDPreferences.TRUTH_VALUE_TRACING_UNKNOWN.equals(event.getProperty())) {
+         updateColors();
+         recreateContent();
+      }
+   }
+   
+   /**
+    * Updates the used colors.
+    */
+   protected void updateColors() {
+      if (trueColor != null) {
+         trueColor.dispose();
+      }
+      trueColor = new Color(root.getDisplay(), KeYSEDPreferences.getTruthValueTracingTrue());
+      if (falseColor != null) {
+         falseColor.dispose();
+      }
+      falseColor = new Color(root.getDisplay(), KeYSEDPreferences.getTruthValueTracingFalse());
+      if (unknownColor != null) {
+         unknownColor.dispose();
+      }
+      unknownColor = new Color(root.getDisplay(), KeYSEDPreferences.getTruthValueTracingUnknown());
    }
 
    /**
@@ -143,6 +293,17 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     */
    @Override
    public void dispose() {
+      if (proofControl != null) {
+         proofControl.removeAutoModeListener(autoModeListener);
+         proofControl = null;
+      }
+      if (proof != null) {
+         proof.removeProofTreeListener(proofTreeListener);
+         proof = null;
+      }
+      KeYSEDPreferences.getStore().removePropertyChangeListener(colorPropertyListener);
+      SWTUtil.getEditorsPreferenceStore().removePropertyChangeListener(editorsListener);
+      JFaceResources.getFontRegistry().removeListener(editorsListener);
       if (trueColor != null) {
          trueColor.dispose();
       }
@@ -153,6 +314,12 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
          unknownColor.dispose();
       }
    }
+
+   protected void handleEditorPropertyChange(PropertyChangeEvent event) {
+      if (event.getProperty().equals(SWTUtil.getEditorsTextFontPropertiesKey())) {
+         recreateContent();
+      }
+   }
    
    /**
     * Updates the shown content.
@@ -160,27 +327,152 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     */
    public void updateContent(final IKeYSENode<?> node) {
       if (!ObjectUtil.equals(currentNode, node)) {
+         // Remove old listener
+         if (proofControl != null) {
+            proofControl.removeAutoModeListener(autoModeListener);
+            proofControl = null;
+         }
+         if (proof != null) {
+            proof.removeProofTreeListener(proofTreeListener);
+            proof = null;
+         }
+         // Change node
          currentNode = node;
-         showEvaluatingInformation();
-         AbstractDependingOnObjectsJob.cancelJobs(this);
-         Job job = new AbstractDependingOnObjectsJob("Evaluating postconditions", this, PlatformUI.getWorkbench()) {
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-               try {
-                  computeAndAddNewContent(node);
-                  return Status.OK_STATUS;
-               }
-               catch (OperationCanceledException e) {
-                  return Status.CANCEL_STATUS;
-               }
-               catch (Exception e) {
-                  return LogUtil.getLogger().createErrorStatus(e);
+         // Add new listener
+         if (node != null) {
+            proof = node.getExecutionNode().getProof();
+            if (proof != null) {
+               proof.addProofTreeListener(proofTreeListener);
+            }
+            KeYDebugTarget debugTarget = node.getDebugTarget();
+            if (debugTarget != null) {
+               proofControl = debugTarget.getEnvironment().getProofControl();
+               if (proofControl != null) {
+                  proofControl.addAutoModeListener(autoModeListener);
                }
             }
-         };
-         job.setSystem(true);
-         job.schedule();
+         }
+         // Update shown content
+         recreateContent();
       }
+   }
+
+   /**
+    * When the auto mode has started.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleAutoModeStarted(ProofEvent e) {
+      if (proof != null) {
+         proof.removeProofTreeListener(proofTreeListener);
+      }
+   }
+
+   /**
+    * When the auto mode has stopped.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleAutoModeStopped(ProofEvent e) {
+      if (proof != null) {
+         proof.addProofTreeListener(proofTreeListener);
+      }
+      recreateContentThreadSave();
+   }
+
+   /**
+    * When the {@link Proof} was expanded.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleProofExpanded(ProofTreeEvent e) {
+      recreateContentThreadSave();
+   }
+
+   /**
+    * When the {@link Proof} was pruned.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleProofPruned(ProofTreeEvent e) {
+      recreateContentThreadSave();
+   }
+
+   /**
+    * When the {@link Proof} structure has changed.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleProofStructureChanged(ProofTreeEvent e) {
+      recreateContentThreadSave();
+   }
+
+   /**
+    * When the {@link Proof} {@link Goal}s have changed.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleProofGoalsChanged(ProofTreeEvent e) {
+      recreateContentThreadSave();
+   }
+
+   /**
+    * When the {@link Proof} {@link Goal}s were added.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleProofGoalsAdded(ProofTreeEvent e) {
+      recreateContentThreadSave();
+   }
+
+   /**
+    * When a {@link Proof} {@link Goal} was removed.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleProofGoalRemoved(ProofTreeEvent e) {
+      recreateContentThreadSave();
+   }
+
+   /**
+    * When the {@link Proof} was closed.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleProofClosed(ProofTreeEvent e) {
+      recreateContentThreadSave();
+   }
+
+   /**
+    * Recreates the shown content thread save.
+    */
+   protected void recreateContentThreadSave() {
+      if (!root.isDisposed()) {
+         root.getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               if (!root.isDisposed()) {
+                  recreateContent();
+               }
+            }
+         });
+      }
+   }
+
+   /**
+    * Recreates the shown content.
+    */
+   protected void recreateContent() {
+      showEvaluatingInformation();
+      AbstractDependingOnObjectsJob.cancelJobs(this);
+      Job job = new AbstractDependingOnObjectsJob("Evaluating postconditions", this, PlatformUI.getWorkbench()) {
+         @Override
+         protected IStatus run(IProgressMonitor monitor) {
+            try {
+               computeAndAddNewContent(currentNode);
+               return Status.OK_STATUS;
+            }
+            catch (OperationCanceledException e) {
+               return Status.CANCEL_STATUS;
+            }
+            catch (Exception e) {
+               return LogUtil.getLogger().createErrorStatus(e);
+            }
+         }
+      };
+      job.setSystem(true);
+      job.schedule();
    }
 
    /**
@@ -218,19 +510,19 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
             // Get required information
             final IExecutionNode<?> executionNode = node.getExecutionNode();
             final Node keyNode = computeNodeToShow(node, executionNode);
-            final Pair<Term, Term> pair = computeTermToShow(node, executionNode, keyNode);
+            final Triple<Term, PosInTerm, Term> triple = computeTermToShow(node, executionNode, keyNode);
             // Compute result
             ITreeSettings settings = node.getExecutionNode().getSettings();
-            final TruthValueEvaluationResult result = TruthValueEvaluationUtil.evaluate(keyNode, 
-                                                                                        FormulaTermLabel.NAME,
-                                                                                        settings.isUseUnicode(),
-                                                                                        settings.isUsePrettyPrinting());
+            final TruthValueTracingResult result = TruthValueTracingUtil.evaluate(keyNode, 
+                                                                                  FormulaTermLabel.NAME,
+                                                                                  settings.isUseUnicode(),
+                                                                                  settings.isUsePrettyPrinting());
             if (!root.isDisposed()) {
                root.getDisplay().syncExec(new Runnable() {
                   @Override
                   public void run() {
                      if (!root.isDisposed()) {
-                        addNewContent(result, pair.first, pair.second, executionNode);
+                        addNewContent(result, triple.first, triple.second, triple.third, executionNode);
                      }
                   }
                });
@@ -278,26 +570,28 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    }
    
    /**
-    * Computes the {@link Sequent} to show.
+    * Computes the {@link Term} to show.
     * @param node The {@link IKeYSENode}.
     * @param executionNode The {@link IExecutionNode}.
     * @param keyNode The {@link Node}.
-    * @return The {@link Sequent} to show and optionally the uninterpreted predicate.
+    * @return The {@link Term} to show and optionally the {@link PosInTerm} of the uninterpreted predicate and the base of the {@link PosInTerm}.
     */
-   protected abstract Pair<Term, Term> computeTermToShow(IKeYSENode<?> node, 
-                                                         IExecutionNode<?> executionNode, 
-                                                         Node keyNode);
+   protected abstract Triple<Term, PosInTerm, Term> computeTermToShow(IKeYSENode<?> node, 
+                                                                      IExecutionNode<?> executionNode, 
+                                                                      Node keyNode);
 
    /**
     * Shows the given content.
-    * @param result The {@link TruthValueEvaluationResult} to consider.
+    * @param result The {@link TruthValueTracingResult} to consider.
     * @param succedent The {@link Term} to show as succedent.
-    * @param uninterpretedPredicate The optional {@link Term} with the uninterpreted predicate offering the {@link FormulaTermLabel}.
+    * @param uninterpretedPredicatePosition The optional {@link PosInTerm} with the uninterpreted predicate.
+    * @param uninterpretedPredicateGroundTerm The {@link Term} in which the {@link PosInTerm} is evaluated in.
     * @param node The {@link IKeYSENode} which provides the new content.
     */
-   protected void addNewContent(TruthValueEvaluationResult result,
+   protected void addNewContent(TruthValueTracingResult result,
                                 Term succedent,
-                                Term uninterpretedPredicate,
+                                PosInTerm uninterpretedPredicatePosition,
+                                Term uninterpretedPredicateGroundTerm,
                                 IExecutionNode<?> executionNode) {
       removeOldContent();
       BranchResult[] branchResults = result.getBranchResults();
@@ -318,18 +612,63 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
          }
       });
       Color notConsideredColor = null;
-      for (BranchResult branchResult : branchResults) {
-         if (shouldShowBranchResult(branchResult, uninterpretedPredicate)) {
+      for (final BranchResult branchResult : branchResults) {
+         if (shouldShowBranchResult(branchResult, uninterpretedPredicatePosition, uninterpretedPredicateGroundTerm)) {
+            // Remove uninterpreted predicate from expressions. Currently, only the AND operator is supported and should be needed.
+            if (uninterpretedPredicatePosition != null) {
+               PosInTerm currentPosition = uninterpretedPredicatePosition;
+               final Term uninterpretedPredicate = currentPosition.getSubTerm(uninterpretedPredicateGroundTerm);
+               while (currentPosition != null) {
+                  Term currentTerm = currentPosition.getSubTerm(uninterpretedPredicateGroundTerm);
+                  FormulaTermLabel label = (FormulaTermLabel)currentTerm.getLabel(FormulaTermLabel.NAME);
+                  MultiEvaluationResult labelResult = branchResult.getResult(label);
+                  if (labelResult != null) {
+                     Term instructionTerm = labelResult.getInstructionTerm();
+                     if (instructionTerm != null && instructionTerm.op() == Junctor.AND) {
+                        if (instructionTerm.sub(0).op() == uninterpretedPredicate.op()) {
+                           instructionTerm = instructionTerm.sub(1);
+                           labelResult = labelResult.newInstructionTerm(instructionTerm);
+                           branchResult.updateResult(label, labelResult);
+                        }
+                        else if (instructionTerm.sub(1).op() == uninterpretedPredicate.op()) {
+                           instructionTerm = instructionTerm.sub(0);
+                           labelResult = labelResult.newInstructionTerm(instructionTerm);
+                           branchResult.updateResult(label, labelResult);
+                        }
+                     }
+                  }
+                  currentPosition = currentPosition.up();
+               }
+            }
+            // Context menu
+            MenuManager menuManager = new MenuManager();
+            menuManager.add(new Action("Open Goal") {
+               @Override
+               public void run() {
+                  openGoal(branchResult);
+               }
+            });
             // Create group
             Group viewerGroup = factory.createGroup(root, "Node " + branchResult.getLeafNode().serialNr());
             viewerGroup.setLayout(new FillLayout());
             viewerGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            viewerGroup.setMenu(menuManager.createContextMenu(viewerGroup));
             controls.add(viewerGroup);
             // Create viewer
             SourceViewer viewer = new SourceViewer(viewerGroup, null, SWT.MULTI | SWT.FULL_SELECTION);
+            viewer.getControl().setMenu(menuManager.createContextMenu(viewer.getControl()));
             viewer.setEditable(false);
+            final Font font = SWTUtil.initializeViewerFont(viewer);
+            viewer.getTextWidget().addDisposeListener(new DisposeListener() {
+               @Override
+               public void widgetDisposed(DisposeEvent e) {
+                  if (font != null) {
+                     font.dispose();
+                  }
+               }
+            });
             notConsideredColor = viewer.getTextWidget().getForeground();
-            TruthValueEvaluationViewerDecorator viewerDecorator = new TruthValueEvaluationViewerDecorator(viewer);
+            TruthValueTracingViewerDecorator viewerDecorator = new TruthValueTracingViewerDecorator(viewer, trueColor.getRGB(), falseColor.getRGB(), unknownColor.getRGB());
             decorators.add(viewerDecorator);
             // Show term and results
             Sequent sequent = createSequentToShow(branchResult.getCondition(), succedent);
@@ -347,14 +686,33 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    }
 
    /**
+    * Opens the {@link Goal} of the given {@link BranchResult}.
+    * @param branchResult The {@link BranchResult}.
+    */
+   protected void openGoal(BranchResult branchResult) {
+      try {
+         IWorkbenchPart part = WorkbenchUtil.openView(ProofView.VIEW_ID);
+         if (part instanceof ProofView) {
+            ((ProofView) part).selectNode(branchResult.getLeafNode());
+         }
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(root.getShell(), e);
+      }
+   }
+
+   /**
     * Check is the given {@link BranchResult} should be shown.
     * @param branchResult The {@link BranchResult} to check.
-    * @param uninterpretedPredicate The uninterpreted predicate which provides the {@link FormulaTermLabel}.
+    * @param uninterpretedPredicatePosition The uninterpreted predicate which provides the {@link FormulaTermLabel}.
+    * @param uninterpretedPredicateGroundTerm The {@link Term} in which the {@link PosInTerm} is evaluated in.
     * @return {@code true} show branch result, {@code false} do not show branch result.
     */
-   protected boolean shouldShowBranchResult(BranchResult branchResult, Term uninterpretedPredicate) {
+   protected boolean shouldShowBranchResult(BranchResult branchResult, PosInTerm uninterpretedPredicatePosition, Term uninterpretedPredicateGroundTerm) {
       if (branchResult != null) {
-         if (uninterpretedPredicate != null) {
+         if (uninterpretedPredicatePosition != null) {
+            Term uninterpretedPredicate = uninterpretedPredicatePosition.getSubTerm(uninterpretedPredicateGroundTerm);
             TermLabel label = uninterpretedPredicate.getLabel(FormulaTermLabel.NAME);
             if (label instanceof FormulaTermLabel) {
                TruthValue result = branchResult.evaluate((FormulaTermLabel) label);
@@ -375,20 +733,53 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    
    /**
     * Searches the {@link Term} with the uninterpreted predicate.
+    * @param node The {@link IKeYSENode} which provides the current {@link Sequent} to search the uninterpreted predicate in.
     * @param term The {@link Term} to start search at.
     * @param uninterpretedPredicate The {@link Term} of the proof obligation which specifies the uninterpreted predicate.
-    * @return The found {@link Term} or {@code null} if not available.
+    * @param additionalPredicates The additional uninterpreted predicates.
+    * @return The {@link PosInTerm} of the uninterpreted predicate.
     */
-   protected Term findUninterpretedPredicateTerm(Term term, Term uninterpretedPredicate) {
+   protected PosInTerm findUninterpretedPredicateTerm(IKeYSENode<?> node, 
+                                                      Term term, 
+                                                      Term uninterpretedPredicate,
+                                                      Set<Term> additionalPredicates) {
+      // Skip updates
+      PosInTerm pit = PosInTerm.getTopLevel();
+      while (term.op() == UpdateApplication.UPDATE_APPLICATION) {
+         term = term.sub(1);
+         pit = pit.down(1);
+      }
+      // Search predicate
+      if (node instanceof KeYBlockContractTermination || node instanceof KeYBlockContractExceptionalTermination) {
+         Set<Operator> additionalPredicateOperators = new HashSet<Operator>();
+         if (!CollectionUtil.isEmpty(additionalPredicates)) {
+            for (Term predicateTerm : additionalPredicates) {
+               additionalPredicateOperators.add(predicateTerm.op());
+            }
+         }
+         return findAdditionalUninterpretedPredicateTerm(term, additionalPredicateOperators, pit);
+      }
+      else {
+         return findMainUninterpretedPredicateTerm(term, uninterpretedPredicate, pit);
+      }
+   }
+
+   /**
+    * Searches the {@link Term} with the uninterpreted predicate.
+    * @param term The {@link Term} to start search at.
+    * @param uninterpretedPredicate The {@link Term} of the proof obligation which specifies the uninterpreted predicate.
+    * @return The {@link PosInTerm} of the uninterpreted predicate.
+    */
+   protected PosInTerm findMainUninterpretedPredicateTerm(Term term, Term uninterpretedPredicate, PosInTerm current) {
       if (uninterpretedPredicate != null) {
          if (term.op() == uninterpretedPredicate.op()) {
-            return term;
+            return current;
          }
          else if (term.op() == Junctor.AND) {
-            Term result = null;
+            PosInTerm result = null;
             int i = 0;
             while (result == null && i < term.arity()) {
-               result = findUninterpretedPredicateTerm(term.sub(i), uninterpretedPredicate);
+               result = findMainUninterpretedPredicateTerm(term.sub(i), uninterpretedPredicate, current.down(i));
                i++;
             }
             return result;
@@ -396,6 +787,30 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
          else {
             return null;
          }
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Searches the {@link Term} with the uninterpreted predicate.
+    * @param term The {@link Term} to start search at.
+    * @param additionalPredicateOperators The operators of the additional uninterpreted predicates.
+    * @return The {@link PosInTerm} of the uninterpreted predicate.
+    */
+   protected PosInTerm findAdditionalUninterpretedPredicateTerm(Term term, Set<Operator> additionalPredicateOperators, PosInTerm current) {
+      if (additionalPredicateOperators.contains(term.op())) {
+         return current;
+      }
+      else if (term.op() == Junctor.AND) {
+         PosInTerm result = null;
+         int i = 0;
+         while (result == null && i < term.arity()) {
+            result = findAdditionalUninterpretedPredicateTerm(term.sub(i), additionalPredicateOperators, current.down(i));
+            i++;
+         }
+         return result;
       }
       else {
          return null;
@@ -418,11 +833,11 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * Removes the uninterpreted predicate if required.
     * @param node The {@link Node}.
     * @param term The {@link Term}.
+    * @param predicate The uninterpreted predicate to remove.
     * @return The {@link Term} without the uninterpreted predicate.
     */
-   protected Term removeUninterpretedPredicate(Node node, Term term) {
+   protected Term removeUninterpretedPredicate(Node node, Term term, Term predicate) {
       Proof proof = node.proof();
-      Term predicate = AbstractOperationPO.getUninterpretedPredicate(proof);
       if (predicate != null) {
          term = removeUninterpretedPredicate(proof.getServices().getTermBuilder(), 
                                              term, 
@@ -488,6 +903,15 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * Adds the legend.
     */
    protected void addLegend(Color notConsideredColor) {
+      // Create context menu
+      MenuManager manager = new MenuManager();
+      manager.add(new Action("Change &Colors...") {
+         @Override
+         public void run() {
+            openColorPreferencePage();
+         }
+      });
+      // Create legend
       Composite legendComposite = factory.createFlatFormComposite(root);
       legendComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       GridLayout legendLayout = new GridLayout(5, false);
@@ -499,21 +923,33 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
       legendLayout.verticalSpacing = 0;
       legendComposite.setLayout(legendLayout);
       controls.add(legendComposite);
-      factory.createLabel(legendComposite, "Legend: ");
+      Label legendLabel = factory.createLabel(legendComposite, "Legend: ");
+      legendLabel.setMenu(manager.createContextMenu(legendLabel));
       Label trueLabel = factory.createLabel(legendComposite, "true");
       trueLabel.setForeground(trueColor);
       trueLabel.setToolTipText("The term evaluates to true.");
+      trueLabel.setMenu(manager.createContextMenu(trueLabel));
       Label falseLabel = factory.createLabel(legendComposite, "false");
       falseLabel.setForeground(falseColor);
       falseLabel.setToolTipText("The term evaluates to false.");
+      falseLabel.setMenu(manager.createContextMenu(falseLabel));
       Label unknownLabel = factory.createLabel(legendComposite, "unknown");
       unknownLabel.setForeground(unknownColor);
       unknownLabel.setToolTipText("The term is not (yet) completely evaluated into true or false.");
+      unknownLabel.setMenu(manager.createContextMenu(unknownLabel));
       Label notConsideredLabel = factory.createLabel(legendComposite, "not considered");
       notConsideredLabel.setForeground(notConsideredColor);
-      notConsideredLabel.setToolTipText("The term is not part of the truth value evaluation.");
+      notConsideredLabel.setToolTipText("The term is not part of the truth value tracing.");
+      notConsideredLabel.setMenu(manager.createContextMenu(notConsideredLabel));
    }
    
+   /**
+    * Opens the preference page to change the colors.
+    */
+   protected void openColorPreferencePage() {
+      KeYColorsPreferencePage.openPreferencePage(root.getShell());
+   }
+
    public static interface ILayoutListener {
       public void layoutUpdated();
    }

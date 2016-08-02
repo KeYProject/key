@@ -57,11 +57,15 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.viewers.ILazyTreePathContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.results.BoolResult;
+import org.eclipse.swtbot.swt.finder.results.Result;
+import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
@@ -70,23 +74,23 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.resources.ProjectExplorer;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.sed.core.annotation.ISEAnnotation;
 import org.key_project.sed.core.annotation.ISEAnnotationLink;
 import org.key_project.sed.core.model.ISEBaseMethodReturn;
+import org.key_project.sed.core.model.ISEBlockContract;
+import org.key_project.sed.core.model.ISEBlockContractExceptionalTermination;
+import org.key_project.sed.core.model.ISEBlockContractTermination;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEBranchStatement;
 import org.key_project.sed.core.model.ISEConstraint;
 import org.key_project.sed.core.model.ISEDebugElement;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalTermination;
@@ -98,6 +102,8 @@ import org.key_project.sed.core.model.ISELoopStatement;
 import org.key_project.sed.core.model.ISEMethodCall;
 import org.key_project.sed.core.model.ISEMethodContract;
 import org.key_project.sed.core.model.ISEMethodReturn;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.ISEStatement;
 import org.key_project.sed.core.model.ISETermination;
 import org.key_project.sed.core.model.ISEThread;
@@ -114,10 +120,6 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
-import org.key_project.util.java.thread.AbstractRunnableWithException;
-import org.key_project.util.java.thread.AbstractRunnableWithResult;
-import org.key_project.util.java.thread.IRunnableWithException;
-import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
@@ -170,7 +172,7 @@ public final class TestSedCoreUtil {
     * @throws CoreException Occurred Exception.
     */
    public static ILaunchConfiguration[] searchFixedExampleLaunchConfigurations() throws CoreException {
-       return DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations(getFixedExampleConfigurationType());
+      return DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations(getFixedExampleConfigurationType());
    }
    
    /**
@@ -193,75 +195,59 @@ public final class TestSedCoreUtil {
     * @throws Exception Occurred Exception.
     */
    public static void launchFixedExample() throws Exception {
-      IRunnableWithException run = new AbstractRunnableWithException() {
+      Result<Exception> run = new Result<Exception>() {
          @Override
-         public void run() {
+         public Exception run() {
             try {
                ILaunchConfiguration config = getFixedExampleLaunchConfiguration();
                DebugUITools.launch(config, FIXED_EXAMPLE_MODE);
+               return null;
             }
             catch (Exception e) {
-               setException(e);
+               return e;
             }
          }
       };
-      Display.getDefault().syncExec(run);
-      if (run.getException() != null) {
-         throw run.getException();
+      Exception exception = UIThreadRunnable.syncExec(run);
+      if (exception != null) {
+         throw exception;
       }
    }
 
    /**
     * Opens the "Symbolic Debug" perspective.
-    * @return The {@link IPerspectiveDescriptor} of "Symbolic Debug" perspective.
     * @throws Exception Occurred Exception.
     */
-   public static IPerspectiveDescriptor openSymbolicDebugPerspective() throws Exception {
-      IRunnableWithResult<IPerspectiveDescriptor> run = new AbstractRunnableWithResult<IPerspectiveDescriptor>() {
+   public static void openSymbolicDebugPerspective(final SWTWorkbenchBot bot) throws Exception {
+      VoidResult toExecute = new VoidResult() {
          @Override
          public void run() {
-            try {
-               // Make sure that the view is not already opened
-               IWorkbenchPage activePage = WorkbenchUtil.getActivePage();
-               TestCase.assertNotNull(activePage);
-               if (activePage.getPerspective() == null || !ObjectUtil.equals(activePage.getPerspective().getId(), SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID)) {
-                  // Make sure that the project explorer is not active to avoid NullPointerException in constructor of org.eclipse.ui.internal.navigator.resources.workbench.TabbedPropertySheetTitleProvider
-                  IWorkbenchPart part = activePage.findView(ProjectExplorer.VIEW_ID);
-                  if (WorkbenchUtil.isActive(part)) {
-                     // Project explorer is active, so select another view if possible
-                     IViewReference[] viewRefs = activePage.getViewReferences();
-                     boolean done = false;
-                     int i = 0;
-                     while (!done && i < viewRefs.length) {
-                        if (!ObjectUtil.equals(viewRefs[i].getId(), ProjectExplorer.VIEW_ID)) {
-                           WorkbenchUtil.activate(viewRefs[i].getView(true));
-                           done = true;
-                        }
-                        i++;
+            // Make sure that the view is not already opened
+            IWorkbenchPage activePage = WorkbenchUtil.getActivePage();
+            TestCase.assertNotNull(activePage);
+            if (activePage.getPerspective() == null || !SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID.equals(activePage.getPerspective().getId())) {
+               // Make sure that the project explorer is not active to avoid NullPointerException in constructor of org.eclipse.ui.internal.navigator.resources.workbench.TabbedPropertySheetTitleProvider
+               IWorkbenchPart part = activePage.findView(ProjectExplorer.VIEW_ID);
+               if (WorkbenchUtil.isActive(part)) {
+                  // Project explorer is active, so select another view if possible
+                  IViewReference[] viewRefs = activePage.getViewReferences();
+                  boolean done = false;
+                  int i = 0;
+                  while (!done && i < viewRefs.length) {
+                     if (!ObjectUtil.equals(viewRefs[i].getId(), ProjectExplorer.VIEW_ID)) {
+                        WorkbenchUtil.activate(viewRefs[i].getView(true));
+                        done = true;
                      }
+                     i++;
                   }
-                  // Change perspective
-                  String perspectiveId = SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID;
-                  IPerspectiveDescriptor perspective = PlatformUI.getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
-                  TestCase.assertNotNull(perspective);
-                  activePage.setPerspective(perspective);
-                  // Make sure that correct perspective is open
-                  TestCase.assertEquals(perspective, activePage.getPerspective());
                }
-            }
-            catch (Exception e) {
-               setException(e);
-            }
-            catch (Throwable t) {
-               setException(new Exception(t));
+               // Change perspective
+               SWTBotPerspective symDebugPerspective = bot.perspectiveById(SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID);
+               symDebugPerspective.activate();
             }
          }
       };
-      Display.getDefault().syncExec(run);
-      if (run.getException() != null) {
-         throw run.getException();
-      }
-      return run.getResult();
+      UIThreadRunnable.syncExec(toExecute);
    }
 
    /**
@@ -592,10 +578,9 @@ public final class TestSedCoreUtil {
        */
       @Override
       public boolean test() throws Exception {
-         IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+         BoolResult run = new BoolResult() {
             @Override
-            public void run() {
-               setResult(Boolean.FALSE);
+            public Boolean run() {
                TreeItem[] rootItems = debugTree.widget.getItems();
                if (rootItems != null && rootItems.length >= 1) {
                   TreeItem[] level1Items = rootItems[0].getItems();
@@ -603,14 +588,14 @@ public final class TestSedCoreUtil {
                      Object data = level1Items[0].getData();
                      if (data instanceof ISEDebugTarget) {
                         target = (ISEDebugTarget)data;
-                        setResult(Boolean.TRUE);
+                        return true;
                      }
                   }
                }
+               return false;
             }
          };
-         debugTree.display.syncExec(run);
-         return run.getResult() != null && run.getResult().booleanValue();
+         return UIThreadRunnable.syncExec(run);
       }
       
       /**
@@ -892,6 +877,14 @@ public final class TestSedCoreUtil {
             TestCase.assertTrue("Expected ISEDBranchStatement on " + ((ISEBranchStatement)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEBranchStatement);
             compareBranchStatement((ISEBranchStatement)expectedNext, (ISEBranchStatement)currentNext, true, compareId, compareVariables, compareCallStack, compareConstraints);
          }
+         else if (expectedNext instanceof ISEBlockContractExceptionalTermination) {
+            TestCase.assertTrue("Expected ISEBlockContractExceptionalTermination on " + ((ISEBlockContractExceptionalTermination)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEBlockContractExceptionalTermination);
+            compareBlockContractExceptionalTermination((ISEBlockContractExceptionalTermination)expectedNext, (ISEBlockContractExceptionalTermination)currentNext, true, compareId, compareVariables, compareCallStack, compareConstraints);
+         }
+         else if (expectedNext instanceof ISEBlockContractTermination) {
+            TestCase.assertTrue("Expected ISEBlockContractTermination on " + ((ISEBlockContractTermination)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEBlockContractTermination);
+            compareBlockContractTermination((ISEBlockContractTermination)expectedNext, (ISEBlockContractTermination)currentNext, true, compareId, compareVariables, compareCallStack, compareConstraints);
+         }
          else if (expectedNext instanceof ISEExceptionalTermination) {
             TestCase.assertTrue("Expected ISEDExceptionalTermination on " + ((ISEExceptionalTermination)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEExceptionalTermination);
             compareExceptionalTermination((ISEExceptionalTermination)expectedNext, (ISEExceptionalTermination)currentNext, true, compareId, compareVariables, compareCallStack, compareConstraints);
@@ -931,6 +924,10 @@ public final class TestSedCoreUtil {
          else if (expectedNext instanceof ISEMethodContract) {
             TestCase.assertTrue("Expected ISEDMethodContract on " + ((ISEMethodContract)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEMethodContract);
             compareMethodContract((ISEMethodContract)expectedNext, (ISEMethodContract)currentNext, true, compareId, compareVariables, compareCallStack, compareConstraints);
+         }
+         else if (expectedNext instanceof ISEBlockContract) {
+            TestCase.assertTrue("Expected ISEBlockContract on " + ((ISEBlockContract)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEBlockContract);
+            compareBlockContract((ISEBlockContract)expectedNext, (ISEBlockContract)currentNext, true, compareId, compareVariables, compareCallStack, compareConstraints);
          }
          else if (expectedNext instanceof ISELoopInvariant) {
             TestCase.assertTrue("Expected ISEDLoopInvariant on " + ((ISELoopInvariant)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISELoopInvariant);
@@ -1073,6 +1070,8 @@ public final class TestSedCoreUtil {
          }
          // Compare parent
          if (compareReferences) {
+            compareLinks(expected.getOutgoingLinks(), current.getOutgoingLinks());
+            compareLinks(expected.getIncomingLinks(), current.getIncomingLinks());
             compareNode(expected.getParent(), current.getParent(), false, compareId, compareVariables, compareCallStack, compareConstraints);
             // Compare children
             ISENode[] expectedChildren = expected.getChildren();
@@ -1086,6 +1085,14 @@ public final class TestSedCoreUtil {
                else if (expectedChildren[i] instanceof ISEBranchStatement) {
                   TestCase.assertTrue("Expected ISEDBranchStatement on " + ((ISEBranchStatement)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEBranchStatement);
                   compareBranchStatement((ISEBranchStatement)expectedChildren[i], (ISEBranchStatement)currentChildren[i], false, compareId, compareVariables, compareCallStack, compareConstraints);
+               }
+               else if (expectedChildren[i] instanceof ISEBlockContractExceptionalTermination) {
+                  TestCase.assertTrue("Expected ISEBlockContractExceptionalTermination on " + ((ISEBlockContractExceptionalTermination)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEBlockContractExceptionalTermination);
+                  compareBlockContractExceptionalTermination((ISEBlockContractExceptionalTermination)expectedChildren[i], (ISEBlockContractExceptionalTermination)currentChildren[i], false, compareId, compareVariables, compareCallStack, compareConstraints);
+               }
+               else if (expectedChildren[i] instanceof ISEBlockContractTermination) {
+                  TestCase.assertTrue("Expected ISEBlockContractTermination on " + ((ISEBlockContractTermination)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEBlockContractTermination);
+                  compareBlockContractTermination((ISEBlockContractTermination)expectedChildren[i], (ISEBlockContractTermination)currentChildren[i], false, compareId, compareVariables, compareCallStack, compareConstraints);
                }
                else if (expectedChildren[i] instanceof ISEExceptionalTermination) {
                   TestCase.assertTrue("Expected ISEDExceptionalTermination on " + ((ISEExceptionalTermination)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEExceptionalTermination);
@@ -1139,6 +1146,10 @@ public final class TestSedCoreUtil {
                   TestCase.assertTrue("Expected ISEDMethodContract on " + ((ISEMethodContract)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEMethodContract);
                   compareMethodContract((ISEMethodContract)expectedChildren[i], (ISEMethodContract)currentChildren[i], false, compareId, compareVariables, compareCallStack, compareConstraints);
                }
+               else if (expectedChildren[i] instanceof ISEBlockContract) {
+                  TestCase.assertTrue("Expected ISEBlockContract on " + ((ISEBlockContract)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEBlockContract);
+                  compareBlockContract((ISEBlockContract)expectedChildren[i], (ISEBlockContract)currentChildren[i], false, compareId, compareVariables, compareCallStack, compareConstraints);
+               }
                else if (expectedChildren[i] instanceof ISELoopInvariant) {
                   TestCase.assertTrue("Expected ISEDLoopInvariant on " + ((ISELoopInvariant)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISELoopInvariant);
                   compareLoopInvariant((ISELoopInvariant)expectedChildren[i], (ISELoopInvariant)currentChildren[i], false, compareId, compareVariables, compareCallStack, compareConstraints);
@@ -1154,6 +1165,43 @@ public final class TestSedCoreUtil {
       }
    }
    
+   /**
+    * Compares the given {@link ISENodeLink}s.
+    * @param expectedEntries The expected {@link ISENodeLink}s.
+    * @param currentEntries The current {@link ISENodeLink}s.
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareLinks(ISENodeLink[] expectedEntries, ISENodeLink[] currentEntries) throws DebugException {
+      if (!ArrayUtil.isEmpty(expectedEntries)) {
+         TestCase.assertNotNull(currentEntries);
+         TestCase.assertEquals(expectedEntries.length, currentEntries.length);
+         for (int i = 0; i < expectedEntries.length; i++) {
+            compareLink(expectedEntries[i], currentEntries[i]);
+         }
+      }
+      else {
+         TestCase.assertTrue(ArrayUtil.isEmpty(currentEntries));
+      }
+   }
+
+   /**
+    * Compares the given {@link ISENodeLink}s.
+    * @param expected The expected {@link ISENodeLink}.
+    * @param current The current {@link ISENodeLink}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareLink(ISENodeLink expected, ISENodeLink current) throws DebugException {
+      if (expected != null) {
+         TestCase.assertNotNull(current);
+         TestCase.assertEquals(expected.getName(), current.getName());
+         compareNode(expected.getSource(), current.getSource(), false, false, false, false, false);
+         compareNode(expected.getTarget(), current.getTarget(), false, false, false, false, false);
+      }
+      else {
+         TestCase.assertNull(current);
+      }
+   }
+
    /**
     * Compares the given call stack entries.
     * @param expected The expected {@link ISENode}s.
@@ -1629,6 +1677,48 @@ public final class TestSedCoreUtil {
    }
 
    /**
+    * Compares the given {@link ISEBlockContractExceptionalTermination}s with each other.
+    * @param expected The expected {@link ISEBlockContractExceptionalTermination}.
+    * @param current The current {@link ISEBlockContractExceptionalTermination}.
+    * @param compareReferences Compare also the containment hierarchy?
+    * @param compareId Compare the value of {@link ISEDebugElement#getId()}?
+    * @param compareVariables Compare variables?
+    * @param compareCallStack Compare call stack?
+    * @param compareConstraints Compare constraints?
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareBlockContractExceptionalTermination(ISEBlockContractExceptionalTermination expected, 
+                                                                    ISEBlockContractExceptionalTermination current, 
+                                                                    boolean compareReferences, 
+                                                                    boolean compareId, 
+                                                                    boolean compareVariables,
+                                                                    boolean compareCallStack,
+                                                                    boolean compareConstraints) throws DebugException {
+      compareTermination(expected, current, compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
+   }
+
+   /**
+    * Compares the given {@link ISEBlockContractTermination}s with each other.
+    * @param expected The expected {@link ISEBlockContractTermination}.
+    * @param current The current {@link ISEBlockContractTermination}.
+    * @param compareReferences Compare also the containment hierarchy?
+    * @param compareId Compare the value of {@link ISEDebugElement#getId()}?
+    * @param compareVariables Compare variables?
+    * @param compareCallStack Compare call stack?
+    * @param compareConstraints Compare constraints?
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareBlockContractTermination(ISEBlockContractTermination expected, 
+                                                         ISEBlockContractTermination current, 
+                                                         boolean compareReferences, 
+                                                         boolean compareId, 
+                                                         boolean compareVariables,
+                                                         boolean compareCallStack,
+                                                         boolean compareConstraints) throws DebugException {
+      compareTermination(expected, current, compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
+   }
+
+   /**
     * Compares the given {@link ISELoopCondition}s with each other.
     * @param expected The expected {@link ISELoopCondition}.
     * @param current The current {@link ISELoopCondition}.
@@ -1752,17 +1842,40 @@ public final class TestSedCoreUtil {
     * @throws DebugException Occurred Exception.
     */
    protected static void compareMethodContract(ISEMethodContract expected, 
-                                                  ISEMethodContract current, 
-                                                  boolean compareReferences, 
-                                                  boolean compareId, 
-                                                  boolean compareVariables,
-                                                  boolean compareCallStack,
-                                                  boolean compareConstraints) throws DebugException {
+                                               ISEMethodContract current, 
+                                               boolean compareReferences, 
+                                               boolean compareId, 
+                                               boolean compareVariables,
+                                               boolean compareCallStack,
+                                               boolean compareConstraints) throws DebugException {
       compareStackFrame(expected, current, compareVariables, compareConstraints);
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
       assertEquals(expected.isPreconditionComplied(), current.isPreconditionComplied());
       assertEquals(expected.hasNotNullCheck(), current.hasNotNullCheck());
       assertEquals(expected.isNotNullCheckComplied(), current.isNotNullCheckComplied());
+   }
+
+   /**
+    * Compares the given {@link ISEBlockContract}s with each other.
+    * @param expected The expected {@link ISEBlockContract}.
+    * @param current The current {@link ISEBlockContract}.
+    * @param compareReferences Compare also the containment hierarchy?
+    * @param compareId Compare the value of {@link ISEDebugElement#getId()}?
+    * @param compareVariables Compare variables?
+    * @param compareCallStack Compare call stack?
+    * @param compareConstraints Compare constraints?
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareBlockContract(ISEBlockContract expected, 
+                                              ISEBlockContract current, 
+                                              boolean compareReferences, 
+                                              boolean compareId, 
+                                              boolean compareVariables,
+                                              boolean compareCallStack,
+                                              boolean compareConstraints) throws DebugException {
+      compareStackFrame(expected, current, compareVariables, compareConstraints);
+      compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
+      assertEquals(expected.isPreconditionComplied(), current.isPreconditionComplied());
    }
 
    /**

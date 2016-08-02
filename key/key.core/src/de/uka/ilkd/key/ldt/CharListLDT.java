@@ -25,8 +25,10 @@ import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 
 public final class CharListLDT extends LDT {
@@ -41,14 +43,7 @@ public final class CharListLDT extends LDT {
     //         LexPathOrdering and into CharListNotation!
                 
     //functions
-    private final Function clEmpty;
-    private final Function clCat;
-    private final Function clCons;
-    private final Function clCharAt;
-    private final Function clLength;
     private final Function clIndexOfChar;
-    private final Function clSub;
-    private final Function clConcat;
     private final Function clIndexOfCl;
     private final Function clLastIndexOfChar;
     private final Function clLastIndexOfCl;
@@ -70,15 +65,8 @@ public final class CharListLDT extends LDT {
     //------------------------------------------------------------------------- 
     
     public CharListLDT(TermServices services) {
-	super(NAME, services);
-	clEmpty           = addFunction(services, "clEmpty");
-	clCat             = addFunction(services, "clCat");
-	clCons            = addFunction(services, "clCons");
-	clCharAt          = addFunction(services, "clCharAt");
-	clLength          = addFunction(services, "clLength");
+	super(NAME, (Sort) services.getNamespaces().sorts().lookup(SeqLDT.NAME), services);
 	clIndexOfChar     = addFunction(services, "clIndexOfChar");
-	clSub             = addFunction(services, "clSub");
-	clConcat          = addFunction(services, "clConcat");
 	clIndexOfCl       = addFunction(services, "clIndexOfCl");
 	clLastIndexOfChar = addFunction(services, "clLastIndexOfChar");
 	clLastIndexOfCl   = addFunction(services, "clLastIndexOfCl");
@@ -127,44 +115,10 @@ public final class CharListLDT extends LDT {
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
-    
-    public Function getClEmpty() {
-	return clEmpty;
-    }
-    
-    
-    public Function getClCat() {
-	return clCat;
-    }
-    
-    
-    public Function getClCons() {
-	return clCons;
-    }
-    
-    
-    public Function getClCharAt() {
-	return clCharAt;
-    }
-    
-    
-    public Function getClLength() {
-	return clLength;
-    }
-    
+        
     
     public Function getClIndexOfChar() {
 	return clIndexOfChar;
-    }
-    
-    
-    public Function getClSub() {
-	return clSub;
-    }
-    
-    
-    public Function getClConcat() {
-	return clConcat;
     }
     
     
@@ -248,7 +202,9 @@ public final class CharListLDT extends LDT {
 
     @Override
     public Term translateLiteral(Literal lit, Services services) {
-	final Term term_empty = services.getTermBuilder().func(clEmpty);
+	final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
+    final TermBuilder tb = services.getTermBuilder();
+    final Term term_empty = tb.func(seqLDT.getSeqEmpty());
 
 	char[] charArray;
 	Term result = term_empty;
@@ -266,10 +222,8 @@ public final class CharListLDT extends LDT {
 	}
 
 	for (int i = charArray.length - 2; i >= 1; i--) {
-	    result = services.getTermBuilder().func(clCons,
-		    intLDT.translateLiteral(new CharLiteral(charArray[i]), 
-			                    services),
-		    result);
+	    Term singleton = tb.seqSingleton(intLDT.translateLiteral(new CharLiteral(charArray[i]), services)); 
+	    result = tb.seqConcat(singleton, result);
 	}
 
 	return result;

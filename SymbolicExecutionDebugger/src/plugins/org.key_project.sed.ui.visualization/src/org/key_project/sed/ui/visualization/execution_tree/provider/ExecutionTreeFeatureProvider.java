@@ -53,6 +53,9 @@ import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
+import org.key_project.sed.core.model.ISEBlockContract;
+import org.key_project.sed.core.model.ISEBlockContractExceptionalTermination;
+import org.key_project.sed.core.model.ISEBlockContractTermination;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEBranchStatement;
 import org.key_project.sed.core.model.ISEDebugTarget;
@@ -68,6 +71,18 @@ import org.key_project.sed.core.model.ISEMethodReturn;
 import org.key_project.sed.core.model.ISEStatement;
 import org.key_project.sed.core.model.ISETermination;
 import org.key_project.sed.core.model.ISEThread;
+import org.key_project.sed.ui.visualization.execution_tree.feature.BlockContractAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.BlockContractCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.BlockContractExceptionalTerminationAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.BlockContractExceptionalTerminationCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.BlockContractExceptionalTerminationLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.BlockContractExceptionalTerminationUpdateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.BlockContractLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.BlockContractTerminationAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.BlockContractTerminationCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.BlockContractTerminationLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.BlockContractTerminationUpdateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.BlockContractUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionLayoutFeature;
@@ -175,7 +190,10 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
                                       new TerminationCreateFeature(this),
                                       new ThreadCreateFeature(this),
                                       new LoopInvariantCreateFeature(this),
-                                      new MethodContractCreateFeature(this)};
+                                      new MethodContractCreateFeature(this),
+                                      new BlockContractCreateFeature(this),
+                                      new BlockContractTerminationCreateFeature(this),
+                                      new BlockContractExceptionalTerminationCreateFeature(this)};
       }
       else {
          return new ICreateFeature[0];
@@ -192,6 +210,15 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
       else if (context.getNewObject() instanceof ISEBranchStatement) {
          return new BranchStatementAddFeature(this);
+      }
+      else if (context.getNewObject() instanceof ISEBlockContract) {
+         return new BlockContractAddFeature(this);
+      }
+      else if (context.getNewObject() instanceof ISEBlockContractExceptionalTermination) {
+         return new BlockContractExceptionalTerminationAddFeature(this);
+      }
+      else if (context.getNewObject() instanceof ISEBlockContractTermination) {
+         return new BlockContractTerminationAddFeature(this);
       }
       else if (context.getNewObject() instanceof ISEExceptionalTermination) {
          return new ExceptionalTerminationAddFeature(this);
@@ -249,6 +276,15 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (bo instanceof ISEBranchStatement) {
          return new BranchStatementUpdateFeature(this);
       }
+      else if (bo instanceof ISEBlockContract) {
+         return new BlockContractUpdateFeature(this);
+      }
+      else if (bo instanceof ISEBlockContractExceptionalTermination) {
+         return new BlockContractExceptionalTerminationUpdateFeature(this);
+      }
+      else if (bo instanceof ISEBlockContractTermination) {
+         return new BlockContractTerminationUpdateFeature(this);
+      }
       else if (bo instanceof ISEExceptionalTermination) {
          return new ExceptionalTerminationUpdateFeature(this);
       }
@@ -302,6 +338,15 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
       else if (bo instanceof ISEBranchStatement) {
          return new BranchStatementLayoutFeature(this);
+      }
+      else if (bo instanceof ISEBlockContract) {
+         return new BlockContractLayoutFeature(this);
+      }
+      else if (bo instanceof ISEBlockContractExceptionalTermination) {
+         return new BlockContractExceptionalTerminationLayoutFeature(this);
+      }
+      else if (bo instanceof ISEBlockContractTermination) {
+         return new BlockContractTerminationLayoutFeature(this);
       }
       else if (bo instanceof ISEExceptionalTermination) {
          return new ExceptionalTerminationLayoutFeature(this);

@@ -15,9 +15,11 @@ package de.uka.ilkd.key.java;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Stack;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -195,6 +197,10 @@ public class PrettyPrinter {
     protected boolean endAlreadyMarked = false;
     protected Object firstStatement = null;
     protected SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+    /** Remembers the start of a keyword to create a range. */
+    private final Stack<Integer> keywordStarts = new Stack<Integer>();
+    /** Contains the java keyword ranges. */
+    private ArrayList<Range> keywordRanges = new ArrayList<Range>();
 
     /** creates a new PrettyPrinter */
     public PrettyPrinter(Writer o) {
@@ -251,7 +257,6 @@ public class PrettyPrinter {
             startAlreadyMarked = true;
         }
     }
-
     /**
      * Marks the end of the first executable statement ...
      * @param n offset from the current position
@@ -265,7 +270,7 @@ public class PrettyPrinter {
 	    endAlreadyMarked = true;
 	}
     }
-
+    
     /**
      * @return the range of the first executable statement that means
      * the corresponding start and end position in the string representation
@@ -273,7 +278,24 @@ public class PrettyPrinter {
     public Range getRangeOfFirstExecutableStatement(){
 	return new Range(firstStatementStart,firstStatementEnd);
     }
-
+    /**
+     * Marks the start of a java keyword.
+     */
+    protected final void markKeywordStart() {
+       keywordStarts.push(getCurrentPos());
+    }
+    /**
+     * Marks the end of a java keyword and creates a keyword range.
+     */
+    protected final void markKeywordEnd() {
+       keywordRanges.add(new Range(keywordStarts.pop(), getCurrentPos()));
+    }
+    /**
+     * @return ranges of all java keywords printed.
+     */
+    public final Range[] getKeywordRanges() {
+       return keywordRanges.toArray(new Range[keywordRanges.size()]);
+    }
     /**
      * Resets the state of this pretty printer ...
      */
@@ -285,6 +307,7 @@ public class PrettyPrinter {
 	endAlreadyMarked = false;
 	writtenCharacters = 0;
 	outBuf = new StringBuffer();
+	keywordRanges = new ArrayList<Range>();
     }
     
 
@@ -425,7 +448,15 @@ public class PrettyPrinter {
     protected void writeSymbol(int lf, int levelChange, String symbol) throws IOException {
         level += levelChange;
         writeIndentation(lf, getTotalIndentation());
+        boolean isKey = (symbol.equals("int") || symbol.equals("float") || symbol.equals("char") 
+              || symbol.equals("short") || symbol.equals("long") || symbol.equals("boolean"));
+        if (isKey) {
+           markKeywordStart();
+        }
         write(symbol);
+        if (isKey) {
+           markKeywordEnd();
+        }
     }
 
     /**
@@ -525,7 +556,15 @@ public class PrettyPrinter {
         //	    parent.setInternalParsedLine(line);
         //	    parent.setInternalParsedColumn(column);
         //	}
+        if (image.equals("catch")) {
+           markKeywordStart();
+           //XXX space before image is a dirty fix for bug where c of catch would not be highlighted
+           write(" ");
+        }
         write(image);
+        if (image.equals("catch")) {
+           markKeywordEnd();
+        }
     }
 
     protected final void writeToken(int blanks, String image,
@@ -962,10 +1001,18 @@ public class PrettyPrinter {
     
     public void printProgramElementName(ProgramElementName x)
 	throws java.io.IOException {
-	
         printHeader(x);
         writeInternalIndentation(x);
-        write(x.getProgramName());
+        String name = x.getProgramName();
+        boolean isKey = (name.equals("int") || name.equals("float") || name.equals("char") || name.equals("short") 
+              || name.equals("long") || name.equals("boolean"));
+        if (isKey) {
+           markKeywordStart();
+        }
+        write(name);
+        if (isKey) {
+           markKeywordEnd();
+        }
         printFooter(x);
     }
 
@@ -1041,7 +1088,9 @@ public class PrettyPrinter {
     public void printBooleanLiteral(BooleanLiteral x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
+        markKeywordStart();
         write(x.getValue() ? "true" : "false");
+        markKeywordEnd();
         printFooter(x);
     }
     
@@ -1228,7 +1277,9 @@ public class PrettyPrinter {
     public void printNullLiteral(NullLiteral x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
+        markKeywordStart();
         write("null");
+        markKeywordEnd();
         printFooter(x);
     }
 
@@ -1280,8 +1331,10 @@ public class PrettyPrinter {
        
         boolean wasNoLinefeed  = noLinefeed;
         boolean wasNoSemicolon = noSemicolons;
-
-        write("assert ");        
+        markKeywordStart();
+        write("assert"); 
+        markKeywordEnd();
+        write(" ");
 
         noLinefeed   = true;
         noSemicolons = true;
@@ -1397,7 +1450,9 @@ public class PrettyPrinter {
         printHeader(x);
         if (x.getExceptions() != null) {
             writeInternalIndentation(x);
+            markKeywordStart();
             write("throws");	    
+            markKeywordEnd();
             
 	    writeCommaList(0, 0, 1, x.getExceptions());
         }
@@ -1735,8 +1790,10 @@ public class PrettyPrinter {
 	
 	// Mark statement start ...
 	markStart(0,x);
-
-        write("break ");
+	     markKeywordStart();
+        write("break");
+        markKeywordEnd();
+        write(" ");
 	noLinefeed=true;
         if (x.getProgramElementName() != null) {
             writeElement(1, x.getProgramElementName());
@@ -1756,8 +1813,10 @@ public class PrettyPrinter {
 
 	// Mark statement start ...
 	markStart(0,x);
-
-        write("continue ");
+	     markKeywordStart();
+        write("continue");
+        markKeywordEnd();
+        write(" ");
 	noLinefeed=true;
         if (x.getProgramElementName() != null) {
             writeElement(1, x.getProgramElementName());
@@ -1777,8 +1836,10 @@ public class PrettyPrinter {
 	
 	// Mark statement start ...
 	markStart(0,x);
-
-        write("return ");
+	     markKeywordStart();
+        write("return");
+        markKeywordEnd();
+        write(" ");
         if (x.getExpression() != null) {
             noSemicolons = true;
             writeElement(1, x.getExpression());
@@ -1823,8 +1884,9 @@ public class PrettyPrinter {
 
 	// Mark statement start ...
 	markStart(0,x);
-
+	markKeywordStart();
    write("do");
+   markKeywordEnd();
 	if (includeBody) {
       if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
           write(";");
@@ -1930,8 +1992,10 @@ public class PrettyPrinter {
 
         // Mark statement start ...
         markStart(0, x);
-
-        write("for (");
+        markKeywordStart();
+        write("for");
+        markKeywordEnd();
+        write(" (");
         noLinefeed = true;
         noSemicolons = true;
         write(" ");
@@ -2002,8 +2066,10 @@ public class PrettyPrinter {
 
 	// Mark statement start ...
 	markStart(0,x);
-
-	write("while (");
+	markKeywordStart();
+	write("while");
+	markKeywordEnd();
+	write(" (");
 	write(" ");
         if (x.getGuardExpression() != null) {
             writeElement(x.getGuardExpression());
@@ -2045,8 +2111,10 @@ public class PrettyPrinter {
 
 	// Mark statement start ...
 	markStart(0,x);
-
-	write("if (");
+	markKeywordStart();
+	write("if");
+	markKeywordEnd();
+	write(" (");
         if (x.getExpression() != null) {
 	    writeElement(1, x.getExpression());
         }
@@ -2085,8 +2153,10 @@ public class PrettyPrinter {
 
 	// Mark statement start ...
 	markStart(0,x);
-
-        write("switch (");
+	     markKeywordStart();
+        write("switch");
+        markKeywordEnd();
+        write(" (");
         if (x.getExpression() != null) {           
             noSemicolons = true;
             writeElement(x.getExpression());
@@ -2113,9 +2183,9 @@ public class PrettyPrinter {
 
 	// // Mark statement start ...
 	// markStart(0,x);
-
+        markKeywordStart();
         write("try");
-
+        markKeywordEnd();
         if (x.getBody() != null) {
                 writeElement(0, 0, x.getBody());
         }
@@ -2153,8 +2223,10 @@ public class PrettyPrinter {
         printHeader(x);
 
 	noLinefeed   = false;
-
-	write("method-frame(");
+	markKeywordStart();
+	write("method-frame");
+	markKeywordEnd();
+	write("(");
 	IProgramVariable pvar = x.getProgramVariable();
 	if (pvar != null) {
 	    write("result->");
@@ -2854,7 +2926,10 @@ public class PrettyPrinter {
         printHeader(x);
 	markStart(0,x);
         writeInternalIndentation(x);
-	write("this (");
+   markKeywordStart();
+	write("this");
+	markKeywordEnd();
+	write(" (");
         if (x.getArguments() != null) {
             writeCommaList(x.getArguments());
         }
@@ -2911,7 +2986,9 @@ public class PrettyPrinter {
     public void printElse(Else x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
+        markKeywordStart();
         write("else ");
+        markKeywordEnd();
         if (x.getBody() != null) {
 	    if (x.getBody() instanceof StatementBlock) {
 		writeElement(1, 0, x.getBody());
@@ -2927,7 +3004,10 @@ public class PrettyPrinter {
     public void printCase(Case x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        write("case ");
+        markKeywordStart();
+        write("case");
+        markKeywordEnd();
+        write(" ");
         if (x.getExpression() != null) {
             boolean wasNoSemicolons = noSemicolons;
             noSemicolons = true;
@@ -2944,7 +3024,8 @@ public class PrettyPrinter {
 
     public void printCatch(Catch x) throws java.io.IOException {
         printHeader(x);
-	writeToken("catch (", x);
+	writeToken("catch", x);
+	write(" (");
         if (x.getParameterDeclaration() != null) {
 	    noLinefeed=true;           
             noSemicolons = true;
@@ -2976,7 +3057,9 @@ public class PrettyPrinter {
 	noLinefeed = true;
 	output();
 	noLinefeed = false;
+	     markKeywordStart();
         write("finally");
+        markKeywordEnd();
         if (x.getBody() != null) {
             writeElement(1, x.getBody());
         }

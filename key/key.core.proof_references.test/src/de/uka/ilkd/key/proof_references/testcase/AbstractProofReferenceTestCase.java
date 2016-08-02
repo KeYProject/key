@@ -442,7 +442,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
       assertNotNull(tester);
       // Start auto mode
       StrategyProperties sp = new StrategyProperties();
-      StrategyProperties.setDefaultStrategyProperties(sp, true, useContracts, false, false, false);
+      StrategyProperties.setDefaultStrategyProperties(sp, true, useContracts, false, false, false, false);
       proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
       proof.getSettings().getStrategySettings().setMaxSteps(1000);
       environment.getProofControl().startAndWaitForAutoMode(proof);

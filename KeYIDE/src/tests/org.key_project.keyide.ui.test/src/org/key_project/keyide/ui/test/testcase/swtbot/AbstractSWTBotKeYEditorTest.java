@@ -49,6 +49,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
@@ -228,7 +229,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
                               PosInTerm pit, 
                               final String tacletName) {
       PosInOccurrence pio = new PosInOccurrence((inAntecedent ? sequent.antecedent() : sequent.succedent()).get(index), pit, inAntecedent);
-      ImmutableList<TacletApp> rules = KeYIDEUtil.findTaclets(ui, goal, pio);
+      ImmutableList<TacletApp> rules = KeYIDEUtil.findTaclets(ui, goal, PosInSequent.createCfmaPos(pio));
       TacletApp tacletApp = CollectionUtil.search(rules, new IFilter<TacletApp>() {
          @Override
          public boolean select(TacletApp element) {

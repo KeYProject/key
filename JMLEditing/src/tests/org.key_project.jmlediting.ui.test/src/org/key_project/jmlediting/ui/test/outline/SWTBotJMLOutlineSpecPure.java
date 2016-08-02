@@ -13,6 +13,7 @@ import org.eclipse.ui.IPageLayout;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.key_project.javaeditor.management.JavaEditorManager;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils.TestProject;
@@ -45,7 +46,7 @@ public class SWTBotJMLOutlineSpecPure {
       editor = testProject.getOpenedEditor();
 
       TestUtilsUtil.openView(IPageLayout.ID_OUTLINE);
-      SWTBotView view = bot.viewByTitle("Outline");
+      SWTBotView view = bot.viewById(IPageLayout.ID_OUTLINE);
       tree = view.bot().tree();
 
    }
@@ -58,7 +59,7 @@ public class SWTBotJMLOutlineSpecPure {
    public static void testChild(String varName, String itemSource, String itemName,
             boolean reloadtree) {
       if (reloadtree) {
-         tree = bot.viewByTitle("Outline").bot().tree();
+         tree = bot.viewById(IPageLayout.ID_OUTLINE).bot().tree();
       }
       for (SWTBotTreeItem item : tree.getAllItems()) {
          if (item.getItems() != null) {
@@ -83,23 +84,30 @@ public class SWTBotJMLOutlineSpecPure {
 
    @Test
    public void TestFieldSingleAnnotation() {
-      testChild("balance : int", "/*@ spec_public@*/", "spec_public", false);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         testChild("balance : int", "/*@ spec_public@*/", "spec_public", false);
+      }
    }
 
    @Test
    public void TestFieldMultipleAnnotation() {
-      testChild("balance2 : int", "/*@ spec_protected nullable@*/",
-               "spec_protected nullable", false);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         testChild("balance2 : int", "/*@ spec_protected nullable@*/", "spec_protected nullable", false);
+      }
    }
 
    @Test
    public void TestMethodSingle() {
-      testChild("amount() : int", "/*@ pure @*/", "pure", false);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         testChild("amount() : int", "/*@ pure @*/", "pure", false);
+      }
    }
 
    @Test
    public void TestMethodMultiple() {
-      testChild("testMulti() : int", "/*@ pure nullable @*/", "pure nullable", false);
+      if (JavaEditorManager.OUTLINE_EXTENSIONS_ENABLED) {
+         testChild("testMulti() : int", "/*@ pure nullable @*/", "pure nullable", false);
+      }
    }
 
    @Test
@@ -116,5 +124,4 @@ public class SWTBotJMLOutlineSpecPure {
 
       }
    }
-
 }

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
 /**
@@ -135,4 +136,6 @@ public interface Profile {
     String getInternalClasslistFilename();
     
     TermLabelManager getTermLabelManager();
+    
+    boolean isSpecificationInvolvedInRuleApp(RuleApp app);
 }

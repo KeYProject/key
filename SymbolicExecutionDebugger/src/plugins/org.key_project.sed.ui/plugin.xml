@@ -6,6 +6,7 @@
    <extension-point id="org.key_project.sed.ui.annotationLinkActions" name="Annotation Link Actions" schema="schema/org.key_project.sed.ui.annotationLinkActions.exsd"/>
    <extension-point id="org.key_project.sed.ui.annotationLinkEditActions" name="Annotation Link Edit Actions" schema="schema/org.key_project.sed.ui.annotationLinkEditActions.exsd"/>
    <extension-point id="org.key_project.sed.ui.annotationTypeImages" name="Annotation Type Images" schema="schema/org.key_project.sed.ui.annotationTypeImages.exsd"/>
+   <extension-point id="org.key_project.sed.ui.slicingSettingsControlFactories" name="Slicing Settings Control Factories" schema="schema/org.key_project.sed.ui.slicingSettingsControlFactories.exsd"/>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -233,7 +234,7 @@
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.property.CallStackPropertySection"
-                    filter="org.key_project.sed.ui.property.SENodeTreeFilter"
+                    filter="org.key_project.sed.ui.property.SECallStackFilter"
                     id="org.key_project.sed.ui.property.CallStackPropertySection"
                     tab="org.key_project.sed.ui.callStack.tab">
               </propertySection>
@@ -477,7 +478,7 @@
             annotationImageProvider="org.key_project.sed.ui.text.SymbolicallyReachedAnnotationImageProvider"
             annotationType="org.key_project.sed.ui.SymbolicallyReachedAnnotation"
             colorPreferenceKey="executedSEDNode_color"
-            colorPreferenceValue="254,248,226"
+            colorPreferenceValue="252,232,160"
             contributesToHeader="false"
             highlightPreferenceKey="executedSEDNode_highlight"
             highlightPreferenceValue="true"
@@ -505,5 +506,11 @@
          <initializer
                class="org.key_project.sed.ui.util.SEDUIPreferenceUtilInitializer">
          </initializer>
+      </extension>
+      <extension
+            point="org.key_project.sed.ui.slicingSettingsControlFactories">
+         <factory
+               class="org.key_project.sed.ui.SlicingSettingsControlFactory1">
+         </factory>
       </extension>
 </plugin>

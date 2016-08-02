@@ -4,4 +4,6 @@ public interface IQuestionWithCildren {
    public AbstractQuestion[] getChildQuestions();
    
    public int countChildQuestions();
+
+   public AbstractQuestion getChildQuestion(String name);
 }

@@ -29,6 +29,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                false,
                 true,
                 true);
    }
@@ -48,6 +49,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -81,6 +83,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                false,
                 true,
                 true);
    }
@@ -107,6 +110,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                false,
                 true,
                 true);
    }
@@ -126,6 +130,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -159,6 +164,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                false,
                 true,
                 true);
    }
@@ -178,6 +184,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -211,6 +218,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                false,
                 true,
                 true);
    }
@@ -237,6 +245,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                false,
                 true,
                 true);
    }
@@ -256,6 +265,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,

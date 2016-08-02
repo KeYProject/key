@@ -11,7 +11,7 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.POExtension;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
+import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
 /**
@@ -51,7 +51,7 @@ public class TruthValuePOExtension implements POExtension {
       if (term != null) {
          final TermFactory tf = services.getTermFactory();
          // Label children of operator
-         if (TruthValueEvaluationUtil.isLogicOperator(term)) {
+         if (TruthValueTracingUtil.isLogicOperator(term)) {
             Term[] newSubs = new Term[term.arity()];
             boolean subsChanged = false;
             for (int i = 0; i < newSubs.length; i++) {
