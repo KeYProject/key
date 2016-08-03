@@ -122,18 +122,21 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
             newConstraints =
                     newConstraints.add(joinElem.getDefiningAxiom(
                             tb.func(newSkolemConst), services));
+            
             // NOTE: We also remember the precise values by if-then-else
             // construction. This preserves completeness and should also
             // not be harmful to performance in cases where completeness
             // is also preserved by the lattice. However, if there are
             // lattices where this construction is bad, it may be safely
             // removed (no harm to soundness!).
+            /*
             newConstraints =
                     newConstraints.add(tb.equals(tb.func(newSkolemConst),
                             JoinIfThenElse.createIfThenElseTerm(state1, state2,
                                     valueInState1, valueInState2,
                                     distinguishingFormula, services)));
-
+            */
+            
             return new ValuesJoinResult(newConstraints,
                     tb.func(newSkolemConst), newNames, sideConditions);
 
