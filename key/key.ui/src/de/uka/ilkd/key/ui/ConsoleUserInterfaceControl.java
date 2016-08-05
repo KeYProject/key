@@ -140,8 +140,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
    }
 
     @Override
-   public void taskFinished(TaskFinishedInfo info) {
-       super.taskFinished(info);
+   public void taskFinished(TaskFinishedInfo info) {    	
+       super.taskFinished(info);              
        progressMax = 0; // reset progress bar marker
        final Proof proof = info.getProof();
        if (proof==null) {
@@ -150,7 +150,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                final Object error = info.getResult();
                if (error instanceof Throwable) {
                    ((Throwable) error).printStackTrace();
-               }
+               }               
            }
            System.exit(1);
        }
@@ -354,10 +354,12 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     @Override
     final public boolean selectProofObligation(InitConfig initConfig) {
-        if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("Proof Obligation selection not supported by console.");
-        }
-        return false;
+    	ConsoleProofObligationSelector sel = new ConsoleProofObligationSelector(this, initConfig);
+    	return sel.selectProofObligation();
+//        if(verbosity >= Verbosity.DEBUG) {
+//            System.out.println("Proof Obligation selection not supported by console.");
+//        }
+//        return false;
     }
     
    /**

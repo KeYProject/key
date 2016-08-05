@@ -258,6 +258,7 @@ public abstract class AbstractProblemLoader {
                         return;
                     }
                 }
+                
                 // Create and register proof at specification repository                    
                 proofList = createProof(poContainer); 
 
