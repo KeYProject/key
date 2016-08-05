@@ -261,7 +261,7 @@ public abstract class AbstractProblemLoader {
                 
                 // Create and register proof at specification repository                    
                 proofList = createProof(poContainer); 
-
+                
                 // try to replay first proof
                 proof = proofList.getProof(poContainer.getProofNum());
                 
@@ -479,6 +479,7 @@ public abstract class AbstractProblemLoader {
      * @throws ProofInputException Occurred Exception.
      */
     protected ProofAggregate createProof(LoadedPOContainer poContainer) throws ProofInputException {
+    	
         ProofAggregate proofList = 
         		problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
 
