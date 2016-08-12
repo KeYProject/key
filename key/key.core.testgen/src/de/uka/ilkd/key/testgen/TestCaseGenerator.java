@@ -618,6 +618,9 @@ public class TestCaseGenerator {
 						
 						testMethod.append("  //" + originalNodeName + NEW_LINE);
 						testMethod.append(getTestMethodSignature(i) + "{" + NEW_LINE);
+						if(!junitFormat){
+							testMethod.append("   System.out.println(\"\\nRun: "+originalNodeName+"\");"+NEW_LINE);
+						}
 						testMethod
 						.append("   //Test preamble: creating objects and intializing test data"
 								+ generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
