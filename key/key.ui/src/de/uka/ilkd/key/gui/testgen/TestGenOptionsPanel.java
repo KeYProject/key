@@ -43,7 +43,7 @@ class TestGenOptionsPanel extends TablePanel{
 			                                       "This functionality is enabled by RFL.java which is generated along the test suite. Please note, a runtime checker may not be able to handle the generated code.";
 	private static final String infoOpenJMLPath = "Set location of the folder containing openjml.jar. OpenJML is a third-party runtime checker. KeYTestGen generates the shell scripts compileWithOpenJML.sh and executeWithOpenJML.sh in the test output directory to simplify compilation and execution of the tests. The user should visit the OpenJML's website for additional instructions.";
 	private static final String infoObjenesisPath = "Set location of the objenesis.jar. Objenesis is a thrid-party library allows easy object creation from classes which do not have a (public) default constructur.";
-	private static final String infoIncludePostcondition = "Includes the negated post condition in the test data constraint when generating test data. The post condition can only be included for paths (branches) where symbolic execution has finished.";
+	private static final String infoIncludePostcondition = "Includes the negated postcondition in the test data constraint when generating test data. The post condition can only be included for paths (branches) where symbolic execution has finished.";
 	
 	public TestGenOptionsPanel(TestGenerationSettings settings){
 		super();
@@ -74,7 +74,7 @@ class TestGenOptionsPanel extends TablePanel{
 	
 	public JTextField getMaxProcesses() {
 		if(maxProcesses == null){
-			maxProcesses = addTextField("Concurrent Processes:",minWidthOfTitle,Long.toString(settings.getNumberOfProcesses()),infoMaxProcesses,
+			maxProcesses = addTextField("Concurrent processes:",minWidthOfTitle,Long.toString(settings.getNumberOfProcesses()),infoMaxProcesses,
 					new ActionListener(){
 
 				@Override
@@ -96,7 +96,7 @@ class TestGenOptionsPanel extends TablePanel{
 	
 	public JTextField getMaxUnwinds() {
 		if(maxUnwinds == null){
-			maxUnwinds = addTextField("Maximal Unwinds:",minWidthOfTitle,Long.toString(settings.getMaximalUnwinds()),infoMaxUnwinds,
+			maxUnwinds = addTextField("Maximal unwinds:",minWidthOfTitle,Long.toString(settings.getMaximalUnwinds()),infoMaxUnwinds,
 					new ActionListener(){
 
 				@Override
@@ -232,7 +232,7 @@ class TestGenOptionsPanel extends TablePanel{
 	
 	public JCheckBox getIncludePostCondition(){		
 		if(includePostCondition == null){			
-			includePostCondition = addCheckBox("Include Post Condition", infoIncludePostcondition, settings.includePostCondition(), new ActionListener() {
+			includePostCondition = addCheckBox("Include postcondition", infoIncludePostcondition, settings.includePostCondition(), new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					settings.setIncludePostCondition(includePostCondition.isSelected());
