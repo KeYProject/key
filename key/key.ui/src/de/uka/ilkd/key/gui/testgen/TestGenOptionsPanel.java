@@ -41,8 +41,8 @@ class TestGenOptionsPanel extends TablePanel{
 	private static final String infoRFLSelection = "Enables initialization of protected, private, and ghost fields with test data, " +
 			                                       "as well as creation of objects from classes which have no default constructor (requires the Objenesis library)." +
 			                                       "This functionality is enabled by RFL.java which is generated along the test suite. Please note, a runtime checker may not be able to handle the generated code.";
-	private static final String infoOpenJMLPath = "Set location of openjml.jar. OpenJML is a third-party runtime checker. KeYTestGen generates the shell scripts compileWithOpenJML.sh and executeWithOpenJML.sh in the test output directory to simplify compilation and execution of the tests. The user should visit the OpenJML's website for additional instructions.";
-	private static final String infoObjenesisPath = "Set location of objenesis.jar. Objenesis is a thrid-party library allows easy object creation from classes which do not have a (public) default constructur.";
+	private static final String infoOpenJMLPath = "Set location of the folder containing openjml.jar. OpenJML is a third-party runtime checker. KeYTestGen generates the shell scripts compileWithOpenJML.sh and executeWithOpenJML.sh in the test output directory to simplify compilation and execution of the tests. The user should visit the OpenJML's website for additional instructions.";
+	private static final String infoObjenesisPath = "Set location of the objenesis.jar. Objenesis is a thrid-party library allows easy object creation from classes which do not have a (public) default constructur.";
 	private static final String infoIncludePostcondition = "Includes the negated post condition in the test data constraint when generating test data. The post condition can only be included for paths (branches) where symbolic execution has finished.";
 	
 	public TestGenOptionsPanel(TestGenerationSettings settings){
@@ -150,7 +150,7 @@ class TestGenOptionsPanel extends TablePanel{
 	}
 	public FileChooserPanel getObjenesisPanel() {
 		if(objenesisPanel == null){
-			objenesisPanel = addFileChooserPanel("Location of objenesis:",
+			objenesisPanel = addFileChooserPanel("Location of objenesis.jar:",
 					settings.getObjenesisPath(), infoObjenesisPath, 
                         false,true,new ActionListener() {
 
@@ -160,7 +160,7 @@ class TestGenOptionsPanel extends TablePanel{
 					settings.fireSettingsChanged();
 
 				}
-			});
+			}, false);
 		}
 		return objenesisPanel;
 	}

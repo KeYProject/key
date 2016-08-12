@@ -118,14 +118,27 @@ public abstract class TablePanel extends JPanel{
 
         
         protected FileChooserPanel addFileChooserPanel(String title, String file, String info,
-                        boolean selected,boolean enabled, ActionListener changeListener){
-              FileChooserPanel fileChooserPanel =  new FileChooserPanel(selected,enabled,title,file);
+                        boolean selected,boolean enabled, ActionListener changeListener, boolean directoryOnly){
+              FileChooserPanel fileChooserPanel =  new FileChooserPanel(selected,enabled,title,file, directoryOnly);
               fileChooserPanel.addActionListener(changeListener);
               setMaximumHeight(fileChooserPanel, fileChooserPanel.getPreferredSize().height);
               addComponent(info,fileChooserPanel);
               
               return fileChooserPanel;
         }
+        
+        protected FileChooserPanel addFileChooserPanel(String title, String file, String info,
+                boolean selected,boolean enabled, ActionListener changeListener){
+      
+      
+      return addFileChooserPanel(title, file, info, selected, enabled, changeListener, true);
+}
+        
+        
+        
+        
+        
+        
         
         protected JComboBox addComboBox(String info,int selectionIndex,ActionListener changeListener,Object... items){
                 JComboBox comboBox = new JComboBox(items);

@@ -123,11 +123,11 @@ public class TestCaseGenerator {
 		return "#!/bin/bash" + NEW_LINE + NEW_LINE
 				+ "if [ -e \""+openJMLPath+File.separator+"openjml.jar\" ] " + NEW_LINE
 				+ "then" + NEW_LINE 
-				+ "   if [ -e \""+objenesisPath+File.separator+OBJENESIS_NAME+"\" ]" + NEW_LINE
+				+ "   if [ -e \""+objenesisPath+"\" ]" + NEW_LINE
 				+ "   then" + NEW_LINE
-				+ "      java -jar "+openJMLPath+File.separator+"openjml.jar -cp \"."+objenesisPath+File.separator+OBJENESIS_NAME+"\" -rac *" + JAVA_FILE_EXTENSION_WITH_DOT + NEW_LINE
+				+ "      java -jar "+openJMLPath+File.separator+"openjml.jar -cp \""+objenesisPath+"\" -rac *" + JAVA_FILE_EXTENSION_WITH_DOT + NEW_LINE
 				+ "   else" + NEW_LINE
-				+ "      echo \"objenesis-2.2.jar not found!\"" + NEW_LINE
+				+ "      echo \"objenesis jar not found!\"" + NEW_LINE
 				+ "   fi" + NEW_LINE
 				+ "else" + NEW_LINE
 				+ "   echo \"openjml.jar not found!\"" + NEW_LINE
@@ -146,7 +146,7 @@ public class TestCaseGenerator {
 				+ "then"
 				+ "  if [ -e \""+path+File.separator+"jmlspecs.jar\" ]" + NEW_LINE
 				+ "  then" + NEW_LINE
-				+ "     if [ -e \""+objenesisPath+File.separator+OBJENESIS_NAME+"\" ]" + NEW_LINE
+				+ "     if [ -e \""+objenesisPath+"\" ]" + NEW_LINE
 				+ "     then" + NEW_LINE
 				+ "        if [ \"$1\" = \"\" ] ; then" + NEW_LINE
 				+ "           echo \"Provide the test driver as an argument (without " + JAVA_FILE_EXTENSION_WITH_DOT + " postfix). For example:\"" + NEW_LINE
@@ -155,10 +155,10 @@ public class TestCaseGenerator {
 				+ "           echo \"current directory.\"" + NEW_LINE
 				+ "           quit" + NEW_LINE
 				+ "        else" + NEW_LINE
-				+ "           java -cp "+objenesisPath+File.separator+OBJENESIS_NAME+":"+path+File.separator+"jmlruntime.jar:"+path+File.separator+"jmlspecs.jar:. $1" + NEW_LINE
+				+ "           java -cp "+objenesisPath+":"+path+File.separator+"jmlruntime.jar:"+path+File.separator+"jmlspecs.jar:. $1" + NEW_LINE
 				+ "        fi" + NEW_LINE
 				+ "      else" + NEW_LINE
-				+ "         echo \"objenesis-2.2.jar not found!\"" + NEW_LINE
+				+ "         echo \"objenesis jar not found!\"" + NEW_LINE
 				+ "      fi" + NEW_LINE
 				+ "else" + NEW_LINE
 				+ "  echo \"jmlspecs.jar not found!\"" + NEW_LINE
@@ -483,12 +483,14 @@ public class TestCaseGenerator {
 		StringBuffer sb = new StringBuffer();
 		String filestr = "compileWithOpenJML.sh";
 		File file = new File(directory + modDir + File.separator + filestr);
+		file.setExecutable(true);
 		if (!file.exists()) {
 			sb.append(compileWithOpenJML);
 			writeToFile(filestr, sb);
-		}
+		}		
 		filestr = "executeWithOpenJML.sh";
 		file = new File(directory + modDir + File.separator + filestr);
+		file.setExecutable(true);
 		if (!file.exists()) {
 			sb = new StringBuffer();
 			sb.append(executeWithOpenJML);

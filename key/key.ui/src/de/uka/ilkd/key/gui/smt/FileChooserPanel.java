@@ -37,6 +37,8 @@ public class FileChooserPanel extends JPanel{
         private JButton chooseButton = null;
         private JTextArea saveToFileExplanation = null;
         private LinkedList<ActionListener> listeners = new LinkedList<ActionListener>();
+        private boolean isDirectoryOnly = true;
+        
         
         public String getPath(){
                 return getFolderField().getText();
@@ -47,9 +49,9 @@ public class FileChooserPanel extends JPanel{
         }
         
         
-        public FileChooserPanel(boolean withSelection,boolean enabled, String title) {
+        public FileChooserPanel(boolean withSelection,boolean enabled, String title, boolean directoryOnly) {
 
-     
+        	this.isDirectoryOnly = directoryOnly;
 
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
             setBorder(BorderFactory.createTitledBorder(null, title,
@@ -70,8 +72,13 @@ public class FileChooserPanel extends JPanel{
         }
         
         public FileChooserPanel(boolean withSelection,boolean enabled, String title,String defaultValue) {
-            this(withSelection,enabled,title);
+            this(withSelection,enabled,title, true);
             this.getFolderField().setText(defaultValue);
+        }
+        
+        public FileChooserPanel(boolean withSelection,boolean enabled, String title,String defaultValue, boolean directoryOnly) {        	
+        	this(withSelection,enabled,title, directoryOnly);
+            this.getFolderField().setText(defaultValue);            
         }
         
 
@@ -145,14 +152,26 @@ public class FileChooserPanel extends JPanel{
          */
         public JButton getChooseButton() {
             if (chooseButton == null) {
-                chooseButton = new JButton();
-                chooseButton.setText("choose folder");
+                chooseButton = new JButton(); 
+                if(isDirectoryOnly){
+                	chooseButton.setText("choose folder");
+                }
+                else{
+                	chooseButton.setText("choose file");
+                }
+                chooseButton.updateUI();
                 chooseButton.addActionListener(new ActionListener() {
                     
                     public void actionPerformed(ActionEvent e) {
                     JFileChooser chooser = new JFileChooser();
-                    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                    if(chooser.showDialog(FileChooserPanel.this, "Choose folder") 
+                    
+                    String title = "Choose file";
+                    if(isDirectoryOnly){
+                    	title = "Choose folder";
+                    	chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                    }
+                    
+                    if(chooser.showDialog(FileChooserPanel.this, title) 
                         == JFileChooser.APPROVE_OPTION){
                         getFolderField().setText(chooser.getSelectedFile().getAbsolutePath()); // was: "/%d_%t_%i_%s"
                     }
