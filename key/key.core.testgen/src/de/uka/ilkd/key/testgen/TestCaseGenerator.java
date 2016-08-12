@@ -170,7 +170,7 @@ public class TestCaseGenerator {
 				+ "   echo \"jmlruntime.jar not found!\"" + NEW_LINE
 				+ "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"" + NEW_LINE
 				+ "   echo \"Copy jmlruntime.jar into the directory with test files.\"" + NEW_LINE
-				+ "   quit" + NEW_LINE 
+				+ "   exit" + NEW_LINE 
 				+ "fi" + NEW_LINE;
 	}
 
