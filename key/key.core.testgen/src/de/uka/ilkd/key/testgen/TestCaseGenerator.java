@@ -153,7 +153,7 @@ public class TestCaseGenerator {
 				+ "           echo \"  executeWithOpenJML.sh TestGeneric0 \"" + NEW_LINE
 				+ "           echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\"" + NEW_LINE
 				+ "           echo \"current directory.\"" + NEW_LINE
-				+ "           quit" + NEW_LINE
+				+ "           exit" + NEW_LINE
 				+ "        else" + NEW_LINE
 				+ "           java -cp "+objenesisPath+":"+path+File.separator+"jmlruntime.jar:"+path+File.separator+"jmlspecs.jar:. $1" + NEW_LINE
 				+ "        fi" + NEW_LINE
