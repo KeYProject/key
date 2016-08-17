@@ -3,7 +3,9 @@ package de.uka.ilkd.key.gui.testgen;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
@@ -23,7 +25,7 @@ class TestGenOptionsPanel extends TablePanel{
 	private JTextField maxProcesses;
 	private JTextField maxUnwinds;
     private JCheckBox symbolicEx;
-	private JCheckBox useJUnit;
+	private ButtonGroup useJUnit;
 	private JCheckBox invariantForAll;
 	private JCheckBox includePostCondition;
 	private JCheckBox removeDuplicates;
@@ -34,7 +36,7 @@ class TestGenOptionsPanel extends TablePanel{
 	private static final String infoApplySymbolicEx = "Performs bounded symbolic execution on the current proof tree. More precisely, the TestGen Macro is executed which the user can also manually execute by right-clicking on the proof tree and selecting Strategy Macros->TestGen.";
 	private static final String infoSaveTo = "Choose the folder where the test case files will be written.";
 	private static final String infoMaxProcesses = "Maximal number of SMT processes that are allowed to run concurrently.";
-	private static final String infoUseJunit = "Generate a JUnit 4 test suite and a test oracle from the postcondition. Disable this option when using a JML runtime checker since the generated code may be too complicated for the runtime checker or may not comply with JML requirements.";
+	private static final String infoUseJunit = "Generate a JUnit 4 test suite and a test oracle from the postcondition or generate a test suite that is to be compiled and executed with a runtime assertion checker like OpenJML.";
 	private static final String infoInvariantForAll = "Includes class invariants in the test data constraints. I.e., require the class invariant of all created objects to be true in the initial state.";
 	private static final String infoMaxUnwinds = "Maximal number of loop unwinds or method calls on a branch that is symbolically executed when using the Strategy Macro \"TestGen\". The Strategy Macro is available by right-click on the proof tree.";
 	private static final String infoRemoveDuplicates = "Generate a single testcase for two or more nodes which represent the same test data constraint. Two different nodes may represent the same test data constraint, because some formulas from the nodes which cannot be translated into a test case may be filtered out from the test data constraint.";
@@ -74,7 +76,7 @@ class TestGenOptionsPanel extends TablePanel{
 	
 	public JTextField getMaxProcesses() {
 		if(maxProcesses == null){
-			maxProcesses = addTextField("Concurrent processes:",minWidthOfTitle,Long.toString(settings.getNumberOfProcesses()),infoMaxProcesses,
+			maxProcesses = addTextField("Parallel SMT solvers:",minWidthOfTitle,Long.toString(settings.getNumberOfProcesses()),infoMaxProcesses,
 					new ActionListener(){
 
 				@Override
@@ -164,16 +166,52 @@ class TestGenOptionsPanel extends TablePanel{
 		}
 		return objenesisPanel;
 	}
-	public JCheckBox getJUnitPanel(){
+	public ButtonGroup getJUnitPanel(){
 		if(useJUnit == null){
 			
-			useJUnit = addCheckBox("Generate JUnit and test oracle", infoUseJunit, settings.useJunit(), new ActionListener() {
+//			useJUnit = addCheckBox("Generate JUnit and test oracle", infoUseJunit, settings.useJunit(), new ActionListener() {
+//				@Override
+//				public void actionPerformed(ActionEvent e) {
+//					settings.setUseJunit(useJUnit.isSelected());
+//					settings.fireSettingsChanged();
+//				}
+//			});	
+			
+			final JRadioButton junitRadioButton = new JRadioButton();
+			junitRadioButton.setText("Generate JUnit and test oracle");
+			junitRadioButton.addActionListener(new ActionListener() {
+				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					settings.setUseJunit(useJUnit.isSelected());
+					settings.setUseJunit(junitRadioButton.isSelected());
 					settings.fireSettingsChanged();
+					
 				}
-			});			
+			});
+			final JRadioButton openJMLRadioButton = new JRadioButton();
+			openJMLRadioButton.setText("Runtime checking with OpenJML");			
+			openJMLRadioButton.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					settings.setUseJunit(!openJMLRadioButton.isSelected());
+					settings.fireSettingsChanged();
+					
+				}
+			});		
+			
+			ButtonGroup group = new ButtonGroup();
+			group.add(junitRadioButton);
+			group.add(openJMLRadioButton);
+			openJMLRadioButton.setSelected(!settings.useJunit());
+			junitRadioButton.setSelected(settings.useJunit());
+			
+			
+			addComponent(infoUseJunit, junitRadioButton, openJMLRadioButton);
+			
+			
+			
+			
 		}		
 		return useJUnit;		
 	}
