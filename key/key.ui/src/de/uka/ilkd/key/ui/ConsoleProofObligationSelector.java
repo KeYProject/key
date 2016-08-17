@@ -23,7 +23,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector{
     public static final String TAB = "   ";
 
     private KeYMediator mediator;
-    private InitConfig initConfig;
+    protected InitConfig initConfig;
     private ConsoleUserInterfaceControl ui;
 
     protected List<Contract> contracts;
@@ -73,7 +73,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector{
                 : contract.createProofObl(initConfig, contract);
     }
 
-    private void findOrStartProof(ProofOblInput po) {
+    protected void findOrStartProof(ProofOblInput po) {
 
 
         Proof proof = findPreferablyClosedProof(po);

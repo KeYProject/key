@@ -183,7 +183,7 @@ public class RIFLTransformer {
         //xmlReader.setFeature("http://xml.org/sax/features/validation", true);
         xmlReader.setContentHandler(new RIFLHandler());
         xmlReader.setErrorHandler(new RIFLHandler.ErrorHandler());
-        xmlReader.parse(new InputSource(new FileReader(fileName)));
+        xmlReader.parse(fileName.toURI().toString());
         return ((RIFLHandler) xmlReader.getContentHandler()).getSpecification();
     }
 

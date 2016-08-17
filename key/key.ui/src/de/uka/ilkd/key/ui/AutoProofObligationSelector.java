@@ -12,20 +12,22 @@ import org.key_project.util.collection.ImmutableSet;
 /**
  * Created by weigl on 17.08.16.
  */
-public class AutoProofObligationSelector
-        extends ConsoleProofObligationSelector {
-    public AutoProofObligationSelector(ConsoleUserInterfaceControl ui, InitConfig initConfig) {
-        super(ui, initConfig);
+public class AutoProofObligationSelector extends ConsoleProofObligationSelector {
+	public AutoProofObligationSelector(ConsoleUserInterfaceControl ui, InitConfig initConfig) {
+		super(ui, initConfig);	
+	}
 
-        printAvailableProofObligations();
-    }
-
-    @Override
-    public boolean selectProofObligation() {
-        //TODO write code to select the non-interference proof.
-        for (Contract c : contracts) {
-
-        }
-        return false;
-    }
+	@Override
+	public boolean selectProofObligation() {
+		// TODO write code to select the non-interference proof.
+		for (Contract c : contracts) {
+			if (c.getDisplayName().startsWith("Non-interference")) {
+				System.out.println("Selecting: "+ c.getDisplayName());
+				ProofOblInput obl = c.createProofObl(initConfig, c);
+				findOrStartProof(obl);
+				return true;
+			}
+		}
+		return false;
+	}
 }
