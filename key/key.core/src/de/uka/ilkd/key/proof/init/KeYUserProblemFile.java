@@ -171,7 +171,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             assert problemHeader.lastIndexOf("\\proofObligation") == -1;
             assert problemHeader.lastIndexOf("\\chooseContract") == -1;
 
-            initConfig.setTaclets(problemParser.getTaclets());
+            //initConfig.setTaclets(problemParser.getTaclets());
             lastParser = problemParser;
         } catch(RecognitionException e) {
             // problemParser cannot be null here

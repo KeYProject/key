@@ -20,6 +20,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import javax.xml.parsers.*;
+
 import org.xml.sax.*;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
@@ -39,9 +40,20 @@ import de.uka.ilkd.key.util.Pair;
  * and Java sources and writes JML* information flow specifications to the
  * original Java files.
  *
+ * <b>changes (weigl, 2016-08-16):</b>
+ * changed interfaces to File. This avoid some crud string operations on filenames
+ *
  * @author bruns
+ * @author weigl, 2016-08-17
  */
 public class RIFLTransformer {
+    private final LinkedHashMap<CompilationUnit, String> javaCUs = new LinkedHashMap<CompilationUnit, String>();
+
+    private RIFLTransformer() throws ParserConfigurationException, SAXException {
+        JPF.initialize(new CrossReferenceServiceConfiguration());
+        assert JPF.getServiceConfiguration() != null;
+    }
+
 
     //private static final String TMP_PATH = System.getProperty("java.io.tmpdir");
     private static final JavaProgramFactory JPF =
@@ -67,21 +79,22 @@ public class RIFLTransformer {
             System.out.println("This is the RIFL to JML* transformer.");
             System.out.println("Usage: <RIFL file> <Java sources>");
         } else {
-            final String riflFilename = args[0];
-            final String javaFilename = args[1];
+            final File riflFilename = new File(args[0]);
+            final File javaFilename = new File(args[1]);
             RIFLTransformer.transform(riflFilename, javaFilename);
         }
     }
 
     /**
      * Transforms plain Java files + RIFL specification to Java+JML* specifications.
+     *
      * @param riflFilename path to a RIFL file
-     * @param javaSource path to Java sources (should be a directory)
-     * @param savePath custom save path
+     * @param javaSource   path to Java sources (should be a directory)
+     * @param savePath     custom save path
      * @param kexh
      */
-    public static void transform(String riflFilename, String javaSource,
-            String savePath, KeYRecoderExcHandler kexh) {
+    public static void transform(File riflFilename, File javaSource,
+                                 File savePath, KeYRecoderExcHandler kexh) {
         assert riflFilename != null;
         assert javaSource != null;
         assert savePath != null;
@@ -102,54 +115,36 @@ public class RIFLTransformer {
         }
     }
 
-    public static void transform(String riflFilename, String javaSource, KeYRecoderExcHandler kexh) {
+    public static void transform(File riflFilename, File javaSource, KeYRecoderExcHandler kexh) {
         transform(riflFilename, javaSource, getDefaultSavePath(javaSource), kexh);
     }
 
-    public static void transform(String riflFilename, String javaSource) {
+    public static void transform(File riflFilename, File javaSource) {
         transform(riflFilename, javaSource, SimpleRIFLExceptionHandler.INSTANCE);
-    }
-
-    private final XMLReader xmlReader;
-    private final LinkedHashMap<CompilationUnit,String> javaCUs
-            = new LinkedHashMap<CompilationUnit,String>();
-
-    private RIFLTransformer() throws ParserConfigurationException, SAXException {
-        final SAXParserFactory spf = SAXParserFactory.newInstance();
-        spf.setNamespaceAware(true);
-        final SAXParser saxParser = spf.newSAXParser();
-        xmlReader = saxParser.getXMLReader();
-        xmlReader.setContentHandler(new RIFLHandler());
-        xmlReader.setErrorHandler(new RIFLHandler.ErrorHandler());
-        JPF.initialize(new CrossReferenceServiceConfiguration());
-        assert JPF.getServiceConfiguration() != null;
     }
 
     /**
      * Returns the default save path for transformed Java files.
+     *
      * @param origSourcePath path to a directory or single Java file
      * @return path to the transformed directory
      */
-    public static String getDefaultSavePath (String origSourcePath) {
+    public static File getDefaultSavePath(File origSourcePath) {
+        //TODO weigl: Shouldn't we use the old directory, because of reference to other java files?
         origSourcePath = getBaseDirPath(origSourcePath);
-        final String[] path = origSourcePath.split(File.separator);
-        final String dirName = "".equals(path[path.length-1])? path[path.length-2]: path[path.length-1];
-        return origSourcePath + File.separator + dirName + "_RIFL" + File.separator;
+        return new File(origSourcePath.getParentFile(), origSourcePath.getName() + "_RIFL");
     }
 
-    private static String getBaseDirPath(String origSourcePath) {
-        if (origSourcePath.endsWith(".java")) {
-            // select containing directory
-            final String absPath = new File(origSourcePath).getAbsolutePath();
-            origSourcePath = absPath.substring(0, absPath.lastIndexOf(File.separator));
-        }
-        return origSourcePath;
+    private static File getBaseDirPath(File origSourcePath) {
+        if (origSourcePath.isFile())
+            return origSourcePath.getParentFile();
+        else
+            return origSourcePath;
     }
 
-    private void readJava(String source) throws IOException, ParserException {
-        final File root = new File(source);
-        assert root.exists(): "source dir must exist";
-        assert root.isDirectory(): "source must be directory";
+    private void readJava(File root) throws IOException, ParserException {
+        assert root.exists() : "source dir must exist";
+        assert root.isDirectory() : "source must be directory";
         final DirectoryFileCollection files = new DirectoryFileCollection(root);
         final Walker walker = files.createWalker(".java");
 
@@ -165,7 +160,7 @@ public class RIFLTransformer {
             try {
                 fr = new BufferedReader(new FileReader(javaFile));
                 cu = JPF.parseCompilationUnit(fr);
-                javaCUs.put(cu,javaFile); // TODO: put absolute or relative path?
+                javaCUs.put(cu, javaFile); // TODO: put absolute or relative path?
                 serviceConfiguration.getChangeHistory().updateModel(); // workaround to an issue in recoder
             } catch (IOException e) {
                 throw e;
@@ -177,96 +172,62 @@ public class RIFLTransformer {
         }
     }
 
-    private SpecificationContainer readRIFL(String fileName)
-            throws IOException, SAXException {
+    private SpecificationContainer readRIFL(File fileName)
+            throws IOException, SAXException, ParserConfigurationException {
         // TODO: validate input file
-        xmlReader.parse(convertToFileURL(fileName));
+        final SAXParserFactory spf = SAXParserFactory.newInstance();
+        spf.setNamespaceAware(true);
+
+        SAXParser saxParser = spf.newSAXParser();
+        XMLReader xmlReader = saxParser.getXMLReader();
+        //xmlReader.setFeature("http://xml.org/sax/features/validation", true);
+        xmlReader.setContentHandler(new RIFLHandler());
+        xmlReader.setErrorHandler(new RIFLHandler.ErrorHandler());
+        xmlReader.parse(new InputSource(new FileReader(fileName)));
         return ((RIFLHandler) xmlReader.getContentHandler()).getSpecification();
     }
 
-    private SpecificationContainer sc = null;
-    private Exception threadExc = null;
+    private void doTransform(final File riflFilename,
+                             final File source,
+                             final File savePath)
+            throws IOException, SAXException, ParserException, ParserConfigurationException {
+        ensureTargetDirExists(savePath);
+        final File javaRoot = getBaseDirPath(source);
 
-    private void doTransform(final String riflFilename, String source, String savePath)
-            throws IOException, SAXException, ParserException {
-
-        // step 1a: parse RIFL file
-        final Runnable r = new Runnable () {
-             public void run() {
-                 // debug
-                 // System.out.println("[RIFL] Start RIFL reader");
-                 try {
-                     sc = readRIFL(riflFilename);
-                     // debug
-                     // System.out.println(sc);
-                 } catch (Exception e) {
-                     threadExc = e;
-                 } finally {
-                     // debug
-                     // System.out.println("[RIFL] Finished RIFL reader");
-                 }
-             }
-        };
-        final Thread riflReader = new Thread(r,"RIFLReader");
-        riflReader.start();
-
-        // step 1b: parse Java source
-        final String javaRoot = getBaseDirPath(source);
-        final Runnable t = new Runnable() {
-            public void run() {
-                // System.out.println("[RIFL] Start Java reader");
-                try {
-                    readJava(javaRoot);
-                } catch (Exception e) {
-                    threadExc = e;
-                } finally {
-                    // System.out.println("[RIFL] Finished Java reader");
-                }
-            }
-        };
-        final Thread javaReader = new Thread(t,"JavaReader");
-        javaReader.start();
-
-        // synchronize
-        while (riflReader.isAlive() || javaReader.isAlive()) {}
-        // promote exceptions
-        if (threadExc instanceof RuntimeException) throw (RuntimeException)threadExc;
-        if (threadExc instanceof IOException) throw (IOException)threadExc;
-        if (threadExc instanceof SAXException) throw (SAXException)threadExc;
-        if (threadExc instanceof ParserException) throw (ParserException)threadExc;
+        // step 1: read files
+        SpecificationContainer sc = readRIFL(riflFilename);
+        readJava(javaRoot);
 
         // step 2: inject specifications
         for (final CompilationUnit cu : javaCUs.keySet()) {
-            final SpecificationInjector si = new SpecificationInjector(sc,JPF.getServiceConfiguration().getSourceInfo());
+            final SpecificationInjector si = new SpecificationInjector(sc, JPF.getServiceConfiguration().getSourceInfo());
             cu.accept(si);
         }
 
         // step 3: write modified Java files
-        ensureTargetDirExists(savePath);
-        for (final Pair<CompilationUnit,String> javaUnit: javaCUs) {
+        for (final Pair<CompilationUnit, String> javaUnit : javaCUs) {
             // TODO: javaCus contains absolute path, strip it
-            final String onlyFilename = javaUnit.second.substring(javaUnit.second.lastIndexOf(File.separator)+1);
+            final String onlyFilename = javaUnit.second.substring(javaUnit.second.lastIndexOf(File.separator) + 1);
             writeJavaFile(savePath, onlyFilename, javaUnit.first);
         }
     }
 
-    private void ensureTargetDirExists(String target) throws IOException {
-        final File file = new File(target);
-        if (file.exists()) {
-            if (file.isDirectory() && file.canWrite()) {
+    private void ensureTargetDirExists(File target) throws IOException {
+        if (target.exists()) {
+            if (target.isDirectory() && target.canWrite()) {
                 return; // nothing to do
             } else { // bad
-                throw new IOException("target directory "+target+" not writable");
+                throw new IOException("target directory " + target + " not writable");
             }
         } else { // create directory
-            file.mkdir();
+            target.mkdir();
         }
     }
 
     /**
      * Writes a single Java file.
      */
-    private void writeJavaFile(String target, String fileName, CompilationUnit cu)
+    private void writeJavaFile(File target, String fileName, CompilationUnit cu)
             throws IOException {
         FileWriter writer = null;
         final String filePath = target + File.separator + fileName;
@@ -277,7 +238,10 @@ public class RIFLTransformer {
             // System.out.println("[RIFL] Write the following contents to file:");
             // System.out.println(source);
             writer.append(source);
-        } catch (final IOException e) { throw e;
-        } finally { if (writer != null) writer.close(); }
+        } catch (final IOException e) {
+            throw e;
+        } finally {
+            if (writer != null) writer.close();
+        }
     }
 }

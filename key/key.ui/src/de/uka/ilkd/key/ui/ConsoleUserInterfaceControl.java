@@ -354,7 +354,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     @Override
     final public boolean selectProofObligation(InitConfig initConfig) {
-    	ConsoleProofObligationSelector sel = new ConsoleProofObligationSelector(this, initConfig);
+    	//ProofObligationSelector sel = new ConsoleProofObligationSelector(this, initConfig);
+        ProofObligationSelector sel = new AutoProofObligationSelector(this, initConfig);
     	return sel.selectProofObligation();
 //        if(verbosity >= Verbosity.DEBUG) {
 //            System.out.println("Proof Obligation selection not supported by console.");
