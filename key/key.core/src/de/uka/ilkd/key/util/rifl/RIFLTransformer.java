@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.Reader;
 import javax.xml.parsers.*;
 
+import de.uka.ilkd.key.util.Debug;
 import org.xml.sax.*;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
@@ -30,7 +31,12 @@ import recoder.java.JavaProgramFactory;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.FileCollection.Walker;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
-import de.uka.ilkd.key.util.LinkedHashMap;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -39,7 +45,7 @@ import de.uka.ilkd.key.util.Pair;
  * developed in the RS3 project. Method <code>transform</code> reads a RIFL file
  * and Java sources and writes JML* information flow specifications to the
  * original Java files.
- *
+ * <p>
  * <b>changes (weigl, 2016-08-16):</b>
  * changed interfaces to File. This avoid some crud string operations on filenames
  *
@@ -47,8 +53,6 @@ import de.uka.ilkd.key.util.Pair;
  * @author weigl, 2016-08-17
  */
 public class RIFLTransformer {
-    private final LinkedHashMap<CompilationUnit, String> javaCUs = new LinkedHashMap<CompilationUnit, String>();
-
     private RIFLTransformer() throws ParserConfigurationException, SAXException {
         JPF.initialize(new CrossReferenceServiceConfiguration());
         assert JPF.getServiceConfiguration() != null;
@@ -93,8 +97,8 @@ public class RIFLTransformer {
      * @param savePath     custom save path
      * @param kexh
      */
-    public static void transform(File riflFilename, File javaSource,
-                                 File savePath, KeYRecoderExcHandler kexh) {
+    public static boolean transform(File riflFilename, File javaSource,
+                                    File savePath, KeYRecoderExcHandler kexh) {
         assert riflFilename != null;
         assert javaSource != null;
         assert savePath != null;
@@ -104,6 +108,7 @@ public class RIFLTransformer {
         try {
             rt = new RIFLTransformer();
             rt.doTransform(riflFilename, javaSource, savePath);
+            return true;
         } catch (final ParserConfigurationException e) {
             kexh.reportException(e);
         } catch (final SAXException e) {
@@ -113,14 +118,15 @@ public class RIFLTransformer {
         } catch (final IOException e) {
             kexh.reportException(e);
         }
+        return false;
     }
 
-    public static void transform(File riflFilename, File javaSource, KeYRecoderExcHandler kexh) {
-        transform(riflFilename, javaSource, getDefaultSavePath(javaSource), kexh);
+    public static boolean transform(File riflFilename, File javaSource, KeYRecoderExcHandler kexh) {
+        return transform(riflFilename, javaSource, getDefaultSavePath(javaSource), kexh);
     }
 
-    public static void transform(File riflFilename, File javaSource) {
-        transform(riflFilename, javaSource, SimpleRIFLExceptionHandler.INSTANCE);
+    public static boolean transform(File riflFilename, File javaSource) {
+        return transform(riflFilename, javaSource, SimpleRIFLExceptionHandler.INSTANCE);
     }
 
     /**
@@ -142,25 +148,33 @@ public class RIFLTransformer {
             return origSourcePath;
     }
 
-    private void readJava(File root) throws IOException, ParserException {
+    private Map<CompilationUnit, File> readJava(File root) throws IOException, ParserException {
         assert root.exists() : "source dir must exist";
         assert root.isDirectory() : "source must be directory";
         final DirectoryFileCollection files = new DirectoryFileCollection(root);
         final Walker walker = files.createWalker(".java");
 
         final ServiceConfiguration serviceConfiguration = JPF.getServiceConfiguration();
+        Map<CompilationUnit, File> javaCUs = new HashMap<CompilationUnit, File>();
 
         // parse
         while (walker.step()) {
-            final String javaFile = walker.getCurrentName();
+            final File javaFile = new File(walker.getCurrentName());
             // debug
-            // System.out.println("[RIFL] Read file: "+ javaFile);
+            if (Debug.ENABLE_DEBUG) {
+                System.out.println("[RIFL] Read file: " + javaFile);
+            }
+
             final CompilationUnit cu;
             Reader fr = null;
+
             try {
                 fr = new BufferedReader(new FileReader(javaFile));
                 cu = JPF.parseCompilationUnit(fr);
-                javaCUs.put(cu, javaFile); // TODO: put absolute or relative path?
+
+                //crud relative
+                File relative = relative(root, javaFile);
+                javaCUs.put(cu, relative); // relative path
                 serviceConfiguration.getChangeHistory().updateModel(); // workaround to an issue in recoder
             } catch (IOException e) {
                 throw e;
@@ -170,6 +184,15 @@ public class RIFLTransformer {
                 if (fr != null) fr.close();
             }
         }
+        return javaCUs;
+    }
+
+    private File relative(File root, File javaFile) {
+        return new File(
+                javaFile.getAbsolutePath().substring(
+                        root.getAbsolutePath().length()
+                )
+        );
     }
 
     private SpecificationContainer readRIFL(File fileName)
@@ -196,7 +219,7 @@ public class RIFLTransformer {
 
         // step 1: read files
         SpecificationContainer sc = readRIFL(riflFilename);
-        readJava(javaRoot);
+        Map<CompilationUnit, File> javaCUs = readJava(javaRoot);
 
         // step 2: inject specifications
         for (final CompilationUnit cu : javaCUs.keySet()) {
@@ -205,10 +228,10 @@ public class RIFLTransformer {
         }
 
         // step 3: write modified Java files
-        for (final Pair<CompilationUnit, String> javaUnit : javaCUs) {
-            // TODO: javaCus contains absolute path, strip it
-            final String onlyFilename = javaUnit.second.substring(javaUnit.second.lastIndexOf(File.separator) + 1);
-            writeJavaFile(savePath, onlyFilename, javaUnit.first);
+        for (Map.Entry<CompilationUnit, File> javaUnit : javaCUs.entrySet()) {
+            CompilationUnit cu = javaUnit.getKey();
+            File relative = javaUnit.getValue();
+            writeJavaFile(new File(savePath, relative.toString()), cu);
         }
     }
 
@@ -227,19 +250,24 @@ public class RIFLTransformer {
     /**
      * Writes a single Java file.
      */
-    private void writeJavaFile(File target, String fileName, CompilationUnit cu)
+    private void writeJavaFile(File target, CompilationUnit cu)
             throws IOException {
         FileWriter writer = null;
-        final String filePath = target + File.separator + fileName;
         try {
-            // System.out.println("[RIFL] Trying to write file "+filePath);
-            writer = new FileWriter(filePath);
+            if (Debug.ENABLE_DEBUG) {
+                System.out.println("[RIFL] Trying to write file " + target);
+            }
+
+            writer = new FileWriter(target);
             final String source = cu.toSource();
-            // System.out.println("[RIFL] Write the following contents to file:");
-            // System.out.println(source);
-            writer.append(source);
-        } catch (final IOException e) {
-            throw e;
+
+            if (Debug.ENABLE_DEBUG) {
+                System.out.println("[RIFL] Write the following contents to file:");
+                System.out.println(source);
+            }
+
+            writer.write(source);
+            writer.flush();
         } finally {
             if (writer != null) writer.close();
         }

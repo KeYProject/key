@@ -211,5 +211,12 @@ public class MediatorProofControl extends AbstractProofControl {
       mediator.setInteractive(false);
       mediator.addInterruptedListener(worker);
       worker.execute();
+       try {
+           worker.get();//TODO remove (debugging)
+       } catch (InterruptedException e) {
+           e.printStackTrace();
+       } catch (ExecutionException e) {
+           e.printStackTrace();
+       }
    }
 }

@@ -605,7 +605,12 @@ public final class Main {
             // only use one input file
             File fileNameOnStartUp = filesOnStartup.get(0).getAbsoluteFile();
 //            final KeYRecoderExceptionHandler kexh = ui.getMediator().getExceptionHandler();
-            RIFLTransformer.transform(riflFileName, fileNameOnStartUp);
+            boolean success = RIFLTransformer.transform(riflFileName, fileNameOnStartUp);
+
+            if (!success) {
+                System.exit(1);
+            }
+
             fileNameOnStartUp = RIFLTransformer.getDefaultSavePath(fileNameOnStartUp);
             if (verbosity > Verbosity.SILENT) {
                 System.out.println("[RIFL] Writing transformed Java files to " + fileNameOnStartUp + " ...");

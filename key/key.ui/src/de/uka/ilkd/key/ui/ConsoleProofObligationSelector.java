@@ -6,15 +6,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uka.ilkd.key.proof.init.*;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
@@ -24,7 +21,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector{
 
     private KeYMediator mediator;
     protected InitConfig initConfig;
-    private ConsoleUserInterfaceControl ui;
+    protected ConsoleUserInterfaceControl ui;
 
     protected List<Contract> contracts;
 
@@ -120,7 +117,6 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector{
 
     public boolean selectProofObligation() {
         ProofOblInput po = createPOForSelectedContract();
-
         //System.out.println("PO: "+po.getPO().getProofs().length);
         findOrStartProof(po);
         return true;

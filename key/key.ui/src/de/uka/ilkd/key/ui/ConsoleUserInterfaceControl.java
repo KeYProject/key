@@ -16,6 +16,7 @@ package de.uka.ilkd.key.ui;
 import java.io.File;
 import java.io.IOException;
 
+import de.uka.ilkd.key.proof.init.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -42,10 +43,6 @@ import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -230,7 +227,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         proofStack = proofStack.prepend(pa.getFirstProof());
     }
     
-    private void finish(Proof proof) {
+    void finish(Proof proof) {
        // setInteractive(false) has to be called because the ruleAppIndex
        // has to be notified that we work in auto mode (CS)
        mediator.setInteractive(false);
@@ -355,7 +352,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     final public boolean selectProofObligation(InitConfig initConfig) {
     	//ProofObligationSelector sel = new ConsoleProofObligationSelector(this, initConfig);
-        ProofObligationSelector sel = new AutoProofObligationSelector(this, initConfig);
+        ProofObligationSelector sel = new NIProofObligationSelector(this, initConfig);
     	return sel.selectProofObligation();
 //        if(verbosity >= Verbosity.DEBUG) {
 //            System.out.println("Proof Obligation selection not supported by console.");
