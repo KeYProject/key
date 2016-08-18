@@ -10,7 +10,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.ProofUserManager;
 
 /**
- * Created by weigl on 17.08.16.
+ * weigl on 17.08.16.
  */
 public class NIProofObligationSelector extends ConsoleProofObligationSelector {
     public NIProofObligationSelector(ConsoleUserInterfaceControl ui, InitConfig initConfig) {
@@ -54,6 +54,8 @@ public class NIProofObligationSelector extends ConsoleProofObligationSelector {
                 }
             }
         }
+
+        System.exit(0);
 
         if (ui.allProofsSuccessful) {
 

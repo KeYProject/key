@@ -13,14 +13,12 @@
 
 package de.uka.ilkd.key.util.rifl;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import javax.xml.parsers.*;
 
+
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.util.Debug;
 import org.xml.sax.*;
 import recoder.CrossReferenceServiceConfiguration;
@@ -32,12 +30,15 @@ import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.FileCollection.Walker;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.util.Pair;
+import recoder.java.declaration.ClassDeclaration;
+import recoder.java.declaration.MethodDeclaration;
+import recoder.java.declaration.ParameterDeclaration;
 
 /**
  * Facet class for interpreting RIFL specifications. The Requirements for
@@ -53,7 +54,9 @@ import de.uka.ilkd.key.util.Pair;
  * @author weigl, 2016-08-17
  */
 public class RIFLTransformer {
-    private RIFLTransformer() throws ParserConfigurationException, SAXException {
+    private List<File> result = new ArrayList<>();
+
+    public RIFLTransformer() throws ParserConfigurationException, SAXException {
         JPF.initialize(new CrossReferenceServiceConfiguration());
         assert JPF.getServiceConfiguration() != null;
     }
@@ -62,18 +65,6 @@ public class RIFLTransformer {
     //private static final String TMP_PATH = System.getProperty("java.io.tmpdir");
     private static final JavaProgramFactory JPF =
             de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory.getInstance();
-
-    private static String convertToFileURL(String filename) {
-        String path = new File(filename).getAbsolutePath();
-        if (File.separatorChar != '/') {
-            path = path.replace(File.separatorChar, '/');
-        }
-
-        if (!path.startsWith("/")) {
-            path = "/" + path;
-        }
-        return "file:" + path;
-    }
 
     /**
      * Entry point for the stand-alone RIFL to JML* tool.
@@ -210,9 +201,9 @@ public class RIFLTransformer {
         return ((RIFLHandler) xmlReader.getContentHandler()).getSpecification();
     }
 
-    private void doTransform(final File riflFilename,
-                             final File source,
-                             final File savePath)
+    public void doTransform(final File riflFilename,
+                            final File source,
+                            final File savePath)
             throws IOException, SAXException, ParserException, ParserConfigurationException {
         ensureTargetDirExists(savePath);
         final File javaRoot = getBaseDirPath(source);
@@ -220,18 +211,69 @@ public class RIFLTransformer {
         // step 1: read files
         SpecificationContainer sc = readRIFL(riflFilename);
         Map<CompilationUnit, File> javaCUs = readJava(javaRoot);
-
+        int counter = 0;
         // step 2: inject specifications
-        for (final CompilationUnit cu : javaCUs.keySet()) {
+        //TODO rename the public class in the compilation unit and reuse the old java folder, for ensure interdepences to other files
+        for (CompilationUnit cu : javaCUs.keySet()) {
             final SpecificationInjector si = new SpecificationInjector(sc, JPF.getServiceConfiguration().getSourceInfo());
             cu.accept(si);
+
+            ClassDeclaration clazz = (ClassDeclaration) cu.getPrimaryTypeDeclaration();
+            for (recoder.abstraction.Method targetMethod : clazz.getAllMethods()) {
+                if (targetMethod instanceof MethodDeclaration) {
+                    MethodDeclaration mdecl = (MethodDeclaration) targetMethod;
+
+                    StringBuilder sb = new StringBuilder();
+                    for (ParameterDeclaration p : mdecl.getParameters()) {
+                        sb.append(p.getTypeReference().getName());
+                        sb.append(",");
+                    }
+                    sb.deleteCharAt(sb.length() - 1);
+
+                    String poname = clazz.getFullName() + "[" +
+                            clazz.getFullName() + "::" +
+                            targetMethod.getName() + "(" + sb + ")" + "]"
+                            + ".Non-Interference Contract.0";
+
+                    File problemFileName = new File(javaRoot.getParent(), riflFilename.getName() + "_" + counter++ + ".key");
+
+                    writeProblemFile(problemFileName, getDefaultSavePath(javaRoot).getName(), poname);
+                    result.add(problemFileName);
+                }
+            }
+            //result.add(keyProblemFile);
         }
+
 
         // step 3: write modified Java files
         for (Map.Entry<CompilationUnit, File> javaUnit : javaCUs.entrySet()) {
             CompilationUnit cu = javaUnit.getKey();
             File relative = javaUnit.getValue();
             writeJavaFile(new File(savePath, relative.toString()), cu);
+        }
+
+    }
+
+
+    private void writeProblemFile(File problemFileName, String newJavaFolder, String poname) {
+        String tmp, blueprint = "";
+        BufferedReader br = new BufferedReader(
+                new InputStreamReader(getClass().getResourceAsStream("blueprint_rifl.key")));
+
+        try {
+            while ((tmp = br.readLine()) != null) {
+                blueprint += tmp + "\n";
+            }
+
+            FileWriter fw = new FileWriter(problemFileName);
+            fw.write(
+                    blueprint.replaceAll("%%JAVA_SOURCE%%", newJavaFolder)
+                            .replaceAll("%%PO_NAME%%", poname)
+            );
+            br.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -271,5 +313,10 @@ public class RIFLTransformer {
         } finally {
             if (writer != null) writer.close();
         }
+    }
+
+
+    public List<File> getProblemFiles() {
+        return result;
     }
 }

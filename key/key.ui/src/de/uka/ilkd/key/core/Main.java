@@ -20,6 +20,9 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
+import de.uka.ilkd.key.speclang.ContractFactory;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
@@ -46,6 +49,10 @@ import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.rifl.RIFLTransformer;
+import org.xml.sax.SAXException;
+import recoder.ParserException;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * The main entry point for KeY
@@ -605,17 +612,25 @@ public final class Main {
             // only use one input file
             File fileNameOnStartUp = filesOnStartup.get(0).getAbsoluteFile();
 //            final KeYRecoderExceptionHandler kexh = ui.getMediator().getExceptionHandler();
-            boolean success = RIFLTransformer.transform(riflFileName, fileNameOnStartUp);
+            try {
+                RIFLTransformer transformer = new RIFLTransformer();
+                transformer.doTransform(riflFileName, fileNameOnStartUp,
+                        RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
 
-            if (!success) {
-                System.exit(1);
+                if (verbosity > Verbosity.SILENT) {
+                    System.out.println("[RIFL] Writing transformed Java files to " + fileNameOnStartUp + " ...");
+                }
+                return transformer.getProblemFiles();
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            } catch (SAXException e) {
+                e.printStackTrace();
+            } catch (ParserException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
-            fileNameOnStartUp = RIFLTransformer.getDefaultSavePath(fileNameOnStartUp);
-            if (verbosity > Verbosity.SILENT) {
-                System.out.println("[RIFL] Writing transformed Java files to " + fileNameOnStartUp + " ...");
-            }
-            result.add(fileNameOnStartUp);
             return result;
         }
         // nothing to do, pass the original files
