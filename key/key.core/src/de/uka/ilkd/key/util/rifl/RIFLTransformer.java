@@ -231,9 +231,9 @@ public class RIFLTransformer {
                     sb.deleteCharAt(sb.length() - 1);
 
                     String poname = clazz.getFullName() + "[" +
-                            clazz.getFullName() + "::" +
+                            clazz.getFullName() + "\\\\:\\\\:" +
                             targetMethod.getName() + "(" + sb + ")" + "]"
-                            + ".Non-Interference Contract.0";
+                            + ".Non-interference contract.0";
 
                     File problemFileName = new File(javaRoot.getParent(), riflFilename.getName() + "_" + counter++ + ".key");
 
