@@ -297,7 +297,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
          proofControl.removeAutoModeListener(autoModeListener);
          proofControl = null;
       }
-      if (proof != null) {
+      if (proof != null && !proof.isDisposed()) {
          proof.removeProofTreeListener(proofTreeListener);
          proof = null;
       }
@@ -332,7 +332,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
             proofControl.removeAutoModeListener(autoModeListener);
             proofControl = null;
          }
-         if (proof != null) {
+         if (proof != null && !proof.isDisposed()) {
             proof.removeProofTreeListener(proofTreeListener);
             proof = null;
          }
@@ -341,7 +341,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
          // Add new listener
          if (node != null) {
             proof = node.getExecutionNode().getProof();
-            if (proof != null) {
+            if (proof != null && !proof.isDisposed()) {
                proof.addProofTreeListener(proofTreeListener);
             }
             KeYDebugTarget debugTarget = node.getDebugTarget();
@@ -362,7 +362,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStarted(ProofEvent e) {
-      if (proof != null) {
+      if (proof != null && !proof.isDisposed()) {
          proof.removeProofTreeListener(proofTreeListener);
       }
    }
@@ -372,7 +372,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      if (proof != null) {
+      if (proof != null && !proof.isDisposed()) {
          proof.addProofTreeListener(proofTreeListener);
       }
       recreateContentThreadSave();
