@@ -48,6 +48,7 @@ import org.junit.runners.Suite;
    de.uka.ilkd.key.symbolic_execution.testcase.strategy.TestExceptionBreakpointStopConditionWithSubclasses.class,
    de.uka.ilkd.key.symbolic_execution.testcase.strategy.TestJavaWatchpointStopConditionWithHitCount.class,
    de.uka.ilkd.key.symbolic_execution.testcase.strategy.TestLineBreakpointStopConditionSimpleWithConditions.class,
+   de.uka.ilkd.key.symbolic_execution.testcase.strategy.TestLineBreakpointStopConditionSimpleWithLoopInvariant.class,
    de.uka.ilkd.key.symbolic_execution.testcase.strategy.TestLineBreakpointStopConditionSimpleWithHitCount.class,
    de.uka.ilkd.key.symbolic_execution.testcase.strategy.TestMethodBreakpointWithConditions.class,
    de.uka.ilkd.key.symbolic_execution.testcase.strategy.TestKeYWatchpointGlobalVariablesOnSatisfiable.class,
