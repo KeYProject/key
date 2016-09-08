@@ -30,16 +30,7 @@ import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.Equals;
-import de.uka.ilkd.key.java.expression.operator.Instanceof;
-import de.uka.ilkd.key.java.expression.operator.LessThan;
-import de.uka.ilkd.key.java.expression.operator.LogicalAnd;
-import de.uka.ilkd.key.java.expression.operator.LogicalOr;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.expression.operator.NotEquals;
-import de.uka.ilkd.key.java.expression.operator.PostIncrement;
+import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
@@ -3140,5 +3131,10 @@ public abstract class KeYJavaASTFactory {
 	final IntLiteral literal = KeYJavaASTFactory.intLiteral(0);
 
 	return literal;
+    }
+
+    public static TypeCast cast(final Expression expression,
+            final KeYJavaType targetType) {
+        return new TypeCast(expression, new TypeRef(targetType));
     }
 }

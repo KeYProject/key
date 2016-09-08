@@ -14,6 +14,7 @@
 package de.hentschel.visualdbc.all.test.suite.swtbot;
 
 import org.junit.runner.RunWith;
+
 import org.junit.runners.Suite;
 import org.key_project.key4eclipse.all.test.suite.swtbot.SWTBotAllTests;
 
@@ -23,6 +24,7 @@ import de.hentschel.visualdbc.dbcmodel.diagram.custom.test.suite.swtbot.SWTBotAl
 import de.hentschel.visualdbc.example.test.suite.swtbot.SWTBotAllExampleTests;
 import de.hentschel.visualdbc.generation.ui.test.suite.swtbot.SWTBotAllGenerationUiTests;
 import de.hentschel.visualdbc.interactive.proving.ui.test.suite.swtbot.SWTBotAllInteractiveProvingUiTests;
+
 /**
  * <p>
  * Run all contained JUnit 4 test cases that requires SWT Bot.
