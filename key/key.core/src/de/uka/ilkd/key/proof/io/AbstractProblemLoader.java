@@ -59,48 +59,47 @@ import de.uka.ilkd.key.util.Triple;
  * no user interaction is required.
  * </p>
  * <p>
- * The basic usage of this class is to instantiate a new
+ * The basic usage of this class is to instantiate a new 
  * {@link SingleThreadProblemLoader} or {@link ProblemLoader}
  * instance which should load the file configured by the constructor's arguments.
  * The next step is to call {@link #load()} which does the loading process and
  * tries to instantiate a proof and to apply rules again if possible. The result
  * of the loading process is available via the getter methods.
  * </p>
- *
  * @author Martin Hentschel
  */
 public abstract class AbstractProblemLoader {
     public static class ReplayResult {
 
-        private Node node;
-        private List<Throwable> errors;
-        private String status;
+		private Node node;
+		private List<Throwable> errors;
+		private String status;
 
-        public ReplayResult(String status, List<Throwable> errors, Node node) {
-            this.status = status;
-            this.errors = errors;
-            this.node = node;
-        }
+		public ReplayResult(String status, List<Throwable> errors, Node node) {
+			this.status = status;
+			this.errors = errors;
+			this.node = node;				
+		}
 
-        public Node getNode() {
-            return node;
-        }
+		public Node getNode() {
+			return node;
+		}
 
-        public String getStatus() {
-            return status;
-        }
+		public String getStatus() {
+			return status;
+		}
 
-        public List<Throwable> getErrorList() {
-            return errors;
-        }
+		public List<Throwable> getErrorList() {
+			return errors;
+		}
 
-        public boolean hasErrors() {
-            return errors != null && !errors.isEmpty();
-        }
+		public boolean hasErrors() {
+			return errors != null && !errors.isEmpty();
+		}
 
-    }
+	}
 
-    /**
+	/**
      * The file or folder to load.
      */
     private final File file;
@@ -114,7 +113,7 @@ public abstract class AbstractProblemLoader {
      * An optional boot class path.
      */
     private final File bootClassPath;
-
+    
     /**
      * The global includes to use.
      */
@@ -132,7 +131,7 @@ public abstract class AbstractProblemLoader {
 
     /**
      * {@code true} to call {@link UserInterfaceControl#selectProofObligation(InitConfig)}
-     * if no {@link Proof} is defined by the loaded proof or
+     * if no {@link Proof} is defined by the loaded proof or 
      * {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
      */
     private final boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
@@ -146,7 +145,7 @@ public abstract class AbstractProblemLoader {
      * {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
      */
     private final boolean forceNewProfileOfNewProofs;
-
+    
     /**
      * The instantiated {@link EnvInput} which describes the file to load.
      */
@@ -166,7 +165,7 @@ public abstract class AbstractProblemLoader {
      * The instantiate proof or {@code null} if no proof was instantiated during loading process.
      */
     private Proof proof;
-
+    
     /**
      * The {@link ReplayResult} if available or {@code null} otherwise.
      */
@@ -178,14 +177,14 @@ public abstract class AbstractProblemLoader {
      * where one token is expected and another is found.
      * Both are usually only referred to by their internal code.
      */
-    private final static Map<Pair<Integer, Integer>, String> mismatchErrors;
-    private final static Map<Integer, String> missedErrors;
-
+    private final static Map<Pair<Integer,Integer>,String> mismatchErrors;
+    private final static Map<Integer,String> missedErrors;
+    
     static {
         // format: (expected, found)
         mismatchErrors = new HashMap<Pair<Integer, Integer>, String>();
         mismatchErrors.put(new Pair<Integer, Integer>(KeYLexer.SEMI, KeYLexer.COMMA), "there may be only one declaration per line");
-
+        
         missedErrors = new HashMap<Integer, String>();
         missedErrors.put(KeYLexer.RPAREN, "closing parenthesis");
         missedErrors.put(KeYLexer.RBRACE, "closing brace");
@@ -194,21 +193,20 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Constructor.
-     *
-     * @param file                                                  The file or folder to load.
-     * @param classPath                                             The optional class path entries to use.
-     * @param bootClassPath                                         An optional boot class path.
-     * @param includes                                              Optional includes to consider.
-     * @param profileOfNewProofs                                    The {@link Profile} to use for new {@link Proof}s.
-     * @param forceNewProfileOfNewProofs                            {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
-     * @param control                                               The {@link ProblemLoaderControl} to use.
+     * @param file The file or folder to load.
+     * @param classPath The optional class path entries to use.
+     * @param bootClassPath An optional boot class path.
+     * @param includes Optional includes to consider.
+     * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
+     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
+     * @param control The {@link ProblemLoaderControl} to use.
      * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterfaceControl#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
      */
-    public AbstractProblemLoader(File file,
-                                 List<File> classPath,
+    public AbstractProblemLoader(File file, 
+                                 List<File> classPath, 
                                  File bootClassPath,
                                  List<File> includes,
-                                 Profile profileOfNewProofs,
+                                 Profile profileOfNewProofs, 
                                  boolean forceNewProfileOfNewProofs,
                                  ProblemLoaderControl control,
                                  boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
@@ -227,62 +225,63 @@ public abstract class AbstractProblemLoader {
     /**
      * Executes the loading process and tries to instantiate a proof
      * and to re-apply rules on it if possible.
-     *
-     * @throws ProofInputException    Occurred Exception.
-     * @throws IOException            Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
+     * @throws IOException Occurred Exception.
      * @throws ProblemLoaderException Occurred Exception.
      */
     public void load() throws ProofInputException, IOException, ProblemLoaderException {
-        control.loadingStarted(this);
-        // Read environment
-        envInput = createEnvInput();
-        problemInitializer = createProblemInitializer();
-        initConfig = createInitConfig();
-        if (!problemInitializer.getWarnings().isEmpty()) {
-            control.reportWarnings(problemInitializer.getWarnings());
-        }
-        // Read proof obligation settings
-        LoadedPOContainer poContainer = createProofObligationContainer();
-        ProofAggregate proofList = null;
-        try {
-            if (poContainer == null) {
-                if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
-                    if (control.selectProofObligation(initConfig)) {
-                        return;
-                    } else {
-                        // That message would be reported otherwise. Undesired.
-                        // return new ProblemLoaderException(this, "Aborted.");
+            control.loadingStarted(this);
+            // Read environment
+            envInput = createEnvInput();
+            problemInitializer = createProblemInitializer();
+            initConfig = createInitConfig();
+            if (!problemInitializer.getWarnings().isEmpty()) {
+               control.reportWarnings(problemInitializer.getWarnings());
+            }
+            // Read proof obligation settings
+            LoadedPOContainer poContainer = createProofObligationContainer();
+            ProofAggregate proofList = null;
+            try {
+                if (poContainer == null) {
+                    if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
+                        if (control.selectProofObligation(initConfig)) {
+                            return;
+                        } else {
+                            // That message would be reported otherwise. Undesired.
+                            // return new ProblemLoaderException(this, "Aborted.");
+                            return;
+                        }
+                    }
+                    else {
+                        // Do not instantiate any proof but allow the user of the DefaultProblemLoader
+                        // to access the loaded InitConfig.
                         return;
                     }
-                } else {
-                    // Do not instantiate any proof but allow the user of the DefaultProblemLoader
-                    // to access the loaded InitConfig.
-                    return;
                 }
+                
+                // Create and register proof at specification repository                    
+                proofList = createProof(poContainer); 
+                
+                // try to replay first proof
+                proof = proofList.getProof(poContainer.getProofNum());
+                
+                
+                if (proof != null) {
+                 OneStepSimplifier.refreshOSS(proof);
+                    result = replayProof(proof);
+                }
+                                      
+                // this message is propagated to the top level in console mode
+                return; // Everything fine
+            } catch (Throwable t) {
+                // Throw this exception; otherwise, it can for instance occur
+                // that "result" will be null (if replayProof(...) fails) and
+                // we get a NullPointerException that is hard to analyze.
+                throw t;
             }
-
-            // Create and register proof at specification repository
-            proofList = createProof(poContainer);
-
-            // try to replay first proof
-            proof = proofList.getProof(poContainer.getProofNum());
-
-
-            if (proof != null) {
-                OneStepSimplifier.refreshOSS(proof);
-                result = replayProof(proof);
+            finally {
+               control.loadingFinished(this, poContainer, proofList, result);
             }
-
-            // this message is propagated to the top level in console mode
-            return; // Everything fine
-        } catch (Throwable t) {
-            // Throw this exception; otherwise, it can for instance occur
-            // that "result" will be null (if replayProof(...) fails) and
-            // we get a NullPointerException that is hard to analyze.
-            throw t;
-        } finally {
-            control.loadingFinished(this, poContainer, proofList, result);
-        }
     }
 
     /**
@@ -290,7 +289,7 @@ public abstract class AbstractProblemLoader {
      */
     private Throwable unwrap(Throwable e) {
         while (e instanceof ExceptionHandlerException
-                || e instanceof ProblemLoaderException)
+               || e instanceof ProblemLoaderException)
             e = e.getCause();
         return e;
     }
@@ -310,24 +309,24 @@ public abstract class AbstractProblemLoader {
                     final org.antlr.runtime.MissingTokenException mte = (org.antlr.runtime.MissingTokenException) c0;
                     // TODO: other commonly missed tokens
                     final String readable = missedErrors.get(mte.expecting);
-                    final String token = readable == null ? "token id " + mte.expecting : readable;
-                    final String msg = "Syntax error: missing " + token +
-                            (occurrence == null ? "" : " at " + occurrence.getText())
-                            + " statement (" + mte.input.getSourceName()
-                            + ":" + mte.line + ")";
+                    final String token = readable==null? "token id "+mte.expecting: readable;
+                    final String msg = "Syntax error: missing "+token+
+                                    (occurrence == null? "": " at "+occurrence.getText())
+                                    +" statement ("+mte.input.getSourceName()
+                                    +":"+mte.line+")";
                     return new ProblemLoaderException(this, msg, mte);
                     // TODO other ANTLR exceptions
                 } else {
                     final org.antlr.runtime.MismatchedTokenException mte = (MismatchedTokenException) c0;
-                    final String genericMsg = "expected " + mte.expecting
-                            + ", but found " + mte.c;
-                    final String readable = mismatchErrors.get(new Pair<Integer, Integer>(mte.expecting, mte.c));
-                    final String msg = "Syntax error: "
-                            + (readable == null ? genericMsg : readable)
-                            + " (" + mte.input.getSourceName()
-                            + ":" + mte.line + ")";
+                    final String genericMsg = "expected "+mte.expecting
+                                    +", but found "+mte.c;
+                    final String readable = mismatchErrors.get(new Pair<Integer, Integer>(mte.expecting,mte.c));
+                    final String msg = "Syntax error: " 
+                                    +(readable == null? genericMsg: readable)
+                                    +" ("+mte.input.getSourceName()
+                                    +":"+mte.line+")";
                     return new ProblemLoaderException(this, msg, mte);
-                }
+                } 
             }
         }
         // default
@@ -336,7 +335,6 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Instantiates the {@link EnvInput} which represents the file to load.
-     *
      * @return The created {@link EnvInput}.
      * @throws IOException Occurred Exception.
      */
@@ -348,35 +346,39 @@ public abstract class AbstractProblemLoader {
             // java file, probably enriched by specifications
             if (file.getParentFile() == null) {
                 return new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs, includes);
-            } else {
-                return new SLEnvInput(file.getParentFile().getAbsolutePath(),
-                        classPath, bootClassPath, profileOfNewProofs, includes);
             }
-        } else if (filename.endsWith(".key") || filename.endsWith(".proof")) {
+            else {
+                return new SLEnvInput(file.getParentFile().getAbsolutePath(),
+                                classPath, bootClassPath, profileOfNewProofs, includes);
+            }
+        }
+        else if (filename.endsWith(".key") || filename.endsWith(".proof")) {
             // KeY problem specification or saved proof
             return new KeYUserProblemFile(filename, file, control, profileOfNewProofs);
 
-        } else if (file.isDirectory()) {
+        }
+        else if (file.isDirectory()) {
             // directory containing java sources, probably enriched
             // by specifications
             return new SLEnvInput(file.getPath(), classPath, bootClassPath, profileOfNewProofs, includes);
-        } else {
+        }
+        else {
             if (filename.lastIndexOf('.') != -1) {
                 throw new IllegalArgumentException("Unsupported file extension \'"
-                        + filename.substring(filename.lastIndexOf('.'))
-                        + "\' of read-in file " + filename
-                        + ". Allowed extensions are: .key, .proof, .java or "
-                        + "complete directories.");
-            } else {
+                                + filename.substring(filename.lastIndexOf('.'))
+                                + "\' of read-in file " + filename
+                                + ". Allowed extensions are: .key, .proof, .java or "
+                                + "complete directories.");
+            }
+            else {
                 throw new FileNotFoundException("File or directory\n\t " + filename
-                        + "\n not found.");
+                                + "\n not found.");
             }
         }
     }
 
     /**
      * Instantiates the {@link ProblemInitializer} to use.
-     *
      * @param registerProof Register loaded {@link Proof}
      * @return The {@link ProblemInitializer} to use.
      */
@@ -387,7 +389,6 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Creates the {@link InitConfig}.
-     *
      * @return The created {@link InitConfig}.
      * @throws ProofInputException Occurred Exception.
      */
@@ -398,7 +399,6 @@ public abstract class AbstractProblemLoader {
     /**
      * Creates a {@link LoadedPOContainer} if available which contains
      * the {@link ProofOblInput} for which a {@link Proof} should be instantiated.
-     *
      * @return The {@link LoadedPOContainer} or {@code null} if not available.
      * @throws IOException Occurred Exception.
      */
@@ -406,17 +406,19 @@ public abstract class AbstractProblemLoader {
         final String chooseContract;
         final String proofObligation;
         if (envInput instanceof KeYFile) {
-            KeYFile keyFile = (KeYFile) envInput;
+            KeYFile keyFile = (KeYFile)envInput;
             chooseContract = keyFile.chooseContract();
             proofObligation = keyFile.getProofObligation();
-        } else {
+        }
+        else {
             chooseContract = null;
             proofObligation = null;
         }
         // Instantiate proof obligation
         if (envInput instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
-            return new LoadedPOContainer((ProofOblInput) envInput);
-        } else if (chooseContract != null && chooseContract.length() > 0) {
+            return new LoadedPOContainer((ProofOblInput)envInput);
+        }
+        else if (chooseContract != null && chooseContract.length() > 0) {
             int proofNum = 0;
             String baseContractName = null;
             int ind = -1;
@@ -430,16 +432,19 @@ public abstract class AbstractProblemLoader {
             if (ind == -1) {
                 baseContractName = chooseContract;
                 proofNum = 0;
-            } else {
+            }
+            else {
                 baseContractName = chooseContract.substring(0, ind);
             }
             final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
             if (contract == null) {
                 throw new RuntimeException("Contract not found: " + baseContractName);
-            } else {
+            }
+            else {
                 return new LoadedPOContainer(contract.createProofObl(initConfig), proofNum);
             }
-        } else if (proofObligation != null && proofObligation.length() > 0) {
+        }
+        else if (proofObligation != null && proofObligation.length() > 0) {
             // Load proof obligation settings
             final Properties properties = new Properties();
             properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
@@ -455,11 +460,13 @@ public abstract class AbstractProblemLoader {
                 // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
                 Class<?> poClassInstance = ClassLoaderUtil.getClassforName(poClass);
                 Method loadMethod = poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
-                return (LoadedPOContainer) loadMethod.invoke(null, initConfig, properties);
-            } catch (Exception e) {
+                return (LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
+            }
+            catch (Exception e) {
                 throw new IOException("Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".", e);
             }
-        } else {
+        }
+        else {
             return null;
         }
     }
@@ -467,19 +474,18 @@ public abstract class AbstractProblemLoader {
     /**
      * Creates a {@link Proof} for the given {@link LoadedPOContainer} and
      * tries to apply rules again.
-     *
      * @param poContainer The {@link LoadedPOContainer} to instantiate a {@link Proof} for.
      * @return The instantiated {@link Proof}.
      * @throws ProofInputException Occurred Exception.
      */
     protected ProofAggregate createProof(LoadedPOContainer poContainer) throws ProofInputException {
-
-        ProofAggregate proofList =
-                problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
+    	
+        ProofAggregate proofList = 
+        		problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
 
         for (Proof p : proofList.getProofs()) {
-            // register proof
-            initConfig.getServices().getSpecificationRepository().registerProof(poContainer.getProofOblInput(), p);
+        	// register proof 
+        	initConfig.getServices().getSpecificationRepository().registerProof(poContainer.getProofOblInput(), p);
         }
 
         return proofList;
@@ -502,7 +508,7 @@ public abstract class AbstractProblemLoader {
         assert envInput instanceof KeYUserProblemFile;
         KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
 
-        Triple<String, Integer, Integer> script = kupf.readProofScript();
+            Triple<String, Integer, Integer> script = kupf.readProofScript();
         String path = kupf.getInitialFile().getAbsolutePath();
         Location location = new Location(path, script.second, script.third);
 
@@ -513,7 +519,7 @@ public abstract class AbstractProblemLoader {
         String status = "";
         List<Throwable> errors = new LinkedList<Throwable>();
         Node lastTouchedNode = proof.root();
-
+        
         IProofFileParser parser = null;
         IntermediateProofReplayer replayer = null;
         IntermediatePresentationProofFileParser.Result parserResult = null;
@@ -523,32 +529,32 @@ public abstract class AbstractProblemLoader {
                 ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
         ReplayResult result;
         try {
-            assert envInput instanceof KeYUserProblemFile;
-
-            parser = new IntermediatePresentationProofFileParser(proof);
-            problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
-            parserResult = ((IntermediatePresentationProofFileParser) parser).getResult();
-
-            // Parser is no longer needed, set it to null to free memory.
-            parser = null;
-
-            // For loading, we generally turn on one step simplification to be
-            // able to load proofs that used it even if the user has currently
-            // turned OSS off.
-            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
-            OneStepSimplifier.refreshOSS(proof);
-
-            replayer = new IntermediateProofReplayer(this, proof, parserResult);
-            replayResult = replayer.replay();
-
-            lastTouchedNode = replayResult.getLastSelectedGoal() != null ? replayResult.getLastSelectedGoal().node() : proof.root();
+        	assert envInput instanceof KeYUserProblemFile;
+        	    
+                parser = new IntermediatePresentationProofFileParser(proof);
+                problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
+                parserResult = ((IntermediatePresentationProofFileParser) parser).getResult();
+                
+                // Parser is no longer needed, set it to null to free memory.
+                parser = null;
+                
+                // For loading, we generally turn on one step simplification to be
+                // able to load proofs that used it even if the user has currently
+                // turned OSS off.
+                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
+                OneStepSimplifier.refreshOSS(proof);
+                
+                replayer = new IntermediateProofReplayer(this, proof, parserResult);
+                replayResult = replayer.replay();
+                
+                lastTouchedNode = replayResult.getLastSelectedGoal() != null ? replayResult.getLastSelectedGoal().node() : proof.root();
 
         } catch (Exception e) {
-            if (parserResult == null || parserResult.getErrors() == null || parserResult.getErrors().isEmpty() ||
-                    replayer == null || replayResult == null || replayResult.getErrors() == null || replayResult.getErrors().isEmpty()) {
-                // this exception was something unexpected
-                errors.add(e);
-            }
+        	if (parserResult == null || parserResult.getErrors() == null || parserResult.getErrors().isEmpty() ||
+        	        replayer == null || replayResult == null || replayResult.getErrors() == null || replayResult.getErrors().isEmpty()) {
+        		// this exception was something unexpected
+        		errors.add(e);
+        	}
         } finally {
             if (parserResult != null) {
                 status = parserResult.getStatus();
@@ -558,19 +564,18 @@ public abstract class AbstractProblemLoader {
             if (replayResult != null) {
                 errors.addAll(replayResult.getErrors());
             }
-
+            
             ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(isOSSActivated);
             OneStepSimplifier.refreshOSS(proof);
             result = new ReplayResult(status, errors, lastTouchedNode);
         }
-
-
+        	
+        
         return result;
     }
 
     /**
      * Returns the file or folder to load.
-     *
      * @return The file or folder to load.
      */
     public File getFile() {
@@ -579,7 +584,6 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Returns the optional class path entries to use.
-     *
      * @return The optional class path entries to use.
      */
     public List<File> getClassPath() {
@@ -588,7 +592,6 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Returns the optional boot class path.
-     *
      * @return The optional boot class path.
      */
     public File getBootClassPath() {
@@ -597,7 +600,6 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Returns the instantiated {@link EnvInput} which describes the file to load.
-     *
      * @return The instantiated {@link EnvInput} which describes the file to load.
      */
     public EnvInput getEnvInput() {
@@ -606,7 +608,6 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Returns the instantiated {@link ProblemInitializer} used during the loading process.
-     *
      * @return The instantiated {@link ProblemInitializer} used during the loading process.
      */
     public ProblemInitializer getProblemInitializer() {
@@ -615,7 +616,6 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Returns the instantiated {@link InitConfig} which provides access to the loaded source elements and specifications.
-     *
      * @return The instantiated {@link InitConfig} which provides access to the loaded source elements and specifications.
      */
     public InitConfig getInitConfig() {
@@ -624,7 +624,6 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Returns the instantiate proof or {@code null} if no proof was instantiated during loading process.
-     *
      * @return The instantiate proof or {@code null} if no proof was instantiated during loading process.
      */
     public Proof getProof() {
@@ -633,10 +632,9 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Returns the {@link ReplayResult} if available.
-     *
      * @return The {@link ReplayResult} or {@code null} if not available.
      */
     public ReplayResult getResult() {
-        return result;
+       return result;
     }
 }
