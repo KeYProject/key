@@ -37,7 +37,6 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
-import de.uka.ilkd.key.proof.init.*;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -60,6 +59,11 @@ import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
@@ -79,7 +83,6 @@ import de.uka.ilkd.key.util.ThreadUtilities;
 /**
  * Implementation of {@link UserInterfaceControl} which controls the {@link MainWindow}
  * with the typical user interface of KeY.
- *
  * @author Mattias Ulbrich
  */
 public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceControl {
@@ -98,27 +101,27 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     }
 
     @Override
-    protected MediatorProofControl createProofControl() {
-        return new MediatorProofControl(this) {
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public boolean isAutoModeSupported(Proof proof) {
-                return super.isAutoModeSupported(proof) &&
-                        mainWindow.getProofList().containsProof(proof);
-            }
-        };
+   protected MediatorProofControl createProofControl() {
+       return new MediatorProofControl(this) {
+          /**
+           * {@inheritDoc}
+           */
+          @Override
+          public boolean isAutoModeSupported(Proof proof) {
+             return super.isAutoModeSupported(proof) &&
+                    mainWindow.getProofList().containsProof(proof);
+          }
+       };
     }
-
+    
     /**
      * loads the problem or proof from the given file
      *
-     * @param file          the File with the problem description or the proof
-     * @param classPath     the class path entries to use.
+     * @param file the File with the problem description or the proof
+     * @param classPath the class path entries to use.
      * @param bootClassPath the boot class path to use.
      */
-    public void loadProblem(File file,
+    public void loadProblem(File file, 
                             List<File> classPath,
                             File bootClassPath,
                             List<File> includes) {
@@ -183,7 +186,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                     // popup is generated and proof is stopped
                     AutoDismissDialog dialog = new AutoDismissDialog(
                             "Couldn't close Goal Nr. " + g.node().serialNr()
-                                    + " automatically");
+                            + " automatically");
                     dialog.show();
                 }
             }
@@ -201,7 +204,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                         // popup is generated and proof is stopped
                         AutoDismissDialog dialog = new AutoDismissDialog(
                                 "Couldn't close Goal Nr. " + g.node().serialNr()
-                                        + " automatically");
+                                + " automatically");
                         dialog.show();
                     }
                 }
@@ -217,7 +220,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
                 ProblemLoader problemLoader = (ProblemLoader) info.getSource();
-                if (problemLoader.hasProofScript()) {
+                if(problemLoader.hasProofScript()) {
                     Pair<String, Location> scriptAndLoc;
                     try {
                         scriptAndLoc = problemLoader.readProofScript();
@@ -247,7 +250,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         return proof.getSettings().getStrategySettings()
                 .getActiveStrategyProperties().getProperty(
                         StrategyProperties.STOPMODE_OPTIONS_KEY).equals(
-                        StrategyProperties.STOPMODE_NONCLOSE);
+                                StrategyProperties.STOPMODE_NONCLOSE);
     }
 
     @Override
@@ -310,7 +313,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             return AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, forced);
         }
         IBuiltInRuleApp result = app;
-        for (InteractiveRuleApplicationCompletion compl : completions) {
+        for (InteractiveRuleApplicationCompletion compl : completions ) {
             if (compl.canComplete(app)) {
                 result = compl.complete(app, goal, forced);
                 break;
@@ -319,279 +322,281 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         return (result != null && result.complete()) ? result : null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public KeYMediator getMediator() {
-        return mainWindow.getMediator();
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYMediator getMediator() {
+      return mainWindow.getMediator();
+   }
+
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public AbstractProblemLoader load(Profile profile,
+                                    File file,
+                                    List<File> classPath,
+                                    File bootClassPath,
+                                    List<File> includes,
+                                    Properties poPropertiesToForce,
+                                    boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
+      if (file != null) {
+         mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
+      }
+      try {
+         getMediator().stopInterface(true);
+         return super.load(profile, file, classPath, bootClassPath, includes, poPropertiesToForce, forceNewProfileOfNewProofs);
+      }
+      finally {
+         getMediator().startInterface(true);
+      }
+   }
+
+   /**
+    * save proof in file. If autoSave is on, this will potentially overwrite already
+    * existing proof files with the same name. Otherwise the save dialog pops up.
+    * For loaded proofs both are turned off by default, i.e. only manual saving is
+    * possible, and the save dialog never pops up automatically (except for hitting
+    * the "Save ..." or "Save current proof" button).
+    */
+   public File saveProof(Proof proof, String fileExtension) {
+       final MainWindow mainWindow = MainWindow.getInstance();
+       final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
+
+       Pair<File, String> f = fileName(proof, fileExtension);
+       final boolean saved = jFC.showSaveDialog(mainWindow, f.first, f.second);
+       File file = null;
+       if (saved) {
+           file = jFC.getSelectedFile();
+           final String filename = file.getAbsolutePath();
+           ProofSaver saver =
+                   new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
+           String errorMsg;
+           try {
+               errorMsg = saver.save();
+           } catch (IOException e) {
+               errorMsg = e.toString();
+           }
+           if (errorMsg != null) {
+               mainWindow.notify(new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg));
+           } else {
+              proof.setProofFile(file);
+           }
+       } else {
+           jFC.resetPath();
+       }
+       return file;
+   }
+
+   protected static Pair<File, String> fileName(Proof proof, String fileExtension) {
+       // TODO: why do we use GUI components here?
+       final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
+
+       File selectedFile = null;
+       if (proof != null) {
+          selectedFile = proof.getProofFile();
+       }
+       // Suggest default file name if required
+       final String defaultName;
+       if (selectedFile == null) {
+           defaultName = MiscTools.toValidFileName(proof.name().toString()) + fileExtension;
+           selectedFile = new File(jFC.getCurrentDirectory(), defaultName);
+       } else if (selectedFile.getName().endsWith(".proof") && fileExtension.equals(".proof")) {
+           defaultName = selectedFile.getName();
+       } else {
+           String proofName = proof.name().toString();
+           if (proofName.endsWith(".key")) {
+               proofName = proofName.substring(0, proofName.lastIndexOf(".key"));
+           } else if (proofName.endsWith(".proof")) {
+               proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
+           }
+           defaultName = MiscTools.toValidFileName(proofName) + fileExtension;
+           selectedFile = new File(selectedFile.getParentFile(), defaultName);
+       }
+       return new Pair<File, String>(selectedFile, defaultName);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void proofDisposing(final ProofDisposedEvent e) {
+      super.proofDisposing(e);
+      // Remove proof from user interface
+      ThreadUtilities.invokeAndWait(new Runnable() {
+         @Override
+         public void run() {
+            mainWindow.getProofList().removeProof(e.getSource());            
+         }
+      });
     }
 
+   @Override
+   public boolean selectProofObligation(InitConfig initConfig) {
+      return ProofManagementDialog.showInstance(initConfig);
+   }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AbstractProblemLoader load(Profile profile,
-                                      File file,
-                                      List<File> classPath,
-                                      File bootClassPath,
-                                      List<File> includes,
-                                      Properties poPropertiesToForce,
-                                      boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
-        if (file != null) {
-            mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
-        }
-        try {
-            getMediator().stopInterface(true);
-            return super.load(profile, file, classPath, bootClassPath, includes, poPropertiesToForce, forceNewProfileOfNewProofs);
-        } finally {
-            getMediator().startInterface(true);
-        }
-    }
+   @Override
+   public void registerProofAggregate(ProofAggregate pa) {
+      super.registerProofAggregate(pa);
+      mainWindow.addProblem(pa);
+      mainWindow.setStandardStatusLine();
+   }
 
-    /**
-     * save proof in file. If autoSave is on, this will potentially overwrite already
-     * existing proof files with the same name. Otherwise the save dialog pops up.
-     * For loaded proofs both are turned off by default, i.e. only manual saving is
-     * possible, and the save dialog never pops up automatically (except for hitting
-     * the "Save ..." or "Save current proof" button).
-     */
-    public File saveProof(Proof proof, String fileExtension) {
-        final MainWindow mainWindow = MainWindow.getInstance();
-        final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
+   @Override
+   public void loadingStarted(AbstractProblemLoader loader) {
+      getMediator().stopInterface(true);
+      super.loadingStarted(loader);
+   }
 
-        Pair<File, String> f = fileName(proof, fileExtension);
-        final boolean saved = jFC.showSaveDialog(mainWindow, f.first, f.second);
-        File file = null;
-        if (saved) {
-            file = jFC.getSelectedFile();
-            final String filename = file.getAbsolutePath();
-            ProofSaver saver =
-                    new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
-            String errorMsg;
-            try {
-                errorMsg = saver.save();
-            } catch (IOException e) {
-                errorMsg = e.toString();
-            }
-            if (errorMsg != null) {
-                mainWindow.notify(new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg));
-            } else {
-                proof.setProofFile(file);
-            }
-        } else {
-            jFC.resetPath();
-        }
-        return file;
-    }
+   @Override
+   public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer, ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
+      super.loadingFinished(loader, poContainer, proofList, result);
+      if (proofList != null) {
+         getMediator().setProof(loader.getProof());
+         if (result != null) {
+             if ("".equals(result.getStatus())) {
+                 this.resetStatus(this);
+              } else {
+                 this.reportStatus(this, result.getStatus());                         
+              }
+             getMediator().getSelectionModel().setSelectedNode(result.getNode());
+             if (result.hasErrors()) {
+                 throw new ProblemLoaderException(loader,
+                       "Proof could only be loaded partially.\n" +
+                             "In summary " + result.getErrorList().size() +
+                             " not loadable rule application(s) have been detected.\n" +
+                             "The first one:\n"+result.getErrorList().get(0).getMessage(), result.getErrorList().get(0));
+             }
+         } else {
+            // should never happen as replay always returns a result object
+             //TODO (DS): Why is it then there? If this happens, we will get\\
+             // a NullPointerException just a line below...
+            getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());                         
+         }
 
-    protected static Pair<File, String> fileName(Proof proof, String fileExtension) {
-        // TODO: why do we use GUI components here?
-        final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
-
-        File selectedFile = null;
-        if (proof != null) {
-            selectedFile = proof.getProofFile();
-        }
-        // Suggest default file name if required
-        final String defaultName;
-        if (selectedFile == null) {
-            defaultName = MiscTools.toValidFileName(proof.name().toString()) + fileExtension;
-            selectedFile = new File(jFC.getCurrentDirectory(), defaultName);
-        } else if (selectedFile.getName().endsWith(".proof") && fileExtension.equals(".proof")) {
-            defaultName = selectedFile.getName();
-        } else {
-            String proofName = proof.name().toString();
-            if (proofName.endsWith(".key")) {
-                proofName = proofName.substring(0, proofName.lastIndexOf(".key"));
-            } else if (proofName.endsWith(".proof")) {
-                proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
-            }
-            defaultName = MiscTools.toValidFileName(proofName) + fileExtension;
-            selectedFile = new File(selectedFile.getParentFile(), defaultName);
-        }
-        return new Pair<File, String>(selectedFile, defaultName);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void proofDisposing(final ProofDisposedEvent e) {
-        super.proofDisposing(e);
-        // Remove proof from user interface
-        ThreadUtilities.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                mainWindow.getProofList().removeProof(e.getSource());
-            }
-        });
-    }
-
-    @Override
-    public boolean selectProofObligation(InitConfig initConfig) {
-        return ProofManagementDialog.showInstance(initConfig);
-    }
-
-    @Override
-    public void registerProofAggregate(ProofAggregate pa) {
-        super.registerProofAggregate(pa);
-        mainWindow.addProblem(pa);
-        mainWindow.setStandardStatusLine();
-    }
-
-    @Override
-    public void loadingStarted(AbstractProblemLoader loader) {
-        getMediator().stopInterface(true);
-        super.loadingStarted(loader);
-    }
-
-    @Override
-    public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer, ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
-        super.loadingFinished(loader, poContainer, proofList, result);
-        if (proofList != null) {
-            getMediator().setProof(loader.getProof());
-            if (result != null) {
-                if ("".equals(result.getStatus())) {
-                    this.resetStatus(this);
-                } else {
-                    this.reportStatus(this, result.getStatus());
-                }
-                getMediator().getSelectionModel().setSelectedNode(result.getNode());
-                if (result.hasErrors()) {
-                    throw new ProblemLoaderException(loader,
-                            "Proof could only be loaded partially.\n" +
-                                    "In summary " + result.getErrorList().size() +
-                                    " not loadable rule application(s) have been detected.\n" +
-                                    "The first one:\n" + result.getErrorList().get(0).getMessage(), result.getErrorList().get(0));
-                }
-            } else {
-                // should never happen as replay always returns a result object
-                //TODO (DS): Why is it then there? If this happens, we will get\\
-                // a NullPointerException just a line below...
-                getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());
-            }
-
-        }
+      }
         getMediator().resetNrGoalsClosedByHeuristics();
         if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
-            ((KeYUserProblemFile) poContainer.getProofOblInput()).close();
+            ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
         }
-    }
+   }
+   
+   
+   
 
+   
+   /**
+    * Loads the given location and returns all required references as {@link KeYEnvironment}
+    * with KeY's {@link MainWindow}.
+    * @param location The location to load.
+    * @param classPaths The class path entries to use.
+    * @param bootClassPath The boot class path to use.
+    * @param includes Optional includes to consider.
+    * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already visible?
+    * @return The {@link KeYEnvironment} which contains all references to the loaded location.
+    * @throws ProblemLoaderException Occurred Exception
+    */
+   public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(File location,
+                                                                             List<File> classPaths,
+                                                                             File bootClassPath,
+                                                                             List<File> includes,
+                                                                             boolean makeMainWindowVisible) throws ProblemLoaderException {
+      return loadInMainWindow(null, location, classPaths, bootClassPath, includes, false, makeMainWindowVisible);
+   }
+   
+   /**
+    * Loads the given location and returns all required references as {@link KeYEnvironment}
+    * with KeY's {@link MainWindow}.
+    * @param profile The {@link Profile} to use.
+    * @param location The location to load.
+    * @param classPaths The class path entries to use.
+    * @param bootClassPath The boot class path to use.
+    * @param includes Optional includes to consider.
+    * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already visible?
+    * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
+    * @return The {@link KeYEnvironment} which contains all references to the loaded location.
+    * @throws ProblemLoaderException Occurred Exception
+    */
+   public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(Profile profile,
+                                                                             File location,
+                                                                             List<File> classPaths,
+                                                                             File bootClassPath,
+                                                                             List<File> includes,
+                                                                             boolean forceNewProfileOfNewProofs,
+                                                                             boolean makeMainWindowVisible) throws ProblemLoaderException {
+      MainWindow main = MainWindow.getInstance();
+      if (makeMainWindowVisible && !main.isVisible()) {
+          main.setVisible(true);
+      }
+      AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, includes, null, forceNewProfileOfNewProofs);
+      InitConfig initConfig = loader.getInitConfig();
+      return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig, loader.getProof(), loader.getResult());
+   }
 
-    /**
-     * Loads the given location and returns all required references as {@link KeYEnvironment}
-     * with KeY's {@link MainWindow}.
-     *
-     * @param location              The location to load.
-     * @param classPaths            The class path entries to use.
-     * @param bootClassPath         The boot class path to use.
-     * @param includes              Optional includes to consider.
-     * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already visible?
-     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
-     * @throws ProblemLoaderException Occurred Exception
-     */
-    public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(File location,
-                                                                              List<File> classPaths,
-                                                                              File bootClassPath,
-                                                                              List<File> includes,
-                                                                              boolean makeMainWindowVisible) throws ProblemLoaderException {
-        return loadInMainWindow(null, location, classPaths, bootClassPath, includes, false, makeMainWindowVisible);
-    }
+   @Override
+   public void notify(NotificationEvent event) {
+      mainWindow.notify(event);
+   }
 
-    /**
-     * Loads the given location and returns all required references as {@link KeYEnvironment}
-     * with KeY's {@link MainWindow}.
-     *
-     * @param profile                    The {@link Profile} to use.
-     * @param location                   The location to load.
-     * @param classPaths                 The class path entries to use.
-     * @param bootClassPath              The boot class path to use.
-     * @param includes                   Optional includes to consider.
-     * @param makeMainWindowVisible      Make KeY's {@link MainWindow} visible if it is not already visible?
-     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
-     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
-     * @throws ProblemLoaderException Occurred Exception
-     */
-    public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(Profile profile,
-                                                                              File location,
-                                                                              List<File> classPaths,
-                                                                              File bootClassPath,
-                                                                              List<File> includes,
-                                                                              boolean forceNewProfileOfNewProofs,
-                                                                              boolean makeMainWindowVisible) throws ProblemLoaderException {
-        MainWindow main = MainWindow.getInstance();
-        if (makeMainWindowVisible && !main.isVisible()) {
-            main.setVisible(true);
-        }
-        AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, includes, null, forceNewProfileOfNewProofs);
-        InitConfig initConfig = loader.getInitConfig();
-        return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig, loader.getProof(), loader.getResult());
-    }
-
-    @Override
-    public void notify(NotificationEvent event) {
-        mainWindow.notify(event);
-    }
-
-    @Override
-    public void reportWarnings(ImmutableSet<PositionedString> warnings) {
-        final JDialog dialog = new JDialog(MainWindow.getInstance(),
-                SLEnvInput.getLanguage() + " warning",
-                true);
-        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        Container pane = dialog.getContentPane();
-        pane.setLayout(new BorderLayout());
-
-        //top label
-        JLabel label = new JLabel("The following non-fatal "
-                + "problems occurred when translating your "
-                + SLEnvInput.getLanguage() + " specifications:");
-        label.setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5));
-        pane.add(label, BorderLayout.NORTH);
-
-        //scrollable warning list
-        JScrollPane scrollpane = new JScrollPane();
-        scrollpane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        JList<PositionedString> list = new JList<PositionedString>(warnings.toArray(new PositionedString[warnings.size()]));
-        list.setBorder(BorderFactory.createLoweredBevelBorder());
-        scrollpane.setViewportView(list);
-        pane.add(scrollpane, BorderLayout.CENTER);
-
-        //ok button
-        final JButton button = new JButton("OK");
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.setVisible(false);
-            }
-        });
-        Dimension buttonDim = new Dimension(100, 27);
-        button.setPreferredSize(buttonDim);
-        button.setMinimumSize(buttonDim);
-        JPanel panel = new JPanel();
-        panel.add(button);
-        pane.add(panel, BorderLayout.SOUTH);
-        dialog.getRootPane().setDefaultButton(button);
-
-        button.registerKeyboardAction(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent event) {
-                        if (event.getActionCommand().equals("ESC")) {
-                            button.doClick();
-                        }
-                    }
-                },
-                "ESC",
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-        dialog.setSize(700, 300);
-        dialog.setLocationRelativeTo(MainWindow.getInstance());
-        dialog.setVisible(true);
-        dialog.dispose();
-    }
+   @Override
+   public void reportWarnings(ImmutableSet<PositionedString> warnings) {
+     final JDialog dialog = new JDialog(MainWindow.getInstance(), 
+                                        SLEnvInput.getLanguage() + " warning", 
+                                        true);
+     dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+     Container pane = dialog.getContentPane();
+     pane.setLayout(new BorderLayout());
+     
+     //top label
+     JLabel label = new JLabel("The following non-fatal "
+                               + "problems occurred when translating your " 
+                               + SLEnvInput.getLanguage() + " specifications:");
+     label.setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5));
+     pane.add(label, BorderLayout.NORTH);
+       
+     //scrollable warning list
+     JScrollPane scrollpane = new JScrollPane();
+     scrollpane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+     JList<PositionedString> list = new JList<PositionedString>(warnings.toArray(new PositionedString[warnings.size()]));
+     list.setBorder(BorderFactory.createLoweredBevelBorder());
+     scrollpane.setViewportView(list);
+     pane.add(scrollpane, BorderLayout.CENTER);
+ 
+     //ok button
+     final JButton button = new JButton("OK");
+     button.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+             dialog.setVisible(false);
+         }
+     });
+     Dimension buttonDim = new Dimension(100, 27);
+     button.setPreferredSize(buttonDim);
+     button.setMinimumSize(buttonDim);
+     JPanel panel = new JPanel();
+     panel.add(button);
+     pane.add(panel, BorderLayout.SOUTH);
+     dialog.getRootPane().setDefaultButton(button);
+     
+     button.registerKeyboardAction(
+         new ActionListener() {
+             @Override
+            public void actionPerformed(ActionEvent event) {
+                 if(event.getActionCommand().equals("ESC")) {
+                     button.doClick();
+                 }
+             }
+         },
+         "ESC",
+         KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+         JComponent.WHEN_IN_FOCUSED_WINDOW);
+     
+     dialog.setSize(700, 300);
+     dialog.setLocationRelativeTo(MainWindow.getInstance());
+     dialog.setVisible(true);
+     dialog.dispose();
+   }
 }
