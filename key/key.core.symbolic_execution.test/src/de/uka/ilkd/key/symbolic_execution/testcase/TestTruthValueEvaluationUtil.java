@@ -33,6 +33,29 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: /set/truthValueLabelBelowUpdatesDifferentToApplicationTerm
+    */
+   public void testTruthValueLabelBelowUpdatesDifferentToApplicationTerm() throws Exception {
+      // Create expected results
+      ExpectedBranchResult goal15 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("2.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("4.0", TruthValue.TRUE));
+      ExpectedBranchResult goal17 = new ExpectedBranchResult(new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("2.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("4.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult result = new ExpectedTruthValueEvaluationResult(goal15, goal17);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueLabelBelowUpdatesDifferentToApplicationTerm/test/TwoBranch.proof", 
+                                 "/set/truthValueLabelBelowUpdatesDifferentToApplicationTerm/oracle/TwoBranch.xml",
+                                 false,
+                                 false,
+                                 false,
+                                 result);
+   }
+   
+   /**
     * Tests example: /set/truthValueExceptinalAssignableNothingTest
     */
    public void testExceptinalAssignableNothingTest_OSS() throws Exception {
