@@ -3,6 +3,7 @@ package org.key_project.sed.key.ui.view;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -76,6 +77,8 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -284,6 +287,16 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
 		}
 	};
 
+   /**
+    * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()}.
+    */
+   private final SettingsListener viewSettingsListener = new SettingsListener() {
+      @Override
+      public void settingsChanged(EventObject e) {
+         handleViewSettingsChanged(e);
+      }
+   };
+
 	/**
 	 * the constructor of the class.
 	 */
@@ -417,6 +430,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       }
       createTreeViewerContextMenu();
       createSourceViewerContextMenu();
+      ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addSettingsListener(viewSettingsListener);
    }
    
    /**
@@ -448,6 +462,19 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       Menu menu = menuMgr.createContextMenu(styledText);
       styledText.setMenu(menu);
       getSite().registerContextMenu(getSourceViewerMenuId(), menuMgr, sourceViewer);
+   }
+
+   /**
+    * When the settings of {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()} have changed.
+    * @param e The event.
+    */
+   protected void handleViewSettingsChanged(EventObject e) {
+      getSite().getShell().getDisplay().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            showNode(getSelectedNode());
+         }
+      });
    }
    
    /**
@@ -482,6 +509,14 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     */
    protected void handleTreeViewerSelectionChanged(SelectionChangedEvent event) {
       Node node = getNode(event.getSelection());
+      showNode(node);
+   }
+   
+   /**
+    * Shows the given {@link Node}.
+    * @param node The {@link Node} to show.
+    */
+   protected void showNode(Node node) {
       if (node != null) {
          sourceViewerDecorator.showNode(node, SymbolicExecutionUtil.createNotationInfo(getCurrentProof()));
       }
@@ -685,6 +720,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     */
    @Override
    public void dispose() {
+      ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().removeSettingsListener(viewSettingsListener);
       if (parentComposite != null) {
          parentComposite.dispose();
       }

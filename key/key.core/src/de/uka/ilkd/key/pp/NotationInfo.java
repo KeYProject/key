@@ -134,8 +134,6 @@ public final class NotationInfo {
      */
     public static boolean DEFAULT_UNICODE_ENABLED = false;
     
-    public static boolean DEFAULT_SYNTAX_HIGHLIGHTING_ENABLED = false;
-    
     public static boolean DEFAULT_HIDE_PACKAGE_PREFIX = false;
     
     /** This maps operators and classes of operators to {@link
