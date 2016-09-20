@@ -145,8 +145,9 @@ include:
   autopilot      full autopilot
   autopilot-prep preparation only autopilot
   split-prop     propositional expansion w/ splits
-  upd-simpl      update simplification
-  heap-simpl     heap simplification
+  nosplit-prop   propositional expansion w/o splits
+  simp-upd       update simplification
+  simp-heap      heap simplification
 
 Examples:
   macro autopilot-prep;
