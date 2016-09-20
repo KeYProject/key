@@ -13,6 +13,9 @@
 
 package org.key_project.sed.key.ui.property;
 
+import java.util.EventObject;
+
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -29,13 +32,15 @@ import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
+import org.key_project.keyide.ui.editor.SequentDisplaySettingsMenuFactory;
 import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -65,12 +70,27 @@ public class KeYTabComposite extends Composite {
    private Font viewerFont;
    
    /**
+    * The currently shown {@link Node}.
+    */
+   private Node keyNode;
+   
+   /**
     * Listens for editor changes.
     */
    private IPropertyChangeListener editorsListener = new IPropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent event) {
          handleEditorPropertyChange(event);
+      }
+   };
+
+   /**
+    * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()}.
+    */
+   private final SettingsListener viewSettingsListener = new SettingsListener() {
+      @Override
+      public void settingsChanged(EventObject e) {
+         handleViewSettingsChanged(e);
       }
    };
    
@@ -110,6 +130,8 @@ public class KeYTabComposite extends Composite {
       data.top = new FormAttachment(nodeText, 0, ITabbedPropertyConstants.VSPACE);
       sequentViewer.getControl().setLayoutData(data);
       sequentViewerDecorator = new ProofSourceViewerDecorator(sequentViewer);
+      MenuManager sequentMenuManager = SequentDisplaySettingsMenuFactory.createSequentDisplaySettingsMenu();
+      sequentViewer.getControl().setMenu(sequentMenuManager.createContextMenu(sequentViewer.getControl()));
       
       CLabel sequentLabel = factory.createCLabel(composite, "Sequent:");
       data = new FormData();
@@ -120,6 +142,7 @@ public class KeYTabComposite extends Composite {
 
       SWTUtil.getEditorsPreferenceStore().addPropertyChangeListener(editorsListener);
       JFaceResources.getFontRegistry().addListener(editorsListener);
+      ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addSettingsListener(viewSettingsListener);
    }
 
    /**
@@ -148,20 +171,37 @@ public class KeYTabComposite extends Composite {
     */
    public void updateContent(IKeYSENode<?> node) {
       String name = null;
-      Node keyNode = null;
-      NotationInfo notationInfo = null;
       if (node != null) {
          keyNode = node.getExecutionNode().getProofNode();
-         notationInfo = SymbolicExecutionUtil.createNotationInfo(node.getExecutionNode());
          name = keyNode.serialNr() + ": " + keyNode.name(); // Copied from ProofRenderer
       }
       SWTUtil.setText(nodeText, name);
+      updateShownSequent();
+   }
+   
+   /**
+    * Updates the shown sequent.
+    */
+   protected void updateShownSequent() {
       if (keyNode != null && !keyNode.proof().isDisposed()) {
-         sequentViewerDecorator.showNode(keyNode, notationInfo);
+         sequentViewerDecorator.showNode(keyNode, SymbolicExecutionUtil.createNotationInfo(keyNode));
       }
       else {
-         sequentViewerDecorator.showNode(null, notationInfo);
+         sequentViewerDecorator.showNode(null, SymbolicExecutionUtil.createNotationInfo(keyNode));
       }
+   }
+
+   /**
+    * When the settings of {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()} have changed.
+    * @param e The event.
+    */
+   protected void handleViewSettingsChanged(EventObject e) {
+      getDisplay().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            updateShownSequent();
+         }
+      });
    }
 
    /**
@@ -169,6 +209,7 @@ public class KeYTabComposite extends Composite {
     */
    @Override
    public void dispose() {
+      ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().removeSettingsListener(viewSettingsListener);
       JFaceResources.getFontRegistry().removeListener(editorsListener);
       SWTUtil.getEditorsPreferenceStore().removePropertyChangeListener(editorsListener);
       if (viewerFont != null) {

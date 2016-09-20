@@ -215,6 +215,10 @@
                commandId="org.key_project.sed.key.ui.showSubtreeCommand"
                icon="icons/subtree.gif">
          </image>
+         <image
+               commandId="org.key_project.sed.key.ui.commands.applyRule"
+               icon="icons/interactiveAppLogo16.png">
+         </image>
       </extension>
       <extension
             point="org.eclipse.ui.handlers">
@@ -733,6 +737,11 @@
          <menuContribution
                allPopups="false"
                locationURI="popup:org.key_project.sed.key.ui.ProofView">
+         </menuContribution>
+         <menuContribution
+               allPopups="false"
+               class="org.key_project.keyide.ui.editor.SequentSettingsContextMenu"
+               locationURI="popup:org.key_project.sed.key.ui.ProofView.popup?before=group.add">
          </menuContribution>
       </extension>
       <extension

@@ -416,6 +416,11 @@
             class="org.key_project.keyide.ui.editor.TacletContextMenu"
             locationURI="popup:#KeYEditorContext?before=group.undo">
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            class="org.key_project.keyide.ui.editor.SequentDisplaySettingsMenuFactory"
+            locationURI="popup:#KeYEditorContext?before=group.undo">
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">

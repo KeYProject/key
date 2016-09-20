@@ -19,6 +19,7 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -189,6 +190,46 @@ public class SwingBot extends SWTBot {
     */
    public SwingBotJMenuBar jMenuBar() {
       return new SwingBotJMenuBar(getFinder(), getFinder().findJMenuBar());
+   }
+   
+   /**
+    * Returns a wrapper for the described element.
+    * @return A wrapper around a {@link JEditorPane} with the specified text.
+    */   
+   public SwingBotJEditorPane jEditorPane() {
+      return jEditorPane(0);
+   }
+   
+   /**
+    * Returns a wrapper for the described element.
+    * @param index The index of the {@link JEditorPane}, in case there are multiple buttons with the same text.
+    * @return A wrapper around a {@link JEditorPane} with the specified index.
+    */      
+   @SuppressWarnings({ "rawtypes", "unchecked" })
+   public SwingBotJEditorPane jEditorPane(int index) {
+      Matcher matcher = ComponentMatcherFactory.allOf(ComponentMatcherFactory.componentOfType(JEditorPane.class));
+      return new SwingBotJEditorPane((JEditorPane)component(matcher, index));
+   }
+   
+   /**
+    * Returns a wrapper for the described element.
+    * @param text The text on the {@link JEditorPane}.
+    * @return A wrapper around a {@link JEditorPane} with the specified text.
+    */   
+   public SwingBotJEditorPane jEditorPane(String text) {
+      return jEditorPane(text, 0);
+   }
+   
+   /**
+    * Returns a wrapper for the described element.
+    * @param text The text on the {@link JEditorPane}.
+    * @param index The index of the {@link JEditorPane}, in case there are multiple buttons with the same text.
+    * @return A wrapper around a {@link JEditorPane} with the specified index.
+    */      
+   @SuppressWarnings({ "rawtypes", "unchecked" })
+   public SwingBotJEditorPane jEditorPane(String text, int index) {
+      Matcher matcher = ComponentMatcherFactory.allOf(ComponentMatcherFactory.componentOfType(JEditorPane.class), ComponentMatcherFactory.withText(text));
+      return new SwingBotJEditorPane((JEditorPane)component(matcher, index));
    }
    
    /**
