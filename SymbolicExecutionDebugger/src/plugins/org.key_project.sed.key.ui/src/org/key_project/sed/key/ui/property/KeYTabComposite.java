@@ -14,7 +14,11 @@
 package org.key_project.sed.key.ui.property;
 
 import java.util.EventObject;
+import java.util.LinkedList;
+import java.util.List;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.source.SourceViewer;
@@ -32,15 +36,27 @@ import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
+import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
+import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.keyide.ui.editor.SequentDisplaySettingsMenuFactory;
 import org.key_project.sed.key.core.model.IKeYSENode;
+import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
+import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
+import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
+import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -48,7 +64,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * and {@link KeYGraphitiDebugNodePropertySection}.
  * @author Martin Hentschel
  */
-public class KeYTabComposite extends Composite {
+public class KeYTabComposite extends Composite implements IProofProvider {
    /**
     * Shows the node id with applied rule of the node in KeY's proof tree represented by the current {@link IKeYSENode}.
     */
@@ -70,9 +86,19 @@ public class KeYTabComposite extends Composite {
    private Font viewerFont;
    
    /**
+    * The currently shown {@link IKeYSENode}.
+    */
+   private IKeYSENode<?> node;
+   
+   /**
     * The currently shown {@link Node}.
     */
    private Node keyNode;
+   
+   /**
+    * Contains the registered {@link IProofProviderListener}.
+    */
+   private final List<IProofProviderListener> proofProviderListener = new LinkedList<IProofProviderListener>();
    
    /**
     * Listens for editor changes.
@@ -91,6 +117,16 @@ public class KeYTabComposite extends Composite {
       @Override
       public void settingsChanged(EventObject e) {
          handleViewSettingsChanged(e);
+      }
+   };
+   
+   /**
+    * Observes changes on the used {@link TermLabelVisibilityManager}.
+    */
+   private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener = new TermLabelVisibilityManagerListener() {
+      @Override
+      public void visibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
+         handleVisibleLabelsChanged(e);
       }
    };
    
@@ -130,8 +166,9 @@ public class KeYTabComposite extends Composite {
       data.top = new FormAttachment(nodeText, 0, ITabbedPropertyConstants.VSPACE);
       sequentViewer.getControl().setLayoutData(data);
       sequentViewerDecorator = new ProofSourceViewerDecorator(sequentViewer);
-      MenuManager sequentMenuManager = SequentDisplaySettingsMenuFactory.createSequentDisplaySettingsMenu();
-      sequentViewer.getControl().setMenu(sequentMenuManager.createContextMenu(sequentViewer.getControl()));
+      MenuManager sequentManager = new MenuManager();
+      sequentManager.add(SequentDisplaySettingsMenuFactory.createSequentDisplaySettingsMenu(this));
+      sequentViewer.getControl().setMenu(sequentManager.createContextMenu(sequentViewer.getControl()));
       
       CLabel sequentLabel = factory.createCLabel(composite, "Sequent:");
       data = new FormData();
@@ -170,13 +207,27 @@ public class KeYTabComposite extends Composite {
     * @param node The {@link IKeYSENode} which provides the new content.
     */
    public void updateContent(IKeYSENode<?> node) {
+      Proof oldProof = getCurrentProof();
+      if (this.node != null) {
+         getTermLabelVisibilityManager().removeTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
+      }
+      this.node = node;
+      if (this.node != null) {
+         getTermLabelVisibilityManager().addTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
+      }
       String name = null;
       if (node != null) {
          keyNode = node.getExecutionNode().getProofNode();
          name = keyNode.serialNr() + ": " + keyNode.name(); // Copied from ProofRenderer
       }
+      else {
+         keyNode = null;
+      }
       SWTUtil.setText(nodeText, name);
       updateShownSequent();
+      if (!ObjectUtil.equals(oldProof, getCurrentProof())) {
+         fireCurrentProofsChanged(new ProofProviderEvent(this, getCurrentProofs(), getCurrentProof(), getUI(), getEnvironment()));
+      }
    }
    
    /**
@@ -184,10 +235,10 @@ public class KeYTabComposite extends Composite {
     */
    protected void updateShownSequent() {
       if (keyNode != null && !keyNode.proof().isDisposed()) {
-         sequentViewerDecorator.showNode(keyNode, SymbolicExecutionUtil.createNotationInfo(keyNode));
+         sequentViewerDecorator.showNode(keyNode, SymbolicExecutionUtil.createNotationInfo(keyNode), getTermLabelVisibilityManager());
       }
       else {
-         sequentViewerDecorator.showNode(null, SymbolicExecutionUtil.createNotationInfo(keyNode));
+         sequentViewerDecorator.showNode(null, SymbolicExecutionUtil.createNotationInfo(keyNode), getTermLabelVisibilityManager());
       }
    }
 
@@ -196,6 +247,21 @@ public class KeYTabComposite extends Composite {
     * @param e The event.
     */
    protected void handleViewSettingsChanged(EventObject e) {
+      updateShownSequentThreadSave();
+   }
+
+   /**
+    * When the visible term labels have changed.
+    * @param e The event.
+    */
+   protected void handleVisibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
+      updateShownSequentThreadSave();
+   }
+   
+   /**
+    * Updates the shown {@link Sequent} thread save.
+    */
+   protected void updateShownSequentThreadSave() {
       getDisplay().syncExec(new Runnable() {
          @Override
          public void run() {
@@ -210,11 +276,116 @@ public class KeYTabComposite extends Composite {
    @Override
    public void dispose() {
       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().removeSettingsListener(viewSettingsListener);
+      if (node != null) {
+         getTermLabelVisibilityManager().removeTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
+      }
       JFaceResources.getFontRegistry().removeListener(editorsListener);
       SWTUtil.getEditorsPreferenceStore().removePropertyChangeListener(editorsListener);
       if (viewerFont != null) {
          viewerFont.dispose();
       }
       super.dispose();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Proof getCurrentProof() {
+      return keyNode != null ? keyNode.proof() : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Proof[] getCurrentProofs() {
+      Proof proof = getCurrentProof();
+      return proof != null ? new Proof[] {proof} : new Proof[0];
+   }
+   
+   /**
+    * Returns the {@link KeYDebugTarget} if available and {@code null} otherwise.
+    * @return The {@link KeYDebugTarget} of the currently shown {@link IKeYSENode} or {@code null} otherwise.
+    */
+   public KeYDebugTarget getDebugTarget() {
+      return node != null ? node.getDebugTarget() : null;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SymbolicExecutionEnvironment<?> getEnvironment() {
+      KeYDebugTarget target = getDebugTarget();
+      return target != null ? target.getEnvironment() : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public UserInterfaceControl getUI() {
+      SymbolicExecutionEnvironment<?> env = getEnvironment();
+      return env != null ? env.getUi() : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ProofControl getProofControl() {
+      UserInterfaceControl ui = getUI();
+      return ui != null ? ui.getProofControl() : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addProofProviderListener(IProofProviderListener l) {
+      if (l != null) {
+         proofProviderListener.add(l);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeProofProviderListener(IProofProviderListener l) {
+      if (l != null) {
+         proofProviderListener.remove(l);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IProject getProject() {
+      KeYDebugTarget target = getDebugTarget();
+      IMethod method = target != null ? target.getMethod() : null;
+      return method != null ? method.getResource().getProject() : null;
+   }
+   
+   /**
+    * Informs all registered {@link IProofProviderListener} about the event.
+    * @param e The {@link ProofProviderEvent}.
+    */
+   protected void fireCurrentProofsChanged(ProofProviderEvent e) {
+      IProofProviderListener[] toInform = proofProviderListener.toArray(new IProofProviderListener[proofProviderListener.size()]);
+      for (IProofProviderListener l : toInform) {
+         l.currentProofsChanged(e);
+      }
+   }
+
+   /**
+    * Returns the used {@link TermLabelVisibilityManager}.
+    * @return The used {@link TermLabelVisibilityManager} or {@code null} if not available.
+    */
+   public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+      UserInterfaceControl ui = getUI();
+      return ui != null ? ui.getTermLabelVisibilityManager() : null; 
    }
 }

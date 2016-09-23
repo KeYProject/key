@@ -198,15 +198,16 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * in the decorated {@link ISourceViewer}.
     * @param node The {@link Node} to show.
     * @param notationInfo The {@link NotationInfo} containing information on how to display node.
+    * @param visibleLabels The visible term labels.
     */
-   public void showNode(Node node, NotationInfo notationInfo) {
+   public void showNode(Node node, NotationInfo notationInfo, VisibleTermLabels visibleLabels) {
       this.node = node;
       if (node != null) {
          filter = new IdentitySequentPrintFilter(node.sequent());
          printer = new SequentViewLogicPrinter(new ProgramPrinter(null), 
                                                notationInfo, 
                                                node.proof().getServices(),
-                                               null);
+                                               visibleLabels);
          text = computeText(notationInfo, node, filter, printer);
       }
       else {

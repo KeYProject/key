@@ -726,6 +726,6 @@
                   tab="org.key_project.keyide.ui.tacletPropertyTab">
             </propertySection>
          </propertySections>
-      </extension>  
+      </extension>
 
 </plugin>

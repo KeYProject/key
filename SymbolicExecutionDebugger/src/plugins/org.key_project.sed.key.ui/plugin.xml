@@ -740,7 +740,7 @@
          </menuContribution>
          <menuContribution
                allPopups="false"
-               class="org.key_project.keyide.ui.editor.SequentSettingsContextMenu"
+               class="org.key_project.keyide.ui.editor.SequentDisplaySettingsMenuFactory"
                locationURI="popup:org.key_project.sed.key.ui.ProofView.popup?before=group.add">
          </menuContribution>
       </extension>

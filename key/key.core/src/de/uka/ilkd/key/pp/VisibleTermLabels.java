@@ -22,12 +22,8 @@ import de.uka.ilkd.key.logic.label.TermLabel;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public abstract class VisibleTermLabels {
-
-    public boolean contains(TermLabel label) {
-        return contains(label.name());
-    }
+public interface VisibleTermLabels {
+    public boolean contains(TermLabel label);
 
     public abstract boolean contains(Name name);
-
 }

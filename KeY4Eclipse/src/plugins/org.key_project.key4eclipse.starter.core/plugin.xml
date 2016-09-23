@@ -51,4 +51,13 @@
             state="true">
       </decorator>
    </extension>
+   <extension
+         point="org.eclipse.ui.services">
+      <serviceFactory
+            factoryClass="org.key_project.key4eclipse.starter.core.service.ProofProviderServiceFactory">
+         <service
+               serviceClass="org.key_project.key4eclipse.starter.core.util.IProofProvider">
+         </service>
+      </serviceFactory>
+   </extension>
 </plugin>
