@@ -96,6 +96,17 @@ public class SwingFinder extends org.eclipse.swtbot.swt.finder.finders.Finder {
    }
    
    /**
+    * Finds all the {@link JMenu}s in the given menu matching the given matcher.
+    * @param menu The menu
+    * @param matcher The matcher that can match menus and menu items.
+    * @return All menu items in the specified menu that match the matcher.
+    * @see MenuFinder#findMenus(JMenu, Matcher)
+    */
+   public List<JMenu> findMenus(JMenu menu, final Matcher<JMenu> matcher) {
+      return swingMenuFinder.findMenus(menu, matcher);
+   }
+   
+   /**
     * Finds all the {@link JMenu}s in the given menu bar matching the given matcher. If recursive is set, it will attempt to
     * find the controls recursively in each of the menus it that is found.
     * @param bar The menu bar

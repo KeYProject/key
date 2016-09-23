@@ -1,18 +1,28 @@
 package org.key_project.keyide.ui.editor;
 
+import java.util.List;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.menus.ExtensionContributionFactory;
 import org.eclipse.ui.menus.IContributionRoot;
 import org.eclipse.ui.services.IServiceLocator;
 import org.key_project.key4eclipse.common.ui.util.KeYImages;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
+import org.key_project.util.java.CollectionUtil;
 
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
 import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
+import de.uka.ilkd.key.gui.actions.TermLabelMenu;
 import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
@@ -31,14 +41,16 @@ public class SequentDisplaySettingsMenuFactory extends ExtensionContributionFact
     */
    @Override
    public void createContributionItems(IServiceLocator serviceLocator, IContributionRoot additions) {
-      additions.addContributionItem(createSequentDisplaySettingsMenu(), null);
+      IProofProvider proofProvider = (IProofProvider) serviceLocator.getService(IProofProvider.class);
+      additions.addContributionItem(createSequentDisplaySettingsMenu(proofProvider), null);
    }
    
    /**
     * Creates the {@link MenuManager} representing the "Sequent Display Settings" menu.
+    * @param proofProvider The active {@link IProofProvider}.
     * @return The created {@link MenuManager}.
     */
-   public static MenuManager createSequentDisplaySettingsMenu() {
+   public static MenuManager createSequentDisplaySettingsMenu(final IProofProvider proofProvider) {
       MenuManager manager = new MenuManager();
       manager.setMenuText(MENU_NAME);
       manager.setImageDescriptor(KeYImages.getImageDescriptor(KeYImages.KEY_LOGO));
@@ -46,7 +58,7 @@ public class SequentDisplaySettingsMenuFactory extends ExtensionContributionFact
       manager.addMenuListener(new IMenuListener() {
          @Override
          public void menuAboutToShow(IMenuManager manager) {
-            fillSequentDisplaySettingsMenu(manager);
+            fillSequentDisplaySettingsMenu(manager, proofProvider);
          }
       });
       return manager;
@@ -55,8 +67,9 @@ public class SequentDisplaySettingsMenuFactory extends ExtensionContributionFact
    /**
     * Fills the {@link IMenuManager} with the items of the "Sequent Display Settings" menu.
     * @param manager The {@link IMenuManager} to fill.
+    * @param proofProvider The active {@link IProofProvider}.
     */
-   protected static void fillSequentDisplaySettingsMenu(IMenuManager manager) {
+   protected static void fillSequentDisplaySettingsMenu(IMenuManager manager, IProofProvider proofProvider) {
       // Pretty Syntax
       final boolean originalPrettyActionCheckedState = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
       Action prettyAction = new Action(PrettyPrintToggleAction.NAME) {
@@ -95,5 +108,49 @@ public class SequentDisplaySettingsMenuFactory extends ExtensionContributionFact
       packageAction.setChecked(originalPackageActionCheckedState);
       packageAction.setEnabled(originalPrettyActionCheckedState);
       manager.add(packageAction);
+      // Term labels
+      if (proofProvider != null) {
+         Proof proof = proofProvider.getCurrentProof();
+         if (proof != null) {
+            UserInterfaceControl ui = proofProvider.getUI();
+            if (ui != null) {
+               final TermLabelVisibilityManager visibilityManager = ui.getTermLabelVisibilityManager();
+               if (visibilityManager != null) {
+                  List<Name> labelNames = TermLabelVisibilityManager.getSortedTermLabelNames(proof);
+                  if (!CollectionUtil.isEmpty(labelNames)) {
+                     // Label menu
+                     MenuManager labelManager = new MenuManager();
+                     labelManager.setMenuText(TermLabelMenu.TERM_LABEL_MENU);
+                     manager.add(labelManager);
+                     // Show labels action
+                     final boolean originalShowLabelsState = visibilityManager.isShowLabels();
+                     Action showLabelsAction = new Action(TermLabelMenu.DisplayLabelsCheckBox.LABEL) {
+                        @Override
+                        public void run() {
+                           visibilityManager.setShowLabels(!originalShowLabelsState);
+                        }
+                     };
+                     showLabelsAction.setToolTipText(TermLabelMenu.DisplayLabelsCheckBox.TOOL_TIP);
+                     showLabelsAction.setChecked(originalShowLabelsState);
+                     labelManager.add(showLabelsAction);
+                     labelManager.add(new Separator());
+                     // Individual labels
+                     for (final Name labelName : labelNames) {
+                        final boolean originalShowLabelState = !visibilityManager.isHidden(labelName);
+                        Action showLabelAction = new Action(labelName.toString()) {
+                           @Override
+                           public void run() {
+                              visibilityManager.setHidden(labelName, originalShowLabelState);
+                           }
+                        };
+                        showLabelAction.setChecked(originalShowLabelState);
+                        showLabelAction.setEnabled(originalShowLabelsState);
+                        labelManager.add(showLabelAction);
+                     }
+                  }
+               }
+            }
+         }
+      }
    }
 }

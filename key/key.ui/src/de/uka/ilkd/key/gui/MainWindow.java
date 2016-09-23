@@ -32,11 +32,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.EventObject;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
@@ -67,9 +64,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.AutoModeListener;
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -134,7 +130,6 @@ import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -259,7 +254,7 @@ public final class MainWindow extends JFrame  {
     
     private final TermLabelMenu termLabelMenu;
     
-    public VisibleTermLabels getVisibleTermLabels(){
+    public TermLabelVisibilityManager getVisibleTermLabels(){
         return termLabelMenu.getVisibleTermLabels();
     }
 
@@ -1544,29 +1539,13 @@ public final class MainWindow extends JFrame  {
     /*
      * Retrieves supported term label names from profile and returns a sorted
      * list of them.
-     * TODO: Maybe there is a better place to put this than MainWindow.
      */
     public List<Name> getSortedTermLabelNames() {
         /* 
          * Get list of labels from profile. This list is not always identical,
          * since the used Profile may change during execution.
          */
-        ImmutableList<Name> labelNamesFromProfile = getMediator()
-                .getProfile().getTermLabelManager().getSupportedTermLabelNames();
-
-        List<Name> labelNames = new LinkedList<Name>();
-        for (Name labelName : labelNamesFromProfile) {
-            labelNames.add(labelName);
-        }
-        Collections.sort(labelNames, new Comparator<Name>() {
-
-            @Override
-            public int compare(Name t, Name t1) {
-                return String.CASE_INSENSITIVE_ORDER.compare(t.toString(), t1.toString());
-            }
-
-        });
-        return labelNames;
+        return TermLabelVisibilityManager.getSortedTermLabelNames(getMediator().getProfile());
     }
 
    /**

@@ -24,11 +24,13 @@ import java.util.TreeMap;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
+import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
+import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.pp.VisibleTermLabels;
 
 /**
  * This menu can be used to toggle TermLabel visibility for the SequentView.
@@ -36,36 +38,34 @@ import de.uka.ilkd.key.pp.VisibleTermLabels;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class TermLabelMenu extends JMenu {
-
+    public static final String TERM_LABEL_MENU = "Term Labels";
+   
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-    private final Map<Name, TermLabelCheckBox> checkBoxMap;
+    private final TermLabelVisibilityManager visibleTermLabels = new TermLabelVisibilityManager();
+    private final Map<Name, TermLabelCheckBox> checkBoxMap = new TreeMap<Name, TermLabelCheckBox>();
     private final MainWindow mainWindow;
-    private final VisibleTermLabels visibleTermLabels;
     private final DisplayLabelsCheckBox displayLabelsCheckBox;
+    
+    /**
+     * Observes changes on {@link #visibleTermLabels}.
+     */
+    private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener = new TermLabelVisibilityManagerListener() {
+       @Override
+       public void visibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
+          handleVisibleLabelsChanged(e);
+       }
+    };
 
     public TermLabelMenu(final MainWindow mainWindow) {
-
-        setText("Term Labels");
-        setToolTipText("Configure term label visibility.");
-        checkBoxMap = new TreeMap<Name, TermLabelCheckBox>();
         this.mainWindow = mainWindow;
+        setText(TERM_LABEL_MENU);
+        setToolTipText("Configure term label visibility.");
+        visibleTermLabels.addTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
 
         displayLabelsCheckBox = new DisplayLabelsCheckBox(mainWindow);
-
-        visibleTermLabels = new VisibleTermLabels() {
-            @Override
-            public boolean contains(Name name) {
-                if (displayLabelsCheckBox.isSelected()) {
-                    TermLabelCheckBox checkedName = checkBoxMap.get(name);
-                    return checkedName == null || checkedName.isSelected();
-                } else {
-                    return false;
-                }
-            }
-        };
 
         rebuildMenu();
 
@@ -101,7 +101,24 @@ public class TermLabelMenu extends JMenu {
         });
     }
 
-    private void rebuildMenu() {
+   /**
+    * When the visible term labels have changed.
+    * <p>
+    * <b>Attention:</b> This can happen in an Eclipse context outside of the checkbox items!
+    * @param e The event object.
+    */
+   protected void handleVisibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
+      if (displayLabelsCheckBox != null) {
+         displayLabelsCheckBox.setSelected(visibleTermLabels.isShowLabels());
+      }
+      for (TermLabelCheckBox box : checkBoxMap.values()) {
+         box.setEnabled(visibleTermLabels.isShowLabels());
+         box.setSelected(!visibleTermLabels.isHidden(box.labelName));
+      }
+      mainWindow.makePrettyView();
+   }
+
+   private void rebuildMenu() {
         removeAll();
         add(displayLabelsCheckBox);
         addSeparator();
@@ -132,27 +149,33 @@ public class TermLabelMenu extends JMenu {
         }
     }
 
-    public VisibleTermLabels getVisibleTermLabels() {
+    public TermLabelVisibilityManager getVisibleTermLabels() {
         return visibleTermLabels;
     }
 
-    private class DisplayLabelsCheckBox extends KeYMenuCheckBox {
+    public class DisplayLabelsCheckBox extends KeYMenuCheckBox {
+        public static final String LABEL = "Display term labels in formulas";
+        
+        public static final String TOOL_TIP = "Use this checkbox to toggle visibility for all term labels.";
 
         /**
          *
          */
         private static final long serialVersionUID = 8766949321781919880L;
 
-        public DisplayLabelsCheckBox(MainWindow mainWindow) {
-            super(mainWindow, "Display term labels in formulas", true);
-            setTooltip("Use this checkbox to toggle visibility for all term labels.");
+        private DisplayLabelsCheckBox(MainWindow mainWindow) {
+            super(mainWindow, LABEL, true);
+            setTooltip(TOOL_TIP);
             setName("DisplayLabelsCheckBox");
+            setSelected(visibleTermLabels.isShowLabels());
         }
 
         @Override
         public void handleClickEvent() {
+            boolean selected = isSelected();
+            visibleTermLabels.setShowLabels(selected);
             for (JCheckBoxMenuItem checkBox : checkBoxMap.values()) {
-                checkBox.setEnabled(isSelected());
+                checkBox.setEnabled(selected);
             }
             mainWindow.makePrettyView();
         }
@@ -181,14 +204,16 @@ public class TermLabelMenu extends JMenu {
             super(mainWindow, labelName.toString(), true);
             this.labelName = labelName;
             setName(labelName.toString());
-            setSelected(true);
+            setSelected(!visibleTermLabels.isHidden(labelName));
             setEnabled(displayLabelsCheckBox.isSelected());
             mainWindow.loadPreferences(this);
+            visibleTermLabels.setHidden(labelName, !isSelected());
             setItalicFont();
         }
 
         @Override
         public void handleClickEvent() {
+            visibleTermLabels.setHidden(labelName, !isSelected());
             mainWindow.makePrettyView();
         }
 
@@ -196,7 +221,6 @@ public class TermLabelMenu extends JMenu {
         public final void setEnabled(boolean b) {
             super.setEnabled(b);
             updateToolTipText();
-
         }
 
         private void setItalicFont() {

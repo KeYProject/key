@@ -69,7 +69,11 @@ import org.key_project.util.java.ArrayUtil;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
+import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -296,6 +300,16 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
          handleViewSettingsChanged(e);
       }
    };
+   
+   /**
+    * Observes changes on the used {@link TermLabelVisibilityManager}.
+    */
+   private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener = new TermLabelVisibilityManagerListener() {
+      @Override
+      public void visibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
+         handleVisibleLabelsChanged(e);
+      }
+   };
 
 	/**
 	 * the constructor of the class.
@@ -469,6 +483,21 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     * @param e The event.
     */
    protected void handleViewSettingsChanged(EventObject e) {
+      updateShownSequentThreadSave();
+   }
+
+   /**
+    * When the visible term labels have changed.
+    * @param e The event.
+    */
+   protected void handleVisibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
+      updateShownSequentThreadSave();
+   }
+   
+   /**
+    * Updates the shown {@link Sequent} thread save.
+    */
+   protected void updateShownSequentThreadSave() {
       getSite().getShell().getDisplay().syncExec(new Runnable() {
          @Override
          public void run() {
@@ -518,10 +547,10 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     */
    protected void showNode(Node node) {
       if (node != null) {
-         sourceViewerDecorator.showNode(node, SymbolicExecutionUtil.createNotationInfo(getCurrentProof()));
+         sourceViewerDecorator.showNode(node, SymbolicExecutionUtil.createNotationInfo(getCurrentProof()), getTermLabelVisibilityManager());
       }
       else {
-         sourceViewerDecorator.showNode(null, SymbolicExecutionUtil.createNotationInfo((Node) null));
+         sourceViewerDecorator.showNode(null, SymbolicExecutionUtil.createNotationInfo((Node) null), getTermLabelVisibilityManager());
       }
    }
    
@@ -604,6 +633,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       if (newProof != proof) {
          // Remove listener from old proof
          if (environment != null) {
+            environment.getUi().getTermLabelVisibilityManager().removeTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
             environment.getProofControl().removeAutoModeListener(autoModeListener);
          }
          if (proof != null && !proof.isDisposed()) {
@@ -617,6 +647,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
             contentProvider.setProofControl(environment != null ? environment.getProofControl() : null);
          }
          if (environment != null) {
+            environment.getUi().getTermLabelVisibilityManager().addTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
             environment.getProofControl().addAutoModeListener(autoModeListener);
             environment.getProofControl().setMinimizeInteraction(true);
          }
@@ -738,6 +769,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
          sourceViewer.getControl().dispose();
       }
       if (environment != null) {
+         environment.getUi().getTermLabelVisibilityManager().removeTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
          environment.getProofControl().removeAutoModeListener(autoModeListener);
       }
       if (baseView != null) {
@@ -1042,5 +1074,14 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
    @Override
    public boolean hasListener(String propertyName, PropertyChangeListener listener) {
       return ArrayUtil.contains(getPropertyChangeListeners(propertyName), listener);
+   }
+
+   /**
+    * Returns the used {@link TermLabelVisibilityManager}.
+    * @return The used {@link TermLabelVisibilityManager} or {@code null} if not available.
+    */
+   public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+      UserInterfaceControl ui = getUI();
+      return ui != null ? ui.getTermLabelVisibilityManager() : null; 
    }
 }

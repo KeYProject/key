@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.control;
 
-import de.uka.ilkd.key.proof.init.IPersistablePO;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -33,6 +32,11 @@ import de.uka.ilkd.key.speclang.PositionedString;
  * @see KeYEnvironment
  */
 public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
+   /**
+    * The used {@link TermLabelVisibilityManager}.
+    */
+   private final TermLabelVisibilityManager termLabelVisibilityManager = new TermLabelVisibilityManager();
+   
    /**
     * The used {@link DefaultProofControl}.
     */
@@ -161,5 +165,13 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
    @Override
    public void reportWarnings(ImmutableSet<PositionedString> warnings) {
       // Nothing to do
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+      return termLabelVisibilityManager;
    }
 }
