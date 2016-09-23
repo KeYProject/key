@@ -22,6 +22,7 @@ import org.eclipse.core.commands.State;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -294,16 +295,22 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		if (mediatorNode != selectedNode) {
 			// Make sure that Node to select is loaded in lazy TreeViewer
 			makeSureElementIsLoaded(mediatorNode);
-			
-			Object parent = contentProvider.getParent(mediatorNode);
-			int viewIndex = contentProvider.getIndexOf(parent, mediatorNode);
-			// Select Node in lazy TreeViewer or the parent node when the node got filtered out
-			if (viewIndex >= 0) {
-				getTreeViewer().setSelection(SWTUtil.createSelection(mediatorNode), true);
-			} else {
-				getTreeViewer().setSelection(SWTUtil.createSelection(parent), true);
+			if (mediatorNode != null) {
+	         Object parent = contentProvider.getParent(mediatorNode);
+	         int viewIndex = contentProvider.getIndexOf(parent, mediatorNode);
+	         // Select Node in lazy TreeViewer or the parent node when the node got filtered out
+	         if (viewIndex >= 0) {
+	            getTreeViewer().setSelection(SWTUtil.createSelection(mediatorNode), true);
+	         }
+            else {
+	            getTreeViewer().setSelection(SWTUtil.createSelection(parent), true);
+	         }
 			}
-		} else {
+			else {
+            getTreeViewer().setSelection(StructuredSelection.EMPTY, true);
+			}
+		}
+      else {
 		   // scroll to the selected Node
 			Object selectedObj = SWTUtil.getFirstElement(getSelection());
 			if (selectedObj != null && !(selectedObj instanceof BranchFolder)) {

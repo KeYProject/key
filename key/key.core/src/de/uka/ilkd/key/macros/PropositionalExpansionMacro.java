@@ -36,6 +36,11 @@ public class PropositionalExpansionMacro extends AbstractPropositionalExpansionM
                 "does not split the goal.";
     }
 
+    @Override
+    public String getScriptCommandName() {
+        return "nosplit-prop";
+    }
+
     private static final String[] ADMITTED_RULES = {
         "andLeft", "orRight", "impRight", "notLeft", "notRight", "close",
         "closeTrue", "closeFalse", "true_left", "false_right"

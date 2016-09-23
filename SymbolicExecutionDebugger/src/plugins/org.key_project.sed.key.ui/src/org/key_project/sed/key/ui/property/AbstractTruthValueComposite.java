@@ -15,16 +15,19 @@ package org.key_project.sed.key.ui.property;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.EventObject;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.JFaceResources;
@@ -51,6 +54,10 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
 import org.key_project.key4eclipse.common.ui.decorator.TruthValueTracingViewerDecorator;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
+import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
+import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
+import org.key_project.keyide.ui.editor.SequentDisplaySettingsMenuFactory;
 import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.KeYBlockContractExceptionalTermination;
 import org.key_project.sed.key.core.model.KeYBlockContractTermination;
@@ -67,6 +74,10 @@ import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
+import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
+import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -84,6 +95,8 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.BranchResult;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.MultiEvaluationResult;
@@ -91,6 +104,7 @@ import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValueTracingResult;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -100,7 +114,7 @@ import de.uka.ilkd.key.util.Triple;
  * and {@link AbstractTruthValueGraphitiPropertySection}.
  * @author Martin Hentschel
  */
-public abstract class AbstractTruthValueComposite implements IDisposable {
+public abstract class AbstractTruthValueComposite implements IProofProvider, IDisposable {
    /**
     * Indicates if updates are included or not.
     */
@@ -154,7 +168,12 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    /**
     * The currently observed proof.
     */
-   private Proof proof;
+   private Proof proof;   
+
+   /**
+    * Contains the registered {@link IProofProviderListener}.
+    */
+   private final List<IProofProviderListener> proofProviderListener = new LinkedList<IProofProviderListener>();
 
    /**
     * Listens for changes on {@link #proof}.
@@ -243,6 +262,26 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
          handleEditorPropertyChange(event);
       }
    };
+
+   /**
+    * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()}.
+    */
+   private final SettingsListener viewSettingsListener = new SettingsListener() {
+      @Override
+      public void settingsChanged(EventObject e) {
+         handleViewSettingsChanged(e);
+      }
+   };
+   
+   /**
+    * Observes changes on the used {@link TermLabelVisibilityManager}.
+    */
+   private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener = new TermLabelVisibilityManagerListener() {
+      @Override
+      public void visibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
+         handleVisibleLabelsChanged(e);
+      }
+   };
    
    /**
     * Constructor.
@@ -259,6 +298,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
       KeYSEDPreferences.getStore().addPropertyChangeListener(colorPropertyListener);
       SWTUtil.getEditorsPreferenceStore().addPropertyChangeListener(editorsListener);
       JFaceResources.getFontRegistry().addListener(editorsListener);
+      ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addSettingsListener(viewSettingsListener);
    }
 
    protected void handleColorPropertyChange(PropertyChangeEvent event) {
@@ -293,11 +333,15 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     */
    @Override
    public void dispose() {
+      ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().removeSettingsListener(viewSettingsListener);
+      if (currentNode != null) {
+         getTermLabelVisibilityManager().removeTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
+      }
       if (proofControl != null) {
          proofControl.removeAutoModeListener(autoModeListener);
          proofControl = null;
       }
-      if (proof != null) {
+      if (proof != null && !proof.isDisposed()) {
          proof.removeProofTreeListener(proofTreeListener);
          proof = null;
       }
@@ -327,21 +371,28 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     */
    public void updateContent(final IKeYSENode<?> node) {
       if (!ObjectUtil.equals(currentNode, node)) {
+         final Proof oldProof = getCurrentProof();
          // Remove old listener
          if (proofControl != null) {
             proofControl.removeAutoModeListener(autoModeListener);
             proofControl = null;
          }
-         if (proof != null) {
+         if (proof != null && !proof.isDisposed()) {
             proof.removeProofTreeListener(proofTreeListener);
             proof = null;
          }
          // Change node
+         if (currentNode != null) {
+            getTermLabelVisibilityManager().removeTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
+         }
          currentNode = node;
+         if (currentNode != null) {
+            getTermLabelVisibilityManager().addTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
+         }
          // Add new listener
          if (node != null) {
             proof = node.getExecutionNode().getProof();
-            if (proof != null) {
+            if (proof != null && !proof.isDisposed()) {
                proof.addProofTreeListener(proofTreeListener);
             }
             KeYDebugTarget debugTarget = node.getDebugTarget();
@@ -354,6 +405,9 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
          }
          // Update shown content
          recreateContent();
+         if (!ObjectUtil.equals(oldProof, getCurrentProof())) {
+            fireCurrentProofsChanged(new ProofProviderEvent(this, getCurrentProofs(), getCurrentProof(), getUI(), getEnvironment()));
+         }
       }
    }
 
@@ -362,7 +416,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStarted(ProofEvent e) {
-      if (proof != null) {
+      if (proof != null && !proof.isDisposed()) {
          proof.removeProofTreeListener(proofTreeListener);
       }
    }
@@ -372,7 +426,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      if (proof != null) {
+      if (proof != null && !proof.isDisposed()) {
          proof.addProofTreeListener(proofTreeListener);
       }
       recreateContentThreadSave();
@@ -648,6 +702,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
                   openGoal(branchResult);
                }
             });
+            menuManager.add(SequentDisplaySettingsMenuFactory.createSequentDisplaySettingsMenu(this));
             // Create group
             Group viewerGroup = factory.createGroup(root, "Node " + branchResult.getLeafNode().serialNr());
             viewerGroup.setLayout(new FillLayout());
@@ -675,6 +730,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
             TruthValue value = viewerDecorator.showSequent(sequent, 
                                                            executionNode.getServices(), 
                                                            SymbolicExecutionUtil.createNotationInfo(executionNode), 
+                                                           getTermLabelVisibilityManager(),
                                                            branchResult);
             viewerGroup.setBackground(viewerDecorator.getColor(value));
          }
@@ -942,6 +998,22 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
       notConsideredLabel.setToolTipText("The term is not part of the truth value tracing.");
       notConsideredLabel.setMenu(manager.createContextMenu(notConsideredLabel));
    }
+
+   /**
+    * When the settings of {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()} have changed.
+    * @param e The event.
+    */
+   protected void handleViewSettingsChanged(EventObject e) {
+      recreateContent();
+   }
+
+   /**
+    * When the visible term labels have changed.
+    * @param e The event.
+    */
+   protected void handleVisibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
+      recreateContent();
+   }
    
    /**
     * Opens the preference page to change the colors.
@@ -952,5 +1024,107 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
 
    public static interface ILayoutListener {
       public void layoutUpdated();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Proof getCurrentProof() {
+      return currentNode != null ? currentNode.getExecutionNode().getProof() : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Proof[] getCurrentProofs() {
+      Proof proof = getCurrentProof();
+      return proof != null ? new Proof[] {proof} : new Proof[0];
+   }
+   
+   /**
+    * Returns the {@link KeYDebugTarget} if available and {@code null} otherwise.
+    * @return The {@link KeYDebugTarget} of the currently shown {@link IKeYSENode} or {@code null} otherwise.
+    */
+   public KeYDebugTarget getDebugTarget() {
+      return currentNode != null ? currentNode.getDebugTarget() : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SymbolicExecutionEnvironment<?> getEnvironment() {
+      KeYDebugTarget target = getDebugTarget();
+      return target != null ? target.getEnvironment() : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public UserInterfaceControl getUI() {
+      SymbolicExecutionEnvironment<?> env = getEnvironment();
+      return env != null ? env.getUi() : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ProofControl getProofControl() {
+      UserInterfaceControl ui = getUI();
+      return ui != null ? ui.getProofControl() : null;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addProofProviderListener(IProofProviderListener l) {
+      if (l != null) {
+         proofProviderListener.add(l);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeProofProviderListener(IProofProviderListener l) {
+      if (l != null) {
+         proofProviderListener.remove(l);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IProject getProject() {
+      KeYDebugTarget target = getDebugTarget();
+      IMethod method = target != null ? target.getMethod() : null;
+      return method != null ? method.getResource().getProject() : null;
+   }
+   
+   /**
+    * Informs all registered {@link IProofProviderListener} about the event.
+    * @param e The {@link ProofProviderEvent}.
+    */
+   protected void fireCurrentProofsChanged(ProofProviderEvent e) {
+      IProofProviderListener[] toInform = proofProviderListener.toArray(new IProofProviderListener[proofProviderListener.size()]);
+      for (IProofProviderListener l : toInform) {
+         l.currentProofsChanged(e);
+      }
+   }
+
+   /**
+    * Returns the used {@link TermLabelVisibilityManager}.
+    * @return The used {@link TermLabelVisibilityManager} or {@code null} if not available.
+    */
+   public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+      UserInterfaceControl ui = getUI();
+      return ui != null ? ui.getTermLabelVisibilityManager() : null; 
    }
 }

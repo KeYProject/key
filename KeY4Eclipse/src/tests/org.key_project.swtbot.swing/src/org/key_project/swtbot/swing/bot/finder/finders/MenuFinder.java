@@ -149,4 +149,40 @@ public class MenuFinder {
       SaveSwingUtil.invokeAndWait(run);
       return run.getResult();
    }
+   
+   /**
+    * Finds all the {@link JMenu}s in the given menu matching the given matcher.
+    * @param menu The menu
+    * @param matcher The matcher that can match menus and menu items.
+    * @return All menu items in the specified menu that match the matcher.
+    */
+   public List<JMenu> findMenus(JMenu menu, final Matcher<JMenu> matcher) {
+      return findMenusInternal(menu, matcher);
+   }
+
+   /**
+    * Finds all the {@link JMenu}s in the given menu matching the given matcher.
+    * @param menu The menu
+    * @param matcher The matcher that can match menus and menu items.
+    * @return All menu items in the specified menu that match the matcher.
+    */
+   private List<JMenu> findMenusInternal(final JMenu menu, 
+                                         final Matcher<JMenu> matcher) {
+      IRunnableWithResult<List<JMenu>> run = new AbstractRunnableWithResult<List<JMenu>>() {
+         @Override
+         public void run() {
+            LinkedHashSet<JMenu> result = new LinkedHashSet<JMenu>();
+            if (menu != null) {
+               for (int i = 0; i < menu.getItemCount(); i++) {
+                  JMenuItem item = menu.getItem(i);
+                  if (item instanceof JMenu && matcher.matches(item))
+                     result.add((JMenu) item);
+               }
+            }
+            setResult(new ArrayList<JMenu>(result));
+         }
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      return run.getResult();
+   }
 }

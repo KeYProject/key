@@ -3,6 +3,7 @@ package org.key_project.sed.key.ui.view;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -68,7 +69,11 @@ import org.key_project.util.java.ArrayUtil;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
+import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -76,6 +81,8 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -284,6 +291,26 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
 		}
 	};
 
+   /**
+    * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()}.
+    */
+   private final SettingsListener viewSettingsListener = new SettingsListener() {
+      @Override
+      public void settingsChanged(EventObject e) {
+         handleViewSettingsChanged(e);
+      }
+   };
+   
+   /**
+    * Observes changes on the used {@link TermLabelVisibilityManager}.
+    */
+   private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener = new TermLabelVisibilityManagerListener() {
+      @Override
+      public void visibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
+         handleVisibleLabelsChanged(e);
+      }
+   };
+
 	/**
 	 * the constructor of the class.
 	 */
@@ -417,6 +444,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       }
       createTreeViewerContextMenu();
       createSourceViewerContextMenu();
+      ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addSettingsListener(viewSettingsListener);
    }
    
    /**
@@ -448,6 +476,34 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       Menu menu = menuMgr.createContextMenu(styledText);
       styledText.setMenu(menu);
       getSite().registerContextMenu(getSourceViewerMenuId(), menuMgr, sourceViewer);
+   }
+
+   /**
+    * When the settings of {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()} have changed.
+    * @param e The event.
+    */
+   protected void handleViewSettingsChanged(EventObject e) {
+      updateShownSequentThreadSave();
+   }
+
+   /**
+    * When the visible term labels have changed.
+    * @param e The event.
+    */
+   protected void handleVisibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
+      updateShownSequentThreadSave();
+   }
+   
+   /**
+    * Updates the shown {@link Sequent} thread save.
+    */
+   protected void updateShownSequentThreadSave() {
+      getSite().getShell().getDisplay().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            showNode(getSelectedNode());
+         }
+      });
    }
    
    /**
@@ -482,11 +538,19 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     */
    protected void handleTreeViewerSelectionChanged(SelectionChangedEvent event) {
       Node node = getNode(event.getSelection());
+      showNode(node);
+   }
+   
+   /**
+    * Shows the given {@link Node}.
+    * @param node The {@link Node} to show.
+    */
+   protected void showNode(Node node) {
       if (node != null) {
-         sourceViewerDecorator.showNode(node, SymbolicExecutionUtil.createNotationInfo(getCurrentProof()));
+         sourceViewerDecorator.showNode(node, SymbolicExecutionUtil.createNotationInfo(getCurrentProof()), getTermLabelVisibilityManager());
       }
       else {
-         sourceViewerDecorator.showNode(null, SymbolicExecutionUtil.createNotationInfo((Node) null));
+         sourceViewerDecorator.showNode(null, SymbolicExecutionUtil.createNotationInfo((Node) null), getTermLabelVisibilityManager());
       }
    }
    
@@ -569,6 +633,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       if (newProof != proof) {
          // Remove listener from old proof
          if (environment != null) {
+            environment.getUi().getTermLabelVisibilityManager().removeTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
             environment.getProofControl().removeAutoModeListener(autoModeListener);
          }
          if (proof != null && !proof.isDisposed()) {
@@ -582,6 +647,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
             contentProvider.setProofControl(environment != null ? environment.getProofControl() : null);
          }
          if (environment != null) {
+            environment.getUi().getTermLabelVisibilityManager().addTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
             environment.getProofControl().addAutoModeListener(autoModeListener);
             environment.getProofControl().setMinimizeInteraction(true);
          }
@@ -685,6 +751,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     */
    @Override
    public void dispose() {
+      ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().removeSettingsListener(viewSettingsListener);
       if (parentComposite != null) {
          parentComposite.dispose();
       }
@@ -702,6 +769,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
          sourceViewer.getControl().dispose();
       }
       if (environment != null) {
+         environment.getUi().getTermLabelVisibilityManager().removeTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
          environment.getProofControl().removeAutoModeListener(autoModeListener);
       }
       if (baseView != null) {
@@ -1006,5 +1074,14 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
    @Override
    public boolean hasListener(String propertyName, PropertyChangeListener listener) {
       return ArrayUtil.contains(getPropertyChangeListeners(propertyName), listener);
+   }
+
+   /**
+    * Returns the used {@link TermLabelVisibilityManager}.
+    * @return The used {@link TermLabelVisibilityManager} or {@code null} if not available.
+    */
+   public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+      UserInterfaceControl ui = getUI();
+      return ui != null ? ui.getTermLabelVisibilityManager() : null; 
    }
 }

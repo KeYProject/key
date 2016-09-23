@@ -67,6 +67,7 @@ import org.key_project.sed.key.core.launch.KeYSourceLookupParticipant.SourceRequ
 import org.key_project.sed.key.core.slicing.KeYThinBackwardSlicer;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.IOUtil;
@@ -74,12 +75,14 @@ import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.TermCreationException;
+import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
@@ -170,6 +173,11 @@ public class KeYDebugTarget extends AbstractSEDebugTarget {
       Proof proof = environment.getProof();
       proof.addProofDisposedListener(proofDisposedListener);
       ProofUserManager.getInstance().addUser(proof, environment, this);
+      // Hide symbolic execution labels by default
+      ImmutableList<TermLabelConfiguration> configurations = SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations(launchSettings.isTruthValueTracingEnabled());
+      for (TermLabelConfiguration config : configurations) {
+         environment.getUi().getTermLabelVisibilityManager().setHidden(config.getTermLabelName(), true);
+      }
       // Update initial model
       setModelIdentifier(MODEL_IDENTIFIER);
       setName(proof.name() != null ? proof.name().toString() : "Unnamed");

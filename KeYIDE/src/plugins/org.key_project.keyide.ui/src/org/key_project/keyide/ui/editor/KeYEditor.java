@@ -17,6 +17,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -77,11 +78,15 @@ import org.key_project.util.java.IOUtil;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
+import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.KeYSelectionModel;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
@@ -96,6 +101,8 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -322,8 +329,26 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
          handleMinimizeInteractionStateChanged();
       }
    };
+
+   /**
+    * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()}.
+    */
+   private final SettingsListener viewSettingsListener = new SettingsListener() {
+      @Override
+      public void settingsChanged(EventObject e) {
+         handleViewSettingsChanged(e);
+      }
+   };
    
-   
+   /**
+    * Observes changes on the used {@link TermLabelVisibilityManager}.
+    */
+   private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener = new TermLabelVisibilityManagerListener() {
+      @Override
+      public void visibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
+         handleVisibleLabelsChanged(e);
+      }
+   };
    
    /**
     * Constructor to initialize the ContextMenu IDs
@@ -338,6 +363,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    @Override
    public void dispose() {
+      ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().removeSettingsListener(viewSettingsListener);
       if (minimizeInteractionState != null) {
          minimizeInteractionState.removeListener(minimizeInteractionsListener);
          minimizeInteractionState = null;
@@ -353,6 +379,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
          DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(breakpointManager);
       }
       if (getUI() != null) {
+         getUI().getTermLabelVisibilityManager().removeTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
          getUI().removeProverTaskListener(proverTaskListener);
       }
       if (getProofControl() != null) {
@@ -361,7 +388,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       if (selectionModel != null) {
          selectionModel.removeKeYSelectionListener(keySelectionListener);
       }
-      if (currentProof != null) {
+      if (currentProof != null && !currentProof.isDisposed()) {
          currentProof.removeProofTreeListener(proofTreeListener);
          currentProof.removeRuleAppListener(ruleAppListener);
       }
@@ -457,6 +484,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
                selectionModel.setProof(currentProof);
             }
             getUI().addProverTaskListener(proverTaskListener);
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addSettingsListener(viewSettingsListener);
             if (getEnvironment().getReplayResult() != null) {
                selectionModel.setSelectedNode(getEnvironment().getReplayResult().getNode());
             }
@@ -467,6 +495,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             breakpointManager = new KeYBreakpointManager(currentProof);
             DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
             ProofUserManager.getInstance().addUser(currentProof, environment, this);
+            getUI().getTermLabelVisibilityManager().addTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
             getUI().getProofControl().setMinimizeInteraction(isMinimizeInteractions());
             this.currentNode = selectionModel.getSelectedNode();
             configureProofForBreakpoints();
@@ -512,6 +541,34 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    protected void handleViewerDecoratorSelectedPosInSequentChanged(PropertyChangeEvent evt) {
       firePropertyChange(PROP_SELECTED_POS_IN_SEQUENT, evt.getOldValue(), evt.getNewValue());
+   }
+
+   /**
+    * When the settings of {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()} have changed.
+    * @param e The event.
+    */
+   protected void handleViewSettingsChanged(EventObject e) {
+      updateShownSequentThreadSave();
+   }
+
+   /**
+    * When the visible term labels have changed.
+    * @param e The event.
+    */
+   protected void handleVisibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
+      updateShownSequentThreadSave();
+   }
+   
+   /**
+    * Updates the shown {@link Sequent} thread save.
+    */
+   protected void updateShownSequentThreadSave() {
+      getSite().getShell().getDisplay().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            viewerDecorator.showNode(currentNode, SymbolicExecutionUtil.createNotationInfo(currentProof), getTermLabelVisibilityManager());
+         }
+      });
    }
 
    /**
@@ -767,7 +824,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    public void setCurrentNode(Node currentNode) {
       this.currentNode = currentNode;
       getUI().getProofControl().setMinimizeInteraction(isMinimizeInteractions());
-      viewerDecorator.showNode(currentNode, SymbolicExecutionUtil.createNotationInfo(currentProof));
+      viewerDecorator.showNode(currentNode, SymbolicExecutionUtil.createNotationInfo(currentProof), getTermLabelVisibilityManager());
    }
 
    /**
@@ -894,6 +951,15 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    public ProofControl getProofControl() {
       KeYEnvironment<?> environment = getEnvironment();
       return environment != null ? environment.getProofControl() : null;
+   }
+   
+   /**
+    * Returns the used {@link TermLabelVisibilityManager}.
+    * @return The used {@link TermLabelVisibilityManager} or {@code null} if not available.
+    */
+   public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+      UserInterfaceControl ui = getUI();
+      return ui != null ? ui.getTermLabelVisibilityManager() : null; 
    }
    
    /**

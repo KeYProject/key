@@ -98,4 +98,10 @@ public interface UserInterfaceControl {
      * @return The used {@link ProofControl}.
      */
     public ProofControl getProofControl();
+    
+    /**
+     * Returns the {@link TermLabelVisibilityManager}.
+     * @return The {@link TermLabelVisibilityManager}.
+     */
+    public TermLabelVisibilityManager getTermLabelVisibilityManager();
 }

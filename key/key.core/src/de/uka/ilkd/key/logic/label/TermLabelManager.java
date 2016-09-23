@@ -363,6 +363,103 @@ public class TermLabelManager {
          return factory.parseInstance(args);
       }
    }
+   
+   /**
+    * Computes the {@link TermLabel}s for the new {@link Term} via
+    * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock, ImmutableArray)}
+    * and refactors the labels below the new {@link Term} in addition via
+    * {@link #refactorTerm(TermLabelState, Services, PosInOccurrence, Term, Goal, Object, Rule, Term)}.
+    * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
+    * @param state The {@link TermLabelState} of the current rule application.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param rule The {@link Rule} which is applied.
+    * @param ruleApp The {@link RuleApp} which is currently performed.
+    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param hint An optional hint passed from the active rule to describe the term which should be created.
+    * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
+    * @param newTerm The new {@link Term} to update its labels.
+    * @return The {@link Term} with updates labels.
+    */
+   public static Term label(Services services, 
+                            TermLabelState state,
+                            PosInOccurrence applicationPosInOccurrence,
+                            Rule rule,
+                            RuleApp ruleApp,
+                            Goal goal,
+                            Object hint,
+                            Term tacletTerm,
+                            Term newTerm) {
+      Term applicationTerm = applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
+      return label(services, state, applicationTerm, applicationPosInOccurrence, rule, ruleApp, goal, hint, tacletTerm, newTerm);
+   }
+   
+   /**
+    * Computes the {@link TermLabel}s for the new {@link Term} via
+    * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock, ImmutableArray)}
+    * and refactors the labels below the new {@link Term} in addition via
+    * {@link #refactorTerm(TermLabelState, Services, PosInOccurrence, Term, Goal, Object, Rule, Term)}.
+    * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
+    * @param state The {@link TermLabelState} of the current rule application.
+    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param rule The {@link Rule} which is applied.
+    * @param ruleApp The {@link RuleApp} which is currently performed.
+    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param hint An optional hint passed from the active rule to describe the term which should be created.
+    * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
+    * @param newTerm The new {@link Term} to update its labels.
+    * @return The {@link Term} with updates labels.
+    */
+   public static Term label(Services services, 
+                            TermLabelState state,
+                            Term applicationTerm,
+                            PosInOccurrence applicationPosInOccurrence,
+                            Rule rule,
+                            RuleApp ruleApp,
+                            Goal goal,
+                            Object hint,
+                            Term tacletTerm,
+                            Term newTerm) {
+      TermLabelManager manager = getTermLabelManager(services);
+      if (manager != null) {
+         return manager.label(state, services, applicationTerm, applicationPosInOccurrence, rule, ruleApp, goal, hint, tacletTerm, newTerm);
+      }
+      else {
+         return newTerm;
+      }
+   }
+   
+   /**
+    * Computes the {@link TermLabel}s for the new {@link Term} via
+    * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock, ImmutableArray)}
+    * and refactors the labels below the new {@link Term} in addition via
+    * {@link #refactorTerm(TermLabelState, Services, PosInOccurrence, Term, Goal, Object, Rule, Term)}.
+    * @param state The {@link TermLabelState} of the current rule application.
+    * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
+    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param rule The {@link Rule} which is applied.
+    * @param ruleApp The {@link RuleApp} which is currently performed.
+    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param hint An optional hint passed from the active rule to describe the term which should be created.
+    * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
+    * @param newTerm The new {@link Term} to update its labels.
+    * @return The {@link Term} with updates labels.
+    */
+   public Term label(TermLabelState state,
+                     Services services,
+                     Term applicationTerm,
+                     PosInOccurrence applicationPosInOccurrence,
+                     Rule rule,
+                     RuleApp ruleApp,
+                     Goal goal,
+                     Object hint,
+                     Term tacletTerm,
+                     Term newTerm) {
+      ImmutableArray<TermLabel> newLabels = instantiateLabels(state, services, applicationTerm, applicationPosInOccurrence, rule, ruleApp, goal, hint, tacletTerm, newTerm.op(), newTerm.subs(), newTerm.boundVars(), newTerm.javaBlock(), newTerm.getLabels());
+      Term newlyLabeledTerm =  services.getTermBuilder().label(newTerm, newLabels);
+      return refactorTerm(state, services, applicationPosInOccurrence, newlyLabeledTerm, goal, hint, rule, tacletTerm);
+   }
 
    /**
     * <p>

@@ -23,6 +23,7 @@ import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotManualRuleApplicatio
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotMinimizeInteractionsHandlerTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotNodePropertySectionTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotProofPropertySectionTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotSequentDisplaySettingsMenuFactoryTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotTacletPropertySectionTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotTermPropertySectionTest;
 
@@ -48,6 +49,7 @@ import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotTermPropertySectionT
    SWTBotManualRuleApplicationTest.class,
    SWTBotNodePropertySectionTest.class,
    SWTBotProofPropertySectionTest.class,
+   SWTBotSequentDisplaySettingsMenuFactoryTest.class,
    SWTBotTacletPropertySectionTest.class,
    SWTBotTermPropertySectionTest.class,
    SWTBotMinimizeInteractionsHandlerTest.class

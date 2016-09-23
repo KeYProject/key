@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.testing.ContributionInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
@@ -676,8 +677,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 */
 	public int getIndexOf(Object parent, Object element) {
 		// Make sure that parameters are valid
-		Assert.isTrue(element instanceof BranchFolder || element instanceof Node, "Unsupported element \"" + element.getClass() + "\".");
-		Assert.isTrue(parent instanceof Proof || parent instanceof BranchFolder || parent instanceof Node, "Unsupported parent \"" + parent.getClass() + "\".");
+		Assert.isTrue(element instanceof BranchFolder || element instanceof Node, "Unsupported element \"" + ObjectUtil.getClass(element) + "\".");
+		Assert.isTrue(parent instanceof Proof || parent instanceof BranchFolder || parent instanceof Node, "Unsupported parent \"" + ObjectUtil.getClass(parent) + "\".");
 		// Find first shown child node of the given parent
 		Node current = null;
 		if (parent instanceof Proof) {
