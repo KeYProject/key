@@ -123,6 +123,14 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
    }
    
    /**
+    * Sets the name.
+    * @param name The new name to set.
+    */
+   protected void setName(String name) {
+      this.name = name;
+   }
+   
+   /**
     * Checks if the value of {@link #getName()} is already computed.
     * @return {@code ture} name is computed, {@code false} name is not computed yet.
     */

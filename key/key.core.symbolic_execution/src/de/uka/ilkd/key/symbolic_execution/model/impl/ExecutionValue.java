@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
@@ -65,7 +66,7 @@ public class ExecutionValue extends AbstractExecutionValue {
    /**
     * The child {@link IExecutionVariable}s.
     */
-   private ExecutionVariable[] childVariables;
+   private IExecutionVariable[] childVariables;
 
    /**
     * Constructor.
@@ -120,7 +121,7 @@ public class ExecutionValue extends AbstractExecutionValue {
     * {@inheritDoc}
     */
    @Override
-   public ExecutionVariable[] getChildVariables() throws ProofInputException {
+   public IExecutionVariable[] getChildVariables() throws ProofInputException {
       synchronized (this) {
          if (childVariables== null) {
             childVariables = lazyComputeChildVariables();
@@ -134,8 +135,8 @@ public class ExecutionValue extends AbstractExecutionValue {
     * @return The contained child {@link IExecutionVariable}s.
     * @throws ProofInputException Occurred Exception.
     */
-   protected ExecutionVariable[] lazyComputeChildVariables() throws ProofInputException {
-      List<ExecutionVariable> children = new LinkedList<ExecutionVariable>();
+   protected IExecutionVariable[] lazyComputeChildVariables() throws ProofInputException {
+      List<IExecutionVariable> children = new LinkedList<IExecutionVariable>();
       if (!isDisposed()) {
          final Services services = getServices();
          Term value = getValue();
@@ -153,21 +154,34 @@ public class ExecutionValue extends AbstractExecutionValue {
                         ExecutionVariable lengthVariable = new ExecutionVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, pvs.iterator().next(), getVariable().getAdditionalCondition());
                         children.add(lengthVariable);
                         ExecutionValue[] lengthValues = lengthVariable.getValues();
-                        for (ExecutionValue lengthValue : lengthValues) {
-                           try {
-                              int length = getSettings().isUsePrettyPrinting() ?
-                                           Integer.valueOf(lengthValue.getValueString()) :
-                                           Integer.valueOf(SymbolicExecutionUtil.formatTerm(lengthValue.getValue(), services, false, true));
-                              for (int i = 0; i < length; i++) {
-                                 Term indexTerm = services.getTermBuilder().zTerm(i);
-                                 ExecutionVariable childI = new ExecutionVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, indexTerm, lengthValue, getVariable().getAdditionalCondition());
-                                 children.add(childI);
+                        if (!ArrayUtil.isEmpty(lengthValues)) {
+                           for (ExecutionValue lengthValue : lengthValues) {
+                              try {
+                                 int length = getSettings().isUsePrettyPrinting() ?
+                                              Integer.valueOf(lengthValue.getValueString()) :
+                                              Integer.valueOf(SymbolicExecutionUtil.formatTerm(lengthValue.getValue(), services, false, true));
+                                 for (int i = 0; i < length; i++) {
+                                    Term indexTerm = services.getTermBuilder().zTerm(i);
+                                    ExecutionVariable childI = new ExecutionVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, indexTerm, lengthValue, getVariable().getAdditionalCondition());
+                                    children.add(childI);
+                                 }
+                              }
+                              catch (NumberFormatException e) {
+                                 ExecutionAllArrayIndicesVariable arrayStarVariable = new ExecutionAllArrayIndicesVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, (IProgramVariable) value.op(), getVariable().getAdditionalCondition());
+                                 children.add(arrayStarVariable);
                               }
                            }
-                           catch (NumberFormatException e) {
-                              // Symbolic value, nothing to do.
-                           }
                         }
+                        else {
+                           // Should never happen, just backup
+                           ExecutionAllArrayIndicesVariable arrayStarVariable = new ExecutionAllArrayIndicesVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, (IProgramVariable) value.op(), getVariable().getAdditionalCondition());
+                           children.add(arrayStarVariable);
+                        }
+                     }
+                     else {
+                        // Should never happen, just backup
+                        ExecutionAllArrayIndicesVariable arrayStarVariable = new ExecutionAllArrayIndicesVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, (IProgramVariable) value.op(), getVariable().getAdditionalCondition());
+                        children.add(arrayStarVariable);
                      }
                   }
                   else if (javaType instanceof ClassType) {
@@ -186,7 +200,7 @@ public class ExecutionValue extends AbstractExecutionValue {
             }
          }
       }
-      return children.toArray(new ExecutionVariable[children.size()]); 
+      return children.toArray(new IExecutionVariable[children.size()]); 
    }
 
    /**

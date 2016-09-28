@@ -1,0 +1,601 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <variable name="heapAtPre" isArrayIndex="false">
+      <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
+   <methodCall name="&lt;call ArrayAssignmentTest.main(array)&gt;" pathCondition="true" pathConditionChanged="false">
+      <variable name="exc" isArrayIndex="false">
+         <value name="exc {or(equals(array,null),and(not(equals(array,null)),not(equals(array,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(array,null),and(not(equals(array,null)),not(equals(array,null))))">
+         </value>
+      </variable>
+      <statement name="array[0]=100;" pathCondition="true" pathConditionChanged="false">
+         <variable name="array" isArrayIndex="false">
+            <value name="array {equals(array,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(array,null)">
+            </value>
+            <value name="array {and(not(equals(array,null)),not(equals(array,null)))}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(array,null)),not(equals(array,null)))">
+               <variable name="length" isArrayIndex="false">
+                  <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="array[*]" isArrayIndex="false">
+                  <value name="array[*] {true}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+            </value>
+         </variable>
+         <variable name="exc" isArrayIndex="false">
+            <value name="exc {or(equals(array,null),and(not(equals(array,null)),not(equals(array,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(array,null),and(not(equals(array,null)),not(equals(array,null))))">
+            </value>
+         </variable>
+         <branchCondition name="update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#)))))" pathCondition="update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#)))))" pathConditionChanged="true" branchCondition="update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="array" isArrayIndex="false">
+               <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="length" isArrayIndex="false">
+                     <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="array[*]" isArrayIndex="false">
+                     <value name="array[*] {or(equals(*,Z(0(#))),not(equals(*,Z(0(#)))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(*,Z(0(#))),not(equals(*,Z(0(#)))))">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <statement name="array[1]=array[2];" pathCondition="update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#)))))" pathConditionChanged="false">
+               <variable name="array" isArrayIndex="false">
+                  <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="length" isArrayIndex="false">
+                        <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="array[*]" isArrayIndex="false">
+                        <value name="array[*] {equals(*,Z(0(#)))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(*,Z(0(#)))">
+                        </value>
+                        <value name="array[*] {not(equals(*,Z(0(#))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(*,Z(0(#))))">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <branchCondition name="not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),or(or(equals(array,null),leq(length(array),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))" pathCondition="and(update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#))))),not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),or(or(equals(array,null),leq(length(array),Z(2(#)))),lt(Z(2(#)),Z(0(#)))))))" pathConditionChanged="true" branchCondition="not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),or(or(equals(array,null),leq(length(array),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <variable name="array" isArrayIndex="false">
+                     <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="array[*]" isArrayIndex="false">
+                           <value name="array[*] {equals(*,Z(0(#)))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(*,Z(0(#)))">
+                           </value>
+                           <value name="array[*] {not(equals(*,Z(0(#))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(*,Z(0(#))))">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="x_arr" isArrayIndex="false">
+                     <value name="x_arr {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="array[*]" isArrayIndex="false">
+                           <value name="array[*] {equals(*,Z(0(#)))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(*,Z(0(#)))">
+                           </value>
+                           <value name="array[*] {not(equals(*,Z(0(#))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(*,Z(0(#))))">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="x_2" isArrayIndex="false">
+                     <value name="x_2 {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="x_3" isArrayIndex="false">
+                     <value name="x_3 {true}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <statement name="array[3]=array[0];" pathCondition="and(update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#))))),not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),or(or(equals(array,null),leq(length(array),Z(2(#)))),lt(Z(2(#)),Z(0(#)))))))" pathConditionChanged="false">
+                     <variable name="array" isArrayIndex="false">
+                        <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="array[*]" isArrayIndex="false">
+                              <value name="array[*] {equals(*,Z(0(#)))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(*,Z(0(#)))">
+                              </value>
+                              <value name="array[*] {and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))">
+                              </value>
+                              <value name="array[*] {and(not(equals(*,Z(0(#)))),not(equals(*,Z(1(#)))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),not(equals(*,Z(1(#)))))">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="exc" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <branchCondition name="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))),array,arr(Z(1(#))),int::select(heap,array,arr(Z(2(#))))))),elem-update(x_arr_1)(array)),elem-update(x_4)(Z(3(#)))),elem-update(x_5)(Z(0(0(1(#)))))),and(and(not(equals(x_arr_1,null)),lt(x_4,length(x_arr_1))),geq(x_4,Z(0(#)))))" pathCondition="and(and(update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#))))),not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),or(or(equals(array,null),leq(length(array),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))),array,arr(Z(1(#))),int::select(heap,array,arr(Z(2(#))))))),elem-update(x_arr_1)(array)),elem-update(x_4)(Z(3(#)))),elem-update(x_5)(Z(0(0(1(#)))))),and(and(not(equals(x_arr_1,null)),lt(x_4,length(x_arr_1))),geq(x_4,Z(0(#))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))),array,arr(Z(1(#))),int::select(heap,array,arr(Z(2(#))))))),elem-update(x_arr_1)(array)),elem-update(x_4)(Z(3(#)))),elem-update(x_5)(Z(0(0(1(#)))))),and(and(not(equals(x_arr_1,null)),lt(x_4,length(x_arr_1))),geq(x_4,Z(0(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <variable name="array" isArrayIndex="false">
+                           <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="array[*]" isArrayIndex="false">
+                                 <value name="array[*] {or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),equals(*,Z(3(#))))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),equals(*,Z(3(#))))))">
+                                 </value>
+                                 <value name="array[*] {and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))">
+                                 </value>
+                                 <value name="array[*] {and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),not(equals(*,Z(3(#))))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),not(equals(*,Z(3(#))))))">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="exc" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="x_arr_1" isArrayIndex="false">
+                           <value name="x_arr_1 {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="array[*]" isArrayIndex="false">
+                                 <value name="array[*] {or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),equals(*,Z(3(#))))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),equals(*,Z(3(#))))))">
+                                 </value>
+                                 <value name="array[*] {and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))">
+                                 </value>
+                                 <value name="array[*] {and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),not(equals(*,Z(3(#))))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),not(equals(*,Z(3(#))))))">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="x_4" isArrayIndex="false">
+                           <value name="x_4 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="x_5" isArrayIndex="false">
+                           <value name="x_5 {true}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <statement name="return array;" pathCondition="and(and(update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#))))),not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),or(or(equals(array,null),leq(length(array),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))),array,arr(Z(1(#))),int::select(heap,array,arr(Z(2(#))))))),elem-update(x_arr_1)(array)),elem-update(x_4)(Z(3(#)))),elem-update(x_5)(Z(0(0(1(#)))))),and(and(not(equals(x_arr_1,null)),lt(x_4,length(x_arr_1))),geq(x_4,Z(0(#))))))" pathConditionChanged="false">
+                           <variable name="array" isArrayIndex="false">
+                              <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="length" isArrayIndex="false">
+                                    <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                                 <variable name="array[*]" isArrayIndex="false">
+                                    <value name="array[*] {or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),equals(*,Z(3(#))))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),equals(*,Z(3(#))))))">
+                                    </value>
+                                    <value name="array[*] {and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))">
+                                    </value>
+                                    <value name="array[*] {and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),not(equals(*,Z(3(#))))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),not(equals(*,Z(3(#))))))">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                           <variable name="exc" isArrayIndex="false">
+                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <methodReturn name="&lt;return of main&gt;" signature="&lt;return of ArrayAssignmentTest.main(array)&gt;" pathCondition="and(and(update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#))))),not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),or(or(equals(array,null),leq(length(array),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))),array,arr(Z(1(#))),int::select(heap,array,arr(Z(2(#))))))),elem-update(x_arr_1)(array)),elem-update(x_4)(Z(3(#)))),elem-update(x_5)(Z(0(0(1(#)))))),and(and(not(equals(x_arr_1,null)),lt(x_4,length(x_arr_1))),geq(x_4,Z(0(#))))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(and(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))),array,arr(Z(1(#))),int::select(heap,array,arr(Z(2(#))))))),elem-update(x_arr_1)(array)),elem-update(x_4)(Z(3(#)))),elem-update(x_5)(Z(0(0(1(#)))))),and(and(not(equals(x_arr_1,null)),lt(x_4,length(x_arr_1))),geq(x_4,Z(0(#))))),not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),or(or(equals(array,null),leq(length(array),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#))))))">
+                              <variable name="array" isArrayIndex="false">
+                                 <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                    <variable name="length" isArrayIndex="false">
+                                       <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                    <variable name="array[*]" isArrayIndex="false">
+                                       <value name="array[*] {or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),equals(*,Z(3(#))))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),equals(*,Z(3(#))))))">
+                                       </value>
+                                       <value name="array[*] {and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))">
+                                       </value>
+                                       <value name="array[*] {and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),not(equals(*,Z(3(#))))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),not(equals(*,Z(3(#))))))">
+                                       </value>
+                                    </variable>
+                                 </value>
+                              </variable>
+                              <variable name="exc" isArrayIndex="false">
+                                 <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <termination name="&lt;end&gt;" pathCondition="and(and(update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#))))),not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),or(or(equals(array,null),leq(length(array),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))),array,arr(Z(1(#))),int::select(heap,array,arr(Z(2(#))))))),elem-update(x_arr_1)(array)),elem-update(x_4)(Z(3(#)))),elem-update(x_5)(Z(0(0(1(#)))))),and(and(not(equals(x_arr_1,null)),lt(x_4,length(x_arr_1))),geq(x_4,Z(0(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                 <variable name="exc" isArrayIndex="false">
+                                    <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </termination>
+                              <callStateVariable name="array" isArrayIndex="false">
+                                 <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                    <variable name="length" isArrayIndex="false">
+                                       <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                    <variable name="array[*]" isArrayIndex="false">
+                                       <value name="array[*] {true}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                 </value>
+                              </callStateVariable>
+                              <callStateVariable name="exc" isArrayIndex="false">
+                                 <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </callStateVariable>
+                              <callStateVariable name="heapBefore_main" isArrayIndex="false">
+                                 <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </callStateVariable>
+                              <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
+                                 <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </callStateVariable>
+                           </methodReturn>
+                        </statement>
+                     </branchCondition>
+                     <branchCondition name="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))),array,arr(Z(1(#))),int::select(heap,array,arr(Z(2(#))))))),elem-update(x_arr_1)(array)),elem-update(x_4)(Z(3(#)))),elem-update(x_5)(Z(0(0(1(#)))))),and(not(equals(x_arr_1,null)),or(leq(length(x_arr_1),x_4),lt(x_4,Z(0(#))))))" pathCondition="and(and(update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#))))),not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),or(or(equals(array,null),leq(length(array),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))),array,arr(Z(1(#))),int::select(heap,array,arr(Z(2(#))))))),elem-update(x_arr_1)(array)),elem-update(x_4)(Z(3(#)))),elem-update(x_5)(Z(0(0(1(#)))))),and(not(equals(x_arr_1,null)),or(leq(length(x_arr_1),x_4),lt(x_4,Z(0(#)))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))),array,arr(Z(1(#))),int::select(heap,array,arr(Z(2(#))))))),elem-update(x_arr_1)(array)),elem-update(x_4)(Z(3(#)))),elem-update(x_5)(Z(0(0(1(#)))))),and(not(equals(x_arr_1,null)),or(leq(length(x_arr_1),x_4),lt(x_4,Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <variable name="array" isArrayIndex="false">
+                           <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                                 <value name="[Z(0(#))] {true}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
+                                 <value name="[Z(1(#))] {true}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[Z(2(#))]" arrayIndex="Z(2(#))" isArrayIndex="true">
+                                 <value name="[Z(2(#))] {true}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="exc" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="x_arr_1" isArrayIndex="false">
+                           <value name="x_arr_1 {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                                 <value name="[Z(0(#))] {true}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
+                                 <value name="[Z(1(#))] {true}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[Z(2(#))]" arrayIndex="Z(2(#))" isArrayIndex="true">
+                                 <value name="[Z(2(#))] {true}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="x_4" isArrayIndex="false">
+                           <value name="x_4 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="x_5" isArrayIndex="false">
+                           <value name="x_5 {true}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <exceptionalMethodReturn name="&lt;throw java.lang.ArrayIndexOutOfBoundsException&gt;" signature="&lt;exceptional return of &lt;call ArrayAssignmentTest.main(array)&gt;&gt;" pathCondition="and(and(update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#))))),not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),or(or(equals(array,null),leq(length(array),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))),array,arr(Z(1(#))),int::select(heap,array,arr(Z(2(#))))))),elem-update(x_arr_1)(array)),elem-update(x_4)(Z(3(#)))),elem-update(x_5)(Z(0(0(1(#)))))),and(not(equals(x_arr_1,null)),or(leq(length(x_arr_1),x_4),lt(x_4,Z(0(#)))))))" pathConditionChanged="false" methodReturnCondition="and(and(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))),array,arr(Z(1(#))),int::select(heap,array,arr(Z(2(#))))))),elem-update(x_arr_1)(array)),elem-update(x_4)(Z(3(#)))),elem-update(x_5)(Z(0(0(1(#)))))),and(not(equals(x_arr_1,null)),or(leq(length(x_arr_1),x_4),lt(x_4,Z(0(#)))))),not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),or(or(equals(array,null),leq(length(array),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#))))))">
+                           <variable name="array" isArrayIndex="false">
+                              <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="length" isArrayIndex="false">
+                                    <value name="length {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                                 <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                                    <value name="[Z(0(#))] {true}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                                 <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
+                                    <value name="[Z(1(#))] {true}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                                 <variable name="[Z(2(#))]" arrayIndex="Z(2(#))" isArrayIndex="true">
+                                    <value name="[Z(2(#))] {true}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                           <variable name="exc" isArrayIndex="false">
+                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="a_8" isArrayIndex="false">
+                              <value name="a_8 {true}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_11" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <termination name="&lt;uncaught java.lang.ArrayIndexOutOfBoundsException&gt;" pathCondition="and(and(update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#))))),not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),or(or(equals(array,null),leq(length(array),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))),array,arr(Z(1(#))),int::select(heap,array,arr(Z(2(#))))))),elem-update(x_arr_1)(array)),elem-update(x_4)(Z(3(#)))),elem-update(x_5)(Z(0(0(1(#)))))),and(not(equals(x_arr_1,null)),or(leq(length(x_arr_1),x_4),lt(x_4,Z(0(#)))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                              <variable name="exc" isArrayIndex="false">
+                                 <value name="exc {true}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_11" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </termination>
+                           <callStateVariable name="array" isArrayIndex="false">
+                              <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="length" isArrayIndex="false">
+                                    <value name="length {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                                 <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                                    <value name="[Z(0(#))] {true}" typeString="int" valueString="int::select(heap,array,arr(Z(0(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                                 <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
+                                    <value name="[Z(1(#))] {true}" typeString="int" valueString="int::select(heap,array,arr(Z(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                                 <variable name="[Z(2(#))]" arrayIndex="Z(2(#))" isArrayIndex="true">
+                                    <value name="[Z(2(#))] {true}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="exc" isArrayIndex="false">
+                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="heapBefore_main" isArrayIndex="false">
+                              <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
+                              <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </callStateVariable>
+                        </exceptionalMethodReturn>
+                     </branchCondition>
+                  </statement>
+               </branchCondition>
+               <branchCondition name="update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),and(not(equals(array,null)),or(leq(length(array),Z(2(#))),lt(Z(2(#)),Z(0(#))))))" pathCondition="and(update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#))))),update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),and(not(equals(array,null)),or(leq(length(array),Z(2(#))),lt(Z(2(#)),Z(0(#)))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),and(not(equals(array,null)),or(leq(length(array),Z(2(#))),lt(Z(2(#)),Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <variable name="array" isArrayIndex="false">
+                     <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="array[*]" isArrayIndex="false">
+                           <value name="array[*] {equals(*,Z(0(#)))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(*,Z(0(#)))">
+                           </value>
+                           <value name="array[*] {not(equals(*,Z(0(#))))}" typeString="int" valueString="int::select(heap,array,arr(Z(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(*,Z(0(#))))">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="x_arr" isArrayIndex="false">
+                     <value name="x_arr {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="array[*]" isArrayIndex="false">
+                           <value name="array[*] {equals(*,Z(0(#)))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(*,Z(0(#)))">
+                           </value>
+                           <value name="array[*] {not(equals(*,Z(0(#))))}" typeString="int" valueString="int::select(heap,array,arr(Z(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(*,Z(0(#))))">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="x_2" isArrayIndex="false">
+                     <value name="x_2 {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <exceptionalMethodReturn name="&lt;throw java.lang.ArrayIndexOutOfBoundsException&gt;" signature="&lt;exceptional return of &lt;call ArrayAssignmentTest.main(array)&gt;&gt;" pathCondition="and(update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#))))),update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),and(not(equals(array,null)),or(leq(length(array),Z(2(#))),lt(Z(2(#)),Z(0(#)))))))" pathConditionChanged="false" methodReturnCondition="and(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),and(not(equals(array,null)),or(leq(length(array),Z(2(#))),lt(Z(2(#)),Z(0(#)))))),update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#))))))">
+                     <variable name="array" isArrayIndex="false">
+                        <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="array[*]" isArrayIndex="false">
+                              <value name="array[*] {equals(*,Z(0(#)))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(*,Z(0(#)))">
+                              </value>
+                              <value name="array[*] {not(equals(*,Z(0(#))))}" typeString="int" valueString="int::select(heap,array,arr(Z(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(*,Z(0(#))))">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="exc" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="x_arr" isArrayIndex="false">
+                        <value name="x_arr {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="array[*]" isArrayIndex="false">
+                              <value name="array[*] {equals(*,Z(0(#)))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(*,Z(0(#)))">
+                              </value>
+                              <value name="array[*] {not(equals(*,Z(0(#))))}" typeString="int" valueString="int::select(heap,array,arr(Z(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(*,Z(0(#))))">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="x_2" isArrayIndex="false">
+                        <value name="x_2 {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="a_4" isArrayIndex="false">
+                        <value name="a_4 {true}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_7" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <termination name="&lt;uncaught java.lang.ArrayIndexOutOfBoundsException&gt;" pathCondition="and(update-application(elem-update(exc)(null),and(and(not(equals(array,null)),lt(Z(0(#)),length(array))),geq(Z(0(#)),Z(0(#))))),update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,array,arr(Z(0(#))),Z(0(0(1(#))))))),elem-update(x_arr)(array)),elem-update(x_2)(Z(1(#)))),and(not(equals(array,null)),or(leq(length(array),Z(2(#))),lt(Z(2(#)),Z(0(#)))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                        <variable name="exc" isArrayIndex="false">
+                           <value name="exc {true}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_7" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </termination>
+                     <callStateVariable name="array" isArrayIndex="false">
+                        <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="array[*]" isArrayIndex="false">
+                              <value name="array[*] {true}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="exc" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="heapBefore_main" isArrayIndex="false">
+                        <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
+                        <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                  </exceptionalMethodReturn>
+               </branchCondition>
+            </statement>
+         </branchCondition>
+         <branchCondition name="update-application(elem-update(exc)(null),equals(array,null))" pathCondition="update-application(elem-update(exc)(null),equals(array,null))" pathConditionChanged="true" branchCondition="update-application(elem-update(exc)(null),equals(array,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="array" isArrayIndex="false">
+               <value name="array {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call ArrayAssignmentTest.main(array)&gt;&gt;" pathCondition="update-application(elem-update(exc)(null),equals(array,null))" pathConditionChanged="false" methodReturnCondition="update-application(elem-update(exc)(null),equals(array,null))">
+               <variable name="array" isArrayIndex="false">
+                  <value name="array {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="n" isArrayIndex="false">
+                  <value name="n {true}" typeString="java.lang.NullPointerException" valueString="n_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="update-application(elem-update(exc)(null),equals(array,null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="java.lang.NullPointerException" valueString="n_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </termination>
+               <callStateVariable name="array" isArrayIndex="false">
+                  <value name="array {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="heapBefore_main" isArrayIndex="false">
+                  <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
+                  <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+            </exceptionalMethodReturn>
+         </branchCondition>
+         <branchCondition name="update-application(elem-update(exc)(null),and(not(equals(array,null)),or(leq(length(array),Z(0(#))),lt(Z(0(#)),Z(0(#))))))" pathCondition="update-application(elem-update(exc)(null),and(not(equals(array,null)),or(leq(length(array),Z(0(#))),lt(Z(0(#)),Z(0(#))))))" pathConditionChanged="true" branchCondition="update-application(elem-update(exc)(null),and(not(equals(array,null)),or(leq(length(array),Z(0(#))),lt(Z(0(#)),Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="array" isArrayIndex="false">
+               <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="length" isArrayIndex="false">
+                     <value name="length {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <exceptionalMethodReturn name="&lt;throw java.lang.ArrayIndexOutOfBoundsException&gt;" signature="&lt;exceptional return of &lt;call ArrayAssignmentTest.main(array)&gt;&gt;" pathCondition="update-application(elem-update(exc)(null),and(not(equals(array,null)),or(leq(length(array),Z(0(#))),lt(Z(0(#)),Z(0(#))))))" pathConditionChanged="false" methodReturnCondition="update-application(elem-update(exc)(null),and(not(equals(array,null)),or(leq(length(array),Z(0(#))),lt(Z(0(#)),Z(0(#))))))">
+               <variable name="array" isArrayIndex="false">
+                  <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="length" isArrayIndex="false">
+                        <value name="length {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="a" isArrayIndex="false">
+                  <value name="a {true}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <termination name="&lt;uncaught java.lang.ArrayIndexOutOfBoundsException&gt;" pathCondition="update-application(elem-update(exc)(null),and(not(equals(array,null)),or(leq(length(array),Z(0(#))),lt(Z(0(#)),Z(0(#))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </termination>
+               <callStateVariable name="array" isArrayIndex="false">
+                  <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="length" isArrayIndex="false">
+                        <value name="length {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="heapBefore_main" isArrayIndex="false">
+                  <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
+                  <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+            </exceptionalMethodReturn>
+         </branchCondition>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/1/0"/>
+      <methodReturnEntry path="/0/0/0/0/1/0"/>
+      <methodReturnEntry path="/0/0/1/0"/>
+      <methodReturnEntry path="/0/0/2/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/1/0/0"/>
+   <terminationEntry path="/0/0/0/0/1/0/0"/>
+   <terminationEntry path="/0/0/1/0/0"/>
+   <terminationEntry path="/0/0/2/0/0"/>
+</start>
