@@ -24,6 +24,7 @@ import org.xml.sax.*;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
+import recoder.java.Comment;
 import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
@@ -100,7 +101,7 @@ public class RIFLTransformer {
             rt = new RIFLTransformer();
             rt.doTransform(riflFilename, javaSource, savePath);
             return true;
-        } catch (final ParserConfigurationException e) {
+        }catch (final ParserConfigurationException e) {
             kexh.reportException(e);
         } catch (final SAXException e) {
             kexh.reportException(e);
@@ -219,27 +220,28 @@ public class RIFLTransformer {
             cu.accept(si);
 
             ClassDeclaration clazz = (ClassDeclaration) cu.getPrimaryTypeDeclaration();
-            for (recoder.abstraction.Method targetMethod : clazz.getAllMethods()) {
-                if (targetMethod instanceof MethodDeclaration) {
-                    MethodDeclaration mdecl = (MethodDeclaration) targetMethod;
+            for (MethodDeclaration mdecl : si.getSpecifiedMethodDeclarations()) {
 
-                    StringBuilder sb = new StringBuilder();
-                    for (ParameterDeclaration p : mdecl.getParameters()) {
-                        sb.append(p.getTypeReference().getName());
-                        sb.append(",");
-                    }
-                    sb.deleteCharAt(sb.length() - 1);
+            	
+            	StringBuilder sb = new StringBuilder();
+            	for (ParameterDeclaration p : mdecl.getParameters()) {
+            		sb.append(p.getTypeReference().getName());
+            		sb.append(",");
+            	}
+            	if(sb.length()>0){
+            		sb.deleteCharAt(sb.length() - 1);
+            	}
 
-                    String poname = clazz.getFullName() + "[" +
-                            clazz.getFullName() + "\\\\:\\\\:" +
-                            targetMethod.getName() + "(" + sb + ")" + "]"
-                            + ".Non-interference contract.0";
+            	String poname = clazz.getFullName() + "[" +
+            			clazz.getFullName() + "\\\\:\\\\:" +
+            			mdecl.getName() + "(" + sb + ")" + "]"
+            			+ ".Non-interference contract.0";
 
-                    File problemFileName = new File(javaRoot.getParent(), riflFilename.getName() + "_" + counter++ + ".key");
+            	File problemFileName = new File(javaRoot.getParent(), riflFilename.getName() + "_" + counter++ + ".key");
 
-                    writeProblemFile(problemFileName, getDefaultSavePath(javaRoot).getName(), poname);
-                    result.add(problemFileName);
-                }
+            	writeProblemFile(problemFileName, getDefaultSavePath(javaRoot).getName(), poname);
+            	result.add(problemFileName);
+
             }
             //result.add(keyProblemFile);
         }

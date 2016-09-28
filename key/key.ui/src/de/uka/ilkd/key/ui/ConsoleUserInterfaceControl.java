@@ -113,6 +113,11 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                System.out.println("Time per step: " + stat.timePerStepInMillis + "ms");
            }
            System.out.println("Number of goals remaining open: " + openGoals);
+           if(openGoals == 0){
+        	   System.out.println("Proved");
+           }else{
+        	   System.out.println("Not proved");
+           }
            System.out.flush();
        }
        // this seems to be a good place to free some memory
