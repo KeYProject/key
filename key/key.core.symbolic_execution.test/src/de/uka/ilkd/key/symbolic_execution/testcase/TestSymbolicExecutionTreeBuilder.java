@@ -46,6 +46,141 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: /set/variablesNonSimpleArrayCreationTest
+    */
+   public void testVariablesNonSimpleArrayCreationTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesNonSimpleArrayCreationTest/test/NonSimpleArrayCreationTest.java", 
+                          "NonSimpleArrayCreationTest", 
+                          "main", 
+                          null,
+                          "/set/variablesNonSimpleArrayCreationTest/oracle/NonSimpleArrayCreationTest.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/variablesNonSimpleArrayAssignmentTest
+    */
+   public void testVariablesNonSimpleArrayAssignmentTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesNonSimpleArrayAssignmentTest/test/NonSimpleArrayAssignmentTest.java", 
+                          "NonSimpleArrayAssignmentTest", 
+                          "main", 
+                          null,
+                          "/set/variablesNonSimpleArrayAssignmentTest/oracle/NonSimpleArrayAssignmentTest.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/variablesArrayCreationInstanceTest
+    */
+   public void testVariablesArrayCreationInstanceTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesArrayCreationInstanceTest/test/ArrayCreationInstanceTest.java", 
+                          "ArrayCreationInstanceTest", 
+                          "main", 
+                          null,
+                          "/set/variablesArrayCreationInstanceTest/oracle/ArrayCreationInstanceTest.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/variablesArrayAssignmentTest
+    */
+   public void testVariablesArrayAssignmentTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesArrayAssignmentTest/test/ArrayAssignmentTest.java", 
+                          "ArrayAssignmentTest", 
+                          "main", 
+                          null,
+                          "/set/variablesArrayAssignmentTest/oracle/ArrayAssignmentTest.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/variablesArrayCreationTest
+    */
+   public void testVariablesArrayCreationTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesArrayCreationTest/test/ArrayCreationTest.java", 
+                          "ArrayCreationTest", 
+                          "main", 
+                          null,
+                          "/set/variablesArrayCreationTest/oracle/ArrayCreationTest.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
     * Tests example: /set/useOperationContractLightweightOperationContractTest
     */
    public void testUseOperationContractLightweightOperationContractTest() throws Exception {

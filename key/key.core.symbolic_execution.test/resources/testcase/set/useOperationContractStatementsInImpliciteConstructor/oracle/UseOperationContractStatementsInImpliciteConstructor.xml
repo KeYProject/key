@@ -22,6 +22,10 @@
                   <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
+               <variable name="array[*]" isArrayIndex="false">
+                  <value name="array[*] {true}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
             </value>
          </variable>
          <variable name="exc" isArrayIndex="false">
@@ -38,6 +42,10 @@
                <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="length" isArrayIndex="false">
                      <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="array[*]" isArrayIndex="false">
+                     <value name="array[*] {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                      </value>
                   </variable>
                </value>
@@ -60,6 +68,10 @@
                   <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="length" isArrayIndex="false">
                         <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="array[*]" isArrayIndex="false">
+                        <value name="array[*] {true}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
@@ -87,6 +99,10 @@ termination: diamond" pathCondition="not(equals(array,null))" pathConditionChang
                            <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
+                        <variable name="array[*]" isArrayIndex="false">
+                           <value name="array[*] {true}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
                      </value>
                   </variable>
                   <variable name="exc" isArrayIndex="false">
@@ -103,6 +119,10 @@ termination: diamond" pathCondition="not(equals(array,null))" pathConditionChang
                         <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="length" isArrayIndex="false">
                               <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="array[*]" isArrayIndex="false">
+                              <value name="array[*] {true}" typeString="int" valueString="int::select(anon_heap_sum&lt;&lt;anonHeapFunction&gt;&gt;,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
@@ -206,6 +226,10 @@ termination: diamond" pathCondition="not(equals(array,null))" pathConditionChang
                                  <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
+                              <variable name="array[*]" isArrayIndex="false">
+                                 <value name="array[*] {true}" typeString="int" valueString="int::select(anon_heap_sum&lt;&lt;anonHeapFunction&gt;&gt;,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
                            </value>
                         </variable>
                         <variable name="exc" isArrayIndex="false">
@@ -243,6 +267,10 @@ as result of self.average(array)&gt;" isReturnValueComputed="true" methodReturnC
                                     <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
+                                 <variable name="array[*]" isArrayIndex="false">
+                                    <value name="array[*] {true}" typeString="int" valueString="int::select(anon_heap_sum&lt;&lt;anonHeapFunction&gt;&gt;,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
                               </value>
                            </variable>
                            <variable name="exc" isArrayIndex="false">
@@ -272,6 +300,10 @@ as result of self.average(array)&gt;" isReturnValueComputed="true" methodReturnC
                               <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="length" isArrayIndex="false">
                                     <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                                 <variable name="array[*]" isArrayIndex="false">
+                                    <value name="array[*] {true}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>

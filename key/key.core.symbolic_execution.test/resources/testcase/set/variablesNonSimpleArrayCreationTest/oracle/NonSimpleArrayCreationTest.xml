@@ -1,0 +1,1067 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <variable name="heapAtPre" isArrayIndex="false">
+      <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
+   <methodCall name="&lt;call NonSimpleArrayCreationTest.main(n,instance)&gt;" pathCondition="true" pathConditionChanged="false">
+      <variable name="exc" isArrayIndex="false">
+         <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+         </value>
+      </variable>
+      <statement name="array=new NonSimpleArrayCreationTest[n];" pathCondition="true" pathConditionChanged="false">
+         <variable name="n" isArrayIndex="false">
+            <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+            </value>
+         </variable>
+         <variable name="instance" isArrayIndex="false">
+            <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+            </value>
+            <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+               <variable name="value" isArrayIndex="false">
+                  <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+            </value>
+         </variable>
+         <variable name="exc" isArrayIndex="false">
+            <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+            </value>
+         </variable>
+         <branchCondition name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,TRUE))" pathCondition="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,TRUE))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,TRUE))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="n" isArrayIndex="false">
+               <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+               </value>
+            </variable>
+            <variable name="instance" isArrayIndex="false">
+               <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+               </value>
+               <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                  <variable name="value" isArrayIndex="false">
+                     <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+               </value>
+            </variable>
+            <variable name="dim0" isArrayIndex="false">
+               <value name="dim0 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+               </value>
+            </variable>
+            <variable name="x" isArrayIndex="false">
+               <value name="x {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+               </value>
+            </variable>
+            <exceptionalMethodReturn name="&lt;throw java.lang.NegativeArraySizeException&gt;" signature="&lt;exceptional return of &lt;call NonSimpleArrayCreationTest.main(n,instance)&gt;&gt;" pathCondition="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,TRUE))" pathConditionChanged="false" methodReturnCondition="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,TRUE))">
+               <variable name="n" isArrayIndex="false">
+                  <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                  </value>
+               </variable>
+               <variable name="instance" isArrayIndex="false">
+                  <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                  </value>
+                  <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                     <variable name="value" isArrayIndex="false">
+                        <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                  </value>
+               </variable>
+               <variable name="n_1" isArrayIndex="false">
+                  <value name="n_1 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="java.lang.NegativeArraySizeException" valueString="n_4" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                  </value>
+               </variable>
+               <termination name="&lt;uncaught java.lang.NegativeArraySizeException&gt;" pathCondition="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,TRUE))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="java.lang.NegativeArraySizeException" valueString="n_4" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                     </value>
+                  </variable>
+               </termination>
+               <callStateVariable name="n" isArrayIndex="false">
+                  <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="instance" isArrayIndex="false">
+                  <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                  </value>
+                  <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                     <variable name="value" isArrayIndex="false">
+                        <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="exc" isArrayIndex="false">
+                  <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="heapBefore_main" isArrayIndex="false">
+                  <value name="heapBefore_main {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
+                  <value name="savedHeapBefore_main {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                  </value>
+               </callStateVariable>
+            </exceptionalMethodReturn>
+         </branchCondition>
+         <branchCondition name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE))" pathCondition="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="n" isArrayIndex="false">
+               <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+               </value>
+            </variable>
+            <variable name="instance" isArrayIndex="false">
+               <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+               </value>
+               <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                  <variable name="value" isArrayIndex="false">
+                     <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+               </value>
+            </variable>
+            <variable name="dim0" isArrayIndex="false">
+               <value name="dim0 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+               </value>
+            </variable>
+            <variable name="x" isArrayIndex="false">
+               <value name="x {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+               </value>
+            </variable>
+            <statement name="array[0]=instance;" pathCondition="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE))" pathConditionChanged="false">
+               <variable name="n" isArrayIndex="false">
+                  <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                  </value>
+               </variable>
+               <variable name="instance" isArrayIndex="false">
+                  <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                  </value>
+                  <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                     <variable name="value" isArrayIndex="false">
+                        <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                  </value>
+               </variable>
+               <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                  <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                     <variable name="length" isArrayIndex="false">
+                        <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                        </value>
+                     </variable>
+                     <variable name="n_arr_2[*]" isArrayIndex="false">
+                        <value name="n_arr_2[*] {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <branchCondition name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))" pathCondition="and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <variable name="n" isArrayIndex="false">
+                     <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                     </value>
+                  </variable>
+                  <variable name="instance" isArrayIndex="false">
+                     <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                     </value>
+                     <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                        <variable name="value" isArrayIndex="false">
+                           <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                     </value>
+                  </variable>
+                  <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                     <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                           </value>
+                        </variable>
+                        <variable name="n_arr_2[*]" isArrayIndex="false">
+                           <value name="n_arr_2[*] {and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))">
+                              <variable name="value" isArrayIndex="false">
+                                 <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                           <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="n_arr_4" isArrayIndex="false">
+                     <value name="n_arr_4 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                           </value>
+                        </variable>
+                        <variable name="n_arr_2[*]" isArrayIndex="false">
+                           <value name="n_arr_2[*] {and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))">
+                              <variable name="value" isArrayIndex="false">
+                                 <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                           <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <statement name="array[1]=array[2];" pathCondition="and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance))))" pathConditionChanged="false">
+                     <variable name="n" isArrayIndex="false">
+                        <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                        </value>
+                     </variable>
+                     <variable name="instance" isArrayIndex="false">
+                        <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                        </value>
+                        <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                           <variable name="value" isArrayIndex="false">
+                              <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="exc" isArrayIndex="false">
+                        <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                        </value>
+                     </variable>
+                     <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                        <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              </value>
+                           </variable>
+                           <variable name="n_arr_2[*]" isArrayIndex="false">
+                              <value name="n_arr_2[*] {and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))">
+                                 <variable name="value" isArrayIndex="false">
+                                    <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                              <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <branchCondition name="not(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),or(or(equals(n_arr_7,null),leq(length(n_arr_7),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))" pathCondition="and(and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))),not(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),or(or(equals(n_arr_7,null),leq(length(n_arr_7),Z(2(#)))),lt(Z(2(#)),Z(0(#)))))))" pathConditionChanged="true" branchCondition="not(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),or(or(equals(n_arr_7,null),leq(length(n_arr_7),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <variable name="n" isArrayIndex="false">
+                           <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                           </value>
+                        </variable>
+                        <variable name="instance" isArrayIndex="false">
+                           <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                           </value>
+                           <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                              <variable name="value" isArrayIndex="false">
+                                 <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="exc" isArrayIndex="false">
+                           <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                           </value>
+                        </variable>
+                        <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                           <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 </value>
+                              </variable>
+                              <variable name="n_arr_2[*]" isArrayIndex="false">
+                                 <value name="n_arr_2[*] {and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))">
+                                    <variable name="value" isArrayIndex="false">
+                                       <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                 </value>
+                                 <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="n_arr_6" isArrayIndex="false">
+                           <value name="n_arr_6 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 </value>
+                              </variable>
+                              <variable name="n_arr_2[*]" isArrayIndex="false">
+                                 <value name="n_arr_2[*] {and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))">
+                                    <variable name="value" isArrayIndex="false">
+                                       <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                 </value>
+                                 <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="x_3" isArrayIndex="false">
+                           <value name="x_3 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                           </value>
+                        </variable>
+                        <variable name="n_arr_7" isArrayIndex="false">
+                           <value name="n_arr_7 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 </value>
+                              </variable>
+                              <variable name="n_arr_2[*]" isArrayIndex="false">
+                                 <value name="n_arr_2[*] {and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))">
+                                    <variable name="value" isArrayIndex="false">
+                                       <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                 </value>
+                                 <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="n_5" isArrayIndex="false">
+                           <value name="n_5 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                           </value>
+                        </variable>
+                        <statement name="array[3]=array[0];" pathCondition="and(and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))),not(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),or(or(equals(n_arr_7,null),leq(length(n_arr_7),Z(2(#)))),lt(Z(2(#)),Z(0(#)))))))" pathConditionChanged="false">
+                           <variable name="n" isArrayIndex="false">
+                              <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              </value>
+                           </variable>
+                           <variable name="instance" isArrayIndex="false">
+                              <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                              </value>
+                              <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                                 <variable name="value" isArrayIndex="false">
+                                    <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                           <variable name="exc" isArrayIndex="false">
+                              <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              </value>
+                           </variable>
+                           <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                              <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 <variable name="length" isArrayIndex="false">
+                                    <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    </value>
+                                 </variable>
+                                 <variable name="n_arr_2[*]" isArrayIndex="false">
+                                    <value name="n_arr_2[*] {and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))">
+                                       <variable name="value" isArrayIndex="false">
+                                          <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          </value>
+                                       </variable>
+                                    </value>
+                                    <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                           <branchCondition name="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance),n_arr_2,arr(Z(1(#))),null))),elem-update(n_arr_9)(n_arr_2)),elem-update(x_4)(Z(3(#)))),elem-update(n_6)(instance)),and(and(and(not(equals(n_arr_9,null)),lt(x_4,length(n_arr_9))),geq(x_4,Z(0(#)))),arrayStoreValid(n_arr_9,n_6)))" pathCondition="and(and(and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))),not(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),or(or(equals(n_arr_7,null),leq(length(n_arr_7),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance),n_arr_2,arr(Z(1(#))),null))),elem-update(n_arr_9)(n_arr_2)),elem-update(x_4)(Z(3(#)))),elem-update(n_6)(instance)),and(and(and(not(equals(n_arr_9,null)),lt(x_4,length(n_arr_9))),geq(x_4,Z(0(#)))),arrayStoreValid(n_arr_9,n_6))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance),n_arr_2,arr(Z(1(#))),null))),elem-update(n_arr_9)(n_arr_2)),elem-update(x_4)(Z(3(#)))),elem-update(n_6)(instance)),and(and(and(not(equals(n_arr_9,null)),lt(x_4,length(n_arr_9))),geq(x_4,Z(0(#)))),arrayStoreValid(n_arr_9,n_6)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                              <variable name="n" isArrayIndex="false">
+                                 <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 </value>
+                              </variable>
+                              <variable name="instance" isArrayIndex="false">
+                                 <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                                 </value>
+                                 <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                                    <variable name="value" isArrayIndex="false">
+                                       <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                 </value>
+                              </variable>
+                              <variable name="exc" isArrayIndex="false">
+                                 <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 </value>
+                              </variable>
+                              <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                                 <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    <variable name="length" isArrayIndex="false">
+                                       <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </variable>
+                                    <variable name="n_arr_2[*]" isArrayIndex="false">
+                                       <value name="n_arr_2[*] {or(and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#)))),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#))))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="or(and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#)))),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#))))))">
+                                          <variable name="value" isArrayIndex="false">
+                                             <value name="value {or(and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#)))),and(and(geq(*,Z(0(#))),gt(n,*)),not(equals(*,Z(0(#))))))}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="or(and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#)))),and(and(geq(*,Z(0(#))),gt(n,*)),not(equals(*,Z(0(#))))))">
+                                             </value>
+                                          </variable>
+                                       </value>
+                                       <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#)))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#)))))))">
+                                       </value>
+                                    </variable>
+                                 </value>
+                              </variable>
+                              <variable name="n_arr_9" isArrayIndex="false">
+                                 <value name="n_arr_9 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    <variable name="length" isArrayIndex="false">
+                                       <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </variable>
+                                    <variable name="n_arr_2[*]" isArrayIndex="false">
+                                       <value name="n_arr_2[*] {or(and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#)))),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#))))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="or(and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#)))),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#))))))">
+                                          <variable name="value" isArrayIndex="false">
+                                             <value name="value {or(and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#)))),and(and(geq(*,Z(0(#))),gt(n,*)),not(equals(*,Z(0(#))))))}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="or(and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#)))),and(and(geq(*,Z(0(#))),gt(n,*)),not(equals(*,Z(0(#))))))">
+                                             </value>
+                                          </variable>
+                                       </value>
+                                       <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#)))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#)))))))">
+                                       </value>
+                                    </variable>
+                                 </value>
+                              </variable>
+                              <variable name="x_4" isArrayIndex="false">
+                                 <value name="x_4 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 </value>
+                              </variable>
+                              <variable name="n_6" isArrayIndex="false">
+                                 <value name="n_6 {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                                 </value>
+                                 <value name="n_6 {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                                    <variable name="value" isArrayIndex="false">
+                                       <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                 </value>
+                              </variable>
+                              <statement name="return array;" pathCondition="and(and(and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))),not(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),or(or(equals(n_arr_7,null),leq(length(n_arr_7),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance),n_arr_2,arr(Z(1(#))),null))),elem-update(n_arr_9)(n_arr_2)),elem-update(x_4)(Z(3(#)))),elem-update(n_6)(instance)),and(and(and(not(equals(n_arr_9,null)),lt(x_4,length(n_arr_9))),geq(x_4,Z(0(#)))),arrayStoreValid(n_arr_9,n_6))))" pathConditionChanged="false">
+                                 <variable name="n" isArrayIndex="false">
+                                    <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    </value>
+                                 </variable>
+                                 <variable name="instance" isArrayIndex="false">
+                                    <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                                    </value>
+                                    <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                                       <variable name="value" isArrayIndex="false">
+                                          <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          </value>
+                                       </variable>
+                                    </value>
+                                 </variable>
+                                 <variable name="exc" isArrayIndex="false">
+                                    <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    </value>
+                                 </variable>
+                                 <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                                    <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       <variable name="length" isArrayIndex="false">
+                                          <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                          </value>
+                                       </variable>
+                                       <variable name="n_arr_2[*]" isArrayIndex="false">
+                                          <value name="n_arr_2[*] {or(and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#)))),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#))))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="or(and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#)))),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#))))))">
+                                             <variable name="value" isArrayIndex="false">
+                                                <value name="value {or(and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#)))),and(and(geq(*,Z(0(#))),gt(n,*)),not(equals(*,Z(0(#))))))}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="or(and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#)))),and(and(geq(*,Z(0(#))),gt(n,*)),not(equals(*,Z(0(#))))))">
+                                                </value>
+                                             </variable>
+                                          </value>
+                                          <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#)))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#)))))))">
+                                          </value>
+                                       </variable>
+                                    </value>
+                                 </variable>
+                                 <methodReturn name="&lt;return of main&gt;" signature="&lt;return of NonSimpleArrayCreationTest.main(n,instance)&gt;" pathCondition="and(and(and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))),not(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),or(or(equals(n_arr_7,null),leq(length(n_arr_7),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance),n_arr_2,arr(Z(1(#))),null))),elem-update(n_arr_9)(n_arr_2)),elem-update(x_4)(Z(3(#)))),elem-update(n_6)(instance)),and(and(and(not(equals(n_arr_9,null)),lt(x_4,length(n_arr_9))),geq(x_4,Z(0(#)))),arrayStoreValid(n_arr_9,n_6))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(and(and(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance),n_arr_2,arr(Z(1(#))),null))),elem-update(n_arr_9)(n_arr_2)),elem-update(x_4)(Z(3(#)))),elem-update(n_6)(instance)),and(and(and(not(equals(n_arr_9,null)),lt(x_4,length(n_arr_9))),geq(x_4,Z(0(#)))),arrayStoreValid(n_arr_9,n_6))),not(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),or(or(equals(n_arr_7,null),leq(length(n_arr_7),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)))">
+                                    <variable name="n" isArrayIndex="false">
+                                       <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </variable>
+                                    <variable name="instance" isArrayIndex="false">
+                                       <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                                       </value>
+                                       <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                                          <variable name="value" isArrayIndex="false">
+                                             <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                             </value>
+                                          </variable>
+                                       </value>
+                                    </variable>
+                                    <variable name="exc" isArrayIndex="false">
+                                       <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </variable>
+                                    <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                                       <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                          <variable name="length" isArrayIndex="false">
+                                             <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                             </value>
+                                          </variable>
+                                          <variable name="n_arr_2[*]" isArrayIndex="false">
+                                             <value name="n_arr_2[*] {or(and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#)))),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#))))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="or(and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#)))),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#))))))">
+                                                <variable name="value" isArrayIndex="false">
+                                                   <value name="value {or(and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#)))),and(and(geq(*,Z(0(#))),gt(n,*)),not(equals(*,Z(0(#))))))}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="or(and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#)))),and(and(geq(*,Z(0(#))),gt(n,*)),not(equals(*,Z(0(#))))))">
+                                                   </value>
+                                                </variable>
+                                             </value>
+                                             <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#)))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#)))))))">
+                                             </value>
+                                          </variable>
+                                       </value>
+                                    </variable>
+                                    <termination name="&lt;end&gt;" pathCondition="and(and(and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))),not(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),or(or(equals(n_arr_7,null),leq(length(n_arr_7),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance),n_arr_2,arr(Z(1(#))),null))),elem-update(n_arr_9)(n_arr_2)),elem-update(x_4)(Z(3(#)))),elem-update(n_6)(instance)),and(and(and(not(equals(n_arr_9,null)),lt(x_4,length(n_arr_9))),geq(x_4,Z(0(#)))),arrayStoreValid(n_arr_9,n_6))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                       <variable name="exc" isArrayIndex="false">
+                                          <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                          </value>
+                                       </variable>
+                                       <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                                          <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                             <variable name="length" isArrayIndex="false">
+                                                <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                                </value>
+                                             </variable>
+                                             <variable name="n_arr_2[*]" isArrayIndex="false">
+                                                <value name="n_arr_2[*] {or(and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#)))),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#))))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="or(and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#)))),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#))))))">
+                                                   <variable name="value" isArrayIndex="false">
+                                                      <value name="value {or(and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#)))),and(and(geq(*,Z(0(#))),gt(n,*)),not(equals(*,Z(0(#))))))}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="or(and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#)))),and(and(geq(*,Z(0(#))),gt(n,*)),not(equals(*,Z(0(#))))))">
+                                                      </value>
+                                                   </variable>
+                                                </value>
+                                                <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#)))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#)))))))">
+                                                </value>
+                                             </variable>
+                                          </value>
+                                       </variable>
+                                    </termination>
+                                    <callStateVariable name="n" isArrayIndex="false">
+                                       <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </callStateVariable>
+                                    <callStateVariable name="instance" isArrayIndex="false">
+                                       <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                                       </value>
+                                       <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                                          <variable name="value" isArrayIndex="false">
+                                             <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                             </value>
+                                          </variable>
+                                       </value>
+                                    </callStateVariable>
+                                    <callStateVariable name="exc" isArrayIndex="false">
+                                       <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </callStateVariable>
+                                    <callStateVariable name="heapBefore_main" isArrayIndex="false">
+                                       <value name="heapBefore_main {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </callStateVariable>
+                                    <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
+                                       <value name="savedHeapBefore_main {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </callStateVariable>
+                                 </methodReturn>
+                              </statement>
+                           </branchCondition>
+                           <branchCondition name="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance),n_arr_2,arr(Z(1(#))),null))),elem-update(n_arr_9)(n_arr_2)),elem-update(x_4)(Z(3(#)))),elem-update(n_6)(instance)),and(not(equals(n_arr_9,null)),or(leq(length(n_arr_9),x_4),lt(x_4,Z(0(#))))))" pathCondition="and(and(and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))),not(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),or(or(equals(n_arr_7,null),leq(length(n_arr_7),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance),n_arr_2,arr(Z(1(#))),null))),elem-update(n_arr_9)(n_arr_2)),elem-update(x_4)(Z(3(#)))),elem-update(n_6)(instance)),and(not(equals(n_arr_9,null)),or(leq(length(n_arr_9),x_4),lt(x_4,Z(0(#)))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance),n_arr_2,arr(Z(1(#))),null))),elem-update(n_arr_9)(n_arr_2)),elem-update(x_4)(Z(3(#)))),elem-update(n_6)(instance)),and(not(equals(n_arr_9,null)),or(leq(length(n_arr_9),x_4),lt(x_4,Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                              <variable name="n" isArrayIndex="false">
+                                 <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 </value>
+                              </variable>
+                              <variable name="instance" isArrayIndex="false">
+                                 <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                                 </value>
+                                 <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                                    <variable name="value" isArrayIndex="false">
+                                       <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                 </value>
+                              </variable>
+                              <variable name="exc" isArrayIndex="false">
+                                 <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 </value>
+                              </variable>
+                              <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                                 <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    <variable name="length" isArrayIndex="false">
+                                       <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </variable>
+                                    <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                                       <value name="[Z(0(#))] {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </variable>
+                                    <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
+                                       <value name="[Z(1(#))] {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </variable>
+                                    <variable name="[Z(2(#))]" arrayIndex="Z(2(#))" isArrayIndex="true">
+                                       <value name="[Z(2(#))] {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </variable>
+                                 </value>
+                              </variable>
+                              <variable name="n_arr_9" isArrayIndex="false">
+                                 <value name="n_arr_9 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    <variable name="length" isArrayIndex="false">
+                                       <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </variable>
+                                    <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                                       <value name="[Z(0(#))] {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </variable>
+                                    <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
+                                       <value name="[Z(1(#))] {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </variable>
+                                    <variable name="[Z(2(#))]" arrayIndex="Z(2(#))" isArrayIndex="true">
+                                       <value name="[Z(2(#))] {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </variable>
+                                 </value>
+                              </variable>
+                              <variable name="x_4" isArrayIndex="false">
+                                 <value name="x_4 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 </value>
+                              </variable>
+                              <variable name="n_6" isArrayIndex="false">
+                                 <value name="n_6 {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                                 </value>
+                                 <value name="n_6 {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                                    <variable name="value" isArrayIndex="false">
+                                       <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                 </value>
+                              </variable>
+                              <exceptionalMethodReturn name="&lt;throw java.lang.ArrayIndexOutOfBoundsException&gt;" signature="&lt;exceptional return of &lt;call NonSimpleArrayCreationTest.main(n,instance)&gt;&gt;" pathCondition="and(and(and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))),not(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),or(or(equals(n_arr_7,null),leq(length(n_arr_7),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance),n_arr_2,arr(Z(1(#))),null))),elem-update(n_arr_9)(n_arr_2)),elem-update(x_4)(Z(3(#)))),elem-update(n_6)(instance)),and(not(equals(n_arr_9,null)),or(leq(length(n_arr_9),x_4),lt(x_4,Z(0(#)))))))" pathConditionChanged="false" methodReturnCondition="and(and(and(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance),n_arr_2,arr(Z(1(#))),null))),elem-update(n_arr_9)(n_arr_2)),elem-update(x_4)(Z(3(#)))),elem-update(n_6)(instance)),and(not(equals(n_arr_9,null)),or(leq(length(n_arr_9),x_4),lt(x_4,Z(0(#)))))),not(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),or(or(equals(n_arr_7,null),leq(length(n_arr_7),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)))">
+                                 <variable name="n" isArrayIndex="false">
+                                    <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    </value>
+                                 </variable>
+                                 <variable name="instance" isArrayIndex="false">
+                                    <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                                    </value>
+                                    <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                                       <variable name="value" isArrayIndex="false">
+                                          <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          </value>
+                                       </variable>
+                                    </value>
+                                 </variable>
+                                 <variable name="exc" isArrayIndex="false">
+                                    <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    </value>
+                                 </variable>
+                                 <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                                    <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       <variable name="length" isArrayIndex="false">
+                                          <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                          </value>
+                                       </variable>
+                                       <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                                          <value name="[Z(0(#))] {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                          </value>
+                                       </variable>
+                                       <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
+                                          <value name="[Z(1(#))] {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                          </value>
+                                       </variable>
+                                       <variable name="[Z(2(#))]" arrayIndex="Z(2(#))" isArrayIndex="true">
+                                          <value name="[Z(2(#))] {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                          </value>
+                                       </variable>
+                                    </value>
+                                 </variable>
+                                 <variable name="a_8" isArrayIndex="false">
+                                    <value name="a_8 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_11" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    </value>
+                                 </variable>
+                                 <termination name="&lt;uncaught java.lang.ArrayIndexOutOfBoundsException&gt;" pathCondition="and(and(and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))),not(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),or(or(equals(n_arr_7,null),leq(length(n_arr_7),Z(2(#)))),lt(Z(2(#)),Z(0(#))))))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance),n_arr_2,arr(Z(1(#))),null))),elem-update(n_arr_9)(n_arr_2)),elem-update(x_4)(Z(3(#)))),elem-update(n_6)(instance)),and(not(equals(n_arr_9,null)),or(leq(length(n_arr_9),x_4),lt(x_4,Z(0(#)))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                                    <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                                       <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                          <variable name="length" isArrayIndex="false">
+                                             <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                             </value>
+                                          </variable>
+                                          <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                                             <value name="[Z(0(#))] {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                             </value>
+                                          </variable>
+                                          <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
+                                             <value name="[Z(1(#))] {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                             </value>
+                                          </variable>
+                                          <variable name="[Z(2(#))]" arrayIndex="Z(2(#))" isArrayIndex="true">
+                                             <value name="[Z(2(#))] {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                             </value>
+                                          </variable>
+                                       </value>
+                                    </variable>
+                                    <variable name="exc" isArrayIndex="false">
+                                       <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_11" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </variable>
+                                 </termination>
+                                 <callStateVariable name="n" isArrayIndex="false">
+                                    <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    </value>
+                                 </callStateVariable>
+                                 <callStateVariable name="instance" isArrayIndex="false">
+                                    <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                                    </value>
+                                    <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                                       <variable name="value" isArrayIndex="false">
+                                          <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          </value>
+                                       </variable>
+                                    </value>
+                                 </callStateVariable>
+                                 <callStateVariable name="exc" isArrayIndex="false">
+                                    <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    </value>
+                                 </callStateVariable>
+                                 <callStateVariable name="heapBefore_main" isArrayIndex="false">
+                                    <value name="heapBefore_main {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    </value>
+                                 </callStateVariable>
+                                 <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
+                                    <value name="savedHeapBefore_main {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    </value>
+                                 </callStateVariable>
+                              </exceptionalMethodReturn>
+                           </branchCondition>
+                        </statement>
+                     </branchCondition>
+                     <branchCondition name="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),and(not(equals(n_arr_7,null)),or(leq(length(n_arr_7),Z(2(#))),lt(Z(2(#)),Z(0(#))))))" pathCondition="and(and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),and(not(equals(n_arr_7,null)),or(leq(length(n_arr_7),Z(2(#))),lt(Z(2(#)),Z(0(#)))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),and(not(equals(n_arr_7,null)),or(leq(length(n_arr_7),Z(2(#))),lt(Z(2(#)),Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <variable name="n" isArrayIndex="false">
+                           <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                           </value>
+                        </variable>
+                        <variable name="instance" isArrayIndex="false">
+                           <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                           </value>
+                           <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                              <variable name="value" isArrayIndex="false">
+                                 <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="exc" isArrayIndex="false">
+                           <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                           </value>
+                        </variable>
+                        <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                           <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 </value>
+                              </variable>
+                              <variable name="n_arr_2[*]" isArrayIndex="false">
+                                 <value name="n_arr_2[*] {and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))">
+                                    <variable name="value" isArrayIndex="false">
+                                       <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                 </value>
+                                 <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="n_arr_6" isArrayIndex="false">
+                           <value name="n_arr_6 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 </value>
+                              </variable>
+                              <variable name="n_arr_2[*]" isArrayIndex="false">
+                                 <value name="n_arr_2[*] {and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))">
+                                    <variable name="value" isArrayIndex="false">
+                                       <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                 </value>
+                                 <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="x_3" isArrayIndex="false">
+                           <value name="x_3 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                           </value>
+                        </variable>
+                        <variable name="n_arr_7" isArrayIndex="false">
+                           <value name="n_arr_7 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 </value>
+                              </variable>
+                              <variable name="n_arr_2[*]" isArrayIndex="false">
+                                 <value name="n_arr_2[*] {and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))">
+                                    <variable name="value" isArrayIndex="false">
+                                       <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                 </value>
+                                 <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <exceptionalMethodReturn name="&lt;throw java.lang.ArrayIndexOutOfBoundsException&gt;" signature="&lt;exceptional return of &lt;call NonSimpleArrayCreationTest.main(n,instance)&gt;&gt;" pathCondition="and(and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),and(not(equals(n_arr_7,null)),or(leq(length(n_arr_7),Z(2(#))),lt(Z(2(#)),Z(0(#)))))))" pathConditionChanged="false" methodReturnCondition="and(and(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),and(not(equals(n_arr_7,null)),or(leq(length(n_arr_7),Z(2(#))),lt(Z(2(#)),Z(0(#)))))),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)))">
+                           <variable name="n" isArrayIndex="false">
+                              <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              </value>
+                           </variable>
+                           <variable name="instance" isArrayIndex="false">
+                              <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                              </value>
+                              <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                                 <variable name="value" isArrayIndex="false">
+                                    <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                           <variable name="exc" isArrayIndex="false">
+                              <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              </value>
+                           </variable>
+                           <variable name="n_arr_6" isArrayIndex="false">
+                              <value name="n_arr_6 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 <variable name="length" isArrayIndex="false">
+                                    <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    </value>
+                                 </variable>
+                                 <variable name="n_arr_2[*]" isArrayIndex="false">
+                                    <value name="n_arr_2[*] {and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))">
+                                       <variable name="value" isArrayIndex="false">
+                                          <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          </value>
+                                       </variable>
+                                    </value>
+                                    <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                           <variable name="x_3" isArrayIndex="false">
+                              <value name="x_3 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              </value>
+                           </variable>
+                           <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                              <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 <variable name="length" isArrayIndex="false">
+                                    <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    </value>
+                                 </variable>
+                                 <variable name="n_arr_2[*]" isArrayIndex="false">
+                                    <value name="n_arr_2[*] {and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))">
+                                       <variable name="value" isArrayIndex="false">
+                                          <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          </value>
+                                       </variable>
+                                    </value>
+                                    <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                           <variable name="a_4" isArrayIndex="false">
+                              <value name="a_4 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_7" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              </value>
+                           </variable>
+                           <termination name="&lt;uncaught java.lang.ArrayIndexOutOfBoundsException&gt;" pathCondition="and(and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(and(and(not(equals(n_arr_4,null)),lt(Z(0(#)),length(n_arr_4))),geq(Z(0(#)),Z(0(#)))),arrayStoreValid(n_arr_4,instance)))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2),n_arr_2,arr(Z(0(#))),instance))),elem-update(n_arr_6)(n_arr_2)),elem-update(x_3)(Z(1(#)))),elem-update(n_arr_7)(n_arr_2)),and(not(equals(n_arr_7,null)),or(leq(length(n_arr_7),Z(2(#))),lt(Z(2(#)),Z(0(#)))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                              <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                                 <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                    <variable name="length" isArrayIndex="false">
+                                       <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                       </value>
+                                    </variable>
+                                    <variable name="n_arr_2[*]" isArrayIndex="false">
+                                       <value name="n_arr_2[*] {and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(and(not(equals(instance,null)),not(equals(instance,null))),equals(*,Z(0(#))))">
+                                          <variable name="value" isArrayIndex="false">
+                                             <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                             </value>
+                                          </variable>
+                                       </value>
+                                       <value name="n_arr_2[*] {or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(equals(instance,null),and(and(not(equals(instance,null)),not(equals(instance,null))),not(equals(*,Z(0(#))))))">
+                                       </value>
+                                    </variable>
+                                 </value>
+                              </variable>
+                              <variable name="exc" isArrayIndex="false">
+                                 <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_7" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 </value>
+                              </variable>
+                           </termination>
+                           <callStateVariable name="n" isArrayIndex="false">
+                              <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="instance" isArrayIndex="false">
+                              <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                              </value>
+                              <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                                 <variable name="value" isArrayIndex="false">
+                                    <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="exc" isArrayIndex="false">
+                              <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="heapBefore_main" isArrayIndex="false">
+                              <value name="heapBefore_main {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
+                              <value name="savedHeapBefore_main {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              </value>
+                           </callStateVariable>
+                        </exceptionalMethodReturn>
+                     </branchCondition>
+                  </statement>
+               </branchCondition>
+               <branchCondition name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(not(equals(n_arr_4,null)),or(leq(length(n_arr_4),Z(0(#))),lt(Z(0(#)),Z(0(#))))))" pathCondition="and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(not(equals(n_arr_4,null)),or(leq(length(n_arr_4),Z(0(#))),lt(Z(0(#)),Z(0(#)))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(not(equals(n_arr_4,null)),or(leq(length(n_arr_4),Z(0(#))),lt(Z(0(#)),Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <variable name="n" isArrayIndex="false">
+                     <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                     </value>
+                  </variable>
+                  <variable name="instance" isArrayIndex="false">
+                     <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                     </value>
+                     <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                        <variable name="value" isArrayIndex="false">
+                           <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                     </value>
+                  </variable>
+                  <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                     <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="n_arr_4" isArrayIndex="false">
+                     <value name="n_arr_4 {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <exceptionalMethodReturn name="&lt;throw java.lang.ArrayIndexOutOfBoundsException&gt;" signature="&lt;exceptional return of &lt;call NonSimpleArrayCreationTest.main(n,instance)&gt;&gt;" pathCondition="and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(not(equals(n_arr_4,null)),or(leq(length(n_arr_4),Z(0(#))),lt(Z(0(#)),Z(0(#)))))))" pathConditionChanged="false" methodReturnCondition="and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(not(equals(n_arr_4,null)),or(leq(length(n_arr_4),Z(0(#))),lt(Z(0(#)),Z(0(#)))))),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)))">
+                     <variable name="n" isArrayIndex="false">
+                        <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                        </value>
+                     </variable>
+                     <variable name="instance" isArrayIndex="false">
+                        <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                        </value>
+                        <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                           <variable name="value" isArrayIndex="false">
+                              <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="exc" isArrayIndex="false">
+                        <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                        </value>
+                     </variable>
+                     <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                        <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="a" isArrayIndex="false">
+                        <value name="a {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_3" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                        </value>
+                     </variable>
+                     <termination name="&lt;uncaught java.lang.ArrayIndexOutOfBoundsException&gt;" pathCondition="and(update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(dim0)(n)),elem-update(x)(if-then-else(lt(n,Z(0(#))),TRUE,FALSE))),equals(x,FALSE)),update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(store(memset(store(store(store(create(heap,n_arr_2),n_arr_2,java.lang.Object::&lt;transient&gt;,Z(0(#))),n_arr_2,java.lang.Object::&lt;transactionConditionallyUpdated&gt;,FALSE),n_arr_2,java.lang.Object::&lt;initialized&gt;,FALSE),arrayRange(n_arr_2,Z(0(#)),add(Z(neglit(1(#))),n)),null),n_arr_2,java.lang.Object::&lt;initialized&gt;,TRUE),null,NonSimpleArrayCreationTest::$array,n_arr_2))),elem-update(n_arr_4)(n_arr_2)),and(not(equals(n_arr_4,null)),or(leq(length(n_arr_4),Z(0(#))),lt(Z(0(#)),Z(0(#)))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                        <variable name="NonSimpleArrayCreationTest::array" isArrayIndex="false">
+                           <value name="NonSimpleArrayCreationTest::array {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="NonSimpleArrayCreationTest[]" valueString="n_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="exc" isArrayIndex="false">
+                           <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_3" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                           </value>
+                        </variable>
+                     </termination>
+                     <callStateVariable name="n" isArrayIndex="false">
+                        <value name="n {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="instance" isArrayIndex="false">
+                        <value name="instance {equals(instance,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(instance,null)">
+                        </value>
+                        <value name="instance {and(not(equals(instance,null)),not(equals(instance,null)))}" typeString="NonSimpleArrayCreationTest" valueString="instance" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(instance,null)),not(equals(instance,null)))">
+                           <variable name="value" isArrayIndex="false">
+                              <value name="value {true}" typeString="int" valueString="int::select(heap,instance,NonSimpleArrayCreationTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="exc" isArrayIndex="false">
+                        <value name="exc {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="heapBefore_main" isArrayIndex="false">
+                        <value name="heapBefore_main {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
+                        <value name="savedHeapBefore_main {or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(instance,null),and(not(equals(instance,null)),not(equals(instance,null))))">
+                        </value>
+                     </callStateVariable>
+                  </exceptionalMethodReturn>
+               </branchCondition>
+            </statement>
+         </branchCondition>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/0/0/0/0/1/0"/>
+      <methodReturnEntry path="/0/0/1/0/0/0/1/0"/>
+      <methodReturnEntry path="/0/0/1/0/1/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0/0/0/1/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0/1/0/0"/>
+   <terminationEntry path="/0/0/1/0/1/0/0"/>
+</start>
