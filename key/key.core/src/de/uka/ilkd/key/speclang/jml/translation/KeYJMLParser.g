@@ -1489,8 +1489,11 @@ decimalnumeral returns [SLExpression result=null] throws SLTranslationException
 :
     n=DIGITS
     {
-	result = new SLExpression(tb.zTerm(n.getText()),
-	                          javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
+      if(n.getText().startsWith("0")) {
+          n.setText(new java.math.BigInteger(n.getText(), 8).toString());
+      }
+	  result = new SLExpression(tb.zTerm(n.getText()),
+	                            javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
     }
 ;
 
