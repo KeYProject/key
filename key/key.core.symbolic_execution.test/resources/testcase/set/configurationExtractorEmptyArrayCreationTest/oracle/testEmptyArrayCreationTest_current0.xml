@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <state name="{}">
+      <value name="n" programVariable="n" isArrayIndex="false" value="Z(0(#))" type="int" condition="true"/>
+      <value name="exc" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="true"/>
+      <association name="obj" programVariable="obj" isArrayIndex="false" target="o1" condition="true"/>
+   </state>
+   <object xml:id="o1" name="obj" type="EmptyArrayCreationTest">
+      <association name="array" programVariable="array" isArrayIndex="false" target="o2" condition="true"/>
+   </object>
+   <object xml:id="o2" name="x_arr_3" type="int[]">
+   </object>
+</model>

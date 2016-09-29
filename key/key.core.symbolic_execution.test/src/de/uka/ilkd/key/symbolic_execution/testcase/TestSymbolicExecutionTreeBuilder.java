@@ -46,6 +46,33 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: /set/variablesEmptyArrayCreationTest
+    */
+   public void testVariablesEmptyArrayCreationTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesEmptyArrayCreationTest/test/EmptyArrayCreationTest.java", 
+                          "EmptyArrayCreationTest", 
+                          "main", 
+                          "obj != null & n == 0",
+                          "/set/variablesEmptyArrayCreationTest/oracle/EmptyArrayCreationTest.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
     * Tests example: /set/variablesNonSimpleArrayCreationTest
     */
    public void testVariablesNonSimpleArrayCreationTest() throws Exception {
@@ -53,7 +80,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           "/set/variablesNonSimpleArrayCreationTest/test/NonSimpleArrayCreationTest.java", 
                           "NonSimpleArrayCreationTest", 
                           "main", 
-                          null,
+                          "n >= 4 & instance != null & instance.value == 100",
                           "/set/variablesNonSimpleArrayCreationTest/oracle/NonSimpleArrayCreationTest.xml",
                           false,
                           true,
@@ -80,7 +107,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           "/set/variablesNonSimpleArrayAssignmentTest/test/NonSimpleArrayAssignmentTest.java", 
                           "NonSimpleArrayAssignmentTest", 
                           "main", 
-                          null,
+                          "array != null & array.length >= 4",
                           "/set/variablesNonSimpleArrayAssignmentTest/oracle/NonSimpleArrayAssignmentTest.xml",
                           false,
                           true,
@@ -107,7 +134,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           "/set/variablesArrayCreationInstanceTest/test/ArrayCreationInstanceTest.java", 
                           "ArrayCreationInstanceTest", 
                           "main", 
-                          null,
+                          "obj != null & n >= 4",
                           "/set/variablesArrayCreationInstanceTest/oracle/ArrayCreationInstanceTest.xml",
                           false,
                           true,
@@ -134,7 +161,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           "/set/variablesArrayAssignmentTest/test/ArrayAssignmentTest.java", 
                           "ArrayAssignmentTest", 
                           "main", 
-                          null,
+                          "array != null & array.length >= 4",
                           "/set/variablesArrayAssignmentTest/oracle/ArrayAssignmentTest.xml",
                           false,
                           true,
@@ -161,7 +188,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           "/set/variablesArrayCreationTest/test/ArrayCreationTest.java", 
                           "ArrayCreationTest", 
                           "main", 
-                          null,
+                          "n >= 4",
                           "/set/variablesArrayCreationTest/oracle/ArrayCreationTest.xml",
                           false,
                           true,

@@ -38,6 +38,16 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
    private final Term arrayIndex;
    
    /**
+    * The array start index or {@code null} if not used.
+    */
+   private final Term arrayStartIndex;
+   
+   /**
+    * The array end index or {@code null} if not used.
+    */
+   private final Term arrayEndIndex;
+   
+   /**
     * The {@link IProgramVariable}.
     */
    private final IProgramVariable programVariable;
@@ -73,6 +83,37 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
       this.arrayIndex = arrayIndex;
       this.target = target;
       this.condition = condition;
+      this.arrayStartIndex = null;
+      this.arrayEndIndex = null;
+   }
+   
+   /**
+    * Constructor.
+    * @param services The {@link Services} to use.
+    * @param arrayIndex The array index.
+    * @param arrayStartIndex The array start index or {@code null} if not used.
+    * @param arrayEndIndex The array end index or {@code null} if not used.
+    * @param target The target {@link ISymbolicObject}.
+    * @param condition The optional condition under which this association is valid.
+    * @param settings The {@link IModelSettings} to use.
+    */
+   public SymbolicAssociation(Services services, 
+                              Term arrayIndex, 
+                              Term arrayStartIndex,
+                              Term arrayEndIndex,
+                              ISymbolicObject target, 
+                              Term condition,
+                              IModelSettings settings) {
+      super(settings);
+      assert services != null;
+      assert target != null;
+      this.services = services;
+      this.programVariable = null;
+      this.arrayIndex = arrayIndex;
+      this.target = target;
+      this.condition = condition;
+      this.arrayStartIndex = arrayStartIndex;
+      this.arrayEndIndex = arrayEndIndex;
    }
    
    /**
@@ -97,6 +138,8 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
       this.target = target;
       this.arrayIndex = null;
       this.condition = condition;
+      this.arrayStartIndex = null;
+      this.arrayEndIndex = null;
    }
    
    /**
@@ -105,7 +148,24 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
    @Override
    public String getName() {
       StringBuffer sb = new StringBuffer();
-      if (isArrayIndex()) {
+      if (isArrayRange()) {
+         sb.append("[");
+         if (getArrayStartIndex() != null) {
+            sb.append(getArrayIndexString());
+            sb.append(" >= ");
+            sb.append(getArrayStartIndexString());
+         }
+         if (getArrayStartIndex() != null && getArrayEndIndex() != null) {
+            sb.append(" and ");
+         }
+         if (getArrayEndIndex() != null) {
+            sb.append(getArrayIndexString());
+            sb.append(" <= ");
+            sb.append(getArrayEndIndexString());
+         }
+         sb.append("]");
+      }
+      else if (isArrayIndex()) {
          sb.append("[");
          sb.append(getArrayIndexString());
          sb.append("]");
@@ -122,11 +182,19 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
    }
    
    /**
-    * {@inheritDoc}
+    * Checks if an array index is represented.
+    * @return {@code true} is array index, {@code false} is something else.
     */
-   @Override
    public boolean isArrayIndex() {
-      return arrayIndex != null;
+      return arrayIndex != null && (arrayStartIndex == null || arrayEndIndex == null);
+   }
+
+   /**
+    * Checks if an array range is represented.
+    * @return {@code true} is array range, {@code false} is something else. 
+    */
+   public boolean isArrayRange() {
+      return arrayStartIndex != null && arrayEndIndex != null;
    }
 
    /**
@@ -191,5 +259,37 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
    @Override
    public String getArrayIndexString() {
       return arrayIndex != null ? formatTerm(arrayIndex, services) : null;
+   }
+
+   /**
+    * Returns the array start index.
+    * @return The array start index.
+    */
+   public Term getArrayStartIndex() {
+      return arrayStartIndex;
+   }
+
+   /**
+    * Returns the human readable array start index.
+    * @return The human readable array start index.
+    */
+   public String getArrayStartIndexString() {
+      return arrayStartIndex != null ? formatTerm(arrayStartIndex, services) : null;
+   }
+   
+   /**
+    * Returns the array end index.
+    * @return The array end index.
+    */
+   public Term getArrayEndIndex() {
+      return arrayEndIndex;
+   }
+   
+   /**
+    * Returns the human readable array end index.
+    * @return The human readable array end index.
+    */
+   public String getArrayEndIndexString() {
+      return arrayEndIndex != null ? formatTerm(arrayEndIndex, services) : null;
    }
 }

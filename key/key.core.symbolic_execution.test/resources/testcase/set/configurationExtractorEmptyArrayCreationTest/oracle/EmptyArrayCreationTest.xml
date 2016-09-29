@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call EmptyArrayCreationTest.compute(obj,n)&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="obj.array=new int[n];" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="not(equals(obj,null))" pathCondition="not(equals(obj,null))" pathConditionChanged="true" branchCondition="not(equals(obj,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="return obj.array;" pathCondition="not(equals(obj,null))" pathConditionChanged="false">
+               <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of EmptyArrayCreationTest.compute(obj,n)&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(obj,null))">
+                  <termination name="&lt;end&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  </termination>
+               </methodReturn>
+            </statement>
+         </branchCondition>
+         <branchCondition name="equals(obj,null)" pathCondition="equals(obj,null)" pathConditionChanged="true" branchCondition="equals(obj,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call EmptyArrayCreationTest.compute(obj,n)&gt;&gt;" pathCondition="equals(obj,null)" pathConditionChanged="false" methodReturnCondition="equals(obj,null)">
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(obj,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+               </termination>
+            </exceptionalMethodReturn>
+         </branchCondition>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0"/>
+</start>
