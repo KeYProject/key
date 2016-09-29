@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <variable name="n" isArrayIndex="false">
+      <value name="n {true}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
+   <variable name="exc" isArrayIndex="false">
+      <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
+   <methodCall name="&lt;call ArrayCreationTest.main(n)&gt;" pathCondition="true" pathConditionChanged="false">
+      <variable name="n" isArrayIndex="false">
+         <value name="n {true}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
+      <variable name="exc" isArrayIndex="false">
+         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
+      <statement name="array=new int[n];" pathCondition="true" pathConditionChanged="false">
+         <variable name="n" isArrayIndex="false">
+            <value name="n {true}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <variable name="exc" isArrayIndex="false">
+            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <statement name="array[0]=100;" pathCondition="true" pathConditionChanged="false">
+            <variable name="n" isArrayIndex="false">
+               <value name="n {or(or(and(geq(*,Z(0(#))),gt(n,*)),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(and(geq(*,Z(0(#))),gt(n,*)),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+               </value>
+            </variable>
+            <variable name="ArrayCreationTest::array" isArrayIndex="false">
+               <value name="ArrayCreationTest::array {or(or(and(geq(*,Z(0(#))),gt(n,*)),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int[]" valueString="x_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(or(and(geq(*,Z(0(#))),gt(n,*)),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                  <variable name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)]" arrayIndex="*" isArrayIndex="true">
+                     <value name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)] {and(geq(*,Z(0(#))),gt(n,*))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="and(geq(*,Z(0(#))),gt(n,*))">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {or(or(and(geq(*,Z(0(#))),gt(n,*)),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(and(geq(*,Z(0(#))),gt(n,*)),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+               </value>
+            </variable>
+            <statement name="array[1]=array[2];" pathCondition="true" pathConditionChanged="false">
+               <variable name="n" isArrayIndex="false">
+                  <value name="n {or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                  </value>
+               </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                  </value>
+               </variable>
+               <variable name="ArrayCreationTest::array" isArrayIndex="false">
+                  <value name="ArrayCreationTest::array {or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int[]" valueString="x_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                     <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                        <value name="[Z(0(#))] {or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                        </value>
+                     </variable>
+                     <variable name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)]" arrayIndex="*" isArrayIndex="true">
+                        <value name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)] {and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*)))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*)))">
+                        </value>
+                        <value name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)] {and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <statement name="array[3]=array[0];" pathCondition="true" pathConditionChanged="false">
+                  <variable name="n" isArrayIndex="false">
+                     <value name="n {or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                     </value>
+                  </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                     </value>
+                  </variable>
+                  <variable name="ArrayCreationTest::array" isArrayIndex="false">
+                     <value name="ArrayCreationTest::array {or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int[]" valueString="x_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                        <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
+                           <value name="[Z(1(#))] {or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                           </value>
+                        </variable>
+                        <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                           <value name="[Z(0(#))] {or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(and(geq(*,Z(0(#))),gt(n,*)),and(geq(*,Z(0(#))),gt(n,*))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                           </value>
+                        </variable>
+                        <variable name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)]" arrayIndex="*" isArrayIndex="true">
+                           <value name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)] {and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*)))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*)))">
+                           </value>
+                           <value name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)] {and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <statement name="return array;" pathCondition="true" pathConditionChanged="false">
+                     <variable name="n" isArrayIndex="false">
+                        <value name="n {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                        </value>
+                     </variable>
+                     <variable name="exc" isArrayIndex="false">
+                        <value name="exc {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                        </value>
+                     </variable>
+                     <variable name="ArrayCreationTest::array" isArrayIndex="false">
+                        <value name="ArrayCreationTest::array {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int[]" valueString="x_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                           <variable name="[Z(3(#))]" arrayIndex="Z(3(#))" isArrayIndex="true">
+                              <value name="[Z(3(#))] {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                              </value>
+                           </variable>
+                           <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
+                              <value name="[Z(1(#))] {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                              </value>
+                           </variable>
+                           <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                              <value name="[Z(0(#))] {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                              </value>
+                           </variable>
+                           <variable name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)]" arrayIndex="*" isArrayIndex="true">
+                              <value name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)] {true}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                              <value name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)] {and(and(not(equals(*,Z(3(#)))),not(equals(*,Z(0(#))))),and(geq(*,Z(0(#))),gt(n,*)))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="and(and(not(equals(*,Z(3(#)))),not(equals(*,Z(0(#))))),and(geq(*,Z(0(#))),gt(n,*)))">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of ArrayCreationTest.main(n)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                        <variable name="n" isArrayIndex="false">
+                           <value name="n {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                           </value>
+                        </variable>
+                        <variable name="exc" isArrayIndex="false">
+                           <value name="exc {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                           </value>
+                        </variable>
+                        <variable name="ArrayCreationTest::array" isArrayIndex="false">
+                           <value name="ArrayCreationTest::array {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int[]" valueString="x_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                              <variable name="[Z(3(#))]" arrayIndex="Z(3(#))" isArrayIndex="true">
+                                 <value name="[Z(3(#))] {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                                 </value>
+                              </variable>
+                              <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
+                                 <value name="[Z(1(#))] {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                                 </value>
+                              </variable>
+                              <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                                 <value name="[Z(0(#))] {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                                 </value>
+                              </variable>
+                              <variable name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)]" arrayIndex="*" isArrayIndex="true">
+                                 <value name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)] {true}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                                 <value name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)] {and(and(not(equals(*,Z(3(#)))),not(equals(*,Z(0(#))))),and(geq(*,Z(0(#))),gt(n,*)))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="and(and(not(equals(*,Z(3(#)))),not(equals(*,Z(0(#))))),and(geq(*,Z(0(#))),gt(n,*)))">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           <variable name="n" isArrayIndex="false">
+                              <value name="n {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                              </value>
+                           </variable>
+                           <variable name="exc" isArrayIndex="false">
+                              <value name="exc {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                              </value>
+                           </variable>
+                           <variable name="ArrayCreationTest::array" isArrayIndex="false">
+                              <value name="ArrayCreationTest::array {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int[]" valueString="x_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                                 <variable name="[Z(3(#))]" arrayIndex="Z(3(#))" isArrayIndex="true">
+                                    <value name="[Z(3(#))] {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                                    </value>
+                                 </variable>
+                                 <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
+                                    <value name="[Z(1(#))] {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                                    </value>
+                                 </variable>
+                                 <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                                    <value name="[Z(0(#))] {or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*)))),not(and(geq(*,Z(0(#))),gt(n,*))))">
+                                    </value>
+                                 </variable>
+                                 <variable name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)]" arrayIndex="*" isArrayIndex="true">
+                                    <value name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)] {true}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                    <value name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)] {and(and(not(equals(*,Z(3(#)))),not(equals(*,Z(0(#))))),and(geq(*,Z(0(#))),gt(n,*)))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="and(and(not(equals(*,Z(3(#)))),not(equals(*,Z(0(#))))),and(geq(*,Z(0(#))),gt(n,*)))">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                        </termination>
+                        <callStateVariable name="n" isArrayIndex="false">
+                           <value name="n {true}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="exc" isArrayIndex="false">
+                           <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                     </methodReturn>
+                  </statement>
+               </statement>
+            </statement>
+         </statement>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0"/>
+</start>

@@ -249,7 +249,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
       synchronized (this) {
          if (!isAnalysed()) {
             // Get path condition
-            Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, settings.isSimplifyConditions(), false);
+            Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, 
+                                                                            true, // Path condition needs always to be simplified, because otherwise additinal symbolic values might be introduced.
+                                                                            false);
             pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
             // Compute all locations used in path conditions and updates. The values of the locations will be later computed in the state computation (and finally shown in a memory layout).
             Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();
@@ -821,7 +823,10 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             SymbolicObject target = objects.get(valueTerm);
             if (target != null) {
                SymbolicAssociation association;
-               if (pair.isArrayIndex()) {
+               if (pair.isArrayRange()) {
+                  association = new SymbolicAssociation(getServices(), pair.getArrayIndex(), pair.getArrayStartIndex(), pair.getArrayEndIndex(), target, pair.getCondition(), settings);
+               }
+               else if (pair.isArrayIndex()) {
                   association = new SymbolicAssociation(getServices(), pair.getArrayIndex(), target, pair.getCondition(), settings);
                }
                else {
@@ -842,7 +847,10 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             }
             else {
                SymbolicValue value;
-               if (pair.isArrayIndex()) {
+               if (pair.isArrayRange()) {
+                  value = new SymbolicValue(getServices(), pair.getArrayIndex(), pair.getArrayStartIndex(), pair.getArrayEndIndex(), valueTerm, pair.getCondition(), settings);
+               }
+               else if (pair.isArrayIndex()) {
                   value = new SymbolicValue(getServices(), pair.getArrayIndex(), valueTerm, pair.getCondition(), settings);
                }
                else {
