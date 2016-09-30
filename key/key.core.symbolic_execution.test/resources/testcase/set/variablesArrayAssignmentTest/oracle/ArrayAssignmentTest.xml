@@ -17,7 +17,7 @@
                   </value>
                </variable>
                <variable name="array[*]" isArrayIndex="false">
-                  <value name="array[*] {true}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <value name="array[*] {and(geq(*,Z(0(#))),gt(length(array),*))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(geq(*,Z(0(#))),gt(length(array),*))">
                   </value>
                </variable>
             </value>
@@ -36,7 +36,7 @@
                   <variable name="array[*]" isArrayIndex="false">
                      <value name="array[*] {equals(*,Z(0(#)))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(*,Z(0(#)))">
                      </value>
-                     <value name="array[*] {not(equals(*,Z(0(#))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(*,Z(0(#))))">
+                     <value name="array[*] {and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(length(array),*)))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(length(array),*)))">
                      </value>
                   </variable>
                </value>
@@ -57,7 +57,7 @@
                         </value>
                         <value name="array[*] {and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))">
                         </value>
-                        <value name="array[*] {and(not(equals(*,Z(0(#)))),not(equals(*,Z(1(#)))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),not(equals(*,Z(1(#)))))">
+                        <value name="array[*] {and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),and(geq(*,Z(0(#))),gt(length(array),*))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),and(geq(*,Z(0(#))),gt(length(array),*))))">
                         </value>
                      </variable>
                   </value>
@@ -78,7 +78,7 @@
                            </value>
                            <value name="array[*] {and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))">
                            </value>
-                           <value name="array[*] {and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),not(equals(*,Z(3(#))))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),not(equals(*,Z(3(#))))))">
+                           <value name="array[*] {and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),and(not(equals(*,Z(3(#)))),and(geq(*,Z(0(#))),gt(length(array),*)))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),and(not(equals(*,Z(3(#)))),and(geq(*,Z(0(#))),gt(length(array),*)))))">
                            </value>
                         </variable>
                      </value>
@@ -99,7 +99,7 @@
                               </value>
                               <value name="array[*] {and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))">
                               </value>
-                              <value name="array[*] {and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),not(equals(*,Z(3(#))))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),not(equals(*,Z(3(#))))))">
+                              <value name="array[*] {and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),and(not(equals(*,Z(3(#)))),and(geq(*,Z(0(#))),gt(length(array),*)))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),and(not(equals(*,Z(3(#)))),and(geq(*,Z(0(#))),gt(length(array),*)))))">
                               </value>
                            </variable>
                         </value>
@@ -121,7 +121,7 @@
                               </value>
                            </variable>
                            <variable name="array[*]" isArrayIndex="false">
-                              <value name="array[*] {true}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <value name="array[*] {and(geq(*,Z(0(#))),gt(length(array),*))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(geq(*,Z(0(#))),gt(length(array),*))">
                               </value>
                            </variable>
                         </value>
