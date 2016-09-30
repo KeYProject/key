@@ -34,7 +34,7 @@
                      </value>
                   </variable>
                   <variable name="x_arr_2[*]" isArrayIndex="false">
-                     <value name="x_arr_2[*] {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="x_arr_2[*] {and(geq(*,Z(0(#))),gt(n,*))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="and(geq(*,Z(0(#))),gt(n,*))">
                      </value>
                   </variable>
                </value>
@@ -55,9 +55,9 @@
                         </value>
                      </variable>
                      <variable name="x_arr_2[*]" isArrayIndex="false">
-                        <value name="x_arr_2[*] {equals(*,Z(0(#)))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(*,Z(0(#)))">
+                        <value name="x_arr_2[*] {and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#))))">
                         </value>
-                        <value name="x_arr_2[*] {not(equals(*,Z(0(#))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(*,Z(0(#))))">
+                        <value name="x_arr_2[*] {and(and(geq(*,Z(0(#))),gt(n,*)),not(equals(*,Z(0(#)))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="and(and(geq(*,Z(0(#))),gt(n,*)),not(equals(*,Z(0(#)))))">
                         </value>
                      </variable>
                   </value>
@@ -78,9 +78,9 @@
                            </value>
                         </variable>
                         <variable name="x_arr_2[*]" isArrayIndex="false">
-                           <value name="x_arr_2[*] {equals(*,Z(0(#)))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(*,Z(0(#)))">
+                           <value name="x_arr_2[*] {and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#))))">
                            </value>
-                           <value name="x_arr_2[*] {not(equals(*,Z(0(#))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(*,Z(0(#))))">
+                           <value name="x_arr_2[*] {and(and(geq(*,Z(0(#))),gt(n,*)),not(equals(*,Z(0(#)))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="and(and(geq(*,Z(0(#))),gt(n,*)),not(equals(*,Z(0(#)))))">
                            </value>
                         </variable>
                      </value>
@@ -101,9 +101,9 @@
                               </value>
                            </variable>
                            <variable name="x_arr_2[*]" isArrayIndex="false">
-                              <value name="x_arr_2[*] {or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#)))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#)))))">
+                              <value name="x_arr_2[*] {or(and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#)))),and(and(geq(*,Z(0(#))),gt(n,*)),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#))))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#)))),and(and(geq(*,Z(0(#))),gt(n,*)),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#))))))">
                               </value>
-                              <value name="x_arr_2[*] {and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#)))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#)))))">
+                              <value name="x_arr_2[*] {and(and(geq(*,Z(0(#))),gt(n,*)),and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#))))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="and(and(geq(*,Z(0(#))),gt(n,*)),and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#))))))">
                               </value>
                            </variable>
                         </value>
@@ -124,9 +124,9 @@
                                  </value>
                               </variable>
                               <variable name="x_arr_2[*]" isArrayIndex="false">
-                                 <value name="x_arr_2[*] {or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#)))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#)))))">
+                                 <value name="x_arr_2[*] {or(and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#)))),and(and(geq(*,Z(0(#))),gt(n,*)),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#))))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#)))),and(and(geq(*,Z(0(#))),gt(n,*)),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#))))))">
                                  </value>
-                                 <value name="x_arr_2[*] {and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#)))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#)))))">
+                                 <value name="x_arr_2[*] {and(and(geq(*,Z(0(#))),gt(n,*)),and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#))))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="and(and(geq(*,Z(0(#))),gt(n,*)),and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#))))))">
                                  </value>
                               </variable>
                            </value>
@@ -143,9 +143,9 @@
                                     </value>
                                  </variable>
                                  <variable name="x_arr_2[*]" isArrayIndex="false">
-                                    <value name="x_arr_2[*] {or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#)))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#)))))">
+                                    <value name="x_arr_2[*] {or(and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#)))),and(and(geq(*,Z(0(#))),gt(n,*)),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#))))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(and(and(geq(*,Z(0(#))),gt(n,*)),equals(*,Z(0(#)))),and(and(geq(*,Z(0(#))),gt(n,*)),and(not(equals(*,Z(0(#)))),equals(*,Z(3(#))))))">
                                     </value>
-                                    <value name="x_arr_2[*] {and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#)))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#)))))">
+                                    <value name="x_arr_2[*] {and(and(geq(*,Z(0(#))),gt(n,*)),and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#))))))}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="and(and(geq(*,Z(0(#))),gt(n,*)),and(not(equals(*,Z(0(#)))),not(equals(*,Z(3(#))))))">
                                     </value>
                                  </variable>
                               </value>

@@ -232,25 +232,27 @@ public class ExecutionVariable extends AbstractExecutionVariable {
       // Instantiate child values
       for (Entry<Term, List<Goal>> valueEntry : valueMap.entrySet()) {
          Term value = valueEntry.getKey();
-         // Format return vale
-         String valueString = formatTerm(value, services);
-         // Determine type
-         String typeString = value.sort().toString();
-         // Compute value condition
-         Term condition = computeValueCondition(tb, valueEntry.getValue(), initConfig);
-         String conditionString = null;
-         if (condition != null) {
-            conditionString = formatTerm(condition, services);
+         if (isValidValue(value)) {
+            // Format return vale
+            String valueString = formatTerm(value, services);
+            // Determine type
+            String typeString = value.sort().toString();
+            // Compute value condition
+            Term condition = computeValueCondition(tb, valueEntry.getValue(), initConfig);
+            String conditionString = null;
+            if (condition != null) {
+               conditionString = formatTerm(condition, services);
+            }
+            // Update result
+            result.add(new ExecutionValue(getProofNode(),
+                                          this,
+                                          false,
+                                          value,
+                                          valueString,
+                                          typeString,
+                                          condition,
+                                          conditionString));
          }
-         // Update result
-         result.add(new ExecutionValue(getProofNode(),
-                                       this,
-                                       false,
-                                       value,
-                                       valueString,
-                                       typeString,
-                                       condition,
-                                       conditionString));
       }
       // Instantiate unknown child values
       if (!unknownValues.isEmpty()) {
@@ -272,6 +274,15 @@ public class ExecutionVariable extends AbstractExecutionVariable {
       }
       // Return child values as result
       return result.toArray(new ExecutionValue[result.size()]);
+   }
+
+   /**
+    * Checks if the given {@link Term} represents a valid value.
+    * @param value The value to check.
+    * @return {@code true} valid value, {@code false} invalid value to be ignored.
+    */
+   protected boolean isValidValue(Term value) {
+      return true;
    }
 
    /**

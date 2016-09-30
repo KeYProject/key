@@ -34,9 +34,19 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
    public static final String ARRAY_INDEX_CONSTANT_NAME = "*";
    
    /**
+    * The name used to represent the fact that a value is not available.
+    */
+   public static final String NOT_A_VALUE_NAME = "<Not a Value>";
+   
+   /**
     * The constant representing an arbitrary array index.
     */
    private Term constant;
+   
+   /**
+    * The constant representing the fact that no value is available.
+    */
+   private final Term notAValue;
 
    /**
     * Constructor.
@@ -60,6 +70,9 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
             arrayProgramVariable,
             additionalCondition);
       assert parentValue != null;
+      TermBuilder tb = getServices().getTermBuilder();
+      Function notAValueFunction = new Function(new Name(tb.newName(NOT_A_VALUE_NAME)), Sort.ANY);
+      notAValue = tb.func(notAValueFunction);
    }
 
    /**
@@ -97,16 +110,17 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
          constant = tb.func(constantFunction);
          setName(lazyComputeName()); // Update name because constant has changed
          Term arrayIndex = tb.dotArr(arrayTerm, constant);
-         
-         // Create predicate which will be used in formulas to store the value interested in.
-         Function resultPredicate = new Function(new Name(tb.newName("ResultPredicate")), Sort.FORMULA, arrayIndex.sort());
+         // Create if check
          Function arrayLengthFunction = sideServices.getTypeConverter().getHeapLDT().getLength();
          Term arrayRange = tb.and(tb.geq(constant, tb.zero()), tb.lt(constant, tb.func(arrayLengthFunction, arrayTerm)));
+         Term resultIf = tb.ife(arrayRange, arrayIndex, notAValue);
+         
+         // Create predicate which will be used in formulas to store the value interested in.
+         Function resultPredicate = new Function(new Name(tb.newName("ResultPredicate")), Sort.FORMULA, resultIf.sort());
          // Create formula which contains the value interested in.
-         Term resultTerm = tb.func(resultPredicate, arrayIndex);
-         Term resultImplication = tb.imp(arrayRange, resultTerm);
+         Term resultTerm = tb.func(resultPredicate, resultIf);
          // Create Sequent to prove with new succedent.
-         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(getProofNode(), getModalityPIO(), siteProofCondition, resultImplication, false);
+         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(getProofNode(), getModalityPIO(), siteProofCondition, resultTerm, false);
          // Perform side proof
          ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(getProof(), 
                                                                                 sideProofEnv,
@@ -132,6 +146,14 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
          return null;
       }
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected boolean isValidValue(Term value) {
+      return notAValue != value;
+   }
 
    /**
     * Creates a {@link Term} to access the array.
@@ -148,5 +170,21 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
    public Term createSelectTerm() {
       assert constant != null : "Call getValues() before calling createSelectTerm().";
       return getServices().getTermBuilder().dotArr(createArrayTerm(), constant);
+   }
+
+   /**
+    * Returns the constant representing an arbitrary array index.
+    * @return The constant representing an arbitrary array index.
+    */
+   public Term getConstant() {
+      return constant;
+   }
+
+   /**
+    * Returns the constant representing the fact that no value is available.
+    * @return The constant representing the fact that no value is available.
+    */
+   public Term getNotAValue() {
+      return notAValue;
    }
 }

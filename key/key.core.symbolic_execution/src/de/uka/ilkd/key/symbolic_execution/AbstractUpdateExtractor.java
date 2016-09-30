@@ -618,11 +618,6 @@ public abstract class AbstractUpdateExtractor {
     */
    public class ExtractLocationParameter {
       /**
-       * The name used to represent the fact that a value is not available.
-       */
-      public static final String NOT_A_VALUE_NAME = "<Not a Value>";
-
-      /**
        * The {@link ProgramVariable} or {@code null} if an array index is used instead.
        */
       private final ProgramVariable programVariable;
@@ -785,7 +780,7 @@ public abstract class AbstractUpdateExtractor {
          TermBuilder tb = getServices().getTermBuilder();
          Function constantFunction = new Function(new Name(tb.newName(ExecutionAllArrayIndicesVariable.ARRAY_INDEX_CONSTANT_NAME)), getServices().getTypeConverter().getIntegerLDT().targetSort());
          this.arrayRangeConstant = tb.func(constantFunction);
-         Function notAValueFunction = new Function(new Name(tb.newName(NOT_A_VALUE_NAME)), Sort.ANY);
+         Function notAValueFunction = new Function(new Name(tb.newName(ExecutionAllArrayIndicesVariable.NOT_A_VALUE_NAME)), Sort.ANY);
          this.notAValue = tb.func(notAValueFunction);
       }
 
