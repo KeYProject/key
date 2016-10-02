@@ -268,4 +268,15 @@ public class ColorUtil {
       }
       return p;
    }
+
+   /**
+    * Converts the given {@link java.awt.Color} into a {@link RGB}.
+    * @param color The {@link java.awt.Color} to convert.
+    * @return The equivalent {@link RGB} instance.
+    */
+   public static RGB toRGB(java.awt.Color color) {
+      return color != null ?
+             new RGB(color.getRed(), color.getGreen(), color.getBlue()) :
+             null;
+   }
 }

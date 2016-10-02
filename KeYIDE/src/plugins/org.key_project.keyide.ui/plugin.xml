@@ -578,6 +578,12 @@
             id="org.key_project.keyide.ui.preference.page.VisualizationPreferencePage"
             name="KeY Perspective">
       </page>
+      <page
+            category="org.key_project.key4eclipse.common.ui.preference.page.KeY"
+            class="org.key_project.keyide.ui.preference.page.KeYIDEColorPreferencePage"
+            id="org.key_project.keyide.ui.preference.page.KeYIDEColorPreferencePage"
+            name="Colors">
+      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

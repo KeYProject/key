@@ -37,6 +37,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -57,6 +58,7 @@ import org.key_project.keyide.ui.handlers.ShowSymbolicExecutionTreeOnlyHandler;
 import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
+import org.key_project.keyide.ui.util.ProofTreeColorManager;
 import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
 import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
@@ -64,6 +66,9 @@ import org.key_project.sed.key.ui.ShowSubtreeOfNodeHandler;
 import org.key_project.sed.key.ui.propertyTester.AutoModePropertyTesterSED;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
+import org.key_project.util.eclipse.swt.viewer.ObservableTreeViewer;
+import org.key_project.util.eclipse.swt.viewer.event.IViewerUpdateListener;
+import org.key_project.util.eclipse.swt.viewer.event.ViewerUpdateEvent;
 import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -112,9 +117,14 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
    private SashForm parentComposite;
 
    /**
-    * the {@link TreeViewer} of this view.
+    * The used {@link ProofTreeColorManager}.
     */
-   private TreeViewer treeViewer;
+   private ProofTreeColorManager proofTreeColorManager;
+   
+   /**
+    * The {@link ObservableTreeViewer} of this view which shows the proof tree.
+    */
+   private ObservableTreeViewer treeViewer;
 
    /**
     * the {@link SourceViewer} of this view.
@@ -405,9 +415,22 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
    @Override
    public void createPartControl(Composite parent) {
       parentComposite = new SashForm(parent, SWT.HORIZONTAL);
+      proofTreeColorManager = new ProofTreeColorManager(parent.getDisplay());
+      proofTreeColorManager.addPropertyChangeListener(new PropertyChangeListener() {
+         @Override
+         public void propertyChange(PropertyChangeEvent evt) {
+            handleProofTreeColorChanged();
+         }
+      });
       //create tree viewer
-      this.treeViewer = new TreeViewer(parentComposite, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL | SWT.BORDER);
+      this.treeViewer = new ObservableTreeViewer(parentComposite, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL | SWT.BORDER);
       treeViewer.setUseHashlookup(true);
+      treeViewer.addViewerUpdateListener(new IViewerUpdateListener() {
+         @Override
+         public void itemUpdated(ViewerUpdateEvent e) {
+            handleItemUpdated(e);
+         }
+      });
       this.contentProvider = new LazyProofTreeContentProvider(environment != null ? environment.getProofControl() : null);
       contentProvider.setHideState((boolean) hideState.getValue());
       contentProvider.setSymbolicState((boolean) symbolicState.getValue());
@@ -445,6 +468,27 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       createTreeViewerContextMenu();
       createSourceViewerContextMenu();
       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addSettingsListener(viewSettingsListener);
+   }
+
+   /**
+    * When a color of the proof tree has changed.
+    */
+   protected void handleProofTreeColorChanged() {
+      treeViewer.refresh();
+   }
+
+   /**
+    * When a tree viewer item was updated.
+    * @param e The event.
+    */
+   protected void handleItemUpdated(ViewerUpdateEvent e) {
+      TreeItem item = (TreeItem) e.getItem();
+      if (item != null) {
+         Object data = e.getElement();
+         if (data instanceof Node) {
+            proofTreeColorManager.colorProofTreeNode(item, (Node) data);
+         }
+      }
    }
    
    /**
@@ -787,7 +831,10 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       }
       if (subtreeState != null) {
          subtreeState.removeListener(subtreeStateListener);
-      }     
+      }
+      if (proofTreeColorManager != null) {
+         proofTreeColorManager.dispose();
+      }
       super.dispose();
    }
    
