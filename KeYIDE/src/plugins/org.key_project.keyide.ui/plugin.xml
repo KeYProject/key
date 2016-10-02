@@ -246,10 +246,6 @@
             class="org.key_project.keyide.ui.handlers.ShowSymbolicExecutionTreeOnlyHandler"
             commandId="org.key_project.keyide.ui.commands.showSymbolicExecutionTreeOnly">
       </handler>
-      <handler
-            class="org.key_project.keyide.ui.handlers.MinimizeInteractionsHandler"
-            commandId="org.key_project.keyide.ui.commands.minimizeInteractions">
-      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -313,22 +309,6 @@
                        id="org.key_project.keyide.ui.commands.generateTestCasesCommand"
                        label="Generate test cases"
                        tooltip="Generate test cases for open goals">
-                    <visibleWhen
-                          checkEnabled="false">
-                       <with
-                             variable="activeEditorId">
-                          <equals
-                                value="org.key_project.keyide.ui.editor">
-                          </equals>
-                       </with>
-                    </visibleWhen>
-                 </command>
-                 <command
-                       commandId="org.key_project.keyide.ui.commands.minimizeInteractions"
-                       id="org.key_project.keyide.ui.commands.minimizeInteractions"
-                       label="Minimize Interactions"
-                       style="toggle"
-                       tooltip="Minimize Interactions">
                     <visibleWhen
                           checkEnabled="false">
                        <with
@@ -421,6 +401,11 @@
             class="org.key_project.keyide.ui.editor.SequentDisplaySettingsMenuFactory"
             locationURI="popup:#KeYEditorContext?before=group.undo">
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            class="org.key_project.keyide.ui.editor.RuleSettingsMenuFactory"
+            locationURI="popup:#KeYEditorContext?before=group.undo">
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -511,26 +496,6 @@
                <parameter
                      name="default"
                      value="false">
-               </parameter>
-               <parameter
-                     name="persisted"
-                     value="true">
-               </parameter>
-            </class>
-         </state>
-      </command>
-      <command
-            categoryId="org.key_project.keyide.ui.commands.category"
-            description="Minimizes the user interactions with the prover."
-            id="org.key_project.keyide.ui.commands.minimizeInteractions"
-            name="Minimize Interactions">
-         <state
-               id="org.eclipse.ui.commands.toggleState">
-            <class
-                  class="org.eclipse.ui.handlers.RegistryToggleState">
-               <parameter
-                     name="default"
-                     value="true">
                </parameter>
                <parameter
                      name="persisted"

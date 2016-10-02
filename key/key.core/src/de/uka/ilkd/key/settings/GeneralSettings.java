@@ -211,4 +211,12 @@ public class GeneralSettings implements Settings, Cloneable {
     public void addSettingsListener(SettingsListener l) {
 	listenerList.add(l);
     }
+
+    /**
+     * removes the listener from the settings object
+     * @param l the listener to remove
+     */
+    public void removeSettingsListener(SettingsListener l) {
+   listenerList.remove(l);
+    }
 }

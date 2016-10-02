@@ -86,6 +86,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
@@ -310,6 +311,16 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
          handleViewSettingsChanged(e);
       }
    };
+
+   /**
+    * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings}.
+    */
+   private final SettingsListener generalSettingsListener = new SettingsListener() {
+      @Override
+      public void settingsChanged(EventObject e) {
+         handleGeneralSettingsChanged(e);
+      }
+   };
    
    /**
     * Observes changes on the used {@link TermLabelVisibilityManager}.
@@ -468,6 +479,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       createTreeViewerContextMenu();
       createSourceViewerContextMenu();
       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addSettingsListener(viewSettingsListener);
+      ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().addSettingsListener(generalSettingsListener);
    }
 
    /**
@@ -548,6 +560,15 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
             showNode(getSelectedNode());
          }
       });
+   }
+
+   /**
+    * When the settings of {@code ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()} have changed.
+    * @param e The event.
+    */
+   protected void handleGeneralSettingsChanged(EventObject e) {
+      getProofControl().setMinimizeInteraction(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter());
+      OneStepSimplifier.refreshOSS(getCurrentProof());
    }
    
    /**
@@ -796,6 +817,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
    @Override
    public void dispose() {
       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().removeSettingsListener(viewSettingsListener);
+      ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().removeSettingsListener(generalSettingsListener);
       if (parentComposite != null) {
          parentComposite.dispose();
       }
