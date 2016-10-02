@@ -337,7 +337,7 @@ public class ProofTreeContentOutlinePage extends Page implements IContentOutline
 	 * Executes {@link #updateSelectedNode()} asynchronously and thread safe.
 	 */
 	protected void updateSelectedNodeThreadSafe() {
-		if (!getControl().getDisplay().isDisposed()) {
+		if (!getControl().isDisposed()) {
 			getControl().getDisplay().asyncExec(new Runnable() {
 				@Override
 				public void run() {
