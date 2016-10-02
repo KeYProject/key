@@ -743,6 +743,11 @@
                class="org.key_project.keyide.ui.editor.SequentDisplaySettingsMenuFactory"
                locationURI="popup:org.key_project.sed.key.ui.ProofView.popup?before=group.add">
          </menuContribution>
+         <menuContribution
+               allPopups="false"
+               class="org.key_project.keyide.ui.editor.RuleSettingsMenuFactory"
+               locationURI="popup:org.key_project.sed.key.ui.ProofView.popup?before=group.add">
+         </menuContribution>
       </extension>
       <extension
             point="org.eclipse.core.expressions.propertyTesters">

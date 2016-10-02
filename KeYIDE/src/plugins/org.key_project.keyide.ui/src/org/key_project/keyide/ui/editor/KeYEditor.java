@@ -61,7 +61,6 @@ import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
 import org.key_project.keyide.ui.handlers.BreakpointToggleHandler;
-import org.key_project.keyide.ui.handlers.MinimizeInteractionsHandler;
 import org.key_project.keyide.ui.propertyTester.AutoModePropertyTester;
 import org.key_project.keyide.ui.propertyTester.ProofPropertyTester;
 import org.key_project.keyide.ui.util.LogUtil;
@@ -101,6 +100,7 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
@@ -316,27 +316,22 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    };
 
    /**
-    * The state of the minimize interactions button.
-    */
-   private State minimizeInteractionState;
-
-   /**
-    * Listens for changes on minimizeInteractionState.
-    */
-   private final IStateListener minimizeInteractionsListener = new IStateListener() {
-      @Override
-      public void handleStateChange(State state, Object oldValue) {
-         handleMinimizeInteractionStateChanged();
-      }
-   };
-
-   /**
     * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()}.
     */
    private final SettingsListener viewSettingsListener = new SettingsListener() {
       @Override
       public void settingsChanged(EventObject e) {
          handleViewSettingsChanged(e);
+      }
+   };
+
+   /**
+    * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings}.
+    */
+   private final SettingsListener generalSettingsListener = new SettingsListener() {
+      @Override
+      public void settingsChanged(EventObject e) {
+         handleGeneralSettingsChanged(e);
       }
    };
    
@@ -364,10 +359,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    @Override
    public void dispose() {
       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().removeSettingsListener(viewSettingsListener);
-      if (minimizeInteractionState != null) {
-         minimizeInteractionState.removeListener(minimizeInteractionsListener);
-         minimizeInteractionState = null;
-      }
+      ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().removeSettingsListener(generalSettingsListener);
       if (breakpointsActivatedState != null) {
          breakpointsActivatedState.removeListener(stateListener);
          breakpointsActivatedState = null;
@@ -413,14 +405,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             breakpointsActivatedState = hideCmd.getState(RegistryToggleState.STATE_ID);
             if (breakpointsActivatedState != null) {
                breakpointsActivatedState.addListener(stateListener);
-            }
-         }
-         
-         Command minimizeInteractionsCommand = service.getCommand(MinimizeInteractionsHandler.COMMAND_ID);
-         if (minimizeInteractionsCommand != null) {
-            minimizeInteractionState = minimizeInteractionsCommand.getState(RegistryToggleState.STATE_ID);
-            if (minimizeInteractionState != null) {
-               minimizeInteractionState.addListener(minimizeInteractionsListener);
             }
          }
       }
@@ -496,7 +480,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
             ProofUserManager.getInstance().addUser(currentProof, environment, this);
             getUI().getTermLabelVisibilityManager().addTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
-            getUI().getProofControl().setMinimizeInteraction(isMinimizeInteractions());
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().addSettingsListener(generalSettingsListener);
+            getProofControl().setMinimizeInteraction(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter());
             this.currentNode = selectionModel.getSelectedNode();
             configureProofForBreakpoints();
          }
@@ -569,6 +554,15 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             viewerDecorator.showNode(currentNode, SymbolicExecutionUtil.createNotationInfo(currentProof), getTermLabelVisibilityManager());
          }
       });
+   }
+
+   /**
+    * When the settings of {@code ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()} have changed.
+    * @param e The event.
+    */
+   protected void handleGeneralSettingsChanged(EventObject e) {
+      getProofControl().setMinimizeInteraction(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter());
+      OneStepSimplifier.refreshOSS(getCurrentProof());
    }
 
    /**
@@ -775,15 +769,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    }
 
    /**
-    * Handles a change in the state of the Minimize Interactions context menu filter.
-    * @author Viktor Pfanschilling
-    */
-   protected void handleMinimizeInteractionStateChanged() {
-      boolean minimized = isMinimizeInteractions();
-      getUI().getProofControl().setMinimizeInteraction(minimized);
-   }
-
-   /**
     * When the auto mode is started.
     * @param e The {@link ProofEvent}.
     */
@@ -823,18 +808,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    public void setCurrentNode(Node currentNode) {
       this.currentNode = currentNode;
-      getUI().getProofControl().setMinimizeInteraction(isMinimizeInteractions());
       viewerDecorator.showNode(currentNode, SymbolicExecutionUtil.createNotationInfo(currentProof), getTermLabelVisibilityManager());
-   }
-
-   /**
-    * Returns whether interactions are minimized.
-    * @return whether interactions are minimized
-    */
-   public boolean isMinimizeInteractions() {
-      Object value = minimizeInteractionState.getValue();
-      boolean minimized = (value instanceof Boolean && ((Boolean) value).booleanValue());
-      return minimized;
    }
    
    /**

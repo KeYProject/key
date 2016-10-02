@@ -20,7 +20,6 @@ import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotGoalsViewPageTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEMethodStarterTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEPreferencePageTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotManualRuleApplicationTest;
-import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotMinimizeInteractionsHandlerTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotNodePropertySectionTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotProofPropertySectionTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotSequentDisplaySettingsMenuFactoryTest;
@@ -51,8 +50,7 @@ import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotTermPropertySectionT
    SWTBotProofPropertySectionTest.class,
    SWTBotSequentDisplaySettingsMenuFactoryTest.class,
    SWTBotTacletPropertySectionTest.class,
-   SWTBotTermPropertySectionTest.class,
-   SWTBotMinimizeInteractionsHandlerTest.class
+   SWTBotTermPropertySectionTest.class
 })
 public class SWTBotAllKeYIDEUITests {
 }
