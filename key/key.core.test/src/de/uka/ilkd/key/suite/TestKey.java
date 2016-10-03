@@ -26,6 +26,8 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.util.pp.TestLayouter.class,
         de.uka.ilkd.key.util.TestProofStarter.class,
         de.uka.ilkd.key.util.TestNodePreorderIterator.class,
+        de.uka.ilkd.key.util.TestSearchNodePreorderIterator.class,
+        de.uka.ilkd.key.util.TestSearchNodeReversePreorderIterator.class,
         de.uka.ilkd.key.util.TestProofUserManager.class
     }; 
 

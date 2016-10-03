@@ -50,12 +50,18 @@ public class KeYIDEColorPreferencePage extends FieldEditorPreferencePage impleme
    protected void createFieldEditors() {
       Group proofTreeGroup = new Group(getFieldEditorParent(), SWT.NONE);
       proofTreeGroup.setText("Proof Tree");
-      proofTreeGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+      gd.horizontalSpan = 2;
+      proofTreeGroup.setLayoutData(gd);
       addField(new ColorFieldEditor(KeYIDEPreferences.CLOSED_GOAL_COLOR, "Closed Goal", proofTreeGroup));
       addField(new ColorFieldEditor(KeYIDEPreferences.LINKED_GOAL_COLOR, "Linked Goal", proofTreeGroup));
       addField(new ColorFieldEditor(KeYIDEPreferences.DISABLED_GOAL_COLOR, "Disabled Goal", proofTreeGroup));
       addField(new ColorFieldEditor(KeYIDEPreferences.OPEN_GOAL_COLOR, "Open Goal", proofTreeGroup));
       addField(new ColorFieldEditor(KeYIDEPreferences.NODE_WITH_NOTES_COLOR, "Node with Notes", proofTreeGroup));
       addField(new ColorFieldEditor(KeYIDEPreferences.NODE_WITH_ACTIVE_STATEMENT_COLOR, "Node with Active Statement", proofTreeGroup));
+      Group proofTreeSearchGroup = new Group(getFieldEditorParent(), SWT.NONE);
+      proofTreeSearchGroup.setText("Proof Tree Search");
+      proofTreeSearchGroup.setLayoutData(gd);
+      addField(new ColorFieldEditor(KeYIDEPreferences.FOUND_NODE_COLOR, "Found Node", proofTreeSearchGroup));
    }
 }

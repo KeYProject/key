@@ -46,6 +46,11 @@ public class ProofTreeColorManager extends Bean implements IDisposable {
     * Property {@link #getNodeWithActiveStatementColor()}.
     */
    public static final String NODE_WITH_ACTIVE_STATEMENT_COLOR = "nodeWithActiveStatementColor";
+
+   /**
+    * Property {@link #getFoundNodeColor()}.
+    */
+   public static final String FOUND_NODE_COLOR = "foundNodeColor";
    
    /**
     * The {@link Device} to use.
@@ -91,6 +96,16 @@ public class ProofTreeColorManager extends Bean implements IDisposable {
     * The {@link Color}.
     */
    private Color nodeWithActiveStatementColor;
+
+   /**
+    * The {@link Color}.
+    */
+   private Color foundNodeColor;
+   
+   /**
+    * Optionally an {@link AbstractProofNodeSearch} to consider.
+    */
+   private AbstractProofNodeSearch search;
    
    /**
     * Constructor.
@@ -104,6 +119,7 @@ public class ProofTreeColorManager extends Bean implements IDisposable {
       this.openGoalColor = new Color(device, KeYIDEPreferences.getOpenGoalColor());
       this.nodeWithNotesColor = new Color(device, KeYIDEPreferences.getNodeWithNotesColor());
       this.nodeWithActiveStatementColor = new Color(device, KeYIDEPreferences.getNodeWithActiveStatementColor());
+      this.foundNodeColor = new Color(device, KeYIDEPreferences.getFoundNodeColor());
       KeYIDEPreferences.getStore().addPropertyChangeListener(propertyListener);
    }
 
@@ -141,6 +157,11 @@ public class ProofTreeColorManager extends Bean implements IDisposable {
          Color oldValue = this.nodeWithActiveStatementColor;
          this.nodeWithActiveStatementColor = new Color(device, KeYIDEPreferences.getNodeWithActiveStatementColor());
          firePropertyChange(NODE_WITH_ACTIVE_STATEMENT_COLOR, oldValue, this.nodeWithActiveStatementColor);
+      }
+      else if (KeYIDEPreferences.FOUND_NODE_COLOR.equals(event.getProperty())) {
+         Color oldValue = this.foundNodeColor;
+         this.foundNodeColor = new Color(device, KeYIDEPreferences.getFoundNodeColor());
+         firePropertyChange(FOUND_NODE_COLOR, oldValue, this.foundNodeColor);
       }
    }
 
@@ -193,6 +214,14 @@ public class ProofTreeColorManager extends Bean implements IDisposable {
    }
 
    /**
+    * Returns the found node {@link Color}.
+    * @return The found node {@link Color}.
+    */
+   public Color getFoundNodeColor() {
+      return foundNodeColor;
+   }
+
+   /**
     * {@inheritDoc}
     */
    @Override
@@ -225,6 +254,19 @@ public class ProofTreeColorManager extends Bean implements IDisposable {
     */
    public void colorProofTreeNode(TreeItem item, Node node) {
       if (item != null && node != null) {
+         // Background color
+         if (search != null) {
+            if (search.containsResult(node)) {
+               item.setBackground(getFoundNodeColor());
+            }
+            else {
+               item.setBackground(null);
+            }
+         }
+         else {
+            item.setBackground(null);
+         }
+         // Foreground color
          if (node.leaf()) { // "A leaf of the proof"
             Proof proof = node.proof();
             if (!proof.isDisposed()) {
@@ -260,5 +302,21 @@ public class ProofTreeColorManager extends Bean implements IDisposable {
             }
          }
       }
+   }
+
+   /**
+    * Returns the currently active search.
+    * @return The currently active search.
+    */
+   public AbstractProofNodeSearch getSearch() {
+      return search;
+   }
+
+   /**
+    * Sets the currently active search.
+    * @param search The currently active search.
+    */
+   public void setSearch(AbstractProofNodeSearch search) {
+      this.search = search;
    }
 }

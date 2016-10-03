@@ -40,5 +40,6 @@ public class KeYIDEPreferencesInitializer extends AbstractPreferenceInitializer 
       KeYIDEPreferences.setDefaultOpenGoalColor(ColorUtil.toRGB(ProofTreeView.DARK_RED_COLOR));
       KeYIDEPreferences.setDefaultNodeWithNotesColor(ColorUtil.toRGB(ProofTreeView.ORANGE_COLOR));
       KeYIDEPreferences.setDefaultNodeWithActiveStatementColor(new RGB(0, 0, 255)); // ColorUtil.toRGB(ProofTreeView.LIGHT_BLUE_COLOR)
+      KeYIDEPreferences.setDefaultFoundNodeColor(new RGB(168, 211, 255)); // Light blue
    }
 }

@@ -39,6 +39,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
@@ -63,6 +65,7 @@ import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
 import org.key_project.keyide.ui.handlers.BreakpointToggleHandler;
 import org.key_project.keyide.ui.propertyTester.AutoModePropertyTester;
 import org.key_project.keyide.ui.propertyTester.ProofPropertyTester;
+import org.key_project.keyide.ui.util.IProofNodeSearchSupport;
 import org.key_project.keyide.ui.util.LogUtil;
 import org.key_project.keyide.ui.views.GoalsPage;
 import org.key_project.keyide.ui.views.IGoalsPage;
@@ -71,6 +74,7 @@ import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
 import org.key_project.keyide.ui.views.StrategySettingsPage;
 import org.key_project.util.bean.IBean;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IOUtil;
 
@@ -114,7 +118,7 @@ import de.uka.ilkd.key.util.ProofUserManager;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan K�sdorf, Marco Drebing
  */
-public class KeYEditor extends TextEditor implements IProofProvider, ITabbedPropertySheetPageContributor, IBean, IPosInSequentProvider {
+public class KeYEditor extends TextEditor implements IProofProvider, ITabbedPropertySheetPageContributor, IBean, IPosInSequentProvider, IProofNodeSearchSupport {
    /**
     * The unique ID of this editor.
     */
@@ -877,6 +881,9 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
          });
          return pcp;
       }
+      else if (IProofNodeSearchSupport.class.equals(adapter)) {
+         return this;
+      }
       else if (IStrategySettingsPage.class.equals(adapter)) {
          return new StrategySettingsPage(this);
       }
@@ -1184,5 +1191,82 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    @Override
    public boolean hasListener(String propertyName, PropertyChangeListener listener) {
        return ArrayUtil.contains(getPropertyChangeListeners(propertyName), listener);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void openSearchPanel() {
+      IProofNodeSearchSupport outlineSupport = getOutlineProofNodeSearchSupport();
+      if (outlineSupport != null) {
+         outlineSupport.openSearchPanel();
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void closeSearchPanel() {
+      IProofNodeSearchSupport outlineSupport = getOutlineProofNodeSearchSupport();
+      if (outlineSupport != null) {
+         outlineSupport.closeSearchPanel();
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void searchText(String text) {
+      IProofNodeSearchSupport outlineSupport = getOutlineProofNodeSearchSupport();
+      if (outlineSupport != null) {
+         outlineSupport.searchText(text);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void jumpToPreviousResult() {
+      IProofNodeSearchSupport outlineSupport = getOutlineProofNodeSearchSupport();
+      if (outlineSupport != null) {
+         outlineSupport.jumpToPreviousResult();
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void jumpToNextResult() {
+      IProofNodeSearchSupport outlineSupport = getOutlineProofNodeSearchSupport();
+      if (outlineSupport != null) {
+         outlineSupport.jumpToNextResult();
+      }
+   }
+   
+   /**
+    * Returns the {@link IProofNodeSearchSupport} of the outline.
+    * @return The {@link IProofNodeSearchSupport} of the outline or {@code null} if not available.
+    */
+   protected IProofNodeSearchSupport getOutlineProofNodeSearchSupport() {
+      try {
+         IViewPart outlineView = WorkbenchUtil.openView(IPageLayout.ID_OUTLINE);
+         if (outlineView != null) {
+            outlineView.setFocus();
+            return (IProofNodeSearchSupport) outlineView.getAdapter(IProofNodeSearchSupport.class);
+         }
+         else {
+            return null;
+         }
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getSite().getShell(), e);
+         return null;
+      }
    }
 }
