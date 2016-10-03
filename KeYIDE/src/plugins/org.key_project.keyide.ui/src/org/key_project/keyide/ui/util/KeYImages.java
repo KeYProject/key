@@ -195,6 +195,21 @@ public final class KeYImages {
     * The key for the image that is used for exceptional loop body termination.
     */
    public static final String BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION_NOT_VERIFIED = "org.key_project.keyide.ui.images.blockContractExceptinalTerminationNotVerified";
+
+   /**
+    * The key for the image that is used to jump to the previous search result.
+    */
+   public static final String JUMP_TO_PREVIOUS_SEARCH_RESULT = "org.key_project.keyide.ui.images.previousSearchResult";
+
+   /**
+    * The key for the image that is used to jump to the next search result.
+    */
+   public static final String JUMP_TO_NEXT_SEARCH_RESULT = "org.key_project.keyide.ui.images.nextSearchResult";
+
+   /**
+    * The key for the image that is used to close the search result.
+    */
+   public static final String CLOSE_SEARCH = "org.key_project.keyide.ui.images.closeSearch";
    
    /**
     * Forbid instances.
@@ -330,6 +345,15 @@ public final class KeYImages {
        }
        else if (BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION_NOT_VERIFIED.equals(key)) {
           path = "icons/SEDIcons/block_contract_exceptional_termination_not_verified.gif";
+       }
+       else if (JUMP_TO_PREVIOUS_SEARCH_RESULT.equals(key)) {
+          path = "icons/previousFoundProofNode.png";
+       }
+       else if (JUMP_TO_NEXT_SEARCH_RESULT.equals(key)) {
+          path = "icons/nextFoundProofNode.png";
+       }
+       else if (CLOSE_SEARCH.equals(key)) {
+          path = "icons/close_view.gif";
        }
        // Load image if possible
        if (path != null) {

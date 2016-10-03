@@ -78,6 +78,12 @@
             id="org.key_project.keyide.ui.commands.counterexample"
             name="Counterexample">
       </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Search a node in the proof tree according to a given text."
+            id="org.key_project.keyide.ui.commands.searchProofNode"
+            name="Search Proof Node">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
@@ -108,6 +114,10 @@
       <image
             commandId="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand"
             icon="icons/stopAtBreakpoints.gif">
+      </image>
+      <image
+            commandId="org.key_project.keyide.ui.commands.searchProofNode"
+            icon="icons/findProofTreeNode.png">
       </image>
    </extension>
    <extension
@@ -245,6 +255,19 @@
       <handler
             class="org.key_project.keyide.ui.handlers.ShowSymbolicExecutionTreeOnlyHandler"
             commandId="org.key_project.keyide.ui.commands.showSymbolicExecutionTreeOnly">
+      </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.SearchProofNodeHandler"
+            commandId="org.key_project.keyide.ui.commands.searchProofNode">
+         <enabledWhen>
+            <with
+                  variable="activePart">
+               <test
+                     forcePluginActivation="true"
+                     property="org.key_project.keyide.ui.supportsProofNodeSearch">
+               </test>
+            </with>
+         </enabledWhen>
       </handler>
    </extension>
    <extension
@@ -389,6 +412,12 @@
                commandId="org.key_project.keyide.ui.commands.showSymbolicExecutionTreeOnly"
                label="Show Symbolic Execution Tree Only"
                style="toggle">
+         </command>
+         <command
+               commandId="org.key_project.keyide.ui.commands.searchProofNode"
+               icon="icons/findProofTreeNode.png"
+               label="Search Proof Node"
+               style="push">
          </command>
       </menuContribution>
       <menuContribution
@@ -629,6 +658,13 @@
             properties="isGoal"
             type="org.eclipse.jface.viewers.IStructuredSelection">
       </propertyTester>
+      <propertyTester
+            class="org.key_project.keyide.ui.propertyTester.ProofNodeSearchSupportTester"
+            id="org.key_project.keyide.ui.propertyTester.ProofNodeSearchSupportTester"
+            namespace="org.key_project.keyide.ui"
+            properties="supportsProofNodeSearch"
+            type="org.eclipse.ui.IWorkbenchPart">
+      </propertyTester>
    </extension>
       <extension
             point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
@@ -697,6 +733,15 @@
                   tab="org.key_project.keyide.ui.tacletPropertyTab">
             </propertySection>
          </propertySections>
+      </extension>
+      <extension
+            point="org.eclipse.ui.bindings">
+         <key
+               commandId="org.key_project.keyide.ui.commands.searchProofNode"
+               contextId="org.eclipse.ui.contexts.window"
+               schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+               sequence="M1+M2+F">
+         </key>
       </extension>
 
 </plugin>

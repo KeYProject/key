@@ -68,6 +68,11 @@ public class KeYIDEPreferences {
    public static final String NODE_WITH_ACTIVE_STATEMENT_COLOR = "org.key_project.keyide.ui.color.nodeWithActiveStatement";
 
    /**
+    * Preference key for the color of a {@link Node} which is part of the search result.
+    */
+   public static final String FOUND_NODE_COLOR = "org.key_project.keyide.ui.color.foundNodeColor";
+
+   /**
     * Returns the managed {@link IPreferenceStore}.
     * @return The managed {@link IPreferenceStore}.
     */
@@ -297,5 +302,37 @@ public class KeYIDEPreferences {
     */
    public static void setDefaultNodeWithActiveStatementColor(RGB defaultValue) {
       PreferenceConverter.setDefault(getStore(), NODE_WITH_ACTIVE_STATEMENT_COLOR, defaultValue);
+   }
+   
+   /**
+    * Returns the current value.
+    * @return The current value.
+    */
+   public static RGB getFoundNodeColor() {
+      return PreferenceConverter.getColor(getStore(), FOUND_NODE_COLOR);
+   }
+   
+   /**
+    * Returns the default value.
+    * @return The default value.
+    */
+   public static RGB getDefaultFoundNodeColor() {
+      return PreferenceConverter.getDefaultColor(getStore(), FOUND_NODE_COLOR);
+   }
+   
+   /**
+    * Sets the current value.
+    * @param value The new value to set.
+    */
+   public static void setFoundNodeColor(RGB value) {
+      PreferenceConverter.setValue(getStore(), FOUND_NODE_COLOR, value);
+   }
+   
+   /**
+    * Returns the current value.
+    * @return The current value.
+    */
+   public static void setDefaultFoundNodeColor(RGB defaultValue) {
+      PreferenceConverter.setDefault(getStore(), FOUND_NODE_COLOR, defaultValue);
    }
 }

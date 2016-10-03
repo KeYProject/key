@@ -27,11 +27,14 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
@@ -43,17 +46,25 @@ import org.eclipse.ui.part.IPageSite;
 import org.eclipse.ui.part.Page;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
+import org.key_project.keyide.ui.composite.SearchComposite;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.handlers.HideIntermediateProofstepsHandler;
 import org.key_project.keyide.ui.handlers.ShowSymbolicExecutionTreeOnlyHandler;
 import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
+import org.key_project.keyide.ui.util.AbstractProofNodeSearch;
+import org.key_project.keyide.ui.util.AbstractProofNodeSearch.ISearchCallback;
+import org.key_project.keyide.ui.util.IProofNodeSearchSupport;
+import org.key_project.keyide.ui.util.ProofNodeTextSearch;
 import org.key_project.keyide.ui.util.ProofTreeColorManager;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.viewer.ObservableTreeViewer;
 import org.key_project.util.eclipse.swt.viewer.event.IViewerUpdateListener;
 import org.key_project.util.eclipse.swt.viewer.event.ViewerUpdateEvent;
+import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -68,9 +79,9 @@ import de.uka.ilkd.key.proof.ProofEvent;
 /**
  * A class to display the correct Outline for the current {@link Proof}
  * 
- * @author Christoph Schneider, Niklas Bunzel, Stefan Kï¿½sdorf, Marco Drebing
+ * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
-public class ProofTreeContentOutlinePage extends Page implements IContentOutlinePage, ISelectionChangedListener, ITabbedPropertySheetPageContributor {
+public class ProofTreeContentOutlinePage extends Page implements IContentOutlinePage, ISelectionChangedListener, ITabbedPropertySheetPageContributor, IProofNodeSearchSupport {
    /**
     * The registered {@link ISelectionChangedListener}.
     */
@@ -90,6 +101,11 @@ public class ProofTreeContentOutlinePage extends Page implements IContentOutline
 	private ProofTreeLabelProvider labelProvider;
 
 	private final KeYSelectionModel selectionModel;
+	
+	/**
+	 * The root {@link Composite} which contains all visible child composites.
+	 */
+	private Composite root;
 	
 	/**
 	 * The {@link State} which indicates hiding or showing of intermediate proofsteps.
@@ -159,6 +175,16 @@ public class ProofTreeContentOutlinePage extends Page implements IContentOutline
 	private ObservableTreeViewer treeViewer;
 	
 	/**
+	 * The used {@link SearchComposite}.
+	 */
+	private SearchComposite searchComposite;
+	
+	/**
+	 * A search for proof nodes.
+	 */
+	private ProofNodeTextSearch searchJob;
+	
+	/**
 	 * Constructor.
 	 * @param proof The {@link Proof} for this Outline.
 	 */
@@ -225,6 +251,7 @@ public class ProofTreeContentOutlinePage extends Page implements IContentOutline
 	 */
 	@Override
 	public void dispose() {
+      disposeSearch();
 		selectionModel.removeKeYSelectionListener(listener);
 		environment.getProofControl().removeAutoModeListener(autoModeListener);
 		if (contentProvider != null) {
@@ -259,8 +286,21 @@ public class ProofTreeContentOutlinePage extends Page implements IContentOutline
             handleProofTreeColorChanged();
          }
       });
+      // Root composite
+      GridLayout rootLayout = new GridLayout(1, false);
+      rootLayout.horizontalSpacing = 0;
+      rootLayout.marginBottom = 0;
+      rootLayout.marginHeight = 0;
+      rootLayout.marginLeft = 0;
+      rootLayout.marginRight = 0;
+      rootLayout.marginTop = 0;
+      rootLayout.marginWidth = 0;
+      rootLayout.verticalSpacing = 0;
+      root = new Composite(parent, SWT.NONE);
+      root.setLayout(rootLayout);
 		// Create TreeViewer
-	   treeViewer = new ObservableTreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
+	   treeViewer = new ObservableTreeViewer(root, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
+	   treeViewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
 	   treeViewer.addSelectionChangedListener(this);
 		treeViewer.setUseHashlookup(true);
 		treeViewer.addViewerUpdateListener(new IViewerUpdateListener() {
@@ -560,9 +600,7 @@ public class ProofTreeContentOutlinePage extends Page implements IContentOutline
     */
    @Override
    public Control getControl() {
-      return treeViewer != null ? 
-             treeViewer.getControl() : 
-             null;
+      return root;
    }
 
    /**
@@ -572,6 +610,154 @@ public class ProofTreeContentOutlinePage extends Page implements IContentOutline
    public void setFocus() {
       if (treeViewer != null) {
          treeViewer.getControl().setFocus();
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void openSearchPanel() {
+      if (searchComposite == null || searchComposite.isDisposed()) {
+         searchComposite = new SearchComposite(root, SWT.NONE, this);
+         updateEmptySearchResult();
+         searchComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+         root.layout();
+      }
+      searchComposite.setFocus();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void closeSearchPanel() {
+      disposeSearch();
+      if (searchComposite != null) {
+         searchComposite.dispose();
+         searchComposite = null;
+      }
+      root.layout();
+      treeViewer.refresh();
+   }
+
+   /**
+    * Disposes the current search.
+    */
+   protected void disposeSearch() {
+      if (searchJob != null) {
+         searchJob.cancel();
+         searchJob.dispose();
+         searchJob = null;
+         proofTreeColorManager.setSearch(null);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void searchText(String text) {
+      disposeSearch();
+      if (!StringUtil.isEmpty(text)) {
+         ISearchCallback callback = new ISearchCallback() {
+            @Override
+            public void searchCompleted(AbstractProofNodeSearch search) {
+               if (search.isSearchComplete()) {
+                  proofTreeColorManager.setSearch(searchJob);
+               }
+               else {
+                  proofTreeColorManager.setSearch(null);
+               }
+               refreshTreeViewerAndUpdateSearchResultThreadSave();
+            }
+         };
+         searchJob = new ProofNodeTextSearch(callback, this, labelProvider, proof, text);
+         searchJob.schedule();
+      }
+      else {
+         treeViewer.refresh();
+         updateEmptySearchResult();
+      }
+   }
+
+   /**
+    * Refreshes {@link #treeViewer} and calls {@link #updateEmptySearchResult()} thread save.
+    */
+   protected void refreshTreeViewerAndUpdateSearchResultThreadSave() {
+      treeViewer.getTree().getDisplay().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            if (!treeViewer.getTree().isDisposed()) {
+               updateEmptySearchResult();
+               treeViewer.refresh();
+            }
+         }
+      });
+   }
+
+   /**
+    * Updates the empty search flag of {@link #searchComposite}.
+    */
+   protected void updateEmptySearchResult() {
+      searchComposite.setEmptySearchResult(searchJob == null || searchJob.isResultEmpty() || !searchJob.isSearchComplete());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void jumpToPreviousResult() {
+      if (searchJob != null) {
+         Node previous = searchJob.getPreviousResult(getSelectedNodeThreadSave());
+         if (previous != null) {
+            setSelectionThreadSave(SWTUtil.createSelection(previous));
+         }
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void jumpToNextResult() {
+      if (searchJob != null) {
+         Node next = searchJob.getNextResult(getSelectedNodeThreadSave());
+         if (next != null) {
+            setSelectionThreadSave(SWTUtil.createSelection(next));
+         }
+      }
+   }
+   
+   /**
+    * Calls {@link #getSelectedNode()} thread save.
+    * @return The currently selected {@link Node} or {@code null} if not available.
+    */
+   protected Node getSelectedNodeThreadSave() {
+      IRunnableWithResult<Node> run = new AbstractRunnableWithResult<Node>() {
+         @Override
+         public void run() {
+            setResult(getSelectedNode());
+         }
+      };
+      treeViewer.getTree().getDisplay().syncExec(run);
+      return run.getResult();
+   }
+
+   /**
+    * Calls {@link #setSelection(ISelection)} thread save.
+    * @param selection The {@link ISelection} to set.
+    */
+   protected void setSelectionThreadSave(final IStructuredSelection selection) {
+      if (!treeViewer.getTree().isDisposed()) {
+         treeViewer.getTree().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               if (!treeViewer.getTree().isDisposed()) {
+                  setSelection(selection);
+               }
+            }
+         });
       }
    }
 }

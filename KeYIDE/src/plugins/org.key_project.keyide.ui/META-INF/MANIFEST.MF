@@ -27,7 +27,8 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: KeY Project
-Export-Package: org.key_project.keyide.ui.editor,
+Export-Package: org.key_project.keyide.ui.composite,
+ org.key_project.keyide.ui.editor,
  org.key_project.keyide.ui.editor.input,
  org.key_project.keyide.ui.handlers,
  org.key_project.keyide.ui.job,
