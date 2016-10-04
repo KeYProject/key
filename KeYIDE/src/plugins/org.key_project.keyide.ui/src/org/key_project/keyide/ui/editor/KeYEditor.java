@@ -898,14 +898,32 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       }
       else if (IProofProvider.class.equals(adapter)) {
          return this;
-      } else if (KeYBreakpointManager.class.equals(adapter)){
+      }
+      else if (KeYBreakpointManager.class.equals(adapter)){
          return getBreakpointManager();
-      } else if (IGoalsPage.class.equals(adapter)) {
+      }
+      else if (IGoalsPage.class.equals(adapter)) {
          return new GoalsPage(getCurrentProof(), getEnvironment(), selectionModel);
       }
       else {
          return super.getAdapter(adapter);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isEditorInputModifiable() {
+      return false; // Text editor is read-only. This disables the replace functionality of the search and replace dialog.
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isEditorInputReadOnly() {
+      return true; // Opposite of isEditorInputModifiable()
    }
 
    /**
