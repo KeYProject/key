@@ -37,7 +37,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -51,24 +50,16 @@ import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorato
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
+import org.key_project.keyide.ui.composite.ProofTreeComposite;
 import org.key_project.keyide.ui.editor.IPosInSequentProvider;
 import org.key_project.keyide.ui.editor.KeYEditor;
-import org.key_project.keyide.ui.handlers.HideIntermediateProofstepsHandler;
-import org.key_project.keyide.ui.handlers.ShowSymbolicExecutionTreeOnlyHandler;
-import org.key_project.keyide.ui.providers.BranchFolder;
-import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
-import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
-import org.key_project.keyide.ui.util.ProofTreeColorManager;
-import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
+import org.key_project.keyide.ui.util.IProofNodeSearchSupport;
 import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.ui.ShowSubtreeOfNodeHandler;
 import org.key_project.sed.key.ui.propertyTester.AutoModePropertyTesterSED;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
-import org.key_project.util.eclipse.swt.viewer.ObservableTreeViewer;
-import org.key_project.util.eclipse.swt.viewer.event.IViewerUpdateListener;
-import org.key_project.util.eclipse.swt.viewer.event.ViewerUpdateEvent;
 import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -96,7 +87,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The view based on the {@link IDebugView} which shows the {@link Proof}.
  * @author Seena Vellaramkalayil
  */
-public class ProofView extends AbstractViewBasedView implements IProofProvider, ITabbedPropertySheetPageContributor, IPosInSequentProvider {   
+public class ProofView extends AbstractViewBasedView implements IProofProvider, ITabbedPropertySheetPageContributor, IPosInSequentProvider, IProofNodeSearchSupport {   
    /**
     * the unique id of this view.
     */
@@ -116,16 +107,11 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     * the {@link SashForm} to divide {@link TreeViewer} and {@link SourceViewer}.
     */
    private SashForm parentComposite;
-
-   /**
-    * The used {@link ProofTreeColorManager}.
-    */
-   private ProofTreeColorManager proofTreeColorManager;
    
    /**
-    * The {@link ObservableTreeViewer} of this view which shows the proof tree.
+    * The {@link ProofTreeComposite} which shows the proof tree.
     */
-   private ObservableTreeViewer treeViewer;
+   private ProofTreeComposite proofTreeComposite;
 
    /**
     * the {@link SourceViewer} of this view.
@@ -162,16 +148,6 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
    };
 
    /**
-    * the {@link LazyProofTreeContentProvider} of the treeViewer.
-    */
-   private LazyProofTreeContentProvider contentProvider;
-
-   /**
-    * the {@link ProofTreeLabelProvider} of the treeViewer.
-    */
-   private ProofTreeLabelProvider labelProvider;
-
-   /**
     * The {@link KeYDebugTarget} which offers the currently shown {@link Proof}.
     */
    private KeYDebugTarget keyDebugTarget;
@@ -190,16 +166,6 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     * the currently loaded {@link IProject}.
     */
    private IProject currentProject;
-   
-   /**
-	 * The {@link State} which indicates hiding or showing of intermediate proof steps.
-	 */
-	private State hideState;
-	
-	/**
-	 * the {@link State} for the show symbolic execution tree only outline filter.
-	 */
-	private State symbolicState;
 	
 	/**
 	 * the {@link State} for showing the subtree of a node.
@@ -245,31 +211,6 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
          }
       }
    };
-   
-   /**
-	 * The {@link IStateListener} to sync the hide intermediate proof steps toggleState with the outline page.
-	 */
-	private final IStateListener hideStateListener = new IStateListener() {
-		@Override
-		public void handleStateChange(State state, Object oldValue) {
-		   contentProvider.setHideState((boolean) state.getValue());
-			handleHideSymbolicStateChanged(state, oldValue);
-		}
-	};
-	
-	/**
-	 * the {@link IStateListener} to sync the show symbolic execution tree only toggleState with the outline page.
-	 */
-	private final IStateListener symbolicStateListener = new IStateListener() {
-	   /**
-	    * {@inheritDoc}
-	    */
-      @Override
-      public void handleStateChange(State state, Object oldValue) {
-         contentProvider.setSymbolicState((boolean) state.getValue());
-         handleHideSymbolicStateChanged(state, oldValue);
-      }
-	};
 	
 	/**
 	 * the {@link IStateListener} to listen to changes on the subtreeState.
@@ -293,7 +234,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
 		 */
 		@Override
 		public void ruleApplied(final ProofEvent e) {
-	      treeViewer.getControl().getDisplay().syncExec(new Runnable() {
+	      getSite().getShell().getDisplay().syncExec(new Runnable() {
             @Override
             public void run() {
                handleRuleApplied(e);
@@ -338,20 +279,6 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
 	public ProofView() {
       ICommandService service = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
       if (service != null) {
-         Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
-         if (hideCmd != null) {
-            hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
-            if (hideState != null) {
-               hideState.addListener(hideStateListener);
-            }
-         }
-         Command symbolicCmd = service.getCommand(ShowSymbolicExecutionTreeOnlyHandler.COMMAND_ID);
-         if (symbolicCmd != null) {
-            symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
-            if (symbolicState != null) {
-               symbolicState.addListener(symbolicStateListener);
-            }
-         }
          Command subtreeCmd = service.getCommand(ShowSubtreeOfNodeHandler.COMMAND_ID);
          if (subtreeCmd != null) {
             subtreeState = subtreeCmd.getState(RegistryToggleState.STATE_ID);
@@ -367,29 +294,16 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
 	 * @param e the {@link ProofEvent} to handle
 	 */
 	protected void handleRuleApplied(ProofEvent e) {
-	   Node selectedNode = getSelectedNode();
+	   Node selectedNode = proofTreeComposite.getSelectedNode();
 	   if (selectedNode != null) {
 	      Node newNode = selectedNode;
 	      while (!newNode.leaf()) {
 	         newNode = newNode.child(0);
 	      }
 	      if (selectedNode != newNode) {
-	         selectNodeThreadSafe(newNode);
+	         proofTreeComposite.selectNodeThreadSafe(newNode);
 	      }
 	   }
-	}
-	
-	/**
-	 * Handles a change in the state of the hideIntermediateProofsteps and showSymbolicExecutionNodes filter.
-	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
-	 * @param oldValue The old value; may be anything.
-	 */
-	protected void handleHideSymbolicStateChanged(State state, Object oldValue) {
-		Node currentSelection = getSelectedNode();
-		treeViewer.setInput(proof);
-		if (currentSelection != null) {
-		   selectNodeThreadSafe(currentSelection);
-		}
 	}
 	
 	/**
@@ -405,17 +319,12 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     * @param keepSelection {@code true} keep selection, {@code false} do not keep selection
     */
    protected void showSubtree(boolean keepSelection) {
-      if (proof != null && treeViewer != null) {
-         Node currentSelection = getSelectedNode();
+      if (proofTreeComposite != null) {
          if (baseViewNode != null && (boolean) subtreeState.getValue()) {
-            contentProvider.setShowSubtreeState(true, baseViewNode.getExecutionNode().getProofNode());
+            proofTreeComposite.showSubtree(keepSelection, true, baseViewNode.getExecutionNode().getProofNode());
          }
          else {
-            contentProvider.setShowSubtreeState(false, proof.root());
-         }
-         treeViewer.setInput(proof);
-         if (currentSelection != null && keepSelection) {
-            selectNodeThreadSafe(currentSelection);
+            proofTreeComposite.showSubtree(keepSelection, false, null);
          }
       }
    }
@@ -426,27 +335,9 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
    @Override
    public void createPartControl(Composite parent) {
       parentComposite = new SashForm(parent, SWT.HORIZONTAL);
-      proofTreeColorManager = new ProofTreeColorManager(parent.getDisplay());
-      proofTreeColorManager.addPropertyChangeListener(new PropertyChangeListener() {
-         @Override
-         public void propertyChange(PropertyChangeEvent evt) {
-            handleProofTreeColorChanged();
-         }
-      });
-      //create tree viewer
-      this.treeViewer = new ObservableTreeViewer(parentComposite, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL | SWT.BORDER);
-      treeViewer.setUseHashlookup(true);
-      treeViewer.addViewerUpdateListener(new IViewerUpdateListener() {
-         @Override
-         public void itemUpdated(ViewerUpdateEvent e) {
-            handleItemUpdated(e);
-         }
-      });
-      this.contentProvider = new LazyProofTreeContentProvider(environment != null ? environment.getProofControl() : null);
-      contentProvider.setHideState((boolean) hideState.getValue());
-      contentProvider.setSymbolicState((boolean) symbolicState.getValue());
-      treeViewer.setContentProvider(contentProvider);
-      treeViewer.addSelectionChangedListener(treeViewerSelectionListener);
+      // Proof tree composite
+      proofTreeComposite = new ProofTreeComposite(parentComposite, SWT.NONE, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL | SWT.BORDER, proof, environment);
+      proofTreeComposite.getTreeViewer().addSelectionChangedListener(treeViewerSelectionListener);
       //create source viewer
       this.sourceViewer = new SourceViewer(parentComposite, null, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
       sourceViewer.setEditable(false);
@@ -470,7 +361,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
             handleViewerDecoratorSelectedPosInSequentChanged(evt);
          }
       });
-      getSite().setSelectionProvider(treeViewer);
+      getSite().setSelectionProvider(proofTreeComposite.getTreeViewer());
       //update viewers if debugView is already open
       updateViewer();
       if ((boolean) subtreeState.getValue()) {
@@ -480,27 +371,6 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       createSourceViewerContextMenu();
       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addSettingsListener(viewSettingsListener);
       ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().addSettingsListener(generalSettingsListener);
-   }
-
-   /**
-    * When a color of the proof tree has changed.
-    */
-   protected void handleProofTreeColorChanged() {
-      treeViewer.refresh();
-   }
-
-   /**
-    * When a tree viewer item was updated.
-    * @param e The event.
-    */
-   protected void handleItemUpdated(ViewerUpdateEvent e) {
-      TreeItem item = (TreeItem) e.getItem();
-      if (item != null) {
-         Object data = e.getElement();
-         if (data instanceof Node) {
-            proofTreeColorManager.colorProofTreeNode(item, (Node) data);
-         }
-      }
    }
    
    /**
@@ -516,9 +386,9 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     */
    protected void createTreeViewerContextMenu() {
       MenuManager menuManager = new MenuManager("Outline popup", "org.key_project.keyide.ui.view.outline.popup");
-      Menu menu = menuManager.createContextMenu(treeViewer.getControl());
-      treeViewer.getControl().setMenu(menu);
-      getSite().registerContextMenu("org.key_project.keyide.ui.view.outline.popup", menuManager, treeViewer);
+      Menu menu = menuManager.createContextMenu(proofTreeComposite.getTreeViewer().getControl());
+      proofTreeComposite.getTreeViewer().getControl().setMenu(menu);
+      getSite().registerContextMenu("org.key_project.keyide.ui.view.outline.popup", menuManager, proofTreeComposite.getTreeViewer());
    }
    
    /**
@@ -557,7 +427,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       getSite().getShell().getDisplay().syncExec(new Runnable() {
          @Override
          public void run() {
-            showNode(getSelectedNode());
+            showNode(proofTreeComposite.getSelectedNode());
          }
       });
    }
@@ -583,13 +453,16 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
             @Override
             public void run() {
                if (!pcp.getControl().isDisposed()) {
-                  pcp.selectionChanged(ProofView.this, treeViewer.getSelection());
+                  pcp.selectionChanged(ProofView.this, proofTreeComposite.getTreeViewer().getSelection());
                }
             }
          });
          return pcp;
       }
       else if (IProofProvider.class.equals(adapter)) {
+         return this;
+      }
+      else if (IProofNodeSearchSupport.class.equals(adapter)) {
          return this;
       }
       else {
@@ -602,7 +475,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     * @param event The selection changed event.
     */
    protected void handleTreeViewerSelectionChanged(SelectionChangedEvent event) {
-      Node node = getNode(event.getSelection());
+      Node node = ProofTreeComposite.getSelectedNode(event.getSelection());
       showNode(node);
    }
    
@@ -624,8 +497,8 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     * @param e The {@link ProofDisposedEvent}.
     */
    protected void handleProofDisposed(ProofDisposedEvent e) {
-      if (treeViewer != null && !treeViewer.getControl().isDisposed()) {
-         treeViewer.getControl().getDisplay().syncExec(new Runnable() {
+      if (proofTreeComposite != null && !proofTreeComposite.isDisposed()) {
+         proofTreeComposite.getDisplay().syncExec(new Runnable() {
             @Override
             public void run() {
                changeProof(keyDebugTarget, null, null, null, baseViewNode);
@@ -708,17 +581,17 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
          // Add listener to new proof
          proof = newProof;
          environment = newEnvironment;
-         if (contentProvider != null) { // Might be null when view is opened and a proof is already defined.
-            contentProvider.setProofControl(environment != null ? environment.getProofControl() : null);
+         if (proofTreeComposite != null) { // Might be null when view is opened and a proof is already defined.
+            proofTreeComposite.changeProof(newProof, newEnvironment);
          }
          if (environment != null) {
             environment.getUi().getTermLabelVisibilityManager().addTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
             environment.getProofControl().addAutoModeListener(autoModeListener);
-            environment.getProofControl().setMinimizeInteraction(true);
+            environment.getProofControl().setMinimizeInteraction(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter());
          }
          if (proof != null && !proof.isDisposed()) {
-            if (contentProvider != null) { // Might be null when view is opened and a proof is already defined.
-               contentProvider.setShowSubtreeState(false, proof.root());
+            if (proofTreeComposite != null) { // Might be null when view is opened and a proof is already defined.
+               proofTreeComposite.showSubtree(false, false, proof.root());
             }
             proof.addProofDisposedListener(proofDisposedListener);
             proof.addRuleAppListener(ruleAppListener);
@@ -729,7 +602,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
          else {
             this.currentProject = null;
          }
-         if (treeViewer != null && sourceViewer != null) {
+         if (proofTreeComposite != null && sourceViewer != null) {
             updateViewer();
          }
          fireCurrentProofsChanged(new ProofProviderEvent(this, getCurrentProofs(), getCurrentProof(), getUI(), getEnvironment()));
@@ -741,9 +614,9 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
             showSubtree(false);
          }
          if (seNode != null) {
-            if (treeViewer != null && sourceViewer!= null) {
+            if (proofTreeComposite != null) {
                Node keyNode = seNode.getExecutionNode().getProofNode();
-               selectNodeThreadSafe(keyNode);
+               proofTreeComposite.selectNodeThreadSafe(keyNode);
             }
          }
       }
@@ -754,27 +627,17 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     * and creates context menus. Selection is set to root.
     */
    protected void updateViewer() {
-      Assert.isNotNull(treeViewer);
+      Assert.isNotNull(proofTreeComposite);
       Assert.isNotNull(sourceViewer);
       Assert.isNotNull(sourceViewerDecorator);
       if (proof != null) {
-         treeViewer.setInput(proof);
-         if (labelProvider != null) {
-            labelProvider.dispose();
-         }
-         labelProvider = new ProofTreeLabelProvider(treeViewer, environment.getProofControl(), proof);
-         treeViewer.setLabelProvider(labelProvider);
-         contentProvider.injectTopLevelElements();
          //set default selection to root
          if (baseViewNode != null && (boolean) subtreeState.getValue()) {
-            selectNodeThreadSafe(baseViewNode.getExecutionNode().getProofNode());
+            proofTreeComposite.selectNodeThreadSafe(baseViewNode.getExecutionNode().getProofNode());
          }
          else {
-            selectNodeThreadSafe(proof.root());
+            proofTreeComposite.selectNodeThreadSafe(proof.root());
          }
-      }
-      else {
-         treeViewer.setInput(null);
       }
       sourceViewer.getTextWidget().layout();
    }
@@ -806,6 +669,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     */
    @Override
    public void setFocus() {
+      TreeViewer treeViewer = proofTreeComposite.getTreeViewer();
       if (treeViewer != null && !treeViewer.getControl().isDisposed()) {
          treeViewer.getControl().setFocus();
       }
@@ -821,15 +685,8 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       if (parentComposite != null) {
          parentComposite.dispose();
       }
-      if (treeViewer != null) {
-         treeViewer.removeSelectionChangedListener(treeViewerSelectionListener);
-         treeViewer.getControl().dispose();
-      }
-      if (labelProvider != null) {
-         labelProvider.dispose();
-      }
-      if (contentProvider != null) {
-         contentProvider.dispose();
+      if (proofTreeComposite != null) {
+         proofTreeComposite.dispose();
       }
       if (sourceViewer != null) {
          sourceViewer.getControl().dispose();
@@ -845,17 +702,8 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
          proof.removeProofDisposedListener(proofDisposedListener);
          proof.removeRuleAppListener(ruleAppListener);
       }
-      if (hideState != null) {
-    	  hideState.removeListener(hideStateListener);
-      }
-      if (symbolicState != null) {
-    	  symbolicState.removeListener(symbolicStateListener);
-      }
       if (subtreeState != null) {
          subtreeState.removeListener(subtreeStateListener);
-      }
-      if (proofTreeColorManager != null) {
-         proofTreeColorManager.dispose();
       }
       super.dispose();
    }
@@ -916,57 +764,6 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
          ISelectionProvider selectionProvider = baseView.getSite().getSelectionProvider();
          selectionProvider.addSelectionChangedListener(baseViewListener);
          handleBaseViewSelectionChanged(selectionProvider.getSelection());
-      }
-   }
-   
-   /**
-    * method to select a node thread safe.
-    * @param node the {@link Node} to select
-    */
-   protected void selectNodeThreadSafe(final Node node) {
-      if (!treeViewer.getControl().getDisplay().isDisposed()) {
-         treeViewer.getControl().getDisplay().syncExec(new Runnable() {
-            @Override
-            public void run() {
-               if (!treeViewer.getControl().isDisposed()) {
-                  selectNode(node);
-               }
-            }
-         });
-      }
-   }
-   
-	/**
-	 * Selects a given {@link Node}. 
-	 * @param node the {@link Node} to select
-	 */
-   public void selectNode(Node node) {
-      ProofTreeContentOutlinePage.makeSureElementIsLoaded(node, treeViewer, contentProvider);
-      treeViewer.setSelection(SWTUtil.createSelection(node), true);
-   }
-   
-   /**
-    * Returns the currently selected node.
-    * @return {@link Node} that is selected on the treeViewer
-    */
-   public Node getSelectedNode() {
-      return treeViewer != null ? getNode(treeViewer.getSelection()) : null;
-   }
-   
-   /**
-    * Returns the currently selected node.
-    * @return {@link Node} that is selected on the treeViewer
-    */
-   public Node getNode(ISelection selection) {
-      Object selectedObj = SWTUtil.getFirstElement(selection);
-      if (selectedObj instanceof Node) {
-         return (Node) selectedObj;
-      }
-      else if (selectedObj instanceof BranchFolder) {
-         return ((BranchFolder) selectedObj).getChild();
-      }
-      else {
-         return null;
       }
    }
    
@@ -1152,5 +949,61 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
    public TermLabelVisibilityManager getTermLabelVisibilityManager() {
       UserInterfaceControl ui = getUI();
       return ui != null ? ui.getTermLabelVisibilityManager() : null; 
+   }
+
+   /**
+    * Returns the currently selected {@link Node}.
+    * @return The currently selected {@link Node}.
+    */
+   public Node getSelectedNode() {
+      return proofTreeComposite.getSelectedNode();
+   }
+
+   /**
+    * Selects a given {@link Node}. 
+    * @param node the {@link Node} to select
+    */
+   public void selectNode(Node node) {
+      proofTreeComposite.selectNode(node);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void openSearchPanel() {
+      proofTreeComposite.openSearchPanel();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void closeSearchPanel() {
+      proofTreeComposite.closeSearchPanel();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void searchText(String text) {
+      proofTreeComposite.searchText(text);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void jumpToPreviousResult() {
+      proofTreeComposite.jumpToPreviousResult();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void jumpToNextResult() {
+      proofTreeComposite.jumpToNextResult();
    }
 }
