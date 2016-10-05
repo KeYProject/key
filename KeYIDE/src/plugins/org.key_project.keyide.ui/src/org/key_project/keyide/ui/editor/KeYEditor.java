@@ -13,9 +13,6 @@
 
 package org.key_project.keyide.ui.editor;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.EventObject;
 import java.util.LinkedList;
@@ -45,13 +42,9 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.dialogs.SaveAsDialog;
-import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.handlers.RegistryToggleState;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
-import org.eclipse.ui.views.properties.IPropertySheetPage;
-import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
-import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.key_project.key4eclipse.common.ui.breakpoints.KeYBreakpointManager;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
 import org.key_project.key4eclipse.common.ui.util.EclipseUserInterfaceCustomization;
@@ -72,10 +65,8 @@ import org.key_project.keyide.ui.views.IGoalsPage;
 import org.key_project.keyide.ui.views.IStrategySettingsPage;
 import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
 import org.key_project.keyide.ui.views.StrategySettingsPage;
-import org.key_project.util.bean.IBean;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -83,14 +74,10 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
-import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.KeYSelectionModel;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -116,18 +103,13 @@ import de.uka.ilkd.key.util.ProofUserManager;
 /**
  * This class represents the Editor for viewing KeY-Proofs
  * 
- * @author Christoph Schneider, Niklas Bunzel, Stefan Kï¿½sdorf, Marco Drebing
+ * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
-public class KeYEditor extends TextEditor implements IProofProvider, ITabbedPropertySheetPageContributor, IBean, IPosInSequentProvider, IProofNodeSearchSupport {
+public class KeYEditor extends SequentEditor implements IProofProvider, IProofNodeSearchSupport {
    /**
     * The unique ID of this editor.
     */
    public static final String EDITOR_ID = "org.key_project.keyide.ui.editor";
-
-   /**
-    * The ID of this {@link ITabbedPropertySheetPageContributor}.
-    */
-   public static final String CONTRIBUTOR_ID = "org.key_project.keyide.ui.KeYPropertyContributor";
 
    /**
     * {@code true} can start auto mode, {@code false} is not allowed to start auto mode.
@@ -168,11 +150,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * The currently shown {@link Node}.
     */
    private Node currentNode; 
-   
-   /**
-    * The used {@link ProofSourceViewerDecorator}.
-    */
-   private ProofSourceViewerDecorator viewerDecorator;
 
    /**
     * The provided {@link ProofTreeContentOutlinePage}.
@@ -293,11 +270,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    };
    
    /**
-    * The used {@link PropertyChangeSupport}.
-    */
-   private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-   
-   /**
     * Manages the available breakpoints.
     */
    private KeYBreakpointManager breakpointManager;
@@ -312,20 +284,10 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    /**
     * Listens for changes on {@link #breakpointsActivatedState}.
     */
-   private final IStateListener stateListener = new IStateListener() {
+   private final IStateListener breakpointsActivatedStateListener = new IStateListener() {
       @Override
       public void handleStateChange(State state, Object oldValue) {
          configureProofForBreakpoints();
-      }
-   };
-
-   /**
-    * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()}.
-    */
-   private final SettingsListener viewSettingsListener = new SettingsListener() {
-      @Override
-      public void settingsChanged(EventObject e) {
-         handleViewSettingsChanged(e);
       }
    };
 
@@ -336,16 +298,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       @Override
       public void settingsChanged(EventObject e) {
          handleGeneralSettingsChanged(e);
-      }
-   };
-   
-   /**
-    * Observes changes on the used {@link TermLabelVisibilityManager}.
-    */
-   private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener = new TermLabelVisibilityManagerListener() {
-      @Override
-      public void visibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
-         handleVisibleLabelsChanged(e);
       }
    };
    
@@ -362,20 +314,15 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    @Override
    public void dispose() {
-      ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().removeSettingsListener(viewSettingsListener);
       ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().removeSettingsListener(generalSettingsListener);
       if (breakpointsActivatedState != null) {
-         breakpointsActivatedState.removeListener(stateListener);
+         breakpointsActivatedState.removeListener(breakpointsActivatedStateListener);
          breakpointsActivatedState = null;
-      }
-      if (viewerDecorator != null) {
-         viewerDecorator.dispose();
       }
       if(breakpointManager!=null){
          DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(breakpointManager);
       }
       if (getUI() != null) {
-         getUI().getTermLabelVisibilityManager().removeTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
          getUI().removeProverTaskListener(proverTaskListener);
       }
       if (getProofControl() != null) {
@@ -408,7 +355,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
          if (hideCmd != null) {
             breakpointsActivatedState = hideCmd.getState(RegistryToggleState.STATE_ID);
             if (breakpointsActivatedState != null) {
-               breakpointsActivatedState.addListener(stateListener);
+               breakpointsActivatedState.addListener(breakpointsActivatedStateListener);
             }
          }
       }
@@ -472,7 +419,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
                selectionModel.setProof(currentProof);
             }
             getUI().addProverTaskListener(proverTaskListener);
-            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addSettingsListener(viewSettingsListener);
             if (getEnvironment().getReplayResult() != null) {
                selectionModel.setSelectedNode(getEnvironment().getReplayResult().getNode());
             }
@@ -483,7 +429,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             breakpointManager = new KeYBreakpointManager(currentProof);
             DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
             ProofUserManager.getInstance().addUser(currentProof, environment, this);
-            getUI().getTermLabelVisibilityManager().addTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
             ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().addSettingsListener(generalSettingsListener);
             getProofControl().setMinimizeInteraction(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter());
             this.currentNode = selectionModel.getSelectedNode();
@@ -509,55 +454,9 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       super.createPartControl(parent);
       selectionModel.addKeYSelectionListener(keySelectionListener);
       getProofControl().addAutoModeListener(autoModeListener);
-      ISourceViewer sourceViewer = getSourceViewer();
-      viewerDecorator = new ProofSourceViewerDecorator(sourceViewer);
-      viewerDecorator.addPropertyChangeListener(ProofSourceViewerDecorator.PROP_SELECTED_POS_IN_SEQUENT, new PropertyChangeListener() {
-         @Override
-         public void propertyChange(PropertyChangeEvent evt) {
-            handleViewerDecoratorSelectedPosInSequentChanged(evt);
-         }
-      });
       getCurrentProof().addProofTreeListener(proofTreeListener);
       getCurrentProof().addRuleAppListener(ruleAppListener);
-      sourceViewer.setEditable(false);
       setCurrentNode(getCurrentNode());
-      
-   }
-   
-   /**
-    * When the selected {@link PosInSequent} in {@link #viewerDecorator} has changed.
-    * @param evt The event.
-    */
-   protected void handleViewerDecoratorSelectedPosInSequentChanged(PropertyChangeEvent evt) {
-      firePropertyChange(PROP_SELECTED_POS_IN_SEQUENT, evt.getOldValue(), evt.getNewValue());
-   }
-
-   /**
-    * When the settings of {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()} have changed.
-    * @param e The event.
-    */
-   protected void handleViewSettingsChanged(EventObject e) {
-      updateShownSequentThreadSave();
-   }
-
-   /**
-    * When the visible term labels have changed.
-    * @param e The event.
-    */
-   protected void handleVisibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
-      updateShownSequentThreadSave();
-   }
-   
-   /**
-    * Updates the shown {@link Sequent} thread save.
-    */
-   protected void updateShownSequentThreadSave() {
-      getSite().getShell().getDisplay().syncExec(new Runnable() {
-         @Override
-         public void run() {
-            viewerDecorator.showNode(currentNode, SymbolicExecutionUtil.createNotationInfo(currentProof), getTermLabelVisibilityManager());
-         }
-      });
    }
 
    /**
@@ -812,15 +711,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    public void setCurrentNode(Node currentNode) {
       this.currentNode = currentNode;
-      viewerDecorator.showNode(currentNode, SymbolicExecutionUtil.createNotationInfo(currentProof), getTermLabelVisibilityManager());
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public PosInSequent getSelectedPosInSequent() {
-      return viewerDecorator.getSelectedPosInSequent();
+      showNode(currentNode, SymbolicExecutionUtil.createNotationInfo(currentProof), getTermLabelVisibilityManager(), getUI().getTermLabelVisibilityManager());
    }
 
    /**
@@ -868,19 +759,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
          }
          return outlinePage;
       }
-      else if (IPropertySheetPage.class.equals(adapter)) {
-         final TabbedPropertySheetPage pcp = new TabbedPropertySheetPage(this);
-         // Make sure that initial content is shown even if the focus is set to the outline view and not to the editor. 
-         getSite().getShell().getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-               if (!pcp.getControl().isDisposed()) {
-                  pcp.selectionChanged(KeYEditor.this, getSelectionProvider().getSelection());
-               }
-            }
-         });
-         return pcp;
-      }
       else if (IProofNodeSearchSupport.class.equals(adapter)) {
          return this;
       }
@@ -908,22 +786,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       else {
          return super.getAdapter(adapter);
       }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isEditorInputModifiable() {
-      return false; // Text editor is read-only. This disables the replace functionality of the search and replace dialog.
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isEditorInputReadOnly() {
-      return true; // Opposite of isEditorInputModifiable()
    }
 
    /**
@@ -1041,174 +903,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    protected void configureProofForBreakpoints() {
       breakpointManager.setEnabled(isBreakpointsActivated());
-   }
-
-   /**
-    * {@inheritDoc}
-    * @return
-    */
-   @Override
-   public String getContributorId() {
-      return CONTRIBUTOR_ID;
-   }
-
-   /**
-    * Returns the used {@link PropertyChangeSupport}.
-    * @return the used {@link PropertyChangeSupport}.
-    */
-   protected PropertyChangeSupport getPcs() {
-       return pcs;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void addPropertyChangeListener(PropertyChangeListener listener) {
-       pcs.addPropertyChangeListener(listener);
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-       pcs.addPropertyChangeListener(propertyName, listener);
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void removePropertyChangeListener(PropertyChangeListener listener) {
-       pcs.removePropertyChangeListener(listener);
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-       pcs.removePropertyChangeListener(propertyName, listener);
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public PropertyChangeListener[] getPropertyChangeListeners() {
-       return pcs.getPropertyChangeListeners();
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public PropertyChangeListener[] getPropertyChangeListeners(String propertyName) {
-       return pcs.getPropertyChangeListeners(propertyName);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean hasListeners() {
-       return getPropertyChangeListeners().length >= 1;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean hasListeners(String propertyName) {
-       return pcs.hasListeners(propertyName);
-   }
-   
-   /**
-    * Fires the event to all available listeners.
-    * @param propertyName The property name.
-    * @param index The changed index.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
-       pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-   }
-   
-   /**
-    * Fires the event to all available listeners.
-    * @param propertyName The property name.
-    * @param index The changed index.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void fireIndexedPropertyChange(String propertyName, int index, int oldValue, int newValue) {
-       pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-   }
-   
-   /**
-    * Fires the event to all available listeners.
-    * @param propertyName The property name.
-    * @param index The changed index.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */    
-   protected void fireIndexedPropertyChange(String propertyName, int index, Object oldValue, Object newValue) {
-       pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-   }
-   
-   /**
-    * Fires the event to all listeners.
-    * @param evt The event to fire.
-    */
-   protected void firePropertyChange(PropertyChangeEvent evt) {
-       pcs.firePropertyChange(evt);
-   }
-   
-   /**
-    * Fires the event to all listeners.
-    * @param propertyName The changed property.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
-       pcs.firePropertyChange(propertyName, oldValue, newValue);
-   }
-   
-   /**
-    * Fires the event to all listeners.
-    * @param propertyName The changed property.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void firePropertyChange(String propertyName, int oldValue, int newValue) {
-       pcs.firePropertyChange(propertyName, oldValue, newValue);
-   }
-   
-   /**
-    * Fires the event to all listeners.
-    * @param propertyName The changed property.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-       pcs.firePropertyChange(propertyName, oldValue, newValue);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean hasListener(PropertyChangeListener listener) {
-       return ArrayUtil.contains(getPropertyChangeListeners(), listener);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean hasListener(String propertyName, PropertyChangeListener listener) {
-       return ArrayUtil.contains(getPropertyChangeListeners(propertyName), listener);
    }
 
    /**

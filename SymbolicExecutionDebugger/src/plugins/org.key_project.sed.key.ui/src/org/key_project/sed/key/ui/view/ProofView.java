@@ -2,10 +2,9 @@ package org.key_project.sed.key.ui.view;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.IStateListener;
@@ -15,61 +14,50 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
-import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.text.source.SourceViewer;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.editors.text.TextEditorActionContributor;
 import org.eclipse.ui.handlers.RegistryToggleState;
-import org.eclipse.ui.views.properties.IPropertySheetPage;
+import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
-import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.keyide.ui.composite.ProofTreeComposite;
 import org.key_project.keyide.ui.editor.IPosInSequentProvider;
 import org.key_project.keyide.ui.editor.KeYEditor;
+import org.key_project.keyide.ui.editor.SequentEditor;
+import org.key_project.keyide.ui.editor.input.TextEditorInput;
 import org.key_project.keyide.ui.util.IProofNodeSearchSupport;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.ui.ShowSubtreeOfNodeHandler;
 import org.key_project.sed.key.ui.propertyTester.AutoModePropertyTesterSED;
-import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
-import org.key_project.util.java.ArrayUtil;
+import org.key_project.sed.ui.visualization.view.AbstractLaunchViewBasedEditorInViewView;
+import org.key_project.util.eclipse.view.editorInView.EditorInViewEditorSite.RegisteredContextMenu;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
-import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -77,9 +65,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -87,66 +73,55 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The view based on the {@link IDebugView} which shows the {@link Proof}.
  * @author Seena Vellaramkalayil
  */
-public class ProofView extends AbstractViewBasedView implements IProofProvider, ITabbedPropertySheetPageContributor, IPosInSequentProvider, IProofNodeSearchSupport {   
+public class ProofView extends AbstractLaunchViewBasedEditorInViewView<SequentEditor, TextEditorActionContributor> implements IProofProvider, ITabbedPropertySheetPageContributor, IProofNodeSearchSupport, IPosInSequentProvider {
    /**
-    * the unique id of this view.
+    * The unique id of this view.
     */
    public static final String VIEW_ID = "org.key_project.sed.key.ui.ProofView";
    
    /**
-    * The used {@link PropertyChangeSupport}.
+    * The message which is shown in case the currently selected {@link IDebugTarget} does not provide a {@link Proof}.
     */
-   private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+   public static final String MESSAGE_DEBUG_TARGET_PROVIDES_NO_PROOF = "The currently selected debug target does not provide a proof.";
+
+   /**
+    * The {@link ProofTreeComposite} which shows the proof tree.
+    */
+   private ProofTreeComposite proofTreeComposite;
+   
+   /**
+    * Listens for selection changes on {@link #treeViewer}.
+    */
+   private final ISelectionChangedListener treeViewerSelectionListener = new ISelectionChangedListener() {
+      @Override
+      public void selectionChanged(SelectionChangedEvent event) {
+         handleTreeViewerSelectionChanged(event);
+      }
+   };
+   
+   /**
+    * the {@link State} for showing the subtree of a node.
+    */
+   private State subtreeState;
+   
+   /**
+    * the {@link IStateListener} to listen to changes on the subtreeState.
+    */
+   private final IStateListener subtreeStateListener = new IStateListener() {
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void handleStateChange(State state, Object oldValue) {
+         handleSubtreeStateChanged(state);
+      }
+   };
    
    /**
     * Contains the registered {@link IProofProviderListener}.
     */
    private final List<IProofProviderListener> proofProviderListener = new LinkedList<IProofProviderListener>();
-
-   /**
-    * the {@link SashForm} to divide {@link TreeViewer} and {@link SourceViewer}.
-    */
-   private SashForm parentComposite;
    
-   /**
-    * The {@link ProofTreeComposite} which shows the proof tree.
-    */
-   private ProofTreeComposite proofTreeComposite;
-
-   /**
-    * the {@link SourceViewer} of this view.
-    */
-   private SourceViewer sourceViewer;
-   
-   /**
-    * the {@link IDebugView} this view is based on.
-    */
-   private IViewPart baseView;
-   
-   /**
-    * The selected {@link IKeYSENode} in {@link #baseView}.
-    */
-   private IKeYSENode<?> baseViewNode;
-
-   /**
-    * the loaded {@link Proof}.
-    */
-   private Proof proof;
-
-   /**
-    * Listens for dispose changes on {@link #proof}.
-    */
-   private final ProofDisposedListener proofDisposedListener = new ProofDisposedListener() {
-      @Override
-      public void proofDisposing(ProofDisposedEvent e) {
-      }
-      
-      @Override
-      public void proofDisposed(ProofDisposedEvent e) {
-         handleProofDisposed(e);
-      }
-   };
-
    /**
     * The {@link KeYDebugTarget} which offers the currently shown {@link Proof}.
     */
@@ -158,27 +133,35 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
    private KeYEnvironment<?> environment;
    
    /**
-    * the {@link ProofSourceViewerDecorator} of the sourceViewer.
+    * The shown {@link Proof}.
     */
-   private ProofSourceViewerDecorator sourceViewerDecorator;
+   private Proof proof;
    
    /**
     * the currently loaded {@link IProject}.
     */
    private IProject currentProject;
-	
-	/**
-	 * the {@link State} for showing the subtree of a node.
-	 */
-	private State subtreeState;
-	
+   
    /**
-    * the {@link ISelectionChangedListener} for the {@link IDebugView}.
+    * The selected {@link IKeYSENode} in {@link #baseView}.
     */
-   private final ISelectionChangedListener baseViewListener = new ISelectionChangedListener() {
+   private IKeYSENode<?> baseViewNode;
+   
+   /**
+    * the {link RuleAppListener} listening to rule applications.
+    */
+   private final RuleAppListener ruleAppListener = new RuleAppListener() {
+      /**
+       * {@inheritDoc}
+       */
       @Override
-      public void selectionChanged(SelectionChangedEvent event) {
-         handleBaseViewSelectionChanged(event.getSelection());
+      public void ruleApplied(final ProofEvent e) {
+         getSite().getShell().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               handleRuleApplied(e);
+            }
+         });
       }
    };
    
@@ -196,87 +179,25 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
          handleAutoModeStopped(e);
       }
    };
-   
-   /**
-    * the {@link IMenuListener} listening to actions on the context menu of the sourceViewer.
-    */
-   private final IMenuListener contextMenuListener = new IMenuListener() {
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public void menuAboutToShow(IMenuManager manager) {
-         if (getSourceViewerMenuId().equals(manager.getId())) {
-            manager.add(new Separator(IWorkbenchActionConstants.GROUP_ADD));
-         }
-      }
-   };
-	
-	/**
-	 * the {@link IStateListener} to listen to changes on the subtreeState.
-	 */
-	private final IStateListener subtreeStateListener = new IStateListener() {
-	   /**
-	    * {@inheritDoc}
-	    */
-      @Override
-      public void handleStateChange(State state, Object oldValue) {
-         handleSubtreeStateChanged(state);
-      }
-	};
-	
-	/**
-	 * the {link RuleAppListener} listening to rule applications.
-	 */
-	private final RuleAppListener ruleAppListener = new RuleAppListener() {
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void ruleApplied(final ProofEvent e) {
-	      getSite().getShell().getDisplay().syncExec(new Runnable() {
-            @Override
-            public void run() {
-               handleRuleApplied(e);
-            }
-	      });
-		}
-	};
 
    /**
-    * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()}.
+    * Listens for dispose changes on {@link #proof}.
     */
-   private final SettingsListener viewSettingsListener = new SettingsListener() {
+   private final ProofDisposedListener proofDisposedListener = new ProofDisposedListener() {
       @Override
-      public void settingsChanged(EventObject e) {
-         handleViewSettingsChanged(e);
+      public void proofDisposing(ProofDisposedEvent e) {
+      }
+      
+      @Override
+      public void proofDisposed(ProofDisposedEvent e) {
+         handleProofDisposed(e);
       }
    };
 
    /**
-    * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings}.
+    * Constructor.
     */
-   private final SettingsListener generalSettingsListener = new SettingsListener() {
-      @Override
-      public void settingsChanged(EventObject e) {
-         handleGeneralSettingsChanged(e);
-      }
-   };
-   
-   /**
-    * Observes changes on the used {@link TermLabelVisibilityManager}.
-    */
-   private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener = new TermLabelVisibilityManagerListener() {
-      @Override
-      public void visibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
-         handleVisibleLabelsChanged(e);
-      }
-   };
-
-	/**
-	 * the constructor of the class.
-	 */
-	public ProofView() {
+   public ProofView() {
       ICommandService service = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
       if (service != null) {
          Command subtreeCmd = service.getCommand(ShowSubtreeOfNodeHandler.COMMAND_ID);
@@ -287,29 +208,149 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
             }
          }
       }
-	}
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      if (proofTreeComposite != null) {
+         proofTreeComposite.dispose();
+      }
+      if (subtreeState != null) {
+         subtreeState.removeListener(subtreeStateListener);
+      }
+      super.dispose();
+   }
 
    /**
-	 * handles the {@link ProofEvent} when a rule is applied manually. Updates selection.
-	 * @param e the {@link ProofEvent} to handle
-	 */
-	protected void handleRuleApplied(ProofEvent e) {
-	   Node selectedNode = proofTreeComposite.getSelectedNode();
-	   if (selectedNode != null) {
-	      Node newNode = selectedNode;
-	      while (!newNode.leaf()) {
-	         newNode = newNode.child(0);
-	      }
-	      if (selectedNode != newNode) {
-	         proofTreeComposite.selectNodeThreadSafe(newNode);
-	      }
-	   }
-	}
-	
-	/**
-	 * handles the change in the subtreeState.
-	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
-	 */
+    * {@inheritDoc}
+    */
+   @Override
+   protected Composite createEditorComposite(Composite parent) {
+      SashForm parentComposite = new SashForm(parent, SWT.HORIZONTAL);
+      // Proof tree composite
+      proofTreeComposite = new ProofTreeComposite(parentComposite, SWT.NONE, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL | SWT.BORDER, proof, environment);
+      proofTreeComposite.getTreeViewer().addSelectionChangedListener(treeViewerSelectionListener);
+      //create editor
+      super.createEditorComposite(parentComposite);
+      parentComposite.setWeights(new int[]{15, 85}); 
+      parentComposite.setOrientation(SWT.HORIZONTAL);
+      getSite().setSelectionProvider(proofTreeComposite.getTreeViewer());
+      //update viewers if debugView is already open
+      updateProofTreeViewer();
+      if ((boolean) subtreeState.getValue()) {
+         showSubtree(true);
+      }
+      createTreeViewerContextMenu();
+      createTextEditorContextMenu();
+      return parentComposite;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void editorPartControlCreated(SequentEditor editorPart, TextEditorActionContributor contributor) {
+      super.editorPartControlCreated(editorPart, contributor);
+      editorPart.addPropertyChangeListener(IPosInSequentProvider.PROP_SELECTED_POS_IN_SEQUENT, new PropertyChangeListener() {
+         @Override
+         public void propertyChange(PropertyChangeEvent evt) {
+            // Rethrow the event with changed source to own listener.
+            firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+         }
+      });
+   }
+
+   /**
+    * method to create the context menu shown on this view's tree viewer.
+    */
+   protected void createTreeViewerContextMenu() {
+      MenuManager menuManager = new MenuManager("Outline popup", "org.key_project.keyide.ui.view.outline.popup");
+      Menu menu = menuManager.createContextMenu(proofTreeComposite.getTreeViewer().getControl());
+      proofTreeComposite.getTreeViewer().getControl().setMenu(menu);
+      getSite().registerContextMenu("org.key_project.keyide.ui.view.outline.popup", menuManager, proofTreeComposite.getTreeViewer());
+   }
+   
+   /**
+    * method to create the context menu containing the available rules to apply on the proof.
+    */
+   protected void createTextEditorContextMenu() {
+      List<RegisteredContextMenu> menus = getVirtualEditorSite().getRegisteredContextMenus();
+      for (RegisteredContextMenu menu : menus) {
+         if (AbstractTextEditor.COMMON_EDITOR_CONTEXT_MENU_ID.equals(menu.getMenuId())) {
+            getSite().registerContextMenu(getSourceViewerMenuId(), menu.getMenuManager(), menu.getSelectionProvider());
+         }
+      }
+   }
+   
+   /**
+    * returns the id of the context menu of the source viewer.
+    * @return String id of the context menu
+    */
+   protected String getSourceViewerMenuId() {
+      return VIEW_ID + ".popup";
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected SequentEditor createEditorPart() {
+      return new SequentEditor();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected TextEditorActionContributor createEditorActionBarContributor() {
+      return new TextEditorActionContributor() {
+         @Override
+         public void contributeToMenu(IMenuManager menu) {
+            IMenuManager editMenu = menu.findMenuUsingPath(IWorkbenchActionConstants.M_EDIT);
+            GroupMarker findExtGroup = new GroupMarker(IWorkbenchActionConstants.FIND_EXT);
+            editMenu.add(findExtGroup);
+            super.contributeToMenu(menu);
+         }
+
+         @Override
+         public void setActiveEditor(IEditorPart part) {
+            super.setActiveEditor(part);
+         }
+      };
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IEditorInput createEditorInput() {
+      return new TextEditorInput(StringUtil.EMPTY_STRING, StringUtil.EMPTY_STRING);
+   }
+   
+   /**
+    * Updates the providers of {@link ProofView#getTreeViewer()} and {@link ProofView#getSourceViewer()}
+    * and creates context menus. Selection is set to root.
+    */
+   protected void updateProofTreeViewer() {
+      Assert.isNotNull(proofTreeComposite);
+      if (proof != null) {
+         //set default selection to root
+         if (baseViewNode != null && (boolean) subtreeState.getValue()) {
+            proofTreeComposite.selectNodeThreadSafe(baseViewNode.getExecutionNode().getProofNode());
+         }
+         else {
+            proofTreeComposite.selectNodeThreadSafe(proof.root());
+         }
+      }
+   }
+   
+   /**
+    * handles the change in the subtreeState.
+    * @param state The state that has changed; never null. The value for this state has been updated to the new value.
+    */
    protected void handleSubtreeStateChanged(State state) {
       showSubtree(true);
    }
@@ -328,148 +369,7 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
          }
       }
    }
-	
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void createPartControl(Composite parent) {
-      parentComposite = new SashForm(parent, SWT.HORIZONTAL);
-      // Proof tree composite
-      proofTreeComposite = new ProofTreeComposite(parentComposite, SWT.NONE, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL | SWT.BORDER, proof, environment);
-      proofTreeComposite.getTreeViewer().addSelectionChangedListener(treeViewerSelectionListener);
-      //create source viewer
-      this.sourceViewer = new SourceViewer(parentComposite, null, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
-      sourceViewer.setEditable(false);
-      final Font font = SWTUtil.initializeViewerFont(sourceViewer);
-      sourceViewer.getTextWidget().addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(DisposeEvent e) {
-            if (font != null) {
-               font.dispose();
-            }
-         }
-      });
-      parentComposite.setWeights(new int[]{15, 85}); 
-      parentComposite.setOrientation(SWT.HORIZONTAL);
-      FormData data = new FormData();
-      sourceViewer.getControl().setLayoutData(data);
-      sourceViewerDecorator = new ProofSourceViewerDecorator(sourceViewer);
-      sourceViewerDecorator.addPropertyChangeListener(ProofSourceViewerDecorator.PROP_SELECTED_POS_IN_SEQUENT, new PropertyChangeListener() {
-         @Override
-         public void propertyChange(PropertyChangeEvent evt) {
-            handleViewerDecoratorSelectedPosInSequentChanged(evt);
-         }
-      });
-      getSite().setSelectionProvider(proofTreeComposite.getTreeViewer());
-      //update viewers if debugView is already open
-      updateViewer();
-      if ((boolean) subtreeState.getValue()) {
-         showSubtree(true);
-      }
-      createTreeViewerContextMenu();
-      createSourceViewerContextMenu();
-      ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addSettingsListener(viewSettingsListener);
-      ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().addSettingsListener(generalSettingsListener);
-   }
    
-   /**
-    * When the selected {@link PosInSequent} in {@link #sourceViewerDecorator} has changed.
-    * @param evt The event.
-    */
-   protected void handleViewerDecoratorSelectedPosInSequentChanged(PropertyChangeEvent evt) {
-      pcs.firePropertyChange(PROP_SELECTED_POS_IN_SEQUENT, evt.getOldValue(), evt.getNewValue());
-   }
-
-   /**
-    * method to create the context menu shown on this view's tree viewer.
-    */
-   protected void createTreeViewerContextMenu() {
-      MenuManager menuManager = new MenuManager("Outline popup", "org.key_project.keyide.ui.view.outline.popup");
-      Menu menu = menuManager.createContextMenu(proofTreeComposite.getTreeViewer().getControl());
-      proofTreeComposite.getTreeViewer().getControl().setMenu(menu);
-      getSite().registerContextMenu("org.key_project.keyide.ui.view.outline.popup", menuManager, proofTreeComposite.getTreeViewer());
-   }
-   
-   /**
-    * method to create the context menu containing the available rules to apply on the proof.
-    */
-   protected void createSourceViewerContextMenu() {
-      StyledText styledText = sourceViewer.getTextWidget();
-      MenuManager menuMgr = new MenuManager(getSourceViewerMenuId(), getSourceViewerMenuId());
-      menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(contextMenuListener);
-      Menu menu = menuMgr.createContextMenu(styledText);
-      styledText.setMenu(menu);
-      getSite().registerContextMenu(getSourceViewerMenuId(), menuMgr, sourceViewer);
-   }
-
-   /**
-    * When the settings of {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()} have changed.
-    * @param e The event.
-    */
-   protected void handleViewSettingsChanged(EventObject e) {
-      updateShownSequentThreadSave();
-   }
-
-   /**
-    * When the visible term labels have changed.
-    * @param e The event.
-    */
-   protected void handleVisibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
-      updateShownSequentThreadSave();
-   }
-   
-   /**
-    * Updates the shown {@link Sequent} thread save.
-    */
-   protected void updateShownSequentThreadSave() {
-      getSite().getShell().getDisplay().syncExec(new Runnable() {
-         @Override
-         public void run() {
-            showNode(proofTreeComposite.getSelectedNode());
-         }
-      });
-   }
-
-   /**
-    * When the settings of {@code ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()} have changed.
-    * @param e The event.
-    */
-   protected void handleGeneralSettingsChanged(EventObject e) {
-      getProofControl().setMinimizeInteraction(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter());
-      OneStepSimplifier.refreshOSS(getCurrentProof());
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
-      if (IPropertySheetPage.class.equals(adapter)) {
-         final TabbedPropertySheetPage pcp = new TabbedPropertySheetPage(this);
-         // Make sure that initial content is shown even if the focus is set to the outline view and not to the editor. 
-         getSite().getShell().getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-               if (!pcp.getControl().isDisposed()) {
-                  pcp.selectionChanged(ProofView.this, proofTreeComposite.getTreeViewer().getSelection());
-               }
-            }
-         });
-         return pcp;
-      }
-      else if (IProofProvider.class.equals(adapter)) {
-         return this;
-      }
-      else if (IProofNodeSearchSupport.class.equals(adapter)) {
-         return this;
-      }
-      else {
-         return super.getAdapter(adapter);
-      }
-   }
-
    /**
     * When the selection on {@link #treeViewer} has changed.
     * @param event The selection changed event.
@@ -478,79 +378,71 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       Node node = ProofTreeComposite.getSelectedNode(event.getSelection());
       showNode(node);
    }
-   
+
    /**
     * Shows the given {@link Node}.
     * @param node The {@link Node} to show.
     */
    protected void showNode(Node node) {
+      TermLabelVisibilityManager manager = getUI() != null ? getUI().getTermLabelVisibilityManager() : null;
       if (node != null) {
-         sourceViewerDecorator.showNode(node, SymbolicExecutionUtil.createNotationInfo(getCurrentProof()), getTermLabelVisibilityManager());
+         getEditorPart().showNode(node, SymbolicExecutionUtil.createNotationInfo(getCurrentProof()), manager, manager);
       }
       else {
-         sourceViewerDecorator.showNode(null, SymbolicExecutionUtil.createNotationInfo((Node) null), getTermLabelVisibilityManager());
+         getEditorPart().showNode(null, SymbolicExecutionUtil.createNotationInfo((Node) null), manager, manager);
       }
    }
    
    /**
-    * When the current proof was disposed.
-    * @param e The {@link ProofDisposedEvent}.
+    * {@inheritDoc}
     */
-   protected void handleProofDisposed(ProofDisposedEvent e) {
-      if (proofTreeComposite != null && !proofTreeComposite.isDisposed()) {
-         proofTreeComposite.getDisplay().syncExec(new Runnable() {
-            @Override
-            public void run() {
-               changeProof(keyDebugTarget, null, null, null, baseViewNode);
-            }
-         });
-      }
-   }
-   
-   /**
-    * changes the currently shown proof if there is a selection change on the {@link DebugView}.
-    * @param selection the current selection on {@link DebugView}
-    */
-   protected void handleBaseViewSelectionChanged(ISelection selection) {
-      // Find selected elements of interest (first selected IKeYSENode or a KeYDebugTarget otherwise)
-      Object[] elements = SWTUtil.toArray(selection);
-      KeYDebugTarget keyTarget = null;
-      IKeYSENode<?> seNode = null;
-      if (elements != null) {
-         int i = 0;
-         while (i < elements.length && seNode == null) {
-            Object element = elements[i];
-            if (element instanceof ILaunch) {
-               element = ((ILaunch) element).getDebugTarget();
-            }
-            if (element instanceof IKeYSENode<?>) {
-               IKeYSENode<?> node = (IKeYSENode<?>) element;
-               KeYDebugTarget target = node.getDebugTarget();
-               if (!target.isTerminated()) {
-                  seNode = node;
-                  keyTarget = target;
+   @Override
+   protected void doUpdateEditorContent(Set<ISEDebugTarget> oldTargets, 
+                                        Set<ISEDebugTarget> newTargets, 
+                                        Object[] newElements) {
+      if (!CollectionUtil.isEmpty(newTargets)) {
+         // Find selected elements of interest (first selected IKeYSENode or a KeYDebugTarget otherwise)
+         KeYDebugTarget keyTarget = null;
+         IKeYSENode<?> seNode = null;
+         if (newElements != null) {
+            int i = 0;
+            while (i < newElements.length && seNode == null) {
+               Object element = newElements[i];
+               if (element instanceof ILaunch) {
+                  element = ((ILaunch) element).getDebugTarget();
                }
-            }
-            else if (element instanceof IDebugElement) {
-               IDebugTarget target = ((IDebugElement) element).getDebugTarget();
-               if (target instanceof KeYDebugTarget && !target.isTerminated()) {
-                  keyTarget = (KeYDebugTarget) target;
+               if (element instanceof IKeYSENode<?>) {
+                  IKeYSENode<?> node = (IKeYSENode<?>) element;
+                  KeYDebugTarget target = node.getDebugTarget();
+                  if (!target.isTerminated()) {
+                     seNode = node;
+                     keyTarget = target;
+                  }
                }
+               else if (element instanceof IDebugElement) {
+                  IDebugTarget target = ((IDebugElement) element).getDebugTarget();
+                  if (target instanceof KeYDebugTarget && !target.isTerminated()) {
+                     keyTarget = (KeYDebugTarget) target;
+                  }
+               }
+               i++;
             }
-            i++;
          }
+         // Get new proof and its environment
+         Proof newProof = null;
+         SymbolicExecutionEnvironment<?> newEnvironment = null;
+         IMethod newMethod = null;
+         if (keyTarget != null) {
+            newProof = keyTarget.getProof();
+            newEnvironment = keyTarget.getEnvironment();
+            newMethod = keyTarget.getMethod();
+         }
+         // Replace content.
+         changeProof(keyTarget, newProof, newEnvironment, newMethod, seNode);
       }
-      // Get new proof and its environment
-      Proof newProof = null;
-      SymbolicExecutionEnvironment<?> newEnvironment = null;
-      IMethod newMethod = null;
-      if (keyTarget != null) {
-         newProof = keyTarget.getProof();
-         newEnvironment = keyTarget.getEnvironment();
-         newMethod = keyTarget.getMethod();
+      else {
+         setMessage(MESSAGE_NO_DEBUG_TARGET_SELECTED);
       }
-      // Replace content.
-      changeProof(keyTarget, newProof, newEnvironment, newMethod, seNode);
    }
    
    /**
@@ -571,7 +463,6 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       if (newProof != proof) {
          // Remove listener from old proof
          if (environment != null) {
-            environment.getUi().getTermLabelVisibilityManager().removeTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
             environment.getProofControl().removeAutoModeListener(autoModeListener);
          }
          if (proof != null && !proof.isDisposed()) {
@@ -585,7 +476,6 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
             proofTreeComposite.changeProof(newProof, newEnvironment);
          }
          if (environment != null) {
-            environment.getUi().getTermLabelVisibilityManager().addTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
             environment.getProofControl().addAutoModeListener(autoModeListener);
             environment.getProofControl().setMinimizeInteraction(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter());
          }
@@ -602,10 +492,17 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
          else {
             this.currentProject = null;
          }
-         if (proofTreeComposite != null && sourceViewer != null) {
-            updateViewer();
+         if (proofTreeComposite != null) {
+            updateProofTreeViewer();
          }
          fireCurrentProofsChanged(new ProofProviderEvent(this, getCurrentProofs(), getCurrentProof(), getUI(), getEnvironment()));
+      }
+      // Update message
+      if (newProof != null && !newProof.isDisposed()) {
+         setMessage(null);
+      }
+      else {
+         setMessage(MESSAGE_DEBUG_TARGET_PROVIDES_NO_PROOF);
       }
       // Update selection
       if (seNode != baseViewNode) {
@@ -623,23 +520,20 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
    }
 
    /**
-    * Updates the providers of {@link ProofView#getTreeViewer()} and {@link ProofView#getSourceViewer()}
-    * and creates context menus. Selection is set to root.
+    * handles the {@link ProofEvent} when a rule is applied manually. Updates selection.
+    * @param e the {@link ProofEvent} to handle
     */
-   protected void updateViewer() {
-      Assert.isNotNull(proofTreeComposite);
-      Assert.isNotNull(sourceViewer);
-      Assert.isNotNull(sourceViewerDecorator);
-      if (proof != null) {
-         //set default selection to root
-         if (baseViewNode != null && (boolean) subtreeState.getValue()) {
-            proofTreeComposite.selectNodeThreadSafe(baseViewNode.getExecutionNode().getProofNode());
+   protected void handleRuleApplied(ProofEvent e) {
+      Node selectedNode = proofTreeComposite.getSelectedNode();
+      if (selectedNode != null) {
+         Node newNode = selectedNode;
+         while (!newNode.leaf()) {
+            newNode = newNode.child(0);
          }
-         else {
-            proofTreeComposite.selectNodeThreadSafe(proof.root());
+         if (selectedNode != newNode) {
+            proofTreeComposite.selectNodeThreadSafe(newNode);
          }
       }
-      sourceViewer.getTextWidget().layout();
    }
 
    /**
@@ -663,110 +557,22 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
       }
       AutoModePropertyTesterSED.updateProperties();
    }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void setFocus() {
-      TreeViewer treeViewer = proofTreeComposite.getTreeViewer();
-      if (treeViewer != null && !treeViewer.getControl().isDisposed()) {
-         treeViewer.getControl().setFocus();
-      }
-   }
    
    /**
-    * {@inheritDoc}
+    * When the current proof was disposed.
+    * @param e The {@link ProofDisposedEvent}.
     */
-   @Override
-   public void dispose() {
-      ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().removeSettingsListener(viewSettingsListener);
-      ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().removeSettingsListener(generalSettingsListener);
-      if (parentComposite != null) {
-         parentComposite.dispose();
+   protected void handleProofDisposed(ProofDisposedEvent e) {
+      if (proofTreeComposite != null && !proofTreeComposite.isDisposed()) {
+         proofTreeComposite.getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               changeProof(keyDebugTarget, null, null, null, baseViewNode);
+            }
+         });
       }
-      if (proofTreeComposite != null) {
-         proofTreeComposite.dispose();
-      }
-      if (sourceViewer != null) {
-         sourceViewer.getControl().dispose();
-      }
-      if (environment != null) {
-         environment.getUi().getTermLabelVisibilityManager().removeTermLabelVisibilityManagerListener(termLabelVisibilityManagerListener);
-         environment.getProofControl().removeAutoModeListener(autoModeListener);
-      }
-      if (baseView != null) {
-         baseView.getSite().getSelectionProvider().removeSelectionChangedListener(baseViewListener);
-      }
-      if (proof != null && !proof.isDisposed()) {
-         proof.removeProofDisposedListener(proofDisposedListener);
-         proof.removeRuleAppListener(ruleAppListener);
-      }
-      if (subtreeState != null) {
-         subtreeState.removeListener(subtreeStateListener);
-      }
-      super.dispose();
-   }
-   
-   /**
-    * returns the id of the context menu of the source viewer.
-    * @return String id of the context menu
-    */
-   protected String getSourceViewerMenuId() {
-      return VIEW_ID + ".popup";
    }
 
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public PosInSequent getSelectedPosInSequent() {
-      return sourceViewerDecorator.getSelectedPosInSequent();
-   }
-   
-   /**
-    * Listens for selection changes on {@link #treeViewer}.
-    */
-   private final ISelectionChangedListener treeViewerSelectionListener = new ISelectionChangedListener() {
-      @Override
-      public void selectionChanged(SelectionChangedEvent event) {
-         handleTreeViewerSelectionChanged(event);
-      }
-   };
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected boolean shouldHandleBaseViewReference(IViewReference baseViewReference) {
-      return IDebugUIConstants.ID_DEBUG_VIEW.equals(baseViewReference.getId());
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected boolean shouldHandleBaseView(IViewPart view) {
-      return IDebugUIConstants.ID_DEBUG_VIEW.equals(view.getSite().getId());
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected void handleBaseViewChanged(IViewPart oldBaseView, IViewPart newBaseView) {
-      if (oldBaseView != null) {
-         oldBaseView.getSite().getSelectionProvider().removeSelectionChangedListener(baseViewListener);
-      }
-      if (newBaseView != null) {
-         this.baseView = newBaseView;
-         ISelectionProvider selectionProvider = baseView.getSite().getSelectionProvider();
-         selectionProvider.addSelectionChangedListener(baseViewListener);
-         handleBaseViewSelectionChanged(selectionProvider.getSelection());
-      }
-   }
-   
    /**
     * returns the currently loaded {@link IProject}.
     * @return the {@link IProject}
@@ -866,111 +672,6 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
     * {@inheritDoc}
     */
    @Override
-   public void addPropertyChangeListener(PropertyChangeListener listener) {
-      pcs.addPropertyChangeListener(listener);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-      pcs.addPropertyChangeListener(propertyName, listener);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void removePropertyChangeListener(PropertyChangeListener listener) {
-      pcs.removePropertyChangeListener(listener);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-      pcs.removePropertyChangeListener(propertyName, listener);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public PropertyChangeListener[] getPropertyChangeListeners() {
-      return pcs.getPropertyChangeListeners();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public PropertyChangeListener[] getPropertyChangeListeners(String propertyName) {
-      return pcs.getPropertyChangeListeners(propertyName);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean hasListeners() {
-      return getPropertyChangeListeners().length >= 1;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean hasListeners(String propertyName) {
-      return pcs.hasListeners(propertyName);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean hasListener(PropertyChangeListener listener) {
-      return ArrayUtil.contains(getPropertyChangeListeners(), listener);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean hasListener(String propertyName, PropertyChangeListener listener) {
-      return ArrayUtil.contains(getPropertyChangeListeners(propertyName), listener);
-   }
-
-   /**
-    * Returns the used {@link TermLabelVisibilityManager}.
-    * @return The used {@link TermLabelVisibilityManager} or {@code null} if not available.
-    */
-   public TermLabelVisibilityManager getTermLabelVisibilityManager() {
-      UserInterfaceControl ui = getUI();
-      return ui != null ? ui.getTermLabelVisibilityManager() : null; 
-   }
-
-   /**
-    * Returns the currently selected {@link Node}.
-    * @return The currently selected {@link Node}.
-    */
-   public Node getSelectedNode() {
-      return proofTreeComposite.getSelectedNode();
-   }
-
-   /**
-    * Selects a given {@link Node}. 
-    * @param node the {@link Node} to select
-    */
-   public void selectNode(Node node) {
-      proofTreeComposite.selectNode(node);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
    public void openSearchPanel() {
       proofTreeComposite.openSearchPanel();
    }
@@ -1005,5 +706,29 @@ public class ProofView extends AbstractViewBasedView implements IProofProvider, 
    @Override
    public void jumpToNextResult() {
       proofTreeComposite.jumpToNextResult();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public PosInSequent getSelectedPosInSequent() {
+      return getEditorPart().getSelectedPosInSequent();
+   }
+
+   /**
+    * Returns the currently selected {@link Node}.
+    * @return The currently selected {@link Node}.
+    */
+   public Node getSelectedNode() {
+      return proofTreeComposite.getSelectedNode();
+   }
+
+   /**
+    * Selects a given {@link Node}. 
+    * @param node the {@link Node} to select
+    */
+   public void selectNode(Node node) {
+      proofTreeComposite.selectNode(node);
    }
 }
