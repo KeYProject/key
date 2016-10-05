@@ -40,7 +40,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * A class to provide the proofTree transformed to the KeY-Internal
  * representation.
  * 
- * @author Christoph Schneider, Niklas Bunzel, Stefan Kï¿½sdorf, Marco Drebing
+ * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
    /**

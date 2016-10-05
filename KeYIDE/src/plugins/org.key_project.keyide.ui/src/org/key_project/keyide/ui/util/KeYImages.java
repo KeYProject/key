@@ -33,7 +33,7 @@ import de.uka.ilkd.key.proof.Node;
  * To get an image use one of the constant defined in this class, e.g.<br>
  * {@code KeYSEDImages.getImage(KeYSEDImages.LAUNCH_MAIN_TAB_GROUP)))}
  * </p>
- * @author Martin Hentschel, Christoph Schneider, Niklas Bunzel, Stefan Kï¿½sdorf, Marco Drebing
+ * @author Martin Hentschel, Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public final class KeYImages {
    /**

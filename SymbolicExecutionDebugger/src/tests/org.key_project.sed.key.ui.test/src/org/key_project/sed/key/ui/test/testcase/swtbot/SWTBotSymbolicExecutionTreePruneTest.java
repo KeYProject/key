@@ -33,22 +33,16 @@ import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests the update of the Symbolic Execution Tree caused by a proof prune.
- * 
  * @author Leonard Goetz
- *
  */
 public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTargetTestCase {
-
    /**
     * Tests the update of the Symbolic Execution Tree caused by a prune.
-    * 
-    * @throws Exception
+    * @throws Exception Occurred Exception.
     */
    @Test
    public void testPruning() throws Exception {
-
       IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
-
          @Override
          public void test(final SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, final ISEDebugTarget target, ILaunch launch) throws Exception {
             // resume on thread
@@ -94,7 +88,6 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
             TestUtilsUtil.sleep(10000); // TODO wait for diagram
             // test diagram after resume
             assertDiagram(bot, project.getProject(), "NumberResume.set", pathToOracleFiles, null);
-
          }
 
          @Override
@@ -110,25 +103,17 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
             }
          }
       };
-
       doKeYDebugTargetTest("SWTBotSymbolicExecutionTreePruneTest_testPruning", Activator.PLUGIN_ID, "data/number/test", false, false, createMethodSelector("Number", "equals", "QNumber;"), null, null, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE, 8, executor);
    }
 
    /**
     * Ensures that the current diagram matches the oracle files.
-    * 
-    * @param bot
-    *           The {@link SWTWorkbenchBot} to use.
-    * @param project
-    *           The {@link IProject} to which the diagram will be saved to.
-    * @param pathToSetFile
-    *           The path to the SET file in the created project.
-    * @param pathToOracleFiles
-    *           The path to the oracle files.
-    * @param fileNameSuffix
-    *           A file name suffix.
-    * @throws Exception
-    *            Occurred Exception
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @param project The {@link IProject} to which the diagram will be saved to.
+    * @param pathToSetFile The path to the SET file in the created project.
+    * @param pathToOracleFiles The path to the oracle files.
+    * @param fileNameSuffix A file name suffix.
+    * @throws Exception Occurred Exception
     */
    public static void assertDiagram(SWTWorkbenchBot bot, IProject project, String pathToSetFile, String pathToOracleFiles, String fileNameSuffix) throws Exception {
       // Open Save diagram wizard
@@ -148,15 +133,14 @@ public class SWTBotSymbolicExecutionTreePruneTest extends AbstractKeYDebugTarget
          File targetOracleDirectory = new File(pathToOracleFiles);
          ResourceUtil.copyIntoFileSystem(project.getFile(fileName + ExecutionTreeUtil.DOMAIN_FILE_EXTENSION_WITH_DOT), new File(targetOracleDirectory, fileName + ExecutionTreeUtil.DOMAIN_FILE_EXTENSION_WITH_DOT));
          ResourceUtil.copyIntoFileSystem(project.getFile(fileName + ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT), new File(targetOracleDirectory, fileName + ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT));
-      } else {
+      }
+      else {
          // Read diagram files
          String expectedDiagramFile = IOUtil.readFrom(BundleUtil.openInputStream(Activator.PLUGIN_ID, pathToOracleFiles + "/" + fileName + ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT));
          String currentDiagramFile = ResourceUtil.readFrom(project.getFile(fileName + ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT));
-
          // delete IDs in both files because they differ
          expectedDiagramFile = expectedDiagramFile.replaceAll("value=\"_[a-zA-Z0-9\\-]*", "#######");
          currentDiagramFile = currentDiagramFile.replaceAll("value=\"_[a-zA-Z0-9\\-]*", "#######");
-
          // Compare diagram files
          if (!StringUtil.equalIgnoreWhiteSpace(expectedDiagramFile, currentDiagramFile)) {
             // Let test fail to have an improved comparison dialog
