@@ -302,11 +302,10 @@ public class KeYEditor extends SequentEditor implements IProofProvider, IProofNo
    };
    
    /**
-    * Constructor to initialize the ContextMenu IDs
+    * Constructor.
     */
    public KeYEditor() {
-      setEditorContextMenuId("#KeYEditorContext");
-      setRulerContextMenuId("#KeYEditorRulerContext");
+      super();
    }
 
    /**

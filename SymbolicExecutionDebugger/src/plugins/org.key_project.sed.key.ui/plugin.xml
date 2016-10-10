@@ -683,7 +683,7 @@
          <menuContribution
                allPopups="false"
                class="org.key_project.sed.key.ui.view.RuleAppContextMenu"
-               locationURI="popup:org.key_project.sed.key.ui.ProofView.popup?before=group.undo">
+               locationURI="popup:#KeYEditorContext?before=sequentDisplaySettings">
          </menuContribution>
          <menuContribution
                allPopups="false"
@@ -733,16 +733,6 @@
                   style="push"
                   tooltip="Save proof as *.proof file.">
             </command>
-         </menuContribution>
-         <menuContribution
-               allPopups="false"
-               class="org.key_project.keyide.ui.editor.SequentDisplaySettingsMenuFactory"
-               locationURI="popup:org.key_project.sed.key.ui.ProofView.popup?before=group.undo">
-         </menuContribution>
-         <menuContribution
-               allPopups="false"
-               class="org.key_project.keyide.ui.editor.RuleSettingsMenuFactory"
-               locationURI="popup:org.key_project.sed.key.ui.ProofView.popup?before=group.undo">
          </menuContribution>
       </extension>
       <extension

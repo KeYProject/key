@@ -93,6 +93,8 @@ public class SequentEditor extends TextEditor implements IBean, ITabbedPropertyS
     */
    public SequentEditor() {
       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addSettingsListener(viewSettingsListener);
+      setEditorContextMenuId("#KeYEditorContext");
+      setRulerContextMenuId("#KeYEditorRulerContext"); // Use own ID to disable globale actions like "Add Bookmark" or "Add Task".
    }
    
    /**
