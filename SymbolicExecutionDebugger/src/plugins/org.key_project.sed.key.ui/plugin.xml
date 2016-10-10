@@ -683,7 +683,7 @@
          <menuContribution
                allPopups="false"
                class="org.key_project.sed.key.ui.view.RuleAppContextMenu"
-               locationURI="popup:org.key_project.sed.key.ui.ProofView.popup?before=group.add">
+               locationURI="popup:org.key_project.sed.key.ui.ProofView.popup?before=group.undo">
          </menuContribution>
          <menuContribution
                allPopups="false"
@@ -736,17 +736,13 @@
          </menuContribution>
          <menuContribution
                allPopups="false"
-               locationURI="popup:org.key_project.sed.key.ui.ProofView">
-         </menuContribution>
-         <menuContribution
-               allPopups="false"
                class="org.key_project.keyide.ui.editor.SequentDisplaySettingsMenuFactory"
-               locationURI="popup:org.key_project.sed.key.ui.ProofView.popup?before=group.add">
+               locationURI="popup:org.key_project.sed.key.ui.ProofView.popup?before=group.undo">
          </menuContribution>
          <menuContribution
                allPopups="false"
                class="org.key_project.keyide.ui.editor.RuleSettingsMenuFactory"
-               locationURI="popup:org.key_project.sed.key.ui.ProofView.popup?before=group.add">
+               locationURI="popup:org.key_project.sed.key.ui.ProofView.popup?before=group.undo">
          </menuContribution>
       </extension>
       <extension
