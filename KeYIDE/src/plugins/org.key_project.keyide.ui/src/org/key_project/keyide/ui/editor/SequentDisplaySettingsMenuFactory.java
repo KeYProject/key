@@ -35,6 +35,11 @@ public class SequentDisplaySettingsMenuFactory extends ExtensionContributionFact
     * The name of the "Sequent Display Settings" menu.
     */
    public static final String MENU_NAME = "Sequent Display Settings";
+
+   /**
+    * The ID of the "Sequent Display Settings" menu.
+    */
+   public static final String MENU_ID = "sequentDisplaySettings";
    
    /**
     * {@inheritDoc}
@@ -51,8 +56,7 @@ public class SequentDisplaySettingsMenuFactory extends ExtensionContributionFact
     * @return The created {@link MenuManager}.
     */
    public static MenuManager createSequentDisplaySettingsMenu(final IProofProvider proofProvider) {
-      MenuManager manager = new MenuManager();
-      manager.setMenuText(MENU_NAME);
+      MenuManager manager = new MenuManager(MENU_NAME, MENU_ID);
       manager.setImageDescriptor(KeYImages.getImageDescriptor(KeYImages.KEY_LOGO));
       manager.setRemoveAllWhenShown(true);
       manager.addMenuListener(new IMenuListener() {

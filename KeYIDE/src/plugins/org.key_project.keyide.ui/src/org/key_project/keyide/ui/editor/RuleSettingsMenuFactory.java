@@ -29,6 +29,11 @@ public class RuleSettingsMenuFactory extends ExtensionContributionFactory {
    public static final String MENU_NAME = "Rule Settings";
    
    /**
+    * The ID of the "Rule Settings" menu.
+    */
+   public static final String MENU_ID = "ruleSettings";
+   
+   /**
     * {@inheritDoc}
     */
    @Override
@@ -43,8 +48,7 @@ public class RuleSettingsMenuFactory extends ExtensionContributionFactory {
     * @return The created {@link MenuManager}.
     */
    public static MenuManager createSequentDisplaySettingsMenu(final IProofProvider proofProvider) {
-      MenuManager manager = new MenuManager();
-      manager.setMenuText(MENU_NAME);
+      MenuManager manager = new MenuManager(MENU_NAME, MENU_ID);
       manager.setImageDescriptor(KeYImages.getImageDescriptor(KeYImages.KEY_LOGO));
       manager.setRemoveAllWhenShown(true);
       manager.addMenuListener(new IMenuListener() {
