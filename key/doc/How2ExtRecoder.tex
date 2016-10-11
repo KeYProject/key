@@ -1,0 +1,375 @@
+\documentclass[11pt]{article}
+
+\title{Extending JML\\By New Data Types}\date{\today}
+
+\author{Peter.~H.~Schmitt}
+
+\begin{document}
+\maketitle
+
+These notes explain the changes to the existing code of the KeY system that are necessary to add a new data type to JML.
+If the new data type is only used in JML specifications then only the changes described in Section
+\ref{sect:JML} need to be done. 
+If you want to use ghost variables or ghost fields, in particular assignments to ghost variables and fields 
+of the new adt then in addition the changes  described in Section
+\ref{sect:Recoder} need to be done. 
+
+These notes do not aim to provide an understanding of the existing code they just tell the user what to do by mimicking
+what is already there. We take the data type $Seq$ of finite sequences as a model.
+
+In the following we use \verb+Basepath+ as an abbreviation for the path\\[5pt]
+\verb+gitKeY/key/key/key.core/src/de/uka/ilkd/key/+
+
+\section{Extension Of  The JML Parser}
+\label{sect:JML}
+
+At the moment the following instructions do not cover the addition of new variable binder symbols.
+
+\paragraph{Change file} \verb+KeYJMLLexer.g+ in \verb+Basepath/speclang/jml/translation+\\
+Here are some existing entries:
+\begin{verbatim}
+ SEQ       : '\\seq';  //KeY extension, not official JML
+ SEQCONCAT : '\\seq_concat'; //KeY extension, not official JML
+ SEQEMPTY  : '\\seq_empty';  //KeY extension, not official JML
+\end{verbatim}
+that you change to fit the purpose. It is important to note that it is here that you establish
+the syntax that is to be used in the code for the data type name and its operations. In the present case that is 
+\verb+\seq+ for the data type of finite sequences and \verb+\seq_concat+ for the concatenation operation and
+  \verb+\seq_empty+ for the empty sequence. Note, the addition escape character \verb+\+.\\
+At the same time you also establish a name for the corresponding nonterminal grammar symbol. 
+
+Personal note: I am suprised that \verb+seqLen+ does not occur here.
+\paragraph{Change file}  \verb+KeYJMLParser.g+ \verb+Basepath/speclang/jml/translation+\\
+\paragraph{\quad Change 1}
+Look for the existing grammar rule for sequences which looks roughly like this:
+\begin{verbatim}
+sequence returns [SLExpression ret = null] throws SLTranslationException
+@init {
+    ImmutableList<Term> tlist = null;
+    KeYJavaType typ;
+    Term t, t2;
+    Token tk = null;
+    Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;
+}
+@after { ret = result; }
+:
+ SEQEMPTY
+   {
+     result=new SLExpression(tb.seqEmpty());
+    }
+ |  
+ .
+ .
+ .        
+ |  (tk2=SEQCONCAT{tk=tk2;} | tk3=SEQGET{tk=tk3;} | tk4=INDEXOF{tk=tk4;})
+      LPAREN e1=expression COMMA e2=expression RPAREN
+  {
+    result=translator.translate(tk.getText(),
+                                SLExpression.class,
+                                services,e1,e2);
+  }
+;
+\end{verbatim}
+Add a new rule replacing the name \verb+sequences+ and adapt what follows after the colon \verb+:+.
+\paragraph{\quad Change 2} In the \verb+jmlprimary+ rule take the entry
+\begin{verbatim}
+| (SEQEMPTY
+   |
+   .
+   .
+   .
+   | SEQCONCAT
+   | SEQGET
+   | INDEXOF)
+         => result = sequence    
+\end{verbatim}
+as a model. Of course you replace \verb+sequence+ in this example by the rule name you chose in the first change.
+\\
+Do not forget to  add an equivalent for your new data type for the line 
+\begin{verbatim}
+| (LPAREN (SEQDEF | SEQ) quantifiedvardecls SEMI)
+\end{verbatim}
+This is neacessary fo parsing quantifier variables of the new data type.
+\paragraph{\quad Change 3} In the \verb+builtintype + rule add a new entry for your data type mimicking
+\begin{verbatim}
+ |   SEQ
+     {
+        type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SEQ);
+      }
+\end{verbatim}
+
+
+\paragraph{Change file} \verb+TermBuilder.java+ in \verb+Basepath/logic+\\
+Look for the section starting with the comment lines
+\begin{verbatim}
+//------------------------
+//sequence operators
+//-----------------------
+\end{verbatim}
+add a suitably adapted section for the new data type. You will notice that you have to use the
+method names introduced in the public interface section in 
+\verb+OrdLDT+.
+\paragraph{Create files} For each nonterminal \verb+NT+ for an operator as declared in  \verb+KeYJMLLexer.g+ create a class file \verb+NameNT.java+ in the directory \\
+\verb+Basepath/java/expression/operator/adt+ following the examples\\ 
+Take \verb+SeqConcat.java+ or \verb+SeqLength.java+ as an example.\\
+It is a good idea to pick a name \verb+NameNT+ that somehwo resembles \verb+NT+.
+
+Constants are treated as literals, not as operators, and their corresponding files go into a different directory. See below.
+
+Calls to the constructors of these new classes are passed on via \verb+super+ to the
+constructors of the class it extends,   \verb+Operator.java+ or \verb+BinaryOperator.java+.
+So here there is nothing else to do but renaming.
+You should also get the \verb+getArity()+ right. \\
+I also set the result of the \verb+getPrecedence()+ method to $0$. I am not 
+sure if that is always correct.
+
+Work needs to be done for the last two methods \verb+visit(Visitor v)+ and
+\verb+prettyPrint(PrettyPrinter p)+ as will be detailed in the next steps.
+
+\paragraph{Change file} \verb+Visitor.java+ in directory
+\verb+Basepath/java/visitor+.\\[5pt]
+This class is an interface. All you have to do here is to add a line that
+adapts the examples you see, e.g.\\[5pt]
+\verb+void performActionOnSeqConcat(SeqConcat x);+
+\paragraph{Change file} \verb+CreatingASTVisitor.java+  in 
+\verb+Basepath/java/visitor+.\\[5pt]
+The empty method specifications from  \verb+Visitor.java+ are overwritten here. 
+Just copy what you see, e.g.
+for  \verb+performActionOnSeqConcat+ and do the appropriate renaming.
+\paragraph{Change file} \verb+JavaASTVisitor.java+  in directory
+\verb+Basepath/java/visitor+.\\[5pt]
+This is an abstract class. You need to add
+a default method implementation.\\
+See   \verb+performActionOnSeqConcat(SeqConcat x)+ for a model.
+
+Always when you edit a file check the import clauses.
+You need to add an adaption of\\[5pt]
+\verb+import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;+
+\\[5pt]
+in all three files you edit in the last three steps. 
+You replace of course \verb+SeqConcat+ by the name of the file you created in step 2.
+
+The files for literals go into the directory \verb+Basepath/java/expression/literal+ instead.
+
+\paragraph{Change file} \verb+PrettyPrinter.java+ in directory
+\verb+Basepath/java+.\\[5pt]
+You need to add a method \verb+printnewOp+ for your operator \verb+newOp+ in the data type
+\verb+newAdt+. tylke your leads e.g. from \verb+printSeqConcat+. Of course you enter here the
+string you want to see printer for your operator.
+
+\paragraph{Create files} in directory \verb+Basepath/java/expression/literals+\\
+This parallels the creation of files like  \verb+SeqConcat.java+ for the operation \verb+SeqConcat+, but now for 
+the literals declared in   \verb+KeYJMLLexer.g+. Note, that these files go into a different directory.
+The following changes also parallel those for operators except that for literals
+ \verb+JavaASTVisitor.java+  is not affected.
+
+\paragraph{Change file} \verb+Visitor.java+ in directory
+\verb+Basepath/java/visitor+.
+\paragraph{Change file} \verb+JavaASTVisitor.java+  in directory
+\verb+Basepath/java/visitor+.
+\paragraph{Change file} \verb+PrettyPrinter.java+ in directory
+\verb+Basepath/java+.
+
+\paragraph{Create file} in directory \verb+Basepath/ldt+\\
+Look at the existing file \verb+SeqLDT.java+ as a model for the new file to be created.
+You will note that for every literal and operation class created in
+\verb+java.expression.literal+   and \verb+java.expression.operator.adt+ a field
+of type \verb+Function+ is declared. To choose a name for this field best follow 
+the pattern you find in \verb+SeqLDT.java+.  The link between the 
+classes in \verb+java.expression.operator.adt+ and the fields are effected in
+method \verb+getFunctionFor+. 
+ The link between the 
+classes in \verb+java.expression.literal+ and the fields are effected in
+method  \verb+translateTerm+. 
+
+Also note that in the constructor  \verb+SeqLDT(TermServices services)+ e.g. in the line
+\begin{verbatim}
+seqConcat   = addFunction(services, "seqConcat");
+\end{verbatim}
+the string, here \verb+ "seqConcat"+, must match the declarations in the .key file, here in
+\verb+seq.key+.
+
+Make sure to include all the files created in the previous two create  steps in 
+the import statements.
+
+This is a lot of work.
+\paragraph{Change file} \verb+LDT.java+ in directory \verb+Basepath/ldt/+\\
+In the  body of the method \verb+getNewLDTInstances(Services s)+   add aline for the new data type mimicking the 
+existing  lines, e.g.\\[5pt]
+\verb+ret.put(SeqLDT.NAME, new SeqLDT(s));+
+\paragraph{Change file} \verb+TypeConverter.java+ in \verb+Basepath/java+\\
+Add a line for the new data type taking the following line for the sequence data type as a model:
+\begin{verbatim}
+ public SeqLDT getSeqLDT() {
+	return (SeqLDT) getLDT(SeqLDT.NAME);
+    }
+\end{verbatim}
+and, as always, do not forget the necessary import statement.
+\section{Extension Of  The Recoder To KeY Translation}
+\label{sect:Recoder}
+
+
+\paragraph{Change file} \verb+LDT.java+ in directory \verb+Basepath/ldt+\\[5pt]
+Add a line for the new data type mimicking e.g. the existing line for the Seq data type
+\begin{verbatim}
+  ret.put(SeqLDT.NAME, new SeqLDT(s));
+\end{verbatim}
+
+\paragraph{Change file } \verb+ProofJavaParser.jj+ in 
+\verb+Basepath/parser/proofjava/+
+\paragraph{\quad Change 1}
+In section \verb+/* RESERVED WORDS AND LITERALS */+ mimick the line\\[5pt]
+\verb+| < SEQ: "\\seq" >+\\[5pt]
+%\verb+| < NEWADT: "\\newAdt" >+\\[5pt]
+The string \verb+SEQ+ for the  nonterminal of the grammar and the name
+\verb+\seq+ for the new data type 
+are the same as in the grammar file  \verb+KeYJMLLexer.g+ in \verb+Basepath/speclang/jml/translation+.
+Note, the additional escape character \verb+\+.
+The notation  you substitute for \verb+\seq+ will be used in the annotated Java code.
+\paragraph{\quad Change 2} Below \verb+TypeReference PrimitiveType() :+ add a line by adapting\\[5pt]
+\verb+ | "\\seq"+
+\paragraph{\quad Change 3}
+Look for \verb+ADTGetter() :+ and  add all getter symbols 
+of the new data type 
+Just mimick what you see there for operators starting with \verb+\seq_+.
+Here is an example:
+\begin{verbatim}
+|
+  "\\seq_concat" "(" expr=Expression() "," result=Expression()")"
+  {
+      result = new SeqConcat(expr, result)
+      setPrefixInfo(result);
+   }
+|
+\end{verbatim}
+enclosed in the disjunctive separator symbol \verb+|+ of the grammar syntax.
+The name of the operator in place of \verb+\seq_concat+ you take from the
+grammar file \verb+KeYJMLLexer.g+ in \verb+Basepath/speclang/jml/translation+.
+The result in the above code fragment refers to a 
+constructor, \verb+SeqConcat(expr,result)+, for the class 
+\verb+SeqConcat+. 
+It is your job to add these classes, one for each operator, 
+getter, constructor or literal. See  below.
+%In the directory \\
+%\verb+Basepath/java/expression/operator/adt+
+%you find a couple of examples to guide you.
+\paragraph{\quad Change 4}
+Look for \verb+ADTConstructor() :+ and add all constructor symbols for the new data type.
+Here is a guiding example from the seq data type:
+\begin{verbatim}
+|
+  "\\seq_concat" "(" expr = Expression() "," result = Expression() ")"
+  {
+      result = new SeqConcat(expr, result)
+      setPrefixInfo(result);
+  }
+|
+\end{verbatim}
+\paragraph{\quad Change 5}
+Constants are not considered as constructors. You have to add them as literals.
+Here is a simple example that suffices for the simplest case of just adding one literal.
+\begin{verbatim}
+EmptySeqLiteral EmptySeqLiteral() :
+{
+    EmptySeqLiteral result;
+}
+{
+  "\\seq_empty"
+  {
+      result = EmptySeqLiteral.INSTANCE;
+      setPrefixInfo(result);
+      return result;
+  }
+}
+\end{verbatim}
+Things get complicated if you want families of literals as e.g. in \verb+bigint+. I did not investigate this.
+
+
+\paragraph{Change file} \verb+Recoder2KeYConverter.java+ in directory
+\verb+Basepath/java+
+\\[5pt]
+convert methods needs to be added. Again look for the line\\[5pt]
+\verb+public SeqConcat convert(...adt.SeqConcat e)+\\[5pt]
+and do the appropriate changes.
+
+Do not forget to add the necessary import statements.
+
+\paragraph{Change file}  \verb+PrimitiveType.java+ in directory
+\verb+Basepath/java/abstraction+\\[5pt]
+Here is the entry for the data type of finite sequence that you may take as a model:
+\begin{verbatim}
+public static final PrimitiveType JAVA_SEQ =
+   new PrimitiveType("\\seq", EmptySeqLiteral.INSTANCE, SeqLDT.NAME);
+\end{verbatim}
+The second argument refers to  the default element for the new data type. See below. 
+\paragraph{Create files} in the directory \verb+Basepath/java/recoderext/adt/+
+for each operator and each literal introduced in 
+ \verb+KeYJMLLexer.g+ in directory\\ 
+\verb+Basepath/speclang/jml/translation+.
+
+Look at \verb+EmptySeqLiteral.java+, \verb+SeqLength.java+, and
+\verb+SeqConcat.java+ as examples for literals, unary and binary operators.
+
+In these files you find a field
+\verb+ private static final long serialVersionUID+
+which you can safely set to $0$.
+
+
+%\paragraph{Create file} in the directory \verb+Basepath/java/recoderext/adt/+\\
+%for the class declared as the default in  \verb+PrimitiveType.java+
+%
+%???
+%
+%Look at \verb+EmptySeqLiteral.java+ as an example.\\
+%In this class you find a field
+%\verb+ private static final long serialVersionUID+
+%which you can safely set to $0$.
+
+
+\paragraph{Change file} \verb+RecoderModelTransformer.java+ in 
+\verb+Basepath/java/recoderext+\\[5pt]
+In this file the default element of the new data tpye is handled.
+Mimic the line
+\begin{verbatim}
+} else if ("\\seq".equals(type.getName())) {
+       return EmptySeqLiteral.INSTANCE;
+\end{verbatim}
+and include the file that replaces \verb+ EmptySeqLiteral+ in the import statements.
+
+
+ \paragraph{Change file} \verb+KeYCrossReferenceSourceInfo.java+ in directory\\[5pt]
+\verb+gitKeY/key/key/key.core/src/recoder/service+\\[5pt]
+First include all the new files you created in the directory\\
+\verb+Basepath/java.recoderext.adt+ in the import statements. Then extend the method
+\verb+ public Type getType(Expression expr)+ appropriately.
+It seems that only constructor  symbols need to be included.
+
+ \paragraph{Change file} \verb+ProgramSVSort.java+ in directory\\[5pt]
+\verb+Basepath/logic/sort+. \\
+This is important for the selection of applicable 
+taclets during proof search. It tells the matching algorithm for schema variables 
+to treat adt expressions  as simple expressions, e.g. when used in assignments to ghost fields.
+
+\section{User Interface}
+You may also want to add a description of the functions of your new data type to the Info
+tab in the user interface. This is done by adding to the xml- file
+\verb+functionExplanations.xml+
+in the directory \\
+\verb+gitKeY/key/key/key.ui/resources/de/uka/ilkd/key/gui/help+.
+
+\section{Find the Error}
+To find the possible error when KeY fails to load I have added the following piece of code
+\begin{verbatim}
+ System.out.println("reached reportError with message "+message); 
+ System.out.println("throwable is "+ t); 
+ java.io.StringWriter sw = new java.io.StringWriter();
+ java.io.PrintWriter pw = new java.io.PrintWriter(sw);
+ t.printStackTrace(pw);
+ System.out.println(sw.toString());
+\end{verbatim}
+at the beginning of the method body for 
+\verb+reportError(String message, Throwable t)+ in file
+\verb+Recoder2KeY.java+ in directory \verb+Basepath/java+.\\
+This prints the error trace of the thrown exception \verb+t+ and might
+give you a hint what could be the problem.
+\end{document}
