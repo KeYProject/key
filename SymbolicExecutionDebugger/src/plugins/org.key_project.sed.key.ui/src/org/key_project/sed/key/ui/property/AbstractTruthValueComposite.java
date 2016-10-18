@@ -1127,4 +1127,36 @@ public abstract class AbstractTruthValueComposite implements IProofProvider, IDi
       UserInterfaceControl ui = getUI();
       return ui != null ? ui.getTermLabelVisibilityManager() : null; 
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanStartAutomode() {
+      return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanApplyRules() {
+      return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanPruneProof() {
+      return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanStartSMTSolver() {
+      return false;
+   }
 }

@@ -16,6 +16,8 @@ package org.key_project.keyide.ui.views;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.util.SafeRunnable;
@@ -33,12 +35,12 @@ import org.eclipse.ui.part.IPageSite;
 import org.eclipse.ui.part.Page;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.keyide.ui.composite.ProofTreeComposite;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.util.IProofNodeSearchSupport;
 
 import de.uka.ilkd.key.control.AutoModeListener;
-import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -52,7 +54,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
-public class ProofTreeContentOutlinePage extends Page implements IContentOutlinePage, ISelectionChangedListener, ITabbedPropertySheetPageContributor, IProofNodeSearchSupport {
+public class ProofTreeContentOutlinePage extends Page implements IContentOutlinePage, ISelectionChangedListener, ITabbedPropertySheetPageContributor, IProofNodeSearchSupport, IAdaptable {
    /**
     * The registered {@link ISelectionChangedListener}.
     */
@@ -60,7 +62,7 @@ public class ProofTreeContentOutlinePage extends Page implements IContentOutline
    
    private final Proof proof;
 
-	private final KeYEnvironment<?> environment;
+	private final IProofProvider proofProvider;
 
 	private final KeYSelectionModel selectionModel;
 	
@@ -104,10 +106,10 @@ public class ProofTreeContentOutlinePage extends Page implements IContentOutline
 	 * @param proof The {@link Proof} for this Outline.
 	 */
 	public ProofTreeContentOutlinePage(Proof proof, 
-	                                   KeYEnvironment<?> environment, 
+	                                   IProofProvider proofProvider, 
 	                                   KeYSelectionModel selectionModel) {
 		this.proof = proof;
-		this.environment = environment;
+		this.proofProvider = proofProvider;
 		this.selectionModel = selectionModel;
 		selectionModel.addKeYSelectionListener(listener);
 	}
@@ -127,7 +129,7 @@ public class ProofTreeContentOutlinePage extends Page implements IContentOutline
 	@Override
 	public void dispose() {
 		selectionModel.removeKeYSelectionListener(listener);
-		environment.getProofControl().removeAutoModeListener(autoModeListener);
+		proofProvider.getProofControl().removeAutoModeListener(autoModeListener);
       if (proofTreeComposite != null) {
          proofTreeComposite.dispose();
       }
@@ -140,9 +142,9 @@ public class ProofTreeContentOutlinePage extends Page implements IContentOutline
 	@Override
 	public void createControl(Composite parent) {
       // Proof tree composite
-      proofTreeComposite = new ProofTreeComposite(parent, SWT.NONE, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL, proof, environment);
+      proofTreeComposite = new ProofTreeComposite(parent, SWT.NONE, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL, proof, proofProvider.getEnvironment());
       proofTreeComposite.getTreeViewer().addSelectionChangedListener(this);
-      environment.getProofControl().addAutoModeListener(autoModeListener); // IMPORTANT: Needs to be registered after label provider is created. Otherwise, injecting elements during selection update fails.
+      proofProvider.getProofControl().addAutoModeListener(autoModeListener); // IMPORTANT: Needs to be registered after label provider is created. Otherwise, injecting elements during selection update fails.
 		// Create context menu of TreeViewer
 		MenuManager menuManager = new MenuManager("Outline popup", "org.key_project.keyide.ui.view.outline.popup");
 		Menu menu = menuManager.createContextMenu(proofTreeComposite.getTreeViewer().getControl());
@@ -355,5 +357,18 @@ public class ProofTreeContentOutlinePage extends Page implements IContentOutline
    @Override
    public void jumpToNextResult() {
       proofTreeComposite.jumpToNextResult();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
+      if (IProofProvider.class.equals(adapter)) {
+         return proofProvider;
+      }
+      else {
+         return Platform.getAdapterManager().getAdapter(this, adapter);
+      }
    }
 }

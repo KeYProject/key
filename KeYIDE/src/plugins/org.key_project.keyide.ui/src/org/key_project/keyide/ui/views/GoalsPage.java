@@ -240,6 +240,9 @@ public class GoalsPage extends Page implements IGoalsPage {
    protected void handleGoalsChanged() {
       ImmutableList<Goal> goals = proof.openGoals();
       if (!ObjectUtil.equals(goals, viewer.getInput())) {
+         labelProvider.dispose();
+         labelProvider = new GoalsLabelProvider(viewer, goals);
+         viewer.setLabelProvider(labelProvider);
          viewer.setInput(goals);
       }
    }
@@ -264,11 +267,14 @@ public class GoalsPage extends Page implements IGoalsPage {
       Object selectedObj = SWTUtil.getFirstElement(selection);
       if (selectedObj instanceof Node) {
          return (Node) selectedObj;
-      } else if (selectedObj instanceof BranchFolder) {
+      }
+      else if (selectedObj instanceof BranchFolder) {
          return ((BranchFolder) selectedObj).getChild();
-      } else if (selectedObj instanceof Goal) {
+      }
+      else if (selectedObj instanceof Goal) {
          return ((Goal) selectedObj).node();
-      } else {
+      }
+      else {
          return null;
       }
    }
@@ -294,12 +300,13 @@ public class GoalsPage extends Page implements IGoalsPage {
     */
    @Override
    public void createControl(Composite parent) {
-      this.viewer = new TableViewer(parent);
-      this.contentProvider = new ImmutableCollectionContentProvider();
-      this.labelProvider = new GoalsLabelProvider();
+      viewer = new TableViewer(parent);
+      contentProvider = new ImmutableCollectionContentProvider();
+      ImmutableList<Goal> goals = proof.openGoals();
+      labelProvider = new GoalsLabelProvider(viewer, goals);
       viewer.setContentProvider(contentProvider);
       viewer.setLabelProvider(labelProvider);
-      viewer.setInput(proof.openGoals());
+      viewer.setInput(goals);
       getSite().setSelectionProvider(viewer); //allow listening to selection changes of this viewer
       getSite().getPage().addSelectionListener(selectionListener);
       updateSelectedNode();
