@@ -1206,4 +1206,36 @@ public class MonKeYComposite extends Composite implements IProofProvider {
    public void setBootClassPath(String bootClassPath) {
       SWTUtil.setText(bootClassPathText, bootClassPath);
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanStartAutomode() {
+      return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanApplyRules() {
+      return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanPruneProof() {
+      return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanStartSMTSolver() {
+      return false;
+   }
 }

@@ -731,4 +731,36 @@ public class ProofView extends AbstractLaunchViewBasedEditorInViewView<SequentEd
    public void selectNode(Node node) {
       proofTreeComposite.selectNode(node);
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanStartAutomode() {
+      return true;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanApplyRules() {
+      return true;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanPruneProof() {
+      return true;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanStartSMTSolver() {
+      return true;
+   }
 }

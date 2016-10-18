@@ -194,7 +194,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		Assert.isTrue(viewer instanceof TreeViewer);
 		this.viewer = (TreeViewer) viewer;
-		if (proof != null) {
+		if (proof != null && !proof.isDisposed()) {
 			proof.removeProofTreeListener(proofTreeListener);
 		}
 		if (newInput instanceof Proof) {
@@ -226,7 +226,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 * @param e The event.
 	 */
    protected void handleAutoModeStarted(ProofEvent e) {
-      if (proof != null) {
+      if (proof != null && !proof.isDisposed()) {
          proof.removeProofTreeListener(proofTreeListener);
          ImmutableList<Goal> goals = proof.openEnabledGoals();
          goalsOfAutomode = ImmutableSLList.<Node>nil();
@@ -241,7 +241,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
     * @param e The event.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      if (proof != null) {
+      if (proof != null && !proof.isDisposed()) {
          proof.addProofTreeListener(proofTreeListener);
          if (!viewer.getControl().isDisposed()) {
             viewer.getControl().getDisplay().asyncExec(new Runnable() {
@@ -823,7 +823,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 */
 	@Override
 	public void dispose() {
-		if (proof != null) {
+		if (proof != null && !proof.isDisposed()) {
 			proof.removeProofTreeListener(proofTreeListener);
 		}
 		if (pc != null) {

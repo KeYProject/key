@@ -714,33 +714,33 @@ public class KeYEditor extends SequentEditor implements IProofProvider, IProofNo
    }
 
    /**
-    * Checks if it is allowed to start the auto mode.
-    * @return {@code true} can start auto mode, {@code false} is not allowed to start auto mode.
+    * {@inheritDoc}
     */
+   @Override
    public boolean isCanStartAutomode() {
       return canStartAutomode;
    }
 
    /**
-    * Checks if it is allowed to apply rules.
-    * @return {@code true} can apply rules, {@code false} is not allowed to apply rules.
+    * {@inheritDoc}
     */
+   @Override
    public boolean isCanApplyRules() {
       return canApplyRules;
    }
 
    /**
-    * Checks if it is allowed to prune proof.
-    * @return {@code true} can prune proof, {@code false} is not allowed to prune proof.
+    * {@inheritDoc}
     */
+   @Override
    public boolean isCanPruneProof() {
       return canPruneProof;
    }
 
    /**
-    * Checks if it is allowed to start SMT solver.
-    * @return {@code true} can start SMT solver, {@code false} is not allowed to start SMT solver.
+    * {@inheritDoc}
     */
+   @Override
    public boolean isCanStartSMTSolver() {
       return canStartSMTSolver;
    }
@@ -753,7 +753,7 @@ public class KeYEditor extends SequentEditor implements IProofProvider, IProofNo
       if (IContentOutlinePage.class.equals(adapter)) {
          synchronized (this) {
             if (outlinePage == null) {
-               outlinePage = new ProofTreeContentOutlinePage(getCurrentProof(), getEnvironment(), selectionModel);
+               outlinePage = new ProofTreeContentOutlinePage(getCurrentProof(), this, selectionModel);
             }
          }
          return outlinePage;

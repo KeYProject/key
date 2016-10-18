@@ -23,6 +23,7 @@ import org.key_project.keyide.ui.Activator;
 import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.util.eclipse.BundleUtil;
 
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
 /**
@@ -210,6 +211,11 @@ public final class KeYImages {
     * The key for the image that is used to close the search result.
     */
    public static final String CLOSE_SEARCH = "org.key_project.keyide.ui.images.closeSearch";
+
+   /**
+    * The key for the image that is used for disabled {@link Goal}s.
+    */
+   public static final String DISABLED_GOAL = "org.key_project.keyide.ui.images.disabledGoal";
    
    /**
     * Forbid instances.
@@ -354,6 +360,9 @@ public final class KeYImages {
        }
        else if (CLOSE_SEARCH.equals(key)) {
           path = "icons/close_view.gif";
+       }
+       else if (DISABLED_GOAL.equals(key)) {
+          path = "icons/keyinteractive.png";
        }
        // Load image if possible
        if (path != null) {

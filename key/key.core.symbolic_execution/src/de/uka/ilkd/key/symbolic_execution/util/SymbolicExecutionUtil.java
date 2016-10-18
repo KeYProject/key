@@ -1692,19 +1692,8 @@ public final class SymbolicExecutionUtil {
     * @return The found {@link Goal}s.
     */
    public static ImmutableList<Goal> collectGoalsInSubtree(Node node) {
-      ImmutableList<Goal> result = ImmutableSLList.nil();
-      if (node != null) {
-         Proof proof = node.proof();
-         Iterator<Node> iter = node.leavesIterator();
-         while (iter.hasNext()) {
-            Node next = iter.next();
-            Goal nextGoal = proof.getGoal(next);
-            if (nextGoal != null) {
-               result = result.append(nextGoal);
-            }
-         }
-      }
-      return result;
+      Proof proof = node.proof();
+      return proof.getSubtreeEnabledGoals(node);
    }
 
    /**
