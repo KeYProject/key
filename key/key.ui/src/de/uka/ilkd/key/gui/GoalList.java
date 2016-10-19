@@ -587,6 +587,9 @@ public class GoalList extends JList<Goal> {
             public void smtDataUpdate(ProofTreeEvent e) {
             }
 
+            @Override
+            public void notesChanged(ProofTreeEvent e) {
+            }
         }
     }
 

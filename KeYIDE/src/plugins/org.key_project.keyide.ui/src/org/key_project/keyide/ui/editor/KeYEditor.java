@@ -84,6 +84,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.ProverTaskListener;
@@ -179,7 +180,7 @@ public class KeYEditor extends SequentEditor implements IProofProvider, IProofNo
    /**
     * Listens for changes on {@link #currentProof}.
     */
-   private final ProofTreeListener proofTreeListener = new ProofTreeListener() {
+   private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
       @Override
       public void smtDataUpdate(ProofTreeEvent e) {
          handleProofChanged(e);

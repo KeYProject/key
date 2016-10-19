@@ -902,6 +902,20 @@ public class Proof implements Named {
 
 
     /**
+     * Fires the event {@link ProofTreeListener#notesChanged(ProofTreeEvent)} to all listener.
+     * @param node The changed {@link Node}.
+     */
+    protected void fireNotesChanged(Node node) {
+        ProofTreeEvent e = new ProofTreeEvent(this, node);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.notesChanged(e);
+            }
+        }
+    }
+
+
+    /**
      * adds a listener to the proof
      * @param listener the ProofTreeListener to be added
      */

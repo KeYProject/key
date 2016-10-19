@@ -92,6 +92,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -178,11 +179,7 @@ public abstract class AbstractTruthValueComposite implements IProofProvider, IDi
    /**
     * Listens for changes on {@link #proof}.
     */
-   private final ProofTreeListener proofTreeListener = new ProofTreeListener() {
-      @Override
-      public void smtDataUpdate(ProofTreeEvent e) {
-      }
-      
+   private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
       @Override
       public void proofStructureChanged(ProofTreeEvent e) {
          handleProofStructureChanged(e);
@@ -191,10 +188,6 @@ public abstract class AbstractTruthValueComposite implements IProofProvider, IDi
       @Override
       public void proofPruned(ProofTreeEvent e) {
          handleProofPruned(e);
-      }
-      
-      @Override
-      public void proofIsBeingPruned(ProofTreeEvent e) {
       }
       
       @Override

@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -56,21 +57,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	/**
 	 * The ProofTreeListener
 	 */
-	private final ProofTreeListener proofTreeListener = new ProofTreeListener() {
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void smtDataUpdate(ProofTreeEvent e) {
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void proofStructureChanged(ProofTreeEvent e) {
-		}
-
+	private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
 		/**
 		 * {@inheritDoc}
 		 */
@@ -83,43 +70,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void proofIsBeingPruned(ProofTreeEvent e) {
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void proofGoalsChanged(ProofTreeEvent e) {
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void proofGoalsAdded(ProofTreeEvent e) {
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void proofGoalRemoved(ProofTreeEvent e) {
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
 		public void proofExpanded(ProofTreeEvent e) {
 			handleProofExpanded(e);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void proofClosed(ProofTreeEvent e) {
 		}
 	};
 	
