@@ -16,6 +16,7 @@ package org.key_project.keyide.ui.util;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -216,6 +217,11 @@ public final class KeYImages {
     * The key for the image that is used for disabled {@link Goal}s.
     */
    public static final String DISABLED_GOAL = "org.key_project.keyide.ui.images.disabledGoal";
+
+   /**
+    * The key for the image that is used for the edit notes wizard.
+    */
+   public static final String EDIT_NOTES_WIZARD = "org.key_project.keyide.ui.images.editNotesWizard";
    
    /**
     * Forbid instances.
@@ -246,7 +252,27 @@ public final class KeYImages {
       }
       return image;
    }
-
+   
+   /**
+    * Returns the {@link ImageDescriptor} for the given key.
+    * @param key The key.
+    * @return The {@link ImageDescriptor} or {@code null} if not available.
+    */
+   public static ImageDescriptor getImageDescriptor(String key) {
+      ImageRegistry imageRegistry = Activator.getDefault().getImageRegistry();
+      ImageDescriptor descriptor = imageRegistry.getDescriptor(key);
+      if (descriptor == null) {
+         synchronized (imageRegistry) { // Make sure that the image is created only once
+            descriptor = imageRegistry.getDescriptor(key); // Make sure that the image is still not available
+            if (descriptor == null) {
+               Image image = createImage(key);
+               imageRegistry.put(key, image);
+               descriptor = imageRegistry.getDescriptor(key);
+            }
+         } 
+      }
+      return descriptor;
+   }
    
    /**
     * Creates an {@link Image} for the given key.
@@ -363,6 +389,9 @@ public final class KeYImages {
        }
        else if (DISABLED_GOAL.equals(key)) {
           path = "icons/keyinteractive.png";
+       }
+       else if (EDIT_NOTES_WIZARD.equals(key)) {
+          path = "icons/editNotes_wizard.png";
        }
        // Load image if possible
        if (path != null) {

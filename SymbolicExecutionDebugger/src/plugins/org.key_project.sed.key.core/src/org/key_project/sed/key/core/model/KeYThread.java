@@ -52,6 +52,7 @@ import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
@@ -139,43 +140,15 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    /**
     * Listens for proof changes
     */
-   private final ProofTreeListener proofChangedListener = new ProofTreeListener() {
-      @Override
-      public void proofExpanded(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void proofIsBeingPruned(ProofTreeEvent e) { 
-      }
-
+   private final ProofTreeListener proofChangedListener = new ProofTreeAdapter() {
       @Override
       public void proofPruned(ProofTreeEvent e) {
         handleProofPruned(e);  
       }
 
       @Override
-      public void proofStructureChanged(ProofTreeEvent e) {  
-      }
-
-      @Override
-      public void proofClosed(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void proofGoalRemoved(ProofTreeEvent e) {  
-      }
-
-      @Override
       public void proofGoalsAdded(ProofTreeEvent e) { 
          handleGoalsAdded(e);
-      }
-
-      @Override
-      public void proofGoalsChanged(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void smtDataUpdate(ProofTreeEvent e) {  
       }
    };
    

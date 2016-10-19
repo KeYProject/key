@@ -25,6 +25,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 
@@ -86,23 +87,7 @@ public class GoalsPage extends Page implements IGoalsPage {
     * The {@link ProofTreeListener} listens to any changes that are made on the
     * current {@link Proof}.
     */
-   private ProofTreeListener proofTreeListener = new ProofTreeListener() {
-      @Override
-      public void proofExpanded(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void proofIsBeingPruned(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void proofPruned(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void proofStructureChanged(ProofTreeEvent e) {
-      }
-
+   private ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
       @Override
       public void proofClosed(ProofTreeEvent e) {
          updateGoalsThreadSafe();
@@ -121,10 +106,6 @@ public class GoalsPage extends Page implements IGoalsPage {
       @Override
       public void proofGoalsChanged(ProofTreeEvent e) {
          updateGoalsThreadSafe();
-      }
-
-      @Override
-      public void smtDataUpdate(ProofTreeEvent e) {
       }
    };
 

@@ -57,6 +57,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
@@ -165,14 +166,10 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
    /**
     * {@link ProofTreeListener} to observe changes on {@link #proof}.
     */
-   private ProofTreeListener proofTreeListener = new ProofTreeListener() {
+   private ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
       @Override
       public void proofExpanded(ProofTreeEvent e) {
          handleProofChanged(e);
-      }
-
-      @Override
-      public void proofIsBeingPruned(ProofTreeEvent e) {
       }
 
       @Override
@@ -188,18 +185,6 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
       @Override
       public void proofClosed(ProofTreeEvent e) {
          handleProofChanged(e);
-      }
-
-      @Override
-      public void proofGoalRemoved(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void proofGoalsAdded(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void proofGoalsChanged(ProofTreeEvent e) {
       }
 
       @Override

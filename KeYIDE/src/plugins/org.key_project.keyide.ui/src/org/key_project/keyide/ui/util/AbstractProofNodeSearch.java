@@ -13,6 +13,7 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.util.NodePreorderIterator;
@@ -57,15 +58,11 @@ public abstract class AbstractProofNodeSearch extends Job implements IDisposable
    /**
     * Listens for changes of the proof tree.
     */
-   private final ProofTreeListener proofTreeListener = new ProofTreeListener() {
+   private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
 
       @Override
       public void proofExpanded(ProofTreeEvent e) {
          handleProofChanged();
-      }
-
-      @Override
-      public void proofIsBeingPruned(ProofTreeEvent e) {
       }
 
       @Override

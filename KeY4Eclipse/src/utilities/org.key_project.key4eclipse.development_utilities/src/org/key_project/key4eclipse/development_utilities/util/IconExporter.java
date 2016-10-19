@@ -92,6 +92,7 @@ public class IconExporter extends TestCase {
       treatIconsToExport(new IconToExpoert(IconFactory.testGeneration(16), 0, 0, "KeYIDE/src/plugins/org.key_project.keyide.ui/icons/testGeneration.png"));
       treatIconsToExport(new IconToExpoert(IconFactory.counterExample(16), 0, 0, "KeYIDE/src/plugins/org.key_project.keyide.ui/icons/counterExample.png"));
       treatIconsToExport(new IconToExpoert(IconFactory.keyHoleInteractive(16, 16), 0, 0, "KeYIDE/src/plugins/org.key_project.keyide.ui/icons/keyinteractive.png"));
+      treatIconsToExport(new IconToExpoert(IconFactory.editFile(16), 0, 0, "KeYIDE/src/plugins/org.key_project.keyide.ui/icons/editFile.png"));
       decorateImages(new IconToDecorate(hole17Image, decProofFileImage, 16, 16, 0, 0, "KeYIDE/src/plugins/org.key_project.keyide.ui/icons/prooffile16.png"));
    }
    

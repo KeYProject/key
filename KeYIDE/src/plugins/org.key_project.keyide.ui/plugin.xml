@@ -96,6 +96,12 @@
             id="org.key_project.keyide.ui.enableGoalsCommand"
             name="Set All Goals Below to Automatic">
       </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Edit Notes"
+            id="org.key_project.keyide.ui.editNotes"
+            name="Edit Notes">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
@@ -138,6 +144,10 @@
       <image
             commandId="org.key_project.keyide.ui.enableGoalsCommand"
             icon="icons/ekey-mono16.png">
+      </image>
+      <image
+            commandId="org.key_project.keyide.ui.editNotes"
+            icon="icons/editFile.png">
       </image>
    </extension>
    <extension
@@ -329,6 +339,10 @@
             </with>
          </enabledWhen>
       </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.EditNotesHandler"
+            commandId="org.key_project.keyide.ui.editNotes">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -508,6 +522,17 @@
                label="Set All Goals Below to Automatic"
                style="push"
                tooltip="Include this node and all goals in the subtree in automatic rule application.">
+         </command>
+         <separator
+               name="org.key_project.keyide.ui.editNotesSeparator"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.key_project.keyide.ui.editNotes"
+               icon="icons/editFile.png"
+               label="Edit Notes"
+               style="push"
+               tooltip="Edit Notes">
          </command>
       </menuContribution>
       <menuContribution

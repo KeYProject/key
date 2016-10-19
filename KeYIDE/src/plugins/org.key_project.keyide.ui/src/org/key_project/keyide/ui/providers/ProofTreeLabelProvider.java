@@ -43,6 +43,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -76,41 +77,13 @@ public class ProofTreeLabelProvider extends LabelProvider {
    /**
     * The ProofTreeListener
     */
-   private final ProofTreeListener proofTreeListener = new ProofTreeListener() {
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public void smtDataUpdate(ProofTreeEvent e) {
-      }
-      
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public void proofStructureChanged(ProofTreeEvent e) {
-      }
-      
+   private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
       /**
        * {@inheritDoc}
        */
       @Override
       public void proofPruned(ProofTreeEvent e) {
          hanldeProofPruned(e);
-      }
-      
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public void proofIsBeingPruned(ProofTreeEvent e) {
-      }
-      
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public void proofGoalsChanged(ProofTreeEvent e) {
       }
       
       /**
@@ -143,6 +116,14 @@ public class ProofTreeLabelProvider extends LabelProvider {
       @Override
       public void proofClosed(ProofTreeEvent e) {
          handleProofClosed(e);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void notesChanged(ProofTreeEvent e) {
+         handleNotesChanged(e);
       }
    };
    
@@ -460,6 +441,14 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * @param e The event.
     */
    protected void hanldeProofPruned(final ProofTreeEvent e) {
+      fireNodeChanged(e.getNode());
+   }
+
+   /**
+    * When the notes of a {@link Node} have changed.
+    * @param e The event.
+    */
+   protected void handleNotesChanged(ProofTreeEvent e) {
       fireNodeChanged(e.getNode());
    }
 
