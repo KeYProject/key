@@ -50,8 +50,6 @@ public interface LoopInvariant extends SpecificationElement {
     public Term getInvariant(LocationVariable heap, Term selfTerm,
                              Map<LocationVariable,Term> atPres, Services services);
 
-    public Term getInvariant(Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
-
     public Term getInvariant(Services services);
 
     /**
