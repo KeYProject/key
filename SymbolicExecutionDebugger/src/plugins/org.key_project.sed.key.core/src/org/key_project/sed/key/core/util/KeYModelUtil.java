@@ -16,7 +16,9 @@ package org.key_project.sed.key.core.util;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
@@ -52,11 +54,14 @@ import org.key_project.sed.key.core.model.KeYLoopStatement;
 import org.key_project.sed.key.core.model.KeYMethodCall;
 import org.key_project.sed.key.core.model.KeYMethodContract;
 import org.key_project.sed.key.core.model.KeYMethodReturn;
+import org.key_project.sed.key.core.model.KeYNodeLink;
 import org.key_project.sed.key.core.model.KeYStatement;
 import org.key_project.sed.key.core.model.KeYTermination;
 import org.key_project.sed.key.core.model.KeYThread;
 import org.key_project.sed.key.core.model.KeYVariable;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -67,6 +72,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLink;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
@@ -102,20 +108,40 @@ public final class KeYModelUtil {
     * @return The created debug model representations.
     * @throws DebugException Occurred Exception.
     */
-   public static IKeYSENode<?>[] updateChildren(IKeYSENode<?> parent,
-         IKeYSENode<?>[] oldChildren, IExecutionNode<?>[] executionChildren)
-         throws DebugException {
+   public static IKeYSENode<?>[] updateChildren(IKeYSENode<?> parent, 
+                                                IKeYSENode<?>[] oldChildren, 
+                                                IExecutionNode<?>[] executionChildren) throws DebugException {
       assert (executionChildren != null);
       IKeYSENode<?>[] result = new IKeYSENode<?>[executionChildren.length];
+      Set<IKeYSENode<?>> removedChildren = new HashSet<IKeYSENode<?>>(oldChildren.length);
+      CollectionUtil.addAll(removedChildren, oldChildren);
       for (int i = 0; i < executionChildren.length; i++) {
          for (int old = 0; old < oldChildren.length; old ++) {
             if (executionChildren[i].equals(oldChildren[old])) { // maybe == instead of equals
                result[i] = oldChildren[old];
+               removedChildren.remove(oldChildren[old]);
                break;
             }
          }
          if (result[i] == null) {
             result[i] = createChild(parent, executionChildren[i]);
+         }
+      }
+      // Remove links from removed children
+      for (IKeYSENode<?> removedChild : removedChildren) {
+         KeYNodeLink[] outgoingLinks = removedChild.getOutgoingLinks();
+         if (!ArrayUtil.isEmpty(outgoingLinks)) {
+            for (KeYNodeLink link : outgoingLinks) {
+               link.getTarget().removeIncomingLink(link);
+               link.getSource().removeOutgoingLink(link);
+            }
+         }
+         KeYNodeLink[] incomingLinks = removedChild.getIncomingLinks();
+         if (!ArrayUtil.isEmpty(incomingLinks)) {
+            for (KeYNodeLink link : incomingLinks) {
+               link.getTarget().removeIncomingLink(link);
+               link.getSource().removeOutgoingLink(link);
+            }
          }
       }
       return result;
@@ -129,7 +155,7 @@ public final class KeYModelUtil {
     * @throws DebugException Occurred Exception.
     */
    public static IKeYSENode<?>[] createChildren(IKeYSENode<?> parent, 
-                                                      IExecutionNode<?>[] executionChildren) throws DebugException {
+                                                IExecutionNode<?>[] executionChildren) throws DebugException {
       if (executionChildren != null) {
          IKeYSENode<?>[] result = new IKeYSENode<?>[executionChildren.length];
          for (int i = 0; i < executionChildren.length; i++) {
@@ -166,9 +192,10 @@ public final class KeYModelUtil {
     * @throws DebugException Occurred Exception.
     */
    public static IKeYSENode<?> createNode(KeYDebugTarget target, 
-                                                KeYThread thread, 
-                                                IKeYSENode<?> parent,
-                                                IExecutionNode<?> executionNode) throws DebugException {
+                                          KeYThread thread, 
+                                          IKeYSENode<?> parent,
+                                          IExecutionNode<?> executionNode) throws DebugException {
+      // Instantiate node
       IKeYSENode<?> result = target.getDebugNode(executionNode);
       if (result != null) {
          if (parent != null) {
@@ -228,6 +255,40 @@ public final class KeYModelUtil {
          }
          else {
             throw new DebugException(LogUtil.getLogger().createErrorStatus("Not supported execution node \"" + executionNode + "\"."));
+         }
+      }
+      // Instantiate incoming links if needed
+      if (result != null) {
+         for (IExecutionLink executionLink : executionNode.getIncomingLinks()) {
+            KeYNodeLink link = target.getLink(executionLink);
+            if (link != null) {
+               if (link.getTarget() == null) {
+                  link.setTarget(result);
+                  result.addIncomingLink(link);
+               }
+            }
+            else {
+               link = new KeYNodeLink(target, executionLink);
+               link.setTarget(result);
+               result.addIncomingLink(link);
+            }
+         }
+      }
+      // Instantiate outgoing links if needed
+      if (result != null) {
+         for (IExecutionLink executionLink : executionNode.getOutgoingLinks()) {
+            KeYNodeLink link = target.getLink(executionLink);
+            if (link != null) {
+               if (link.getSource() == null) {
+                  result.addOutgoingLink(link);
+                  link.setSource(result);
+               }
+            }
+            else {
+               link = new KeYNodeLink(target, executionLink);
+               link.setSource(result);
+               result.addOutgoingLink(link);
+            }
          }
       }
       return result;
@@ -311,9 +372,9 @@ public final class KeYModelUtil {
     * @throws DebugException Occurred Exception.
     */
    public static IKeYSENode<?> createTermination(KeYDebugTarget target, 
-                                                       KeYThread thread, 
-                                                       IKeYSENode<?> parent, 
-                                                       IExecutionTermination terminationExecutionNode) throws DebugException {
+                                                 KeYThread thread, 
+                                                 IKeYSENode<?> parent, 
+                                                 IExecutionTermination terminationExecutionNode) throws DebugException {
       synchronized (thread) {
          ISETermination terminationNode = thread.getTermination(terminationExecutionNode);
          if (terminationNode != null) {

@@ -81,6 +81,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLink;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
@@ -135,6 +136,11 @@ public class KeYDebugTarget extends AbstractSEDebugTarget {
     * Maps an {@link IExecutionNode} to its representation in the debug model.
     */
    private final Map<IExecutionNode<?>, IKeYSENode<?>> executionToDebugMapping = new HashMap<IExecutionNode<?>, IKeYSENode<?>>();
+   
+   /**
+    * Maps an {@link IExecutionLink} to its representation in the debug model.
+    */
+   private final Map<IExecutionLink, KeYNodeLink> linkToDebubMapping = new HashMap<IExecutionLink, KeYNodeLink>();
    
    /**
     * Observes the proof.
@@ -286,6 +292,17 @@ public class KeYDebugTarget extends AbstractSEDebugTarget {
       }
    }
    
+   /**
+    * Registers the given {@link KeYNodeLink} as part of this {@link KeYDebugTarget}.
+    * @param node The {@link KeYNodeLink} to register as part.
+    */
+   public void registerLink(KeYNodeLink link) {
+      if (link != null) {
+         KeYNodeLink oldLink = linkToDebubMapping.put(link.getExecutionLink(), link);
+         Assert.isTrue(oldLink == null);
+      }
+   }
+   
    protected void registerContractSourceLocation(KeYMethodContract node) throws DebugException {
       String path = node.getContractSourcePath();
       if (path != null) {
@@ -336,6 +353,15 @@ public class KeYDebugTarget extends AbstractSEDebugTarget {
     */
    public IKeYSENode<?> getDebugNode(IExecutionNode<?> executionNode) {
       return executionToDebugMapping.get(executionNode);
+   }
+   
+   /**
+    * Returns the {@link KeYNodeLink} for the given {@link IExecutionLink}.
+    * @param link The requested {@link IExecutionLink}.
+    * @return The available {@link KeYNodeLink} or {@code null} otherwise.
+    */
+   public KeYNodeLink getLink(IExecutionLink link) {
+      return linkToDebubMapping.get(link);
    }
 
    /**

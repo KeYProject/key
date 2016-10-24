@@ -46,6 +46,28 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: /set/joinTest
+    */
+   public void testJoinTestAfterAssignment() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/joinTest/test/JoinTestAfterAssignment.proof",
+                          "/set/joinTest/oracle/JoinTestAfterAssignment.xml",
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
     * Tests example: /set/variablesEmptyArrayCreationTest
     */
    public void testVariablesEmptyArrayCreationTest() throws Exception {

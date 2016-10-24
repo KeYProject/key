@@ -407,22 +407,7 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
     */
    @Override
    public IRemoveFeature getRemoveFeature(IRemoveContext context) {
-      if (!isReadOnly()) {
-         return getRemoveFeatureIgnoreReadonlyState(context);
-      }
-      else {
-         return null;
-      }
-   }
-
-   /**
-    * Returns the {@link IRemoveFeature} for the given {@link IRemoveContext}
-    * ignoring the read-only state ({@link #isReadOnly()}).
-    * @param removeContext The {@link IRemoveContext} for that an {@link IRemoveFeature} is requested.
-    * @return The {@link IRemoveFeature} to use or {@code null} if no {@link IRemoveFeature} is available.
-    */
-   public IRemoveFeature getRemoveFeatureIgnoreReadonlyState(IRemoveContext removeContext) {
-      return new ExecutionTreeRemoveFeature(this);
+      return new ExecutionTreeRemoveFeature(this); // Read-only state needs to be ignored to ensure that links between nodes are correctly removed.
    }
    
    /**

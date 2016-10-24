@@ -127,6 +127,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -4179,5 +4180,15 @@ public final class SymbolicExecutionUtil {
       else {
          return false;
       }
+   }
+
+   /**
+    * Checks if the {@link JoinRuleBuiltInRuleApp} is applied.
+    * @param ruleApp The {@link RuleApp} to check.
+    * @return {@code true} is {@link JoinRuleBuiltInRuleApp}, {@code false} otherwise.
+    */
+   public static boolean isJoin(RuleApp ruleApp) {
+      return ruleApp instanceof JoinRuleBuiltInRuleApp &&
+             !((JoinRuleBuiltInRuleApp) ruleApp).getJoinPartners().isEmpty();
    }
 }

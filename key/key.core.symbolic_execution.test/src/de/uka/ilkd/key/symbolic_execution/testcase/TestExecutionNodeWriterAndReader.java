@@ -27,7 +27,7 @@ import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeWriter;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYLessLink;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBlockContract;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBranchStatement;
@@ -45,6 +45,7 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStatement;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessTermination;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessValue;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessVariable;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeWriter;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
@@ -252,6 +253,12 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       sVar1_2Value.addChildVariable(sVar1_2_2);
       KeYlessValue sVar1_2_2Value = new KeYlessValue(sVar1_2_2, "myType", "myValue", "value of sVar1_2_2", true, true, "c9");
       sVar1_2_2.addValue(sVar1_2_2Value);
+      
+      KeYLessLink link = new KeYLessLink();
+      link.setSource(emr);
+      emr.addOutgoingLink(link);
+      link.setTarget(blockContract);
+      blockContract.addIncomingLink(link);
       return root;
    }
 }

@@ -73,6 +73,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLink;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
@@ -396,6 +397,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             assertBlockCompletions((IExecutionBlockStartNode<?>)expected, (IExecutionBlockStartNode<?>)current);
          }
          assertCompletedBlocks(expected, current);
+         assertOutgoingLinks(expected, current);
+         assertIncomingLinks(expected, current);
       }
       if (expected instanceof IExecutionBaseMethodReturn<?>) {
          assertTrue(current instanceof IExecutionBaseMethodReturn<?>);
@@ -516,6 +519,62 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Optionally compare parent
       if (compareParent) {
          assertExecutionNode(expected, current, false, compareVariables, compareCallStack, compareReturnValues, compareConstraints);
+      }
+   }
+
+   /**
+    * Compares the outgoing links.
+    * @param expected The expected {@link IExecutionNode}.
+    * @param current The current {@link IExecutionNode}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertOutgoingLinks(IExecutionNode<?> expected, IExecutionNode<?> current) throws ProofInputException {
+      ImmutableList<IExecutionLink> expectedEntries = expected.getOutgoingLinks();
+      ImmutableList<IExecutionLink> currentEntries = current.getOutgoingLinks();
+      if (expectedEntries != null) {
+         assertNotNull("Outgoing links of \"" + current + "\" should not be null.", currentEntries);
+         assertEquals("Outgoing links: " + expected, expectedEntries.size(), currentEntries.size());
+         Iterator<IExecutionLink> expectedIter = expectedEntries.iterator();
+         Iterator<IExecutionLink> currentIter = currentEntries.iterator();
+         while (expectedIter.hasNext() && currentIter.hasNext()) {
+            IExecutionLink expectedNext = expectedIter.next();
+            IExecutionLink currentNext = currentIter.next();
+            assertExecutionNode(expectedNext.getSource(), currentNext.getSource(), false, false, false, false, false);
+            assertExecutionNode(expectedNext.getTarget(), currentNext.getTarget(), false, false, false, false, false);
+         }
+         assertFalse(expectedIter.hasNext());
+         assertFalse(currentIter.hasNext());
+      }
+      else{
+         assertTrue("Outgoing links of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.", currentEntries == null || currentEntries.isEmpty());
+      }
+   }
+
+   /**
+    * Compares the incoming links.
+    * @param expected The expected {@link IExecutionNode}.
+    * @param current The current {@link IExecutionNode}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertIncomingLinks(IExecutionNode<?> expected, IExecutionNode<?> current) throws ProofInputException {
+      ImmutableList<IExecutionLink> expectedEntries = expected.getIncomingLinks();
+      ImmutableList<IExecutionLink> currentEntries = current.getIncomingLinks();
+      if (expectedEntries != null) {
+         assertNotNull("Incoming links of \"" + current + "\" should not be null.", currentEntries);
+         assertEquals("Incoming links: " + expected, expectedEntries.size(), currentEntries.size());
+         Iterator<IExecutionLink> expectedIter = expectedEntries.iterator();
+         Iterator<IExecutionLink> currentIter = currentEntries.iterator();
+         while (expectedIter.hasNext() && currentIter.hasNext()) {
+            IExecutionLink expectedNext = expectedIter.next();
+            IExecutionLink currentNext = currentIter.next();
+            assertExecutionNode(expectedNext.getSource(), currentNext.getSource(), false, false, false, false, false);
+            assertExecutionNode(expectedNext.getTarget(), currentNext.getTarget(), false, false, false, false, false);
+         }
+         assertFalse(expectedIter.hasNext());
+         assertFalse(currentIter.hasNext());
+      }
+      else{
+         assertTrue("Incoming links of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.", currentEntries == null || currentEntries.isEmpty());
       }
    }
 

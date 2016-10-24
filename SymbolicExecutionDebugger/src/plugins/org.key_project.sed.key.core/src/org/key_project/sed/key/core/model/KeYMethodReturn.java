@@ -13,13 +13,15 @@
 
 package org.key_project.sed.key.core.model;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEMethodReturn;
-import org.key_project.sed.core.model.ISENodeLink;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEVariable;
 import org.key_project.sed.core.model.impl.AbstractSEMethodReturn;
 import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
@@ -93,6 +95,16 @@ public class KeYMethodReturn extends AbstractSEMethodReturn implements IKeYSENod
     * The contained KeY variables at the call state.
     */
    private KeYVariable[] callStateVariables;
+   
+   /**
+    * The outgoing links.
+    */
+   private final List<KeYNodeLink> outgoingLinks = new LinkedList<KeYNodeLink>();
+
+   /**
+    * The incoming links.
+    */
+   private final List<KeYNodeLink> incomingLinks = new LinkedList<KeYNodeLink>();
 
    /**
     * Constructor.
@@ -488,15 +500,47 @@ public class KeYMethodReturn extends AbstractSEMethodReturn implements IKeYSENod
     * {@inheritDoc}
     */
    @Override
-   public ISENodeLink[] getOutgoingLinks() throws DebugException {
-      return null;
+   public void addOutgoingLink(KeYNodeLink link) {
+      outgoingLinks.add(link);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYNodeLink[] getOutgoingLinks() throws DebugException {
+      return outgoingLinks.toArray(new KeYNodeLink[outgoingLinks.size()]);
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public ISENodeLink[] getIncomingLinks() throws DebugException {
-      return null;
+   public KeYNodeLink[] getIncomingLinks() throws DebugException {
+      return incomingLinks.toArray(new KeYNodeLink[incomingLinks.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addIncomingLink(KeYNodeLink link) {
+      incomingLinks.add(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeIncomingLink(KeYNodeLink link) {
+      incomingLinks.remove(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeOutgoingLink(KeYNodeLink link) {
+      outgoingLinks.remove(link);
    }
 }
