@@ -43,12 +43,16 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     private Map<String, ImmutableList<PositionedString>>
         invariants = new LinkedHashMap<String, ImmutableList<PositionedString>>();
     
+    private Map<String, ImmutableList<PositionedString>>
+    freeInvariants = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+    
     
     public TextualJMLLoopSpec(ImmutableList<String> mods) {
         super(mods);
         for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
           assignables.put(heap.toString(), ImmutableSLList.<PositionedString>nil());
           invariants.put(heap.toString(), ImmutableSLList.<PositionedString>nil());
+          freeInvariants.put(heap.toString(), ImmutableSLList.<PositionedString>nil());
         }
     }
 
