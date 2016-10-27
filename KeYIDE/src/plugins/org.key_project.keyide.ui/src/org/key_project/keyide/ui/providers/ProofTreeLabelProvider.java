@@ -239,7 +239,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
 			}
 			else if (node.leaf()) {
 			   Goal goal = node.proof().getGoal(node);
-			   if (goal.isAutomatic()) {
+			   if (goal != null && goal.isAutomatic()) {
 	            return KeYImages.getImage(KeYImages.NODE);
 			   }
 			   else {
