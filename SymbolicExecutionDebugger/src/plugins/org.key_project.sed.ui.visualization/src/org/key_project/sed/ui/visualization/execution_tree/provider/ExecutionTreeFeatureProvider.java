@@ -61,6 +61,7 @@ import org.key_project.sed.core.model.ISEBranchStatement;
 import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalTermination;
+import org.key_project.sed.core.model.ISEJoin;
 import org.key_project.sed.core.model.ISELoopBodyTermination;
 import org.key_project.sed.core.model.ISELoopCondition;
 import org.key_project.sed.core.model.ISELoopInvariant;
@@ -102,6 +103,10 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.ExceptionalTe
 import org.key_project.sed.ui.visualization.execution_tree.feature.ExceptionalTerminationUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ExecutionTreeDeleteFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ExecutionTreeRemoveFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.JoinAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.JoinCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.JoinLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.JoinUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopBodyTerminationAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopBodyTerminationCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopBodyTerminationLayoutFeature;
@@ -193,7 +198,8 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
                                       new MethodContractCreateFeature(this),
                                       new BlockContractCreateFeature(this),
                                       new BlockContractTerminationCreateFeature(this),
-                                      new BlockContractExceptionalTerminationCreateFeature(this)};
+                                      new BlockContractExceptionalTerminationCreateFeature(this),
+                                      new JoinCreateFeature(this)};
       }
       else {
          return new ICreateFeature[0];
@@ -255,6 +261,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
       else if (context.getNewObject() instanceof ISELoopInvariant) {
          return new LoopInvariantAddFeature(this);
+      }
+      else if (context.getNewObject() instanceof ISEJoin) {
+         return new JoinAddFeature(this);
       }
       else {
          return super.getAddFeature(context);
@@ -321,6 +330,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (bo instanceof ISELoopInvariant) {
          return new LoopInvariantUpdateFeature(this);
       }
+      else if (bo instanceof ISEJoin) {
+         return new JoinUpdateFeature(this);
+      }
       else {
          return super.getUpdateFeature(context);
       }
@@ -383,6 +395,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
       else if (bo instanceof ISELoopInvariant) {
          return new LoopInvariantLayoutFeature(this);
+      }
+      else if (bo instanceof ISEJoin) {
+         return new JoinLayoutFeature(this);
       }
       else {
          return super.getLayoutFeature(context);

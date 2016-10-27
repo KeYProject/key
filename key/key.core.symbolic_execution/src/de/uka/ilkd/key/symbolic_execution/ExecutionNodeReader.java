@@ -72,6 +72,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionJoin;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLink;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
@@ -766,6 +767,9 @@ public class ExecutionNodeReader {
       }
       else if (ExecutionNodeWriter.TAG_BLOCK_CONTRACT.equals(qName)) {
          return new KeYlessBlockContract(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isPreconditionComplied(attributes));
+      }
+      else if (ExecutionNodeWriter.TAG_JOIN.equals(qName)) {
+         return new KeYlessJoin(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else {
          throw new SAXException("Unknown tag \"" + qName + "\".");
@@ -2355,6 +2359,35 @@ public class ExecutionNodeReader {
       @Override
       public String getElementType() {
          return "Statement";
+      }
+   }
+
+   /**
+    * An implementation of {@link IExecutionJoin} which is independent
+    * from KeY and provides such only children and default attributes.
+    * @author Martin Hentschel
+    */
+   public static class KeYlessJoin extends AbstractKeYlessExecutionNode<SourceElement> implements IExecutionJoin {
+      /**
+       * Constructor.
+       * @param parent The parent {@link IExecutionNode}.
+       * @param name The name of this node.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
+       * @param formatedPathCondition The formated path condition.
+       */
+      public KeYlessJoin(IExecutionNode<?> parent, 
+                         String name, 
+                         String formatedPathCondition,
+                         boolean pathConditionChanged) {
+         super(parent, name, formatedPathCondition, pathConditionChanged);
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Join";
       }
    }
 

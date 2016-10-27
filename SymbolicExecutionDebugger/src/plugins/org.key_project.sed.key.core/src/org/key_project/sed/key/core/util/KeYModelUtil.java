@@ -47,6 +47,7 @@ import org.key_project.sed.key.core.model.KeYConstraint;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.model.KeYExceptionalMethodReturn;
 import org.key_project.sed.key.core.model.KeYExceptionalTermination;
+import org.key_project.sed.key.core.model.KeYJoin;
 import org.key_project.sed.key.core.model.KeYLoopBodyTermination;
 import org.key_project.sed.key.core.model.KeYLoopCondition;
 import org.key_project.sed.key.core.model.KeYLoopInvariant;
@@ -72,6 +73,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionJoin;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLink;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
@@ -252,6 +254,9 @@ public final class KeYModelUtil {
          else if (executionNode instanceof IExecutionTermination) {
             IExecutionTermination terminationExecutionNode = (IExecutionTermination)executionNode;
             result = createTermination(target, thread, parent, terminationExecutionNode);
+         }
+         else if (executionNode instanceof IExecutionJoin) {
+            result = new KeYJoin(target, parent, thread, (IExecutionJoin)executionNode);
          }
          else {
             throw new DebugException(LogUtil.getLogger().createErrorStatus("Not supported execution node \"" + executionNode + "\"."));

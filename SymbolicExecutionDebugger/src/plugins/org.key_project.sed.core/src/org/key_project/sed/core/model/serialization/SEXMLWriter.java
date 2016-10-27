@@ -47,6 +47,7 @@ import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalTermination;
 import org.key_project.sed.core.model.ISEGroupable;
 import org.key_project.sed.core.model.ISEIDElement;
+import org.key_project.sed.core.model.ISEJoin;
 import org.key_project.sed.core.model.ISELoopBodyTermination;
 import org.key_project.sed.core.model.ISELoopCondition;
 import org.key_project.sed.core.model.ISELoopInvariant;
@@ -153,6 +154,11 @@ public class SEXMLWriter {
     * Tag name to store {@link ISEStatement}s.
     */
    public static final String TAG_STATEMENT = "sedStatement";
+
+   /**
+    * Tag name to store {@link ISEJoin}s.
+    */
+   public static final String TAG_JOIN = "sedJoin";
 
    /**
     * Tag name to store {@link ISETermination}s.
@@ -757,6 +763,9 @@ public class SEXMLWriter {
       else if (node instanceof ISELoopInvariant) {
          return toXML(level, (ISELoopInvariant)node, saveVariables, saveCallStack, saveConstraints, monitor);
       }
+      else if (node instanceof ISEJoin) {
+         return toXML(level, (ISEJoin)node, saveVariables, saveCallStack, saveConstraints, monitor);
+      }
       else {
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Unknown node type of node \"" + node + "\"."));
       }
@@ -1059,6 +1068,28 @@ public class SEXMLWriter {
    }
    
    /**
+    * Serializes the given {@link ISEJoin} into a {@link String}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param statement The {@link ISEJoin} to serialize.
+    * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
+    * @param saveConstraints Save constraints?
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @return The serialized {@link String}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected String toXML(int level, 
+                          ISEJoin statement, 
+                          boolean saveVariables,
+                          boolean saveCallStack,
+                          boolean saveConstraints,
+                          IProgressMonitor monitor) throws DebugException {
+      StringBuffer sb = new StringBuffer();
+      appendNode(level, TAG_JOIN, statement, saveVariables, saveCallStack, saveConstraints, false, sb, monitor);
+      return sb.toString();
+   }
+   
+   /**
     * Serializes the given {@link ISEMethodContract} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
     * @param methodContract The {@link ISEMethodContract} to serialize.
@@ -1306,7 +1337,9 @@ public class SEXMLWriter {
    protected void appendOutgoingLink(int level, ISENodeLink link, StringBuffer sb) throws DebugException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_ID, link.getId());
-      attributeValues.put(ATTRIBUTE_NAME, link.getName());
+      if (link.getName() != null) {
+         attributeValues.put(ATTRIBUTE_NAME, link.getName());
+      }
       if (link.getTarget() != null) {
          attributeValues.put(ATTRIBUTE_LINK_TARGET, link.getTarget().getId());
       }

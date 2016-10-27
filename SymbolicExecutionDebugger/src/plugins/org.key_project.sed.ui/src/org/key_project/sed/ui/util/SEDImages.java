@@ -31,6 +31,7 @@ import org.key_project.sed.core.model.ISEBlockContractExceptionalTermination;
 import org.key_project.sed.core.model.ISEBlockContractTermination;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEBranchStatement;
+import org.key_project.sed.core.model.ISEJoin;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalTermination;
@@ -81,6 +82,11 @@ public final class SEDImages {
      * The key for the image that is used for termination.
      */
     public static final String TERMINATION_NOT_VERIFIED = "org.key_project.sed.ui.images.terminationNotVerified";
+    
+    /**
+     * The key for the image that is used for joins.
+     */
+    public static final String JOIN = "org.key_project.sed.ui.images.join";
     
     /**
      * The key for the image that is used for branch statement.
@@ -452,6 +458,9 @@ public final class SEDImages {
         else if (BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION_NOT_VERIFIED.equals(key)) {
            path = "icons/block_contract_exceptional_termination_not_verified.gif";
         }
+        else if (JOIN.equals(key)) {
+           path = "icons/join.gif";
+        }
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -600,6 +609,9 @@ public final class SEDImages {
           else {
              return getImage(SEDImages.BLOCK_CONTRACT_NOT_PRE);
           }
+       }
+       else if (element instanceof ISEJoin) {
+          return getImage(SEDImages.JOIN);
        }
        else {
           return DebugUIPlugin.getDefaultLabelProvider().getImage(element);

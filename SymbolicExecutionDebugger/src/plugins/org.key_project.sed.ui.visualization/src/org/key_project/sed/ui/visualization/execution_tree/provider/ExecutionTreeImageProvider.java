@@ -72,6 +72,7 @@ public class ExecutionTreeImageProvider extends AbstractImageProvider {
        addImageFilePath(IExecutionTreeImageConstants.IMG_BLOCK_CONTRACT_TERMINATION_NOT_VERIFIED, ROOT_FOLDER_FOR_IMG + "block_contract_termination_not_verified.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION, ROOT_FOLDER_FOR_IMG + "block_contract_exceptional_termination.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION_NOT_VERIFIED, ROOT_FOLDER_FOR_IMG + "block_contract_exceptional_termination_not_verified.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_JOIN, ROOT_FOLDER_FOR_IMG + "join.gif");
 
        addImageFilePath(IExecutionTreeImageConstants.IMG_RESUME, ROOT_FOLDER_FOR_IMG_DEBUG_UI + "resume_co.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_SUSPEND, ROOT_FOLDER_FOR_IMG_DEBUG_UI + "suspend_co.gif");

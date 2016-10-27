@@ -93,6 +93,6 @@ public class KeYNodeLink extends AbstractSENodeLink {
     */
    @Override
    public String getName() {
-      return "join";
+      return null;
    }
 }

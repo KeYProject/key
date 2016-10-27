@@ -127,6 +127,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.join.CloseAfterJoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -170,6 +171,16 @@ public final class SymbolicExecutionUtil {
     * Value in choice option "runtimeExceptions" to allow exceptions.
     */
    public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW = "runtimeExceptions:allow";
+   
+   /**
+    * Key for the choice option "joinGenerateIsWeakeningGoal".
+    */
+   public static final String CHOICE_JOIN_GENERATES_WEAKENING_GOAL_ON = "joinGenerateIsWeakeningGoal:on";
+   
+   /**
+    * Key for the choice option "joinGenerateIsWeakeningGoal".
+    */
+   public static final String CHOICE_JOIN_GENERATES_WEAKENING_GOAL = "joinGenerateIsWeakeningGoal";
 
    /**
     * Name of {@link #RESULT_LABEL}.
@@ -4190,5 +4201,24 @@ public final class SymbolicExecutionUtil {
    public static boolean isJoin(RuleApp ruleApp) {
       return ruleApp instanceof JoinRuleBuiltInRuleApp &&
              !((JoinRuleBuiltInRuleApp) ruleApp).getJoinPartners().isEmpty();
+   }
+
+   /**
+    * Checks if the {@link CloseAfterJoinRuleBuiltInRuleApp} is applied.
+    * @param ruleApp The {@link RuleApp} to check.
+    * @return {@code true} is {@link CloseAfterJoinRuleBuiltInRuleApp}, {@code false} otherwise.
+    */
+   public static boolean isCloseAfterJoin(RuleApp ruleApp) {
+      return ruleApp instanceof CloseAfterJoinRuleBuiltInRuleApp;
+   }
+
+   public static boolean isWeakeningGoalEnabled(Proof proof) {
+      if (proof != null && !proof.isDisposed()) {
+         String value = proof.getSettings().getChoiceSettings().getDefaultChoices().get(CHOICE_JOIN_GENERATES_WEAKENING_GOAL);
+         return CHOICE_JOIN_GENERATES_WEAKENING_GOAL_ON.equals(value);
+      }
+      else {
+         return false;
+      }
    }
 }

@@ -21,18 +21,18 @@ import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEConstraint;
 import org.key_project.sed.core.model.ISEDebugTarget;
-import org.key_project.sed.core.model.ISELoopStatement;
+import org.key_project.sed.core.model.ISEJoin;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.ISEThread;
-import org.key_project.sed.core.model.impl.AbstractSELoopStatement;
+import org.key_project.sed.core.model.impl.AbstractSEJoin;
 
 /**
- * Implementation of {@link ISELoopStatement} that stores all
+ * Implementation of {@link ISEJoin} that stores all
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEMemoryLoopStatement extends AbstractSELoopStatement implements ISEMemoryStackFrameCompatibleDebugNode, ISEMemoryNode, ISEMemoryGroupable {
+public class SEMemoryJoin extends AbstractSEJoin implements ISEMemoryStackFrameCompatibleDebugNode, ISEMemoryNode {
    /**
     * The contained child nodes.
     */
@@ -87,16 +87,6 @@ public class SEMemoryLoopStatement extends AbstractSELoopStatement implements IS
     * The known group start conditions.
     */
    private final List<ISEBranchCondition> groupStartConditions = new LinkedList<ISEBranchCondition>();
-
-   /**
-    * The known group end conditions.
-    */
-   private final List<ISEBranchCondition> groupEndConditions = new LinkedList<ISEBranchCondition>();
-
-   /**
-    * The grouable state.
-    */
-   private boolean groupable;
    
    /**
     * The outgoing {@link ISENodeLink}s.
@@ -110,13 +100,13 @@ public class SEMemoryLoopStatement extends AbstractSELoopStatement implements IS
    
    /**
     * Constructor.
-    * @param target The {@link ISEDebugTarget} in that this loop statement is contained.
+    * @param target The {@link ISEDebugTarget} in that this statement is contained.
     * @param parent The parent in that this node is contained as child.
-    * @param thread The {@link ISEThread} in that this loop statement is contained.
+    * @param thread The {@link ISEThread} in that this statement is contained.
     */
-   public SEMemoryLoopStatement(ISEDebugTarget target, 
-                                 ISENode parent, 
-                                 ISEThread thread) {
+   public SEMemoryJoin(ISEDebugTarget target, 
+                             ISENode parent, 
+                             ISEThread thread) {
       super(target, parent, thread);
    }
 
@@ -346,40 +336,6 @@ public class SEMemoryLoopStatement extends AbstractSELoopStatement implements IS
       if (groupStartCondition != null) {
          groupStartConditions.add(groupStartCondition);
       }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public ISEBranchCondition[] getGroupEndConditions() throws DebugException {
-      return groupEndConditions.toArray(new ISEBranchCondition[groupEndConditions.size()]);
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void addGroupEndCondition(ISEBranchCondition groupEndCondition) {
-      if (groupEndCondition != null) {
-         groupEndConditions.add(groupEndCondition);
-      }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isGroupable() {
-      return groupable;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void setGroupable(boolean groupable) {
-      this.groupable = groupable;
    }
 
    /**

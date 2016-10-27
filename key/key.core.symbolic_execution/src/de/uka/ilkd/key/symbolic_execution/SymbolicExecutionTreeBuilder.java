@@ -82,6 +82,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBlockContract;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionExceptionalMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionJoin;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLink;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopInvariant;
@@ -490,8 +491,8 @@ public class SymbolicExecutionTreeBuilder {
          Node node = iter.next();
          visitor.visit(proof, node); // This visitor pattern must be used because a recursive iteration causes StackOverflowErrors if the proof tree in KeY is to deep (e.g. simple list with 2000 elements during computation of fibonacci(7)
       }
-      visitor.injectLinks(); // Needs to be execute before the completeTree() is called.
       visitor.completeTree();
+      visitor.injectLinks(); // Needs to be execute after the completeTree() is called.
       return completions;
    }
    
@@ -776,6 +777,10 @@ public class SymbolicExecutionTreeBuilder {
             if (source != null) {
                for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> partner : ruleApp.getJoinPartners()) {
                   IExecutionNode<?> target = getBestExecutionNode(partner.first.node());
+                  // Ignore branch conditions below join node
+                  while (target instanceof IExecutionBranchCondition) {
+                     target = getBestExecutionNode(target.getProofNode().parent());
+                  }
                   if (target != null) {
                      IExecutionLink link = source.getOutgoingLink(target);
                      if (link == null) {
@@ -1129,6 +1134,9 @@ public class SymbolicExecutionTreeBuilder {
                // Initialize new call stack of the validity branch
                initNewValidiityMethodCallStack(node);
             }
+         }
+         else if (SymbolicExecutionUtil.isCloseAfterJoin(node.getAppliedRuleApp())) {
+            result = new ExecutionJoin(settings, node);
          }
       }
       else if (SymbolicExecutionUtil.isLoopBodyTermination(node, node.getAppliedRuleApp())) {

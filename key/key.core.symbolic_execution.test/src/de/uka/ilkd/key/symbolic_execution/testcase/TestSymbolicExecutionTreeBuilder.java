@@ -48,6 +48,72 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/joinTest
     */
+   public void testJoinTestAfterBranchConditionWithWeakeningGoalAndSubgoals() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/joinTest/test/JoinTestAfterBranchConditionWithWeakeningGoalAndSubgoals.proof",
+                          "/set/joinTest/oracle/JoinTestAfterBranchCondition.xml", // Same result: with and without weakening!
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/joinTest
+    */
+   public void testJoinTestAfterBranchConditionWithWeakeningGoal() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/joinTest/test/JoinTestAfterBranchConditionWithWeakeningGoal.proof",
+                          "/set/joinTest/oracle/JoinTestAfterBranchCondition.xml", // Same result: with and without weakening!
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/joinTest
+    */
+   public void testJoinTestAfterBranchCondition() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/joinTest/test/JoinTestAfterBranchCondition.proof",
+                          "/set/joinTest/oracle/JoinTestAfterBranchCondition.xml", // Same result: with and without weakening!
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/joinTest
+    */
    public void testJoinTestAfterAssignment() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/joinTest/test/JoinTestAfterAssignment.proof",

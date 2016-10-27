@@ -33,6 +33,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionJoin;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLink;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
@@ -277,6 +278,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String TAG_TERMINATION = "termination";
 
    /**
+    * Tag name to store {@link IExecutionJoin}s.
+    */
+   public static final String TAG_JOIN = "join";
+
+   /**
     * Tag name to store {@link IExecutionOperationContract}s.
     */
    public static final String TAG_OPERATION_CONTRACT = "operationContract";
@@ -479,6 +485,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
       }
       else if (node instanceof IExecutionBlockContract) {
          appendExecutionBlockContract(level, (IExecutionBlockContract)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      }
+      else if (node instanceof IExecutionJoin) {
+         appendExecutionJoin(level, (IExecutionJoin)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
       else {
          throw new IllegalArgumentException("Not supported node \"" + node + "\".");
@@ -836,6 +845,38 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendOutgoingLinks(level + 1, node, sb);
       appendCompletedBlocks(level + 1, node, sb);
       appendEndTag(level, TAG_STATEMENT, sb);
+   }
+
+   /**
+    * Converts the given {@link IExecutionJoin} into XML and appends it to the {@link StringBuffer}.
+    * @param level The current child level.
+    * @param node The {@link IExecutionJoin} to convert.
+    * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendExecutionJoin(int level, 
+                                      IExecutionJoin node, 
+                                      boolean saveVariables, 
+                                      boolean saveCallStack, 
+                                      boolean saveReturnValues,
+                                      boolean saveConstraints,
+                                      StringBuffer sb) throws ProofInputException {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_NAME, node.getName());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
+      appendStartTag(level, TAG_JOIN, attributeValues, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
+      appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendOutgoingLinks(level + 1, node, sb);
+      appendCompletedBlocks(level + 1, node, sb);
+      appendEndTag(level, TAG_JOIN, sb);
    }
 
    /**

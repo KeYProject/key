@@ -33,6 +33,7 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBranchCondi
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessConstraint;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessExceptionalMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessJoin;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessLoopStatement;
@@ -209,6 +210,8 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       mc.addMethodReturn(mr);
       KeYlessBlockContract blockContract = new KeYlessBlockContract(mr, "blockContract", "formatedPathCondition", true, true);
       mr.addChild(blockContract);
+      KeYlessJoin join = new KeYlessJoin(mr, "join", "formatedPathConditionOfJoin", false);
+      mr.addChild(join);
       
       KeYlessVariable mrVar1 = new KeYlessVariable(null, true, "2", "mrVar1");
       mr.addCallStateVariable(mrVar1);
