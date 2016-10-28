@@ -44,7 +44,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         invariants = new LinkedHashMap<String, ImmutableList<PositionedString>>();
     
     private Map<String, ImmutableList<PositionedString>>
-    freeInvariants = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+    	freeInvariants = new LinkedHashMap<String, ImmutableList<PositionedString>>();
     
     
     public TextualJMLLoopSpec(ImmutableList<String> mods) {
@@ -61,6 +61,10 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         addGeneric(invariants, ps);
     }
 
+    public void addFreeInvariant(PositionedString ps) {
+        addGeneric(freeInvariants, ps);
+    }
+    
     public void addAssignable(PositionedString ps) {
         addGeneric(assignables, ps);
     }
@@ -79,13 +83,21 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         setPosition(ps);
     }
 
-    public ImmutableList<PositionedString> getInvariant(String hName) {
-        return invariants.get(hName);
-    }
+//    public ImmutableList<PositionedString> getInvariant(String hName) {
+//        return invariants.get(hName);
+//    }
+//    
+//    public ImmutableList<PositionedString> getFreeInvariant(String hName) {
+//        return freeInvariants.get(hName);
+//    }
 
-    public ImmutableList<PositionedString> getInvariant() {
-        return invariants.get(HeapLDT.BASE_HEAP_NAME.toString());
-    }
+//    public ImmutableList<PositionedString> getInvariant() {
+//        return invariants.get(HeapLDT.BASE_HEAP_NAME.toString());
+//    }
+    
+//    public ImmutableList<PositionedString> getFreeInvariant() {
+//        return freeInvariants.get(HeapLDT.BASE_HEAP_NAME.toString());
+//    }
 
     public ImmutableList<PositionedString> getAssignable() {
         return assignables.get(HeapLDT.BASE_HEAP_NAME.toString());
@@ -107,6 +119,9 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return invariants;
     }
 
+    public Map<String,ImmutableList<PositionedString>> getFreeInvariants() {
+        return freeInvariants;
+    }
     public PositionedString getVariant() {
         return variant;
     }
