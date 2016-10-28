@@ -1859,6 +1859,7 @@ public final class TestSedCoreUtil {
                                      boolean compareConstraints) throws DebugException {
       compareStackFrame(expected, current, compareVariables, compareConstraints);
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
+      assertEquals(expected.isWeakeningVerified(), current.isWeakeningVerified());
    }
 
    /**

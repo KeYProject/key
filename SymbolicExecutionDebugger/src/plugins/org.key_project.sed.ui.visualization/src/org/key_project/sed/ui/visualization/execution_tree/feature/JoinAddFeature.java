@@ -45,6 +45,9 @@ public class JoinAddFeature extends AbstractDebugNodeAddFeature {
     */
    @Override
    protected String getImageId(ISENode node) {
-      return IExecutionTreeImageConstants.IMG_JOIN;
+      ISEJoin joinNode = (ISEJoin) node;
+      return joinNode.isWeakeningVerified() ? 
+             IExecutionTreeImageConstants.IMG_JOIN : 
+             IExecutionTreeImageConstants.IMG_JOIN_WEAKENING_NOT_VERIFIED;
    }
 }

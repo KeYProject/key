@@ -1284,9 +1284,10 @@ public class SEXMLReader {
       join.setSourcePath(getSourcePath(attributes));
       fillDebugNode(join, attributes);
       fillStackFrame(join, attributes);
+      join.setWeakeningVerified(isWeakeningVerified(attributes));
       return join;
    }
-   
+
    /**
     * Creates a {@link SEMemoryMethodContract} instance for the content in the given tag.
     * @param target The parent {@link ISEDebugTarget} or {@code null} if not available.
@@ -1608,6 +1609,15 @@ public class SEXMLReader {
     */
    protected boolean isPreconditionComplied(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(SEXMLWriter.ATTRIBUTE_PRECONDITION_COMPLIED));
+   }
+   
+   /**
+    * Returns the weakening verified value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isWeakeningVerified(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(SEXMLWriter.ATTRIBUTE_WEAKENING_VERIFIED));
    }
    
    /**

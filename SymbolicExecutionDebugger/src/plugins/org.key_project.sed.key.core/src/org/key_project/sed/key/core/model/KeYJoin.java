@@ -163,6 +163,14 @@ public class KeYJoin extends AbstractSEJoin implements IKeYSENode<IExecutionJoin
     * {@inheritDoc}
     */
    @Override
+   public boolean isWeakeningVerified() {
+      return executionNode.isWeakeningVerified();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public String getSourcePath() {
       try {
          // Return source path of the parent which is not a branch condition.

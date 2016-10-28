@@ -16,7 +16,7 @@
             </statement>
          </branchCondition>
          <branchCondition name="gt(value,Z(neglit(1(#))))" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(value,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <join name="Join" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="false">
+            <join name="Join" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="false" weakeningVerified="true">
                <outgoingLink path="/0/0/0/0"/>
             </join>
          </branchCondition>

@@ -222,4 +222,9 @@ public interface IExecutionTreeImageConstants {
     * Key of the image for {@link ISEJoin}s.
     */
    public static final String IMG_JOIN = PREFIX + "join";
+
+   /**
+    * Key of the image for {@link ISEJoin}s.
+    */
+   public static final String IMG_JOIN_WEAKENING_NOT_VERIFIED = PREFIX + "joinWeakeningNotVerified";
 }

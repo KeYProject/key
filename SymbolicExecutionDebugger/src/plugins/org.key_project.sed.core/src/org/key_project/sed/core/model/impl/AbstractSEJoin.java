@@ -41,6 +41,10 @@ public abstract class AbstractSEJoin extends AbstractSEStackFrameCompatibleDebug
     */
    @Override
    public String getNodeType() {
-      return "Join";
+      String kind = "Join";
+      if (!isWeakeningVerified()) {
+         kind += " (weakening not verified)";
+      }
+      return kind;
    }
 }

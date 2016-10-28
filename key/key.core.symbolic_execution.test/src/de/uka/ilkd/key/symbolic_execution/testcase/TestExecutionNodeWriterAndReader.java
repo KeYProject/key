@@ -210,7 +210,7 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       mc.addMethodReturn(mr);
       KeYlessBlockContract blockContract = new KeYlessBlockContract(mr, "blockContract", "formatedPathCondition", true, true);
       mr.addChild(blockContract);
-      KeYlessJoin join = new KeYlessJoin(mr, "join", "formatedPathConditionOfJoin", false);
+      KeYlessJoin join = new KeYlessJoin(mr, "join", "formatedPathConditionOfJoin", false, true);
       mr.addChild(join);
       
       KeYlessVariable mrVar1 = new KeYlessVariable(null, true, "2", "mrVar1");

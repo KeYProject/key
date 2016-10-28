@@ -342,6 +342,11 @@ public class SEXMLWriter {
    public static final String ATTRIBUTE_PRECONDITION_COMPLIED = "preconditionComplied";
 
    /**
+    * Attribute name to store {@link ISEJoin#isWeakeningVerified()}.
+    */
+   public static final String ATTRIBUTE_WEAKENING_VERIFIED = "weakeningVerified";
+
+   /**
     * Attribute name to store {@link ISEMethodContract#hasNotNullCheck()}.
     */
    public static final String ATTRIBUTE_HAS_NOT_NULL_CHECK = "hasNotNullCheck";
@@ -1070,7 +1075,7 @@ public class SEXMLWriter {
    /**
     * Serializes the given {@link ISEJoin} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
-    * @param statement The {@link ISEJoin} to serialize.
+    * @param join The {@link ISEJoin} to serialize.
     * @param saveVariables Save variables?
     * @param saveCallStack Save call stack?
     * @param saveConstraints Save constraints?
@@ -1079,13 +1084,15 @@ public class SEXMLWriter {
     * @throws DebugException Occurred Exception.
     */
    protected String toXML(int level, 
-                          ISEJoin statement, 
+                          ISEJoin join, 
                           boolean saveVariables,
                           boolean saveCallStack,
                           boolean saveConstraints,
                           IProgressMonitor monitor) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_JOIN, statement, saveVariables, saveCallStack, saveConstraints, false, sb, monitor);
+      Map<String, String> attributeValues = createDefaultNodeAttributes(join);
+      attributeValues.put(ATTRIBUTE_WEAKENING_VERIFIED, join.isWeakeningVerified() + "");
+      appendNode(level, TAG_JOIN, join, saveVariables, saveCallStack, saveConstraints, false, attributeValues, sb, monitor);
       return sb.toString();
    }
    

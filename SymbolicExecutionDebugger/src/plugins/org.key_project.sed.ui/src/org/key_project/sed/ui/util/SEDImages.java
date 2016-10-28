@@ -89,6 +89,11 @@ public final class SEDImages {
     public static final String JOIN = "org.key_project.sed.ui.images.join";
     
     /**
+     * The key for the image that is used for joins.
+     */
+    public static final String JOIN_WEAKENING_NOT_VERIFIED = "org.key_project.sed.ui.images.joinWeakeningNotVerified";
+    
+    /**
      * The key for the image that is used for branch statement.
      */
     public static final String BRANCH_STATEMENT = "org.key_project.sed.ui.images.branchStatement";
@@ -461,6 +466,9 @@ public final class SEDImages {
         else if (JOIN.equals(key)) {
            path = "icons/join.gif";
         }
+        else if (JOIN_WEAKENING_NOT_VERIFIED.equals(key)) {
+           path = "icons/join_weakening_not_verified.gif";
+        }
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -611,7 +619,13 @@ public final class SEDImages {
           }
        }
        else if (element instanceof ISEJoin) {
-          return getImage(SEDImages.JOIN);
+          ISEJoin join = (ISEJoin) element;
+          if (join.isWeakeningVerified()) {
+             return getImage(SEDImages.JOIN);
+          }
+          else {
+             return getImage(SEDImages.JOIN_WEAKENING_NOT_VERIFIED);
+          }
        }
        else {
           return DebugUIPlugin.getDefaultLabelProvider().getImage(element);

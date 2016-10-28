@@ -221,6 +221,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Attribute name to store {@link IExecutionBlockStartNode#isBlockOpened()}.
     */
    public static final String ATTRIBUTE_BLOCK_OPENED = "blockOpened";
+
+   /**
+    * Attribute name to store {@link IExecutionJoin#isWeakeningVerified()}.
+    */
+   public static final String ATTRIBUTE_WEAKENING_VERIFIED = "weakeningVerified";
    
    /**
     * Tag name to store {@link IExecutionBranchCondition}s.
@@ -869,6 +874,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
+      attributeValues.put(ATTRIBUTE_WEAKENING_VERIFIED, node.isWeakeningVerified() + "");
       appendStartTag(level, TAG_JOIN, attributeValues, sb);
       appendConstraints(level + 1, node, saveConstraints, sb);
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);

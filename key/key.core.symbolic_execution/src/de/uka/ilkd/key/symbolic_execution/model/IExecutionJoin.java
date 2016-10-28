@@ -17,4 +17,9 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionJoin;
  * @see ExecutionJoin
  */
 public interface IExecutionJoin extends IExecutionNode<SourceElement> {
+   /**
+    * Checks if the weakening is verified.
+    * @return {@code true} is verified, {@code false} is not verified.
+    */
+   public boolean isWeakeningVerified();
 }

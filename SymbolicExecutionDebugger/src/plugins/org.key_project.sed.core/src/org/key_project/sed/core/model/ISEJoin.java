@@ -33,5 +33,9 @@ import org.key_project.sed.core.model.memory.SEMemoryJoin;
  * @see ISENode
  */
 public interface ISEJoin extends ISENode, IStackFrame {
-
+   /**
+    * Checks if the weakening is verified.
+    * @return {@code true} is verified, {@code false} is not verified.
+    */
+   public boolean isWeakeningVerified();
 }

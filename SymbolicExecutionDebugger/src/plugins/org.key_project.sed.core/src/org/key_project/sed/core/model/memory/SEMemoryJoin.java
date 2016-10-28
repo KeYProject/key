@@ -97,6 +97,11 @@ public class SEMemoryJoin extends AbstractSEJoin implements ISEMemoryStackFrameC
     * The incoming {@link ISENodeLink}s.
     */
    private final List<ISENodeLink> incomingLinks = new LinkedList<ISENodeLink>();
+
+   /**
+    * Is the weakening verified?
+    */
+   private boolean weakeningVerified;
    
    /**
     * Constructor.
@@ -105,8 +110,8 @@ public class SEMemoryJoin extends AbstractSEJoin implements ISEMemoryStackFrameC
     * @param thread The {@link ISEThread} in that this statement is contained.
     */
    public SEMemoryJoin(ISEDebugTarget target, 
-                             ISENode parent, 
-                             ISEThread thread) {
+                       ISENode parent, 
+                       ISEThread thread) {
       super(target, parent, thread);
    }
 
@@ -384,5 +389,21 @@ public class SEMemoryJoin extends AbstractSEJoin implements ISEMemoryStackFrameC
    @Override
    public ISENodeLink[] getIncomingLinks() throws DebugException {
       return incomingLinks.toArray(new ISENodeLink[incomingLinks.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isWeakeningVerified() {
+      return weakeningVerified;
+   }
+
+   /**
+    * Defines if the weakening is verified.
+    * @param weakeningVerified {@code true} verified, {@code false} not verified.
+    */
+   public void setWeakeningVerified(boolean weakeningVerified) {
+      this.weakeningVerified = weakeningVerified;
    }
 }

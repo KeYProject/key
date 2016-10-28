@@ -59,4 +59,17 @@ public class ExecutionJoin extends AbstractExecutionNode<SourceElement> implemen
    public String getElementType() {
       return "Join";
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isWeakeningVerified() {
+      if (SymbolicExecutionUtil.isWeakeningGoalEnabled(getProof())) {
+         return SymbolicExecutionUtil.lazyComputeIsMainBranchVerified(getProofNode().child(0));
+      }
+      else {
+         return true;
+      }
+   }
 }

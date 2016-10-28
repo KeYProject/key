@@ -501,6 +501,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       else if (expected instanceof IExecutionJoin) {
          assertTrue("Expected IExecutionJoin but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionJoin);
+         assertEquals(((IExecutionJoin)expected).isWeakeningVerified(), ((IExecutionJoin)current).isWeakeningVerified());
          assertVariables((IExecutionJoin)expected, (IExecutionJoin)current, compareVariables, compareConstraints);
          assertConstraints((IExecutionJoin)expected, (IExecutionJoin)current, compareConstraints);
       }

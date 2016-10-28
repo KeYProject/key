@@ -39,6 +39,40 @@ public class SWTBotKeYDebugTargetProofFileTest extends AbstractKeYDebugTargetTes
     * Tests the joining of two branches.
     */
    @Test
+   public void testJoinTestAfterBranchConditionWithWeakeningGoalNotVerified() throws Exception {
+      IKeYDebugTargetProofFileTestExecutor executor = new IKeYDebugTargetProofFileTestExecutor() {
+         @Override
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IFile file, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
+            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/joinTest/oracle/JoinTestAfterBranchConditionWithWeakeningGoalNotVerified.xml", false, false, false);
+         }
+      };
+      doKeYDebugTargetTest("SWTBotKeYDebugTargetProofFileTest_testJoinTestAfterBranchConditionWithWeakeningGoalNotVerified", 
+                           Activator.PLUGIN_ID, 
+                           "data/joinTest/test", 
+                           true, 
+                           true, 
+                           new IFileSelector() {
+                              @Override
+                              public IFile getFile(IJavaProject project) throws Exception {
+                                 return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path("SWTBotKeYDebugTargetProofFileTest_testJoinTestAfterBranchConditionWithWeakeningGoalNotVerified/src/JoinTestAfterBranchConditionWithWeakeningGoalNotVerified.proof"));
+                              }
+                           },
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           14, 
+                           executor);
+   }
+   
+   /**
+    * Tests the joining of two branches.
+    */
+   @Test
    public void testJoinTestAfterBranchConditionWithWeakeningGoal() throws Exception {
       IKeYDebugTargetProofFileTestExecutor executor = new IKeYDebugTargetProofFileTestExecutor() {
          @Override

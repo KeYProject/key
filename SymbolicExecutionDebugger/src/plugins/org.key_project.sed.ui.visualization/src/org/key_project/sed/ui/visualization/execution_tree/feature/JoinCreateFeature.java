@@ -63,6 +63,7 @@ public class JoinCreateFeature extends AbstractDebugNodeCreateFeature {
                                               String name) throws DebugException {
       SEMemoryJoin result = new SEMemoryJoin(target, parent, thread);
       result.setName(name);
+      result.setWeakeningVerified(true);
       return result;
    }
 }

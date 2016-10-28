@@ -48,6 +48,28 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/joinTest
     */
+   public void testJoinTestAfterBranchConditionWithWeakeningGoalNotVerified() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/joinTest/test/JoinTestAfterBranchConditionWithWeakeningGoalNotVerified.proof",
+                          "/set/joinTest/oracle/JoinTestAfterBranchConditionWithWeakeningGoalNotVerified.xml",
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/joinTest
+    */
    public void testJoinTestAfterBranchConditionWithWeakeningGoalAndSubgoals() throws Exception {
       doSETTestAndDispose(testCaseDirectory,
                           "/set/joinTest/test/JoinTestAfterBranchConditionWithWeakeningGoalAndSubgoals.proof",

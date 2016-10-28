@@ -769,7 +769,7 @@ public class ExecutionNodeReader {
          return new KeYlessBlockContract(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isPreconditionComplied(attributes));
       }
       else if (ExecutionNodeWriter.TAG_JOIN.equals(qName)) {
-         return new KeYlessJoin(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
+         return new KeYlessJoin(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isWeakeningVerified(attributes));
       }
       else {
          throw new SAXException("Unknown tag \"" + qName + "\".");
@@ -909,6 +909,15 @@ public class ExecutionNodeReader {
     */
    protected boolean isValueAnObject(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_IS_VALUE_AN_OBJECT));
+   }
+
+   /**
+    * Returns if the weakening is verified.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isWeakeningVerified(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_WEAKENING_VERIFIED));
    }
 
    /**
@@ -2369,17 +2378,25 @@ public class ExecutionNodeReader {
     */
    public static class KeYlessJoin extends AbstractKeYlessExecutionNode<SourceElement> implements IExecutionJoin {
       /**
+       * Is the weakening verified?
+       */
+      private final boolean weakeningVerified;
+      
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param pathConditionChanged Is the path condition changed compared to parent?
        * @param formatedPathCondition The formated path condition.
+       * @param weakeningVerified Is the weakening verified?
        */
       public KeYlessJoin(IExecutionNode<?> parent, 
                          String name, 
                          String formatedPathCondition,
-                         boolean pathConditionChanged) {
+                         boolean pathConditionChanged,
+                         boolean weakeningVerified) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
+         this.weakeningVerified = weakeningVerified;
       }
       
       /**
@@ -2388,6 +2405,14 @@ public class ExecutionNodeReader {
       @Override
       public String getElementType() {
          return "Join";
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isWeakeningVerified() {
+         return weakeningVerified;
       }
    }
 
