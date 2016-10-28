@@ -446,4 +446,12 @@ public class KeYJoin extends AbstractSEJoin implements IKeYSENode<IExecutionJoin
    public void removeOutgoingLink(KeYNodeLink link) {
       outgoingLinks.remove(link);
    }
+
+   /**
+    * Checks if the weakening verification is supported.
+    * @return {@code true} supported, {@code false} not supported.
+    */
+   public boolean isWeakeningVerificationSupported() {
+      return executionNode.isWeakeningVerificationSupported();
+   }
 }

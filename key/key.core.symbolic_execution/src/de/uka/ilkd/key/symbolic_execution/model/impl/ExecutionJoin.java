@@ -65,11 +65,19 @@ public class ExecutionJoin extends AbstractExecutionNode<SourceElement> implemen
     */
    @Override
    public boolean isWeakeningVerified() {
-      if (SymbolicExecutionUtil.isWeakeningGoalEnabled(getProof())) {
+      if (isWeakeningVerificationSupported()) {
          return SymbolicExecutionUtil.lazyComputeIsMainBranchVerified(getProofNode().child(0));
       }
       else {
          return true;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isWeakeningVerificationSupported() {
+      return SymbolicExecutionUtil.isWeakeningGoalEnabled(getProof());
    }
 }

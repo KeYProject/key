@@ -2414,6 +2414,14 @@ public class ExecutionNodeReader {
       public boolean isWeakeningVerified() {
          return weakeningVerified;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isWeakeningVerificationSupported() {
+         return true;
+      }
    }
 
    /**

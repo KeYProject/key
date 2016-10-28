@@ -127,6 +127,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.join.CloseAfterJoin;
 import de.uka.ilkd.key.rule.join.CloseAfterJoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
@@ -171,16 +172,6 @@ public final class SymbolicExecutionUtil {
     * Value in choice option "runtimeExceptions" to allow exceptions.
     */
    public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW = "runtimeExceptions:allow";
-   
-   /**
-    * Key for the choice option "joinGenerateIsWeakeningGoal".
-    */
-   public static final String CHOICE_JOIN_GENERATES_WEAKENING_GOAL_ON = "joinGenerateIsWeakeningGoal:on";
-   
-   /**
-    * Key for the choice option "joinGenerateIsWeakeningGoal".
-    */
-   public static final String CHOICE_JOIN_GENERATES_WEAKENING_GOAL = "joinGenerateIsWeakeningGoal";
 
    /**
     * Name of {@link #RESULT_LABEL}.
@@ -4212,10 +4203,15 @@ public final class SymbolicExecutionUtil {
       return ruleApp instanceof CloseAfterJoinRuleBuiltInRuleApp;
    }
 
+   /**
+    * Checks if the weakening goal is enabled or not.
+    * @param proof The {@link Proof} to check.
+    * @return {@code true} enabled, {@code false} disabled.
+    */
    public static boolean isWeakeningGoalEnabled(Proof proof) {
       if (proof != null && !proof.isDisposed()) {
-         String value = proof.getSettings().getChoiceSettings().getDefaultChoices().get(CHOICE_JOIN_GENERATES_WEAKENING_GOAL);
-         return CHOICE_JOIN_GENERATES_WEAKENING_GOAL_ON.equals(value);
+         String value = proof.getSettings().getChoiceSettings().getDefaultChoices().get(CloseAfterJoin.JOIN_GENERATE_IS_WEAKENING_GOAL_CFG);
+         return CloseAfterJoin.JOIN_GENERATE_IS_WEAKENING_GOAL_CFG_ON.equals(value);
       }
       else {
          return false;

@@ -29,6 +29,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.join.CloseAfterJoin;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
 /**
@@ -161,7 +162,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
              (rule instanceof WhileInvariantRule && WhileInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint)) ||
              (rule instanceof UseOperationContractRule && UseOperationContractRule.FINAL_PRE_TERM_HINT.equals(hint)) ||
              (rule instanceof BlockContractRule && BlockContractRule.FULL_PRECONDITION_TERM_HINT.equals(hint)) ||
-             (rule instanceof BlockContractRule && BlockContractRule.NEW_POSTCONDITION_TERM_HINT.equals(hint))) {
+             (rule instanceof BlockContractRule && BlockContractRule.NEW_POSTCONDITION_TERM_HINT.equals(hint)) ||
+             (rule instanceof CloseAfterJoin && CloseAfterJoin.FINAL_WEAKENING_TERM_HINT.equals(hint))) {
             ProofOblInput problem = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
             if (problem instanceof AbstractOperationPO) {
                return ((AbstractOperationPO) problem).isAddSymbolicExecutionLabel();
@@ -194,7 +196,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
                                Term term, 
                                List<TermLabel> labels) {
       if (shouldRefactorSpecificationApplication(rule, goal, hint)) {
-         refactorSpecificationApplication(term, goal ,services, labels);
+         refactorSpecificationApplication(term, goal, services, labels, hint);
       }
       else if (isParentRefactroingRequired(state)) {
          refactorInCaseOfNewIdRequired(state, goal, term, services, labels);
@@ -220,8 +222,10 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    protected void refactorSpecificationApplication(Term term, 
                                                    Goal goal,
                                                    Services services, 
-                                                   List<TermLabel> labels) {
-      if (TruthValueTracingUtil.isPredicate(term)) {
+                                                   List<TermLabel> labels,
+                                                   Object hint) {
+      if (TruthValueTracingUtil.isPredicate(term)
+          || (CloseAfterJoin.FINAL_WEAKENING_TERM_HINT.equals(hint) && TruthValueTracingUtil.isLogicOperator(term))) {
          TermLabel existingLabel = term.getLabel(FormulaTermLabel.NAME);
          if (existingLabel == null) {
             int labelID = services.getCounter(FormulaTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();

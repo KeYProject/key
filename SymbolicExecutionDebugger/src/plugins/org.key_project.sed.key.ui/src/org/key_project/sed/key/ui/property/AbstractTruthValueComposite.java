@@ -997,7 +997,7 @@ public abstract class AbstractTruthValueComposite implements IProofProvider, IDi
     * @param e The event.
     */
    protected void handleViewSettingsChanged(EventObject e) {
-      recreateContent();
+      recreateContentThreadSave();
    }
 
    /**
@@ -1005,7 +1005,7 @@ public abstract class AbstractTruthValueComposite implements IProofProvider, IDi
     * @param e The event.
     */
    protected void handleVisibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
-      recreateContent();
+      recreateContentThreadSave();
    }
    
    /**
