@@ -1434,6 +1434,8 @@ public class JMLSpecFactory {
                                                  Map<String,ImmutableList<PositionedString>>
                                                         originalInvariants,
                                                  Map<String,ImmutableList<PositionedString>>
+    													originalFreeInvariants,
+                                                 Map<String,ImmutableList<PositionedString>>
                                                         originalAssignables,
                                                  ImmutableList<PositionedString>
                                                         originalInfFlowSpecs,
@@ -1502,6 +1504,28 @@ public class JMLSpecFactory {
           }
           invariants.put(heap, invariant);
         }
+        
+        Map<LocationVariable,Term> freeInvariants = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable heap : allHeaps) {
+          Term freeInvariant;
+          ImmutableList<PositionedString> originalFreeInvariant =
+                  originalFreeInvariants.get(heap.name().toString());
+          if (originalFreeInvariant.isEmpty()) {
+            freeInvariant = null;
+          } else {
+        	freeInvariant = TB.tt();
+            for (PositionedString expr : originalFreeInvariant) {
+                Term translated =
+                        JMLTranslator.translate(expr, pm.getContainerType(),
+                                                selfVar, allVars, null,
+                                                null, atPres,
+                                                Term.class, services);
+                freeInvariant = TB.andSC(freeInvariant, TB.convertToFormula(translated));
+            }
+          }
+          freeInvariants.put(heap, freeInvariant);
+        }
+        
         //translateToTerm assignable
         Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
         for(String h : originalAssignables.keySet()) {
@@ -1596,6 +1620,7 @@ public class JMLSpecFactory {
         return createJMLLoopInvariant(pm,
                                       loop,
                                       textualLoopSpec.getInvariants(),
+                                      textualLoopSpec.getFreeInvariants(),
                                       textualLoopSpec.getAssignables(),
                                       textualLoopSpec.getInfFlowSpecs(),
                                       textualLoopSpec.getVariant());
