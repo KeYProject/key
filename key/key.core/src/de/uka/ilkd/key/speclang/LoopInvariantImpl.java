@@ -48,6 +48,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     private final IProgramMethod pm;
     private final KeYJavaType kjt;
     private final Map<LocationVariable,Term> originalInvariants;
+    private final Map<LocationVariable,Term> originalFreeInvariants;
     private final Map<LocationVariable,Term> originalModifies;
     private final Map<LocationVariable,
                       ImmutableList<InfFlowSpec>> originalInfFlowSpecs;
@@ -75,6 +76,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
                              IProgramMethod pm,
                              KeYJavaType kjt,
                              Map<LocationVariable, Term> invariants,
+                             Map<LocationVariable, Term> freeInvariants,
                              Map<LocationVariable, Term> modifies,
                              Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs,
                              Term variant,
@@ -90,6 +92,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
         this.kjt                        = kjt;
         this.originalInvariants         =
                 invariants == null ? new LinkedHashMap<LocationVariable,Term>() : invariants;
+                this.originalFreeInvariants         =
+                		freeInvariants == null ? new LinkedHashMap<LocationVariable,Term>() : freeInvariants;
         this.originalVariant            = variant;
         this.originalModifies           =
                 modifies == null ? new LinkedHashMap<LocationVariable,Term>() : modifies;
@@ -113,7 +117,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
                              KeYJavaType kjt,
 	    		     Term selfTerm, 
 	    		     Map<LocationVariable,Term> atPres) {
-        this(loop, pm, kjt, null, null, null, null, selfTerm, null, null, atPres);
+        this(loop, pm, kjt, null, null, null, null, null, selfTerm, null, null, atPres);
     }
 
 
@@ -294,6 +298,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                 IProgramMethod pm,
                                 KeYJavaType kjt,
                                 Map<LocationVariable,Term> invariants,
+                                Map<LocationVariable,Term> freeInvariants,
                                 Map<LocationVariable,Term> modifies,
                                 Map<LocationVariable,
                                     ImmutableList<InfFlowSpec>> infFlowSpecs,
@@ -302,7 +307,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                 ImmutableList<Term> localIns,
                                 ImmutableList<Term> localOuts,
                                 Map<LocationVariable,Term> atPres) {
-        return new LoopInvariantImpl(loop, pm, kjt, invariants,
+        return new LoopInvariantImpl(loop, pm, kjt, invariants, freeInvariants, 
                                      modifies, infFlowSpecs, variant, selfTerm,
                                      localIns, localOuts, atPres);
     }
@@ -310,6 +315,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public LoopInvariant create(LoopStatement loop,
                                 Map<LocationVariable,Term> invariants,
+                                Map<LocationVariable,Term> freeInvariants,
                                 Map<LocationVariable,Term> modifies,
                                 Map<LocationVariable,
                                     ImmutableList<InfFlowSpec>> infFlowSpecs,
@@ -318,23 +324,24 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                 ImmutableList<Term> localIns,
                                 ImmutableList<Term> localOuts,
                                 Map<LocationVariable,Term> atPres) {
-        return create(loop, pm, kjt, invariants, modifies, infFlowSpecs,
+        return create(loop, pm, kjt, invariants, freeInvariants, modifies, infFlowSpecs,
                       variant, selfTerm, localIns, localOuts, atPres);
     }
 
     @Override
     public LoopInvariant instantiate(Map<LocationVariable,Term> invariants,
-                                     Term variant) {
-        return configurate(invariants, originalModifies, originalInfFlowSpecs, variant);
+    								Map<LocationVariable,Term> freeInvariants, Term variant) {
+        return configurate(invariants, freeInvariants, originalModifies, originalInfFlowSpecs, variant);
     }
 
     @Override
     public LoopInvariant configurate(Map<LocationVariable,Term> invariants,
+    								 Map<LocationVariable,Term> freeInvariants,
                                      Map<LocationVariable,Term> modifies,
                                      Map<LocationVariable,
                                          ImmutableList<InfFlowSpec>> infFlowSpecs,
                                      Term variant) {
-        return create(loop, invariants, modifies, infFlowSpecs, variant,
+        return create(loop, invariants, freeInvariants, modifies, infFlowSpecs, variant,
                       originalSelfTerm, localIns, localOuts, originalAtPres);
     }
 
@@ -344,6 +351,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                      pm,
                                      kjt,
                                      originalInvariants,
+                                     originalFreeInvariants,
                                      originalModifies,
                                      originalInfFlowSpecs,
                                      originalVariant,
@@ -359,6 +367,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                      newPM,
                                      kjt,
                                      originalInvariants,
+                                     originalFreeInvariants,
                                      originalModifies,
                                      originalInfFlowSpecs,
                                      originalVariant, 

@@ -1590,6 +1590,7 @@ public class JMLSpecFactory {
                                      pm,
                                      pm.getContainerType(),
                                      invariants,
+                                     freeInvariants,
                                      mods,
                                      infFlowSpecs,
                                      variant,

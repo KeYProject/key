@@ -115,6 +115,7 @@ public interface LoopInvariant extends SpecificationElement {
                                 IProgramMethod pm,
                                 KeYJavaType kjt,
                                 Map<LocationVariable,Term> invariants,
+                                Map<LocationVariable,Term> freeInvariants,
                                 Map<LocationVariable,Term> modifies,
                                 Map<LocationVariable,
                                     ImmutableList<InfFlowSpec>> infFlowSpecs,
@@ -126,6 +127,7 @@ public interface LoopInvariant extends SpecificationElement {
 
     public LoopInvariant create(LoopStatement loop,
                                 Map<LocationVariable,Term> invariants,
+                                Map<LocationVariable,Term> freeInvariants,
                                 Map<LocationVariable,Term> modifies,
                                 Map<LocationVariable,
                                     ImmutableList<InfFlowSpec>> infFlowSpecs,
@@ -135,9 +137,11 @@ public interface LoopInvariant extends SpecificationElement {
                                 ImmutableList<Term> localOuts,
                                 Map<LocationVariable,Term> atPres);
 
-    public LoopInvariant instantiate(Map<LocationVariable,Term> invariants, Term variant);
+    public LoopInvariant instantiate(Map<LocationVariable,Term> invariants, 
+    									Map<LocationVariable,Term> freeInvariants,Term variant);
 
     public LoopInvariant configurate(Map<LocationVariable,Term> invariants,
+    								 Map<LocationVariable,Term> freeInvariants,
                                      Map<LocationVariable,Term> modifies,
                                      Map<LocationVariable,
                                          ImmutableList<InfFlowSpec>> infFlowSpecs,
@@ -156,6 +160,7 @@ public interface LoopInvariant extends SpecificationElement {
      * replaced with the passed one. Take care: the variables used for
      * the receiver, parameters, and local variables must stay the same!
      */
+    //TODO jonas: muss hier auch freeInvariant rein?
     public LoopInvariant setInvariant(Map<LocationVariable,Term> invariants, 
             			      Term selfTerm,
             			      Map<LocationVariable,Term> atPres,
