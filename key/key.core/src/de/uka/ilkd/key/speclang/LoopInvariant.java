@@ -162,6 +162,7 @@ public interface LoopInvariant extends SpecificationElement {
      */
     //TODO jonas: muss hier auch freeInvariant rein?
     public LoopInvariant setInvariant(Map<LocationVariable,Term> invariants, 
+    						  Map<LocationVariable,Term> freeInvariants,
             			      Term selfTerm,
             			      Map<LocationVariable,Term> atPres,
             			      Services services); 

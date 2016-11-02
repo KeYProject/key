@@ -378,22 +378,30 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public LoopInvariant setInvariant(Map<LocationVariable,Term> invariants, 
-            			      Term selfTerm,
+    public LoopInvariant setInvariant(Map<LocationVariable,Term> invariants,
+    						  Map<LocationVariable,Term> freeInvariants,
+    						  Term selfTerm,
             			      Map<LocationVariable,Term> atPres,
             			      Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> inverseReplaceMap 
             = getInverseReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(inverseReplaceMap, services.getTermFactory());
+        
         Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable heap : invariants.keySet()) {
            newInvariants.put(heap, or.replace(invariants.get(heap)));
+        }
+        
+        Map<LocationVariable,Term> newFreeInvariants = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable heap : freeInvariants.keySet()) {
+        	newFreeInvariants.put(heap, or.replace(freeInvariants.get(heap)));
         }
         return new LoopInvariantImpl(loop,
                                      pm,
                                      kjt,
                                      newInvariants,
+                                     newFreeInvariants,
                                      originalModifies,
                                      originalInfFlowSpecs,
                                      originalVariant,
@@ -514,7 +522,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public LoopInvariant setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
         return new LoopInvariantImpl(loop, (IProgramMethod)newPM, newKJT,
-                                     originalInvariants, originalModifies,
+                                     originalInvariants, originalFreeInvariants, originalModifies,
                                      originalInfFlowSpecs, originalVariant,
                                      originalSelfTerm, localIns, localOuts,
                                      originalAtPres);
