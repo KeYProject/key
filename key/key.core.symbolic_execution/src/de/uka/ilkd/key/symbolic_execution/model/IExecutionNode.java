@@ -175,4 +175,30 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
     * @return The human readable condition under which this node completes the code block of the given {@link IExecutionBlockStartNode}.
     */
    public String getFormatedBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode) throws ProofInputException;
+   
+   /**
+    * Returns the outgoing {@link IExecutionLink}.
+    * @param target The target {@link IExecutionNode}.
+    * @return The found {@link IExecutionLink} or {@code null} if such a link is not available.
+    */
+   public IExecutionLink getOutgoingLink(IExecutionNode<?> target);
+   
+   /**
+    * Returns all available outgoing links.
+    * @return The available outgoing links.
+    */
+   public ImmutableList<IExecutionLink> getOutgoingLinks();
+   
+   /**
+    * Returns the incoming {@link IExecutionLink}.
+    * @param source The source {@link IExecutionNode}.
+    * @return The found {@link IExecutionLink} or {@code null} if such a link is not available.
+    */
+   public IExecutionLink getIncomingLink(IExecutionNode<?> source);
+   
+   /**
+    * Returns all available incoming links.
+    * @return The available incoming links.
+    */
+   public ImmutableList<IExecutionLink> getIncomingLinks();
 }

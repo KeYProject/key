@@ -1,8 +1,8 @@
 package org.key_project.sed.core.model.memory;
 
 import org.key_project.sed.core.model.ISEBranchCondition;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEGroupable;
+import org.key_project.sed.core.model.ISENode;
 
 /**
  * Defines the public methods to edit an {@link ISEGroupable} in

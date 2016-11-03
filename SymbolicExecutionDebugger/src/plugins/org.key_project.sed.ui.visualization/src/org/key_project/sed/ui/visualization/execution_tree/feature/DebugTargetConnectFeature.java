@@ -140,7 +140,7 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
                         for (PictogramElement pictogramElement : elements) {
                            if (!monitor.isCanceled()) {
                               IRemoveContext removeContext = new RemoveContext(pictogramElement);
-                              IRemoveFeature feature = getFeatureProvider().getRemoveFeatureIgnoreReadonlyState(removeContext);
+                              IRemoveFeature feature = getFeatureProvider().getRemoveFeature(removeContext);
                               Assert.isNotNull(feature, "No remove feature available for \"" + removeContext + "\".");
                               feature.execute(removeContext);
                            }

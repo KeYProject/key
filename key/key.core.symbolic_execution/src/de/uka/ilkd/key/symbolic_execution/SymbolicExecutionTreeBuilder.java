@@ -52,6 +52,7 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -63,9 +64,11 @@ import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLink;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
@@ -79,6 +82,8 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBlockContract;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionExceptionalMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionJoin;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLink;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopStatement;
@@ -95,6 +100,7 @@ import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * <p>
@@ -486,8 +492,10 @@ public class SymbolicExecutionTreeBuilder {
          visitor.visit(proof, node); // This visitor pattern must be used because a recursive iteration causes StackOverflowErrors if the proof tree in KeY is to deep (e.g. simple list with 2000 elements during computation of fibonacci(7)
       }
       visitor.completeTree();
+      visitor.injectLinks(); // Needs to be execute after the completeTree() is called.
       return completions;
    }
+   
    /**
     * Prunes the symbolic execution tree at the first {@link IExecutionNode} in the parent hierarchy of the given 
     * {@link Node} (including the Node itself).
@@ -495,7 +503,7 @@ public class SymbolicExecutionTreeBuilder {
     * @author Anna Filighera
     * @return The {@link AbstractExecutionNode}'s which where deleted.
     */
-   public HashSet<AbstractExecutionNode<?>> prune(Node node) { 
+   public Set<AbstractExecutionNode<?>> prune(Node node) { 
       // search for the first node in the parent hierarchy (including the node itself) who is an AbstractExecutionNode
       boolean pruneOnExNode = false;
       IExecutionNode<?> firstFather = getExecutionNode(node);
@@ -514,7 +522,7 @@ public class SymbolicExecutionTreeBuilder {
       if (!pruneOnExNode) {
          subtreeToBePruned.next();
       }
-      HashSet<AbstractExecutionNode<?>> exNodesToDelete = new HashSet<AbstractExecutionNode<?>>(proof.countNodes());
+      Set<AbstractExecutionNode<?>> exNodesToDelete = new HashSet<AbstractExecutionNode<?>>();
       while (subtreeToBePruned.hasNext()) {
          AbstractExecutionNode<?> exNode = (AbstractExecutionNode<?>) subtreeToBePruned.next();
          exNodesToDelete.add(exNode);  
@@ -529,14 +537,29 @@ public class SymbolicExecutionTreeBuilder {
             methodReturnsToIgnoreMap.remove(label);
          }   
       }
-      // remove all parent-child-references of pruned nodes
+      // remove all parent-child-references of pruned nodes and links
       Iterator<AbstractExecutionNode<?>> prunedExNodes = exNodesToDelete.iterator();
       while (prunedExNodes.hasNext()) {
+         // remove all parent-child-references of pruned nodes
          AbstractExecutionNode<?> exNode = prunedExNodes.next();
          AbstractExecutionNode<?> exParent = exNode.getParent();
          if (exParent != null) {
             exParent.removeChild(exNode);
             exNode.setParent(null);       
+         }
+         // Remove outgoing links
+         if (!exNode.getOutgoingLinks().isEmpty()) {
+            for (IExecutionLink link : exNode.getOutgoingLinks()) {
+               ((AbstractExecutionNode<?>) link.getSource()).removeOutgoingLink(link);
+               ((AbstractExecutionNode<?>) link.getTarget()).removeIncomingLink(link);
+            }
+         }
+         // Remove incoming links
+         if (!exNode.getIncomingLinks().isEmpty()) {
+            for (IExecutionLink link : exNode.getIncomingLinks()) {
+               ((AbstractExecutionNode<?>) link.getSource()).removeOutgoingLink(link);
+               ((AbstractExecutionNode<?>) link.getTarget()).removeIncomingLink(link);
+            }
          }
       } 
       // remove all other references to deleted nodes
@@ -677,6 +700,11 @@ public class SymbolicExecutionTreeBuilder {
       private Map<AbstractExecutionNode<?>, List<ExecutionBranchCondition>> parentToBranchConditionMapping = new LinkedHashMap<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>();
 
       /**
+       * Contains all {@link Node}s which are closed after a join.
+       */
+      private ImmutableList<Node> joinNodes = ImmutableSLList.<Node>nil();
+      
+      /**
        * Constructor.
        * @param completions The {@link SymbolicExecutionCompletions} to update.
        */
@@ -729,6 +757,36 @@ public class SymbolicExecutionTreeBuilder {
                      // Set call stack on new created node if possible
                      if (SymbolicExecutionUtil.hasSymbolicExecutionLabel(visitedNode.getAppliedRuleApp())) {
                         condition.setCallStack(createCallStack(visitedNode));
+                     }
+                  }
+               }
+            }
+         }
+         if (SymbolicExecutionUtil.isJoin(visitedNode.getAppliedRuleApp())) {
+            joinNodes = joinNodes.prepend(visitedNode);
+         }
+      }
+      
+      /**
+       * Instantiates all missing {@link IExecutionLink}s and injects them into the symbolic execution tree.
+       */
+      public void injectLinks() {
+         for (Node node : joinNodes) {
+            JoinRuleBuiltInRuleApp ruleApp = (JoinRuleBuiltInRuleApp) node.getAppliedRuleApp();
+            IExecutionNode<?> source = getBestExecutionNode(node);
+            if (source != null) {
+               for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> partner : ruleApp.getJoinPartners()) {
+                  IExecutionNode<?> target = getBestExecutionNode(partner.first.node());
+                  // Ignore branch conditions below join node
+                  while (target instanceof IExecutionBranchCondition) {
+                     target = getBestExecutionNode(target.getProofNode().parent());
+                  }
+                  if (target != null) {
+                     IExecutionLink link = source.getOutgoingLink(target);
+                     if (link == null) {
+                        link = new ExecutionLink(target, source); // Source and target needs to be swapped in the symbolic execution tree
+                        ((AbstractExecutionNode<?>) link.getTarget()).addIncomingLink(link);
+                        ((AbstractExecutionNode<?>) link.getSource()).addOutgoingLink(link);
                      }
                   }
                }
@@ -1076,6 +1134,9 @@ public class SymbolicExecutionTreeBuilder {
                // Initialize new call stack of the validity branch
                initNewValidiityMethodCallStack(node);
             }
+         }
+         else if (SymbolicExecutionUtil.isCloseAfterJoin(node.getAppliedRuleApp())) {
+            result = new ExecutionJoin(settings, node);
          }
       }
       else if (SymbolicExecutionUtil.isLoopBodyTermination(node, node.getAppliedRuleApp())) {
@@ -1631,6 +1692,21 @@ public class SymbolicExecutionTreeBuilder {
    protected void addChild(AbstractExecutionNode<?> parent, AbstractExecutionNode<?> child) {
       child.setParent(parent);
       parent.addChild(child);
+   }
+   
+   /**
+    * Returns the best matching {@link IExecutionNode} for the given proof {@link Node}
+    * in the parent hierarchy.
+    * @param proofNode The proof {@link Node}.
+    * @return The best matching {@link IExecutionNode} or {@code null} if not available.
+    */
+   public IExecutionNode<?> getBestExecutionNode(Node proofNode) {
+      IExecutionNode<?> node = getExecutionNode(proofNode);
+      while (node == null && proofNode != null) {
+         proofNode = proofNode.parent();
+         node = getExecutionNode(proofNode);
+      }
+      return node;
    }
 
    /**

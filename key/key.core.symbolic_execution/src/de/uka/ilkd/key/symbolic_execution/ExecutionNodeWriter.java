@@ -33,6 +33,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionJoin;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLink;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
@@ -219,6 +221,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Attribute name to store {@link IExecutionBlockStartNode#isBlockOpened()}.
     */
    public static final String ATTRIBUTE_BLOCK_OPENED = "blockOpened";
+
+   /**
+    * Attribute name to store {@link IExecutionJoin#isWeakeningVerified()}.
+    */
+   public static final String ATTRIBUTE_WEAKENING_VERIFIED = "weakeningVerified";
    
    /**
     * Tag name to store {@link IExecutionBranchCondition}s.
@@ -274,6 +281,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Tag name to store {@link IExecutionTermination}s.
     */
    public static final String TAG_TERMINATION = "termination";
+
+   /**
+    * Tag name to store {@link IExecutionJoin}s.
+    */
+   public static final String TAG_JOIN = "join";
 
    /**
     * Tag name to store {@link IExecutionOperationContract}s.
@@ -335,6 +347,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Tag name to store one entry of {@link IExecutionStart#getTerminations()}.
     */
    public static final String TAG_TERMINATION_ENTRY = "terminationEntry";
+
+   /**
+    * Tag name to store one entry of {@link IExecutionNode#getOutgoingLinks()}.
+    */
+   public static final String TAG_OUTGOING_LINK = "outgoingLink";
 
    /**
     * Character to separate path entries in attributes {@value #ATTRIBUTE_PATH_IN_TREE}.
@@ -474,6 +491,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
       else if (node instanceof IExecutionBlockContract) {
          appendExecutionBlockContract(level, (IExecutionBlockContract)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
+      else if (node instanceof IExecutionJoin) {
+         appendExecutionJoin(level, (IExecutionJoin)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      }
       else {
          throw new IllegalArgumentException("Not supported node \"" + node + "\".");
       }
@@ -510,6 +530,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendOutgoingLinks(level + 1, node, sb);
       appendCompletedBlocks(level + 1, node, sb);
       appendEndTag(level, TAG_BRANCH_CONDITION, sb);
    }
@@ -541,6 +562,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendOutgoingLinks(level + 1, node, sb);
       appendTerminations(level + 1, node, sb);
       appendCompletedBlocks(level + 1, node, sb);
       appendEndTag(level, TAG_START, sb);
@@ -591,6 +613,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendOutgoingLinks(level + 1, node, sb);
       appendCompletedBlocks(level + 1, node, sb);
       appendBlockCompletions(level + 1, node, sb);
       appendEndTag(level, TAG_BRANCH_STATEMENT, sb);
@@ -624,6 +647,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendOutgoingLinks(level + 1, node, sb);
       appendCompletedBlocks(level + 1, node, sb);
       appendBlockCompletions(level + 1, node, sb);
       appendEndTag(level, TAG_LOOP_CONDITION, sb);
@@ -657,6 +681,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendOutgoingLinks(level + 1, node, sb);
       appendCompletedBlocks(level + 1, node, sb);
       appendBlockCompletions(level + 1, node, sb);
       appendEndTag(level, TAG_LOOP_STATEMENT, sb);
@@ -689,6 +714,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendOutgoingLinks(level + 1, node, sb);
       appendMethodReturns(level + 1, node, sb);
       appendCompletedBlocks(level + 1, node, sb);
       appendEndTag(level, TAG_METHOD_CALL, sb);
@@ -734,6 +760,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendOutgoingLinks(level + 1, node, sb);
       appendCompletedBlocks(level + 1, node, sb);
       appendCallStateVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendEndTag(level, TAG_METHOD_RETURN, sb);
@@ -768,6 +795,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendOutgoingLinks(level + 1, node, sb);
       appendCompletedBlocks(level + 1, node, sb);
       appendCallStateVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendEndTag(level, TAG_EXCEPTIONAL_METHOD_RETURN, sb);
@@ -819,8 +847,42 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendOutgoingLinks(level + 1, node, sb);
       appendCompletedBlocks(level + 1, node, sb);
       appendEndTag(level, TAG_STATEMENT, sb);
+   }
+
+   /**
+    * Converts the given {@link IExecutionJoin} into XML and appends it to the {@link StringBuffer}.
+    * @param level The current child level.
+    * @param node The {@link IExecutionJoin} to convert.
+    * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendExecutionJoin(int level, 
+                                      IExecutionJoin node, 
+                                      boolean saveVariables, 
+                                      boolean saveCallStack, 
+                                      boolean saveReturnValues,
+                                      boolean saveConstraints,
+                                      StringBuffer sb) throws ProofInputException {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_NAME, node.getName());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
+      attributeValues.put(ATTRIBUTE_WEAKENING_VERIFIED, node.isWeakeningVerified() + "");
+      appendStartTag(level, TAG_JOIN, attributeValues, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
+      appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendOutgoingLinks(level + 1, node, sb);
+      appendCompletedBlocks(level + 1, node, sb);
+      appendEndTag(level, TAG_JOIN, sb);
    }
 
    /**
@@ -859,6 +921,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendOutgoingLinks(level + 1, node, sb);
       appendCompletedBlocks(level + 1, node, sb);
       appendEndTag(level, TAG_OPERATION_CONTRACT, sb);
    }
@@ -893,6 +956,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendOutgoingLinks(level + 1, node, sb);
       appendCompletedBlocks(level + 1, node, sb);
       appendEndTag(level, TAG_LOOP_INVARIANT, sb);
    }
@@ -927,6 +991,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendOutgoingLinks(level + 1, node, sb);
       appendCompletedBlocks(level + 1, node, sb);
       appendEndTag(level, TAG_BLOCK_CONTRACT, sb);
    }
@@ -960,6 +1025,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendOutgoingLinks(level + 1, node, sb);
       appendCompletedBlocks(level + 1, node, sb);
       appendEndTag(level, TAG_TERMINATION, sb);
    }
@@ -1130,6 +1196,20 @@ public class ExecutionNodeWriter extends AbstractWriter {
       for (IExecutionNode<?> child : children) {
          appendExecutionNode(childLevel, child, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
+   }
+
+   protected void appendOutgoingLinks(int level, IExecutionNode<?> node, StringBuffer sb) {
+      if (!node.getOutgoingLinks().isEmpty()) {
+         for (IExecutionLink link : node.getOutgoingLinks()) {
+            appendOutgoingLink(level, link, sb);
+         }
+      }
+   }
+
+   protected void appendOutgoingLink(int level, IExecutionLink link, StringBuffer sb) {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_PATH_IN_TREE, computePath(link.getTarget()));
+      appendEmptyTag(level, TAG_OUTGOING_LINK, attributeValues, sb);
    }
 
    /**

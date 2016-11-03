@@ -89,4 +89,11 @@ public abstract class ProofTreeAdapter implements ProofTreeListener {
      * of the SMT solver. The data from the SMT solver can be accessed via.
      * {@code Node.getCounterExData()}*/
     public void smtDataUpdate(ProofTreeEvent e){}
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void notesChanged(ProofTreeEvent e) {
+    }
 }

@@ -25,6 +25,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 
@@ -86,23 +87,7 @@ public class GoalsPage extends Page implements IGoalsPage {
     * The {@link ProofTreeListener} listens to any changes that are made on the
     * current {@link Proof}.
     */
-   private ProofTreeListener proofTreeListener = new ProofTreeListener() {
-      @Override
-      public void proofExpanded(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void proofIsBeingPruned(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void proofPruned(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void proofStructureChanged(ProofTreeEvent e) {
-      }
-
+   private ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
       @Override
       public void proofClosed(ProofTreeEvent e) {
          updateGoalsThreadSafe();
@@ -121,10 +106,6 @@ public class GoalsPage extends Page implements IGoalsPage {
       @Override
       public void proofGoalsChanged(ProofTreeEvent e) {
          updateGoalsThreadSafe();
-      }
-
-      @Override
-      public void smtDataUpdate(ProofTreeEvent e) {
       }
    };
 
@@ -240,6 +221,9 @@ public class GoalsPage extends Page implements IGoalsPage {
    protected void handleGoalsChanged() {
       ImmutableList<Goal> goals = proof.openGoals();
       if (!ObjectUtil.equals(goals, viewer.getInput())) {
+         labelProvider.dispose();
+         labelProvider = new GoalsLabelProvider(viewer, goals);
+         viewer.setLabelProvider(labelProvider);
          viewer.setInput(goals);
       }
    }
@@ -264,11 +248,14 @@ public class GoalsPage extends Page implements IGoalsPage {
       Object selectedObj = SWTUtil.getFirstElement(selection);
       if (selectedObj instanceof Node) {
          return (Node) selectedObj;
-      } else if (selectedObj instanceof BranchFolder) {
+      }
+      else if (selectedObj instanceof BranchFolder) {
          return ((BranchFolder) selectedObj).getChild();
-      } else if (selectedObj instanceof Goal) {
+      }
+      else if (selectedObj instanceof Goal) {
          return ((Goal) selectedObj).node();
-      } else {
+      }
+      else {
          return null;
       }
    }
@@ -294,12 +281,13 @@ public class GoalsPage extends Page implements IGoalsPage {
     */
    @Override
    public void createControl(Composite parent) {
-      this.viewer = new TableViewer(parent);
-      this.contentProvider = new ImmutableCollectionContentProvider();
-      this.labelProvider = new GoalsLabelProvider();
+      viewer = new TableViewer(parent);
+      contentProvider = new ImmutableCollectionContentProvider();
+      ImmutableList<Goal> goals = proof.openGoals();
+      labelProvider = new GoalsLabelProvider(viewer, goals);
       viewer.setContentProvider(contentProvider);
       viewer.setLabelProvider(labelProvider);
-      viewer.setInput(proof.openGoals());
+      viewer.setInput(goals);
       getSite().setSelectionProvider(viewer); //allow listening to selection changes of this viewer
       getSite().getPage().addSelectionListener(selectionListener);
       updateSelectedNode();

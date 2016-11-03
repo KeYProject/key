@@ -162,7 +162,9 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
       composite.setLayout(new FillLayout());
       composite.setEnabled(isEditorEnabled());
       editorPart.createPartControl(composite);
-      editorActionBarContributor.setActiveEditor(editorPart);
+      if (editorActionBarContributor != null) {
+         editorActionBarContributor.setActiveEditor(editorPart);
+      }
       return composite;
    }
 
