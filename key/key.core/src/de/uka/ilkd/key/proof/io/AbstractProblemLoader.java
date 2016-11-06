@@ -515,6 +515,18 @@ public abstract class AbstractProblemLoader {
         return new Pair<String, Location>(script.first, location);
     }
 
+    public Pair<String, Location> getProofScript() throws ProblemLoaderException {
+        if(hasProofScript()) {
+            try {
+                return readProofScript();
+            } catch (ProofInputException e) {
+                throw new ProblemLoaderException(this, e);
+            }
+        } else {
+            return null;
+        }
+    }
+
     private ReplayResult replayProof(Proof proof) throws ProofInputException, ProblemLoaderException {
         String status = "";
         List<Throwable> errors = new LinkedList<Throwable>();

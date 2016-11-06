@@ -534,7 +534,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       }
       AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, includes, null, forceNewProfileOfNewProofs);
       InitConfig initConfig = loader.getInitConfig();
-      return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig, loader.getProof(), loader.getResult());
+      return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig,
+          loader.getProof(), loader.getProofScript(), loader.getResult());
    }
 
    @Override

@@ -19,6 +19,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -28,6 +29,7 @@ import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Instances of this class are used to collect and access all
@@ -51,6 +53,11 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
    private final Proof loadedProof;
    
    /**
+    * An optional field denoting a script contained in the proof file.
+    */
+   private final Pair<String, Location> proofScript;
+
+   /**
     * Indicates that this {@link KeYEnvironment} is disposed.
     */
    private boolean disposed;
@@ -66,7 +73,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     * @param initConfig The loaded project.
     */
    public KeYEnvironment(U ui, InitConfig initConfig) {
-      this(ui, initConfig, null, null);
+      this(ui, initConfig, null, null, null);
    }
 
    /**
@@ -74,10 +81,11 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     * @param ui The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
     * @param initConfig The loaded project.
     */
-   public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof, ReplayResult replayResult) {
+   public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof, Pair<String, Location> proofScript, ReplayResult replayResult) {
       this.ui = ui;
       this.initConfig = initConfig;
       this.loadedProof = loadedProof;
+      this.proofScript = proofScript;
       this.replayResult = replayResult;
    }
 
@@ -241,7 +249,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
       DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(ruleCompletionHandler);
       AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, includes, poPropertiesToForce, forceNewProfileOfNewProofs); 
       InitConfig initConfig = loader.getInitConfig();
-      return new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig, loader.getProof(), loader.getResult());
+
+      return new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig, loader.getProof(), loader.getProofScript(), loader.getResult());
    }
    
    public static KeYEnvironment<DefaultUserInterfaceControl> load(File keyFile) throws ProblemLoaderException {
@@ -266,4 +275,9 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
    public boolean isDisposed() {
       return disposed;
    }
+
+   public Pair<String, Location> getProofScript() {
+	   return proofScript;
+   }
+
 }
