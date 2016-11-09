@@ -52,6 +52,12 @@ public interface LoopInvariant extends SpecificationElement {
 
     public Term getInvariant(Services services);
 
+    /** Returns the free invariant formula. */
+    public Term getFreeInvariant(LocationVariable heap, Term selfTerm,
+    		Map<LocationVariable,Term> atPres, Services services);
+
+    public Term getFreeInvariant(Services services);
+
     /**
      * Returns the modifies clause.
      */

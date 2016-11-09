@@ -927,7 +927,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                            beforeLoopUpdate,
                            anonUpdate,
                            variantUpdate};
-        final Term uAnonInv = tb.applySequential(uAnon, tb.and(invTerm, reachableOut));
+        final Term uAnonInv = tb.applySequential(uAnon, tb.and(invTerm, reachableOut)); //TODO Jonas: AND free inv term; Umbenennung LoopInvariant.java in Loop specification (eigener Commit)
 
         final ImmutableList<Goal> result;
         Goal wdGoal;
@@ -947,7 +947,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         //"Invariant Initially Valid":
         // \replacewith (==> inv );
-        prepareInvInitiallyValidBranch(termLabelState, services, ruleApp, inst, invTerm, reachableState, initGoal);
+        prepareInvInitiallyValidBranch(termLabelState, services, ruleApp, inst, invTerm, reachableState, initGoal); //TODO Jonas: Ist die doppelanwendung nötig?
+        
 
         setupWdGoal(wdGoal, inst.inv, inst.u, inst.selfTerm, heapContext.get(0),
                     anonHeap, localIns, ruleApp.posInOccurrence(), services);
