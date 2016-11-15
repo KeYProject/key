@@ -1388,7 +1388,8 @@ loop_specification[ImmutableList<String> mods]
    result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ls);
 }
 :
-    ps=loop_invariant       { ls.addInvariant(ps); }
+    (ps=loop_invariant       { ls.addInvariant(ps); }
+    | 	ps=loop_invariant_free       { ls.addFreeInvariant(ps); })
     (
 	options { greedy = true; }
 	:

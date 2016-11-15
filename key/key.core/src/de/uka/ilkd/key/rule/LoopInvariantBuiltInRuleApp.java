@@ -89,6 +89,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private LoopSpecification instantiateIndexValues(LoopSpecification rawInv, TermServices services){
     	if (rawInv == null) return null;
     	Map<LocationVariable,Term> invs = rawInv.getInternalInvariants();
+    	Map<LocationVariable,Term> freeInvs = rawInv.getInternalFreeInvariants();
     	Term var = rawInv.getInternalVariant();
         final TermBuilder tb = services.getTermBuilder();
     	boolean skipIndex = false;
@@ -100,8 +101,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     	// the guard is expected to be of the form "i < x" and we want to retrieve "i".
     	assert guard.getChildCount() == 1 : "child count: "+guard.getChildCount();
     	ProgramElement guardStatement = guard.getChildAt(0);
-	skipIndex = !(guardStatement instanceof LessThan);
-	Expression loopIndex = skipIndex ? null :
+    	skipIndex = !(guardStatement instanceof LessThan);
+    	Expression loopIndex = skipIndex ? null :
 	    (Expression) ((LessThan)guard.getChildAt(0)).getChildAt(0);
     	skipIndex = skipIndex || !( loopIndex instanceof ProgramVariable);
 		final Term loopIdxVar = skipIndex? null: tb.var((ProgramVariable)loopIndex);
@@ -181,21 +182,38 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
         // replace index
         Map<LocationVariable,Term> newInvs = new LinkedHashMap<LocationVariable,Term>(invs);
-        Map<LocationVariable,Term> newFreeInvs = new LinkedHashMap<LocationVariable,Term>(invs); //TODO Jonas: nicht initialisiert
 		if (!skipIndex){
-		IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();
-                for(LocationVariable heap : invs.keySet()) {
-                   Term inv = invs.get(heap);
-		   if (inv != null) {
-		     v.visit(inv);
-		     inv = v.getResult();
-                     newInvs.put(heap, inv);
-  		   }                   
-                }
-		if (var != null) {
-		    v.visit(var);
-		    var = v.getResult();
-		}}
+			IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();
+			for(LocationVariable heap : invs.keySet()) {
+				Term inv = invs.get(heap);
+				if (inv != null) {
+					v.visit(inv);
+					inv = v.getResult();
+					newInvs.put(heap, inv);
+                }                   
+			}
+			if (var != null) {
+				v.visit(var);
+				var = v.getResult();
+			}
+		}
+		
+		Map<LocationVariable,Term> newFreeInvs = new LinkedHashMap<LocationVariable,Term>(freeInvs);
+		if (!skipIndex){
+			IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();
+			for(LocationVariable heap : freeInvs.keySet()) {
+				Term inv = freeInvs.get(heap);
+				if (inv != null) {
+					v.visit(inv);
+					inv = v.getResult();
+					newFreeInvs.put(heap, inv);
+				}                   
+			}
+			if (var != null) {
+				v.visit(var);
+				var = v.getResult();
+			}
+		}
 		
 		// replace values
         if (!skipValues){

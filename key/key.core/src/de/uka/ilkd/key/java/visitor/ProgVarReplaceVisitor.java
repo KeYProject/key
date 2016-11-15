@@ -393,7 +393,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         Map<LocationVariable,Term> atPres = inv.getInternalAtPres();
 
         Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
-        Map<LocationVariable,Term> newFreeInvariants = new LinkedHashMap<LocationVariable,Term>(); //TODO Jonas: müssen vermutlich noch initialisiert werden
+        Map<LocationVariable,Term> newFreeInvariants = new LinkedHashMap<LocationVariable,Term>(); 
         Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
         Map<LocationVariable,
             ImmutableList<InfFlowSpec>> newInfFlowSpecs
@@ -411,11 +411,19 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                                                           atPres,
                                                                           services));
             newInfFlowSpecs.put(heap, infFlowSpecs);
+            
             final Term i =
                     replaceVariablesInTerm(inv.getInvariant(heap, selfTerm,
                                                             atPres,
                                                             services));
             newInvariants.put(heap, i);
+            
+            final Term j =
+            		replaceVariablesInTerm(inv.getFreeInvariant(heap, selfTerm,
+            				atPres,
+            				services));
+            newFreeInvariants.put(heap, j);
+            
         }
 
         //variant

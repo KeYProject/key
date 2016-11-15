@@ -106,6 +106,7 @@ public interface LoopSpecification extends SpecificationElement {
      */
     public Map<LocationVariable,Term> getInternalInvariants();
 
+    public Map<LocationVariable, Term> getInternalFreeInvariants();
     /**
      * Returns the term internally used for the variant. 
      * Use with care - it is likely that this is *not* the right "self" for you.
@@ -195,4 +196,5 @@ public interface LoopSpecification extends SpecificationElement {
      * Returns the original Self Variable to replace it easier.
      */
     public OriginalVariables getOrigVars();
+
 }

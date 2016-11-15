@@ -92,8 +92,8 @@ public final class LoopSpecImpl implements LoopSpecification {
         this.kjt                        = kjt;
         this.originalInvariants         =
                 invariants == null ? new LinkedHashMap<LocationVariable,Term>() : invariants;
-                this.originalFreeInvariants         =
-                		freeInvariants == null ? new LinkedHashMap<LocationVariable,Term>() : freeInvariants;
+        this.originalFreeInvariants         =
+                freeInvariants == null ? new LinkedHashMap<LocationVariable,Term>() : freeInvariants;
         this.originalVariant            = variant;
         this.originalModifies           =
                 modifies == null ? new LinkedHashMap<LocationVariable,Term>() : modifies;
@@ -271,6 +271,11 @@ public final class LoopSpecImpl implements LoopSpecification {
     @Override
     public Map<LocationVariable,Term> getInternalInvariants() {
         return originalInvariants;
+    }
+    
+    @Override
+    public Map<LocationVariable,Term> getInternalFreeInvariants() {
+    	return originalFreeInvariants;
     }
 
     @Override
