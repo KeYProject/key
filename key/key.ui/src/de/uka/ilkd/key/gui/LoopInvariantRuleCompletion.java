@@ -48,7 +48,7 @@ public class LoopInvariantRuleCompletion implements
         Term progPost = loopApp.programTerm();
         final While loop = loopApp.getLoopStatement();
 
-        LoopSpecification inv = loopApp.getInvariant();
+        LoopSpecification inv = loopApp.getSpec();
         if (inv == null) { // no invariant present, get it interactively
             MethodFrame mf = JavaTools.getInnermostMethodFrame(progPost.javaBlock(),
                                                                services);

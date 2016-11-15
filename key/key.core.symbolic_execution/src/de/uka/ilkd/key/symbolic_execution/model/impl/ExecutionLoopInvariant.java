@@ -76,7 +76,7 @@ public class ExecutionLoopInvariant extends AbstractExecutionNode<SourceElement>
     */
    @Override
    public LoopSpecification getLoopInvariant() {
-      return ((LoopInvariantBuiltInRuleApp)getProofNode().getAppliedRuleApp()).getInvariant();
+      return ((LoopInvariantBuiltInRuleApp)getProofNode().getAppliedRuleApp()).getSpec();
    }
 
    /**

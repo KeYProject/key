@@ -64,7 +64,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro imple
         }
         final LoopInvariantBuiltInRuleApp loopInvRuleApp =
                 (LoopInvariantBuiltInRuleApp) app;
-        final LoopSpecification loopInv = loopInvRuleApp.getInvariant();
+        final LoopSpecification loopInv = loopInvRuleApp.getSpec();
         final IFProofObligationVars ifVars =
                 loopInvRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {
@@ -95,7 +95,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro imple
 
         final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
 
-        final LoopSpecification loopInv = loopInvRuleApp.getInvariant();
+        final LoopSpecification loopInv = loopInvRuleApp.getSpec();
         final IFProofObligationVars ifVars =
                 loopInvRuleApp.getInformationFlowProofObligationVars();
         final ExecutionContext executionContext =

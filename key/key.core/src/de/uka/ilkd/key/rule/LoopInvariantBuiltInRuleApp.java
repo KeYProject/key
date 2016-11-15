@@ -50,7 +50,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private final While loop;
 
-    private LoopSpecification inv;
+    private LoopSpecification spec;
     private final List<LocationVariable> heapContext;
     private IFProofObligationVars infFlowVars;
     private ExecutionContext executionContext;
@@ -70,7 +70,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         this.loop = (While) JavaTools.getActiveStatement(programTerm()
                 .javaBlock());
         assert loop != null;
-        this.inv = instantiateIndexValues(inv, services);
+        this.spec = instantiateIndexValues(inv, services);
         this.heapContext = heapContext;
         this.services = services;
     }
@@ -221,12 +221,12 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public boolean complete() {
-        return inv != null && loop != null && invariantAvailable()
+        return spec != null && loop != null && invariantAvailable()
                 && (!variantRequired() || variantAvailable());
     }
 
-    public LoopSpecification getInvariant() {
-        return inv;
+    public LoopSpecification getSpec() {
+        return spec;
     }
 
     public While getLoopStatement() {
@@ -234,9 +234,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public boolean invariantAvailable() {
-        boolean result = inv != null && inv.getInternalInvariants() != null;
+        boolean result = spec != null && spec.getInternalInvariants() != null;
         if(result) {
-          Map<LocationVariable,Term> invs = inv.getInternalInvariants();
+          Map<LocationVariable,Term> invs = spec.getInternalInvariants();
           result = false;
           for(LocationVariable heap : heapContext) {
             if(invs.get(heap) != null) {
@@ -261,7 +261,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public LoopInvariantBuiltInRuleApp replacePos(PosInOccurrence newPos) {
-        return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, inv, heapContext, services);
+        return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, spec, heapContext, services);
     }
 
     public LoopSpecification retrieveLoopInvariantFromSpecification(
@@ -280,7 +280,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopSpecification inv) {
         assert inv != null;
         if (this.loop == (While)inv.getLoop())
-            this.inv = inv;
+            this.spec = inv;
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext, services);
     }
     
@@ -298,7 +298,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public LoopInvariantBuiltInRuleApp tryToInstantiate(Goal goal) {
-        if (inv != null) {
+        if (spec != null) {
             return this;
         }
         final Services services = goal.proof().getServices();
@@ -312,7 +312,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public boolean variantAvailable() {
-        return inv != null && inv.getInternalVariant() != null;
+        return spec != null && spec.getInternalVariant() != null;
     }
 
     public boolean variantRequired() {

@@ -61,7 +61,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         final LoopInvariantBuiltInRuleApp loopInvRuleApp = 
                 (LoopInvariantBuiltInRuleApp) initiatingGoal.node().parent().getAppliedRuleApp();
         LoopSpecification loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
-        loopInv = loopInv != null ? loopInv : loopInvRuleApp.getInvariant();
+        loopInv = loopInv != null ? loopInv : loopInvRuleApp.getSpec();
         IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
         ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
 
