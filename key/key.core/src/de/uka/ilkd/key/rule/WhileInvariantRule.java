@@ -794,6 +794,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final List<LocationVariable> heapContext = ((IBuiltInRuleApp)ruleApp).getHeapContext();        
 
         final Term invTerm = conjunctInv(services, inst, atPres, heapContext);
+        final Term invFreeTerm = conjunctInv(services, inst, atPres, heapContext);
 
         final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable heap : heapContext) {
@@ -927,7 +928,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                            beforeLoopUpdate,
                            anonUpdate,
                            variantUpdate};
-        final Term uAnonInv = tb.applySequential(uAnon, tb.and(invTerm, reachableOut)); //TODO Jonas: AND free inv term; Umbenennung LoopInvariant.java in Loop specification (eigener Commit)
+        final Term uAnonInv = tb.applySequential(uAnon, tb.and(tb.and(invTerm, reachableOut), invFreeTerm)); //TODO Jonas: AND free inv term; Umbenennung LoopInvariant.java in Loop specification (eigener Commit)
 
         final ImmutableList<Goal> result;
         Goal wdGoal;

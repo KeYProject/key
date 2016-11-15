@@ -197,6 +197,22 @@ public final class LoopInvariantImpl implements LoopInvariant {
         return originalInvariants.get(services.getTypeConverter().getHeapLDT().getHeap());
     }
     
+
+	@Override
+	public Term getFreeInvariant(LocationVariable heap, Term selfTerm, Map<LocationVariable, Term> atPres,
+			Services services) {
+		assert (selfTerm == null) == (originalSelfTerm == null);
+        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
+        return or.replace(originalFreeInvariants.get(heap));
+	}
+
+
+	@Override
+	public Term getFreeInvariant(Services services) {
+		return originalFreeInvariants.get(services.getTypeConverter().getHeapLDT().getHeap());
+	}
+    
     @Override
     public Term getModifies(LocationVariable heap, Term selfTerm,
             		    Map<LocationVariable,Term> atPres,
@@ -549,4 +565,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
         return new OriginalVariables(self, null, null, atPreVars,
                                      ImmutableSLList.<ProgramVariable>nil());
     }
+
+
 }
