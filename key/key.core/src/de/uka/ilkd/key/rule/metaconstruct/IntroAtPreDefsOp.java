@@ -184,6 +184,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                                                      ImmutableList<InfFlowSpec>>();
                 //LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
                 Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
+                Map<LocationVariable,Term> newFreeInvariants = new LinkedHashMap<LocationVariable,Term>(); // TODO Jonas: init
                 for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                   if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap()
                      &&
@@ -205,6 +206,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                                     frame.getProgramMethod(),
                                     frame.getProgramMethod().getContainerType(),
                                     newInvariants,
+                                    newFreeInvariants,
                                     newMods,
                                     newInfFlowSpecs,
                                     newVariant,

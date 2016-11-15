@@ -147,6 +147,7 @@ public class InvariantConfigurator {
                     = new LinkedHashMap<LocationVariable,
                                         ImmutableList<InfFlowSpec>>();
             private Map<LocationVariable,Term> invariantTerm = new LinkedHashMap<LocationVariable,Term>();
+            private Map<LocationVariable,Term> freeInvariantTerm = new LinkedHashMap<LocationVariable,Term>();
 
             private static final String INVARIANTTITLE = "Invariant%s: ";
             private static final String VARIANTTITLE = "Variant%s: ";
@@ -847,7 +848,7 @@ public class InvariantConfigurator {
                 }
 
                 if (requirementsAreMet) {
-                    newInvariant = loopInv.configurate(invariantTerm, modifiesTerm,
+                    newInvariant = loopInv.configurate(invariantTerm, freeInvariantTerm, modifiesTerm,
                                                        infFlowSpecs, variantTerm);
                     return true;
                 } else

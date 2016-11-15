@@ -181,6 +181,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
         // replace index
         Map<LocationVariable,Term> newInvs = new LinkedHashMap<LocationVariable,Term>(invs);
+        Map<LocationVariable,Term> newFreeInvs = new LinkedHashMap<LocationVariable,Term>(invs); //TODO Jonas: nicht initialisiert
 		if (!skipIndex){
 		IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();
                 for(LocationVariable heap : invs.keySet()) {
@@ -211,7 +212,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             v.visit(var);
             var = v.getResult();
         }}
-        return rawInv.instantiate(newInvs, var);    	
+        return rawInv.instantiate(newInvs, newFreeInvs, var);    	
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
