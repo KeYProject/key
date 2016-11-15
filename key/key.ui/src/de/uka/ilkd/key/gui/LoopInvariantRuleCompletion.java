@@ -24,7 +24,7 @@ import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
+import de.uka.ilkd.key.speclang.LoopSpecImpl;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -52,7 +52,7 @@ public class LoopInvariantRuleCompletion implements
         if (inv == null) { // no invariant present, get it interactively
             MethodFrame mf = JavaTools.getInnermostMethodFrame(progPost.javaBlock(),
                                                                services);
-            inv = new LoopInvariantImpl(loop,
+            inv = new LoopSpecImpl(loop,
                                         mf == null ?
                                                 null : mf.getProgramMethod(),
                                         mf == null || mf.getProgramMethod() == null ?

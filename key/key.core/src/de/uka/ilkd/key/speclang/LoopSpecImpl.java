@@ -42,7 +42,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 /**
  * Standard implementation of the LoopInvariant interface.
  */
-public final class LoopInvariantImpl implements LoopSpecification {
+public final class LoopSpecImpl implements LoopSpecification {
 
     private final LoopStatement loop;
     private final IProgramMethod pm;
@@ -72,7 +72,7 @@ public final class LoopInvariantImpl implements LoopSpecification {
      * @param selfTerm the term used for the receiver object
      * @param heapAtPre the term used for the at pre heap
      */
-    public LoopInvariantImpl(LoopStatement loop,
+    public LoopSpecImpl(LoopStatement loop,
                              IProgramMethod pm,
                              KeYJavaType kjt,
                              Map<LocationVariable, Term> invariants,
@@ -112,7 +112,7 @@ public final class LoopInvariantImpl implements LoopSpecification {
     /**
      * Creates an empty, default loop invariant for the passed loop.
      */
-    public LoopInvariantImpl(LoopStatement loop,
+    public LoopSpecImpl(LoopStatement loop,
                              IProgramMethod pm,
                              KeYJavaType kjt,
 	    		     Term selfTerm, 
@@ -323,7 +323,7 @@ public final class LoopInvariantImpl implements LoopSpecification {
                                 ImmutableList<Term> localIns,
                                 ImmutableList<Term> localOuts,
                                 Map<LocationVariable,Term> atPres) {
-        return new LoopInvariantImpl(loop, pm, kjt, invariants, freeInvariants, 
+        return new LoopSpecImpl(loop, pm, kjt, invariants, freeInvariants, 
                                      modifies, infFlowSpecs, variant, selfTerm,
                                      localIns, localOuts, atPres);
     }
@@ -363,7 +363,7 @@ public final class LoopInvariantImpl implements LoopSpecification {
 
     @Override
     public LoopSpecification setLoop(LoopStatement loop) {
-        return new LoopInvariantImpl(loop,
+        return new LoopSpecImpl(loop,
                                      pm,
                                      kjt,
                                      originalInvariants,
@@ -379,7 +379,7 @@ public final class LoopInvariantImpl implements LoopSpecification {
 
     @Override
     public LoopSpecification setTarget(IProgramMethod newPM) {
-        return new LoopInvariantImpl(loop,
+        return new LoopSpecImpl(loop,
                                      newPM,
                                      kjt,
                                      originalInvariants,
@@ -413,7 +413,7 @@ public final class LoopInvariantImpl implements LoopSpecification {
         for(LocationVariable heap : freeInvariants.keySet()) {
         	newFreeInvariants.put(heap, or.replace(freeInvariants.get(heap)));
         }
-        return new LoopInvariantImpl(loop,
+        return new LoopSpecImpl(loop,
                                      pm,
                                      kjt,
                                      newInvariants,
@@ -537,7 +537,7 @@ public final class LoopInvariantImpl implements LoopSpecification {
 
     public LoopSpecification setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
-        return new LoopInvariantImpl(loop, (IProgramMethod)newPM, newKJT,
+        return new LoopSpecImpl(loop, (IProgramMethod)newPM, newKJT,
                                      originalInvariants, originalFreeInvariants, originalModifies,
                                      originalInfFlowSpecs, originalVariant,
                                      originalSelfTerm, localIns, localOuts,
