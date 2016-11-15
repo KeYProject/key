@@ -557,7 +557,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     private Term conjunctFreeInv(Services services, Instantiation inst,
     		final Map<LocationVariable, Term> atPres,
     		final List<LocationVariable> heapContext) {
-    	Term freeInvTerm = null;
+    	Term freeInvTerm = services.getTermBuilder().tt();
     	for(LocationVariable heap : heapContext) {
     		final Term i = inst.inv.getFreeInvariant(heap, inst.selfTerm, atPres, services);
     		if(i == null) continue;
