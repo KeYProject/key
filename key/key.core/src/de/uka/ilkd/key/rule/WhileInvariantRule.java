@@ -102,7 +102,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     private static InfFlowData prepareSetUpOfInfFlowValidityGoal(final AnonUpdateData anonUpdateData,
                                                                  final Term guardTerm,
                                                                  final Instantiation inst,
-                                                                 LoopSpecification inv,
+                                                                 LoopSpecification spec,
                                                                  Services services,
                                                                  LoopInvariantBuiltInRuleApp ruleApp,
                                                                  final ImmutableSet<ProgramVariable> localIns,
@@ -114,15 +114,15 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term baseHeap = anonUpdateData.loopHeapAtPre;
         final Term selfTerm = inst.selfTerm;
 
-        services.getSpecificationRepository().addLoopInvariant(inv);
-        ruleApp.setLoopInvariant(inv);
+        services.getSpecificationRepository().addLoopInvariant(spec);
+        ruleApp.setLoopInvariant(spec);
         instantiate(ruleApp, services);
 
         // create heap_Before_LOOP
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         Name heapAtPreName = new Name(tb.newName(baseHeap + "_Before_LOOP"));
         final Function heapAtPreFunc = new Function(heapAtPreName, heapLDT.targetSort(), true);
-	services.getNamespaces().functions().addSafely(heapAtPreFunc);
+        services.getNamespaces().functions().addSafely(heapAtPreFunc);
         final Term heapAtPre = tb.func(heapAtPreFunc);
 
         final Term heapAtPost = anonUpdateData.loopHeap;
@@ -174,7 +174,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Pair<Term, Term> updates = new Pair<Term, Term> (inst.u, anonUpdate);
         final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
                 new InfFlowLoopInvariantTacletBuilder(services);
-        ifInvariantBuilder.setInvariant(inv);
+        ifInvariantBuilder.setInvariant(spec);
         ifInvariantBuilder.setExecutionContext(inst.innermostExecutionContext);
         ifInvariantBuilder.setContextUpdate(/*inst.u*/);
         ifInvariantBuilder.setProofObligationVars(instantiationVars);
@@ -214,7 +214,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         if (focusTerm == lastFocusTerm &&
                 lastInstantiation.inv == services.getSpecificationRepository()
-                .getLoopInvariant(lastInstantiation.loop)) {
+                .getLoopSpec(lastInstantiation.loop)) {
             return lastInstantiation;
         }
 
@@ -232,15 +232,15 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final While loop = app.getLoopStatement();
 
 	// try to get invariant from JML specification
-	LoopSpecification inv = app.getInvariant();
-	if (inv == null) // may happen after reloading proof 
+	LoopSpecification spec = app.getSpec();
+	if (spec == null) // may happen after reloading proof 
 	    throw new RuleAbortException("no invariant found");
 
 	//collect self, execution context
 	final MethodFrame innermostMethodFrame =
 	        JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services);
 	if (innermostMethodFrame != null) {
-	    inv = inv.setTarget(innermostMethodFrame.getProgramMethod());
+	    spec = spec.setTarget(innermostMethodFrame.getProgramMethod());
 	}
 
 	final Term selfTerm = innermostMethodFrame == null
@@ -251,10 +251,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 	        innermostMethodFrame == null
 	        ? null
 	        : (ExecutionContext) innermostMethodFrame.getExecutionContext();
-	services.getSpecificationRepository().addLoopInvariant(inv);
+	services.getSpecificationRepository().addLoopInvariant(spec);
 
 	//cache and return result
-	final Instantiation result = new Instantiation(u, progPost, loop, inv, selfTerm,
+	final Instantiation result = new Instantiation(u, progPost, loop, spec, selfTerm,
 	                                               innermostExecutionContext);
 	lastFocusTerm = focusTerm;
 	lastInstantiation = result;
@@ -553,6 +553,22 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
         return invTerm;
     }
+    
+    private Term conjunctFreeInv(Services services, Instantiation inst,
+    		final Map<LocationVariable, Term> atPres,
+    		final List<LocationVariable> heapContext) {
+    	Term freeInvTerm = null;
+    	for(LocationVariable heap : heapContext) {
+    		final Term i = inst.inv.getFreeInvariant(heap, inst.selfTerm, atPres, services);
+    		if(i == null) continue;
+    		if(freeInvTerm == null) {
+    			freeInvTerm = i;
+    		}else{
+    			freeInvTerm = services.getTermBuilder().and(freeInvTerm, i);
+    		}
+    	}
+    	return freeInvTerm;
+    }
 
     private Pair<Term,Term> prepareVariant (Instantiation inst, Term variant, TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
@@ -794,7 +810,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final List<LocationVariable> heapContext = ((IBuiltInRuleApp)ruleApp).getHeapContext();        
 
         final Term invTerm = conjunctInv(services, inst, atPres, heapContext);
-        final Term invFreeTerm = conjunctInv(services, inst, atPres, heapContext);
+        final Term invFreeTerm = conjunctFreeInv(services, inst, atPres, heapContext);
 
         final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable heap : heapContext) {
@@ -928,7 +944,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                            beforeLoopUpdate,
                            anonUpdate,
                            variantUpdate};
-        final Term uAnonInv = tb.applySequential(uAnon, tb.and(tb.and(invTerm, reachableOut), invFreeTerm)); //TODO Jonas: AND free inv term; Umbenennung LoopInvariant.java in Loop specification (eigener Commit)
+        final Term uAnonInv = tb.applySequential(uAnon, tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
 
         final ImmutableList<Goal> result;
         Goal wdGoal;
