@@ -163,7 +163,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
  * TODO: Document.
@@ -471,7 +471,7 @@ public interface SimultaneousVisitor {
 
     public void visit(While x1, While x2);
 
-    public void visit(LoopInvariant x);
+    public void visit(LoopSpecification x);
 
     public void visit(BlockContract x);
 

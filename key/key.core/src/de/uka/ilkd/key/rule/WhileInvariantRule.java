@@ -71,7 +71,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvariantTransformer;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.LoopWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
@@ -102,7 +102,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     private static InfFlowData prepareSetUpOfInfFlowValidityGoal(final AnonUpdateData anonUpdateData,
                                                                  final Term guardTerm,
                                                                  final Instantiation inst,
-                                                                 LoopInvariant inv,
+                                                                 LoopSpecification inv,
                                                                  Services services,
                                                                  LoopInvariantBuiltInRuleApp ruleApp,
                                                                  final ImmutableSet<ProgramVariable> localIns,
@@ -232,7 +232,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final While loop = app.getLoopStatement();
 
 	// try to get invariant from JML specification
-	LoopInvariant inv = app.getInvariant();
+	LoopSpecification inv = app.getInvariant();
 	if (inv == null) // may happen after reloading proof 
 	    throw new RuleAbortException("no invariant found");
 
@@ -283,7 +283,7 @@ public final class WhileInvariantRule implements BuiltInRule {
      * @return (assumption, anon update, anon heap)
      */    
     private static AnonUpdateData createAnonUpdate(LocationVariable heap, Term mod,
-                                                   LoopInvariant inv, Services services) {
+                                                   LoopSpecification inv, Services services) {
         final TermBuilder tb = services.getTermBuilder();
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name loopHeapName = new Name(tb.newName(heap+"_After_LOOP"));
@@ -500,7 +500,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         infFlowGoal.clearAndDetachRuleAppIndex();
 
         // prepare data
-        LoopInvariant inv = inst.inv;
+        LoopSpecification inv = inst.inv;
         final Term guard = ruleApp.getGuard();
         InfFlowData infFlowData =
                 prepareSetUpOfInfFlowValidityGoal(anonUpdateData, guard,
@@ -755,7 +755,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
     }
 
-    private void setupWdGoal(final Goal goal, final LoopInvariant inv,
+    private void setupWdGoal(final Goal goal, final LoopSpecification inv,
                              final Term update, final Term selfTerm,
                              final LocationVariable heap, final Term anonHeap,
                              final ImmutableSet<ProgramVariable> localIns,
@@ -1030,14 +1030,14 @@ public final class WhileInvariantRule implements BuiltInRule {
 	public final Term u;
 	public final Term progPost;
 	public final While loop;
-	public final LoopInvariant inv;
+	public final LoopSpecification inv;
 	public final Term selfTerm;
 	public final ExecutionContext innermostExecutionContext;
 
 	public Instantiation(Term u, 
 			     Term progPost, 
 			     While loop,
-			     LoopInvariant inv,
+			     LoopSpecification inv,
 			     Term selfTerm,
 			     ExecutionContext innermostExecutionContext) {
 	    assert u != null;

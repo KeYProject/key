@@ -64,7 +64,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.InitiallyClauseImpl;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
@@ -1429,7 +1429,7 @@ public class JMLSpecFactory {
         return null;
     }
 
-    private LoopInvariant createJMLLoopInvariant(IProgramMethod pm,
+    private LoopSpecification createJMLLoopInvariant(IProgramMethod pm,
                                                  LoopStatement loop,
                                                  Map<String,ImmutableList<PositionedString>>
                                                         originalInvariants,
@@ -1614,7 +1614,7 @@ public class JMLSpecFactory {
         return result.prepend(localVars);
     }
 
-    public LoopInvariant createJMLLoopInvariant(IProgramMethod pm,
+    public LoopSpecification createJMLLoopInvariant(IProgramMethod pm,
                                                 LoopStatement loop,
                                                 TextualJMLLoopSpec textualLoopSpec)
             throws SLTranslationException {

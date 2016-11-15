@@ -59,7 +59,7 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.RuleAbortException;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
@@ -82,7 +82,7 @@ public class InvariantConfigurator {
     private List<Map<String,String>[]> invariants = null;
     private HashMap<LoopStatement, List<Map<String,String>[]>> mapLoopsToInvariants = null;
     private int index = 0;
-    private LoopInvariant newInvariant = null;
+    private LoopSpecification newInvariant = null;
     private boolean userPressedCancel = false;
 
     /**
@@ -112,7 +112,7 @@ public class InvariantConfigurator {
      * @param services
      * @return LoopInvariant
      */
-    public LoopInvariant getLoopInvariant (final LoopInvariant loopInv,
+    public LoopSpecification getLoopInvariant (final LoopSpecification loopInv,
             final Services services, final boolean requiresVariant, final List<LocationVariable> heapContext)
                     throws RuleAbortException {
         // Check if there is a LoopInvariant

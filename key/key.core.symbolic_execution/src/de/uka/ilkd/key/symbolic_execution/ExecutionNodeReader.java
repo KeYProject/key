@@ -61,7 +61,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
@@ -2466,7 +2466,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public LoopInvariant getLoopInvariant() {
+      public LoopSpecification getLoopInvariant() {
          return null;
       }
 

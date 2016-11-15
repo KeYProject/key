@@ -33,19 +33,19 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  */
 public class LoopWellDefinedness extends StatementWellDefinedness {
 
-    private final LoopInvariant inv;
+    private final LoopSpecification inv;
 
     private LoopWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                 LocationVariable heap, OriginalVariables origVars,
                                 Condition requires, Term assignable, Term accessible,
-                                Condition ensures, Term mby, Term rep, LoopInvariant inv,
+                                Condition ensures, Term mby, Term rep, LoopSpecification inv,
                                 TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires,
               assignable, accessible, ensures, mby, rep, tb);
         this.inv = inv;
     }
 
-    public LoopWellDefinedness(LoopInvariant inv, ImmutableSet<ProgramVariable> params,
+    public LoopWellDefinedness(LoopSpecification inv, ImmutableSet<ProgramVariable> params,
                                Services services) {
         super(inv.getName(), inv.getLoop().getStartPosition().getLine(), inv.getTarget(),
               inv.getOrigVars().add(convertParams(params)), Type.LOOP_INVARIANT, services);
@@ -68,7 +68,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
                                            TB.and(wdPre, imp)));
     }
 
-    public LoopInvariant getStatement() {
+    public LoopSpecification getStatement() {
         return this.inv;
     }
 

@@ -42,7 +42,7 @@ import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -384,7 +384,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     public void performActionOnLoopInvariant(LoopStatement oldLoop,
                                              LoopStatement newLoop) {
         final TermBuilder tb = services.getTermBuilder();
-        LoopInvariant inv
+        LoopSpecification inv
             = services.getSpecificationRepository().getLoopInvariant(oldLoop);
         if(inv == null) {
             return;
@@ -441,7 +441,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         ImmutableList<Term> newLocalIns = tb.var(MiscTools.getLocalIns(newLoop, services));
         ImmutableList<Term> newLocalOuts = tb.var(MiscTools.getLocalOuts(newLoop, services));
 
-        LoopInvariant newInv = inv.create(newLoop, newInvariants, newFreeInvariants, newMods, newInfFlowSpecs,
+        LoopSpecification newInv = inv.create(newLoop, newInvariants, newFreeInvariants, newMods, newInfFlowSpecs,
                                           newVariant, newSelfTerm, newLocalIns,
                                           newLocalOuts, atPres);
         services.getSpecificationRepository().addLoopInvariant(newInv);

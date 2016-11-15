@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 
 /**
@@ -58,7 +58,7 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
         registerFactoryMethods();
     }
 
-    InfFlowPOSnippetFactoryImpl(LoopInvariant invariant,
+    InfFlowPOSnippetFactoryImpl(LoopSpecification invariant,
                                 ProofObligationVars vars1,
                                 ProofObligationVars vars2,
                                 ExecutionContext context,

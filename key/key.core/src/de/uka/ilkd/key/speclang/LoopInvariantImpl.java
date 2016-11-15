@@ -42,7 +42,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 /**
  * Standard implementation of the LoopInvariant interface.
  */
-public final class LoopInvariantImpl implements LoopInvariant {
+public final class LoopInvariantImpl implements LoopSpecification {
 
     private final LoopStatement loop;
     private final IProgramMethod pm;
@@ -310,7 +310,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public LoopInvariant create(LoopStatement loop,
+    public LoopSpecification create(LoopStatement loop,
                                 IProgramMethod pm,
                                 KeYJavaType kjt,
                                 Map<LocationVariable,Term> invariants,
@@ -329,7 +329,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public LoopInvariant create(LoopStatement loop,
+    public LoopSpecification create(LoopStatement loop,
                                 Map<LocationVariable,Term> invariants,
                                 Map<LocationVariable,Term> freeInvariants,
                                 Map<LocationVariable,Term> modifies,
@@ -345,13 +345,13 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public LoopInvariant instantiate(Map<LocationVariable,Term> invariants,
+    public LoopSpecification instantiate(Map<LocationVariable,Term> invariants,
     								Map<LocationVariable,Term> freeInvariants, Term variant) {
         return configurate(invariants, freeInvariants, originalModifies, originalInfFlowSpecs, variant);
     }
 
     @Override
-    public LoopInvariant configurate(Map<LocationVariable,Term> invariants,
+    public LoopSpecification configurate(Map<LocationVariable,Term> invariants,
     								 Map<LocationVariable,Term> freeInvariants,
                                      Map<LocationVariable,Term> modifies,
                                      Map<LocationVariable,
@@ -362,7 +362,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public LoopInvariant setLoop(LoopStatement loop) {
+    public LoopSpecification setLoop(LoopStatement loop) {
         return new LoopInvariantImpl(loop,
                                      pm,
                                      kjt,
@@ -378,7 +378,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public LoopInvariant setTarget(IProgramMethod newPM) {
+    public LoopSpecification setTarget(IProgramMethod newPM) {
         return new LoopInvariantImpl(loop,
                                      newPM,
                                      kjt,
@@ -394,7 +394,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public LoopInvariant setInvariant(Map<LocationVariable,Term> invariants,
+    public LoopSpecification setInvariant(Map<LocationVariable,Term> invariants,
     						  Map<LocationVariable,Term> freeInvariants,
     						  Term selfTerm,
             			      Map<LocationVariable,Term> atPres,
@@ -535,7 +535,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         return !getInfFlowSpecs(services).isEmpty();
     }
 
-    public LoopInvariant setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
+    public LoopSpecification setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
         return new LoopInvariantImpl(loop, (IProgramMethod)newPM, newKJT,
                                      originalInvariants, originalFreeInvariants, originalModifies,

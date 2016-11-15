@@ -172,7 +172,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
  * Extends the JavaASTWalker to use the visitor mechanism. The methods inherited
@@ -204,7 +204,7 @@ public abstract class SimultaneousJavaASTVisitor extends
         super.walk(node1, node2);
 
         if (node1 instanceof LoopStatement && services != null) {
-            LoopInvariant li = services.getSpecificationRepository()
+            LoopSpecification li = services.getSpecificationRepository()
                     .getLoopInvariant((LoopStatement) node1);
             if (li != null) {
                 visit(li);
@@ -1005,7 +1005,7 @@ public abstract class SimultaneousJavaASTVisitor extends
     }
 
     @Override
-    public void visit(LoopInvariant x) {
+    public void visit(LoopSpecification x) {
         // do nothing
     }
 

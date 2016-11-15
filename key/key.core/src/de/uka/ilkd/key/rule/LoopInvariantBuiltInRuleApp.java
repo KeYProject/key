@@ -41,7 +41,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
  * The built in rule app for the loop invariant rule.
@@ -50,7 +50,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private final While loop;
 
-    private LoopInvariant inv;
+    private LoopSpecification inv;
     private final List<LocationVariable> heapContext;
     private IFProofObligationVars infFlowVars;
     private ExecutionContext executionContext;
@@ -64,7 +64,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
-            LoopInvariant inv, List<LocationVariable> heapContext, TermServices services) {
+            LoopSpecification inv, List<LocationVariable> heapContext, TermServices services) {
         super(rule, pio, ifInsts);
         assert pio != null;
         this.loop = (While) JavaTools.getActiveStatement(programTerm()
@@ -86,7 +86,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
      * otherwise <code>rawInv</code> is returned.
     * @param services TODO
      */
-    private LoopInvariant instantiateIndexValues(LoopInvariant rawInv, TermServices services){
+    private LoopSpecification instantiateIndexValues(LoopSpecification rawInv, TermServices services){
     	if (rawInv == null) return null;
     	Map<LocationVariable,Term> invs = rawInv.getInternalInvariants();
     	Term var = rawInv.getInternalVariant();
@@ -216,7 +216,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence pio, LoopInvariant inv, TermServices services) {
+            PosInOccurrence pio, LoopSpecification inv, TermServices services) {
         this(rule, pio, null, inv, null, services);
     }
 
@@ -225,7 +225,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                 && (!variantRequired() || variantAvailable());
     }
 
-    public LoopInvariant getInvariant() {
+    public LoopSpecification getInvariant() {
         return inv;
     }
 
@@ -264,7 +264,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, inv, heapContext, services);
     }
 
-    public LoopInvariant retrieveLoopInvariantFromSpecification(
+    public LoopSpecification retrieveLoopInvariantFromSpecification(
             Services services) {
         return services.getSpecificationRepository().getLoopInvariant(loop);
     }
@@ -277,7 +277,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     }
 
-    public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopInvariant inv) {
+    public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopSpecification inv) {
         assert inv != null;
         if (this.loop == (While)inv.getLoop())
             this.inv = inv;
@@ -302,7 +302,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             return this;
         }
         final Services services = goal.proof().getServices();
-        LoopInvariant inv = retrieveLoopInvariantFromSpecification(services);
+        LoopSpecification inv = retrieveLoopInvariantFromSpecification(services);
         Modality m = (Modality)programTerm().op();
         boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION); 
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv,

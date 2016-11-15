@@ -40,7 +40,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
@@ -138,7 +138,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         //create atPre for parameters
         for (LoopStatement loop : loops) {
-            LoopInvariant inv
+            LoopSpecification inv
                = services.getSpecificationRepository().getLoopInvariant(loop);
             if(inv != null) {
                 // Nasty bug! The order of these things was not constant! Would fail indeterministically
@@ -166,7 +166,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         //update loop invariants
         for(LoopStatement loop : loops) {
-            LoopInvariant inv
+            LoopSpecification inv
                 = services.getSpecificationRepository().getLoopInvariant(loop);
             if(inv != null) {
                 if(selfTerm != null && inv.getInternalSelfTerm() == null) {
@@ -201,7 +201,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 }
                 ImmutableList<Term> newLocalIns = TB.var(MiscTools.getLocalIns(loop, services));
                 ImmutableList<Term> newLocalOuts = TB.var(MiscTools.getLocalOuts(loop, services));
-                final LoopInvariant newInv
+                final LoopSpecification newInv
                        = inv.create(loop,
                                     frame.getProgramMethod(),
                                     frame.getProgramMethod().getContainerType(),

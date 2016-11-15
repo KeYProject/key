@@ -162,7 +162,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
  * This class is implemented by visitors/walkers.
@@ -471,7 +471,7 @@ public interface Visitor {
 
     void performActionOnLocationVariable(LocationVariable variable); 
 
-    void performActionOnLoopInvariant(LoopInvariant x);
+    void performActionOnLoopInvariant(LoopSpecification x);
     
     void performActionOnBlockContract(BlockContract x);
 
