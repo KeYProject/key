@@ -97,7 +97,7 @@ public final class InfFlowLoopInvariantTacletBuilder
                                    ProofObligationVars contAppData2,
                                    Services services) {
         LoopSpecification ifContract =
-                services.getSpecificationRepository().getLoopInvariant(loopinvariant.getLoop());
+                services.getSpecificationRepository().getLoopSpec(loopinvariant.getLoop());
 
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(ifContract, contAppData,

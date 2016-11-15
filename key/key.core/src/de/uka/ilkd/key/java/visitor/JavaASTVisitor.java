@@ -196,7 +196,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
         super.walk(node);
         if(node instanceof LoopStatement && services != null) {
             LoopSpecification li = services.getSpecificationRepository()
-                                       .getLoopInvariant((LoopStatement) node);
+                                       .getLoopSpec((LoopStatement) node);
             if(li != null) {
                 performActionOnLoopInvariant(li);
             }

@@ -385,7 +385,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                              LoopStatement newLoop) {
         final TermBuilder tb = services.getTermBuilder();
         LoopSpecification inv
-            = services.getSpecificationRepository().getLoopInvariant(oldLoop);
+            = services.getSpecificationRepository().getLoopSpec(oldLoop);
         if(inv == null) {
             return;
         }

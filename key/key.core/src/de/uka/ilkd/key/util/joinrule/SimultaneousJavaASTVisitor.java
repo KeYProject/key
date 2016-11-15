@@ -205,7 +205,7 @@ public abstract class SimultaneousJavaASTVisitor extends
 
         if (node1 instanceof LoopStatement && services != null) {
             LoopSpecification li = services.getSpecificationRepository()
-                    .getLoopInvariant((LoopStatement) node1);
+                    .getLoopSpec((LoopStatement) node1);
             if (li != null) {
                 visit(li);
             }

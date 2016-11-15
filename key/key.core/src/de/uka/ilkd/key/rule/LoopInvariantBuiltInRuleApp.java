@@ -266,7 +266,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     public LoopSpecification retrieveLoopInvariantFromSpecification(
             Services services) {
-        return services.getSpecificationRepository().getLoopInvariant(loop);
+        return services.getSpecificationRepository().getLoopSpec(loop);
     }
 
     @Override

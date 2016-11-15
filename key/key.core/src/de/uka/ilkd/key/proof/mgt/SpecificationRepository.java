@@ -1432,7 +1432,7 @@ public final class SpecificationRepository {
     /**
      * Returns the registered loop invariant for the passed loop, or null.
      */
-    public LoopSpecification getLoopInvariant(LoopStatement loop) {
+    public LoopSpecification getLoopSpec(LoopStatement loop) {
         final int line = loop.getStartPosition().getLine();
         Pair<LoopStatement, Integer> l =
                 new Pair<LoopStatement, Integer>(loop, line);
@@ -1454,7 +1454,7 @@ public final class SpecificationRepository {
      * @param loop the loop for which the contract is to be copied
      */
     public void copyLoopInvariant(LoopStatement from, LoopStatement to) {
-        LoopSpecification inv = getLoopInvariant(from);
+        LoopSpecification inv = getLoopSpec(from);
         if (inv != null) {
             inv = inv.setLoop(to);
             addLoopInvariant(inv);

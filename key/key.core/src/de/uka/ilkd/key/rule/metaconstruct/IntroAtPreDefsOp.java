@@ -139,7 +139,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         //create atPre for parameters
         for (LoopStatement loop : loops) {
             LoopSpecification inv
-               = services.getSpecificationRepository().getLoopInvariant(loop);
+               = services.getSpecificationRepository().getLoopSpec(loop);
             if(inv != null) {
                 // Nasty bug! The order of these things was not constant! Would fail indeterministically
                 // when reloading. Better sort the variables.
@@ -167,7 +167,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         //update loop invariants
         for(LoopStatement loop : loops) {
             LoopSpecification inv
-                = services.getSpecificationRepository().getLoopInvariant(loop);
+                = services.getSpecificationRepository().getLoopSpec(loop);
             if(inv != null) {
                 if(selfTerm != null && inv.getInternalSelfTerm() == null) {
                     //we're calling a static method from an instance context
