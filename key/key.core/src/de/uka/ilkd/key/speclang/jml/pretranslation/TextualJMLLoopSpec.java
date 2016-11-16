@@ -122,6 +122,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     public Map<String,ImmutableList<PositionedString>> getFreeInvariants() {
         return freeInvariants;
     }
+    
     public PositionedString getVariant() {
         return variant;
     }
@@ -137,6 +138,12 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
           while(it.hasNext()) {
             sb.append("invariant<"+heap+">: " + it.next() + "\n");
           }
+        }
+        for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
+        	it = freeInvariants.get(heap.toString()).iterator();
+        	while(it.hasNext()) {
+        		sb.append("free invariant<"+heap+">: " + it.next() + "\n");
+        	}
         }
         for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
           it = assignables.get(heap.toString()).iterator();
