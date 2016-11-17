@@ -290,9 +290,16 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
                 && (!(visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp).isListSV()))) {
             final Term newTerm = toTerm(svInst.getTermInstantiation((SchemaVariable) visitedOp, svInst.getExecutionContext(), services));
-            pushNew(services.getTermBuilder().label(
-                    newTerm, instantiateLabels(visited, newTerm.op(), newTerm.subs(),
-                            newTerm.boundVars(), newTerm.javaBlock(), newTerm.getLabels())));
+            final Term labeledTerm = TermLabelManager.label(services, 
+                                                            termLabelState, 
+                                                            applicationPosInOccurrence, 
+                                                            rule, 
+                                                            ruleApp, 
+                                                            goal, 
+                                                            labelHint, 
+                                                            visited, 
+                                                            newTerm);
+            pushNew(labeledTerm);
         } else {
             final Operator newOp = instantiateOperator(visitedOp);
             // instantiation of java block
@@ -426,11 +433,16 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         if (subtreeRoot.op() instanceof TermTransformer) {
             final TermTransformer mop = (TermTransformer) subtreeRoot.op();
             final Term newTerm = mop.transform((Term)subStack.pop(),svInst, services);
-            pushNew(services.getTermBuilder().label(newTerm,
-                    instantiateLabels(subtreeRoot, newTerm.op(),
-                            newTerm.subs(), newTerm.boundVars(),
-                            newTerm.javaBlock(),
-                            newTerm.getLabels())));
+            final Term labeledTerm = TermLabelManager.label(services, 
+                                                            termLabelState, 
+                                                            applicationPosInOccurrence, 
+                                                            rule, 
+                                                            ruleApp, 
+                                                            goal, 
+                                                            labelHint, 
+                                                            subtreeRoot, 
+                                                            newTerm);
+            pushNew(labeledTerm);
         } 
     }
 }

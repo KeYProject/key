@@ -32,6 +32,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -70,6 +72,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionJoin;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLink;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
@@ -177,6 +181,21 @@ public class ExecutionNodeReader {
                   entry.getKey().addBlockCompletion(returnEntry);
                }
             }
+            // Construct links
+            Set<Entry<AbstractKeYlessExecutionNode<?>, List<String>>> outgoingLinks = handler.getOutgoingLinks().entrySet();
+            for (Entry<AbstractKeYlessExecutionNode<?>, List<String>> entry : outgoingLinks) {
+               for (String path : entry.getValue()) {
+                  IExecutionNode<?> target = findNode(root, path);
+                  if (target == null) {
+                     throw new SAXException("Can't find link targets \"" + path + "\" in parsed symbolic execution tree.");
+                  }
+                  KeYLessLink link = new KeYLessLink();
+                  link.setSource(entry.getKey());
+                  link.setTarget(target);
+                  entry.getKey().addOutgoingLink(link);
+                  ((AbstractKeYlessExecutionNode<?>) target).addIncomingLink(link);
+               }
+            }
             // Construct terminations
             Set<Entry<KeYlessStart, List<String>>> terminationEntries = handler.getTerminationPathEntries().entrySet();
             for (Entry<KeYlessStart, List<String>> entry : terminationEntries) {
@@ -278,6 +297,11 @@ public class ExecutionNodeReader {
       private final Map<AbstractKeYlessExecutionBlockStartNode<?>, List<String>> blockCompletionEntries = new LinkedHashMap<AbstractKeYlessExecutionBlockStartNode<?>, List<String>>();
       
       /**
+       * Maps an {@link AbstractKeYlessExecutionNode} to the path entries of its outgoing links.
+       */
+      private final Map<AbstractKeYlessExecutionNode<?>, List<String>> outgoingLinks = new LinkedHashMap<AbstractKeYlessExecutionNode<?>, List<String>>();
+      
+      /**
        * Maps an {@link KeYlessStart} to the path entries of its terminations.
        */
       private final Map<KeYlessStart, List<String>> terminationPathEntries = new LinkedHashMap<KeYlessStart, List<String>>();
@@ -376,6 +400,14 @@ public class ExecutionNodeReader {
             }
             blockCompletionPathEntries.add(getPathInTree(attributes));
          }
+         else if (isOutgoingLink(uri, localName, qName)) {
+            List<String> linkPaths = outgoingLinks.get(parent);
+            if (linkPaths == null) {
+               linkPaths = new LinkedList<String>();
+               outgoingLinks.put((AbstractKeYlessExecutionNode<?>)parent, linkPaths);
+            }
+            linkPaths.add(getPathInTree(attributes));
+         }
          else if (isTerminationEntry(uri, localName, qName)) {
             List<String> terminationEntries = terminationPathEntries.get(parent);
             if (terminationEntries == null) {
@@ -433,6 +465,9 @@ public class ExecutionNodeReader {
          else if (isBlockCompletionEntry(uri, localName, qName)) {
             // Nothing to do.
          }
+         else if (isOutgoingLink(uri, localName, qName)) {
+            // Nothing to do.
+         }
          else if (isTerminationEntry(uri, localName, qName)) {
             // Nothing to do.
          }
@@ -477,8 +512,8 @@ public class ExecutionNodeReader {
       }
 
       /**
-       * Returns the mapping of a {@link AbstractKeYlessExecutionBlockStartNode} to its block completion entries.
-       * @return The mapping of a {@link AbstractKeYlessExecutionBlockStartNode} to its block completion entries.
+       * Returns the mapping of an {@link AbstractKeYlessExecutionBlockStartNode} to its block completion entries.
+       * @return The mapping of an {@link AbstractKeYlessExecutionBlockStartNode} to its block completion entries.
        */
       public Map<AbstractKeYlessExecutionBlockStartNode<?>, List<String>> getBlockCompletionEntries() {
          return blockCompletionEntries;
@@ -490,6 +525,14 @@ public class ExecutionNodeReader {
        */
       public Map<KeYlessStart, List<String>> getTerminationPathEntries() {
          return terminationPathEntries;
+      }
+
+      /**
+       * Returns the mapping of an {@link AbstractKeYlessExecutionNode} to its outgoing links.
+       * @return The mapping of an {@link AbstractKeYlessExecutionNode} to its outgoing links.
+       */
+      public Map<AbstractKeYlessExecutionNode<?>, List<String>> getOutgoingLinks() {
+         return outgoingLinks;
       }
    }
    
@@ -579,6 +622,17 @@ public class ExecutionNodeReader {
     */
    protected boolean isCompletedBlockEntry(String uri, String localName, String qName) {
       return ExecutionNodeWriter.TAG_COMPLETED_BLOCK_ENTRY.equals(qName);
+   }
+
+   /**
+    * Checks if the currently parsed tag represents an entry of {@link IExecutionNode#getOutgoingLinks()}.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @return {@code true} represents block completion entry, {@code false} is something else.
+    */
+   protected boolean isOutgoingLink(String uri, String localName, String qName) {
+      return ExecutionNodeWriter.TAG_OUTGOING_LINK.equals(qName);
    }
 
    /**
@@ -713,6 +767,9 @@ public class ExecutionNodeReader {
       }
       else if (ExecutionNodeWriter.TAG_BLOCK_CONTRACT.equals(qName)) {
          return new KeYlessBlockContract(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isPreconditionComplied(attributes));
+      }
+      else if (ExecutionNodeWriter.TAG_JOIN.equals(qName)) {
+         return new KeYlessJoin(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isWeakeningVerified(attributes));
       }
       else {
          throw new SAXException("Unknown tag \"" + qName + "\".");
@@ -852,6 +909,15 @@ public class ExecutionNodeReader {
     */
    protected boolean isValueAnObject(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_IS_VALUE_AN_OBJECT));
+   }
+
+   /**
+    * Returns if the weakening is verified.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isWeakeningVerified(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_WEAKENING_VERIFIED));
    }
 
    /**
@@ -1166,6 +1232,16 @@ public class ExecutionNodeReader {
        * The formated conditions under which a block is completed.
        */
       private final Map<IExecutionBlockStartNode<?>, String> formatedCompletedBlockConditions = new LinkedHashMap<IExecutionBlockStartNode<?>, String>();
+
+      /**
+       * The contained outgoing links.
+       */
+      private ImmutableList<IExecutionLink> outgoingLinks = ImmutableSLList.<IExecutionLink>nil();
+
+      /**
+       * The contained incoming links.
+       */
+      private ImmutableList<IExecutionLink> incomingLinks = ImmutableSLList.<IExecutionLink>nil();
       
       /**
        * Constructor.
@@ -1378,6 +1454,64 @@ public class ExecutionNodeReader {
             completedBlocks = completedBlocks.append(completedBlock);
             formatedCompletedBlockConditions.put(completedBlock, formatedCondition);
          }
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionLink getOutgoingLink(final IExecutionNode<?> target) {
+         return CollectionUtil.search(outgoingLinks, new IFilter<IExecutionLink>() {
+            @Override
+            public boolean select(IExecutionLink element) {
+               return element.getTarget() == target;
+            }
+         });
+      }
+      
+      /**
+       * Adds the outgoing {@link IExecutionLink}.
+       * @param link The outgoing {@link IExecutionLink} to add.
+       */
+      public void addOutgoingLink(IExecutionLink link) {
+         outgoingLinks = outgoingLinks.append(link);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<IExecutionLink> getOutgoingLinks() {
+         return outgoingLinks;
+      }
+      
+      /**
+       * Adds the incoming {@link IExecutionLink}.
+       * @param link The incoming {@link IExecutionLink} to add.
+       */
+      public void addIncomingLink(IExecutionLink link) {
+         incomingLinks = incomingLinks.append(link);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionLink getIncomingLink(final IExecutionNode<?> source) {
+         return CollectionUtil.search(incomingLinks, new IFilter<IExecutionLink>() {
+            @Override
+            public boolean select(IExecutionLink element) {
+               return element.getSource() == source;
+            }
+         });
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<IExecutionLink> getIncomingLinks() {
+         return incomingLinks;
       }
    }
    
@@ -2238,6 +2372,59 @@ public class ExecutionNodeReader {
    }
 
    /**
+    * An implementation of {@link IExecutionJoin} which is independent
+    * from KeY and provides such only children and default attributes.
+    * @author Martin Hentschel
+    */
+   public static class KeYlessJoin extends AbstractKeYlessExecutionNode<SourceElement> implements IExecutionJoin {
+      /**
+       * Is the weakening verified?
+       */
+      private final boolean weakeningVerified;
+      
+      /**
+       * Constructor.
+       * @param parent The parent {@link IExecutionNode}.
+       * @param name The name of this node.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
+       * @param formatedPathCondition The formated path condition.
+       * @param weakeningVerified Is the weakening verified?
+       */
+      public KeYlessJoin(IExecutionNode<?> parent, 
+                         String name, 
+                         String formatedPathCondition,
+                         boolean pathConditionChanged,
+                         boolean weakeningVerified) {
+         super(parent, name, formatedPathCondition, pathConditionChanged);
+         this.weakeningVerified = weakeningVerified;
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Join";
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isWeakeningVerified() {
+         return weakeningVerified;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isWeakeningVerificationSupported() {
+         return true;
+      }
+   }
+
+   /**
     * An implementation of {@link IExecutionOperationContract} which is independent
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
@@ -2717,6 +2904,55 @@ public class ExecutionNodeReader {
       public Term createSelectTerm() {
          return null;
       }
+   }
+   
+   /**
+    * An implementation of {@link IExecutionLink} which is independent
+    * from KeY and provides such only children and default attributes.
+    * @author Martin Hentschel
+    */
+   public static class KeYLessLink implements IExecutionLink {
+      /**
+       * The source.
+       */
+      private IExecutionNode<?> source;
+
+      /**
+       * The target.
+       */
+      private IExecutionNode<?> target;
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionNode<?> getSource() {
+         return source;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionNode<?> getTarget() {
+         return target;
+      }
+
+      /**
+       * Sets the source.
+       * @param target The source to set.
+       */
+      public void setSource(IExecutionNode<?> source) {
+         this.source = source;
+      }
+
+      /**
+       * Sets the target.
+       * @param target The target to set.
+       */
+      public void setTarget(IExecutionNode<?> target) {
+         this.target = target;
+      }      
    }
    
    /**

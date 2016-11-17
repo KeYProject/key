@@ -15,6 +15,7 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.EventObject;
 
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
@@ -24,35 +25,60 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
 
 public class OneStepSimplificationToggleAction extends MainWindowAction {
+    public static final String NAME = "One Step Simplification";
 
     /**
      * 
      */
     private static final long serialVersionUID = -2772730241688097857L;
+    
+    /**
+     * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()}.
+     * <p>
+     * Such changes can occur in the Eclipse context when settings are changed in for instance the KeYIDE.
+     */
+    private final SettingsListener generalSettingsListener = new SettingsListener() {
+       @Override
+       public void settingsChanged(EventObject e) {
+          handleGeneralSettingsChanged(e);
+       }
+    };
 
     public OneStepSimplificationToggleAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("One Step Simplification");
+        setName(NAME);
         putValue(MNEMONIC_KEY, KeyEvent.VK_O);
-        putValue(SHORT_DESCRIPTION, "Toggle the aggregation of simplification rules." +
-        		" Faster if on, more transparent if off.");
+        putValue(SHORT_DESCRIPTION, "Toggle the aggregation of simplification rules." 
+                                    + " Faster if on, more transparent if off.");
         
         Icon icon = IconFactory.oneStepSimplifier(MainWindow.TOOLBAR_ICON_SIZE);
         putValue(SMALL_ICON, icon);
 
-        final boolean oneStepSimplificationOn = 
-        		ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
-        setSelected(oneStepSimplificationOn);
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().addSettingsListener(generalSettingsListener); // Attention: The listener is never removed, because there is only one MainWindow!
+    }
+    
+    protected void updateSelectedState() {
+       final boolean oneStepSimplificationOn = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+       setSelected(oneStepSimplificationOn);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
 	boolean b = ((AbstractButton) e.getSource()).isSelected();
 	ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(b);
-	OneStepSimplifier.refreshOSS(getMediator().getSelectedProof());
-	
+   updateMainWindow();
+    }
+    
+    protected void updateMainWindow() {
+       OneStepSimplifier.refreshOSS(getMediator().getSelectedProof());
+    }
+
+    protected void handleGeneralSettingsChanged(EventObject e) {
+       updateSelectedState();
+       updateMainWindow();
     }
 
    @Override

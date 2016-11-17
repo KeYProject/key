@@ -72,4 +72,40 @@ public interface IKeYSENode<E extends IExecutionNode<?>> extends ISENode {
     * @return {@code true} enabled, {@code false} disabled.
     */
    public boolean isTruthValueTracingEnabled();
+
+   /**
+    * Adds the outgoing link.
+    * @param link The outgoing link to add.
+    */
+   public void addOutgoingLink(KeYNodeLink link);
+
+   /**
+    * Removes the outgoing link.
+    * @param link The outgoing link to remove.
+    */
+   public void removeOutgoingLink(KeYNodeLink link);
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYNodeLink[] getOutgoingLinks() throws DebugException;
+
+   /**
+    * Adds the incoming link.
+    * @param link The incoming link to add.
+    */
+   public void addIncomingLink(KeYNodeLink link);
+
+   /**
+    * Removes the incoming link.
+    * @param link The incoming link to remove.
+    */
+   public void removeIncomingLink(KeYNodeLink link);
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYNodeLink[] getIncomingLinks() throws DebugException;
 }

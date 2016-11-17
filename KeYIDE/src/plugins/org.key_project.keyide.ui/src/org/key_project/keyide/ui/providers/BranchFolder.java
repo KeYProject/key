@@ -13,6 +13,7 @@
 
 package org.key_project.keyide.ui.providers;
 
+import de.uka.ilkd.key.gui.prooftree.GUIAbstractTreeNode;
 import de.uka.ilkd.key.proof.Node;
 
 /**
@@ -48,6 +49,7 @@ public class BranchFolder {
     * @return the label {@link String} of this {@link BranchFolder}.
     */
    public String getLabel() {
+      GUIAbstractTreeNode.ensureBranchLabelIsSet(child);
       return child.getNodeInfo().getBranchLabel();
    }
 

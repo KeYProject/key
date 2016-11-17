@@ -20,6 +20,9 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
+import de.uka.ilkd.key.speclang.ContractFactory;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
@@ -46,16 +49,20 @@ import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.rifl.RIFLTransformer;
+import org.xml.sax.SAXException;
+import recoder.ParserException;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * The main entry point for KeY
- *
+ * <p>
  * This has been extracted from MainWindow to keep GUI and control further apart.
  */
 public final class Main {
-/**
- * Command line options
- */
+    /**
+     * Command line options
+     */
     private static final String HELP = "--help";
     private static final String SHOW_PROPERTIES = "--show-properties";
     private static final String AUTO = "--auto";
@@ -67,21 +74,21 @@ public final class Main {
     private static final String MACRO = "--macro";
     private static final String NO_JMLSPECS = "--no-jmlspecs";
     private static final String TACLET_DIR = "--tacletDir";
-    public static final String JUSTIFY_RULES ="--justify-rules";
+    public static final String JUSTIFY_RULES = "--justify-rules";
     private static final String SAVE_ALL_CONTRACTS = "--save-all";
-    private static final String TIMEOUT ="--timeout";
+    private static final String TIMEOUT = "--timeout";
     private static final String EXAMPLES = "--examples";
     private static final String RIFL = "--rifl";
     public static final String JKEY_PREFIX = "--jr-";
     public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
-//    deprecated
+    //    deprecated
 //    public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
     public static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
     public static final String JTIMEOUT = JKEY_PREFIX + "timeout";
     public static final String JPRINT = JKEY_PREFIX + "print";
     public static final String JSAVE_RESULTS_TO_FILE = JKEY_PREFIX + "saveProofToFile";
     public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
-    public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX +"signature";
+    public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX + "signature";
     private static final String VERBOSITY = "--verbose";
 
     /**
@@ -95,25 +102,27 @@ public final class Main {
      * The user interface modes KeY can operate in.
      */
     private enum UiMode {
-	/**
-	 * Interactive operation mode.
-	 */
-	INTERACTIVE,
+        /**
+         * Interactive operation mode.
+         */
+        INTERACTIVE,
 
-	/**
-	 * Auto operation mode.
-	 */
-	AUTO
+        /**
+         * Auto operation mode.
+         */
+        AUTO
     }
 
-    /** Level of verbosity for command line outputs. */
+    /**
+     * Level of verbosity for command line outputs.
+     */
     private static byte verbosity = Verbosity.NORMAL;
 
     private static String examplesDir = null;
 
     /**
      * Determines which {@link UserInterfaceControl} is to be used.
-     *
+     * <p>
      * By specifying <code>AUTO</code> as command line argument this will be set
      * to {@link UiMode#AUTO}, but {@link UiMode#INTERACTIVE} is the default.
      */
@@ -122,7 +131,7 @@ public final class Main {
     /**
      * Determines whether to actually prove or only load a problem when
      * {@link Main#uiMode} is {@link UiMode#AUTO}.
-     *
+     * <p>
      * This can be controlled from the command line by specifying the argument
      * <code>AUTO_LOADONLY</code> instead of <code>AUTO</code>.
      */
@@ -135,7 +144,7 @@ public final class Main {
     /**
      * flag whether recent loaded file should be loaded on startup
      */
-    private static boolean loadRecentFile=false;
+    private static boolean loadRecentFile = false;
 
     /**
      * The file names provided on the command line
@@ -151,7 +160,7 @@ public final class Main {
     /**
      * Path to a RIFL specification file.
      */
-    private static String riflFileName = null;
+    private static File riflFileName = null;
 
     /**
      * Save all contracts in selected location to automate the creation
@@ -182,15 +191,15 @@ public final class Main {
         }
 
         // does no harm on non macs
-        System.setProperty("apple.laf.useScreenMenuBar","true");
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
 
         try {
             cl = createCommandLine();
             cl.parse(args);
             evaluateOptions(cl);
             fileArguments = cl.getFileArguments();
-            AbstractMediatorUserInterfaceControl userInterface = createUserInterface(fileArguments);
             fileArguments = preProcessInput(fileArguments);
+            AbstractMediatorUserInterfaceControl userInterface = createUserInterface(fileArguments);
             loadCommandLineFiles(userInterface, fileArguments);
         } catch (ExceptionInInitializerError e) {
             System.err.println("D'oh! It seems that KeY was not built properly!");
@@ -217,7 +226,7 @@ public final class Main {
             if (ui instanceof ConsoleUserInterfaceControl) {
                 System.exit(((ConsoleUserInterfaceControl) ui).allProofsSuccessful ? 0 : 1);
             }
-        } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
+        } else if (Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             ui.openExamples();
         }
     }
@@ -225,9 +234,10 @@ public final class Main {
 
     /**
      * Register commandline options with command line object
+     *
      * @return commandline object
      */
-    private static CommandLine createCommandLine(){
+    private static CommandLine createCommandLine() {
         CommandLine cl = new CommandLine();
         cl.setIndentation(3);
         cl.addSection("Using KeY");
@@ -244,39 +254,41 @@ public final class Main {
         cl.addOption(DEBUG, null, "start KeY in debug mode");
         cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
         cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");
-        cl.addOption(VERBOSITY, "<number>", "verbosity (default: "+Verbosity.NORMAL+")");
+        cl.addOption(VERBOSITY, "<number>", "verbosity (default: " + Verbosity.NORMAL + ")");
         cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
         cl.addOption(EXAMPLES, "<directory>", "load the directory containing the example files on startup");
         cl.addOption(RIFL, "<filename>", "load RIFL specifications from file (requires GUI and startup file)");
         cl.addOption(MACRO, "<proofMacro>", "apply automatic proof macro");
         cl.addOption(SAVE_ALL_CONTRACTS, null, "save all selected contracts for automatic execution");
-        cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +", i.e., no timeout)");
+        cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)");
         cl.addSection("Options for justify rules:");
-        cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument" );
+        cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument");
         cl.addText("\n", true);
         cl.addText("The '" + JUSTIFY_RULES + "' option has a number of additional parameters you can set.", false);
         cl.addText("The following options only apply if '" + JUSTIFY_RULES + "' is used.", false);
         cl.addText("\n", true);
-        cl.addOption(JMAX_RULES, "<number>","maximum number of rule application to perform (default: " + LemmataAutoModeOptions.DEFAULT_MAXRULES +")");
+        cl.addOption(JMAX_RULES, "<number>", "maximum number of rule application to perform (default: " + LemmataAutoModeOptions.DEFAULT_MAXRULES + ")");
         cl.addOption(JPATH_OF_RESULT, "<path>", "store proofs to this folder");
-        cl.addOption(JTIMEOUT, "<timeout>", "the timeout for proof of a taclet in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +")");
+        cl.addOption(JTIMEOUT, "<timeout>", "the timeout for proof of a taclet in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ")");
         cl.addOption(JPRINT, "<terminal/disable>", "send output to terminal or disable output");
-        cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "save or drop proofs (then stored to path given by "+ JPATH_OF_RESULT + ")");
+        cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "save or drop proofs (then stored to path given by " + JPATH_OF_RESULT + ")");
         cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "read axioms from given file");
         cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "read definitions from given file");
         return cl;
     }
+
     /**
      * Evaluate the parsed commandline options
+     *
      * @param commandline object cl
      */
     public static void evaluateOptions(CommandLine cl) {
 
-        if(cl.isSet(VERBOSITY)){ // verbosity
+        if (cl.isSet(VERBOSITY)) { // verbosity
             try {
-                verbosity = (byte)cl.getInteger(VERBOSITY, Verbosity.HIGH);
+                verbosity = (byte) cl.getInteger(VERBOSITY, Verbosity.HIGH);
             } catch (CommandLineException e) {
-                if(Debug.ENABLE_DEBUG) {
+                if (Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
                 }
                 System.err.println(e.getMessage());
@@ -290,23 +302,24 @@ public final class Main {
         if (cl.isSet(SHOW_PROPERTIES)) {
             try {
                 java.util.Properties props = System.getProperties();
-                for (Object o: props.keySet()) {
-                    System.out.println(""+o+"=\""+props.get(o)+"\"");
+                for (Object o : props.keySet()) {
+                    System.out.println("" + o + "=\"" + props.get(o) + "\"");
                 }
             } finally {
                 System.exit(0);
             }
         }
 
-        if(cl.isSet(AUTO)){
-        	uiMode = UiMode.AUTO;
+        if (cl.isSet(AUTO)) {
+            uiMode = UiMode.AUTO;
+
         }
-        if(cl.isSet(AUTO_LOADONLY)){
-        	uiMode = UiMode.AUTO;
-        	loadOnly = true;
+        if (cl.isSet(AUTO_LOADONLY)) {
+            uiMode = UiMode.AUTO;
+            loadOnly = true;
         }
 
-        if(cl.isSet(AUTOSAVE)){
+        if (cl.isSet(AUTOSAVE)) {
             try {
                 int eachSteps = cl.getInteger(AUTOSAVE, 0);
                 if (eachSteps < 0) {
@@ -314,34 +327,34 @@ public final class Main {
                 }
                 AutoSaver.setDefaultValues(eachSteps, uiMode == UiMode.INTERACTIVE);
             } catch (CommandLineException e) {
-                if(Debug.ENABLE_DEBUG) {
+                if (Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
                 }
                 System.err.println(e.getMessage());
             }
         }
 
-        if(cl.isSet(HELP)){
+        if (cl.isSet(HELP)) {
             // 0 as exit value means: no error
             printUsageAndExit(true, null, 0);
         }
 
-        if(cl.isSet(NO_JMLSPECS)){
+        if (cl.isSet(NO_JMLSPECS)) {
             GeneralSettings.disableSpecs = true;
         }
 
-        if(cl.isSet(TIMEOUT)){
+        if (cl.isSet(TIMEOUT)) {
             if (verbosity >= Verbosity.HIGH) {
-            System.out.println("Timeout is set");
+                System.out.println("Timeout is set");
             }
             long timeout = -1;
             try {
                 timeout = cl.getLong(TIMEOUT, -1);
                 if (verbosity >= Verbosity.HIGH) {
-                System.out.println("Timeout is: "+ timeout+" ms");
+                    System.out.println("Timeout is: " + timeout + " ms");
                 }
             } catch (CommandLineException e) {
-                if(Debug.ENABLE_DEBUG) {
+                if (Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
                 }
                 System.err.println(e.getMessage());
@@ -354,25 +367,25 @@ public final class Main {
             ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
         }
 
-        if(cl.isSet(EXAMPLES)){
+        if (cl.isSet(EXAMPLES)) {
             examplesDir = cl.getString(EXAMPLES, null);
         }
 
         if (verbosity > Verbosity.SILENT) {
-        if (Debug.ENABLE_DEBUG) {
-            System.out.println("Running in debug mode ...");
-        }
+            if (Debug.ENABLE_DEBUG) {
+                System.out.println("Running in debug mode ...");
+            }
 
-        if (Debug.ENABLE_ASSERTION) {
-            System.out.println("Using assertions ...");
-        } else {
-            System.out.println("Not using assertions ...");
-        }
+            if (Debug.ENABLE_ASSERTION) {
+                System.out.println("Using assertions ...");
+            } else {
+                System.out.println("Not using assertions ...");
+            }
         }
 
         if (cl.isSet(EXPERIMENTAL)) {
             if (verbosity > Verbosity.SILENT) {
-            System.out.println("Running in experimental mode ...");
+                System.out.println("Running in experimental mode ...");
             }
             setEnabledExperimentalFeatures(true);
         } else {
@@ -380,14 +393,14 @@ public final class Main {
         }
 
         if (cl.isSet(RIFL)) {
-            riflFileName = cl.getString(RIFL, null);
+            riflFileName = new File(cl.getString(RIFL, null));
             if (verbosity > Verbosity.SILENT) {
-                System.out.println("[RIFL] Loading RIFL specification from "+riflFileName+ " ...");
+                System.out.println("[RIFL] Loading RIFL specification from " + riflFileName + " ...");
             }
         }
 
-        if(cl.isSet(LAST)){
-            loadRecentFile=true;
+        if (cl.isSet(LAST)) {
+            loadRecentFile = true;
         }
 
         if (cl.isSet(JUSTIFY_RULES)) {
@@ -400,7 +413,7 @@ public final class Main {
 
         if (cl.isSet(MACRO)) {
             String macro = cl.getString(MACRO, "");
-            for (ProofMacro m: ClassLoaderUtil.loadServices(ProofMacro.class)) {
+            for (ProofMacro m : ClassLoaderUtil.loadServices(ProofMacro.class)) {
                 if (macro.equals(m.getClass().getSimpleName())) {
                     // memorize macro for later
                     try {
@@ -424,15 +437,17 @@ public final class Main {
             saveAllContracts = true;
         }
 
-        if(cl.isSet(TACLET_DIR)) {
+        if (cl.isSet(TACLET_DIR)) {
             System.setProperty(RuleSourceFactory.STD_TACLET_DIR_PROP_KEY,
                     cl.getString(TACLET_DIR, ""));
         }
 
     }
 
-    /** Deactivate experimental features. */
-    public static void setEnabledExperimentalFeatures (boolean state) {
+    /**
+     * Deactivate experimental features.
+     */
+    public static void setEnabledExperimentalFeatures(boolean state) {
         experimentalMode = state;
     }
 
@@ -440,7 +455,9 @@ public final class Main {
         return experimentalMode;
     }
 
-    /** Print a header text on to the console. */
+    /**
+     * Print a header text on to the console.
+     */
     private static void printHeader() {
         System.out.println("\nKeY Version " + KeYConstants.VERSION);
         System.out.println(KeYConstants.COPYRIGHT + "\nKeY is protected by the " +
@@ -449,12 +466,12 @@ public final class Main {
 
     /**
      * Initializes the {@link UserInterfaceControl} to be used by KeY.
-     *
+     * <p>
      * {@link ConsoleUserInterfaceControl} will be used if {@link Main#uiMode} is
      * {@link UiMode#AUTO} and {@link WindowUserInterfaceControl} otherwise.
      *
      * @return a <code>UserInterfaceControl</code> based on the value of
-     *         <code>uiMode</code>
+     * <code>uiMode</code>
      */
     private static AbstractMediatorUserInterfaceControl createUserInterface(List<File> fileArguments) {
 
@@ -465,12 +482,12 @@ public final class Main {
                 public void uncaughtException(Thread t, Throwable e) {
                     if (verbosity > Verbosity.SILENT) {
                         System.out.println("Auto mode was terminated by an exception:"
-                                            + e.getClass().toString().substring(5));
+                                + e.getClass().toString().substring(5));
                         if (verbosity >= Verbosity.DEBUG) {
                             e.printStackTrace();
                         }
                         final String msg = e.getMessage();
-                        if (msg!=null) {
+                        if (msg != null) {
                             System.out.println(msg);
                         }
                     }
@@ -506,27 +523,27 @@ public final class Main {
     }
 
     public static void ensureExamplesAvailable() {
-       File examplesDir = getExamplesDir() == null ?
-                          ExampleChooser.lookForExamples() :
-                          new File(getExamplesDir());
-       if (!examplesDir.exists()) {
-          setExamplesDir(WebstartMain.setupExamples().getAbsolutePath());
-       }
+        File examplesDir = getExamplesDir() == null ?
+                ExampleChooser.lookForExamples() :
+                new File(getExamplesDir());
+        if (!examplesDir.exists()) {
+            setExamplesDir(WebstartMain.setupExamples().getAbsolutePath());
+        }
     }
 
     private static void updateSplashScreen() {
         try {
             final java.awt.SplashScreen sp = java.awt.SplashScreen.getSplashScreen();
-            if (sp == null)
-             {
+            if (sp == null) {
                 return;
-            // insert customization code here
-            // see http://docs.oracle.com/javase/tutorial/uiswing/misc/splashscreen.html
+                // insert customization code here
+                // see http://docs.oracle.com/javase/tutorial/uiswing/misc/splashscreen.html
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
     }
 
-    private static void evaluateLemmataOptions(CommandLine options){
+    private static void evaluateLemmataOptions(CommandLine options) {
 
         LemmataAutoModeOptions opt;
         try {
@@ -537,8 +554,8 @@ public final class Main {
                     AbstractProfile.getDefaultProfile());
             handler.start();
 
-        } catch(Exception e) {
-            if(Debug.ENABLE_DEBUG) {
+        } catch (Exception e) {
+            if (Debug.ENABLE_DEBUG) {
                 e.printStackTrace();
             }
             printUsageAndExit(false, e.getMessage(), -2);
@@ -547,8 +564,8 @@ public final class Main {
     }
 
     public static void printUsageAndExit(boolean printUsage, String offending, int exitValue) {
-        PrintStream ps = exitValue==0 ? System.out : System.err;
-        if(offending != null) {
+        PrintStream ps = exitValue == 0 ? System.out : System.err;
+        if (offending != null) {
             ps.println(offending);
         }
         if (printUsage) {
@@ -584,29 +601,36 @@ public final class Main {
      * Perform necessary actions before loading any problem files.
      * Currently only performs RIFL to JML transformation.
      */
-    private static List<File> preProcessInput (List<File> filesOnStartup) {
+    private static List<File> preProcessInput(List<File> filesOnStartup) {
         List<File> result = new ArrayList<File>();
         // RIFL to JML transformation
         if (riflFileName != null) {
             if (filesOnStartup.isEmpty()) {
                 System.out.println("[RIFL] No Java file to load from.");
-                System.exit (-130826);
+                System.exit(-130826);
             }
             // only use one input file
-            String fileNameOnStartUp = null;
-			try {
-				fileNameOnStartUp = filesOnStartup.get(0).getCanonicalPath();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+            File fileNameOnStartUp = filesOnStartup.get(0).getAbsoluteFile();
 //            final KeYRecoderExceptionHandler kexh = ui.getMediator().getExceptionHandler();
-            RIFLTransformer.transform(riflFileName, fileNameOnStartUp);
-            fileNameOnStartUp = RIFLTransformer.getDefaultSavePath(fileNameOnStartUp);
-            if (verbosity > Verbosity.SILENT) {
-                System.out.println("[RIFL] Writing transformed Java files to "+fileNameOnStartUp+" ...");
+            try {
+                RIFLTransformer transformer = new RIFLTransformer();
+                transformer.doTransform(riflFileName, fileNameOnStartUp,
+                        RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
+
+                if (verbosity > Verbosity.SILENT) {
+                    System.out.println("[RIFL] Writing transformed Java files to " + fileNameOnStartUp + " ...");
+                }
+                return transformer.getProblemFiles();
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            } catch (SAXException e) {
+                e.printStackTrace();
+            } catch (ParserException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            result.add(new File(fileNameOnStartUp));
+
             return result;
         }
         // nothing to do, pass the original files
@@ -621,6 +645,7 @@ public final class Main {
      * Defines the examples directory. This method is used by the
      * Eclipse integration (KeY4Eclipse) to use the examples extract
      * from the plug-in into the workspace.
+     *
      * @param newExamplesDir The new examples directory to use.
      */
     public static void setExamplesDir(String newExamplesDir) {
@@ -630,6 +655,7 @@ public final class Main {
     /**
      * Returns the {@link KeYDesktop} to use. Never use {@link Desktop}
      * directly because the {@link KeYDesktop} is different in Eclipse.
+     *
      * @return The {@link KeYDesktop} to use.
      */
     public static KeYDesktop getKeyDesktop() {
@@ -638,6 +664,7 @@ public final class Main {
 
     /**
      * Sets the {@link KeYDesktop} to use.
+     *
      * @param keyDesktop The new {@link KeYDesktop} to use.
      */
     public static void setKeyDesktop(KeYDesktop keyDesktop) {

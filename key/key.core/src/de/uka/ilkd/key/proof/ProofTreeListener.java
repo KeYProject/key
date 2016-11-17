@@ -72,4 +72,10 @@ public interface ProofTreeListener {
      * of the SMT solver. The data from the SMT solver can be accessed via.
      * {@code Node.getCounterExData()}*/
     void smtDataUpdate(ProofTreeEvent e);
+    
+    /**
+     * If the notes of a {@link NodeInfo} of a proof tree {@link Node} have changed.
+     * @param e The {@link ProofTreeEvent}.
+     */
+    void notesChanged(ProofTreeEvent e);
 }

@@ -39,6 +39,7 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
@@ -81,14 +82,9 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
    private KeYEnvironment<DefaultUserInterfaceControl> environment = null;
    
    /**
-    * Indicates whether minimize Interactions was checked initially.
+    * Indicates whether the taclet filter was originally enabled or not.
     */
-   private boolean checkedInitial;
-   
-   /**
-    * Indicates whether the minimize interactions had to be toggled.
-    */
-   private boolean flipped = false;
+   private boolean originalTacletFilter;
 
    /**
     * Tests whether finishing the dialog works as expected.
@@ -272,12 +268,9 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
          throw run.getException();
       }
       
-      checkedInitial = bot.toolbarToggleButtonWithTooltip("Minimize Interactions").isChecked();
-      //Unminimize Interactions, so that we can use the required Taclets.
-      if (checkedInitial) {
-         flipped = true;
-         TestUtilsUtil.clickDirectly(bot.toolbarToggleButtonWithTooltip("Minimize Interactions"));
-      }
+      originalTacletFilter = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
+      //Deactivate taclet filter, so that we can use the required Taclets.
+      ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setTacletFilter(false);
       
       editor = bot.activeEditor();
       assertNotNull(editor);
@@ -311,9 +304,7 @@ public class SWTBotCompleteAndApplyTacletMatchWizardPageTest {
          dialogShell = null;
       }
       //restore Interactions
-      if (flipped && bot.toolbarToggleButtonWithTooltip("Minimize Interactions").isChecked() != checkedInitial) {
-         TestUtilsUtil.clickDirectly(bot.toolbarToggleButtonWithTooltip("Minimize Interactions"));
-      }
+      ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setTacletFilter(originalTacletFilter);
       
       previousperspective.activate();
       StarterPreferenceUtil.setDontAskForProofStarter(prevDontAsk);

@@ -198,14 +198,16 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * in the decorated {@link ISourceViewer}.
     * @param node The {@link Node} to show.
     * @param notationInfo The {@link NotationInfo} containing information on how to display node.
+    * @param visibleLabels The visible term labels.
     */
-   public void showNode(Node node, NotationInfo notationInfo) {
+   public void showNode(Node node, NotationInfo notationInfo, VisibleTermLabels visibleLabels) {
       this.node = node;
       if (node != null) {
          filter = new IdentitySequentPrintFilter(node.sequent());
-         printer = new LogicPrinter(new ProgramPrinter(null), 
-                                    notationInfo, 
-                                    node.proof().getServices());
+         printer = new SequentViewLogicPrinter(new ProgramPrinter(null), 
+                                               notationInfo, 
+                                               node.proof().getServices(),
+                                               visibleLabels);
          text = computeText(notationInfo, node, filter, printer);
       }
       else {
@@ -273,17 +275,10 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
                              VisibleTermLabels visibleLabels) {
       this.node = null;
       filter = null;
-      if (visibleLabels != null) {
-         printer = new SequentViewLogicPrinter(new ProgramPrinter(null), 
-                                               notationInfo, 
-                                               services,
-                                               visibleLabels);
-      }
-      else {
-         printer = new LogicPrinter(new ProgramPrinter(null), 
-                                    notationInfo, 
-                                    services);
-      }
+      printer = new SequentViewLogicPrinter(new ProgramPrinter(null), 
+                                            notationInfo, 
+                                            services,
+                                            visibleLabels);
       String str = computeText(sequent, printer);
       viewer.setDocument(new Document(str));
 

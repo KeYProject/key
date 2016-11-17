@@ -80,7 +80,7 @@ public class ProofSourceViewerDecoratorTest {
          // let showNode fill StyleRanges of StyledText
          ISourceViewer sourceViewer = new SourceViewer(shell, null, SWT.NONE);
          decorator = new ProofSourceViewerDecorator(sourceViewer);
-         decorator.showNode(proof.root(), SymbolicExecutionUtil.createNotationInfo(proof));
+         decorator.showNode(proof.root(), SymbolicExecutionUtil.createNotationInfo(proof), null);
          text = sourceViewer.getTextWidget();
          
          // fill Array for Test with correct StyleRanges

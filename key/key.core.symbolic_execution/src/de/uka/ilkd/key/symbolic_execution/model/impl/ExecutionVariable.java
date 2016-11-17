@@ -28,7 +28,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.proof.ApplyStrategy;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -179,62 +179,21 @@ public class ExecutionVariable extends AbstractExecutionVariable {
          else {
             sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services, getProofNode(), getModalityPIO(), siteProofCondition, getProgramVariable());
          }
-         ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(getProof(), 
-                                                                             sideProofEnv,
-                                                                             sequentToProve.getSequentToProve(), 
-                                                                             StrategyProperties.METHOD_NONE,
-                                                                             StrategyProperties.LOOP_NONE,
-                                                                             StrategyProperties.QUERY_OFF,
-                                                                             StrategyProperties.SPLITTING_DELAYED);
+         ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(getProof(), 
+                                                                                sideProofEnv,
+                                                                                sequentToProve.getSequentToProve(), 
+                                                                                StrategyProperties.METHOD_NONE,
+                                                                                StrategyProperties.LOOP_NONE,
+                                                                                StrategyProperties.QUERY_OFF,
+                                                                                StrategyProperties.SPLITTING_DELAYED);
          try {
-            List<ExecutionValue> result = new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
-            // Group values of the branches
-            Map<Term, List<Goal>> valueMap = new LinkedHashMap<Term, List<Goal>>();
-            List<Goal> unknownValues = new LinkedList<Goal>();
-            groupGoalsByValue(info.getProof().openGoals(), sequentToProve.getOperator(), siteProofSelectTerm, siteProofCondition, valueMap, unknownValues, services);
-            // Instantiate child values
-            for (Entry<Term, List<Goal>> valueEntry : valueMap.entrySet()) {
-               Term value = valueEntry.getKey();
-               // Format return vale
-               String valueString = formatTerm(value, services);
-               // Determine type
-               String typeString = value.sort().toString();
-               // Compute value condition
-               Term condition = computeValueCondition(tb, valueEntry.getValue(), initConfig);
-               String conditionString = null;
-               if (condition != null) {
-                  conditionString = formatTerm(condition, services);
-               }
-               // Update result
-               result.add(new ExecutionValue(getProofNode(),
-                                             this,
-                                             false,
-                                             value,
-                                             valueString,
-                                             typeString,
-                                             condition,
-                                             conditionString));
-            }
-            // Instantiate unknown child values
-            if (!unknownValues.isEmpty()) {
-               // Compute value condition
-               Term condition = computeValueCondition(tb, unknownValues, initConfig);
-               String conditionString = null;
-               if (condition != null) {
-                  conditionString = formatTerm(condition, services);
-               }
-               // Update result
-               result.add(new ExecutionValue(getProofNode(),
-                                             this,
-                                             true,
-                                             null,
-                                             null,
-                                             null,
-                                             condition,
-                                             conditionString));
-            }
-            // Return child values as result
-            return result.toArray(new ExecutionValue[result.size()]);
+            return instantiateValuesFromSideProof(initConfig, 
+                                                  services, 
+                                                  tb, 
+                                                  info, 
+                                                  sequentToProve.getOperator(),
+                                                  siteProofSelectTerm,
+                                                  siteProofCondition);
          }
          finally {
             SymbolicExecutionSideProofUtil.disposeOrStore("Value computation on node " + getProofNode().serialNr(), info);
@@ -243,6 +202,87 @@ public class ExecutionVariable extends AbstractExecutionVariable {
       else {
          return null;
       }
+   }
+   
+   /**
+    * Analyzes the side proof defined by the {@link ApplyStrategyInfo}
+    * and creates {@link ExecutionValue}s from it.
+    * @param initConfig The {@link InitConfig} of the side proof.
+    * @param services The {@link Services} of the side proof.
+    * @param tb The {@link TermBuilder} of the side proof.
+    * @param info The side proof.
+    * @param resultOperator The {@link Operator} of the result predicate.
+    * @param siteProofSelectTerm The queried value.
+    * @param siteProofCondition The condition under which the value is queried.
+    * @return The created {@link ExecutionValue} instances.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected ExecutionValue[] instantiateValuesFromSideProof(InitConfig initConfig,
+                                                             Services services, 
+                                                             TermBuilder tb,
+                                                             ApplyStrategyInfo info,
+                                                             Operator resultOperator,
+                                                             Term siteProofSelectTerm,
+                                                             Term siteProofCondition) throws ProofInputException {
+      List<ExecutionValue> result = new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
+      // Group values of the branches
+      Map<Term, List<Goal>> valueMap = new LinkedHashMap<Term, List<Goal>>();
+      List<Goal> unknownValues = new LinkedList<Goal>();
+      groupGoalsByValue(info.getProof().openGoals(), resultOperator, siteProofSelectTerm, siteProofCondition, valueMap, unknownValues, services);
+      // Instantiate child values
+      for (Entry<Term, List<Goal>> valueEntry : valueMap.entrySet()) {
+         Term value = valueEntry.getKey();
+         if (isValidValue(value)) {
+            // Format return vale
+            String valueString = formatTerm(value, services);
+            // Determine type
+            String typeString = value.sort().toString();
+            // Compute value condition
+            Term condition = computeValueCondition(tb, valueEntry.getValue(), initConfig);
+            String conditionString = null;
+            if (condition != null) {
+               conditionString = formatTerm(condition, services);
+            }
+            // Update result
+            result.add(new ExecutionValue(getProofNode(),
+                                          this,
+                                          false,
+                                          value,
+                                          valueString,
+                                          typeString,
+                                          condition,
+                                          conditionString));
+         }
+      }
+      // Instantiate unknown child values
+      if (!unknownValues.isEmpty()) {
+         // Compute value condition
+         Term condition = computeValueCondition(tb, unknownValues, initConfig);
+         String conditionString = null;
+         if (condition != null) {
+            conditionString = formatTerm(condition, services);
+         }
+         // Update result
+         result.add(new ExecutionValue(getProofNode(),
+                                       this,
+                                       true,
+                                       null,
+                                       null,
+                                       null,
+                                       condition,
+                                       conditionString));
+      }
+      // Return child values as result
+      return result.toArray(new ExecutionValue[result.size()]);
+   }
+
+   /**
+    * Checks if the given {@link Term} represents a valid value.
+    * @param value The value to check.
+    * @return {@code true} valid value, {@code false} invalid value to be ignored.
+    */
+   protected boolean isValidValue(Term value) {
+      return true;
    }
 
    /**
@@ -339,5 +379,13 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     */
    public IExecutionNode<?> getParentNode() {
       return parentNode;
+   }
+
+   /**
+    * Returns the {@link ExecutionValue} from which the array length was computed.
+    * @return The {@link ExecutionValue} from which the array length was computed.
+    */
+   public ExecutionValue getLengthValue() {
+      return lengthValue;
    }
 }

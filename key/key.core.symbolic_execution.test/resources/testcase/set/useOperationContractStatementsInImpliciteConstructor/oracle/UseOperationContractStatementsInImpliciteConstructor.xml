@@ -22,6 +22,10 @@
                   <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
+               <variable name="array[*]" isArrayIndex="false">
+                  <value name="array[*] {imp(geq(length(array),Z(0(#))),and(geq(*,Z(0(#))),gt(length(array),*)))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="imp(geq(length(array),Z(0(#))),and(geq(*,Z(0(#))),gt(length(array),*)))">
+                  </value>
+               </variable>
             </value>
          </variable>
          <variable name="exc" isArrayIndex="false">
@@ -38,6 +42,10 @@
                <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="length" isArrayIndex="false">
                      <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="array[*]" isArrayIndex="false">
+                     <value name="array[*] {imp(geq(length(array),Z(0(#))),or(or(and(geq(*,Z(0(#))),gt(length(array),*)),and(geq(*,Z(0(#))),or(leq(*,Z(neglit(1(#)))),leq(length(array),*)))),and(leq(*,Z(neglit(1(#)))),or(leq(*,Z(neglit(1(#)))),leq(length(array),*)))))}" isValueAnObject="false" isValueUnknown="true" conditionString="imp(geq(length(array),Z(0(#))),or(or(and(geq(*,Z(0(#))),gt(length(array),*)),and(geq(*,Z(0(#))),or(leq(*,Z(neglit(1(#)))),leq(length(array),*)))),and(leq(*,Z(neglit(1(#)))),or(leq(*,Z(neglit(1(#)))),leq(length(array),*)))))">
                      </value>
                   </variable>
                </value>
@@ -60,6 +68,10 @@
                   <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="length" isArrayIndex="false">
                         <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="array[*]" isArrayIndex="false">
+                        <value name="array[*] {imp(geq(length(array),Z(0(#))),and(geq(*,Z(0(#))),gt(length(array),*)))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="imp(geq(length(array),Z(0(#))),and(geq(*,Z(0(#))),gt(length(array),*)))">
                         </value>
                      </variable>
                   </value>
@@ -87,6 +99,10 @@ termination: diamond" pathCondition="not(equals(array,null))" pathConditionChang
                            <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
+                        <variable name="array[*]" isArrayIndex="false">
+                           <value name="array[*] {imp(geq(length(array),Z(0(#))),and(geq(*,Z(0(#))),gt(length(array),*)))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="imp(geq(length(array),Z(0(#))),and(geq(*,Z(0(#))),gt(length(array),*)))">
+                           </value>
+                        </variable>
                      </value>
                   </variable>
                   <variable name="exc" isArrayIndex="false">
@@ -103,6 +119,10 @@ termination: diamond" pathCondition="not(equals(array,null))" pathConditionChang
                         <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="length" isArrayIndex="false">
                               <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="array[*]" isArrayIndex="false">
+                              <value name="array[*] {imp(geq(length(array),Z(0(#))),and(geq(*,Z(0(#))),gt(length(array),*)))}" typeString="int" valueString="int::select(anon_heap_sum&lt;&lt;anonHeapFunction&gt;&gt;,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="imp(geq(length(array),Z(0(#))),and(geq(*,Z(0(#))),gt(length(array),*)))">
                               </value>
                            </variable>
                         </value>
@@ -206,6 +226,10 @@ termination: diamond" pathCondition="not(equals(array,null))" pathConditionChang
                                  <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
+                              <variable name="array[*]" isArrayIndex="false">
+                                 <value name="array[*] {imp(geq(length(array),Z(0(#))),and(geq(*,Z(0(#))),gt(length(array),*)))}" typeString="int" valueString="int::select(anon_heap_sum&lt;&lt;anonHeapFunction&gt;&gt;,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="imp(geq(length(array),Z(0(#))),and(geq(*,Z(0(#))),gt(length(array),*)))">
+                                 </value>
+                              </variable>
                            </value>
                         </variable>
                         <variable name="exc" isArrayIndex="false">
@@ -243,6 +267,10 @@ as result of self.average(array)&gt;" isReturnValueComputed="true" methodReturnC
                                     <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
+                                 <variable name="array[*]" isArrayIndex="false">
+                                    <value name="array[*] {imp(geq(length(array),Z(0(#))),or(and(and(geq(*,Z(0(#))),geq(result_0,Z(0(#)))),gt(length(array),*)),and(and(geq(*,Z(0(#))),leq(result_0,Z(neglit(1(#))))),gt(length(array),*))))}" typeString="int" valueString="int::select(anon_heap_sum&lt;&lt;anonHeapFunction&gt;&gt;,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="imp(geq(length(array),Z(0(#))),or(and(and(geq(*,Z(0(#))),geq(result_0,Z(0(#)))),gt(length(array),*)),and(and(geq(*,Z(0(#))),leq(result_0,Z(neglit(1(#))))),gt(length(array),*))))">
+                                    </value>
+                                 </variable>
                               </value>
                            </variable>
                            <variable name="exc" isArrayIndex="false">
@@ -272,6 +300,10 @@ as result of self.average(array)&gt;" isReturnValueComputed="true" methodReturnC
                               <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="length" isArrayIndex="false">
                                     <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                                 <variable name="array[*]" isArrayIndex="false">
+                                    <value name="array[*] {imp(geq(length(array),Z(0(#))),and(geq(*,Z(0(#))),gt(length(array),*)))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="imp(geq(length(array),Z(0(#))),and(geq(*,Z(0(#))),gt(length(array),*)))">
                                     </value>
                                  </variable>
                               </value>

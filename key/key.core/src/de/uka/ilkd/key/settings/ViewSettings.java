@@ -327,16 +327,27 @@ public class ViewSettings implements Settings, Cloneable {
 	listenerList.add(l);
     }
 
+    /**
+     * removes the listener from the settings object
+     * @param l the listener to remove
+     */
+    public void removeSettingsListener(SettingsListener l) {
+   listenerList.remove(l);
+    }
+
 public boolean isUsePretty() {
 	return usePretty;
 }
 
 public void setUsePretty(boolean usePretty) {
+   final boolean originalUsePretty = this.usePretty;
 	this.usePretty = usePretty;
 	if(!usePretty){
 	    setUseUnicode(false);
 	}
-	fireSettingsChanged();
+	if (originalUsePretty != this.usePretty) {
+	   fireSettingsChanged();
+	}
 }
 /**
  * Use Unicode Symbols is only allowed if pretty syntax is used
@@ -353,12 +364,15 @@ public boolean isUseUnicode() {
 }
 
 public void setUseUnicode(boolean useUnicode) {
+   final boolean originalUseUnicode = this.useUnicode;
 	if(isUsePretty()){
 	 this.useUnicode = useUnicode;
 	} else {
 	 this.useUnicode = false;
 	}
-	fireSettingsChanged();
+	if (originalUseUnicode != this.useUnicode) {
+	   fireSettingsChanged();
+	}
 }
 
     public boolean isUseSyntaxHighlighting() {
@@ -370,13 +384,16 @@ public void setUseUnicode(boolean useUnicode) {
         fireSettingsChanged();
     }
 
-    public boolean hidePackagePrefix() {
+    public boolean isHidePackagePrefix() {
         return hidePackagePrefix;
     }
 
     public void setHidePackagePrefix(boolean hide) {
+        final boolean originalHide = hidePackagePrefix;
         hidePackagePrefix = hide;
-        fireSettingsChanged();
+        if (originalHide != hide) {
+           fireSettingsChanged();
+        }
     }
 
     /** Whether to display the confirmation dialog upon exiting the main window. */

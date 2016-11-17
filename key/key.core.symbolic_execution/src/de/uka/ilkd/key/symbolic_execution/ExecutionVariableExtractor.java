@@ -88,7 +88,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       this.additionalCondition = condition;
       this.simplifyConditions = simplifyConditions;
       // Get path condition
-      Term pathCondition = SymbolicExecutionUtil.computePathCondition(executionNode.getProofNode(), simplifyConditions, false);
+      Term pathCondition = SymbolicExecutionUtil.computePathCondition(executionNode.getProofNode(), 
+                                                                      true, // Path condition needs always to be simplified, because otherwise additinal symbolic values might be introduced. 
+                                                                      false);
       pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
       // Extract locations from updates
       Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();
@@ -189,6 +191,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                                                            modalityPio, 
                                                                            firstPair.getProgramVariable(), 
                                                                            firstPair.getArrayIndex(), 
+                                                                           firstPair.getArrayStartIndex(),
+                                                                           firstPair.getArrayEndIndex(),
                                                                            additionalCondition, 
                                                                            parentValue);
       if (parentValue != null) {
@@ -223,6 +227,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          assert firstPair.getProgramVariable() == pair.getProgramVariable();
          assert firstPair.getArrayIndex() == pair.getArrayIndex();
          assert firstPair.isArrayIndex() == pair.isArrayIndex();
+         assert firstPair.getArrayStartIndex() == pair.getArrayStartIndex();
+         assert firstPair.getArrayEndIndex() == pair.getArrayEndIndex();
+         assert firstPair.isArrayRange() == pair.isArrayRange();
          List<ExecutionVariableValuePair> values = groupedPairs.get(pair.getValue());
          if (values == null) {
             values = new LinkedList<ExecutionVariableValuePair>();
@@ -463,18 +470,23 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                if (values == null) {
                   // Compute values
                   Set<ExecutionVariableValuePair> pairs = computeVariableValuePairs(getAdditionalCondition(), layoutTerm, currentLocations, true, simplifyConditions);
-                  // Analyze tree structure of pairs
-                  Map<LocationDefinition, List<ExecutionVariableValuePair>> topVariables = new LinkedHashMap<LocationDefinition, List<ExecutionVariableValuePair>>();
-                  Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap = new LinkedHashMap<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>>();
-                  analyzeTreeStructure(pairs, topVariables, contentMap);
-                  // Create variables and values from tree structure
-                  for (List<ExecutionVariableValuePair> pairsList : topVariables.values()) {
-                     ExecutionVariableValuePair firstPair = pairsList.get(0);
-                     List<IExecutionValue> values = new LinkedList<IExecutionValue>();
-                     StateExecutionVariable variable = allStateVariables.get(new LocationDefinition(firstPair.getProgramVariable(), firstPair.getArrayIndex()));
-                     assert variable != null;
-                     createValues(variable, pairsList, firstPair, contentMap, values, ImmutableSLList.<Term>nil());
-                     variable.values = values.toArray(new IExecutionValue[values.size()]);
+                  if (pairs != null) { 
+                     // Analyze tree structure of pairs
+                     Map<LocationDefinition, List<ExecutionVariableValuePair>> topVariables = new LinkedHashMap<LocationDefinition, List<ExecutionVariableValuePair>>();
+                     Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap = new LinkedHashMap<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>>();
+                     analyzeTreeStructure(pairs, topVariables, contentMap);
+                     // Create variables and values from tree structure
+                     for (List<ExecutionVariableValuePair> pairsList : topVariables.values()) {
+                        ExecutionVariableValuePair firstPair = pairsList.get(0);
+                        List<IExecutionValue> values = new LinkedList<IExecutionValue>();
+                        StateExecutionVariable variable = allStateVariables.get(new LocationDefinition(firstPair.getProgramVariable(), firstPair.getArrayIndex()));
+                        assert variable != null;
+                        createValues(variable, pairsList, firstPair, contentMap, values, ImmutableSLList.<Term>nil());
+                        variable.values = values.toArray(new IExecutionValue[values.size()]);
+                     }
+                  }
+                  else {
+                     values = new IExecutionValue[0]; // Something went wrong, values are not available.
                   }
                }
             }
@@ -495,11 +507,21 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     * The {@link IExecutionVariable} instantiated by the {@link ExecutionVariableExtractor}.
     * @author Martin Hentschel
     */
-   private static class ExtractedExecutionVariable extends AbstractExecutionVariable {
+   public static class ExtractedExecutionVariable extends AbstractExecutionVariable {
       /**
        * The contained {@link IExecutionValue}s.
        */
       private List<IExecutionValue> values;
+      
+      /**
+       * The array start index or {@code null} if not used.
+       */
+      private final Term arrayStartIndex;
+      
+      /**
+       * The array end index or {@code null} if not used.
+       */
+      private final Term arrayEndIndex;
       
       /**
        * Constructor.
@@ -516,6 +538,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                         PosInOccurrence modalityPIO,
                                         IProgramVariable programVariable,
                                         Term arrayIndex,
+                                        Term arrayStartIndex,
+                                        Term arrayEndIndex,
                                         Term additionalCondition,
                                         ExtractedExecutionValue parentValue) {
          super(parentNode.getSettings(),
@@ -525,6 +549,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                arrayIndex, 
                additionalCondition, 
                modalityPIO);
+         this.arrayStartIndex = arrayStartIndex;
+         this.arrayEndIndex = arrayEndIndex;
       }
       
       /**
@@ -550,13 +576,69 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       public Term createSelectTerm() {
          return SymbolicExecutionUtil.createSelectTerm(this);
       }
+
+      /**
+       * Returns the array start index.
+       * @return The array start index.
+       */
+      public Term getArrayStartIndex() {
+         return arrayStartIndex;
+      }
+
+      /**
+       * Returns the human readable array start index.
+       * @return The human readable array start index.
+       */
+      public String getArrayStartIndexString() {
+         return arrayStartIndex != null ? formatTerm(arrayStartIndex, getServices()) : null;
+      }
+      
+      /**
+       * Returns the array end index.
+       * @return The array end index.
+       */
+      public Term getArrayEndIndex() {
+         return arrayEndIndex;
+      }
+      
+      /**
+       * Returns the human readable array end index.
+       * @return The human readable array end index.
+       */
+      public String getArrayEndIndexString() {
+         return arrayEndIndex != null ? formatTerm(arrayEndIndex, getServices()) : null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      protected String lazyComputeName() throws ProofInputException {
+         if (getArrayStartIndex() != null || getArrayEndIndex() != null) {
+            String name = "[";
+            if (getArrayStartIndex() != null) {
+               name += getArrayIndexString() + " >= " + getArrayStartIndexString();
+            }
+            if (getArrayStartIndex() != null && getArrayEndIndex() != null) {
+               name += " and ";
+            }
+            if (getArrayEndIndex() != null) {
+               name += getArrayIndexString() + " <= " + getArrayEndIndexString();
+            }
+            name += "]";
+            return name;
+         }
+         else {
+            return super.lazyComputeName();
+         }
+      }
    }
    
    /**
     * The {@link IExecutionValue} instantiated by the {@link ExecutionVariableExtractor}.
     * @author Martin Hentschel
     */
-   private static class ExtractedExecutionValue extends AbstractExecutionValue {
+   public static class ExtractedExecutionValue extends AbstractExecutionValue {
       /**
        * The available child {@link ExtractedExecutionVariable}.
        */

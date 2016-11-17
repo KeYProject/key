@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof.proverules;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Collection;
@@ -18,6 +19,8 @@ import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -25,11 +28,12 @@ import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.LinkedHashMap;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * JUnit test class for re-running taclet proofs (formerly implemented as Perl
  * script proveRules.pl). The following procedure is executed during test run:
- * 
+ *
  * 1) Retrieve names of all taclets that have annotation "\lemma" in their
  * declaration. <br>
  * 2) Retrieve all names of taclets for which there is a taclet proof available.
@@ -38,7 +42,7 @@ import de.uka.ilkd.key.util.LinkedHashMap;
  * 4) Run the test cases. Each test case will check that its corresponding
  * taclet is annotated with "\lemma" and then attempt to load the proof of the
  * taclet.
- * 
+ *
  * @author Kai Wallisch
  *
  */
@@ -71,7 +75,7 @@ public class ProveRulesTest {
    }
 
    @Test
-   public void loadTacletProof() throws ProblemLoaderException {
+   public void loadTacletProof() throws Exception {
       assertNotNull("Taclet " + tacletName
             + " was annoted with \\lemma but no taclet proof was found.",
             proofFile);
@@ -84,9 +88,15 @@ public class ProveRulesTest {
                   + " but the taclet is not registered as a lemma. It can be registered as a lemma by "
                   + "adding annotation \\lemma to the declaration of the taclet.",
             taclet.getRuleJustification() instanceof LemmaJustification);
-      KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment
-            .load(proofFile);
+      KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(proofFile);
       Proof proof = env.getLoadedProof();
+
+      Pair<String, Location> script = env.getProofScript();
+      if(script != null) {
+    	  ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+          pse.execute(env.getUi(), proof);
+      }
+
       assertTrue("Taclet proof of taclet " + tacletName + " did not close.",
             proof.closed());
       proof.dispose();

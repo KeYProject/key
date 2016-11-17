@@ -319,5 +319,37 @@ public class ProofProviderAdapterFactory implements IAdapterFactory {
       public void disconnected(DSConnectionEvent e) {
          fireCurrentProofsChangedThreadSave();
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isCanStartAutomode() {
+         return false;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isCanApplyRules() {
+         return false;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isCanPruneProof() {
+         return false;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isCanStartSMTSolver() {
+         return false;
+      }
    };
 }

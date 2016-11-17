@@ -15,6 +15,10 @@ package org.key_project.keyide.ui.util;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.swt.graphics.RGB;
+import org.key_project.util.java.ColorUtil;
+
+import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 
 /**
  * Initializes the preferences of {@link KeYIDEPreferences} when they are
@@ -30,5 +34,12 @@ public class KeYIDEPreferencesInitializer extends AbstractPreferenceInitializer 
    @Override
    public void initializeDefaultPreferences() {
       KeYIDEPreferences.setDefaultSwitchToKeyPerspective(MessageDialogWithToggle.PROMPT);
+      KeYIDEPreferences.setDefaultClosedGoalColor(ColorUtil.toRGB(ProofTreeView.DARK_GREEN_COLOR));
+      KeYIDEPreferences.setDefaultLinkedGoalColor(ColorUtil.toRGB(ProofTreeView.PINK_COLOR));
+      KeYIDEPreferences.setDefaultDisabledGoalColor(new RGB(87, 87, 87)); // ColorUtil.toRGB(ProofTreeView.ORANGE_COLOR)
+      KeYIDEPreferences.setDefaultOpenGoalColor(ColorUtil.toRGB(ProofTreeView.DARK_RED_COLOR));
+      KeYIDEPreferences.setDefaultNodeWithNotesColor(ColorUtil.toRGB(ProofTreeView.ORANGE_COLOR));
+      KeYIDEPreferences.setDefaultNodeWithActiveStatementColor(new RGB(0, 0, 255)); // ColorUtil.toRGB(ProofTreeView.LIGHT_BLUE_COLOR)
+      KeYIDEPreferences.setDefaultFoundNodeColor(new RGB(168, 211, 255)); // Light blue
    }
 }

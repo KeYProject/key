@@ -95,6 +95,7 @@ import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalTermination;
 import org.key_project.sed.core.model.ISEGroupable;
+import org.key_project.sed.core.model.ISEJoin;
 import org.key_project.sed.core.model.ISELoopBodyTermination;
 import org.key_project.sed.core.model.ISELoopCondition;
 import org.key_project.sed.core.model.ISELoopInvariant;
@@ -913,6 +914,10 @@ public final class TestSedCoreUtil {
             TestCase.assertTrue("Expected ISEDStatement on " + ((ISEStatement)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEStatement);
             compareStatement((ISEStatement)expectedNext, (ISEStatement)currentNext, true, compareId, compareVariables, compareCallStack, compareConstraints);
          }
+         else if (expectedNext instanceof ISEJoin) {
+            TestCase.assertTrue("Expected ISEJoin on " + ((ISEJoin)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEJoin);
+            compareJoin((ISEJoin)expectedNext, (ISEJoin)currentNext, true, compareId, compareVariables, compareCallStack, compareConstraints);
+         }
          else if (expectedNext instanceof ISETermination) {
             TestCase.assertTrue("Expected ISEDTermination on " + ((ISETermination)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISETermination);
             compareTermination((ISETermination)expectedNext, (ISETermination)currentNext, true, compareId, compareVariables, compareCallStack, compareConstraints);
@@ -1133,6 +1138,10 @@ public final class TestSedCoreUtil {
                else if (expectedChildren[i] instanceof ISEStatement) {
                   TestCase.assertTrue("Expected ISEDStatement on " + ((ISEStatement)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEStatement);
                   compareStatement((ISEStatement)expectedChildren[i], (ISEStatement)currentChildren[i], false, compareId, compareVariables, compareCallStack, compareConstraints);
+               }
+               else if (expectedChildren[i] instanceof ISEJoin) {
+                  TestCase.assertTrue("Expected ISEJoin on " + ((ISEJoin)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEJoin);
+                  compareJoin((ISEJoin)expectedChildren[i], (ISEJoin)currentChildren[i], false, compareId, compareVariables, compareCallStack, compareConstraints);
                }
                else if (expectedChildren[i] instanceof ISETermination) {
                   TestCase.assertTrue("Expected ISEDTermination on " + ((ISETermination)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISETermination);
@@ -1828,6 +1837,29 @@ public final class TestSedCoreUtil {
                                           boolean compareConstraints) throws DebugException {
       compareStackFrame(expected, current, compareVariables, compareConstraints);
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
+   }
+
+   /**
+    * Compares the given {@link ISEJoin}s with each other.
+    * @param expected The expected {@link ISEJoin}.
+    * @param current The current {@link ISEJoin}.
+    * @param compareReferences Compare also the containment hierarchy?
+    * @param compareId Compare the value of {@link ISEDebugElement#getId()}?
+    * @param compareVariables Compare variables?
+    * @param compareCallStack Compare call stack?
+    * @param compareConstraints Compare constraints?
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareJoin(ISEJoin expected, 
+                                     ISEJoin current, 
+                                     boolean compareReferences, 
+                                     boolean compareId, 
+                                     boolean compareVariables,
+                                     boolean compareCallStack,
+                                     boolean compareConstraints) throws DebugException {
+      compareStackFrame(expected, current, compareVariables, compareConstraints);
+      compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
+      assertEquals(expected.isWeakeningVerified(), current.isWeakeningVerified());
    }
 
    /**

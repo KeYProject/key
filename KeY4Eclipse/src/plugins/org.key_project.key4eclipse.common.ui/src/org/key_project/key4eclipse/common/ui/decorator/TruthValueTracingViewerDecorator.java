@@ -15,11 +15,9 @@ import org.eclipse.swt.graphics.RGB;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -97,19 +95,15 @@ public class TruthValueTracingViewerDecorator extends ProofSourceViewerDecorator
     * @param services The {@link Services} to use.
     * @param notationInfo The {@link NotationInfo} to use.
     * @param branchResult The {@link BranchResult}s to visualize.
+    * @param visibleTermLabels The visible term labels.
     * @return The shown {@link TruthValue} of {@link Term} to show.
     */
    public TruthValue showSequent(Sequent sequent, 
                                  Services services, 
-                                 NotationInfo notationInfo, 
+                                 NotationInfo notationInfo,
+                                 VisibleTermLabels visibleTermLabels,
                                  final BranchResult branchResult) {
       // Show Term
-      VisibleTermLabels visibleTermLabels = new VisibleTermLabels() {
-         @Override
-         public boolean contains(Name name) {
-            return !ObjectUtil.equals(name, branchResult.getTermLabelName());
-         }
-      };
       String text = showSequent(sequent, services, notationInfo, visibleTermLabels);
       // Highlight results of all terms
       LogicPrinter printer = getPrinter();

@@ -295,7 +295,7 @@ public final class SideProofStore {
          this.description = description;
          this.proof = proof;
          DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
-         this.environment = new KeYEnvironment<DefaultUserInterfaceControl>(ui, proof.getInitConfig(), proof, null);
+         this.environment = new KeYEnvironment<DefaultUserInterfaceControl>(ui, proof.getInitConfig(), proof, null, null);
       }
 
       /**

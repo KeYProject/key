@@ -258,9 +258,10 @@ public abstract class AbstractProblemLoader {
                         return;
                     }
                 }
+                
                 // Create and register proof at specification repository                    
                 proofList = createProof(poContainer); 
-
+                
                 // try to replay first proof
                 proof = proofList.getProof(poContainer.getProofNum());
                 
@@ -478,6 +479,7 @@ public abstract class AbstractProblemLoader {
      * @throws ProofInputException Occurred Exception.
      */
     protected ProofAggregate createProof(LoadedPOContainer poContainer) throws ProofInputException {
+    	
         ProofAggregate proofList = 
         		problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
 
@@ -511,6 +513,18 @@ public abstract class AbstractProblemLoader {
         Location location = new Location(path, script.second, script.third);
 
         return new Pair<String, Location>(script.first, location);
+    }
+
+    public Pair<String, Location> getProofScript() throws ProblemLoaderException {
+        if(hasProofScript()) {
+            try {
+                return readProofScript();
+            } catch (ProofInputException e) {
+                throw new ProblemLoaderException(this, e);
+            }
+        } else {
+            return null;
+        }
     }
 
     private ReplayResult replayProof(Proof proof) throws ProofInputException, ProblemLoaderException {

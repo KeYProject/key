@@ -9,9 +9,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
@@ -260,14 +258,8 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
     * has resemblances with KeYEnvironment.load ...
     */
    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(File keyFile) throws ProblemLoaderException, ProofInputException {
-       DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
-       AbstractProblemLoader loader = ui.load(null, keyFile, null, null, null, null, false);
-       InitConfig initConfig = loader.getInitConfig();
-       KeYEnvironment<DefaultUserInterfaceControl> env =
-               new KeYEnvironment<>(ui, initConfig,
-                       loader.getProof(), loader.getResult());
-       Pair<String, Location> proofScript = loader.hasProofScript() ? loader.readProofScript() : null;
-       return new Pair<>(env, proofScript);
+	   KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
+       return new Pair<>(env, env.getProofScript());
    }
 
    /**

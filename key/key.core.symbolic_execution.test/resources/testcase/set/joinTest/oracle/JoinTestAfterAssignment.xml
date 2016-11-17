@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call JoinTest.zero(_value)&gt;" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (_value&lt;0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+         <branchCondition name="lt(value,Z(0(#)))" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(value,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="_value=_value*-1;" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="false">
+               <statement name="int result = _value;" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="false">
+               </statement>
+               <completedBlockEntry path="/0/0" conditionString="lt(value,Z(0(#)))"/>
+            </statement>
+         </branchCondition>
+         <branchCondition name="gt(value,Z(neglit(1(#))))" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(value,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="int result = _value;" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="false">
+               <join name="Join" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="false" weakeningVerified="true">
+                  <outgoingLink path="/0/0/0/0/0"/>
+               </join>
+            </statement>
+            <completedBlockEntry path="/0/0" conditionString="true"/>
+         </branchCondition>
+         <blockCompletionEntry path="/0/0/0/0"/>
+         <blockCompletionEntry path="/0/0/1"/>
+      </branchStatement>
+   </methodCall>
+</start>

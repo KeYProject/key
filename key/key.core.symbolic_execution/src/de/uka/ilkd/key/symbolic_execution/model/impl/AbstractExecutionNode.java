@@ -20,6 +20,8 @@ import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
@@ -34,6 +36,7 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeSymbolicLayoutExtractor;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLink;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
@@ -100,6 +103,16 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * The already computed human readable block completion conditions.
     */
    private final Map<IExecutionBlockStartNode<?>, String> formatedBlockCompletionConditions = new HashMap<IExecutionBlockStartNode<?>, String>();
+   
+   /**
+    * The up to know discovered outgoing links.
+    */
+   private ImmutableList<IExecutionLink> outgoingLinks = ImmutableSLList.nil();
+   
+   /**
+    * The up to know discovered incoming links.
+    */
+   private ImmutableList<IExecutionLink> incomingLinks = ImmutableSLList.nil();
    
    /**
     * Constructor.
@@ -487,6 +500,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
          return null;
       }
    }
+   
    /**
     * Removes the given child.
     * @param child The child to be removed.
@@ -494,5 +508,79 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     */
    public void removeChild(IExecutionNode<?> child) {
       children.remove(child);
+   }
+   
+   /**
+    * Adds the given {@link IExecutionLink} as outgoing link.
+    * @param link The {@link IExecutionLink} to add.
+    */
+   public void addOutgoingLink(IExecutionLink link) {
+      outgoingLinks = outgoingLinks.prepend(link);
+   }
+
+   /**
+    * Removes the given {@link IExecutionLink} from the outgoing links.
+    * @param link The {@link IExecutionLink} to remove.
+    */
+   public void removeOutgoingLink(IExecutionLink link) {
+      outgoingLinks = outgoingLinks.removeAll(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IExecutionLink getOutgoingLink(final IExecutionNode<?> target) {
+      return CollectionUtil.search(outgoingLinks, new IFilter<IExecutionLink>() {
+         @Override
+         public boolean select(IExecutionLink element) {
+            return element.getTarget() == target;
+         }
+      });
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ImmutableList<IExecutionLink> getOutgoingLinks() {
+      return outgoingLinks;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IExecutionLink getIncomingLink(final IExecutionNode<?> source) {
+      return CollectionUtil.search(incomingLinks, new IFilter<IExecutionLink>() {
+         @Override
+         public boolean select(IExecutionLink element) {
+            return element.getSource() == source;
+         }
+      });
+   }
+
+   /**
+    * Adds the given {@link IExecutionLink} as incoming link.
+    * @param link The {@link IExecutionLink} to add.
+    */
+   public void addIncomingLink(IExecutionLink link) {
+      incomingLinks = incomingLinks.prepend(link);
+   }
+
+   /**
+    * Removes the given {@link IExecutionLink} from the incoming links.
+    * @param link The {@link IExecutionLink} to remove.
+    */
+   public void removeIncomingLink(IExecutionLink link) {
+      incomingLinks = incomingLinks.removeAll(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ImmutableList<IExecutionLink> getIncomingLinks() {
+      return incomingLinks;
    }
 }

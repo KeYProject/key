@@ -16,8 +16,10 @@ package org.key_project.sed.key.core.model;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.IStateListener;
@@ -31,7 +33,6 @@ import org.eclipse.ui.handlers.RegistryToggleState;
 import org.key_project.keyide.ui.handlers.BreakpointToggleHandler;
 import org.key_project.sed.core.model.ISEDebugElement;
 import org.key_project.sed.core.model.ISENode;
-import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.ISETermination;
 import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.model.impl.AbstractSEThread;
@@ -52,6 +53,7 @@ import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
@@ -139,43 +141,15 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
    /**
     * Listens for proof changes
     */
-   private final ProofTreeListener proofChangedListener = new ProofTreeListener() {
-      @Override
-      public void proofExpanded(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void proofIsBeingPruned(ProofTreeEvent e) { 
-      }
-
+   private final ProofTreeListener proofChangedListener = new ProofTreeAdapter() {
       @Override
       public void proofPruned(ProofTreeEvent e) {
         handleProofPruned(e);  
       }
 
       @Override
-      public void proofStructureChanged(ProofTreeEvent e) {  
-      }
-
-      @Override
-      public void proofClosed(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void proofGoalRemoved(ProofTreeEvent e) {  
-      }
-
-      @Override
       public void proofGoalsAdded(ProofTreeEvent e) { 
          handleGoalsAdded(e);
-      }
-
-      @Override
-      public void proofGoalsChanged(ProofTreeEvent e) {
-      }
-
-      @Override
-      public void smtDataUpdate(ProofTreeEvent e) {  
       }
    };
    
@@ -203,6 +177,16 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
          hnadleStopAtBreakpointsChanged(state, oldValue);
       }
    };
+   
+   /**
+    * The outgoing links.
+    */
+   private final List<KeYNodeLink> outgoingLinks = new LinkedList<KeYNodeLink>();
+
+   /**
+    * The incoming links.
+    */
+   private final List<KeYNodeLink> incomingLinks = new LinkedList<KeYNodeLink>();
 
    /**
     * Constructor.
@@ -359,7 +343,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
     * @param e The event.
     */
    protected void handleProofPruned(ProofTreeEvent e) {
-	  HashSet<AbstractExecutionNode<?>> deletedExNodes = getBuilder().prune(e.getNode());	 
+	  Set<AbstractExecutionNode<?>> deletedExNodes = getBuilder().prune(e.getNode());	 
 	  SEPreorderIterator iter = new SEPreorderIterator(this);
 	  // iterate over key node tree and remove all pruned method returns
 	  try {
@@ -1033,15 +1017,47 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
     * {@inheritDoc}
     */
    @Override
-   public ISENodeLink[] getOutgoingLinks() throws DebugException {
-      return null;
+   public void addOutgoingLink(KeYNodeLink link) {
+      outgoingLinks.add(link);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYNodeLink[] getOutgoingLinks() throws DebugException {
+      return outgoingLinks.toArray(new KeYNodeLink[outgoingLinks.size()]);
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public ISENodeLink[] getIncomingLinks() throws DebugException {
-      return null;
+   public KeYNodeLink[] getIncomingLinks() throws DebugException {
+      return incomingLinks.toArray(new KeYNodeLink[incomingLinks.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addIncomingLink(KeYNodeLink link) {
+      incomingLinks.add(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeIncomingLink(KeYNodeLink link) {
+      incomingLinks.remove(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeOutgoingLink(KeYNodeLink link) {
+      outgoingLinks.remove(link);
    }
 }

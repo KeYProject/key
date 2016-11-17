@@ -18,6 +18,7 @@ import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEBranchStatement;
 import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalTermination;
+import org.key_project.sed.core.model.ISEJoin;
 import org.key_project.sed.core.model.ISELoopBodyTermination;
 import org.key_project.sed.core.model.ISELoopCondition;
 import org.key_project.sed.core.model.ISELoopInvariant;
@@ -216,4 +217,14 @@ public interface IExecutionTreeImageConstants {
     * Key of the image for visualize state action.
     */
    public static final String IMG_VISUALIZE_STATE = PREFIX + "visualizeState";
+
+   /**
+    * Key of the image for {@link ISEJoin}s.
+    */
+   public static final String IMG_JOIN = PREFIX + "join";
+
+   /**
+    * Key of the image for {@link ISEJoin}s.
+    */
+   public static final String IMG_JOIN_WEAKENING_NOT_VERIFIED = PREFIX + "joinWeakeningNotVerified";
 }

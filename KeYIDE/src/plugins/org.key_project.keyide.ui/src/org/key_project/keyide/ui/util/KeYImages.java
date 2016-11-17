@@ -16,6 +16,7 @@ package org.key_project.keyide.ui.util;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -23,6 +24,7 @@ import org.key_project.keyide.ui.Activator;
 import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.util.eclipse.BundleUtil;
 
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
 /**
@@ -33,7 +35,7 @@ import de.uka.ilkd.key.proof.Node;
  * To get an image use one of the constant defined in this class, e.g.<br>
  * {@code KeYSEDImages.getImage(KeYSEDImages.LAUNCH_MAIN_TAB_GROUP)))}
  * </p>
- * @author Martin Hentschel, Christoph Schneider, Niklas Bunzel, Stefan Kï¿½sdorf, Marco Drebing
+ * @author Martin Hentschel, Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public final class KeYImages {
    /**
@@ -195,6 +197,31 @@ public final class KeYImages {
     * The key for the image that is used for exceptional loop body termination.
     */
    public static final String BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION_NOT_VERIFIED = "org.key_project.keyide.ui.images.blockContractExceptinalTerminationNotVerified";
+
+   /**
+    * The key for the image that is used to jump to the previous search result.
+    */
+   public static final String JUMP_TO_PREVIOUS_SEARCH_RESULT = "org.key_project.keyide.ui.images.previousSearchResult";
+
+   /**
+    * The key for the image that is used to jump to the next search result.
+    */
+   public static final String JUMP_TO_NEXT_SEARCH_RESULT = "org.key_project.keyide.ui.images.nextSearchResult";
+
+   /**
+    * The key for the image that is used to close the search result.
+    */
+   public static final String CLOSE_SEARCH = "org.key_project.keyide.ui.images.closeSearch";
+
+   /**
+    * The key for the image that is used for disabled {@link Goal}s.
+    */
+   public static final String DISABLED_GOAL = "org.key_project.keyide.ui.images.disabledGoal";
+
+   /**
+    * The key for the image that is used for the edit notes wizard.
+    */
+   public static final String EDIT_NOTES_WIZARD = "org.key_project.keyide.ui.images.editNotesWizard";
    
    /**
     * Forbid instances.
@@ -225,7 +252,27 @@ public final class KeYImages {
       }
       return image;
    }
-
+   
+   /**
+    * Returns the {@link ImageDescriptor} for the given key.
+    * @param key The key.
+    * @return The {@link ImageDescriptor} or {@code null} if not available.
+    */
+   public static ImageDescriptor getImageDescriptor(String key) {
+      ImageRegistry imageRegistry = Activator.getDefault().getImageRegistry();
+      ImageDescriptor descriptor = imageRegistry.getDescriptor(key);
+      if (descriptor == null) {
+         synchronized (imageRegistry) { // Make sure that the image is created only once
+            descriptor = imageRegistry.getDescriptor(key); // Make sure that the image is still not available
+            if (descriptor == null) {
+               Image image = createImage(key);
+               imageRegistry.put(key, image);
+               descriptor = imageRegistry.getDescriptor(key);
+            }
+         } 
+      }
+      return descriptor;
+   }
    
    /**
     * Creates an {@link Image} for the given key.
@@ -330,6 +377,21 @@ public final class KeYImages {
        }
        else if (BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION_NOT_VERIFIED.equals(key)) {
           path = "icons/SEDIcons/block_contract_exceptional_termination_not_verified.gif";
+       }
+       else if (JUMP_TO_PREVIOUS_SEARCH_RESULT.equals(key)) {
+          path = "icons/previousFoundProofNode.png";
+       }
+       else if (JUMP_TO_NEXT_SEARCH_RESULT.equals(key)) {
+          path = "icons/nextFoundProofNode.png";
+       }
+       else if (CLOSE_SEARCH.equals(key)) {
+          path = "icons/close_view.gif";
+       }
+       else if (DISABLED_GOAL.equals(key)) {
+          path = "icons/keyinteractive.png";
+       }
+       else if (EDIT_NOTES_WIZARD.equals(key)) {
+          path = "icons/editNotes_wizard.png";
        }
        // Load image if possible
        if (path != null) {

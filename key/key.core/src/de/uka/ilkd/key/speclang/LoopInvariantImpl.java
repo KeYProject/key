@@ -189,16 +189,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     @Override
-    public Term getInvariant(Term selfTerm, Map<LocationVariable,Term> atPres, Services services){
-        assert (selfTerm == null) == (originalSelfTerm == null);
-        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-        Map<Term, Term> replaceMap = 
-            getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
-        return or.replace(originalModifies.get(baseHeap));
-    }
-    
-    @Override
     public Term getInvariant(Services services) {
         return originalInvariants.get(services.getTypeConverter().getHeapLDT().getHeap());
     }

@@ -39,7 +39,7 @@ public class NameRecorder {
     public Name getProposal() {
         Name proposal = null;
 
-        if (!pre.isEmpty()) {
+        if (pre != null && !pre.isEmpty()) {
             proposal = pre.head();
             pre = pre.tail();
         }

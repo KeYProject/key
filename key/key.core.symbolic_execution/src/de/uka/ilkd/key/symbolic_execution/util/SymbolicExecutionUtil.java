@@ -127,13 +127,15 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.join.CloseAfterJoin;
+import de.uka.ilkd.key.rule.join.CloseAfterJoinRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -1693,19 +1695,8 @@ public final class SymbolicExecutionUtil {
     * @return The found {@link Goal}s.
     */
    public static ImmutableList<Goal> collectGoalsInSubtree(Node node) {
-      ImmutableList<Goal> result = ImmutableSLList.nil();
-      if (node != null) {
-         Proof proof = node.proof();
-         Iterator<Node> iter = node.leavesIterator();
-         while (iter.hasNext()) {
-            Node next = iter.next();
-            Goal nextGoal = proof.getGoal(next);
-            if (nextGoal != null) {
-               result = result.append(nextGoal);
-            }
-         }
-      }
-      return result;
+      Proof proof = node.proof();
+      return proof.getSubtreeEnabledGoals(node);
    }
 
    /**
@@ -4187,6 +4178,40 @@ public final class SymbolicExecutionUtil {
       if (pio != null) {
          Term applicationTerm = TermBuilder.goBelowUpdates(pio.subTerm());
          return applicationTerm.getLabel(BlockContractValidityTermLabel.NAME) != null;
+      }
+      else {
+         return false;
+      }
+   }
+
+   /**
+    * Checks if the {@link JoinRuleBuiltInRuleApp} is applied.
+    * @param ruleApp The {@link RuleApp} to check.
+    * @return {@code true} is {@link JoinRuleBuiltInRuleApp}, {@code false} otherwise.
+    */
+   public static boolean isJoin(RuleApp ruleApp) {
+      return ruleApp instanceof JoinRuleBuiltInRuleApp &&
+             !((JoinRuleBuiltInRuleApp) ruleApp).getJoinPartners().isEmpty();
+   }
+
+   /**
+    * Checks if the {@link CloseAfterJoinRuleBuiltInRuleApp} is applied.
+    * @param ruleApp The {@link RuleApp} to check.
+    * @return {@code true} is {@link CloseAfterJoinRuleBuiltInRuleApp}, {@code false} otherwise.
+    */
+   public static boolean isCloseAfterJoin(RuleApp ruleApp) {
+      return ruleApp instanceof CloseAfterJoinRuleBuiltInRuleApp;
+   }
+
+   /**
+    * Checks if the weakening goal is enabled or not.
+    * @param proof The {@link Proof} to check.
+    * @return {@code true} enabled, {@code false} disabled.
+    */
+   public static boolean isWeakeningGoalEnabled(Proof proof) {
+      if (proof != null && !proof.isDisposed()) {
+         String value = proof.getSettings().getChoiceSettings().getDefaultChoices().get(CloseAfterJoin.JOIN_GENERATE_IS_WEAKENING_GOAL_CFG);
+         return CloseAfterJoin.JOIN_GENERATE_IS_WEAKENING_GOAL_CFG_ON.equals(value);
       }
       else {
          return false;

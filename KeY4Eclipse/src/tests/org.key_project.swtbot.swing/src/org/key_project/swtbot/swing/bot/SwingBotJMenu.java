@@ -68,4 +68,21 @@ public class SwingBotJMenu extends AbstractSwingBotComponent<JMenu> {
          return null;
       }
    }
+   
+   /**
+    * Gets the {@link JMenu} matching the given title.
+    * @param title The name of the {@link JMenu} that is to be found
+    * @return The first menu that matches the menuName
+    * @throws WidgetNotFoundException If the {@link Component} is not found.
+    */
+   @SuppressWarnings({ "rawtypes", "unchecked" })
+   public SwingBotJMenu menu(String title) throws WidgetNotFoundException {
+      Matcher withText = ComponentMatcherFactory.allOf(ComponentMatcherFactory.componentOfType(JMenu.class), ComponentMatcherFactory.withText(title));
+      List<JMenu> menus = finder.findMenus(component, withText);
+      if (!menus.isEmpty()) 
+         return new SwingBotJMenu(finder, menus.get(0));
+      else {
+         return null;
+      }
+   }
 }

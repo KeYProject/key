@@ -83,17 +83,22 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 	if ( res != null )
 	    return res;
 
-	String label = p_node.getNodeInfo().getBranchLabel();
-
-        if (p_node.root()) { 
-            label = "Proof Tree";
-        }
-        if (label == null) {
-            label = "Case " + (p_node.parent ().getChildNr ( p_node ) + 1);
-            p_node.getNodeInfo().setBranchLabel(label);
-        }
+	String label = ensureBranchLabelIsSet(p_node);
 
 	return getProofTreeModel ().getBranchNode(p_node, label);
+    }
+    
+    public static String ensureBranchLabelIsSet(Node p_node) { // TODO: This functionality should be hidden somewhere in NodeInfo without the need to call it explicitly.
+       String label = p_node.getNodeInfo().getBranchLabel();
+
+       if (p_node.root()) { 
+           label = "Proof Tree";
+       }
+       if (label == null) {
+           label = "Case " + (p_node.parent ().getChildNr ( p_node ) + 1);
+           p_node.getNodeInfo().setBranchLabel(label);
+       }
+       return label;
     }
 
     private class ChildEnumeration implements Enumeration<TreeNode> {

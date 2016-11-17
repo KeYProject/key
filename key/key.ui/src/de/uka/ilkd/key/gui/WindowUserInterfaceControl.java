@@ -41,6 +41,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -533,7 +534,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       }
       AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, includes, null, forceNewProfileOfNewProofs);
       InitConfig initConfig = loader.getInitConfig();
-      return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig, loader.getProof(), loader.getResult());
+      return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig,
+          loader.getProof(), loader.getProofScript(), loader.getResult());
    }
 
    @Override
@@ -598,5 +600,13 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      dialog.setLocationRelativeTo(MainWindow.getInstance());
      dialog.setVisible(true);
      dialog.dispose();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+      return mainWindow.getVisibleTermLabels();
    }
 }
