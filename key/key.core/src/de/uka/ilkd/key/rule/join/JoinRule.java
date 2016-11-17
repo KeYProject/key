@@ -256,6 +256,17 @@ public class JoinRule implements BuiltInRule {
         // resultPathCondition =
         // trySimplify(services.getProof(), resultPathCondition, true);
 
+        // Close partner goals
+        for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
+            closeJoinPartnerGoal(
+                    newGoal.node(),
+                    joinPartner.first,
+                    joinPartner.second,
+                    joinedState,
+                    sequentToSEPair(joinPartner.first.node(),
+                            joinPartner.second, services), thisSEState.third);
+        }
+
         // Delete previous sequents
         clearSemisequent(newGoal, true);
         clearSemisequent(newGoal, false);
@@ -304,17 +315,6 @@ public class JoinRule implements BuiltInRule {
         // measure is to avoid new names of join nodes being added as
         // new names of the partners.
         services.saveNameRecorder(currentNode);
-
-        // Close partner goals
-        for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
-            closeJoinPartnerGoal(
-                    newGoal.node(),
-                    joinPartner.first,
-                    joinPartner.second,
-                    joinedState,
-                    sequentToSEPair(joinPartner.first.node(),
-                            joinPartner.second, services), thisSEState.third);
-        }
 
         // Register new names
         for (Name newName : newNames) {
