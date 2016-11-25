@@ -13,7 +13,6 @@ class LoopInvFree {
 	static void test() {
 		int i = 0;
 		/*@
-		  @ loop_invariant true;
 		  @ loop_invariant_free a > 5;
 		  @ assignable a;
 		  @*/

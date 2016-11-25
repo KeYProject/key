@@ -442,6 +442,8 @@ public final class LoopSpecImpl implements LoopSpecification {
     public String toString() {
         return "invariants: " 
                 + originalInvariants
+                + "free invariants: " 
+                + originalFreeInvariants
                 + "; modifies: " 
                 + originalModifies
                 + "; information flow specification: "

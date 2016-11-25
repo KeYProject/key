@@ -892,6 +892,7 @@ public class InvariantConfigurator {
 
                 try {
                     int i = inputPane.getSelectedIndex();
+                    //TODO Jonas: hier geht's bei der manuellen Regelanwendung vermutlich schief, wenn es nur freie Invarianten gibt
                     if (invariants.get(i)[VAR_IDX].get(DEFAULT).equals("")) {
                         variantTerm = null;
                         if (requiresVariant) {

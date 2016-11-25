@@ -541,7 +541,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     private Term conjunctInv(Services services, Instantiation inst,
                              final Map<LocationVariable, Term> atPres,
                              final List<LocationVariable> heapContext) {
-        Term invTerm = null;
+        Term invTerm = services.getTermBuilder().tt();
         for(LocationVariable heap : heapContext) {
             final Term i = inst.inv.getInvariant(heap, inst.selfTerm, atPres, services);
             if(i == null) continue;
@@ -944,7 +944,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                            beforeLoopUpdate,
                            anonUpdate,
                            variantUpdate};
-        final Term uAnonInv = tb.applySequential(uAnon, tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
+        final Term uAnonInv = tb.applySequential(uAnon, tb.and(tb.and(invTerm, reachableOut), invFreeTerm)); //TODO invTerm kann null werden, FIX
 
         final ImmutableList<Goal> result;
         Goal wdGoal;

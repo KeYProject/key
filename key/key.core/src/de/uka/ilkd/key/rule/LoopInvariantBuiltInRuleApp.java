@@ -254,7 +254,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     public boolean invariantAvailable() {
         boolean result = spec != null && spec.getInternalInvariants() != null;
         if(result) {
-          Map<LocationVariable,Term> invs = spec.getInternalInvariants();
+          Map<LocationVariable,Term> invs = new LinkedHashMap<LocationVariable,Term>();
+          invs.putAll(spec.getInternalInvariants());
+          invs.putAll(spec.getInternalFreeInvariants());
           result = false;
           for(LocationVariable heap : heapContext) {
             if(invs.get(heap) != null) {
