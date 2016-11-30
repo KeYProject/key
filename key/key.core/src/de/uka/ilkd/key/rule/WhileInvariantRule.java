@@ -944,7 +944,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                            beforeLoopUpdate,
                            anonUpdate,
                            variantUpdate};
-        final Term uAnonInv = tb.applySequential(uAnon, tb.and(tb.and(invTerm, reachableOut), invFreeTerm)); //TODO invTerm kann null werden, FIX
+        final Term uAnonInv = tb.applySequential(uAnon, tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
 
         final ImmutableList<Goal> result;
         Goal wdGoal;
