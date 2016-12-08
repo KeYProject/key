@@ -15,7 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopInvariant;
 
@@ -33,10 +33,10 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopInvariant;
  */
 public interface IExecutionLoopInvariant extends IExecutionNode<SourceElement> {
    /**
-    * Returns the used {@link LoopInvariant}.
-    * @return The used {@link LoopInvariant}.
+    * Returns the used {@link LoopSpecification}.
+    * @return The used {@link LoopSpecification}.
     */
-   public LoopInvariant getLoopInvariant();
+   public LoopSpecification getLoopInvariant();
    
    /**
     * Returns the loop statement which is simulated by its loop invariant.

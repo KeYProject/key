@@ -26,7 +26,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
@@ -86,7 +86,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
 
     @Override
-    public void performActionOnLoopInvariant(LoopInvariant x) {
+    public void performActionOnLoopInvariant(LoopSpecification x) {
         TermProgramVariableCollector tpvc =
             services.getFactory().create(services);
         Term selfTerm = x.getInternalSelfTerm();

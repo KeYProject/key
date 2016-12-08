@@ -71,7 +71,7 @@ import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.QueryAxiom;
@@ -116,8 +116,8 @@ public final class SpecificationRepository {
             new LinkedHashMap<KeYJavaType, ImmutableSet<InitiallyClause>>();
     private final Map<ProofOblInput, ImmutableSet<Proof>> proofs =
             new LinkedHashMap<ProofOblInput, ImmutableSet<Proof>>();
-    private final Map<Pair<LoopStatement, Integer>, LoopInvariant> loopInvs =
-            new LinkedHashMap<Pair<LoopStatement, Integer>, LoopInvariant>();
+    private final Map<Pair<LoopStatement, Integer>, LoopSpecification> loopInvs =
+            new LinkedHashMap<Pair<LoopStatement, Integer>, LoopSpecification>();
     private final Map<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>> blockContracts =
             new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>>();
     private final Map<IObserverFunction, IObserverFunction> unlimitedToLimited =
@@ -1432,11 +1432,11 @@ public final class SpecificationRepository {
     /**
      * Returns the registered loop invariant for the passed loop, or null.
      */
-    public LoopInvariant getLoopInvariant(LoopStatement loop) {
+    public LoopSpecification getLoopSpec(LoopStatement loop) {
         final int line = loop.getStartPosition().getLine();
         Pair<LoopStatement, Integer> l =
                 new Pair<LoopStatement, Integer>(loop, line);
-        LoopInvariant inv = loopInvs.get(l);
+        LoopSpecification inv = loopInvs.get(l);
         if (inv == null && line != -1) {
             l = new Pair<LoopStatement, Integer>(loop, -1);
             inv = loopInvs.get(l);
@@ -1454,7 +1454,7 @@ public final class SpecificationRepository {
      * @param loop the loop for which the contract is to be copied
      */
     public void copyLoopInvariant(LoopStatement from, LoopStatement to) {
-        LoopInvariant inv = getLoopInvariant(from);
+        LoopSpecification inv = getLoopSpec(from);
         if (inv != null) {
             inv = inv.setLoop(to);
             addLoopInvariant(inv);
@@ -1465,7 +1465,7 @@ public final class SpecificationRepository {
      * Registers the passed loop invariant, possibly overwriting an older
      * registration for the same loop.
      */
-    public void addLoopInvariant(final LoopInvariant inv) {
+    public void addLoopInvariant(final LoopSpecification inv) {
         final LoopStatement loop = inv.getLoop();
         final int line = loop.getStartPosition().getLine();
         Pair<LoopStatement, Integer> l =
@@ -1519,8 +1519,8 @@ public final class SpecificationRepository {
                 addInitiallyClause((InitiallyClause) spec);
             } else if (spec instanceof ClassAxiom) {
                 addClassAxiom((ClassAxiom) spec);
-            } else if (spec instanceof LoopInvariant) {
-                addLoopInvariant((LoopInvariant) spec);
+            } else if (spec instanceof LoopSpecification) {
+                addLoopInvariant((LoopSpecification) spec);
             } else if (spec instanceof BlockContract) {
                 addBlockContract((BlockContract) spec);
             } else {

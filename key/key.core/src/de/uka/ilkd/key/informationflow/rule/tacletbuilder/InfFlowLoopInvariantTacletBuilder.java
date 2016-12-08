@@ -18,7 +18,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -28,7 +28,7 @@ import de.uka.ilkd.key.util.MiscTools;
 public final class InfFlowLoopInvariantTacletBuilder
         extends AbstractInfFlowContractAppTacletBuilder {
     
-    private LoopInvariant loopinvariant;    
+    private LoopSpecification loopinvariant;    
     private ExecutionContext executionContext;
     private Term guard;
 
@@ -36,7 +36,7 @@ public final class InfFlowLoopInvariantTacletBuilder
         super(services);
     }
     
-    public void setInvariant(LoopInvariant invariant) {
+    public void setInvariant(LoopSpecification invariant) {
         this.loopinvariant = invariant;
     }
 
@@ -96,8 +96,8 @@ public final class InfFlowLoopInvariantTacletBuilder
     Term buildContractApplications(ProofObligationVars contAppData,
                                    ProofObligationVars contAppData2,
                                    Services services) {
-        LoopInvariant ifContract =
-                services.getSpecificationRepository().getLoopInvariant(loopinvariant.getLoop());
+        LoopSpecification ifContract =
+                services.getSpecificationRepository().getLoopSpec(loopinvariant.getLoop());
 
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(ifContract, contAppData,

@@ -564,6 +564,8 @@ group javadl {
    provable ./standard_key/java_dl/java5/for_Iterable.key
    provable ./standard_key/java_dl/java5/for_ReferenceArray.key
    provable ./standard_key/java_dl/jml-bigint/cast.key
+   provable ./standard_key/java_dl/jml-free/loopInvFree.key
+   provable ./standard_key/java_dl/jml-free/ensuresFree.key
 # proof gets very long
 # requires further investigations
    provable ./standard_key/java_dl/jml-information-flow.key

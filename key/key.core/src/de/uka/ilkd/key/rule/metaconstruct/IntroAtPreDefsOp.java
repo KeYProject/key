@@ -40,7 +40,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
@@ -138,8 +138,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         //create atPre for parameters
         for (LoopStatement loop : loops) {
-            LoopInvariant inv
-               = services.getSpecificationRepository().getLoopInvariant(loop);
+            LoopSpecification inv
+               = services.getSpecificationRepository().getLoopSpec(loop);
             if(inv != null) {
                 // Nasty bug! The order of these things was not constant! Would fail indeterministically
                 // when reloading. Better sort the variables.
@@ -166,16 +166,16 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         //update loop invariants
         for(LoopStatement loop : loops) {
-            LoopInvariant inv
-                = services.getSpecificationRepository().getLoopInvariant(loop);
-            if(inv != null) {
-                if(selfTerm != null && inv.getInternalSelfTerm() == null) {
+            LoopSpecification spec
+                = services.getSpecificationRepository().getLoopSpec(loop);
+            if(spec != null) {
+                if(selfTerm != null && spec.getInternalSelfTerm() == null) {
                     //we're calling a static method from an instance context
                     selfTerm = null;
                 }
 
                 final Term newVariant
-                    = inv.getVariant(selfTerm, atPres, services);
+                    = spec.getVariant(selfTerm, atPres, services);
 
                 Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
                 Map<LocationVariable,
@@ -184,27 +184,31 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                                                      ImmutableList<InfFlowSpec>>();
                 //LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
                 Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
+                Map<LocationVariable,Term> newFreeInvariants = new LinkedHashMap<LocationVariable,Term>(); // TODO Jonas: init
                 for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                   if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap()
                      &&
-                     inv.getInternalModifies().get(services.getTypeConverter().getHeapLDT().getHeap()).equals(TB.strictlyNothing())) {
+                     spec.getInternalModifies().get(services.getTypeConverter().getHeapLDT().getHeap()).equals(TB.strictlyNothing())) {
                     continue;
                   }
-                  final Term m = inv.getModifies(heap, selfTerm, atPres, services);
+                  final Term m = spec.getModifies(heap, selfTerm, atPres, services);
                   final ImmutableList<InfFlowSpec> infFlowSpecs =
-                                 inv.getInfFlowSpecs(heap, selfTerm, atPres, services);
-                  final Term in = inv.getInvariant(heap, selfTerm, atPres, services);
+                                 spec.getInfFlowSpecs(heap, selfTerm, atPres, services);
+                  final Term inv = spec.getInvariant(heap, selfTerm, atPres, services);
+                  if(inv != null) { newInvariants.put(heap, inv); }
                   if(m != null) { newMods.put(heap, m); }
                   newInfFlowSpecs.put(heap, infFlowSpecs);
-                  if(in != null) { newInvariants.put(heap, in); }
+                  final Term freeInv = spec.getFreeInvariant(heap, selfTerm, atPres, services);
+                  if(freeInv != null) { newFreeInvariants.put(heap, freeInv); }
                 }
                 ImmutableList<Term> newLocalIns = TB.var(MiscTools.getLocalIns(loop, services));
                 ImmutableList<Term> newLocalOuts = TB.var(MiscTools.getLocalOuts(loop, services));
-                final LoopInvariant newInv
-                       = inv.create(loop,
+                final LoopSpecification newInv
+                       = spec.create(loop,
                                     frame.getProgramMethod(),
                                     frame.getProgramMethod().getContainerType(),
                                     newInvariants,
+                                    newFreeInvariants,
                                     newMods,
                                     newInfFlowSpecs,
                                     newVariant,

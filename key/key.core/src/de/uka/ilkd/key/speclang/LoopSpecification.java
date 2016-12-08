@@ -34,7 +34,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
  * A loop invariant, consisting of an invariant formula, a set of loop 
  * predicates, a modifies clause, and a variant term.
  */
-public interface LoopInvariant extends SpecificationElement {
+public interface LoopSpecification extends SpecificationElement {
 
     /**
      * Returns the loop to which the invariant belongs.
@@ -51,6 +51,12 @@ public interface LoopInvariant extends SpecificationElement {
                              Map<LocationVariable,Term> atPres, Services services);
 
     public Term getInvariant(Services services);
+
+    /** Returns the free invariant formula. */
+    public Term getFreeInvariant(LocationVariable heap, Term selfTerm,
+    		Map<LocationVariable,Term> atPres, Services services);
+
+    public Term getFreeInvariant(Services services);
 
     /**
      * Returns the modifies clause.
@@ -100,6 +106,7 @@ public interface LoopInvariant extends SpecificationElement {
      */
     public Map<LocationVariable,Term> getInternalInvariants();
 
+    public Map<LocationVariable, Term> getInternalFreeInvariants();
     /**
      * Returns the term internally used for the variant. 
      * Use with care - it is likely that this is *not* the right "self" for you.
@@ -111,10 +118,11 @@ public interface LoopInvariant extends SpecificationElement {
     public Map<LocationVariable,
                ImmutableList<InfFlowSpec>> getInternalInfFlowSpec();
 
-    public LoopInvariant create(LoopStatement loop,
+    public LoopSpecification create(LoopStatement loop,
                                 IProgramMethod pm,
                                 KeYJavaType kjt,
                                 Map<LocationVariable,Term> invariants,
+                                Map<LocationVariable,Term> freeInvariants,
                                 Map<LocationVariable,Term> modifies,
                                 Map<LocationVariable,
                                     ImmutableList<InfFlowSpec>> infFlowSpecs,
@@ -124,8 +132,9 @@ public interface LoopInvariant extends SpecificationElement {
                                 ImmutableList<Term> localOuts,
                                 Map<LocationVariable,Term> atPres);
 
-    public LoopInvariant create(LoopStatement loop,
+    public LoopSpecification create(LoopStatement loop,
                                 Map<LocationVariable,Term> invariants,
+                                Map<LocationVariable,Term> freeInvariants,
                                 Map<LocationVariable,Term> modifies,
                                 Map<LocationVariable,
                                     ImmutableList<InfFlowSpec>> infFlowSpecs,
@@ -135,9 +144,11 @@ public interface LoopInvariant extends SpecificationElement {
                                 ImmutableList<Term> localOuts,
                                 Map<LocationVariable,Term> atPres);
 
-    public LoopInvariant instantiate(Map<LocationVariable,Term> invariants, Term variant);
+    public LoopSpecification instantiate(Map<LocationVariable,Term> invariants, 
+    									Map<LocationVariable,Term> freeInvariants,Term variant);
 
-    public LoopInvariant configurate(Map<LocationVariable,Term> invariants,
+    public LoopSpecification configurate(Map<LocationVariable,Term> invariants,
+    								 Map<LocationVariable,Term> freeInvariants,
                                      Map<LocationVariable,Term> modifies,
                                      Map<LocationVariable,
                                          ImmutableList<InfFlowSpec>> infFlowSpecs,
@@ -147,16 +158,18 @@ public interface LoopInvariant extends SpecificationElement {
      * Returns a new loop invariant where the loop reference has been
      * replaced with the passed one.
      */
-    public LoopInvariant setLoop(LoopStatement loop);
+    public LoopSpecification setLoop(LoopStatement loop);
 
-    public LoopInvariant setTarget(IProgramMethod newPM);
+    public LoopSpecification setTarget(IProgramMethod newPM);
 
     /**
      * Returns a new loop invariant where the invariant formula has been
      * replaced with the passed one. Take care: the variables used for
      * the receiver, parameters, and local variables must stay the same!
      */
-    public LoopInvariant setInvariant(Map<LocationVariable,Term> invariants, 
+    //TODO jonas: muss hier auch freeInvariant rein?
+    public LoopSpecification setInvariant(Map<LocationVariable,Term> invariants, 
+    						  Map<LocationVariable,Term> freeInvariants,
             			      Term selfTerm,
             			      Map<LocationVariable,Term> atPres,
             			      Services services); 
@@ -177,10 +190,11 @@ public interface LoopInvariant extends SpecificationElement {
 
     public KeYJavaType getKJT();
 
-    public LoopInvariant setTarget(KeYJavaType newKJT, IObserverFunction newPM);
+    public LoopSpecification setTarget(KeYJavaType newKJT, IObserverFunction newPM);
 
     /**
      * Returns the original Self Variable to replace it easier.
      */
     public OriginalVariables getOrigVars();
+
 }

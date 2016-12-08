@@ -64,8 +64,8 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.InitiallyClauseImpl;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
+import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.speclang.LoopSpecImpl;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.speclang.SimpleBlockContract;
@@ -1429,10 +1429,12 @@ public class JMLSpecFactory {
         return null;
     }
 
-    private LoopInvariant createJMLLoopInvariant(IProgramMethod pm,
+    private LoopSpecification createJMLLoopInvariant(IProgramMethod pm,
                                                  LoopStatement loop,
                                                  Map<String,ImmutableList<PositionedString>>
                                                         originalInvariants,
+                                                 Map<String,ImmutableList<PositionedString>>
+    													originalFreeInvariants,
                                                  Map<String,ImmutableList<PositionedString>>
                                                         originalAssignables,
                                                  ImmutableList<PositionedString>
@@ -1502,6 +1504,28 @@ public class JMLSpecFactory {
           }
           invariants.put(heap, invariant);
         }
+        
+        Map<LocationVariable,Term> freeInvariants = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable heap : allHeaps) {
+          Term freeInvariant;
+          ImmutableList<PositionedString> originalFreeInvariant =
+                  originalFreeInvariants.get(heap.name().toString());
+          if (originalFreeInvariant.isEmpty()) {
+            freeInvariant = null;
+          } else {
+        	freeInvariant = TB.tt();
+            for (PositionedString expr : originalFreeInvariant) {
+                Term translated =
+                        JMLTranslator.translate(expr, pm.getContainerType(),
+                                                selfVar, allVars, null,
+                                                null, atPres,
+                                                Term.class, services);
+                freeInvariant = TB.andSC(freeInvariant, TB.convertToFormula(translated));
+            }
+          }
+          freeInvariants.put(heap, freeInvariant);
+        }
+        
         //translateToTerm assignable
         Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
         for(String h : originalAssignables.keySet()) {
@@ -1562,10 +1586,11 @@ public class JMLSpecFactory {
         //create loop invariant annotation
         Term selfTerm = selfVar == null ? null : TB.var(selfVar);
 
-        return new LoopInvariantImpl(loop,
+        return new LoopSpecImpl(loop,
                                      pm,
                                      pm.getContainerType(),
                                      invariants,
+                                     freeInvariants,
                                      mods,
                                      infFlowSpecs,
                                      variant,
@@ -1589,13 +1614,14 @@ public class JMLSpecFactory {
         return result.prepend(localVars);
     }
 
-    public LoopInvariant createJMLLoopInvariant(IProgramMethod pm,
+    public LoopSpecification createJMLLoopInvariant(IProgramMethod pm,
                                                 LoopStatement loop,
                                                 TextualJMLLoopSpec textualLoopSpec)
             throws SLTranslationException {
         return createJMLLoopInvariant(pm,
                                       loop,
                                       textualLoopSpec.getInvariants(),
+                                      textualLoopSpec.getFreeInvariants(),
                                       textualLoopSpec.getAssignables(),
                                       textualLoopSpec.getInfFlowSpecs(),
                                       textualLoopSpec.getVariant());
