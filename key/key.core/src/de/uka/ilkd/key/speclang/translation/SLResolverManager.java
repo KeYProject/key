@@ -119,7 +119,7 @@ public abstract class SLResolverManager {
     private SLExpression resolveImplicit(String name, SLParameters parameters) 
             throws SLTranslationException {
         if(useLocalVarsAsImplicitReceivers) {
-            for(Namespace ns : localVariablesNamespaces) {
+            for(Namespace<?> ns : localVariablesNamespaces) {
                 for(Named n : ns.elements()) {
                     ParsableVariable localVar = (ParsableVariable) n;
                     SLExpression receiver 

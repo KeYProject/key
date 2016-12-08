@@ -13,11 +13,13 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
-import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -31,137 +33,156 @@ import org.key_project.util.collection.ImmutableSet;
  * keeps track of all new added names since the last call of {@link
  * Namespace#startProtocol}.
  */
-public class Namespace implements java.io.Serializable {
+public class Namespace<E extends Named> implements java.io.Serializable {
+
+    private static final long serialVersionUID = 7510655524858729144L;
 
     /**
-     * 
+     * The fall-back namespace for symbols not present in this Namespace.
      */
-    private static final long serialVersionUID = 3094844691883883929L;
+    private Namespace<E> parent;    
+
+    /**
+     * The map that maps a name to a symbols of that name if it is defined in
+     * this Namespace.
+     */
+    private Map<Name, E> symbols;
+    
+    /**
+     * A namespace can be made immutable, this is called "sealing". This flag
+     * indicates whether this namespace has been sealed or not.
+     */
+    private boolean sealed;
+     
+    /** Additions can be "recorded" here 
+     * @deprecated */
+    @Deprecated
+    private Map<Name, E> protocol;
+
 
     /** 
-     * The fall-back namespace for symbols not present in this
-     * Namespace.
+     * Construct an empty Namespace without a parent namespace.
      */
-    protected Namespace parent = null;    
-
-    /** The hashmap that maps a name to a symbols of that name if it 
-     * is defined in this Namespace. */
-    protected HashMap<Name, Named> symbols = null;
-     
-    /** One defined symbol.  Many Namespaces, e.g. those generated when 
-     * a quantified formula is parsed, define only one new symbol,
-     * and it would be a waste of time and space to create a hashmap for that.
-     * So {@link #symbols} is only initialized when there is more than one
-     * symbol in this namespace.  Otherwise, <code>localSym</code> contains
-     * that symbol. */
-    protected Named localSym = null;
-
-    /** The number of symbols defined in this namespace.  This is different 
-     * from <code>symbols.size()</code> because symbols might be null if
-     * there is only one symbol in this Namespace. */
-    protected int numLocalSyms = 0;
-
-    /** Additions can be "recorded" here */
-    protected HashMap<Name, Named> protocol = null;
-
-
-    /** Construct an empty Namespace without a parent namespace. */
     public Namespace() {
 	this.parent = null;
     }
 
-    /** Construct an empty Namespace with protocol <code>protocol</code> 
-     * and without a parent namespace. */
-    public Namespace(HashMap<Name, Named> protocol) {
-	this.parent = null;
-	this.protocol = protocol;
+    /** 
+     * Construct a Namespace that uses <code>parent</code> as a fallback
+     * for finding symbols not defined in this one. 
+     */
+    public Namespace(Namespace<E> parent) {
+	this.parent = parent;
     }
 
-    /** Construct a Namespace that uses <code>parent</code> as a fallback
-     * for finding symbols not defined in this one. */
-    public Namespace(Namespace parent) {
-	this.parent=parent;
-    }
-
-    /** Construct a Namespace that uses <code>parent</code> as a fallback
-     * for finding symbols not defined in this one.  Put an entry for
-     * <code>sym</code> in this one. */
-    public Namespace(Namespace parent, Named sym) {
-	this.parent=parent;
-	add(sym);
-    }
-
-    /** Adds the object <code>sym</code> to this Namespace. 
+    /** 
+     * Adds the object <code>sym</code> to this Namespace. 
      * If an object with the same name is already there, it is quietly 
      * replaced by <code>sym</code>. Use addSafely() instead if possible.
-     * TODO:The problem of saving to localSym, symbols, and symbolRefs is not solved yet.*/
-    public void add(Named sym) {
-	if (numLocalSyms>0) {
-                if (symbols == null) {
-                    symbols = new LinkedHashMap<Name, Named>();
-                    if (localSym != null) {
-                        symbols.put(localSym.name(), localSym);
-                        localSym = null;
-                    }
-                }
-                symbols.put(sym.name(), sym);
+     *
+     * TODO:The problem of saving to localSym, symbols, and symbolRefs is not solved yet.
+     *   (This is no longer self-explanatory. mu 2016) 
+     *   
+     * If the local table is empty, then the new symbol is added as 
+     * "singleton map". This has been adapted from an earlier 
+     * implementation, done for memory efficiency reasons: Many namespaces
+     * only contain a single element; no need to allocate a hash map.
+     * The hash map is only created when the 2nd element is added.
+     * 
+     * This is not threadsafe.
+     */
+    public void add(E sym) {
+        
+        if(sealed) {
+            System.err.println("SEALED");
+            throw new IllegalStateException("This namespace has been sealed; addition is not possible.");
+        }
+
+        if (symbols == null) {
+            symbols = Collections.singletonMap(sym.name(), sym);
+        } else {
+            if (symbols.size() == 1) {
+                symbols = new LinkedHashMap<Name, E>(symbols);
             }
-	else localSym=sym;
-	numLocalSyms++;
+            symbols.put(sym.name(), sym);
+        }
+        
         if (protocol != null) {
 	    protocol.put(sym.name(),sym); 
         }
     }
     
-    public void remove(Name name){
-    	if(symbols != null && symbols.containsKey(name)){
-    		symbols.remove(name);
-    	}
-       	if(protocol != null && protocol.containsKey(name)){
-    		protocol.remove(name);
-    	}
+    public void add(Namespace<E> source) {
+        add(source.elements());
     }
-    
-    /** Adds the object <code>sym</code> to this namespace. 
+
+    public void add(Iterable<? extends E> list) {
+        for (E element : list) {
+            add(element);
+        }
+    }
+
+    /**
+     * Adds the object <code>sym</code> to this namespace. 
      * Throws a runtime exception if an object with the same name is 
-     * already there. */
-    public void addSafely(Named sym) {
+     * already there. 
+     */
+    public void addSafely(E sym) {
         if(lookup(sym.name()) != null) {
             throw new RuntimeException("Name already in namespace: " 
                                        + sym.name());
         }
+        
         add(sym);
+    }
+
+    public void addSafely(Iterable<? extends E> names) {
+        for (E name : names) {
+            addSafely(name);
+        }
+    }
+
+    /**
+     * Remove a name from the namespace.
+     * 
+     * Removal is not delegated to the parent namespace.
+     * 
+     * @param name non-null name whose symbol is to be removed.
+     */
+    public void remove(Name name){
+        if(symbols != null){
+            symbols.remove(name);
+        }
+        if(protocol != null){
+            protocol.remove(name);
+        }
     }
     
     /** "remember" all additions from now on */
     public void startProtocol() {
-        protocol = new LinkedHashMap<Name, Named>();
+        protocol = new LinkedHashMap<Name, E>();
     }
 
     /** gets symbols added since last <code>startProtocol()</code>;
      *  resets the protocol */
-    public Iterator<Named> getProtocolled() {
+    public Iterator<E> getProtocolled() {
         if (protocol == null) {
-            return ImmutableSLList.<Named>nil().iterator();
+            return ImmutableSLList.<E>nil().iterator();
         }
-        final Iterator<Named> it = protocol.values().iterator();
+        
+        assert protocol.equals(symbols);
+        
+        final Iterator<E> it = protocol.values().iterator();
         protocol = null;
         return it;
     }
-    
 
     protected Named lookupLocally(Name name){
-	if (numLocalSyms==0) return null;
-	if (numLocalSyms > 1) {
-            if (symbols != null && symbols.containsKey(name)) {
-                return symbols.get(name);
-            } 
+        if (symbols != null) {
+            return symbols.get(name);
+        } else {
             return null;
         }
-	if (localSym.name().equals(name)) {
-	    return localSym;
-	}
-	else return null;
     }  
 
 
@@ -169,16 +190,14 @@ public class Namespace implements java.io.Serializable {
      * an entry for <code>sym</code>.
      * @return the new Namespace
      */
-    public Namespace extended(Named sym) {
-	return new Namespace(this, sym);
+    public Namespace<E> extended(E sym) {
+        return extended(Collections.singleton(sym));
     }
 
-    public Namespace extended(Iterable<? extends Named> ext) {
-        Namespace res = new Namespace(this);
-        for (Named anExt : ext) {
-            res.add(anExt);
-        }
-        return res;
+    public Namespace<E> extended(Iterable<? extends E> ext) {
+	Namespace<E> result = new Namespace<E>(this);
+	result.addSafely(ext);
+        return result;
     }
 
    /** 
@@ -193,9 +212,11 @@ public class Namespace implements java.io.Serializable {
         if (symbol != null) {
             return symbol;
         }
+        
         if (parent != null) {
             return parent.lookup(name);
         }
+        
         return null;
     }
     
@@ -208,90 +229,56 @@ public class Namespace implements java.io.Serializable {
      * namespace (not about the one of the parent)
      * @return the list of the named objects
      */
-    public ImmutableList<Named> elements() {
-	ImmutableList<Named> list = ImmutableSLList.<Named>nil();
-
-	if (numLocalSyms == 1) {
-            list = list.prepend(localSym);
-        } else if (numLocalSyms > 1) {          
-            if (symbols != null) {
-                for (Named named1 : symbols.values()) {
-                    Named named = named1;
-                    if (named != null) {
-                        list = list.prepend(named);
-                    }
-                }
-            }
-        }
-
-	return list;
+    public Collection<E> elements() {
+        return Collections.unmodifiableCollection(symbols.values());
     }
     
 
-    public ImmutableList<Named> allElements() {
+    public Collection<E> allElements() {
 	if (parent==null) {
-	    return elements();
+	    return new ArrayList<>(elements());
 	} else {
-	    return elements().append(parent().allElements());
+	    Collection<E> result = parent().allElements();
+	    result.addAll(elements());
+	    return result;
 	}
     }
 
     /** returns the fall-back Namespace of this Namespace, i.e. the one
      * where symbols are looked up that are not found in this one.
      */
-    public Namespace parent() {
+    public Namespace<E> parent() {
 	return parent;
     }
 
     public String toString() {
-	String res="Namespace: [local:"+localSym+", "+symbols;
+	String res="Namespace: [local:" + symbols;
 	if (parent!=null) res=res+"; parent:"+parent;
 	return res+"]";
     }
 
-    public void add(Namespace source) {
-        for (Named named : source.elements()) {
-            add(named);
-        }
-	
-    }
-
-    public void add(Iterable<? extends Named> l) {
-        for (Named aL : l) {
-            add(aL);
-        }
-    }
-
-    public <T extends Named> void addSafely(Iterable<T> names) {
-        for (Named name : names) {
-            addSafely(name);
-        }
-    }
-    
-    @SuppressWarnings("unchecked")
-    public Namespace copy() {
-	Namespace copy;
-	if(protocol != null){
-	    copy = new Namespace((HashMap<Name, Named>)protocol.clone());
-	}else{
-	    copy = new Namespace();
+    public Namespace<E> copy() {
+	Namespace<E> copy = new Namespace<E>();
+	if(symbols != null)
+	    copy.addSafely(symbols.values());
+	if(protocol != null) {
+	    copy.protocol = new LinkedHashMap<Name, E>(copy.protocol);
 	}
-	//%%%%make more efficient!!!
-        for (Named named : allElements()) {
-            copy.add(named);
-        }
+	
 	return copy;
     }
     
-    public void reset() {
-	parent=null;
-	symbols=null;	
-	localSym=null;
-	numLocalSyms=0;
+    private void reset() {
+        parent = null;
+        symbols = null;
     }
-    
-    public <T extends Named> void set(ImmutableSet<T> names) {
+
+    public <T extends E> void set(ImmutableSet<T> names) {
         reset();
         addSafely(names);
+    }
+
+    public void seal() {
+        sealed = true;
     }
 }

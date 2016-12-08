@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -212,7 +213,7 @@ public class TestVariableNamer extends TestCase {
 	assertTrue(inGlobals(goal, v));
 
 	// Reset progVar namespace which was altered due to addGlobal()
-	proof.getNamespaces().programVariables().reset();
+	proof.getNamespaces().setProgramVariables(new Namespace<IProgramVariable>());
 	testTemporaryNames(vn);
     }
 

@@ -28,6 +28,8 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -342,14 +344,14 @@ public class InitConfig {
 
     /** returns the function namespace of this initial configuration
      */
-    public Namespace funcNS() {
+    public Namespace<Operator> funcNS() {
         return namespaces().functions();
     }
 
 
     /** returns the sort namespace of this initial configuration
      */
-    public Namespace sortNS() {
+    public Namespace<Sort> sortNS() {
         return namespaces().sorts();
     }
 

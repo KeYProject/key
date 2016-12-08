@@ -17,25 +17,30 @@ import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.RuleSet;
+
 public class NamespaceSet {
 
-    private Namespace varNS          = new Namespace();
-    private Namespace progVarNS      = new Namespace();
-    private Namespace funcNS         = new Namespace();
-    private Namespace ruleSetNS      = new Namespace();
-    private Namespace sortNS         = new Namespace();
-    private Namespace choiceNS       = new Namespace();
+    private Namespace<QuantifiableVariable> varNS = new Namespace<QuantifiableVariable>();
+    private Namespace<IProgramVariable> progVarNS = new Namespace<IProgramVariable>();
+    private Namespace<Operator> funcNS = new Namespace<Operator>();
+    private Namespace<RuleSet> ruleSetNS = new Namespace<RuleSet>();
+    private Namespace<Sort> sortNS = new Namespace<Sort>();
+    private Namespace<Choice> choiceNS = new Namespace<Choice>();
 
-    
     public NamespaceSet() {
     }
 
-    public NamespaceSet(Namespace varNS, 
-	    		Namespace funcNS, 
-                        Namespace sortNS, 
-                        Namespace ruleSetNS,
-			Namespace choiceNS, 
-			Namespace programVarNS) {
+    public NamespaceSet(Namespace<QuantifiableVariable> varNS, 
+	    		Namespace<Operator> funcNS, 
+                        Namespace<Sort> sortNS, 
+                        Namespace<RuleSet> ruleSetNS,
+			Namespace<Choice> choiceNS, 
+			Namespace<IProgramVariable> programVarNS) {
 	this.varNS     = varNS;
 	this.progVarNS = programVarNS;
 	this.funcNS    = funcNS;
@@ -44,51 +49,51 @@ public class NamespaceSet {
 	this.choiceNS  = choiceNS;
     }
 
-    public Namespace variables() {
+    public Namespace<QuantifiableVariable> variables() {
 	return varNS;
     }
 
-    public void setVariables(Namespace varNS) {
+    public void setVariables(Namespace<QuantifiableVariable> varNS) {
 	this.varNS = varNS;
     }
 
-    public Namespace programVariables() {
+    public Namespace<IProgramVariable> programVariables() {
 	return progVarNS;
     }
 
-    public void setProgramVariables(Namespace progVarNS) {
+    public void setProgramVariables(Namespace<IProgramVariable> progVarNS) {
 	this.progVarNS = progVarNS;
     }
 
-    public Namespace functions() {
+    public Namespace<Operator> functions() {
 	return funcNS;
     }
 
-    public void setFunctions(Namespace funcNS) {
+    public void setFunctions(Namespace<Operator> funcNS) {
 	this.funcNS = funcNS;
     }
 
-    public Namespace ruleSets() {
+    public Namespace<RuleSet> ruleSets() {
 	return ruleSetNS;
     }
 
-    public void setRuleSets(Namespace ruleSetNS) {
+    public void setRuleSets(Namespace<RuleSet> ruleSetNS) {
 	this.ruleSetNS = ruleSetNS;
     }
 
-    public Namespace sorts() {
+    public Namespace<Sort> sorts() {
 	return sortNS;
     }
 
-    public void setSorts(Namespace sortNS) {
+    public void setSorts(Namespace<Sort> sortNS) {
 	this.sortNS = sortNS;
     }
 
-    public Namespace choices() {
+    public Namespace<Choice> choices() {
 	return choiceNS;
     }
 
-    public void setChoices(Namespace choiceNS) {
+    public void setChoices(Namespace<Choice> choiceNS) {
 	this.choiceNS = choiceNS;
     }
     
@@ -127,7 +132,7 @@ public class NamespaceSet {
     /**
      * returns all namespaces in an array     
      */
-    private Namespace[] asArray() {
+    private Namespace<?>[] asArray() {
         return new Namespace[]{variables(), 
         		       programVariables(), 
         		       sorts(), 
@@ -142,7 +147,7 @@ public class NamespaceSet {
      * in a real sequent (this means all namespaces without
      * variables, choices and ruleSets)      
      */
-    private Namespace[] logicAsArray() {
+    private Namespace<?>[] logicAsArray() {
         return new Namespace[]{
            programVariables(), sorts(), functions()
         };
@@ -151,6 +156,8 @@ public class NamespaceSet {
     /**
      * adds the protocolled names of the given NamespaceSet to this one    
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Deprecated 
     public void addProtocolled(NamespaceSet nss) {
       final Namespace[] myNames = asArray();
       final Namespace[] otherNames = nss.asArray();
@@ -189,7 +196,7 @@ public class NamespaceSet {
      * given namespaces, otherwise <tt>null</tt>
      */
     private Named lookup(Name name, final Namespace[] spaces) {
-        for (Namespace space : spaces) {
+        for (Namespace<?> space : spaces) {
             final Named n = space.lookup(name);
             if (n != null) return n;
         } 
@@ -216,4 +223,14 @@ public class NamespaceSet {
         }
         return true;
     }
+    
+    public void seal() {
+        varNS.seal();
+        progVarNS.seal();
+        funcNS.seal();
+        ruleSetNS.seal();
+        sortNS.seal();
+        choiceNS.seal();
+    }
+    
 }
