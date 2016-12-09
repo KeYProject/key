@@ -20,6 +20,7 @@ import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.MultiEvaluationR
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValueTracingResult;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockContract;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionJoin;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
@@ -32,6 +33,57 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestCase {
+   /**
+    * Tests example: /set/truthValueWeakeningTest
+    */
+   public void testJoinTestAfterBranchConditionWithWeakeningGoal() throws Exception {
+      // Create expected results
+      ExpectedBranchResult seGoal = new ExpectedBranchResult();
+      ExpectedBranchResult weakeningGoal = new ExpectedBranchResult(new ExpectedTruthValueResult("13.0", TruthValue.FALSE),
+                                                                    new ExpectedTruthValueResult("8.0", TruthValue.TRUE),
+                                                                    new ExpectedTruthValueResult("10.0", TruthValue.FALSE),
+                                                                    new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                                    new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                                    new ExpectedTruthValueResult("12.0", TruthValue.FALSE),
+                                                                    new ExpectedTruthValueResult("9.0", TruthValue.TRUE),
+                                                                    new ExpectedTruthValueResult("7.0", TruthValue.TRUE),
+                                                                    new ExpectedTruthValueResult("17.0", TruthValue.TRUE),
+                                                                    new ExpectedTruthValueResult("11.0", TruthValue.FALSE));
+      ExpectedTruthValueEvaluationResult seResult = new ExpectedTruthValueEvaluationResult(seGoal);
+      ExpectedTruthValueEvaluationResult weakeningResult = new ExpectedTruthValueEvaluationResult(weakeningGoal);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueWeakeningTest/test/JoinTestAfterBranchConditionWithWeakeningGoal.proof", 
+                                 "/set/truthValueWeakeningTest/oracle/JoinTestAfterBranchCondition.xml",
+                                 false,
+                                 false,
+                                 false,
+                                 seResult,
+                                 weakeningResult);
+   }
+   
+   /**
+    * Tests example: /set/truthValueLabelBelowUpdatesDifferentToApplicationTerm
+    */
+   public void testTruthValueLabelBelowUpdatesDifferentToApplicationTerm() throws Exception {
+      // Create expected results
+      ExpectedBranchResult goal15 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("2.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("4.0", TruthValue.TRUE));
+      ExpectedBranchResult goal17 = new ExpectedBranchResult(new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("2.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("4.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult result = new ExpectedTruthValueEvaluationResult(goal15, goal17);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueLabelBelowUpdatesDifferentToApplicationTerm/test/TwoBranch.proof", 
+                                 "/set/truthValueLabelBelowUpdatesDifferentToApplicationTerm/oracle/TwoBranch.xml",
+                                 false,
+                                 false,
+                                 false,
+                                 result);
+   }
+   
    /**
     * Tests example: /set/truthValueExceptinalAssignableNothingTest
     */
@@ -1031,6 +1083,9 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
          }
          else if (next instanceof IExecutionBlockContract) {
             nodeToEvaluate = next.getProofNode().child(1); // Precondition branch
+         }
+         else if (next instanceof IExecutionJoin) {
+            nodeToEvaluate = next.getProofNode().child(0); // Weakening branch
          }
          else {
             nodeToEvaluate = null;

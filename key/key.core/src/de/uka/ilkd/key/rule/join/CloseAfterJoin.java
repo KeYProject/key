@@ -34,6 +34,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -68,8 +70,8 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
  */
 public class CloseAfterJoin implements BuiltInRule {
 
-    private static final String JOIN_GENERATE_IS_WEAKENING_GOAL_CFG = "joinGenerateIsWeakeningGoal";
-    private static final String JOIN_GENERATE_IS_WEAKENING_GOAL_CFG_ON =
+    public static final String JOIN_GENERATE_IS_WEAKENING_GOAL_CFG = "joinGenerateIsWeakeningGoal";
+    public static final String JOIN_GENERATE_IS_WEAKENING_GOAL_CFG_ON =
             JOIN_GENERATE_IS_WEAKENING_GOAL_CFG + ":on";
     private static final String JOINED_NODE_IS_WEAKENING_TITLE = "Joined node is weakening";
 
@@ -77,6 +79,11 @@ public class CloseAfterJoin implements BuiltInRule {
     private static final Name RULE_NAME = new Name(DISPLAY_NAME);
 
     public static final CloseAfterJoin INSTANCE = new CloseAfterJoin();
+    
+    /**
+     * Hint to refactor the final weakening term.
+     */    
+    public static final String FINAL_WEAKENING_TERM_HINT = "finalWeakeningTerm";
 
     private CloseAfterJoin() {
         /* Singleton class */
@@ -95,6 +102,7 @@ public class CloseAfterJoin implements BuiltInRule {
     @Override
     public ImmutableList<Goal> apply(final Goal goal, final Services services,
             final RuleApp ruleApp) throws RuleAbortException {
+        final TermLabelState termLabelState = new TermLabelState();
 
         assert ruleApp instanceof CloseAfterJoinRuleBuiltInRuleApp : "Rule app for CloseAfterJoin has to be an instance of CloseAfterJoinRuleBuiltInRuleApp";
 
@@ -147,13 +155,14 @@ public class CloseAfterJoin implements BuiltInRule {
             final Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
             ruleIsWeakeningGoal.setBranchLabel(JOINED_NODE_IS_WEAKENING_TITLE);
 
-            final Term isWeakeningForm = getSyntacticWeakeningFormula(services,
-                    closeApp);
+            Term isWeakeningForm = getSyntacticWeakeningFormula(services, closeApp);
+            isWeakeningForm = TermLabelManager.refactorTerm(termLabelState, services, null, isWeakeningForm, this, ruleIsWeakeningGoal, FINAL_WEAKENING_TERM_HINT, null);
             // Delete previous sequents
             clearSemisequent(ruleIsWeakeningGoal, true);
             clearSemisequent(ruleIsWeakeningGoal, false);
             ruleIsWeakeningGoal.addFormula(new SequentFormula(isWeakeningForm),
                     false, true);
+            TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this, ruleIsWeakeningGoal, null, null);
         }
 
         return jpNewGoals;

@@ -76,7 +76,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 
 /**
  * Content in the {@link MonKeYView} that contains the whole
@@ -361,11 +361,11 @@ public class MonKeYComposite extends Composite implements IProofProvider {
         methodTreatmentGroup.setText("Method Treatment");
         methodTreatmentContractButton = new Button(methodTreatmentGroup, SWT.RADIO);
         methodTreatmentContractButton.setText("&Contract");
-        methodTreatmentContractButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_METHOD_CONTRACT));
+        methodTreatmentContractButton.setToolTipText(formatToolTip(JavaCardDLStrategyFactory.TOOL_TIP_METHOD_CONTRACT));
         methodTreatmentExpandButton = new Button(methodTreatmentGroup, SWT.RADIO);
         methodTreatmentExpandButton.setSelection(true);
         methodTreatmentExpandButton.setText("E&xpand");
-        methodTreatmentExpandButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_METHOD_EXPAND));
+        methodTreatmentExpandButton.setToolTipText(formatToolTip(JavaCardDLStrategyFactory.TOOL_TIP_METHOD_EXPAND));
         Group dependencyContractsGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
         dependencyContractsGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         dependencyContractsGroup.setLayout(new GridLayout(2, false));
@@ -373,10 +373,10 @@ public class MonKeYComposite extends Composite implements IProofProvider {
         dependencyContractsOnButton = new Button(dependencyContractsGroup, SWT.RADIO);
         dependencyContractsOnButton.setText("O&n");
         dependencyContractsOnButton.setSelection(true);
-        dependencyContractsOnButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_DEPENDENCY_ON));
+        dependencyContractsOnButton.setToolTipText(formatToolTip(JavaCardDLStrategyFactory.TOOL_TIP_DEPENDENCY_ON));
         dependencyContractsOffButton = new Button(dependencyContractsGroup, SWT.RADIO);
         dependencyContractsOffButton.setText("O&ff");
-        dependencyContractsOffButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_DEPENDENCY_OFF));
+        dependencyContractsOffButton.setToolTipText(formatToolTip(JavaCardDLStrategyFactory.TOOL_TIP_DEPENDENCY_OFF));
         Group queryTreatmentGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
         queryTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         queryTreatmentGroup.setLayout(new GridLayout(2, false));
@@ -384,20 +384,20 @@ public class MonKeYComposite extends Composite implements IProofProvider {
         queryTreatmentOnButton = new Button(queryTreatmentGroup, SWT.RADIO);
         queryTreatmentOnButton.setText("On");
         queryTreatmentOnButton.setSelection(true);
-        queryTreatmentOnButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_QUERY_ON));
+        queryTreatmentOnButton.setToolTipText(formatToolTip(JavaCardDLStrategyFactory.TOOL_TIP_QUERY_ON));
         queryTreatmentOffButton = new Button(queryTreatmentGroup, SWT.RADIO);
         queryTreatmentOffButton.setText("Off");
-        queryTreatmentOffButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_QUERY_OFF));
+        queryTreatmentOffButton.setToolTipText(formatToolTip(JavaCardDLStrategyFactory.TOOL_TIP_QUERY_OFF));
         Group arithmeticTreatmentGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
         arithmeticTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         arithmeticTreatmentGroup.setLayout(new GridLayout(2, false));
         arithmeticTreatmentGroup.setText("Arithmetic Treatment");
         arithmeticTreatmentBaseButton = new Button(arithmeticTreatmentGroup, SWT.RADIO);
         arithmeticTreatmentBaseButton.setText("&Base");
-        arithmeticTreatmentBaseButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_ARITHMETIC_BASE));
+        arithmeticTreatmentBaseButton.setToolTipText(formatToolTip(JavaCardDLStrategyFactory.TOOL_TIP_ARITHMETIC_BASE));
         arithmeticTreatmentDefOpsButton = new Button(arithmeticTreatmentGroup, SWT.RADIO);
         arithmeticTreatmentDefOpsButton.setText("DefO&ps");
-        arithmeticTreatmentDefOpsButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_ARITHMETIC_DEF_OPS));
+        arithmeticTreatmentDefOpsButton.setToolTipText(formatToolTip(JavaCardDLStrategyFactory.TOOL_TIP_ARITHMETIC_DEF_OPS));
         arithmeticTreatmentDefOpsButton.setSelection(true);
         Group stopAtGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
         stopAtGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -405,11 +405,11 @@ public class MonKeYComposite extends Composite implements IProofProvider {
         stopAtGroup.setText("Stop at");
         stopAtDefaultButton = new Button(stopAtGroup, SWT.RADIO);
         stopAtDefaultButton.setText("Def&ault");
-        stopAtDefaultButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_STOP_AT_DEFAULT));
+        stopAtDefaultButton.setToolTipText(formatToolTip(JavaCardDLStrategyFactory.TOOL_TIP_STOP_AT_DEFAULT));
         stopAtUnclosableButton = new Button(stopAtGroup, SWT.RADIO);
         stopAtUnclosableButton.setText("&Unclosable");
         stopAtUnclosableButton.setSelection(true);
-        stopAtUnclosableButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_STOP_AT_UNCLOSABLE));
+        stopAtUnclosableButton.setToolTipText(formatToolTip(JavaCardDLStrategyFactory.TOOL_TIP_STOP_AT_UNCLOSABLE));
         // Proof viewer
         Composite proofViewerComposite = new Composite(proofGroup, SWT.NONE);
         proofViewerComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -1205,5 +1205,37 @@ public class MonKeYComposite extends Composite implements IProofProvider {
     */
    public void setBootClassPath(String bootClassPath) {
       SWTUtil.setText(bootClassPathText, bootClassPath);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanStartAutomode() {
+      return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanApplyRules() {
+      return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanPruneProof() {
+      return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanStartSMTSolver() {
+      return false;
    }
 }

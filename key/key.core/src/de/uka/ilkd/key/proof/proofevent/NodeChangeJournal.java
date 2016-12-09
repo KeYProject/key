@@ -139,4 +139,8 @@ public class NodeChangeJournal implements GoalListener {
         return res;
     }
 
+    @Override
+    public void automaticStateChanged(Goal source, boolean oldAutomatic, boolean newAutomatic) {
+       // Nothing to do
+    }
 }

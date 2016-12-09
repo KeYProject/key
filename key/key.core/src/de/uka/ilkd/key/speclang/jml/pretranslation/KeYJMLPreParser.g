@@ -1388,11 +1388,13 @@ loop_specification[ImmutableList<String> mods]
    result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ls);
 }
 :
-    ps=loop_invariant       { ls.addInvariant(ps); }
+    (ps=loop_invariant       { ls.addInvariant(ps); }
+    | 	ps=loop_invariant_free       { ls.addFreeInvariant(ps); })
     (
 	options { greedy = true; }
 	:
             ps=loop_invariant       { ls.addInvariant(ps); }
+        |   ps=loop_invariant_free       { ls.addFreeInvariant(ps); }
         |   ps=loop_separates_clause      { ls.addInfFlowSpecs(ps); }
         |   ps=loop_determines_clause      { ls.addInfFlowSpecs(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
@@ -1406,6 +1408,12 @@ loop_invariant returns [PositionedString r = null]
 @after { r = result; }
 :
     maintaining_keyword result=expression { result = flipHeaps("", result); }
+;
+loop_invariant_free returns [PositionedString r = null]
+@init { result = r; }
+@after { r = result; }
+:
+    LOOP_INVARIANT_FREE result=expression { result = flipHeaps("", result); }
 ;
 
 maintaining_keyword

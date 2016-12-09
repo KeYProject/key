@@ -26,6 +26,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -210,8 +211,10 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
                String targetName, SWTBotView debugView, SWTBotTree debugTree,
                ISEDebugTarget target, ILaunch launch) throws Exception {
             //test if manual rule application functions before stepping into the proof
+            TestSedCoreUtil.waitForDebugTreeInterface();
             SWTBotView proofView = getProofBotView(bot);
             int count = proofView.bot().tree().rowCount();
+            assertEquals(1, count);
             proofView.bot().tree().select(count - 1);
             final SWTBotStyledText styledText0 = proofView.bot().styledText();
             Point point0 = TestUtilsUtil.selectText(styledText0, "well");
@@ -362,9 +365,10 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
             //get the node that is selected
             Node goal = view.getCurrentProof().openGoals().head().node();
             IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter(goal.sequent());
-            LogicPrinter printer = new LogicPrinter(new ProgramPrinter(null), 
-                                       SymbolicExecutionUtil.createNotationInfo(view.getCurrentProof()), 
-                                       goal.proof().getServices());
+            LogicPrinter printer = new SequentViewLogicPrinter(new ProgramPrinter(null), 
+                                                               SymbolicExecutionUtil.createNotationInfo(view.getCurrentProof()), 
+                                                               goal.proof().getServices(),
+                                                               view.getUI().getTermLabelVisibilityManager());
             //check if source viewer is showing the content correctly
             assertEquals(proofView.bot().styledText().getText(), 
                          ProofSourceViewerDecorator.computeText(SymbolicExecutionUtil.createNotationInfo(view.getCurrentProof()), goal, filter, printer));

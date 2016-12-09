@@ -27,7 +27,7 @@ import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
  * This transformation is used to transform a for-loop into a while-loop.
@@ -126,8 +126,8 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             }
             
             // copy loop invariant to the created while loop
-            LoopInvariant li 
-                = services.getSpecificationRepository().getLoopInvariant(x);
+            LoopSpecification li 
+                = services.getSpecificationRepository().getLoopSpec(x);
             if (li != null) {
                 li = li.setLoop((While)outerBlockStatements[initSize]);
                 services.getSpecificationRepository().addLoopInvariant(li);

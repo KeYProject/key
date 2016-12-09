@@ -78,6 +78,30 @@
             id="org.key_project.keyide.ui.commands.counterexample"
             name="Counterexample">
       </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Search a node in the proof tree according to a given text."
+            id="org.key_project.keyide.ui.commands.searchProofNode"
+            name="Search Proof Node">
+      </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Exclude this node and all goals in the subtree from automatic rule application"
+            id="org.key_project.keyide.ui.disableGoalsCommand"
+            name="Set All Goals Below to Interactive">
+      </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Include this node and all goals in the subtree in automatic rule application."
+            id="org.key_project.keyide.ui.enableGoalsCommand"
+            name="Set All Goals Below to Automatic">
+      </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Edit Notes"
+            id="org.key_project.keyide.ui.editNotes"
+            name="Edit Notes">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
@@ -108,6 +132,22 @@
       <image
             commandId="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand"
             icon="icons/stopAtBreakpoints.gif">
+      </image>
+      <image
+            commandId="org.key_project.keyide.ui.commands.searchProofNode"
+            icon="icons/findProofTreeNode.png">
+      </image>
+      <image
+            commandId="org.key_project.keyide.ui.disableGoalsCommand"
+            icon="icons/keyinteractive.png">
+      </image>
+      <image
+            commandId="org.key_project.keyide.ui.enableGoalsCommand"
+            icon="icons/ekey-mono16.png">
+      </image>
+      <image
+            commandId="org.key_project.keyide.ui.editNotes"
+            icon="icons/editFile.png">
       </image>
    </extension>
    <extension
@@ -247,8 +287,61 @@
             commandId="org.key_project.keyide.ui.commands.showSymbolicExecutionTreeOnly">
       </handler>
       <handler
-            class="org.key_project.keyide.ui.handlers.MinimizeInteractionsHandler"
-            commandId="org.key_project.keyide.ui.commands.minimizeInteractions">
+            class="org.key_project.keyide.ui.handlers.SearchProofNodeHandler"
+            commandId="org.key_project.keyide.ui.commands.searchProofNode">
+         <enabledWhen>
+            <with
+                  variable="activePart">
+               <test
+                     forcePluginActivation="true"
+                     property="org.key_project.keyide.ui.supportsProofNodeSearch">
+               </test>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.DisableGoalsHandler"
+            commandId="org.key_project.keyide.ui.disableGoalsCommand">
+         <enabledWhen>
+            <with
+                  variable="activePart">
+               <and>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.canApplyRules"
+                        value="true">
+                  </test>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.isNotAutoMode">
+                  </test>
+               </and>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.EnableGoalsHandler"
+            commandId="org.key_project.keyide.ui.enableGoalsCommand">
+         <enabledWhen>
+            <with
+                  variable="activePart">
+               <and>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.canApplyRules"
+                        value="true">
+                  </test>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.isNotAutoMode">
+                  </test>
+               </and>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.EditNotesHandler"
+            commandId="org.key_project.keyide.ui.editNotes">
       </handler>
    </extension>
    <extension
@@ -323,22 +416,6 @@
                        </with>
                     </visibleWhen>
                  </command>
-                 <command
-                       commandId="org.key_project.keyide.ui.commands.minimizeInteractions"
-                       id="org.key_project.keyide.ui.commands.minimizeInteractions"
-                       label="Minimize Interactions"
-                       style="toggle"
-                       tooltip="Minimize Interactions">
-                    <visibleWhen
-                          checkEnabled="false">
-                       <with
-                             variable="activeEditorId">
-                          <equals
-                                value="org.key_project.keyide.ui.editor">
-                          </equals>
-                       </with>
-                    </visibleWhen>
-                 </command>
          </toolbar>
       </menuContribution>
       <menuContribution
@@ -372,6 +449,10 @@
                </with>
             </visibleWhen>
          </command>
+         <separator
+               name="org.key_project.keyide.ui.separator3"
+               visible="true">
+         </separator>
          <command
                commandId="org.key_project.keyide.ui.commands.counterexample"
                icon="icons/counterExample.png"
@@ -400,6 +481,10 @@
                </with>
             </visibleWhen>
          </command>
+         <separator
+               name="org.key_project.keyide.ui.treeSettingsSeparator"
+               visible="true">
+         </separator>
          <command
                commandId="org.key_project.keyide.ui.commands.hideIntermediateProofsteps"
                label="Hide Intermediate Proofsteps"
@@ -410,11 +495,60 @@
                label="Show Symbolic Execution Tree Only"
                style="toggle">
          </command>
+         <separator
+               name="org.key_project.keyide.ui.searchSeparator"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.key_project.keyide.ui.commands.searchProofNode"
+               icon="icons/findProofTreeNode.png"
+               label="Search Proof Node"
+               style="push">
+         </command>
+         <separator
+               name="org.key_project.keyide.ui.goalsSeparator"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.key_project.keyide.ui.disableGoalsCommand"
+               icon="icons/keyinteractive.png"
+               label="Set All Goals Below to Interactive"
+               style="push"
+               tooltip="Exclude this node and all goals in the subtree from automatic rule application">
+         </command>
+         <command
+               commandId="org.key_project.keyide.ui.enableGoalsCommand"
+               icon="icons/ekey-mono16.png"
+               label="Set All Goals Below to Automatic"
+               style="push"
+               tooltip="Include this node and all goals in the subtree in automatic rule application.">
+         </command>
+         <separator
+               name="org.key_project.keyide.ui.editNotesSeparator"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.key_project.keyide.ui.editNotes"
+               icon="icons/editFile.png"
+               label="Edit Notes"
+               style="push"
+               tooltip="Edit Notes">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            class="org.key_project.keyide.ui.editor.RuleSettingsMenuFactory"
+            locationURI="popup:#KeYEditorContext?before=group.undo">
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            class="org.key_project.keyide.ui.editor.SequentDisplaySettingsMenuFactory"
+            locationURI="popup:#KeYEditorContext?before=ruleSettings">
       </menuContribution>
       <menuContribution
             allPopups="false"
             class="org.key_project.keyide.ui.editor.TacletContextMenu"
-            locationURI="popup:#KeYEditorContext?before=group.undo">
+            locationURI="popup:#KeYEditorContext?before=sequentDisplaySettings">
       </menuContribution>
    </extension>
    <extension
@@ -514,26 +648,6 @@
             </class>
          </state>
       </command>
-      <command
-            categoryId="org.key_project.keyide.ui.commands.category"
-            description="Minimizes the user interactions with the prover."
-            id="org.key_project.keyide.ui.commands.minimizeInteractions"
-            name="Minimize Interactions">
-         <state
-               id="org.eclipse.ui.commands.toggleState">
-            <class
-                  class="org.eclipse.ui.handlers.RegistryToggleState">
-               <parameter
-                     name="default"
-                     value="true">
-               </parameter>
-               <parameter
-                     name="persisted"
-                     value="true">
-               </parameter>
-            </class>
-         </state>
-      </command>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
@@ -572,6 +686,12 @@
             class="org.key_project.keyide.ui.preference.page.KeYIDEPreferencePage"
             id="org.key_project.keyide.ui.preference.page.VisualizationPreferencePage"
             name="KeY Perspective">
+      </page>
+      <page
+            category="org.key_project.key4eclipse.common.ui.preference.page.KeY"
+            class="org.key_project.keyide.ui.preference.page.KeYIDEColorPreferencePage"
+            id="org.key_project.keyide.ui.preference.page.KeYIDEColorPreferencePage"
+            name="Colors">
       </page>
    </extension>
    <extension
@@ -623,7 +743,7 @@
             id="org.key_project.keyide.ui.AutoModeTester"
             namespace="org.key_project.keyide.ui"
             properties="isAutoMode, isNotAutoMode"
-            type="org.eclipse.ui.IEditorPart">
+            type="org.eclipse.core.runtime.IAdaptable">
       </propertyTester>
       <propertyTester
             class="org.key_project.keyide.ui.propertyTester.PruneProofPropertyTester"
@@ -637,7 +757,7 @@
             id="org.key_project.keyide.ui.CanFunctionPropertyTester"
             namespace="org.key_project.keyide.ui"
             properties="canStartAutomode, canApplyRules, canPruneProof, canStartSMTSolver"
-            type="org.eclipse.ui.IEditorPart">
+            type="org.eclipse.core.runtime.IAdaptable">
       </propertyTester>
       <propertyTester
             class="org.key_project.keyide.ui.propertyTester.ProofPropertyTester"
@@ -652,6 +772,13 @@
             namespace="org.key_project.keyide.ui"
             properties="isGoal"
             type="org.eclipse.jface.viewers.IStructuredSelection">
+      </propertyTester>
+      <propertyTester
+            class="org.key_project.keyide.ui.propertyTester.ProofNodeSearchSupportTester"
+            id="org.key_project.keyide.ui.propertyTester.ProofNodeSearchSupportTester"
+            namespace="org.key_project.keyide.ui"
+            properties="supportsProofNodeSearch"
+            type="org.eclipse.ui.IWorkbenchPart">
       </propertyTester>
    </extension>
       <extension
@@ -721,6 +848,15 @@
                   tab="org.key_project.keyide.ui.tacletPropertyTab">
             </propertySection>
          </propertySections>
-      </extension>  
+      </extension>
+      <extension
+            point="org.eclipse.ui.bindings">
+         <key
+               commandId="org.key_project.keyide.ui.commands.searchProofNode"
+               contextId="org.eclipse.ui.contexts.window"
+               schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+               sequence="M1+M2+F">
+         </key>
+      </extension>
 
 </plugin>

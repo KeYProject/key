@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <state name="{}">
+      <value name="n {and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*)))}" programVariable="n" isArrayIndex="false" value="n" type="int" condition="and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*)))"/>
+      <value name="n {and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))}" programVariable="n" isArrayIndex="false" value="n" type="int" condition="and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))"/>
+      <value name="n {or(lt(*,Z(0(#))),leq(n,*))}" programVariable="n" isArrayIndex="false" value="n" type="int" condition="or(lt(*,Z(0(#))),leq(n,*))"/>
+      <value name="exc {and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*)))}" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*)))"/>
+      <value name="exc {and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))}" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))"/>
+      <value name="exc {or(lt(*,Z(0(#))),leq(n,*))}" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="or(lt(*,Z(0(#))),leq(n,*))"/>
+      <association name="ArrayCreationTest::array {and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*)))}" programVariable="ArrayCreationTest::array" isArrayIndex="false" target="o1" condition="and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*)))"/>
+      <association name="ArrayCreationTest::array {and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))}" programVariable="ArrayCreationTest::array" isArrayIndex="false" target="o1" condition="and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))"/>
+      <association name="ArrayCreationTest::array {or(lt(*,Z(0(#))),leq(n,*))}" programVariable="ArrayCreationTest::array" isArrayIndex="false" target="o1" condition="or(lt(*,Z(0(#))),leq(n,*))"/>
+   </state>
+   <object xml:id="o1" name="x_arr_2" type="int[]">
+      <value name="[Z(3(#))] {and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*)))}" isArrayIndex="true" arrayIndex="Z(3(#))" value="Z(0(0(1(#))))" type="int" condition="and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*)))"/>
+      <value name="[Z(3(#))] {and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))}" isArrayIndex="true" arrayIndex="Z(3(#))" value="Z(0(0(1(#))))" type="int" condition="and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))"/>
+      <value name="[Z(3(#))] {or(lt(*,Z(0(#))),leq(n,*))}" isArrayIndex="true" arrayIndex="Z(3(#))" value="Z(0(0(1(#))))" type="int" condition="or(lt(*,Z(0(#))),leq(n,*))"/>
+      <value name="[Z(1(#))] {and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*)))}" isArrayIndex="true" arrayIndex="Z(1(#))" value="Z(0(#))" type="int" condition="and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*)))"/>
+      <value name="[Z(1(#))] {and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))}" isArrayIndex="true" arrayIndex="Z(1(#))" value="Z(0(#))" type="int" condition="and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))"/>
+      <value name="[Z(1(#))] {or(lt(*,Z(0(#))),leq(n,*))}" isArrayIndex="true" arrayIndex="Z(1(#))" value="Z(0(#))" type="int" condition="or(lt(*,Z(0(#))),leq(n,*))"/>
+      <value name="[Z(0(#))] {and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*)))}" isArrayIndex="true" arrayIndex="Z(0(#))" value="Z(0(0(1(#))))" type="int" condition="and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),gt(n,*)))"/>
+      <value name="[Z(0(#))] {and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))}" isArrayIndex="true" arrayIndex="Z(0(#))" value="Z(0(0(1(#))))" type="int" condition="and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(n,*)))"/>
+      <value name="[Z(0(#))] {or(lt(*,Z(0(#))),leq(n,*))}" isArrayIndex="true" arrayIndex="Z(0(#))" value="Z(0(0(1(#))))" type="int" condition="or(lt(*,Z(0(#))),leq(n,*))"/>
+      <value name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)]" isArrayIndex="false" arrayIndex="*" value="Z(0(0(1(#))))" type="int" condition="true"/>
+      <value name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)] {equals(*,Z(3(#)))}" isArrayIndex="false" arrayIndex="*" value="Z(0(0(1(#))))" type="int" condition="equals(*,Z(3(#)))"/>
+      <value name="[* &gt;= Z(0(#)) and * &lt;= add(Z(neglit(1(#))),n)] {and(and(not(equals(*,Z(3(#)))),not(equals(*,Z(0(#))))),and(geq(*,Z(0(#))),gt(n,*)))}" isArrayIndex="false" arrayIndex="*" value="Z(0(#))" type="int" condition="and(and(not(equals(*,Z(3(#)))),not(equals(*,Z(0(#))))),and(geq(*,Z(0(#))),gt(n,*)))"/>
+   </object>
+</model>

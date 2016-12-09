@@ -22,7 +22,7 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -88,7 +88,7 @@ class BasicSnippetData {
         TARGET_BLOCK(StatementBlock.class),
         PRECONDITION(Term.class),
         POSTCONDITION(Term.class),
-        LOOP_INVARIANT(LoopInvariant.class),
+        LOOP_INVARIANT(LoopSpecification.class),
         LOOP_INVARIANT_TERM(Term.class),
         MODIFIES(Term.class),
         DEPENDENS(Term.class),
@@ -140,7 +140,7 @@ class BasicSnippetData {
                               contract.getResult(), contract.getExc(), heap);
     }
     
-    BasicSnippetData(LoopInvariant invariant,
+    BasicSnippetData(LoopSpecification invariant,
                      ExecutionContext context,
                      Term guardTerm,
                      Services services) {

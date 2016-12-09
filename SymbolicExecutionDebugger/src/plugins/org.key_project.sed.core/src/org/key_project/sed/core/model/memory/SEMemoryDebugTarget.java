@@ -20,8 +20,8 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.model.impl.AbstractSEDebugTarget;
 

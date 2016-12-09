@@ -16,8 +16,10 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.Iterator;
 
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Term;
@@ -41,24 +43,24 @@ class MultiTrigger implements Trigger {
 
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(
 	    ImmutableSet<Term> targetTerms, TermServices services) {
-	ImmutableSet<Substitution> res = DefaultImmutableSet.<Substitution> nil();
+	ImmutableList<Substitution> res = ImmutableSLList.nil();
 	
 	ImmutableSet<Substitution> mulsubs = setMultiSubstitution(triggers.iterator(),
 		targetTerms, services);
 
 	for (Substitution sub : mulsubs) {
 	    if (sub.isTotalOn(qvs)) {
-		res = res.add(sub);
+		res = res.prepend(sub);
 	    }
 	}
 
-	return res;
+	return DefaultImmutableSet.fromImmutableList(res);
     }
 
     /** help function for getMultiSubstitution */
     private ImmutableSet<Substitution> setMultiSubstitution(
 	    Iterator<? extends Trigger> ts, ImmutableSet<Term> terms, TermServices services) {
-	ImmutableSet<Substitution> res = DefaultImmutableSet.<Substitution> nil();
+	ImmutableList<Substitution> res = ImmutableSLList.nil();
 	if (ts.hasNext()) {
 	    ImmutableSet<Substitution> subi = ts.next().getSubstitutionsFromTerms(
 		    terms, services);
@@ -73,13 +75,13 @@ class MultiTrigger implements Trigger {
 		for (Substitution subiSub : subi) {
 		    final Substitution sub1 = unifySubstitution(sub0, subiSub);
 		    if (sub1 != null) {
-			res = res.add(sub1);
+			res = res.prepend(sub1);
 		    }
 		}
 
 	    }
 	}
-	return res;
+	return DefaultImmutableSet.fromImmutableList(res);
     }
 
     /**

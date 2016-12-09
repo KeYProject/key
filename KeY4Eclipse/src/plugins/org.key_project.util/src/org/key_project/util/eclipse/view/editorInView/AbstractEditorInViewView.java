@@ -145,15 +145,27 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
       rootComposite = new Composite(parent, SWT.NONE);
       rootComposite.setLayout(rootLayout);
       // Create editor
-      editorComposite = new Composite(rootComposite, SWT.NONE);
-      editorComposite.setLayout(new FillLayout());
-      editorComposite.setEnabled(isEditorEnabled());
-      editorPart.createPartControl(editorComposite);
+      editorComposite = createEditorComposite(rootComposite);
       editorPartControlCreated(editorPart, editorActionBarContributor);
       // Create message label
       createAdditionalControls(rootComposite);
       // Show editor or message text
       updateShownControl(rootComposite, rootLayout);
+   }
+   
+   /**
+    * Creates the editor {@link Composite}.
+    * @return The editor {@link Composite}.
+    */
+   protected Composite createEditorComposite(Composite parent) {
+      Composite composite = new Composite(parent, SWT.NONE);
+      composite.setLayout(new FillLayout());
+      composite.setEnabled(isEditorEnabled());
+      editorPart.createPartControl(composite);
+      if (editorActionBarContributor != null) {
+         editorActionBarContributor.setActiveEditor(editorPart);
+      }
+      return composite;
    }
 
    /**
@@ -482,5 +494,21 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
    @Override
    public boolean isSaveOnCloseNeeded() {
       return isEditorShown() && editorPart.isSaveOnCloseNeeded();
+   }
+
+   /**
+    * Returns the virtual {@link EditorInViewWorkbenchPage}.
+    * @return The virtual {@link EditorInViewWorkbenchPage}.
+    */
+   public EditorInViewWorkbenchPage getVirtualEditorWorkbenchPage() {
+      return virtualEditorWorkbenchPage;
+   }
+
+   /**
+    * Returns the virtual {@link EditorInViewEditorSite}.
+    * @return The virtual {@link EditorInViewEditorSite}.
+    */
+   public EditorInViewEditorSite getVirtualEditorSite() {
+      return virtualEditorSite;
    }
 }

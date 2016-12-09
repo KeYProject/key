@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
@@ -43,6 +45,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
  * Tests {@link SymbolicLayoutExtractor}.
  * @author Martin Hentschel
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCase {
 //   public void testSimpleLinkedOjbectsWithAdditionalInstances() throws Exception {
 //      doTest("/set/configurationExtractorSimpleLinkedOjbectsWithAdditionalInstances/test/SimpleLinkedOjbectsWithAdditionalInstances.java",
@@ -68,6 +71,46 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
 //             "x != null & x.next != null & x.next.next != null & a != null & a.x == 42 & b != null");
 //   }
 
+   /**
+    * Tests "configurationExtractorInstanceCreationTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testEmptyArrayCreationTest() throws Exception {
+      doTest("/set/configurationExtractorEmptyArrayCreationTest/test/EmptyArrayCreationTest.java",
+             "EmptyArrayCreationTest",
+             "/set/configurationExtractorEmptyArrayCreationTest/oracle/",
+             "EmptyArrayCreationTest.xml",
+             "testEmptyArrayCreationTest_initial",
+             ".xml",
+             "testEmptyArrayCreationTest_current",
+             ".xml",
+             "n == 0",
+             1,
+             1,
+             false,
+             false);
+   }
+      
+   /**
+    * Tests "configurationExtractorInstanceCreationTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testArrayCreationTest() throws Exception {
+      doTest("/set/configurationExtractorArrayCreationTest/test/ArrayCreationTest.java",
+             "ArrayCreationTest",
+             "/set/configurationExtractorArrayCreationTest/oracle/",
+             "ArrayCreationTest.xml",
+             "testArrayCreationTest_initial",
+             ".xml",
+             "testArrayCreationTest_current",
+             ".xml",
+             "n >= 4",
+             1,
+             1,
+             false,
+             false);
+   }
+   
    /**
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.

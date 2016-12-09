@@ -14,6 +14,7 @@
 package org.key_project.keyide.ui.propertyTester;
 
 import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.core.runtime.IAdaptable;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.util.eclipse.WorkbenchUtil;
@@ -49,8 +50,15 @@ public class AutoModePropertyTester extends PropertyTester {
                        final String property, 
                        final Object[] args, 
                        final Object expectedValue) {
-      if (receiver instanceof IProofProvider) {
-         return testProofProvider((IProofProvider) receiver, property);
+      if (receiver instanceof IAdaptable) {
+         IAdaptable adaptable = (IAdaptable) receiver;
+         IProofProvider pp = (IProofProvider) adaptable.getAdapter(IProofProvider.class);
+         if (pp != null) {
+            return testProofProvider(pp, property);
+         }
+         else {
+            return false;
+         }
       }
       else {
          return false;

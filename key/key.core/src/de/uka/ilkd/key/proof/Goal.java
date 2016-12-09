@@ -229,6 +229,12 @@ public final class Goal  {
 	}
     }
 
+   protected void fireAautomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
+      for (GoalListener listener : listeners) {
+         listener.automaticStateChanged(this, oldAutomatic, newAutomatic);
+      }
+   }
+
   
     public void setGlobalProgVars(ImmutableSet<ProgramVariable> s) {
         assert node.proof().getNamespaces().contains(names(s)) :
@@ -313,8 +319,10 @@ public final class Goal  {
      *                the new status: true for automatic, false for interactive
      */
     public void setEnabled(boolean t) {
+        boolean oldAutomatic = automatic;
         automatic = t;
         node().clearNameCache();
+        fireAautomaticStateChanged(oldAutomatic, automatic);
     }
 
     /**
@@ -635,11 +643,11 @@ public final class Goal  {
     }
 
     private <T extends Named> ImmutableSet<Name> names(ImmutableSet<T> set) {
-        ImmutableSet<Name> names = DefaultImmutableSet.<Name>nil();
+        ImmutableList<Name> names = ImmutableSLList.nil();
         for (T elem : set) {
-            names = names.add(elem.name());
+            names = names.prepend(elem.name());
         }
-        return names;
+        return DefaultImmutableSet.fromImmutableList(names);
     }
 
     public <T> T getStrategyInfo(Property<T> property) {

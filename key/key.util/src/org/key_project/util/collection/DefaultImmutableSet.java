@@ -13,6 +13,7 @@
 
 package org.key_project.util.collection;
 
+import java.util.HashSet;
 import java.util.Iterator;
 
 
@@ -27,6 +28,11 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      *
      */
     private static final long serialVersionUID = -5000602574000532257L;
+
+    /**
+     * Constant defining the set size at which an optimized union operation will be executed.
+     */
+    public static final int UNION_OPTIMIZATION_SIZE = 100;
 
     /** list containing the elements */
     private final ImmutableList<T> elementList;
@@ -58,18 +64,22 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     }
 
 
+//    private static HashSet<String> previousComplains = new HashSet<>();
     private void complainAboutSize() {
-        // Immutable linear sets are very expensive with O(n) addition
-        // and O(n) lookup.
-        // To create a list with N entries O(N^2) comparisons need to be made
-        // Better restrict this class to very small instances.
-        // The following helps detecting "bad" usages. (MU 2016)
+//        // Immutable linear sets are very expensive with O(n) addition
+//        // and O(n) lookup.
+//        // To create a list with N entries O(N^2) comparisons need to be made
+//        // Better restrict this class to very small instances.
+//        // The following helps detecting "bad" usages. (MU 2016)
 //        if(elementList.size() > 20) {
 //            StackTraceElement[] st = new Throwable().getStackTrace();
-//            for (int i = 2; i < 6; i++) {
-//                System.err.println(st[i]);
+//            String complain = "TOO LARGE: " + st[2];
+//            if(previousComplains.add(complain)) {
+//                System.err.println(complain);
+////                for (int i = 2; i < 6; i++) {
+////                    System.err.println(st[i]);
+////                }
 //            }
-//            System.err.println("TOO LARGE");
 //        }
     }
 
@@ -99,7 +109,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     /** @return union of this set with set */
     public ImmutableSet<T> union(ImmutableSet<T> set) {
-	if(set instanceof DefaultImmutableSet && size() * set.size() > 100) {
+	if(set instanceof DefaultImmutableSet && size() * set.size() > UNION_OPTIMIZATION_SIZE) {
 	    return newUnion((DefaultImmutableSet<T>) set);
 	}
 
@@ -107,15 +117,13 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     }
 
 
-    /*package visible for testing!*/
-    DefaultImmutableSet<T> newUnion(DefaultImmutableSet<T> set) {
+    private DefaultImmutableSet<T> newUnion(DefaultImmutableSet<T> set) {
         ImmutableList<T> otherList = set.elementList;
         ImmutableList<T> clean = Immutables.concatDuplicateFreeLists(this.elementList, otherList);
 	    return new DefaultImmutableSet<T>(clean);
     }
 
-    /*package visible for testing!*/
-    DefaultImmutableSet<T> originalUnion(ImmutableSet<T> set) {
+    private DefaultImmutableSet<T> originalUnion(ImmutableSet<T> set) {
 	if (set.isEmpty()) {
 	    return this;
 	}

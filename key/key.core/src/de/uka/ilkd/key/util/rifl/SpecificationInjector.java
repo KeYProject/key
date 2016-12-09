@@ -16,6 +16,8 @@ package de.uka.ilkd.key.util.rifl;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -137,8 +139,8 @@ public class SpecificationInjector extends SourceVisitor {
         /** Gets a formatted JML comment. */
         String getSpecification() {
             // start JML
-            final StringBuffer sb = new StringBuffer(indentation);
-            sb.append(JML_START + LINE_BREAK);
+            final StringBuffer sb = new StringBuffer();
+            
             // debug
             //System.out.println("Respects: "+respects);
 
@@ -184,11 +186,20 @@ public class SpecificationInjector extends SourceVisitor {
                 // sb.append(" // "+ domain + " -> " + set);
                 sb.append(LINE_BREAK);
             }
-            // close JML
-            sb.append(indentation);
-            sb.append(DEFAULT_INDENTATION);
-            sb.append(JML_END);
-            return sb.toString();
+            
+            if(!sb.toString().trim().isEmpty()){
+            	sb.insert(0,indentation + JML_START + LINE_BREAK);
+            	// close JML
+                sb.append(indentation);
+                sb.append(DEFAULT_INDENTATION);
+                sb.append(JML_END);
+                return sb.toString();
+            }
+            else{
+            	return null;
+            }
+            
+            
         }
 
         private void put(String key, Entry<String, Type> value) {
@@ -210,10 +221,17 @@ public class SpecificationInjector extends SourceVisitor {
 
     private final SpecificationContainer sc;
     private final SourceInfo si;
+    
+    private List<MethodDeclaration> specifiedMethodDeclarations;
 
     public SpecificationInjector(SpecificationContainer sc, SourceInfo sourceInfo) {
         this.sc = sc;
         si = sourceInfo;
+        specifiedMethodDeclarations = new LinkedList<MethodDeclaration>();
+    }
+    
+    public List<MethodDeclaration> getSpecifiedMethodDeclarations(){
+    	return specifiedMethodDeclarations;
     }
 
     // ////////////////////////////////////////////////////////////
@@ -225,7 +243,12 @@ public class SpecificationInjector extends SourceVisitor {
             pe.getChildAt(i).accept(this);
     }
 
-    private static void addComment(JavaProgramElement se, String comment) {
+    private void addComment(JavaProgramElement se, String comment) {
+    	//remember which methods were specified and generate po files only for them
+    	if(se instanceof MethodDeclaration){
+    		specifiedMethodDeclarations.add((MethodDeclaration) se);
+    	}
+    	
         // fixes issue with Recoder that it writes comments _after_ the element
         final NonTerminalProgramElement parent = se.getASTParent();
         assert parent != null : "Program element "+se+" with null parent";
@@ -240,7 +263,9 @@ public class SpecificationInjector extends SourceVisitor {
         final ASTList<Comment> oldComments = se.getComments();
         if (oldComments != null)
             commentList.addAll(oldComments);
-        commentList.add(new Comment(comment));
+        if(comment != null && !comment.isEmpty()){
+        	commentList.add(new Comment(comment));
+        }
         se.setComments(commentList);
     }
 
@@ -312,6 +337,10 @@ public class SpecificationInjector extends SourceVisitor {
                 factory.addToDetermines(fName, Type.SINK, fieldSnk);
             }
         }
-        addComment(md, factory.getSpecification());
+        //only add comment for methods for which we generated a specification
+        String comment = factory.getSpecification();
+        if(comment != null){
+        	addComment(md, factory.getSpecification());
+        }     
     }
 }

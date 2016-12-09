@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Mon Feb 02 11:29:41 CET 2015
+#Fri Jul 15 10:23:50 CEST 2016
 [StrategyProperty]VBT_PHASE=VBT_SYM_EX
 [SMTSettings]useUninterpretedMultiplication=true
 [SMTSettings]SelectedTaclets=
@@ -24,7 +24,7 @@
 [Strategy]Timeout=-1
 [Strategy]MaximumNumberOfAutomaticApplications=1000
 [SMTSettings]integersMaximum=2147483645
-[Choice]DefaultChoices=Strings-Strings\\:on , reach-reach\\:on , JavaCard-JavaCard\\:off , assertions-assertions\\:on , bigint-bigint\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , modelFields-modelFields\\:showSatisfiability , initialisation-initialisation\\:disableStaticInitialisation , sequences-sequences\\:on , runtimeExceptions-runtimeExceptions\\:allow , integerSimplificationRules-integerSimplificationRules\\:full , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , moreSeqRules-moreSeqRules\\:off
+[Choice]DefaultChoices=wdChecks-wdChecks\\:off , JavaCard-JavaCard\\:off , bigint-bigint\\:on , programRules-programRules\\:Java , intRules-intRules\\:arithmeticSemanticsIgnoringOF , moreSeqRules-moreSeqRules\\:off , sequences-sequences\\:on , joinGenerateIsWeakeningGoal-joinGenerateIsWeakeningGoal\\:off , runtimeExceptions-runtimeExceptions\\:allow , integerSimplificationRules-integerSimplificationRules\\:full , Strings-Strings\\:on , reach-reach\\:on , assertions-assertions\\:on , initialisation-initialisation\\:disableStaticInitialisation , modelFields-modelFields\\:showSatisfiability , wdOperator-wdOperator\\:L , permissions-permissions\\:off
 [SMTSettings]useConstantsForBigOrSmallIntegers=true
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
@@ -42,7 +42,7 @@
 \javaSource "";
 
 \proofObligation "#Proof Obligation Settings
-#Mon Feb 02 11:29:41 CET 2015
+#Fri Jul 15 10:23:50 CEST 2016
 name=SimpleInstanceFields[SimpleInstanceFields\\:\\:main(SimpleInstanceFields)].JML normal_behavior operation contract.0
 addSymbolicExecutionLabel=true
 contract=SimpleInstanceFields[SimpleInstanceFields\\:\\:main(SimpleInstanceFields)].JML normal_behavior operation contract.0
@@ -52,11 +52,12 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
 
 \proof {
 (keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+(keyLog "1" (keyUser "marti" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "547")
+(autoModeTime "625")
 
 (branch "dummy ID"
-(builtin "One Step Simplification" (formula "1") (newnames "heapAtPre"))
+(builtin "One Step Simplification" (formula "1") (newnames "obj,result,exc,heapAtPre,SETAccumulate,o,f"))
 (rule "impRight" (formula "1"))
 (rule "andLeft" (formula "1"))
 (rule "andLeft" (formula "2"))
@@ -84,101 +85,81 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
          (builtin "One Step Simplification" (formula "6") (ifInst ""  (formula "5")))
          (rule "false_right" (formula "6"))
          (builtin "One Step Simplification" (formula "6"))
-         (rule "eval_order_access4" (formula "6") (term "1") (inst "#v1=x") (inst "#v0=s"))
-         (rule "ifUnfold" (formula "6") (term "1") (inst "#boolv=x_1"))
+         (rule "eval_order_access4" (formula "6") (term "1") (inst "#v0=s") (inst "#v1=x"))
+         (rule "variableDeclarationAssign" (formula "6") (term "1"))
+         (rule "variableDeclaration" (formula "6") (term "1") (newnames "s"))
+         (rule "assignment" (formula "6") (term "1"))
+         (builtin "One Step Simplification" (formula "6"))
+         (rule "variableDeclarationAssign" (formula "6") (term "1"))
+         (rule "variableDeclaration" (formula "6") (term "1") (newnames "x"))
+         (rule "compound_addition_2" (formula "6") (term "1") (inst "#v1=x_2") (inst "#v0=x_1"))
+         (rule "variableDeclarationAssign" (formula "6") (term "1"))
          (rule "variableDeclaration" (formula "6") (term "1") (newnames "x_1"))
-         (rule "equality_comparison_simple" (formula "6") (term "1"))
-         (builtin "One Step Simplification" (formula "6"))
-         (rule "replace_known_right" (formula "6") (term "0,0,1,0") (ifseqformula "5"))
-         (builtin "One Step Simplification" (formula "6"))
-         (rule "ifSplit" (formula "6"))
-         (branch "if x_1 true"
-            (builtin "One Step Simplification" (formula "1"))
-            (rule "closeFalse" (formula "1"))
-         )
-         (branch "if x_1 false"
-            (builtin "One Step Simplification" (formula "1"))
-            (rule "true_left" (formula "1"))
+         (rule "assignment_read_attribute" (formula "6") (term "1"))
+         (branch "Normal Execution (_obj != null)"
+            (builtin "One Step Simplification" (formula "6") (ifInst ""  (formula "5")))
+            (rule "false_right" (formula "6"))
             (builtin "One Step Simplification" (formula "6"))
+            (rule "dismissNonSelectedField" (formula "6") (term "0,1,0"))
+            (rule "dismissNonSelectedField" (formula "6") (term "0,1,0"))
+            (rule "pullOutSelect" (formula "6") (term "0,1,0") (inst "selectSK=SimpleInstanceFields_x_0"))
+            (rule "simplifySelectOfStore" (formula "1"))
+            (builtin "One Step Simplification" (formula "1"))
+            (rule "castDel" (formula "1") (term "0"))
+            (rule "applyEqReverse" (formula "7") (term "0,1,0") (ifseqformula "1"))
+            (rule "hideAuxiliaryEq" (formula "1"))
             (rule "variableDeclarationAssign" (formula "6") (term "1"))
-            (rule "variableDeclaration" (formula "6") (term "1") (newnames "s"))
-            (rule "assignment" (formula "6") (term "1"))
-            (builtin "One Step Simplification" (formula "6"))
-            (rule "variableDeclarationAssign" (formula "6") (term "1"))
-            (rule "variableDeclaration" (formula "6") (term "1") (newnames "x"))
-            (rule "compound_addition_2" (formula "6") (term "1") (inst "#v1=x_2") (inst "#v0=x_1"))
-            (rule "variableDeclarationAssign" (formula "6") (term "1"))
-            (rule "variableDeclaration" (formula "6") (term "1") (newnames "x_3"))
+            (rule "variableDeclaration" (formula "6") (term "1") (newnames "x_2"))
             (rule "assignment_read_attribute" (formula "6") (term "1"))
             (branch "Normal Execution (_obj != null)"
                (builtin "One Step Simplification" (formula "6") (ifInst ""  (formula "5")))
                (rule "false_right" (formula "6"))
                (builtin "One Step Simplification" (formula "6"))
                (rule "dismissNonSelectedField" (formula "6") (term "0,1,0"))
-               (rule "dismissNonSelectedField" (formula "6") (term "0,1,0"))
-               (rule "pullOutSelect" (formula "6") (term "0,1,0") (inst "selectSK=SimpleInstanceFields_x_0"))
+               (rule "pullOutSelect" (formula "6") (term "0,1,0") (inst "selectSK=SimpleInstanceFields_y_0"))
                (rule "simplifySelectOfStore" (formula "1"))
                (builtin "One Step Simplification" (formula "1"))
                (rule "castDel" (formula "1") (term "0"))
                (rule "applyEqReverse" (formula "7") (term "0,1,0") (ifseqformula "1"))
                (rule "hideAuxiliaryEq" (formula "1"))
-               (rule "variableDeclarationAssign" (formula "6") (term "1"))
-               (rule "variableDeclaration" (formula "6") (term "1") (newnames "x_2"))
-               (rule "assignment_read_attribute" (formula "6") (term "1"))
-               (branch "Normal Execution (_obj != null)"
+               (rule "assignmentAdditionInt" (formula "6") (term "1"))
+               (rule "translateJavaAddInt" (formula "6") (term "0,0,1"))
+               (builtin "One Step Simplification" (formula "6"))
+               (rule "add_literals" (formula "6") (term "0,1,0"))
+               (rule "assignment_write_attribute" (formula "6") (term "1"))
+               (branch "Normal Execution (s != null)"
                   (builtin "One Step Simplification" (formula "6") (ifInst ""  (formula "5")))
                   (rule "false_right" (formula "6"))
                   (builtin "One Step Simplification" (formula "6"))
-                  (rule "dismissNonSelectedField" (formula "6") (term "0,1,0"))
-                  (rule "pullOutSelect" (formula "6") (term "0,1,0") (inst "selectSK=SimpleInstanceFields_y_0"))
-                  (rule "simplifySelectOfStore" (formula "1"))
-                  (builtin "One Step Simplification" (formula "1"))
-                  (rule "castDel" (formula "1") (term "0"))
-                  (rule "applyEqReverse" (formula "7") (term "0,1,0") (ifseqformula "1"))
-                  (rule "hideAuxiliaryEq" (formula "1"))
-                  (rule "assignmentAdditionInt" (formula "6") (term "1"))
-                  (rule "translateJavaAddInt" (formula "6") (term "0,0,1"))
-                  (builtin "One Step Simplification" (formula "6"))
-                  (rule "add_literals" (formula "6") (term "0,1,0"))
-                  (rule "assignment_write_attribute" (formula "6") (term "1"))
-                  (branch "Normal Execution (s != null)"
+                  (rule "returnUnfold" (formula "6") (term "1") (inst "#v0=x"))
+                  (rule "variableDeclarationAssign" (formula "6") (term "1"))
+                  (rule "variableDeclaration" (formula "6") (term "1") (newnames "x_3"))
+                  (rule "assignment_read_attribute" (formula "6") (term "1"))
+                  (branch "Normal Execution (_obj != null)"
                      (builtin "One Step Simplification" (formula "6") (ifInst ""  (formula "5")))
                      (rule "false_right" (formula "6"))
                      (builtin "One Step Simplification" (formula "6"))
-                     (rule "returnUnfold" (formula "6") (term "1") (inst "#v0=x"))
-                     (rule "variableDeclarationAssign" (formula "6") (term "1"))
-                     (rule "variableDeclaration" (formula "6") (term "1") (newnames "x_4"))
-                     (rule "assignment_read_attribute" (formula "6") (term "1"))
-                     (branch "Normal Execution (_obj != null)"
-                        (builtin "One Step Simplification" (formula "6") (ifInst ""  (formula "5")))
-                        (rule "false_right" (formula "6"))
-                        (builtin "One Step Simplification" (formula "6"))
-                        (rule "pullOutSelect" (formula "6") (term "0,1,0") (inst "selectSK=SimpleInstanceFields_result_0"))
-                        (rule "simplifySelectOfStore" (formula "1"))
-                        (builtin "One Step Simplification" (formula "1"))
-                        (rule "castDel" (formula "1") (term "0"))
-                        (rule "applyEqReverse" (formula "7") (term "0,1,0") (ifseqformula "1"))
-                        (rule "hideAuxiliaryEq" (formula "1"))
-                        (rule "methodCallReturn" (formula "6") (term "1"))
-                        (rule "assignment" (formula "6") (term "1"))
-                        (builtin "One Step Simplification" (formula "6"))
-                        (rule "methodCallEmpty" (formula "6") (term "1"))
-                        (rule "tryEmpty" (formula "6") (term "1"))
-                        (rule "emptyModality" (formula "6") (term "1"))
-                        (builtin "One Step Simplification" (formula "6"))
-                        (opengoal " ")
-                     )
-                     (branch "Null Reference (_obj = null)"
-                        (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "6")))
-                        (rule "closeFalse" (formula "1"))
-                     )
+                     (rule "pullOutSelect" (formula "6") (term "0,1,0") (inst "selectSK=SimpleInstanceFields_result_0"))
+                     (rule "simplifySelectOfStore" (formula "1"))
+                     (builtin "One Step Simplification" (formula "1"))
+                     (rule "castDel" (formula "1") (term "0"))
+                     (rule "applyEqReverse" (formula "7") (term "0,1,0") (ifseqformula "1"))
+                     (rule "hideAuxiliaryEq" (formula "1"))
+                     (rule "methodCallReturn" (formula "6") (term "1"))
+                     (rule "assignment" (formula "6") (term "1"))
+                     (builtin "One Step Simplification" (formula "6"))
+                     (rule "methodCallEmpty" (formula "6") (term "1"))
+                     (rule "tryEmpty" (formula "6") (term "1"))
+                     (rule "emptyModality" (formula "6") (term "1"))
+                     (builtin "One Step Simplification" (formula "6"))
+                     (opengoal " ")
                   )
-                  (branch "Null Reference (s = null)"
+                  (branch "Null Reference (_obj = null)"
                      (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "6")))
                      (rule "closeFalse" (formula "1"))
                   )
                )
-               (branch "Null Reference (_obj = null)"
+               (branch "Null Reference (s = null)"
                   (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "6")))
                   (rule "closeFalse" (formula "1"))
                )
@@ -187,6 +168,10 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "6")))
                (rule "closeFalse" (formula "1"))
             )
+         )
+         (branch "Null Reference (_obj = null)"
+            (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "6")))
+            (rule "closeFalse" (formula "1"))
          )
       )
       (branch "Null Reference (_obj = null)"

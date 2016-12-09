@@ -27,7 +27,7 @@ import java.util.Iterator;
  * heaps. Heaps may contain multiple references to one object, or
  * multiple objects which are <code>equal</code>.
  */
-public interface ImmutableHeap<T extends Comparable<T>> extends java.io.Serializable {
+public interface ImmutableHeap<T extends Comparable<T>> extends java.io.Serializable, Iterable<T> {
 
     /**
      * @return true iff this heap is empty
@@ -83,11 +83,6 @@ public interface ImmutableHeap<T extends Comparable<T>> extends java.io.Serializ
      * @return the number of elements this heap holds
      */
     int size ();
-
-    /**
-     * @return an iterator that returns all elements of this heap
-     */
-    Iterator<T> iterator ();
 
     /**
      * @return an iterator that returns all elements of this heap in

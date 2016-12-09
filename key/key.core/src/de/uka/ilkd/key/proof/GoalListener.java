@@ -25,7 +25,6 @@ public interface GoalListener {
      */
     void sequentChanged(Goal source, SequentChangeInfo sci);
 
-
     /**
      * Informs the listener that the given goal <code>source</code>
      * has been replaced by the goals <code>newGoals</code> (note that
@@ -34,4 +33,12 @@ public interface GoalListener {
      * children of the node <code>parent</code>
      */
     void goalReplaced(Goal source, Node parent, ImmutableList<Goal> newGoals);
+    
+    /**
+     * Informs the listener that the automatic state {@link Goal#isAutomatic()} has changed.
+     * @param source The changed {@link Goal}.
+     * @param oldAutomatic The old state.
+     * @param newAutomatic The new state.
+     */
+    void automaticStateChanged(Goal source, boolean oldAutomatic, boolean newAutomatic);
 }

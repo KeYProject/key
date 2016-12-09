@@ -13,6 +13,9 @@
 
 package org.key_project.util.eclipse.view.editorInView;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -66,6 +69,11 @@ public class EditorInViewEditorSite extends PartSite implements IEditorSite, IDi
     * Indicates that this {@link IEditorSite} is disposed or not.
     */
    private boolean disposed = false;
+   
+   /**
+    * Collect the context menus that where registered via the {@code #registerContextMenu(...)} methods.
+    */
+   private final List<RegisteredContextMenu> registeredContextMenus = new LinkedList<RegisteredContextMenu>();
    
    /**
     * Constructor.
@@ -213,6 +221,7 @@ public class EditorInViewEditorSite extends PartSite implements IEditorSite, IDi
    @Override
    public void registerContextMenu(String menuId, MenuManager menuManager, ISelectionProvider selectionProvider) {
       wrapperViewSite.registerContextMenu(menuId, menuManager, selectionProvider);
+      registeredContextMenus.add(new RegisteredContextMenu(menuId, menuManager, selectionProvider));
    }
 
    /**
@@ -226,6 +235,7 @@ public class EditorInViewEditorSite extends PartSite implements IEditorSite, IDi
    @Override
    public void registerContextMenu(MenuManager menuManager, ISelectionProvider selectionProvider) {
       wrapperViewSite.registerContextMenu(menuManager, selectionProvider);
+      registeredContextMenus.add(new RegisteredContextMenu(menuManager, selectionProvider));
    }
 
    /**
@@ -295,6 +305,88 @@ public class EditorInViewEditorSite extends PartSite implements IEditorSite, IDi
    public void dispose() {
       if (!isDisposed()) {
          disposed = true;
+      }
+   }
+   
+   /**
+    * Returns all tracked {@link RegisteredContextMenu}.
+    * @return All tracked {@link RegisteredContextMenu}.
+    */
+   public List<RegisteredContextMenu> getRegisteredContextMenus() {
+      return registeredContextMenus;
+   }
+
+   /**
+    * The data used to register a context menu.
+    * @author Martin Hentschel
+    */
+   public static class RegisteredContextMenu {
+      /**
+       * The ID of the menu.
+       */
+      private final String menuId;
+      
+      /**
+       * The {@link MenuManager}.
+       */
+      private final MenuManager menuManager;
+      
+      /**
+       * The {@link ISelectionProvider}.
+       */
+      private final ISelectionProvider selectionProvider;
+
+      /**
+       * Constructor.
+       * @param menuManager The {@link MenuManager}.
+       * @param selectionProvider The {@link ISelectionProvider}.
+       */
+      public RegisteredContextMenu(MenuManager menuManager, ISelectionProvider selectionProvider) {
+         this(null, menuManager, selectionProvider);
+      }
+
+      /**
+       * Constructor.
+       * @param menuId The ID of the menu.
+       * @param menuManager The {@link MenuManager}.
+       * @param selectionProvider The {@link ISelectionProvider}.
+       */
+      public RegisteredContextMenu(String menuId, MenuManager menuManager, ISelectionProvider selectionProvider) {
+         this.menuId = menuId;
+         this.menuManager = menuManager;
+         this.selectionProvider = selectionProvider;
+      }
+
+      /**
+       * Returns the ID of the menu.
+       * @return The ID of the menu.
+       */
+      public String getMenuId() {
+         return menuId;
+      }
+
+      /**
+       * Returns the {@link MenuManager}.
+       * @return The {@link MenuManager}.
+       */
+      public MenuManager getMenuManager() {
+         return menuManager;
+      }
+
+      /**
+       * Returns the {@link ISelectionProvider}.
+       * @return The {@link ISelectionProvider}.
+       */
+      public ISelectionProvider getSelectionProvider() {
+         return selectionProvider;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String toString() {
+         return "menuId = " + menuId + ", menuManager = " + menuManager + ", selectionProvider = " + selectionProvider;
       }
    }
 }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call ArrayCreationTest.compute(n)&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="array=new int[n];" pathCondition="true" pathConditionChanged="false">
+         <statement name="array[0]=100;" pathCondition="true" pathConditionChanged="false">
+            <statement name="array[1]=array[2];" pathCondition="true" pathConditionChanged="false">
+               <statement name="array[3]=array[0];" pathCondition="true" pathConditionChanged="false">
+                  <statement name="return array;" pathCondition="true" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of ArrayCreationTest.compute(n)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </statement>
+            </statement>
+         </statement>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0"/>
+</start>

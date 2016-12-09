@@ -64,6 +64,7 @@ import org.key_project.sed.core.model.memory.SEMemoryConstraint;
 import org.key_project.sed.core.model.memory.SEMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEMemoryExceptionalMethodReturn;
 import org.key_project.sed.core.model.memory.SEMemoryExceptionalTermination;
+import org.key_project.sed.core.model.memory.SEMemoryJoin;
 import org.key_project.sed.core.model.memory.SEMemoryLoopBodyTermination;
 import org.key_project.sed.core.model.memory.SEMemoryLoopCondition;
 import org.key_project.sed.core.model.memory.SEMemoryLoopInvariant;
@@ -884,6 +885,9 @@ public class SEXMLReader {
       else if (SEXMLWriter.TAG_STATEMENT.equals(qName)) {
          return createStatement(target, parent, thread, uri, localName, qName, attributes);
       }
+      else if (SEXMLWriter.TAG_JOIN.equals(qName)) {
+         return createJoin(target, parent, thread, uri, localName, qName, attributes);
+      }
       else if (SEXMLWriter.TAG_TERMINATION.equals(qName)) {
          return createTermination(target, parent, thread, uri, localName, qName, attributes);
       }
@@ -1262,7 +1266,28 @@ public class SEXMLReader {
       fillStackFrame(statement, attributes);
       return statement;
    }
-   
+
+   /**
+    * Creates a {@link SEMemoryJoin} instance for the content in the given tag.
+    * @param target The parent {@link ISEDebugTarget} or {@code null} if not available.
+    * @param parent The parent {@link ISENode} or {@code null} if not available.
+    * @param thread The parent {@link ISEThread} or {@code null} if not available.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
+    * @return The created {@link SEMemoryJoin}.
+    * @throws SAXException Occurred Exception.
+    */   
+   protected SEMemoryJoin createJoin(ISEDebugTarget target, ISENode parent, ISEThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      SEMemoryJoin join = new SEMemoryJoin(target, parent, thread);
+      join.setSourcePath(getSourcePath(attributes));
+      fillDebugNode(join, attributes);
+      fillStackFrame(join, attributes);
+      join.setWeakeningVerified(isWeakeningVerified(attributes));
+      return join;
+   }
+
    /**
     * Creates a {@link SEMemoryMethodContract} instance for the content in the given tag.
     * @param target The parent {@link ISEDebugTarget} or {@code null} if not available.
@@ -1584,6 +1609,15 @@ public class SEXMLReader {
     */
    protected boolean isPreconditionComplied(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(SEXMLWriter.ATTRIBUTE_PRECONDITION_COMPLIED));
+   }
+   
+   /**
+    * Returns the weakening verified value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isWeakeningVerified(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(SEXMLWriter.ATTRIBUTE_WEAKENING_VERIFIED));
    }
    
    /**

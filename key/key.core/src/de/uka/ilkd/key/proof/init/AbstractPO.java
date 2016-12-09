@@ -14,10 +14,13 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.HashMap;
 import java.util.Properties;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -39,13 +42,8 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassWellDefinedness;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.MethodWellDefinedness;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.Pair;
-
 
 
 /**
@@ -96,60 +94,6 @@ public abstract class AbstractPO implements IPersistablePO {
         return axioms;
     }
 
-
-    private boolean reach(Pair<Sort, IObserverFunction> from,
-                          Pair<Sort, IObserverFunction> to,
-                          ImmutableSet<ClassAxiom> axioms,
-                          Services services) {
-        ImmutableSet<Pair<Sort, IObserverFunction>> reached =
-                DefaultImmutableSet.nil();
-        ImmutableSet<Pair<Sort, IObserverFunction>> newlyReached =
-                DefaultImmutableSet.<Pair<Sort, IObserverFunction>>nil().add(from);
-
-        while (!newlyReached.isEmpty()) {
-            for (Pair<Sort, IObserverFunction> node : newlyReached) {
-                newlyReached = newlyReached.remove(node);
-                reached = reached.add(node);
-                final ImmutableSet<ClassAxiom> nodeAxioms = getAxiomsForObserver(
-                        node, axioms);
-                for (ClassAxiom nodeAxiom : nodeAxioms) {
-                    final ImmutableSet<Pair<Sort, IObserverFunction>> nextNodes =
-                            nodeAxiom.getUsedObservers(services);
-                    for (Pair<Sort, IObserverFunction> nextNode : nextNodes) {
-                        if (nextNode.equals(to)) {
-                            return true;
-                        } else if (!reached.contains(nextNode)) {
-                            newlyReached = newlyReached.add(nextNode);
-                        }
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-
-    private ImmutableSet<Pair<Sort, IObserverFunction>> getSCC(ClassAxiom startAxiom,
-                                                               ImmutableSet<ClassAxiom> axioms,
-                                                               Services services) {
-        //TODO: make more efficient
-        final Pair<Sort, IObserverFunction> start =
-                new Pair<Sort, IObserverFunction>(startAxiom.getKJT().getSort(),
-                                                  startAxiom.getTarget());
-        ImmutableSet<Pair<Sort, IObserverFunction>> result =
-                DefaultImmutableSet.nil();
-        for (ClassAxiom nodeAxiom : axioms) {
-            final Pair<Sort, IObserverFunction> node =
-                    new Pair<Sort, IObserverFunction>(nodeAxiom.getKJT().getSort(), 
-                            nodeAxiom.getTarget());
-            if (reach(start, node, axioms, services) && reach(node, start, axioms, services)) {
-                result = result.add(node);
-            }
-        }
-        return result;
-    }
-
     /**
      * Generate well-definedness taclets to resolve formulas as
      * WD(pv.<inv>) or WD(pv.m(...)).
@@ -198,22 +142,10 @@ public abstract class AbstractPO implements IPersistablePO {
     protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType selfKJT) {
         return specRepos.getClassAxioms(selfKJT);
     }
+   
 
     protected void collectClassAxioms(KeYJavaType selfKJT, InitConfig proofConfig) {
-        final ImmutableSet<ClassAxiom> axioms = selectClassAxioms(selfKJT);
-        for (ClassAxiom axiom : axioms) {
-            final ImmutableSet<Pair<Sort, IObserverFunction>> scc =
-                    getSCC(axiom, axioms, proofConfig.getServices());
-            
-            for (Taclet axiomTaclet : axiom.getTaclets(scc, proofConfig.getServices())) {
-                assert axiomTaclet != null : "class axiom returned null taclet: "
-                        + axiom.getName();
-                // only include if choices are appropriate
-                if (choicesApply(axiomTaclet, proofConfig.getActivatedChoices())) {
-                    register(axiomTaclet, proofConfig);
-                }
-            }
-        }
+        registerClassAxiomTaclets(selfKJT, proofConfig);        
     }
 
     /** Check whether a taclet conforms with the currently active choices.
@@ -246,7 +178,7 @@ public abstract class AbstractPO implements IPersistablePO {
             register(pv, services);
         }
     }
-
+ 
 
     protected final void register(Function f, Services services) {
          Namespace functionNames = services.getNamespaces().functions();
@@ -260,7 +192,168 @@ public abstract class AbstractPO implements IPersistablePO {
          }
     }
 
+    // ==================================================
+    // Implementation of Tarjan algorithm to compute SCC
+    // ==================================================
+    
+    /**
+     * Represents a vertex and additional information required by the Tarjan algorithm.
+     * Two vertices are equal if the observer function and the target sort are identical.
+     */
+    static class Vertex {
+        private final ClassAxiom axiom;
+        private final Pair<Sort, IObserverFunction> core;
+        
+        /** to avoid linear lookup in the stack */
+        boolean onStack;
+        
+        /** the index (number of already visited nodes) and -1 if not yet visited */
+        int index;
+        
+        /** an SCC is identified by the node that was visited first */
+        int lowLink;
+        
+        public Vertex(Pair<Sort, IObserverFunction> vertexCore, 
+                ClassAxiom axiom, boolean onStack,
+                int index, int lowLink) {
+            this.core = vertexCore;
+            this.axiom = axiom;
+            this.onStack = onStack;
+            this.index = index;
+            this.lowLink = lowLink;
+        }
+        
+        public boolean equals(Object o) {
+            if (o instanceof Vertex) {
+                Vertex other = (Vertex) o;
+                return core.equals(other.core);
+            } else { 
+                return false;
+            }
+        }
+        
+        public int hashCode() {
+            return 17*core.hashCode();
+        }
 
+        ClassAxiom getAxiom() {
+            return axiom;
+        }       
+    }
+    
+    
+    // fields used by Tarjan Algorithm
+    private final HashMap<Pair<Sort, IObserverFunction>, Vertex> vertices = new HashMap<>();
+    private final ArrayDeque<Vertex> stack = new ArrayDeque<>();
+    private HashMap<Vertex, ImmutableList<Pair<Sort, IObserverFunction>>> allSCCs = new HashMap<>();
+
+    
+    /** number of currently visited nodes */
+    private int index = 0;    
+        
+    private Vertex getVertexFor(Sort targetSort, IObserverFunction observer, ClassAxiom axiom) {
+        final Pair<Sort, IObserverFunction> vertexCore = new Pair<>(targetSort, observer); 
+        Vertex vertex = vertices.get(vertexCore);
+        if (vertex == null) {
+            vertex = new Vertex(vertexCore, axiom, false, -1, -1);
+            vertices.put(vertexCore, vertex);
+        }
+        return vertex; 
+    }
+    
+    private Vertex getVertexFor(Pair<Sort, IObserverFunction> vertexCore, ClassAxiom axiom) {      
+        Vertex vertex = vertices.get(vertexCore);
+        if (vertex == null) {
+            vertex = new Vertex(vertexCore, axiom, false, -1, -1);
+            vertices.put(vertexCore, vertex);
+        }
+        return vertex; 
+    }
+    
+    
+    /**
+     * adds all taclets for the class axioms accessible and needed by this PO
+     * 
+     * @param selfKJT the {@link KeYJavaType} for which to collect all accessible class axioms
+     * @param proofConfig the {@link InitConfig} of the proof for this PO
+     */
+    private void registerClassAxiomTaclets(KeYJavaType selfKJT, InitConfig proofConfig) {
+        final ImmutableSet<ClassAxiom> axioms = selectClassAxioms(selfKJT);
+        for (ClassAxiom axiom : axioms) {            
+            final Vertex node = getVertexFor(axiom.getKJT().getSort(), axiom.getTarget(), axiom);
+            if (node.index == -1) {
+                getSCCForNode(node, axioms, proofConfig);
+            }
+            ImmutableList<Pair<Sort, IObserverFunction>> scc = allSCCs.get(node);
+            for (Taclet axiomTaclet : 
+                axiom.getTaclets(DefaultImmutableSet.fromImmutableList(scc == null ? 
+                        ImmutableSLList.<Pair<Sort, IObserverFunction>>nil() : scc), 
+                        proofConfig.getServices())) {
+                assert axiomTaclet != null : "class axiom returned null taclet: "
+                        + axiom.getName();
+                // only include if choices are appropriate
+                if (choicesApply(axiomTaclet, proofConfig.getActivatedChoices())) {
+                    register(axiomTaclet, proofConfig);
+                }
+            }
+        }
+         
+        index = 0;
+        stack.clear();
+        vertices.clear();
+        allSCCs.clear();
+    }
+       
+    /** 
+     * computes all strongly connected components reachable by the given node and adds them
+     * to {@link AbstractPO#allSCCs}
+     * 
+     * @param node the starting {@link Vertex}
+     * @param axioms set of {@link ClassAxiom} used to compute the outgoing edges of the nodes
+     * @param proofConfig the {@link InitConfig} of the proof for this PO
+     */
+    private void getSCCForNode(final Vertex node, ImmutableSet<ClassAxiom> axioms, InitConfig proofConfig) {        
+        final Services services = proofConfig.getServices();
+        node.index = index;
+        node.lowLink = index;
+        index++;
+        stack.push(node);
+        node.onStack = true;
+        
+        for (final ClassAxiom nodeAxiom : getAxiomsForObserver(node.core, axioms)) {
+            final ImmutableSet<Pair<Sort, IObserverFunction>> nextNodes = 
+                    nodeAxiom.getUsedObservers(services);
+            for (Pair<Sort, IObserverFunction> nextNodeCore : nextNodes) {             
+                final Vertex nextNode = getVertexFor(nextNodeCore, nodeAxiom);
+                if (nextNode.index == -1) {
+                    getSCCForNode(nextNode, axioms, proofConfig);
+                    if (node.lowLink > nextNode.lowLink) {
+                        node.lowLink = nextNode.lowLink;
+                    }                    
+                } else if (nextNode.onStack) {
+                    if (node.lowLink > nextNode.index) {
+                        node.lowLink = nextNode.index;
+                    }       
+                }
+            }         
+        }
+        
+        if (node.index == node.lowLink) {
+            ImmutableList<Pair<Sort, IObserverFunction>> scc = 
+                    ImmutableSLList.<Pair<Sort, IObserverFunction>>nil();
+            Vertex sccMember;          
+            do  {   
+                sccMember = stack.pop();
+                sccMember.onStack = false;
+                scc = scc.prepend(sccMember.core);                
+            } while(!sccMember.equals(node));
+            allSCCs.put(node, scc); 
+        }        
+    }
+    
+    
+    
+    
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------

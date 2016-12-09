@@ -215,6 +215,10 @@
                commandId="org.key_project.sed.key.ui.showSubtreeCommand"
                icon="icons/subtree.gif">
          </image>
+         <image
+               commandId="org.key_project.sed.key.ui.commands.applyRule"
+               icon="icons/interactiveAppLogo16.png">
+         </image>
       </extension>
       <extension
             point="org.eclipse.ui.handlers">
@@ -446,6 +450,12 @@
                   label="Precondition">
             </propertyTab>
             <propertyTab
+                  afterTab="org.key_project.sed.ui.key.tab"
+                  category="Debug"
+                  id="org.key_project.sed.ui.weakening.tab"
+                  label="Weakening">
+            </propertyTab>
+            <propertyTab
                   category="Debug"
                   id="org.key_project.sed.ui.main.tab"
                   image="icons/logo16.gif"
@@ -500,6 +510,12 @@
                   id="org.key_project.sed.key.ui.property.CustomizationKeYDebugTargetPropertySection"
                   tab="org.key_project.sed.ui.customization.tab">
             </propertySection>
+            <propertySection
+                  class="org.key_project.sed.key.ui.property.WeakeningPropertySection"
+                  filter="org.key_project.sed.key.ui.property.WeakeningTreeFilter"
+                  id="org.key_project.sed.key.ui.property.WeakeningPropertySection"
+                  tab="org.key_project.sed.ui.weakening.tab">
+            </propertySection>
          </propertySections>
       </extension>
       <extension
@@ -530,6 +546,12 @@
                   id="org.key_project.sed.ui.visualization.precondition.tab"
                   label="Precondition">
             </propertyTab>
+            <propertyTab
+                  afterTab="org.key_project.sed.ui.visualization.key.tab"
+                  category="Graphiti"
+                  id="org.key_project.sed.ui.visualization.weakening.tab"
+                  label="Weakening">
+            </propertyTab>
          </propertyTabs>
       </extension>
       <extension
@@ -559,6 +581,12 @@
                   filter="org.key_project.sed.key.ui.property.PreconditionGraphitiTreeFilter"
                   id="org.key_project.sed.key.ui.property.PreconditionGraphitiPropertySection"
                   tab="org.key_project.sed.ui.visualization.precondition.tab">
+            </propertySection>
+            <propertySection
+                  class="org.key_project.sed.key.ui.property.WeakeningGraphitiPropertySection"
+                  filter="org.key_project.sed.key.ui.property.WeakeningGraphitiTreeFilter"
+                  id="org.key_project.sed.key.ui.property.WeakeningGraphitiPropertySection"
+                  tab="org.key_project.sed.ui.visualization.weakening.tab">
             </propertySection>
          </propertySections>
       </extension>
@@ -679,7 +707,7 @@
          <menuContribution
                allPopups="false"
                class="org.key_project.sed.key.ui.view.RuleAppContextMenu"
-               locationURI="popup:org.key_project.sed.key.ui.ProofView.popup?before=group.add">
+               locationURI="popup:#KeYEditorContext?before=sequentDisplaySettings">
          </menuContribution>
          <menuContribution
                allPopups="false"
@@ -729,10 +757,6 @@
                   style="push"
                   tooltip="Save proof as *.proof file.">
             </command>
-         </menuContribution>
-         <menuContribution
-               allPopups="false"
-               locationURI="popup:org.key_project.sed.key.ui.ProofView">
          </menuContribution>
       </extension>
       <extension

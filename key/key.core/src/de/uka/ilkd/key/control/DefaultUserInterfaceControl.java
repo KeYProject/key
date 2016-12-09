@@ -33,6 +33,11 @@ import de.uka.ilkd.key.speclang.PositionedString;
  */
 public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
    /**
+    * The used {@link TermLabelVisibilityManager}.
+    */
+   private final TermLabelVisibilityManager termLabelVisibilityManager = new TermLabelVisibilityManager();
+   
+   /**
     * The used {@link DefaultProofControl}.
     */
    private final DefaultProofControl proofControl;
@@ -79,7 +84,7 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
     */
    @Override
    public boolean selectProofObligation(InitConfig initConfig) {
-      return false; // Not supported.
+      return false;
    }
 
    /**
@@ -160,5 +165,13 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
    @Override
    public void reportWarnings(ImmutableSet<PositionedString> warnings) {
       // Nothing to do
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+      return termLabelVisibilityManager;
    }
 }

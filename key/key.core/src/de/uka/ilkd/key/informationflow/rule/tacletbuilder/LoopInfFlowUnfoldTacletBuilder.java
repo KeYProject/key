@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -21,7 +21,7 @@ import de.uka.ilkd.key.util.MiscTools;
  */
 public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletBuilder {
 
-    private LoopInvariant loopInv;
+    private LoopSpecification loopInv;
     private ExecutionContext executionContext;
     private Term guard;
 
@@ -31,7 +31,7 @@ public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletB
     }
 
 
-    public void setLoopInv(LoopInvariant loopInv) {
+    public void setLoopInv(LoopSpecification loopInv) {
         this.loopInv = loopInv;
     }
 

@@ -14,37 +14,38 @@
 package org.key_project.keyide.ui.propertyTester;
 
 import org.eclipse.core.expressions.PropertyTester;
-import org.key_project.keyide.ui.editor.KeYEditor;
+import org.eclipse.core.runtime.IAdaptable;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 
 /**
- * This property tester can be used to check if a {@link KeYEditor} provides
+ * This property tester can be used to check if a {@link IProofProvider} provides
  * a function. It supports:
  * <ul>
- *    <li>{@link KeYEditor#isCanStartAutomode()}</li>
- *    <li>{@link KeYEditor#isCanApplyRules()}</li>
- *    <li>{@link KeYEditor#isCanPruneProof()}</li>
- *    <li>{@link KeYEditor#isCanStartSMTSolver()}</li>
+ *    <li>{@link IProofProvider#isCanStartAutomode()}</li>
+ *    <li>{@link IProofProvider#isCanApplyRules()}</li>
+ *    <li>{@link IProofProvider#isCanPruneProof()}</li>
+ *    <li>{@link IProofProvider#isCanStartSMTSolver()}</li>
  * </ul>
  * @author Martin Hentschel
  */
 public class CanFunctionPropertyTester extends PropertyTester {
    /**
-    * Property to test {@link KeYEditor#isCanStartAutomode()}
+    * Property to test {@link IProofProvider#isCanStartAutomode()}
     */
    public static final String CAN_START_AUTO_MODE = "canStartAutomode";
 
    /**
-    * Property to test {@link KeYEditor#isCanApplyRules()} 
+    * Property to test {@link IProofProvider#isCanApplyRules()} 
     */
    public static final String CAN_APPLY_RULES = "canApplyRules";
 
    /**
-    * Property to test {@link KeYEditor#isCanPruneProof()}
+    * Property to test {@link IProofProvider#isCanPruneProof()}
     */
    public static final String CAN_PRUNE_PROOF = "canPruneProof";
 
    /**
-    * Property to test {@link KeYEditor#isCanStartSMTSolver()}
+    * Property to test {@link IProofProvider#isCanStartSMTSolver()}
     */
    public static final String CAN_START_SMT_SOLVER = "canStartSMTSolver";
 
@@ -56,19 +57,25 @@ public class CanFunctionPropertyTester extends PropertyTester {
                        String property, 
                        Object[] args, 
                        Object expectedValue) {
-      if (receiver instanceof KeYEditor) {
-         KeYEditor editor = (KeYEditor)receiver;
-         if (CAN_START_AUTO_MODE.equals(property)) {
-            return editor.isCanStartAutomode();
-         }
-         else if (CAN_APPLY_RULES.equals(property)) {
-            return editor.isCanApplyRules();
-         }
-         else if (CAN_PRUNE_PROOF.equals(property)) {
-            return editor.isCanPruneProof();
-         }
-         else if (CAN_START_SMT_SOLVER.equals(property)) {
-            return editor.isCanStartSMTSolver();
+      if (receiver instanceof IAdaptable) {
+         IAdaptable adaptable = (IAdaptable) receiver;
+         IProofProvider pp = (IProofProvider) adaptable.getAdapter(IProofProvider.class);
+         if (pp != null) {
+            if (CAN_START_AUTO_MODE.equals(property)) {
+               return pp.isCanStartAutomode();
+            }
+            else if (CAN_APPLY_RULES.equals(property)) {
+               return pp.isCanApplyRules();
+            }
+            else if (CAN_PRUNE_PROOF.equals(property)) {
+               return pp.isCanPruneProof();
+            }
+            else if (CAN_START_SMT_SOLVER.equals(property)) {
+               return pp.isCanStartSMTSolver();
+            }
+            else {
+               return false;
+            }
          }
          else {
             return false;

@@ -46,6 +46,278 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: /set/joinTest
+    */
+   public void testJoinTestAfterBranchConditionWithWeakeningGoalNotVerified() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/joinTest/test/JoinTestAfterBranchConditionWithWeakeningGoalNotVerified.proof",
+                          "/set/joinTest/oracle/JoinTestAfterBranchConditionWithWeakeningGoalNotVerified.xml",
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/joinTest
+    */
+   public void testJoinTestAfterBranchConditionWithWeakeningGoalAndSubgoals() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/joinTest/test/JoinTestAfterBranchConditionWithWeakeningGoalAndSubgoals.proof",
+                          "/set/joinTest/oracle/JoinTestAfterBranchCondition.xml", // Same result: with and without weakening!
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/joinTest
+    */
+   public void testJoinTestAfterBranchConditionWithWeakeningGoal() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/joinTest/test/JoinTestAfterBranchConditionWithWeakeningGoal.proof",
+                          "/set/joinTest/oracle/JoinTestAfterBranchCondition.xml", // Same result: with and without weakening!
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/joinTest
+    */
+   public void testJoinTestAfterBranchCondition() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/joinTest/test/JoinTestAfterBranchCondition.proof",
+                          "/set/joinTest/oracle/JoinTestAfterBranchCondition.xml", // Same result: with and without weakening!
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/joinTest
+    */
+   public void testJoinTestAfterAssignment() throws Exception {
+      doSETTestAndDispose(testCaseDirectory,
+                          "/set/joinTest/test/JoinTestAfterAssignment.proof",
+                          "/set/joinTest/oracle/JoinTestAfterAssignment.xml",
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/variablesEmptyArrayCreationTest
+    */
+   public void testVariablesEmptyArrayCreationTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesEmptyArrayCreationTest/test/EmptyArrayCreationTest.java", 
+                          "EmptyArrayCreationTest", 
+                          "main", 
+                          "obj != null & n == 0",
+                          "/set/variablesEmptyArrayCreationTest/oracle/EmptyArrayCreationTest.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/variablesNonSimpleArrayCreationTest
+    */
+   public void testVariablesNonSimpleArrayCreationTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesNonSimpleArrayCreationTest/test/NonSimpleArrayCreationTest.java", 
+                          "NonSimpleArrayCreationTest", 
+                          "main", 
+                          "n >= 4 & instance != null & instance.value == 100",
+                          "/set/variablesNonSimpleArrayCreationTest/oracle/NonSimpleArrayCreationTest.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/variablesNonSimpleArrayAssignmentTest
+    */
+   public void testVariablesNonSimpleArrayAssignmentTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesNonSimpleArrayAssignmentTest/test/NonSimpleArrayAssignmentTest.java", 
+                          "NonSimpleArrayAssignmentTest", 
+                          "main", 
+                          "array != null & array.length >= 4",
+                          "/set/variablesNonSimpleArrayAssignmentTest/oracle/NonSimpleArrayAssignmentTest.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/variablesArrayCreationInstanceTest
+    */
+   public void testVariablesArrayCreationInstanceTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesArrayCreationInstanceTest/test/ArrayCreationInstanceTest.java", 
+                          "ArrayCreationInstanceTest", 
+                          "main", 
+                          "obj != null & n >= 4",
+                          "/set/variablesArrayCreationInstanceTest/oracle/ArrayCreationInstanceTest.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/variablesArrayAssignmentTest
+    */
+   public void testVariablesArrayAssignmentTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesArrayAssignmentTest/test/ArrayAssignmentTest.java", 
+                          "ArrayAssignmentTest", 
+                          "main", 
+                          "array != null & array.length >= 4",
+                          "/set/variablesArrayAssignmentTest/oracle/ArrayAssignmentTest.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/variablesArrayCreationTest
+    */
+   public void testVariablesArrayCreationTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesArrayCreationTest/test/ArrayCreationTest.java", 
+                          "ArrayCreationTest", 
+                          "main", 
+                          "n >= 4",
+                          "/set/variablesArrayCreationTest/oracle/ArrayCreationTest.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false);
+   }
+   
+   /**
     * Tests example: /set/useOperationContractLightweightOperationContractTest
     */
    public void testUseOperationContractLightweightOperationContractTest() throws Exception {

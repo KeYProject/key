@@ -22,9 +22,17 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.testing.ContributionInfo;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.ObjectUtil;
 
+import de.uka.ilkd.key.control.AutoModeListener;
+import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -33,9 +41,14 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * A class to provide the proofTree transformed to the KeY-Internal
  * representation.
  * 
- * @author Christoph Schneider, Niklas Bunzel, Stefan Kï¿½sdorf, Marco Drebing
+ * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
+   /**
+    * The {@link ProofControl} of the {@link Proof} which offers the proof tree to show.
+    */
+   private ProofControl pc;
+   
 	/**
 	 * A mapping from {@link Node}s to {@link BranchFolder}s.
 	 */
@@ -44,21 +57,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	/**
 	 * The ProofTreeListener
 	 */
-	private final ProofTreeListener proofTreeListener = new ProofTreeListener() {
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void smtDataUpdate(ProofTreeEvent e) {
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void proofStructureChanged(ProofTreeEvent e) {
-		}
-
+	private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
 		/**
 		 * {@inheritDoc}
 		 */
@@ -71,44 +70,24 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void proofIsBeingPruned(ProofTreeEvent e) {
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void proofGoalsChanged(ProofTreeEvent e) {
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void proofGoalsAdded(ProofTreeEvent e) {
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void proofGoalRemoved(ProofTreeEvent e) {
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
 		public void proofExpanded(ProofTreeEvent e) {
 			handleProofExpanded(e);
 		}
+	};
+	
+	/**
+	 * Listens for start and stop of the auto mode.
+	 */
+	private final AutoModeListener autoModeListener = new AutoModeListener() {
+      @Override
+      public void autoModeStarted(ProofEvent e) {
+         handleAutoModeStarted(e);
+      }
 
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void proofClosed(ProofTreeEvent e) {
-		}
+      @Override
+      public void autoModeStopped(ProofEvent e) {
+         handleAutoModeStopped(e);
+      }
 	};
 
 	/**
@@ -138,38 +117,115 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	private boolean showSubtree;
 	
 	/**
-	 * The root of the show subtree of node filtered prooftree.
+	 * The root of the show subtree of node filtered proof tree.
 	 */
 	private Node newRoot;
 	
 	/**
-	 * The Constructor
+	 * The {@link Goal}s on which the auto mode operates.
 	 */
-	public LazyProofTreeContentProvider() {
-		hideState = false;
-		symbolicState = false;
-		showSubtree = false;
-	}
+	private ImmutableList<Node> goalsOfAutomode;
 	
 	/**
+	 * The Constructor
+	 */
+	public LazyProofTreeContentProvider(ProofControl pc) {
+	   this.pc = pc;
+		this.hideState = false;
+		this.symbolicState = false;
+		this.showSubtree = false;
+		if (pc != null) {
+		   pc.addAutoModeListener(autoModeListener);
+		}
+	}
+
+   /**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		Assert.isTrue(viewer instanceof TreeViewer);
 		this.viewer = (TreeViewer) viewer;
-		if (oldInput != null) {
+		if (proof != null && !proof.isDisposed()) {
 			proof.removeProofTreeListener(proofTreeListener);
 		}
 		if (newInput instanceof Proof) {
 			this.proof = (Proof) newInput;
-			if (!proof.isDisposed()) {
-			   proof.addProofTreeListener(proofTreeListener);
-			}
-		} else {
+		}
+		else if (newInput instanceof Node) {
+		   this.proof = ((Node) newInput).proof();
+		}
+		else {
 			this.proof = null;
 		}
+      if (proof != null && !proof.isDisposed()) {
+         proof.addProofTreeListener(proofTreeListener);
+      }
 	}
+	
+	public void setProofControl(ProofControl pc) {
+	   if (this.pc != null) {
+	      this.pc.removeAutoModeListener(autoModeListener);
+	   }
+	   this.pc = pc;
+      if (this.pc != null) {
+         this.pc.addAutoModeListener(autoModeListener);
+      }
+	}
+
+	/**
+	 * When the auto mode is started.
+	 * @param e The event.
+	 */
+   protected void handleAutoModeStarted(ProofEvent e) {
+      if (proof != null && !proof.isDisposed()) {
+         proof.removeProofTreeListener(proofTreeListener);
+         ImmutableList<Goal> goals = proof.openEnabledGoals();
+         goalsOfAutomode = ImmutableSLList.<Node>nil();
+         for (Goal goal : goals) {
+            goalsOfAutomode = goalsOfAutomode.prepend(goal.node());
+         }
+      }
+   }
+   
+   /**
+    * When the auto mode stopps.
+    * @param e The event.
+    */
+   protected void handleAutoModeStopped(ProofEvent e) {
+      if (proof != null && !proof.isDisposed()) {
+         proof.addProofTreeListener(proofTreeListener);
+         if (!viewer.getControl().isDisposed()) {
+            viewer.getControl().getDisplay().asyncExec(new Runnable() {
+               @Override
+               public void run() {
+                  if (!viewer.getControl().isDisposed()) {
+                     updateOriginalGoalNodesAfterAutoModeStopped();
+                  }
+               }
+            });
+         }
+      }
+   }
+   
+   /**
+    * Ensures that the viewer shows the full proof tree after the auto mode has stopped.
+    */
+   protected void updateOriginalGoalNodesAfterAutoModeStopped() {
+      if (goalsOfAutomode != null) {
+         for (Node node : goalsOfAutomode) {
+            Object parent = getParent(node);
+            // Update child count of parent
+            int childCount = doUpdateChildCount(parent, -1);
+            // Ensure that all children below the parents are known. This is required under Eclipse 4.5 and 4.6.
+            // Other ancestors (children of children) are later loaded lazily by the viewer. 
+            for (int i = 0; i < childCount; i++) {
+               updateElement(parent, i);
+            }
+         }
+         goalsOfAutomode = null;
+      }
+   }
 
 	/**
 	 * Ensures that all top level elements are shown which is required in
@@ -233,7 +289,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		doUpdateChildCount(element, currentChildCount);
 	}
 
-	/**
+   /**
 	 * Performs the steps of {@link #updateChildCount(Object, int)}.
 	 * 
 	 * @param element
@@ -336,19 +392,12 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 */
 	protected void doHandleProofExpanded(Node node) {
 		Object parent = getParent(node);
-		doUpdateChildCount(parent, -1);
-//		if (false) { // TODO: This code was added for compatibility reasons with Eclipse 4.4. Reason does no longer exist in Eclipse 4.4.2?
-//	      int parentChildCount = doUpdateChildCount(parent, -1);
-//	      int childIndex = getIndexOf(parent, node);
-//	      if (node.childrenCount() > 1) { // If statement added by students in context of filtering. Don't know why.
-//	         childIndex = 0;
-//	      }
-//	      if (childIndex >= 0 && childIndex < parentChildCount) {
-//	         for (int i = childIndex; i < parentChildCount; i++) {
-//	            updateElement(parent, i);
-//	         }
-//	      }
-//		}
+		// Update child count of parent
+		int childCount = doUpdateChildCount(parent, -1);
+		// Make new nodes visible to tree. This is required under Eclipse 4.5 and 4.6.
+		for (int i = 0; i < node.childrenCount(); i++) {
+		   updateElement(parent, childCount - 1 - i);
+		}
 	}
 
 	/**
@@ -580,8 +629,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 */
 	public int getIndexOf(Object parent, Object element) {
 		// Make sure that parameters are valid
-		Assert.isTrue(element instanceof BranchFolder || element instanceof Node, "Unsupported element \"" + element.getClass() + "\".");
-		Assert.isTrue(parent instanceof Proof || parent instanceof BranchFolder || parent instanceof Node, "Unsupported parent \"" + parent.getClass() + "\".");
+		Assert.isTrue(element instanceof BranchFolder || element instanceof Node, "Unsupported element \"" + ObjectUtil.getClass(element) + "\".");
+		Assert.isTrue(parent instanceof Proof || parent instanceof BranchFolder || parent instanceof Node, "Unsupported parent \"" + ObjectUtil.getClass(parent) + "\".");
 		// Find first shown child node of the given parent
 		Node current = null;
 		if (parent instanceof Proof) {
@@ -726,9 +775,12 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 */
 	@Override
 	public void dispose() {
-		if (proof != null) {
+		if (proof != null && !proof.isDisposed()) {
 			proof.removeProofTreeListener(proofTreeListener);
 		}
+		if (pc != null) {
+         pc.removeAutoModeListener(autoModeListener);
+      }
 	}
 	
 	public boolean getHideState(){

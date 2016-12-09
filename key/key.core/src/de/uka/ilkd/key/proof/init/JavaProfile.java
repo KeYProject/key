@@ -39,6 +39,7 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
 /**
@@ -65,7 +66,7 @@ public class JavaProfile extends AbstractProfile {
     private boolean permissions = false;
 
     public final static StrategyFactory DEFAULT =
-        new JavaCardDLStrategy.Factory();
+        new JavaCardDLStrategyFactory();
 
     private OneStepSimplifier oneStepSimpilifier;
 

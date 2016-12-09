@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.Pair;
 
 public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
@@ -104,7 +104,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
                 (ExecutionContext) d.get(BasicSnippetData.Key.EXECUTION_CONTEXT);        
 
         //create loop call
-        LoopInvariant inv = (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
+        LoopSpecification inv = (LoopSpecification) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         StatementBlock sb = (StatementBlock) inv.getLoop().getBody();
 
         final Assignment guardVarDecl =

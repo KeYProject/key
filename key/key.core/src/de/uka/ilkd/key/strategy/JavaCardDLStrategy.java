@@ -13,43 +13,22 @@
 
 package de.uka.ilkd.key.strategy;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
-import de.uka.ilkd.key.rule.BlockContractRule;
-import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.rule.join.JoinRule;
-import de.uka.ilkd.key.strategy.definition.AbstractStrategyPropertyDefinition;
-import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
-import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
-import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
-import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
 import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
@@ -83,7 +62,6 @@ import de.uka.ilkd.key.strategy.feature.ReducibleMonomialsFeature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.SVNeedsInstantiation;
 import de.uka.ilkd.key.strategy.feature.ScaleFeature;
-import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
 import de.uka.ilkd.key.strategy.feature.SetsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.SumFeature;
 import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
@@ -96,7 +74,6 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCost;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCostScalerFeature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.SplittableQuantifiedFormulaFeature;
 import de.uka.ilkd.key.strategy.termProjection.AssumptionProjection;
 import de.uka.ilkd.key.strategy.termProjection.CoeffGcdProjection;
@@ -108,8 +85,6 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.ConstantTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsInductionVariable;
 import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
@@ -165,8 +140,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         this.tf =
                 new ArithTermFeatures(getServices().getTypeConverter()
                         .getIntegerLDT());
-        this.ff = new FormulaTermFeatures();
-        this.vf = new ValueTermFeature();
+        this.ff = new FormulaTermFeatures(this.tf);
+        this.vf = new ValueTermFeature(op(heapLDT.getNull()));
 
         costComputationDispatcher = setupCostComputationF();
         approvalDispatcher = setupApprovalDispatcher();
@@ -277,52 +252,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 ifMatchedF, dispatcher);
     }
 
-    private Feature loopInvFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(WhileInvariantRule.INSTANCE);
-        return ConditionalFeature.createConditional(filter, cost);
-    }
-
-    private Feature blockContractFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(BlockContractRule.INSTANCE);
-        return ConditionalFeature.createConditional(filter, cost);
-    }
-
-    private Feature methodSpecFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(UseOperationContractRule.INSTANCE);
-        return ConditionalFeature.createConditional(filter, cost);
-    }
-
-    private Feature querySpecFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(QueryExpand.INSTANCE);
-        return ConditionalFeature.createConditional(filter, cost);
-    }
-
     private Feature oneStepSimplificationFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(MiscTools.findOneStepSimplifier(getProof()));
         return ConditionalFeature.createConditional(filter, cost);
     }
-
-    private Feature setupJoinRule() {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(JoinRule.INSTANCE);
-
-        return ConditionalFeature.createConditional(filter, inftyConst());
-    }
-
-    // private Feature smtFeature(Feature cost) {
-    // ClassRuleFilter filter = new ClassRuleFilter(SMTRule.class);
-    // return ConditionalFeature.createConditional(filter, cost);
-    // }
-
-    // private Feature smtMultiFeature(Feature cost) {
-    // ClassRuleFilter filter = new ClassRuleFilter(SMTRuleMulti.class);
-    // return ConditionalFeature.createConditional(filter, cost);
-    // }
 
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
@@ -339,7 +273,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final LocSetLDT locSetLDT =
                 getServices().getTypeConverter().getLocSetLDT();
 
-        final RuleSetDispatchFeature d = RuleSetDispatchFeature.create();
+        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
         bindRuleSet(d, "semantics_blasting", inftyConst());
         bindRuleSet(d, "simplify_heap_high_costs", inftyConst());
@@ -977,10 +911,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return inftyConst();
     }
 
-    private Feature sequentContainsNoPrograms() {
-        return not(SeqContainsExecutableCodeFeature.PROGRAMS);
-    }
-
     private boolean quantifierInstantiatedEnabled() {
         return !StrategyProperties.QUANTIFIERS_NONE.equals(strategyProperties
                 .getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY));
@@ -1133,36 +1063,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                                 longConst(0),
                                                                 longConst(100)) })) }));
     }
-
-    private Feature countOccurrences(ProjectionToTerm cutFormula) {
-        TermBuffer sf = new TermBuffer();
-        TermBuffer sub = new TermBuffer();
-
-        Feature countOccurrencesInSeq =
-                sum(sf,
-                        SequentFormulasGenerator.sequent(),
-                        sum(sub,
-                                SubtermGenerator
-                                        .leftTraverse(sf, any()), // instead
-                                                                          // of
-                                                                          // any
-                                                                          // a
-                                                                          // condition
-                                                                          // which
-                                                                          // stops
-                                                                          // traversal
-                                                                          // when
-                                                                          // depth(cutF)
-                                                                          // >
-                                                                          // depth(sub)
-                                                                          // would
-                                                                          // be
-                                                                          // better
-                                ifZero(applyTF(cutFormula, eq(sub)),
-                                        longConst(1), longConst(0))));
-        return countOccurrencesInSeq;
-    }
-
     
     private void setupSplittingApproval(RuleSetDispatchFeature d) {
         bindRuleSet(d, "beta", allowSplitting(FocusFormulaProjection.INSTANCE));
@@ -1810,28 +1710,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                 not(add(columnOpEq, biggerLeftSide)))));
     }
 
-    private Feature termSmallerThan(String smaller, String bigger) {
-        return TermSmallerThanFeature.create(instOf(smaller), instOf(bigger));
-    }
-
-    private Feature monSmallerThan(String smaller, String bigger,
-            IntegerLDT numbers) {
-        return MonomialsSmallerThanFeature.create(instOf(smaller),
-                instOf(bigger), numbers);
-    }
-
-    private Feature atomSmallerThan(String smaller, String bigger,
-            IntegerLDT numbers) {
-        return AtomsSmallerThanFeature.create(instOf(smaller), instOf(bigger),
-                numbers);
-    }
-
-    private Feature literalsSmallerThan(String smaller, String bigger,
-            IntegerLDT numbers) {
-        return LiteralsSmallerThanFeature.create(instOf(smaller),
-                instOf(bigger), numbers);
-    }
-
     private void setupPullOutGcd(RuleSetDispatchFeature d, String ruleSet,
             boolean roundingUp) {
         final TermBuffer gcd = new TermBuffer();
@@ -2433,7 +2311,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 not(applyTF(succFor, tf.intEquation))));
     }
 
-    protected Services getServices() {
+    protected final Services getServices() {
         return getProof().getServices();
     }
 
@@ -2655,13 +2533,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
 
-    /**
-     * @deprecated Use {@link #setupApprovalF()} instead
-     */
-    protected Feature setupApprovalF(Services services) {
-        return setupApprovalF();
-    }
-
     protected Feature setupApprovalF() {
         final Feature depSpecF;
         final String depProp =
@@ -2686,7 +2557,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private RuleSetDispatchFeature setupApprovalDispatcher() {
-        final RuleSetDispatchFeature d = RuleSetDispatchFeature.create();
+        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
         final IntegerLDT numbers =
                 getServices().getTypeConverter().getIntegerLDT();
@@ -2832,7 +2703,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private RuleSetDispatchFeature setupInstantiationF() {
         enableInstantiate();
 
-        final RuleSetDispatchFeature d = RuleSetDispatchFeature.create();
+        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
         setupQuantifierInstantiation(d);
 
@@ -2899,9 +2770,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule
      *         shall not be applied at all (it is discarded by the strategy).
      */
-    public final RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
             Goal goal) {
-        return costComputationF.compute(app, pio, goal);
+        return costComputationF.computeCost(app, pio, goal);
     }
 
     /**
@@ -2912,454 +2783,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      */
     public final boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
             Goal goal) {
-        return !(approvalF.compute(app, pio, goal) instanceof TopRuleAppCost);
+        return !(approvalF.computeCost(app, pio, goal) instanceof TopRuleAppCost);
     }
 
-    protected final RuleAppCost instantiateApp(RuleApp app,
+    protected RuleAppCost instantiateApp(RuleApp app,
             PosInOccurrence pio, Goal goal) {
-        return instantiationF.compute(app, pio, goal);
-    }
-
-    public static class Factory implements StrategyFactory {
-        /**
-         * The unique {@link Name} of this {@link StrategyFactory}.
-         */
-        public static final Name NAME = new Name(JavaCardDLStrategy);
-
-        public static final String TOOL_TIP_STOP_AT_DEFAULT =
-                "<html>Stop when (i) the maximum number of rule<br>"
-                        + "applications is reached or (ii) no more rules are<br>"
-                        + "applicable on the proof tree.</html>";
-        public static final String TOOL_TIP_STOP_AT_UNCLOSABLE =
-                "<html>Stop as soon as the first not automatically<br>"
-                        + "closable goal is encountered.</html>";
-        public static final String TOOL_TIP_PROOF_SPLITTING_FREE = "<html>"
-                + "Split formulas (if-then-else expressions,<br>"
-                + "disjunctions in the antecedent, conjunctions in<br>"
-                + "the succedent) freely without restrictions." + "</html>";
-        public static final String TOOL_TIP_PROOF_SPLITTING_DELAYED = "<html>"
-                + "Do not split formulas (if-then-else expressions,<br>"
-                + "disjunctions in the antecedent, conjunctions in<br>"
-                + "the succedent) as long as programs are present in<br>"
-                + "the sequent.<br>"
-                + "NB: This does not affect the splitting of formulas<br>"
-                + "that themselves contain programs.<br>"
-                + "NB2: Delaying splits often prevents KeY from finding<br>"
-                + "short proofs, but in some cases it can significantly<br>"
-                + "improve the performance." + "</html>";
-        public static final String TOOL_TIP_PROOF_SPLITTING_OFF = "<html>"
-                + "Do never split formulas (if-then-else expressions,<br>"
-                + "disjunctions in the antecedent, conjunctions in<br>"
-                + "the succedent).<br>"
-                + "NB: This does not affect the splitting of formulas<br>"
-                + "that contain programs.<br>"
-                + "NB2: Without splitting, KeY is often unable to find<br>"
-                + "proofs even for simple problems. This option can,<br>"
-                + "nevertheless, be meaningful to keep the complexity<br>"
-                + "of proofs small and support interactive proving."
-                + "</html>";
-        public static final String TOOL_TIP_LOOP_INVARIANT =
-                "<html>"
-                        + "Use loop invariants for loops.<br>"
-                        + "Three properties have to be shown:<br>"
-                        + "<ul><li>Validity of invariant of a loop is preserved by the<br>"
-                        + "loop guard and loop body (initially valid).</li>"
-                        + "<li>If the invariant was valid at the start of the loop, it holds <br>"
-                        + "after arbitrarily many loop iterations (body preserves invariant).</li>"
-                        + "<li>Invariant holds after the loop terminates (use case).</li>"
-                        + "</ul></html>";
-        public static final String TOOL_TIP_LOOP_EXPAND = "<html>"
-                + "Unroll loop body." + "</html>";
-        public static final String TOOL_TIP_LOOP_NONE = "<html>"
-                + "Leave loops untouched." + "</html>";
-        public static final String TOOL_TIP_BLOCK_CONTRACT =
-                "<html>"
-                        + "If block contracts are specified, Java blocks are replaced by their contract.<br>"
-                        + "Three properties have to be shown:"
-                        + "<ul><li>Validity of block contract</li>"
-                        + "<li>Precondition of contract holds</li>"
-                        + "<li>Postcondition holds after block terminates</li>"
-                        + "</ul></html>";
-        public static final String TOOL_TIP_BLOCK_EXPAND =
-                "<html>"
-                        + "Do not use block contracts for Java blocks. Expand Java blocks."
-                        + "</html>";
-        public static final String TOOL_TIP_METHOD_CONTRACT =
-                "<html>Replace method calls by contracts. In some cases<br>"
-                        + "a method call may also be replaced by its method body.<br>"
-                        + "If query treatment is activated, this behavior applies<br>"
-                        + "to queries as well.</html>";
-        public static final String TOOL_TIP_METHOD_EXPAND =
-                "<html>Replace method calls by their bodies, i.e. by their<br>"
-                        + "implementation. Method contracts are strictly deactivated.</html>";
-        public static final String TOOL_TIP_METHOD_NONE = "<html>"
-                + "Stop when encountering a method" + "</html>";
-        public static final String TOOL_TIP_CLASSAXIOM_FREE =
-                "<html>Expand class axioms (such as invariants) freely.</html>";
-        public static final String TOOL_TIP_CLASSAXIOM_DELAYED =
-                "<html>Expand class axioms (such as invariants) only after symbolic execution.</html>";
-        public static final String TOOL_TIP_CLASSAXIOM_OFF =
-                "<html>Do not expand class axioms (such as invariants).</html>";
-        public static final String TOOL_TIP_DEPENDENCY_ON =
-                "<html>Uses the information in JML's <tt>accessible</tt> clauses<br>"
-                        + "in order to simplify heap terms. For instance, consider the term<br>"
-                        + "<center><i>f(store(heap,o,a,1))</i></center>"
-                        + "If <i>f</i> does not depend on the location <i>(o,a)</i>, which is<br>"
-                        + "expressed by an <tt>accessible</tt> clause, then the term can be <br>"
-                        + "simplified to <i>f(heap)</i>.</html>";
-        public static final String TOOL_TIP_DEPENDENCY_OFF =
-                "<html>Does <i>not</i> use the framing information contained in JML's <br>"
-                        + "<tt>accessible</tt> clauses automatically in order to simplify heap terms.<br>"
-                        + "This prevents the automatic proof search to find proofs for a number of problems.<br>"
-                        + "On the other hand, the automatic proof search does not use a particular order in<br>"
-                        + "which <tt>accessible</tt> clauses are used. Since the usage of an <tt>accessible</tt><br>"
-                        + "clause is splitting, this might result in huge (or even infeasible) proofs.</html>";
-        public static final String TOOL_TIP_QUERY_ON =
-                "<html>Rewrite query to a method call so that contracts or inlining<br>"
-                        + "can be used. A query is a method that is used as a function <br>"
-                        + "in the logic and stems from the specification.<br><br>"
-                        + "Whether contracts or inlining are used depends on the <br>"
-                        + "Method Treatment settings.</html>";
-        public static final String TOOL_TIP_QUERY_RESTRICTED =
-                "<html>Rewrite query to a method call (expanded) so that contracts or inlining can be used.<br>"
-                        + "<ul><li> Priority of expanding queries occuring earlier on a branch is higher than<br>"
-                        + " for queries introduced more recently. This approximates in a breath-first search<br>"
-                        + " with respect to query expansion.</li>"
-                        + "<li> Reexpansion of identical query terms is suppressed.</li>"
-                        + "<li> A query is not expanded if one of its arguments contains a literal greater<br>"
-                        + " than "
-                        + QueryExpandCost.ConsideredAsBigLiteral
-                        + ", or smaller than "
-                        + (-QueryExpandCost.ConsideredAsBigLiteral)
-                        + ". This helps detecting loops in a proof.</li>"
-                        + "<li> Queries are expanded after the loop body in the \"Preserves Invariant\"<br>"
-                        + " branch of the loop invariant rule.</li>"
-                        + "<li> Queries are expanded in the Base Case and the conclusio of the Step Case <br>"
-                        + " branch when using Auto Induction.</li>"
-                        + "</ul></html>";
-        public static final String TOOL_TIP_QUERY_OFF = "<html>"
-                + "Turn rewriting of query off." + "</html>";
-        public static final String TOOL_TIP_EXPAND_LOCAL_QUERIES_ON =
-                "<html>Replaces queries by their method body in certain safe cases.<br>"
-                        + "Safe cases are:"
-                        + "<ul><li>the return type of the expanded method is known</li>"
-                        + "<li>the object on which the methodcall is invoked, is self or a parent of self</li></ul>"
-                        + "This mechanism works independently of the query treatment <br>"
-                        + "and method treatment settings above.<br>"
-                        + "<i>The internal rule name is Query Axiom</i></html>";
-        public static final String TOOL_TIP_EXPAND_LOCAL_QUERIES_OFF = "<html>"
-                + "Expansion of local queries is turned off. <br>"
-                + "This setting is independent of the query treatment setting."
-                + "</html>";
-        public static final String TOOL_TIP_ARITHMETIC_BASE =
-                "<html>"
-                        + "Basic arithmetic support:"
-                        + "<ul>"
-                        + "<li>Simplification of polynomial expressions</li>"
-                        + "<li>Computation of Gr&ouml;bner Bases for polynomials in the antecedent</li>"
-                        + "<li>(Partial) Omega procedure for handling linear inequations</li>"
-                        + "</ul>" + "</html>";
-        public static final String TOOL_TIP_ARITHMETIC_DEF_OPS =
-                "<html>"
-                        + "Automatically expand defined symbols like:"
-                        + "<ul>"
-                        + "<li><tt>/</tt>, <tt>%</tt>, <tt>jdiv</tt>, <tt>jmod</tt>, ...</li>"
-                        + "<li><tt>int_RANGE</tt>, <tt>short_MIN</tt>, ...</li>"
-                        + "<li><tt>inInt</tt>, <tt>inByte</tt>, ...</li>"
-                        + "<li><tt>addJint</tt>, <tt>mulJshort</tt>, ...</li>"
-                        + "</ul>" + "</html>";
-        public static final String TOOL_TIP_ARITHMETIC_MODEL_SEARCH =
-                "<html>"
-                        + "Support for non-linear inequations and model search.<br>"
-                        + "In addition, this performs:"
-                        + "<ul>"
-                        + "<li>Multiplication of inequations with each other</li>"
-                        + "<li>Systematic case distinctions (cuts)</li>"
-                        + "</ul>"
-                        + "This method is guaranteed to find counterexamples for<br>"
-                        + "invalid goals that only contain polynomial (in)equations.<br>"
-                        + "Such counterexamples turn up as trivially unprovable goals.<br>"
-                        + "It is also able to prove many more valid goals involving<br>"
-                        + "(in)equations, but will in general not terminate on such goals."
-                        + "</html>";
-        public static final String TOOL_TIP_QUANTIFIER_NONE = "<html>"
-                + "Do not instantiate quantified formulas automatically"
-                + "</html>";
-        public static final String TOOL_TIP_QUANTIFIER_NO_SPLITS =
-                "<html>"
-                        + "Instantiate quantified formulas automatically<br>"
-                        + "with terms that occur in a sequent, but only if<br>"
-                        + "this does not cause proof splitting. Further, quantified<br>"
-                        + "formulas that contain queries are not instantiated<br>"
-                        + "automatically." + "</html>";
-        public static final String TOOL_TIP_QUANTIFIER_NO_SPLITS_WITH_PROGS =
-                "<html>"
-                        + "Instantiate quantified formulas automatically<br>"
-                        + "with terms that occur in a sequent, but if the<br>"
-                        + "sequent contains programs then only perform<br>"
-                        + "instantiations that do not cause proof splitting.<br>"
-                        + "Further, quantified formulas that contain queries<br>"
-                        + "are not instantiated automatically." + "</html>";
-        public static final String TOOL_TIP_QUANTIFIER_FREE = "<html>"
-                + "Instantiate quantified formulas automatically<br>"
-                + "with terms that occur in a sequent, also if this<br>"
-                + "might cause proof splitting." + "</html>";
-        public static final String TOOL_TIP_AUTO_INDUCTION_ON = "<html>"
-                + "Create an inductive proof for formulas of the form:<br>"
-                + "      ==>  \\forall int i; 0&lt;=i->phi <br>"
-                + "and certain other forms. The induction hypothesis<br>"
-                + "is the subformula phi. The rule is applied before<br>"
-                + "beta rules are applied.<br>" + "<br>"
-                + "When encountering a formula of the form<br>"
-                + "      ==>  (\\forall int i; 0&lt;=i->phi) & psi <br>"
-                + "and certain similar forms, then the quantified formula<br>"
-                + "is used in the Use Case branch as a lemma for psi,<br>"
-                + "i.e., the sequent in the Use Case has the form:<br>"
-                + "      (\\forall int i; 0&lt;=i->phi) ==>  psi <br>"
-                + "</html>";
-        public static final String TOOL_TIP_AUTO_INDUCTION_RESTRICTED =
-                "<html>"
-                        + "Performs auto induction only on quantified formulas that<br>"
-                        + "(a) fullfill a certain pattern (as described for the \"on\"option)<br>"
-                        + "and (b) whose quantified variable has the suffix \"Ind\" or \"IND\".<br>"
-                        + "For instance, auto induction will be applied on:<br>"
-                        + "      ==>  \\forall int iIND; 0&lt;=iIND->phi <br>"
-                        + "but not on: <br>"
-                        + "      ==>  \\forall int i; 0&lt;=i->phi <br>"
-                        + "</html>";
-        public static final String TOOL_TIP_AUTO_INDUCTION_OFF = "<html>"
-                + "Deactivates automatic creation of inductive proofs.<br>"
-                + "In order to make use of auto induction, activate <br>"
-                + "auto induction early in proofs before the <br>"
-                + "quantified formula that is to be proven inductively<br>"
-                + "is Skolemized (using the delta rule). Auto induction<br>"
-                + "is not applied on Skolemized formulas in order to<br>"
-                + "limit the number of inductive proofs." + "</html>";
-
-        public static String TOOL_TIP_USER_OFF(int i) {
-            return "Taclets of the rule set \"userTaclets" + i
-                    + "\" are not applied automatically";
-        }
-
-        public static String TOOL_TIP_USER_LOW(int i) {
-            return "Taclets of the rule set \"userTaclets" + i
-                    + "\" are applied automatically with low priority";
-        }
-
-        public static String TOOL_TIP_USER_HIGH(int i) {
-            return "Taclets of the rule set \"userTaclets" + i
-                    + "\" are applied automatically with high priority";
-        }
-
-        public Factory() {
-        }
-
-        public Strategy create(Proof p_proof,
-                StrategyProperties strategyProperties) {
-            return new JavaCardDLStrategy(p_proof, strategyProperties);
-        }
-
-        public Name name() {
-            return NAME;
-        }
-
-        @Override
-        public StrategySettingsDefinition getSettingsDefinition() {
-            // Properties
-            OneOfStrategyPropertyDefinition stopAt =
-                    new OneOfStrategyPropertyDefinition(
-                            StrategyProperties.STOPMODE_OPTIONS_KEY, "Stop at",
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.STOPMODE_DEFAULT,
-                                    "Default", TOOL_TIP_STOP_AT_DEFAULT),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.STOPMODE_NONCLOSE,
-                                    "Unclosable", TOOL_TIP_STOP_AT_UNCLOSABLE));
-            OneOfStrategyPropertyDefinition proofSplitting =
-                    new OneOfStrategyPropertyDefinition(
-                            StrategyProperties.SPLITTING_OPTIONS_KEY,
-                            "Proof splitting",
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.SPLITTING_NORMAL,
-                                    "Free", TOOL_TIP_PROOF_SPLITTING_FREE),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.SPLITTING_DELAYED,
-                                    "Delayed", TOOL_TIP_PROOF_SPLITTING_DELAYED),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.SPLITTING_OFF, "Off",
-                                    TOOL_TIP_PROOF_SPLITTING_OFF));
-            OneOfStrategyPropertyDefinition loopTreatment =
-                    new OneOfStrategyPropertyDefinition(
-                            StrategyProperties.LOOP_OPTIONS_KEY,
-                            "Loop treatment",
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.LOOP_INVARIANT,
-                                    "Invariant", TOOL_TIP_LOOP_INVARIANT),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.LOOP_EXPAND, "Expand",
-                                    TOOL_TIP_LOOP_EXPAND),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.LOOP_NONE, "None",
-                                    TOOL_TIP_LOOP_NONE));
-            OneOfStrategyPropertyDefinition blockTreatment =
-                    new OneOfStrategyPropertyDefinition(
-                            StrategyProperties.BLOCK_OPTIONS_KEY,
-                            "Block treatment",
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.BLOCK_CONTRACT,
-                                    "Contract", TOOL_TIP_BLOCK_CONTRACT),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.BLOCK_EXPAND, "Expand",
-                                    TOOL_TIP_BLOCK_EXPAND));
-            OneOfStrategyPropertyDefinition methodTreatment =
-                    new OneOfStrategyPropertyDefinition(
-                            StrategyProperties.METHOD_OPTIONS_KEY,
-                            "Method treatment",
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.METHOD_CONTRACT,
-                                    "Contract", TOOL_TIP_METHOD_CONTRACT),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.METHOD_EXPAND, "Expand",
-                                    TOOL_TIP_METHOD_EXPAND),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.METHOD_NONE, "None",
-                                    TOOL_TIP_METHOD_NONE));
-            OneOfStrategyPropertyDefinition dependencyContracts =
-                    new OneOfStrategyPropertyDefinition(
-                            StrategyProperties.DEP_OPTIONS_KEY,
-                            "Dependency contracts",
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.DEP_ON, "On",
-                                    TOOL_TIP_DEPENDENCY_ON),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.DEP_OFF, "Off",
-                                    TOOL_TIP_DEPENDENCY_OFF));
-            OneOfStrategyPropertyDefinition expandLocalQueries =
-                    new OneOfStrategyPropertyDefinition(
-                            StrategyProperties.QUERYAXIOM_OPTIONS_KEY,
-                            "Expand local queries:",
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.QUERYAXIOM_ON, "On",
-                                    TOOL_TIP_EXPAND_LOCAL_QUERIES_ON),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.QUERYAXIOM_OFF, "Off",
-                                    TOOL_TIP_EXPAND_LOCAL_QUERIES_OFF));
-            OneOfStrategyPropertyDefinition queryTreatment =
-                    new OneOfStrategyPropertyDefinition(
-                            StrategyProperties.QUERY_OPTIONS_KEY,
-                            "Query treatment",
-                            new AbstractStrategyPropertyDefinition[] { expandLocalQueries },
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.QUERY_ON, "On",
-                                    TOOL_TIP_QUERY_ON),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.QUERY_RESTRICTED,
-                                    "Restricted", TOOL_TIP_QUERY_RESTRICTED),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.QUERY_OFF, "Off",
-                                    TOOL_TIP_QUERY_OFF));
-            OneOfStrategyPropertyDefinition arithmeticTreatment =
-                    new OneOfStrategyPropertyDefinition(
-                            StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-                            "Arithmetic treatment",
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.NON_LIN_ARITH_NONE,
-                                    "Basic", TOOL_TIP_ARITHMETIC_BASE),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.NON_LIN_ARITH_DEF_OPS,
-                                    "DefOps", TOOL_TIP_ARITHMETIC_DEF_OPS),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.NON_LIN_ARITH_COMPLETION,
-                                    "Model Search",
-                                    TOOL_TIP_ARITHMETIC_MODEL_SEARCH));
-            OneOfStrategyPropertyDefinition quantifierTreatment =
-                    new OneOfStrategyPropertyDefinition(
-                            StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-                            "Quantifier treatment",
-                            2,
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.QUANTIFIERS_NONE,
-                                    "None", TOOL_TIP_QUANTIFIER_NONE, 2, 4),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.QUANTIFIERS_NON_SPLITTING,
-                                    "No Splits", TOOL_TIP_QUANTIFIER_NO_SPLITS,
-                                    6, 2),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS,
-                                    "No Splits with Progs",
-                                    TOOL_TIP_QUANTIFIER_NO_SPLITS_WITH_PROGS,
-                                    2, 4), new StrategyPropertyValueDefinition(
-                                    StrategyProperties.QUANTIFIERS_INSTANTIATE,
-                                    "Free", TOOL_TIP_QUANTIFIER_FREE, 6, 2));
-            OneOfStrategyPropertyDefinition classAxiom =
-                    new OneOfStrategyPropertyDefinition(
-                            StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
-                            "Class axiom rule",
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.CLASS_AXIOM_FREE,
-                                    "Free", TOOL_TIP_CLASSAXIOM_FREE),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.CLASS_AXIOM_DELAYED,
-                                    "Delayed", TOOL_TIP_CLASSAXIOM_DELAYED),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.CLASS_AXIOM_OFF, "Off",
-                                    TOOL_TIP_CLASSAXIOM_OFF));
-            OneOfStrategyPropertyDefinition autoInduction =
-                    new OneOfStrategyPropertyDefinition(
-                            StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY,
-                            "Auto Induction",
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.AUTO_INDUCTION_LEMMA_ON,
-                                    "On", TOOL_TIP_AUTO_INDUCTION_ON),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.AUTO_INDUCTION_RESTRICTED,
-                                    "Restricted",
-                                    TOOL_TIP_AUTO_INDUCTION_RESTRICTED),
-                            new StrategyPropertyValueDefinition(
-                                    StrategyProperties.AUTO_INDUCTION_OFF,
-                                    "Off", TOOL_TIP_AUTO_INDUCTION_OFF));
-            // User properties
-            List<AbstractStrategyPropertyDefinition> props =
-                    new LinkedList<AbstractStrategyPropertyDefinition>();
-            for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
-                OneOfStrategyPropertyDefinition user =
-                        new OneOfStrategyPropertyDefinition(
-                                StrategyProperties.USER_TACLETS_OPTIONS_KEY(i),
-                                i + ":  ", new StrategyPropertyValueDefinition(
-                                        StrategyProperties.USER_TACLETS_OFF,
-                                        "Off", TOOL_TIP_USER_OFF(i), 3, 1),
-                                new StrategyPropertyValueDefinition(
-                                        StrategyProperties.USER_TACLETS_LOW,
-                                        "Low prior.", TOOL_TIP_USER_LOW(i), 4,
-                                        2),
-                                new StrategyPropertyValueDefinition(
-                                        StrategyProperties.USER_TACLETS_HIGH,
-                                        "High prior.", TOOL_TIP_USER_HIGH(i),
-                                        6, 2));
-                props.add(user);
-            }
-            
-            OneOfStrategyPropertyDefinition userOptions =
-                    new OneOfStrategyPropertyDefinition(
-                            null,
-                            "User-specific taclet sets",
-                            "<html>"
-                                    + "These options define whether user- and problem-specific taclet sets<br>"
-                                    + "are applied automatically by the strategy. Problem-specific taclets<br>"
-                                    + "can be defined in the \\rules-section of a .key-problem file. For<br>"
-                                    + "automatic application, the taclets have to contain a clause<br>"
-                                    + "\\heuristics(userTaclets1), \\heuristics(userTaclets2), etc."
-                                    + "</html>",
-                            -1,
-                            props.toArray(new AbstractStrategyPropertyDefinition[props
-                                    .size()]));
-            // Model
-            return new StrategySettingsDefinition("Java DL Options", stopAt,
-                    proofSplitting, loopTreatment, blockTreatment,
-                    methodTreatment, dependencyContracts, queryTreatment,
-                    arithmeticTreatment, quantifierTreatment, classAxiom,
-                    autoInduction, userOptions);
-        }
+        return instantiationF.computeCost(app, pio, goal);
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -3373,287 +2802,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private final ArithTermFeatures tf;
     private final FormulaTermFeatures ff;
     private final ValueTermFeature vf;
-
-    private class ArithTermFeatures {
-
-        public ArithTermFeatures(IntegerLDT numbers) {
-            Z = numbers.getNumberSymbol();
-            C = numbers.getCharSymbol();
-
-            add = numbers.getAdd();
-            mul = numbers.getMul();
-            mod = numbers.getMod();
-            div = numbers.getDiv();
-            jmod = numbers.getJModulo();
-            jdiv = numbers.getJDivision();
-
-            eq = Equality.EQUALS;
-            leq = numbers.getLessOrEquals();
-            geq = numbers.getGreaterOrEquals();
-
-            intS = numbers.getNumberSymbol().sort();
-
-            intF = extendsTrans(intS);
-
-            addF = op(add);
-            mulF = op(mul);
-            modF = op(mod);
-            divF = op(div);
-            jmodF = op(jmod);
-            jdivF = op(jdiv);
-
-            eqF = op(eq);
-            geqF = op(geq);
-            leqF = op(leq);
-
-            literal = op(Z);
-            negLiteral = opSub(Z, op(numbers.getNegativeNumberSign()));
-            nonNegLiteral = opSub(Z, not(op(numbers.getNegativeNumberSign())));
-            zeroLiteral =
-                    opSub(Z,
-                            opSub(numbers.getNumberLiteralFor(0),
-                                    op(numbers.getNumberTerminator())));
-            oneLiteral =
-                    opSub(Z,
-                            opSub(numbers.getNumberLiteralFor(1),
-                                    op(numbers.getNumberTerminator())));
-            nonPosLiteral = or(zeroLiteral, negLiteral);
-            posLiteral = add(nonNegLiteral, not(zeroLiteral));
-            atLeastTwoLiteral = add(posLiteral, not(oneLiteral));
-
-            charLiteral = op(C);
-
-            constant = ConstantTermFeature.INSTANCE;
-            
-            atom = add(not(addF), not(mulF));
-            linearMonomial = or(atom, opSub(mul, atom, literal));
-
-            // left-associatively arranged monomials, literals are only allowed
-            // as right-most term
-            monomial =
-                    or(atom,
-                            opSub(mul,
-                                    rec(mulF,
-                                            or(opSub(mul, any(), not(mulF)),
-                                                    add(not(addF), not(literal)))),
-                                    atom));
-
-            // left-associatively arranged polynomials
-            polynomial = rec(addF, or(opSub(add, any(), not(addF)), monomial));
-
-            nonNegMonomial =
-                    add(monomial, or(not(mulF), sub(any(), not(negLiteral))));
-            posMonomial = opSub(mul, monomial, posLiteral);
-            negMonomial = opSub(mul, monomial, negLiteral);
-            nonCoeffMonomial =
-                    add(monomial, or(not(mulF), sub(any(), not(literal))));
-            nonNegOrNonCoeffMonomial =
-                    add(monomial, or(not(mulF), sub(any(), not(negLiteral))));
-            atLeastTwoCoeffMonomial = opSub(mul, monomial, atLeastTwoLiteral);
-
-            intEquation =
-                    opSub(eq, add(intF, nonNegMonomial), add(intF, polynomial));
-            linearEquation = opSub(eq, linearMonomial, add(intF, polynomial));
-            monomialEquation =
-                    opSub(eq, add(intF, nonNegMonomial), add(intF, monomial));
-            intInEquation =
-                    add(or(leqF, geqF), sub(nonNegMonomial, polynomial));
-            linearInEquation =
-                    add(or(leqF, geqF), sub(linearMonomial, polynomial));
-            intRelation =
-                    add(or(leqF, geqF, eqF),
-                            sub(add(intF, nonNegMonomial), polynomial));
-
-            notContainsProduct =
-                    rec(any(),
-                            ifZero(mulF, not(sub(not(literal), not(literal)))));
-            notContainsDivMod =
-                    rec(any(),
-                            add(add(not(divF), not(modF)),
-                                    add(not(jdivF), not(jmodF))));
-        }
-
-        final Sort intS;
-
-        final Function Z;
-        final Function C;
-        final Function add;
-        final Function mul;
-        final Function mod;
-        final Function div;
-        final Function jmod;
-        final Function jdiv;
-
-        final Operator eq;
-        final Function leq;
-        final Function geq;
-
-        final TermFeature intF;
-
-        final TermFeature addF;
-        final TermFeature mulF;
-        final TermFeature modF;
-        final TermFeature divF;
-        final TermFeature jmodF;
-        final TermFeature jdivF;
-
-        final TermFeature eqF;
-        final TermFeature leqF;
-        final TermFeature geqF;
-
-        final TermFeature constant;
-        final TermFeature atom;
-        final TermFeature linearMonomial;
-
-        // left-associatively arranged monomials
-        final TermFeature monomial;
-        // left-associatively arranged polynomials
-        final TermFeature polynomial;
-
-        final TermFeature literal;
-        final TermFeature posLiteral;
-        final TermFeature negLiteral;
-        final TermFeature nonNegLiteral;
-        final TermFeature nonPosLiteral;
-        final TermFeature zeroLiteral;
-        final TermFeature oneLiteral;
-        final TermFeature atLeastTwoLiteral;
-
-        final TermFeature charLiteral;
-
-        final TermFeature nonNegMonomial;
-        final TermFeature posMonomial;
-        final TermFeature negMonomial;
-        final TermFeature nonCoeffMonomial;
-        final TermFeature nonNegOrNonCoeffMonomial;
-        final TermFeature atLeastTwoCoeffMonomial;
-
-        final TermFeature intEquation;
-        final TermFeature linearEquation;
-        final TermFeature monomialEquation;
-        final TermFeature intInEquation;
-        final TermFeature linearInEquation;
-        final TermFeature intRelation;
-
-        final TermFeature notContainsProduct;
-        final TermFeature notContainsDivMod;
-
-    }
-
-    private class FormulaTermFeatures {
-
-        public FormulaTermFeatures() {
-            forF = extendsTrans(Sort.FORMULA);            
-            orF = op(Junctor.OR);
-            andF = op(Junctor.AND);
-            impF = op(Junctor.IMP);
-            notF = op(Junctor.NOT);
-            ifThenElse = OperatorClassTF.create(IfThenElse.class);
-            
-            atom = AtomTermFeature.INSTANCE;
-            propJunctor =
-                    or(OperatorClassTF.create(Junctor.class), op(Equality.EQV));
-            literal = or(atom, opSub(Junctor.NOT, atom));
-
-            // left-associatively arranged clauses
-            clause = rec(orF, or(opSub(Junctor.OR, any(), not(orF)), literal));
-
-            // left-associatively arranged sets of clauses
-            clauseSet =
-                    rec(andF, or(opSub(Junctor.AND, any(), not(andF)), clause));
-
-            quantifiedFor = or(op(Quantifier.ALL), op(Quantifier.EX));
-            quantifiedClauseSet =
-                    rec(quantifiedFor, or(quantifiedFor, clauseSet));
-
-            quantifiedAnd = rec(quantifiedFor, or(quantifiedFor, andF));
-            quantifiedOr = rec(quantifiedFor, or(quantifiedFor, orF));
-
-            // conjunction or disjunction of literals, without and-or
-            // alternation
-            pureLitConjDisj =
-                    or(rec(andF, or(andF, literal)), rec(orF, or(orF, literal)));
-            quantifiedPureLitConjDisj =
-                    rec(quantifiedFor, or(quantifiedFor, pureLitConjDisj));
-
-            elemUpdate = OperatorClassTF.create(ElementaryUpdate.class);
-            update = OperatorClassTF.create(UpdateApplication.class);
-            program = OperatorClassTF.create(Modality.class);
-            modalOperator = or(update, program);
-
-            // directCutAllowed = add ( atom, not ( modalOperator ) );
-            notExecutable = not(program);
-
-            notContainsExecutable =
-                    not(ContainsExecutableCodeTermFeature.PROGRAMS);
-
-            cutAllowed =
-                    add(notContainsExecutable,
-                            tf.notContainsProduct,
-                            or(tf.eqF, OperatorClassTF.create(Function.class),
-                                    OperatorClassTF
-                                            .create(ParsableVariable.class))); // XXX
-            cutAllowedBelowQuantifier =
-                    add(not(propJunctor), notContainsExecutable);
-            cutPriority =
-                    add(ifZero(
-                            tf.intInEquation,
-                            longTermConst(0),
-                            ifZero(tf.eqF, longTermConst(100),
-                                    longTermConst(200))),
-                            rec(any(), longTermConst(1)));
-            // directCutAllowed = add ( tf.intInEquation, notContainsQuery );
-
-        }
-
-        final TermFeature forF;
-
-        final TermFeature orF;
-        final TermFeature andF;
-        final TermFeature impF;
-        final TermFeature notF;
-        final TermFeature propJunctor;
-        final TermFeature ifThenElse;
-        final TermFeature notExecutable;
-        final TermFeature notContainsExecutable;
-
-        final TermFeature quantifiedFor;
-        final TermFeature quantifiedOr;
-        final TermFeature quantifiedAnd;
-
-        final TermFeature atom;
-        final TermFeature literal;
-        final TermFeature clause;
-        final TermFeature clauseSet;
-        final TermFeature quantifiedClauseSet;
-
-        final TermFeature pureLitConjDisj;
-        final TermFeature quantifiedPureLitConjDisj;
-
-        final TermFeature elemUpdate;
-        final TermFeature update;
-        final TermFeature program;
-        final TermFeature modalOperator;
-
-        final TermFeature cutAllowed;
-        final TermFeature cutAllowedBelowQuantifier;
-        final TermFeature cutPriority;
-    }
-
-    private class ValueTermFeature {
-
-        public ValueTermFeature() {
-            equals = op(Equality.EQUALS);
-            tt = op(Junctor.TRUE);
-            ff = op(Junctor.FALSE);
-            nullTerm = op(heapLDT.getNull());
-        }
-
-        final TermFeature equals;
-        final TermFeature tt;
-        final TermFeature ff;
-        final TermFeature nullTerm;
-    }
 
     @Override
     public boolean isStopAtFirstNonCloseableGoal() {

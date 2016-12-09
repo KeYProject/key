@@ -25,12 +25,8 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.operator.TypeCast;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
@@ -78,7 +74,7 @@ public class ExpandMethodBody extends ProgramTransformer {
 	    // static method
 	    newCalled = null;
 	}
-
+	
 // removed this again. see bugs #437,#479 -- vladimir
 //	result = prettyNewObjectNames(result, methDecl, classContext);
 
@@ -100,18 +96,6 @@ public class ExpandMethodBody extends ProgramTransformer {
 	paramRepl.start();	
 	result = (StatementBlock) paramRepl.result();
 	
-	// bugfix for #1226
-	// Add a down cast if the programvariable is of a supertype
-	{
-	    KeYJavaType classType = mbs.getBodySource();
-	    if (newCalled instanceof ProgramVariable) {
-	        ProgramVariable pv = (ProgramVariable)newCalled;
-	        if(pv.getKeYJavaType() != classType) {
-	            newCalled = new ParenthesizedExpression(
-	                    new TypeCast(pv, new TypeRef(classType)));
-	        }
-            }
-	}
 
 	return KeYJavaASTFactory.methodFrame(mbs.getResultVariable(),
 		KeYJavaASTFactory.executionContext(mbs.getBodySource(), pm,

@@ -57,7 +57,9 @@ public class MacroKeyBinding extends AbstractAction {
         }
 
         PosInOccurrence posInOcc = mousePos.getPosInOccurrence();
-        mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, posInOcc);
+        if(macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
+            mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, posInOcc);
+        }
     }
 
     public static void registerMacroKeyBindings(KeYMediator mediator, SequentView sequentView, JComponent comp) {

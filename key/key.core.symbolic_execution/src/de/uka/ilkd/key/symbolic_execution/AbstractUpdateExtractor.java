@@ -36,7 +36,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.ApplyStrategy;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -44,6 +44,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionAllArrayIndicesVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -399,7 +400,14 @@ public abstract class AbstractUpdateExtractor {
          // Initial Heap, nothing to do
       }
       else if (term.op() == heapLDT.getMemset()) {
-         // Array initialization, nothing to do.
+         // Check modified array range.
+         Term arrayRange = term.sub(1);
+         if (arrayRange.op() == getServices().getTypeConverter().getLocSetLDT().getArrayRange()) {
+            Term array = arrayRange.sub(0);
+            Term startIndex = arrayRange.sub(1);
+            Term endIndex = arrayRange.sub(2);
+            locationsToFill.add(new ExtractLocationParameter(startIndex, endIndex, array));
+         }
          // Iterate over child heap modifications
          collectLocationsFromHeapUpdate(term.sub(0), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);
       }
@@ -615,9 +623,19 @@ public abstract class AbstractUpdateExtractor {
       private final ProgramVariable programVariable;
       
       /**
-       * The array index or {@code null} if a {@link ProgramVariable} is used instead.
+       * The array index or {@code null} if not used.
        */
       private final Term arrayIndex;
+      
+      /**
+       * The array start index or {@code null} if not used.
+       */
+      private final Term arrayStartIndex;
+      
+      /**
+       * The array end index or {@code null} if not used.
+       */
+      private final Term arrayEndIndex;
       
       /**
        * An optional parent object represented as {@link Term}. If it is {@code null} an {@link IProgramVariable} of the state is represented.
@@ -645,6 +663,16 @@ public abstract class AbstractUpdateExtractor {
        * Defines if this location should explicitly be shown on the state.
        */
       private final boolean stateMember;
+      
+      /**
+       * The constant used to query an array range.
+       */
+      private final Term arrayRangeConstant;
+      
+      /**
+       * The constant representing the fact that no value is available.
+       */
+      private final Term notAValue;
 
       /**
        * Constructor for cloning purpose.
@@ -659,6 +687,10 @@ public abstract class AbstractUpdateExtractor {
          this.valueTermIndexInStatePredicate = original.valueTermIndexInStatePredicate;
          this.preVariable = original.preVariable;
          this.stateMember = original.stateMember;
+         this.arrayStartIndex = original.arrayStartIndex;
+         this.arrayEndIndex = original.arrayEndIndex;
+         this.arrayRangeConstant = original.arrayRangeConstant;
+         this.notAValue = original.notAValue;
       }
 
       /**
@@ -699,6 +731,10 @@ public abstract class AbstractUpdateExtractor {
          this.preVariable = createLocationVariable("Pre" + preVariableIndex++, parentTerm != null ? parentTerm.sort() : programVariable.sort());
          this.arrayIndex = null;
          this.stateMember = stateMember;
+         this.arrayStartIndex = null;
+         this.arrayEndIndex = null;
+         this.arrayRangeConstant = null;
+         this.notAValue = null;
       }
       
       /**
@@ -715,6 +751,37 @@ public abstract class AbstractUpdateExtractor {
          this.parentTerm = parentTerm;
          this.preVariable = createLocationVariable("Pre" + preVariableIndex++, parentTerm.sort());
          this.stateMember = false;
+         this.arrayStartIndex = null;
+         this.arrayEndIndex = null;
+         this.arrayRangeConstant = null;
+         this.notAValue = null;
+      }
+      
+      /**
+       * Constructor.
+       * @param arrayStartIndex The array start index.
+       * @param arrayEndIndex The array end index.
+       * @param parentTerm The parent object represented as {@link Term}.
+       * @throws ProofInputException Occurred Exception.
+       */
+      public ExtractLocationParameter(Term arrayStartIndex, 
+                                      Term arrayEndIndex,
+                                      Term parentTerm) throws ProofInputException {
+         assert arrayStartIndex != null;
+         assert arrayEndIndex != null;
+         assert parentTerm != null;
+         this.programVariable = null;
+         this.arrayIndex = null;
+         this.parentTerm = parentTerm;
+         this.preVariable = createLocationVariable("Pre" + preVariableIndex++, parentTerm.sort());
+         this.stateMember = false;
+         this.arrayStartIndex = arrayStartIndex;
+         this.arrayEndIndex = arrayEndIndex;
+         TermBuilder tb = getServices().getTermBuilder();
+         Function constantFunction = new Function(new Name(tb.newName(ExecutionAllArrayIndicesVariable.ARRAY_INDEX_CONSTANT_NAME)), getServices().getTypeConverter().getIntegerLDT().targetSort());
+         this.arrayRangeConstant = tb.func(constantFunction);
+         Function notAValueFunction = new Function(new Name(tb.newName(ExecutionAllArrayIndicesVariable.NOT_A_VALUE_NAME)), Sort.ANY);
+         this.notAValue = tb.func(notAValueFunction);
       }
 
       /**
@@ -737,11 +804,19 @@ public abstract class AbstractUpdateExtractor {
       }
 
       /**
-       * Checks if an array index or a {@link ProgramVariable} is represented.
-       * @return {@code true} is array index, {@code false} is {@link ProgramVariable}. 
+       * Checks if an array index is represented.
+       * @return {@code true} is array index, {@code false} is something else.
        */
       public boolean isArrayIndex() {
          return arrayIndex != null;
+      }
+
+      /**
+       * Checks if an array range is represented.
+       * @return {@code true} is array range, {@code false} is something else. 
+       */
+      public boolean isArrayRange() {
+         return arrayStartIndex != null && arrayEndIndex != null;
       }
       
       /**
@@ -752,6 +827,38 @@ public abstract class AbstractUpdateExtractor {
          return arrayIndex;
       }
       
+      /**
+       * Returns the array start index.
+       * @return The array start index.
+       */
+      public Term getArrayStartIndex() {
+         return arrayStartIndex;
+      }
+      
+      /**
+       * Returns the array end index.
+       * @return The array end index.
+       */
+      public Term getArrayEndIndex() {
+         return arrayEndIndex;
+      }
+
+      /**
+       * Returns the constant used to query an array range.
+       * @return The constant used to query an array range.
+       */
+      public Term getArrayRangeConstant() {
+         return arrayRangeConstant;
+      }
+
+      /**
+       * Returns the constant representing the fact that no value is available.
+       * @return The constant representing the fact that no value is available.
+       */
+      public Term getNotAValue() {
+         return notAValue;
+      }
+
       /**
        * Returns the pre variable.
        * @return The pre variable.
@@ -792,29 +899,35 @@ public abstract class AbstractUpdateExtractor {
        * @return The {@link Term} to compute the value with help of the pre update.
        */
       public Term createPreValueTerm() {
+         final TermBuilder tb = getServices().getTermBuilder();
          if (parentTerm != null) {
-            if (isArrayIndex()) {
-               return getServices().getTermBuilder().dotArr(parentTerm, arrayIndex);
+            if (isArrayRange()) {
+               Term arrayRange = tb.and(tb.geq(arrayRangeConstant, arrayStartIndex),
+                                        tb.leq(arrayRangeConstant, arrayEndIndex));
+               return tb.ife(arrayRange, tb.dotArr(parentTerm, arrayRangeConstant), notAValue);
+            }
+            else if (isArrayIndex()) {
+               return tb.dotArr(parentTerm, arrayIndex);
             }
             else {
                if (getServices().getJavaInfo().getArrayLength() == programVariable) {
                   // Special handling for length attribute of arrays
                   Function function = getServices().getTypeConverter().getHeapLDT().getLength();
-                  return getServices().getTermBuilder().func(function, createPreParentTerm());
+                  return tb.func(function, createPreParentTerm());
                }
                else {
                   Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)programVariable, getServices());
-                  return getServices().getTermBuilder().dot(programVariable.sort(), createPreParentTerm(), function);
+                  return tb.dot(programVariable.sort(), createPreParentTerm(), function);
                }
             }
          }
          else {
             if (programVariable.isStatic()) {
                Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)programVariable, getServices());
-               return getServices().getTermBuilder().staticDot(programVariable.sort(), function);
+               return tb.staticDot(programVariable.sort(), function);
             }
             else {
-               return getServices().getTermBuilder().var(programVariable);
+               return tb.var(programVariable);
             }
          }
       }
@@ -872,7 +985,10 @@ public abstract class AbstractUpdateExtractor {
        */
       @Override
       public String toString() {
-         if (isArrayIndex()) {
+         if (isArrayRange()) {
+            return "[" + arrayStartIndex + " to " + arrayEndIndex + "] " + (parentTerm != null ? " of " + parentTerm : "");
+         }
+         else if (isArrayIndex()) {
             return "[" + arrayIndex + "] " + (parentTerm != null ? " of " + parentTerm : "");
          }
          else {
@@ -945,8 +1061,9 @@ public abstract class AbstractUpdateExtractor {
          additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
          preUpdateMap.put(evp.getPreVariable(), evp.getPreUpdateTarget());
       }
-      // Apply updates
+      // Apply array range conditions
       TermBuilder tb = getServices().getTermBuilder();
+      // Apply updates
       Term updateLayoutTerm = tb.applyParallel(originalUpdates, layoutTerm);
       updateLayoutTerm = tb.applyParallel(additionalUpdates, updateLayoutTerm);
       for (Term additionalUpdate : collectAdditionalUpdates()) {
@@ -955,77 +1072,91 @@ public abstract class AbstractUpdateExtractor {
       final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, modalityPio, layoutCondition, updateLayoutTerm, null, false);
       // Instantiate and run proof
-      ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(getProof(), 
-                                                                          sideProofEnv,
-                                                                          sequent, 
-                                                                          StrategyProperties.METHOD_CONTRACT,
-                                                                          StrategyProperties.LOOP_INVARIANT,
-                                                                          StrategyProperties.QUERY_ON,
-                                                                          StrategyProperties.SPLITTING_NORMAL);
+      ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(getProof(), 
+                                                                             sideProofEnv,
+                                                                             sequent, 
+                                                                             StrategyProperties.METHOD_CONTRACT,
+                                                                             StrategyProperties.LOOP_INVARIANT,
+                                                                             StrategyProperties.QUERY_ON,
+                                                                             StrategyProperties.SPLITTING_NORMAL);
       try {
-         @SuppressWarnings("unchecked")
-         Map<Term, Set<Goal>>[] paramValueMap = new Map[locations.size()];
-         // Group equal values as precondition of computeValueConditions(...)
-         for (Goal goal : info.getProof().openGoals()) {
-            Term resultTerm = SymbolicExecutionSideProofUtil.extractOperatorTerm(goal, layoutTerm.op());
+         if (!info.getProof().closed()) {
+            @SuppressWarnings("unchecked")
+            Map<Term, Set<Goal>>[] paramValueMap = new Map[locations.size()];
+            // Group equal values as precondition of computeValueConditions(...)
+            for (Goal goal : info.getProof().openGoals()) {
+               Term resultTerm = SymbolicExecutionSideProofUtil.extractOperatorTerm(goal, layoutTerm.op());
+               int i = 0;
+               for (ExtractLocationParameter param : locations) {
+                  Map<Term, Set<Goal>> valueMap = paramValueMap[i];
+                  if (valueMap == null) {
+                     valueMap = new LinkedHashMap<Term, Set<Goal>>();
+                     paramValueMap[i] = valueMap;
+                  }
+                  Term value = resultTerm.sub(param.getValueTermIndexInStatePredicate());
+                  value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value, getServices());
+                  // Replace pre variable with original target
+                  if (value.op() instanceof LocationVariable) {
+                     Term originalTarget = preUpdateMap.get(value.op());
+                     if (originalTarget != null) {
+                        value = originalTarget;
+                     }
+                  }
+                  else if (SymbolicExecutionUtil.isSelect(goal.proof().getServices(), value)) {
+                     Term object = value.sub(1);
+                     if (object.op() instanceof LocationVariable) {
+                        Term originalTarget = preUpdateMap.get(object.op());
+                        if (originalTarget != null) {
+                           value = goal.proof().getServices().getTermBuilder().select(value.sort(), value.sub(0), originalTarget, value.sub(2));
+                        }
+                     }
+                  }
+                  // Update value list
+                  Set<Goal> valueList = valueMap.get(value);
+                  if (valueList == null) {
+                     valueList = new LinkedHashSet<Goal>();
+                     valueMap.put(value, valueList);
+                  }
+                  valueList.add(goal);
+                  i++;
+               }
+            }
+            // Compute values including conditions
+            Map<Node, Term> branchConditionCache = new HashMap<Node, Term>();
+            Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
             int i = 0;
             for (ExtractLocationParameter param : locations) {
-               Map<Term, Set<Goal>> valueMap = paramValueMap[i];
-               if (valueMap == null) {
-                  valueMap = new LinkedHashMap<Term, Set<Goal>>();
-                  paramValueMap[i] = valueMap;
-               }
-               Term value = resultTerm.sub(param.getValueTermIndexInStatePredicate());
-               value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value, getServices());
-               // Replace pre variable with original target
-               if (value.op() instanceof LocationVariable) {
-                  Term originalTarget = preUpdateMap.get(value.op());
-                  if (originalTarget != null) {
-                     value = originalTarget;
+               for (Entry<Term, Set<Goal>> valueEntry : paramValueMap[i].entrySet()) {
+                  Map<Goal, Term> conditionsMap = computeValueConditions(valueEntry.getValue(), branchConditionCache, simplifyConditions);
+                  if (param.isArrayRange()) {
+                     for (Goal goal : valueEntry.getValue()) {
+                        if (valueEntry.getKey() != param.getNotAValue()) {
+                           ExecutionVariableValuePair pair = new ExecutionVariableValuePair(param.getArrayStartIndex(), param.getArrayEndIndex(), param.getArrayRangeConstant(), param.getParentTerm(), valueEntry.getKey(), conditionsMap.get(goal), param.isStateMember(), goal.node());
+                           pairs.add(pair);
+                        }
+                     }
                   }
-               }
-               else if (SymbolicExecutionUtil.isSelect(goal.proof().getServices(), value)) {
-                  Term object = value.sub(1);
-                  if (object.op() instanceof LocationVariable) {
-                     Term originalTarget = preUpdateMap.get(object.op());
-                     if (originalTarget != null) {
-                        value = goal.proof().getServices().getTermBuilder().select(value.sort(), value.sub(0), originalTarget, value.sub(2));
+                  else if (param.isArrayIndex()) {
+                     for (Goal goal : valueEntry.getValue()) {
+                        ExecutionVariableValuePair pair = new ExecutionVariableValuePair(param.getArrayIndex(), param.getParentTerm(), valueEntry.getKey(), conditionsMap.get(goal), param.isStateMember(), goal.node());
+                        pairs.add(pair);
+                     }
+                  }
+                  else {
+                     for (Goal goal : valueEntry.getValue()) {
+                        ExecutionVariableValuePair pair = new ExecutionVariableValuePair(param.getProgramVariable(), param.getParentTerm(), valueEntry.getKey(), conditionsMap.get(goal), param.isStateMember(), goal.node());
+                        pairs.add(pair);
                      }
                   }
                }
-               // Update value list
-               Set<Goal> valueList = valueMap.get(value);
-               if (valueList == null) {
-                  valueList = new LinkedHashSet<Goal>();
-                  valueMap.put(value, valueList);
-               }
-               valueList.add(goal);
                i++;
             }
+            return pairs;
          }
-         // Compute values including conditions
-         Map<Node, Term> branchConditionCache = new HashMap<Node, Term>();
-         Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
-         int i = 0;
-         for (ExtractLocationParameter param : locations) {
-            for (Entry<Term, Set<Goal>> valueEntry : paramValueMap[i].entrySet()) {
-               Map<Goal, Term> conditionsMap = computeValueConditions(valueEntry.getValue(), branchConditionCache, simplifyConditions);
-               if (param.isArrayIndex()) {
-                  for (Goal goal : valueEntry.getValue()) {
-                     ExecutionVariableValuePair pair = new ExecutionVariableValuePair(param.getArrayIndex(), param.getParentTerm(), valueEntry.getKey(), conditionsMap.get(goal), param.isStateMember(), goal.node());
-                     pairs.add(pair);
-                  }
-               }
-               else {
-                  for (Goal goal : valueEntry.getValue()) {
-                     ExecutionVariableValuePair pair = new ExecutionVariableValuePair(param.getProgramVariable(), param.getParentTerm(), valueEntry.getKey(), conditionsMap.get(goal), param.isStateMember(), goal.node());
-                     pairs.add(pair);
-                  }
-               }
-            }
-            i++;
+         else {
+            // Proof is closed, something went wrong, continuation impossible
+            return null;
          }
-         return pairs;
       }
       finally {
          SymbolicExecutionSideProofUtil.disposeOrStore("Layout computation on node " + node.serialNr() + " with layout term " + ProofSaver.printAnything(layoutTerm, getServices()) + ".", info);
@@ -1065,7 +1196,7 @@ public abstract class AbstractUpdateExtractor {
 
    /**
     * This method computes for all given {@link Goal}s representing the same 
-    * value their path conditions. A computed path condition will consists only
+    * value their path conditions. A computed path condition consists only
     * of the branch conditions which contribute to the value. Branch conditions
     * of splits which does not contribute to the value are ignored.
     * <p>
@@ -1083,7 +1214,7 @@ public abstract class AbstractUpdateExtractor {
     *       The iteration is only performed on one
     *       goal (or the {@link Node} it stops last) at a time. The iteration
     *       is always performed on the {@link Node} with the highest serial
-    *       number to ensure that different {@link Goal} will meet at their
+    *       number to ensure that different {@link Goal}s will meet at their
     *       common parents.
     *    </li>
     *    <li>
@@ -1356,9 +1487,19 @@ public abstract class AbstractUpdateExtractor {
       private final ProgramVariable programVariable;
 
       /**
-       * The array index or {@code null} if a {@link ProgramVariable} is used instead.
+       * The array index or {@code null} if not used.
        */
       private final Term arrayIndex;
+      
+      /**
+       * The array start index or {@code null} if not used.
+       */
+      private final Term arrayStartIndex;
+      
+      /**
+       * The array end index or {@code null} if not used.
+       */
+      private final Term arrayEndIndex;
       
       /**
        * An optional parent object or {@code null} if it is a value/association of the state.
@@ -1408,6 +1549,8 @@ public abstract class AbstractUpdateExtractor {
          this.arrayIndex = null;
          this.stateMember = stateMember;
          this.goalNode = goalNode;
+         this.arrayStartIndex = null;
+         this.arrayEndIndex = null;
       }
 
       /**
@@ -1433,6 +1576,39 @@ public abstract class AbstractUpdateExtractor {
          this.condition = condition;
          this.stateMember = stateMember;
          this.goalNode = goalNode;
+         this.arrayStartIndex = null;
+         this.arrayEndIndex = null;
+      }
+
+      /**
+       * Constructor.
+       * @param arrayStartIndex The array start index.
+       * @param arrayEndIndex The array end index.
+       * @param arrayRangeConstant The constant used to query an array range.
+       * @param parent The parent object.
+       * @param value The value or association target.
+       * @param condition An optional condition under which the value is valid.
+       * @param stateMember Defines if this location should explicitly be shown on the state.
+       */
+      public ExecutionVariableValuePair(Term arrayStartIndex, 
+                                        Term arrayEndIndex,
+                                        Term arrayRangeConstant,
+                                        Term parent, 
+                                        Term value, 
+                                        Term condition,
+                                        boolean stateMember,
+                                        Node goalNode) {
+         assert parent != null;
+         assert value != null;
+         this.programVariable = null;
+         this.arrayIndex = arrayRangeConstant;
+         this.parent = parent;
+         this.value = value;
+         this.condition = condition;
+         this.stateMember = stateMember;
+         this.goalNode = goalNode;
+         this.arrayStartIndex = arrayStartIndex;
+         this.arrayEndIndex = arrayEndIndex;
       }
 
       /**
@@ -1460,19 +1636,43 @@ public abstract class AbstractUpdateExtractor {
       }
       
       /**
-       * Checks if an array index or a {@link ProgramVariable} is represented.
-       * @return {@code true} is array index, {@code false} is {@link ProgramVariable}. 
+       * Checks if an array index is represented.
+       * @return {@code true} is array index, {@code false} is something else.
        */
       public boolean isArrayIndex() {
-         return arrayIndex != null;
+         return arrayIndex != null && (arrayStartIndex == null || arrayEndIndex == null);
       }
 
+      /**
+       * Checks if an array range is represented.
+       * @return {@code true} is array range, {@code false} is something else. 
+       */
+      public boolean isArrayRange() {
+         return arrayStartIndex != null && arrayEndIndex != null;
+      }
+      
       /**
        * Returns the array index.
        * @return The array index.
        */
       public Term getArrayIndex() {
          return arrayIndex;
+      }
+      
+      /**
+       * Returns the array start index.
+       * @return The array start index.
+       */
+      public Term getArrayStartIndex() {
+         return arrayStartIndex;
+      }
+      
+      /**
+       * Returns the array end index.
+       * @return The array end index.
+       */
+      public Term getArrayEndIndex() {
+         return arrayEndIndex;
       }
 
       /**
@@ -1506,7 +1706,8 @@ public abstract class AbstractUpdateExtractor {
       public boolean equals(Object obj) {
          if (obj instanceof ExecutionVariableValuePair) {
             ExecutionVariableValuePair other = (ExecutionVariableValuePair)obj;
-            return isArrayIndex() ? getArrayIndex().equals(other.getArrayIndex()) : getProgramVariable().equals(other.getProgramVariable()) &&
+            return isArrayRange() ? (getArrayStartIndex().equals(other.getArrayStartIndex()) && getArrayEndIndex().equals(other.getArrayEndIndex())) : 
+                                    (isArrayIndex() ? getArrayIndex().equals(other.getArrayIndex()) : getProgramVariable().equals(other.getProgramVariable())) &&
                    getParent() != null ? getParent().equals(other.getParent()) : other.getParent() == null &&
                    getCondition() != null ? getCondition().equals(other.getCondition()) : other.getCondition() == null &&
                    getValue().equals(other.getValue()) &&
@@ -1523,7 +1724,16 @@ public abstract class AbstractUpdateExtractor {
       @Override
       public int hashCode() {
          int result = 17;
-         result = 31 * result + (isArrayIndex() ? getArrayIndex().hashCode() : getProgramVariable().hashCode());
+         if (isArrayRange()) {
+            result = 31 * result + getArrayStartIndex().hashCode();
+            result = 31 * result + getArrayEndIndex().hashCode();
+         }
+         else if (isArrayIndex()) {
+            result = 31 * result + getArrayIndex().hashCode();
+         }
+         else {
+            result = 31 * result + getProgramVariable().hashCode();
+         }
          result = 31 * result + (getParent() != null ? getParent().hashCode() : 0);
          result = 31 * result + (getCondition() != null ? getCondition().hashCode() : 0);
          result = 31 * result + getValue().hashCode();
@@ -1536,7 +1746,14 @@ public abstract class AbstractUpdateExtractor {
        */
       @Override
       public String toString() {
-         if (isArrayIndex()) {
+         if (isArrayRange()) {
+            return "[" + getArrayIndex() + "]" +
+                   " between " + getArrayStartIndex() + " and " + getArrayEndIndex() +
+                   (getParent() != null ? " of " + getParent() : "") +
+                   " is " + getValue() + (getCondition() != null ? " under condition " + getCondition() : "") +
+                   " at goal " + goalNode.serialNr();
+         }
+         else if (isArrayIndex()) {
             return "[" + getArrayIndex() + "]" +
                    (getParent() != null ? " of " + getParent() : "") +
                    " is " + getValue() + (getCondition() != null ? " under condition " + getCondition() : "") +

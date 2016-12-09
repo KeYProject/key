@@ -163,14 +163,11 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             // This resets the proof strategy and the managers after the
             // automation has run.
             for (final Goal openGoal : proof.openGoals()) {
-                AutomatedRuleApplicationManager manager = openGoal
-                        .getRuleAppManager();
+                AutomatedRuleApplicationManager manager = openGoal.getRuleAppManager();
 
                 // Touch the manager only if necessary.
-                if (manager.getDelegate() != null) {
-                    while (manager.getDelegate() != null) {
-                        manager = manager.getDelegate();
-                    }
+                if (manager instanceof FocussedRuleApplicationManager) {
+                    manager = ((FocussedRuleApplicationManager) manager).rootManager;
                     manager.clearCache();
                     openGoal.setRuleAppManager(manager);
                 }

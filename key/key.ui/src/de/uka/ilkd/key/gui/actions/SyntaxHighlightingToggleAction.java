@@ -18,7 +18,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 public class SyntaxHighlightingToggleAction extends MainWindowAction {
@@ -34,8 +33,6 @@ public class SyntaxHighlightingToggleAction extends MainWindowAction {
                 ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                         .isUseSyntaxHighlighting();
         setSelected(useSyntaxHighlighting);
-        NotationInfo.DEFAULT_SYNTAX_HIGHLIGHTING_ENABLED =
-                useSyntaxHighlighting;
     }
 
     @Override

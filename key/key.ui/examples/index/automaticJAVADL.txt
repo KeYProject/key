@@ -167,6 +167,13 @@ group performance {
    provable ./performance-test/Modelfield(Modelfield__foo_08()).JML_operation_contract.0.key
 }
 
+# Test performance of PO construction
+group performancePOConstruction {
+   provable ./performance-test/Test(Test__a0(int)).JML_normal_behavior_operation_contract.0.key
+   provable ./performance-test/Test(Test__a1(int)).JML_normal_behavior_operation_contract.0.key
+   provable ./performance-test/Test(Test__f1(int)).JML_normal_behavior_operation_contract.0.key
+}
+
 # Tests for rule application restrictions
 group applicationRestrictions {
    provable ./heap/polarity_tests/wellformed1.key
@@ -557,6 +564,8 @@ group javadl {
    provable ./standard_key/java_dl/java5/for_Iterable.key
    provable ./standard_key/java_dl/java5/for_ReferenceArray.key
    provable ./standard_key/java_dl/jml-bigint/cast.key
+   provable ./standard_key/java_dl/jml-free/loopInvFree.key
+   provable ./standard_key/java_dl/jml-free/ensuresFree.key
 # proof gets very long
 # requires further investigations
    provable ./standard_key/java_dl/jml-information-flow.key
