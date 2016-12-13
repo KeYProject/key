@@ -403,7 +403,12 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                 final ProgVarReplacer pvr = new ProgVarReplacer(vn.getRenamingMap(), services);
 
                 //globals
-                // XXX XXX XXX goal.setGlobalProgVars(pvr.replace(Immutables.createSetFrom(progVars)));
+                // we do not need to do the old assignment
+                //  goal.setGlobalProgVars(pvr.replace(Immutables.createSetFrom(progVars)));
+                // as the following assertions ensure it would have no effect anyways.
+                assert renamingMap.size() == 1;
+                assert renamingMap.get(inst) == renamedInst;
+                assert !progVars.contains(inst);
 
                 //taclet apps
                 pvr.replace(goal.ruleAppIndex().tacletIndex());
