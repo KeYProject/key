@@ -40,6 +40,7 @@ import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenameTable;
@@ -54,6 +55,7 @@ import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
@@ -447,7 +449,7 @@ public abstract class TacletApp implements RuleApp {
 	if (!isExecutable(services)) {
         throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " + this);
 	}
-    registerSkolemConstants(services);
+    registerSkolemConstants(goal.getLocalNamespaces());
 	goal.addAppliedRuleApp(this);
 	return taclet().apply(goal, services.getOverlay(goal.getLocalNamespaces()), this);
     }
@@ -783,15 +785,14 @@ public abstract class TacletApp implements RuleApp {
     }
     
     
-    public void registerSkolemConstants(TermServices services) {
+    public void registerSkolemConstants(NamespaceSet nss) {
 	final SVInstantiations insts = instantiations();
 	final Iterator<SchemaVariable> svIt = insts.svIterator();
 	while(svIt.hasNext()) {
 	    final SchemaVariable sv = svIt.next();
 	    if(sv instanceof SkolemTermSV) {
 		final Term inst = (Term) insts.getInstantiation(sv);
-		final Namespace functions =
-                        services.getNamespaces().functions();
+                final Namespace<Operator> functions = nss.functions();
 
                 // skolem constant might already be registered in
                 // case it is used in the \addrules() section of a rule
