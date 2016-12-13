@@ -205,7 +205,11 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * @return the list of the named objects
      */
     public Collection<E> elements() {
+        if(symbols == null) {
+            return Collections.emptyList();
+        } else {
         return Collections.unmodifiableCollection(symbols.values());
+    }
     }
 
 
