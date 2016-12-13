@@ -45,6 +45,37 @@ public class NamespaceSet {
 	this.choiceNS  = choiceNS;
     }
 
+    public NamespaceSet copy() {
+        return new NamespaceSet(
+                variables().copy(),
+                functions().copy(),
+                sorts().copy(),
+                ruleSets().copy(),
+                choices().copy(),
+                programVariables().copy());
+    }
+
+    public NamespaceSet shallowCopy() {
+        return new NamespaceSet(
+                variables(),
+                functions(),
+                sorts(),
+                ruleSets(),
+                choices(),
+                programVariables());
+    }
+
+    public NamespaceSet copyWithParent() {
+        return new NamespaceSet(
+                new Namespace<QuantifiableVariable>(variables()),
+                new Namespace<Operator>(functions()),
+                new Namespace<Sort>(sorts()),
+                new Namespace<RuleSet>(ruleSets()),
+                new Namespace<Choice>(choices()),
+                new Namespace<IProgramVariable>(programVariables())
+                );
+    }
+
     public Namespace<QuantifiableVariable> variables() {
 	return varNS;
     }
@@ -100,17 +131,6 @@ public class NamespaceSet {
 	ruleSets().add(ns.ruleSets());
 	functions().add(ns.functions());
 	choices().add(ns.choices());
-    }
-
-    public NamespaceSet copy() {
-	NamespaceSet c = new NamespaceSet();
-	c.setSorts(sorts().copy());
-	c.setRuleSets(ruleSets().copy());
-	c.setFunctions(functions().copy());
-	c.setVariables(variables().copy());
-	c.setProgramVariables(programVariables().copy());
-	c.setChoices(choices().copy());
-	return c;
     }
 
     /**
@@ -199,6 +219,50 @@ public class NamespaceSet {
         ruleSetNS.seal();
         sortNS.seal();
         choiceNS.seal();
+    }
+
+    public boolean isEmpty() {
+        return varNS.isEmpty() &&
+                programVariables().isEmpty() &&
+                funcNS.isEmpty() &&
+                ruleSetNS.isEmpty() &&
+                sortNS.isEmpty() &&
+                choiceNS.isEmpty();
+    }
+
+
+    // create a namespace
+    public NamespaceSet simplify() {
+        return new NamespaceSet(varNS.simplify(),
+                funcNS.simplify(),
+                sortNS.simplify(),
+                ruleSetNS.simplify(),
+                choiceNS.simplify(),
+                progVarNS.simplify());
+    }
+
+    public NamespaceSet getCompression() {
+        return new NamespaceSet(varNS.compress(),
+                funcNS.compress(),
+                sortNS.compress(),
+                ruleSetNS.compress(),
+                choiceNS.compress(),
+                progVarNS.compress());
+    }
+
+    public void flushToParent() {
+        for (Namespace<?> ns : asArray()) {
+            ns.flushToParent();
+        }
+    }
+
+    public NamespaceSet getParent() {
+        return new NamespaceSet(varNS.parent(),
+                funcNS.parent(),
+                sortNS.parent(),
+                ruleSetNS.parent(),
+                choiceNS.parent(),
+                progVarNS.parent());
     }
 
 }

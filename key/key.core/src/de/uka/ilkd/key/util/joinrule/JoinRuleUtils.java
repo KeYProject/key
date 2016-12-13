@@ -51,6 +51,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -642,8 +643,9 @@ public class JoinRuleUtils {
 
         int newCounter = 0;
         String branchUniqueName = base;
+        Iterable<IProgramVariable> progVars = intrNode.getLocalProgVars();
         while (!isUniqueInGlobals(branchUniqueName.toString(),
-                intrNode.getGlobalProgVars())
+                progVars)
                 || (lookupVarInNS(branchUniqueName, services) != null && !lookupVarInNS(
                         branchUniqueName, services).sort().equals(var.sort()))) {
             newCounter += 1;
@@ -669,7 +671,7 @@ public class JoinRuleUtils {
     public static Node getIntroducingNodeforLocVar(LocationVariable var,
             Node node) {
 
-        while (!node.root() && node.getGlobalProgVars().contains(var)) {
+        while (!node.root() && node.getLocalProgVars().contains(var)) {
             node = node.parent();
         }
 
@@ -1571,8 +1573,8 @@ public class JoinRuleUtils {
      * @see VariableNamer#isUniqueInGlobals(String, Globals)
      */
     private static boolean isUniqueInGlobals(String name,
-            ImmutableSet<ProgramVariable> globals) {
-        for (final ProgramVariable n : globals) {
+            Iterable<IProgramVariable> globals) {
+        for (final IProgramVariable n : globals) {
             if (n.toString().equals(name)) {
                 return false;
             }

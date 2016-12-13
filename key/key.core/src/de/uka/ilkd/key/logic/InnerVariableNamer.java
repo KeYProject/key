@@ -52,7 +52,7 @@ public class InnerVariableNamer extends VariableNamer {
                                   PosInOccurrence posOfFind) {
 	ProgramElementName name = var.getProgramElementName();
 	BasenameAndIndex bai = getBasenameAndIndex(name);
-	Globals globals = wrapGlobals(goal.getGlobalProgVars());
+	Globals globals = wrapGlobals(goal.node().getLocalProgVars());
 	map.clear();
 
 	//prepare renaming of inner var

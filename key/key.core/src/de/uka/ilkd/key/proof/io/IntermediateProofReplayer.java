@@ -38,9 +38,11 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
@@ -899,10 +901,10 @@ public class IntermediateProofReplayer {
             result = app.createSkolemConstant(value, sv, true, services);
         }
         else {
-            Namespace varNS = p.getNamespaces().variables();
+            Namespace<QuantifiableVariable> varNS = p.getNamespaces().variables();
+            Namespace<IProgramVariable> prgVarNS = targetGoal.getLocalNamespaces().programVariables();
             varNS = app.extendVarNamespaceForSV(varNS, sv);
-            Term instance = parseTerm(value, p, varNS,
-                   varNS.extended(targetGoal.getGlobalProgVars()));
+            Term instance = parseTerm(value, p, varNS, prgVarNS);
             result = app.addCheckedInstantiation(sv, instance, services, true);
         }
         return result;

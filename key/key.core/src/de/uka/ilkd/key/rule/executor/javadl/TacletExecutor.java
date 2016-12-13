@@ -1,11 +1,14 @@
 package de.uka.ilkd.key.rule.executor.javadl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Immutables;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -19,6 +22,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -382,7 +386,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             = (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
             //if the goal already contains the variable to be added 
             //(not just a variable with the same name), then there is nothing to do
-            if(goal.getGlobalProgVars().contains(inst)) {
+            Collection<IProgramVariable> progVars = goal.getLocalNamespaces().programVariables().elements();
+            if(progVars.contains(inst)) {
                 continue;
             }
 
@@ -398,7 +403,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                 final ProgVarReplacer pvr = new ProgVarReplacer(vn.getRenamingMap(), services);
 
                 //globals
-                goal.setGlobalProgVars(pvr.replace(goal.getGlobalProgVars()));
+                // XXX XXX XXX goal.setGlobalProgVars(pvr.replace(Immutables.createSetFrom(progVars)));
 
                 //taclet apps
                 pvr.replace(goal.ruleAppIndex().tacletIndex());

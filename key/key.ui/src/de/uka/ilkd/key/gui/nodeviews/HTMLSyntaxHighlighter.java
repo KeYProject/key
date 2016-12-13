@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import javax.swing.JEditorPane;
 import javax.swing.text.html.HTMLDocument;
 
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
@@ -191,11 +192,11 @@ public class HTMLSyntaxHighlighter {
             // there are a lot of registered globals AND the number of formulae
             // in the sequent is big.
             
-            Iterable<? extends ProgramVariable> programVariables;
+            Iterable<? extends IProgramVariable> programVariables;
             final InitConfig initConfig = displayedNode.proof().getInitConfig();
             
-            if (displayedNode.getGlobalProgVars().size() < NUM_PROGVAR_THRESHOLD) {
-                programVariables = displayedNode.getGlobalProgVars();
+            if (displayedNode.getLocalProgVars().size() < NUM_PROGVAR_THRESHOLD) {
+                programVariables = displayedNode.getLocalProgVars();
             } else if (initConfig != null
                     && displayedNode.sequent().size() < NUM_FORMULAE_IN_SEQ_THRESHOLD) {
                 programVariables = JoinRuleUtils
@@ -231,7 +232,7 @@ public class HTMLSyntaxHighlighter {
      * @return The input String augmented by syntax highlighting tags.
      */
     private String addSyntaxHighlighting(String htmlString,
-            Iterable<? extends ProgramVariable> programVariables) {
+            Iterable<? extends IProgramVariable> programVariables) {
 
         htmlString =
                 PROP_LOGIC_KEYWORDS_PATTERN.matcher(htmlString).replaceAll(

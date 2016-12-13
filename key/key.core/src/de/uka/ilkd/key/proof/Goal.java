@@ -25,10 +25,13 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
@@ -94,13 +97,16 @@ public final class Goal  {
      */
     private final Properties strategyInfos;
 
+    private NamespaceSet localNamespaces;
+
     /** creates a new goal referencing the given node */
     private Goal(Node node,
                  RuleAppIndex ruleAppIndex,
                  ImmutableList<RuleApp> appliedRuleApps,
                  FormulaTagManager tagManager,
                  AutomatedRuleApplicationManager ruleAppManager,
-                 Properties strategyInfos) {
+            Properties strategyInfos,
+            NamespaceSet localNamespace) {
         this.node = node;
         this.ruleAppIndex = ruleAppIndex;
         this.appliedRuleApps = appliedRuleApps;
@@ -109,13 +115,15 @@ public final class Goal  {
         this.ruleAppIndex.setup(this);
         this.strategyInfos = strategyInfos;
         setRuleAppManager(ruleAppManager);
+        this.localNamespaces = localNamespace.copyWithParent();
     }
 
     private Goal(Node node,
                  RuleAppIndex ruleAppIndex,
                  ImmutableList<RuleApp> appliedRuleApps,
                  AutomatedRuleApplicationManager ruleAppManager,
-                 Properties strategyInfos) {
+            Properties strategyInfos,
+            NamespaceSet localNamespace) {
       this.node            = node;
       this.ruleAppIndex    = ruleAppIndex;
       this.appliedRuleApps = appliedRuleApps;
@@ -123,11 +131,13 @@ public final class Goal  {
       this.ruleAppIndex.setup ( this );
       this.strategyInfos = strategyInfos;
       setRuleAppManager ( ruleAppManager );
-      this.tagManager      = new FormulaTagManager ( this );;
+        this.tagManager      = new FormulaTagManager ( this );
+        this.localNamespaces = localNamespace.copyWithParent();
       }
     
     /**
      * creates a new goal referencing the given node
+     * @param namespaceSet
      */
     public Goal (Node node, RuleAppIndex ruleAppIndex) {
         this ( node,
@@ -135,7 +145,8 @@ public final class Goal  {
                ImmutableSLList.<RuleApp>nil(),
                null,
                new QueueRuleApplicationManager (),
-               new MapProperties());
+                new MapProperties(),
+                node.proof().getServices().getNamespaces().copyWithParent());
         tagManager = new FormulaTagManager ( this );
     }
 
@@ -184,8 +195,8 @@ public final class Goal  {
 	return node;
     }
 
-    public ImmutableSet<ProgramVariable> getGlobalProgVars() {
-	return node.getGlobalProgVars();
+    public NamespaceSet getLocalNamespaces() {
+        return localNamespaces;
     }
 
     /**
@@ -235,13 +246,6 @@ public final class Goal  {
       }
    }
 
-  
-    public void setGlobalProgVars(ImmutableSet<ProgramVariable> s) {
-        assert node.proof().getNamespaces().containsAll(names(s)) :
-                    "\""+names(s)+ "\" not found in namespace.";
-        node.setGlobalProgVars(s);
-    }
-
     /**
      * set the node the goal is related to
      * @param p_node the Node in the proof tree to which this goal
@@ -254,6 +258,16 @@ public final class Goal  {
 	} else
 	    node = p_node;
 	ruleAppIndex.setup ( this );
+
+        NamespaceSet newNS = proof().getServices().getNamespaces().copyWithParent();
+        for (IProgramVariable  pv : node.getLocalProgVars()) {
+            newNS.programVariables().add(pv);
+        }
+        for (Operator op : node.getLocalFunctions()) {
+            newNS.functions().add(op);
+        }
+
+        localNamespaces = newNS.copyWithParent();
     }
 
     /**
@@ -365,7 +379,7 @@ public final class Goal  {
      */
     public void setSequent(SequentChangeInfo sci) {
         node().setSequent(sci.sequent());
-//VK reminder: now update the index
+        //VK reminder: now update the index
        	fireSequentChanged(sci);
     }
 
@@ -465,19 +479,19 @@ public final class Goal  {
     }
 
     public void addProgramVariable(ProgramVariable pv) {
-       proof().getNamespaces().programVariables().addSafely(pv);
-	node.setGlobalProgVars(getGlobalProgVars().add(pv));
+        localNamespaces.programVariables().addSafely(pv);
     }
 
+    @Deprecated
     public void setProgramVariables(Namespace ns) {
-	final Iterator<Named> it=ns.elements().iterator();
-	ImmutableSet<ProgramVariable> s = DefaultImmutableSet.<ProgramVariable>nil();
-	while (it.hasNext()) {
-	    s = s.add((ProgramVariable)it.next());
-	}
-        node().setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
-        proof().getNamespaces().programVariables().set(s);
-        setGlobalProgVars(s);
+//        final Iterator<Named> it=ns.elements().iterator();
+//        ImmutableSet<ProgramVariable> s = DefaultImmutableSet.<ProgramVariable>nil();
+//        while (it.hasNext()) {
+//            s = s.add((ProgramVariable)it.next());
+//        }
+//        node().setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
+//        proof().getNamespaces().programVariables().set(s);
+//        setGlobalProgVars(s);
     }
 
     /**
@@ -493,14 +507,16 @@ public final class Goal  {
                     ruleAppIndex.copy(),
                     appliedRuleApps,
                     ruleAppManager.copy(),
-                    strategyInfos.clone());
+                    strategyInfos.clone(),
+                    localNamespaces.getParent().copy());
         } else {
             clone = new Goal (node,
                     ruleAppIndex.copy(),
                     appliedRuleApps,
                     getFormulaTagManager().copy(),
                     ruleAppManager.copy(),
-                    strategyInfos.clone());
+                    strategyInfos.clone(),
+                    localNamespaces.getParent().copy());
         }
         clone.listeners = (List<GoalListener>)
                 ((ArrayList<GoalListener>) listeners).clone();
@@ -544,7 +560,7 @@ public final class Goal  {
      * @return the list of new created goals.
      */
     public ImmutableList<Goal> split(int n) {
-	ImmutableList<Goal> goalList=ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> goalList = ImmutableSLList.<Goal>nil();
 	
 	final Node parent = node; // has to be stored because the node
 	// of this goal will be replaced
@@ -554,8 +570,11 @@ public final class Goal  {
                 parent.sequent(),
                 parent);
 
-        // newNode.addNoPosTacletApps(parent.getNoPosTacletApps());
-        newNode.setGlobalProgVars(parent.getGlobalProgVars());
+            newNode.addLocalProgVars(localNamespaces.programVariables().elements());
+            newNode.addLocalFunctions(localNamespaces.functions().elements());
+
+            flushNamespaces();
+
         parent.add(newNode);
         this.setNode(newNode);
         goalList = goalList.prepend(this);  
@@ -567,12 +586,12 @@ public final class Goal  {
 	        newNode[i] = new Node(parent.proof(),
 	                parent.sequent(),
 	                parent);
-
-	        // newNode[i].addNoPosTacletApps(parent.getNoPosTacletApps());
-	        newNode[i].setGlobalProgVars(parent.getGlobalProgVars());
+                newNode[i].addLocalProgVars(localNamespaces.programVariables().elements());
+                newNode[i].addLocalFunctions(localNamespaces.functions().elements());
 	    }
 
         parent.addAll(newNode);
+            flushNamespaces();
 
         this.setNode(newNode[0]);
         goalList = goalList.prepend(this);      
@@ -585,6 +604,12 @@ public final class Goal  {
 	fireGoalReplaced ( this, parent, goalList );
 
 	return goalList;
+    }
+
+    private void flushNamespaces() {
+        NamespaceSet base = localNamespaces.getParent();
+        base.add(localNamespaces);
+        localNamespaces = base.copyWithParent();
     }
 
     private void resetTagManager() {

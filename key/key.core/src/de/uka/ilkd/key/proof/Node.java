@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -24,10 +25,13 @@ import java.util.ListIterator;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -60,7 +64,8 @@ public class Node  {
 
     private NameRecorder         nameRecorder;
 
-    private ImmutableSet<ProgramVariable> globalProgVars      = DefaultImmutableSet.<ProgramVariable>nil();
+    private ImmutableList<IProgramVariable> localProgVars      = ImmutableSLList.<IProgramVariable>nil();
+    private ImmutableList<Operator> localFunctions      = ImmutableSLList.<Operator>nil();
 
     private boolean              closed              = false;
 
@@ -113,7 +118,9 @@ public class Node  {
      */
     public Node(Proof proof, Sequent seq, Node parent) {
         this(proof, seq);
-        this.parent=parent;
+        this.parent = parent;
+        this.localFunctions = parent.localFunctions;
+        this.localProgVars = parent.localProgVars;
     }
 
     /** sets the sequent at this node
@@ -181,12 +188,24 @@ public class Node  {
 	return localIntroducedRules;
     }
 
-    public ImmutableSet<ProgramVariable> getGlobalProgVars() {
-	return globalProgVars;
+    public ImmutableList<IProgramVariable> getLocalProgVars() {
+        return localProgVars;
     }
 
-    public void setGlobalProgVars(ImmutableSet<ProgramVariable> progVars) {
-	globalProgVars=progVars;
+    public void addLocalProgVars(Collection<IProgramVariable> elements) {
+        for (IProgramVariable pv : elements) {
+            localProgVars = localProgVars.prepend(pv);
+        }
+    }
+
+    public Iterable<Operator> getLocalFunctions() {
+        return localFunctions;
+    }
+
+    public void addLocalFunctions(Collection<? extends Operator> elements) {
+        for (Operator op : elements) {
+            localFunctions = localFunctions.prepend(op);
+        }
     }
 
      /**

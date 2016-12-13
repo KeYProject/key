@@ -21,6 +21,9 @@ import java.util.Map;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /**
  * A Namespace keeps track of already used {@link Name}s and the objects
@@ -230,7 +233,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     public Namespace<E> copy() {
-        Namespace<E> copy = new Namespace<E>();
+        Namespace<E> copy = new Namespace<E>(parent);
         if(symbols != null)
             copy.add(symbols.values());
 
@@ -250,4 +253,44 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     public void seal() {
         sealed = true;
     }
+
+    public boolean isEmpty() {
+        return symbols == null || symbols.isEmpty();
+    }
+
+    public boolean isSealed() {
+        return sealed;
+    }
+
+    public Namespace<E> simplify() {
+        if (parent != null && isSealed() && isEmpty()) {
+            return parent;
+        } else {
+            return this;
+        }
+    }
+
+    public Namespace<E> compress() {
+        // TODO the order may be changed! This seems rather inefficient ...
+        Namespace<E> result = new Namespace<E>();
+        result.add(allElements());
+        return result;
+    }
+
+    public boolean contains(E var) {
+        return lookup(var.name()) == var;
+    }
+
+    public void flushToParent() {
+        if (parent == null) {
+            return;
+        }
+
+        for (E element : elements()) {
+            parent.add(element);
+        }
+//      all symbols are contained in parent now ... we are empty again.
+        symbols = null;
+    }
+
 }

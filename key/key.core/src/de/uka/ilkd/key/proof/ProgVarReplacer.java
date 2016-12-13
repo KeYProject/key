@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -105,11 +106,11 @@ public final class ProgVarReplacer {
     /**
      * replaces in a set
      */
-    public ImmutableSet<ProgramVariable> replace(ImmutableSet<ProgramVariable> vars) {
-    	ImmutableSet<ProgramVariable> result = vars;
+    public ImmutableSet<IProgramVariable> replace(ImmutableSet<IProgramVariable> vars) {
+    	ImmutableSet<IProgramVariable> result = vars;
 
-    	for (final ProgramVariable var : vars) {
-	    ProgramVariable newVar = map.get(var);
+    	for (final IProgramVariable var : vars) {
+	    IProgramVariable newVar = map.get(var);
 	    if(newVar != null) {
 	    	result = result.remove(var);
 	    	result = result.add(newVar);

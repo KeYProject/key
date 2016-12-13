@@ -1163,8 +1163,8 @@ public abstract class TacletApp implements RuleApp {
      *            the old variable namespace
      * @return the new created variable namespace
      */
-    public Namespace extendVarNamespaceForSV(Namespace var_ns, SchemaVariable sv) {
-	Namespace ns = new Namespace(var_ns);
+    public Namespace<QuantifiableVariable> extendVarNamespaceForSV(Namespace<QuantifiableVariable> var_ns, SchemaVariable sv) {
+	Namespace<QuantifiableVariable> ns = new Namespace<QuantifiableVariable>(var_ns);
 	Iterator<SchemaVariable> it = taclet().getPrefix(sv).prefix()
 		.iterator();
 	while (it.hasNext()) {

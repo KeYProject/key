@@ -308,7 +308,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * creates a Globals object for use with other internal methods
      */
-    protected Globals wrapGlobals(ImmutableList<Named> globals) {
+    protected Globals wrapGlobals(ImmutableList<? extends Named> globals) {
 	return new GlobalsAsListOfNamed(globals);
     }
 
@@ -796,9 +796,9 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     private static class GlobalsAsListOfNamed
     		   implements Globals {
-	private ImmutableList<Named> globals;
+	private ImmutableList<? extends Named> globals;
 
-	public GlobalsAsListOfNamed(ImmutableList<Named> globals) {
+	public GlobalsAsListOfNamed(ImmutableList<? extends Named> globals) {
 	    this.globals = globals;
 	}
 
@@ -830,9 +830,9 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     private static class AdapterOfIteratorOfNamed
 		   implements Iterator<ProgramElementName> {
-	private Iterator<Named> it;
+	private Iterator<? extends Named> it;
 
-	public AdapterOfIteratorOfNamed(Iterator<Named> it) {
+	public AdapterOfIteratorOfNamed(Iterator<? extends Named> it) {
 	    this.it = it;
 	}
 
@@ -915,9 +915,8 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * internal representation for global variables
      */
-    protected static interface Globals {
-    	public Iterator<ProgramElementName> iterator();
-    }
+    // TODO ... get rid of this old thing.
+    protected static interface Globals extends Iterable<ProgramElementName> {}
 
 
     /**

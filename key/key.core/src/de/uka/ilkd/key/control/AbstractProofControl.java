@@ -11,8 +11,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
@@ -348,18 +346,9 @@ public abstract class AbstractProofControl implements ProofControl {
     public TacletInstantiationModel createModel(TacletApp app, Goal goal) {
        final Proof proof = goal.proof();
        
-       final Namespace progVars = new Namespace(); 
-       final NamespaceSet ns = proof.getNamespaces();
-       progVars.add(goal.getGlobalProgVars());
-       
        return new TacletInstantiationModel(
             app, goal.sequent(),
-       new NamespaceSet(ns.variables(),
-              ns.functions(),
-              ns.sorts(),
-              ns.ruleSets(),
-              ns.choices(),
-              progVars),
+               goal.getLocalNamespaces(),
               proof.abbreviations(),
        goal);
     }
