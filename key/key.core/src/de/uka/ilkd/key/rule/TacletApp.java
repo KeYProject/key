@@ -449,7 +449,7 @@ public abstract class TacletApp implements RuleApp {
 	}
     registerSkolemConstants(services);
 	goal.addAppliedRuleApp(this);
-	return taclet().apply(goal, services, this);
+	return taclet().apply(goal, services.getOverlay(goal.getLocalNamespaces()), this);
     }
 
     /*
