@@ -202,7 +202,7 @@ public abstract class AbstractProofControl implements ProofControl {
                     firstApp = ifSeqCandidates.head();
                 }
                 TacletApp tmpApp =
-                    firstApp.tryToInstantiate(services);
+                    firstApp.tryToInstantiate(services.getOverlay(goal.getLocalNamespaces()));
                 if (tmpApp != null) firstApp = tmpApp;
 
             }

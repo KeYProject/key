@@ -140,6 +140,28 @@ public class Services implements TermServices {
     	nameRecorder = new NameRecorder();
     }
 
+    private Services(Services s) {
+        this.profile = s.profile;
+        this.proof = s.proof;
+        this.namespaces = s.namespaces;
+        this.cee = s.cee;
+        this.typeconverter = s.typeconverter;
+        this.javainfo = s.javainfo;
+        this.counters = s.counters;
+        this.specRepos = s.specRepos;
+        this.javaModel = s.javaModel;
+        this.nameRecorder = s.nameRecorder;
+        this.factory = s.factory;
+        this.caches = s.caches;
+        this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+    }
+
+    public Services getOverlay(NamespaceSet namespaces) {
+        Services result = new Services(this);
+        result.setNamespaces(namespaces);
+        return result;
+    }
+
 
     /**
      * Returns the TypeConverter associated with this Services object.
@@ -233,6 +255,10 @@ public class Services implements TermServices {
     	return s;
     }
     
+    public Services shallowCopy() {
+        return new Services(this);
+    }
+
     /**
      * Creates a deep copy of {@link #counters} which means that a new
      * list is created with a copy of each contained {@link Counter}.
