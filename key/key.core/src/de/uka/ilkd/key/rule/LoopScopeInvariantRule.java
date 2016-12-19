@@ -230,7 +230,7 @@ public class LoopScopeInvariantRule implements BuiltInRule {
                         ruleApp.posInOccurrence());
         
         // Create the "Invariant Preserved and Used" goal
-        presrvAndUCGoal.setBranchLabel("Invariant Initially Valid");
+        presrvAndUCGoal.setBranchLabel("Invariant Preserved and Used");
         presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);
 
         // TODO Create the transformed sequent formula
