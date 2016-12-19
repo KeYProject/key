@@ -231,7 +231,10 @@ public class LoopScopeInvariantRule implements BuiltInRule {
         
         // Create the "Invariant Preserved and Used" goal
         presrvAndUCGoal.setBranchLabel("Invariant Initially Valid");
+        presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);
 
+        // TODO Create the transformed sequent formula
+        
         return goals;
     }
 

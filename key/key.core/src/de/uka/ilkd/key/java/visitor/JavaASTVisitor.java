@@ -146,6 +146,7 @@ import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopInit;
+import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -890,6 +891,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     @Override
     public void performActionOnSynchronizedBlock(SynchronizedBlock x) {
 	doDefaultAction(x);
+    }
+    
+    @Override
+    public void performActionOnLoopScopeBlock(LoopScopeBlock x) {
+        doDefaultAction(x);
     }
 
     @Override
