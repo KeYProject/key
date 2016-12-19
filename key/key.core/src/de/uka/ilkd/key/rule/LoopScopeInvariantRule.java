@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -228,13 +229,24 @@ public class LoopScopeInvariantRule implements BuiltInRule {
                         initFormula(termLabelState, inst, invTerm,
                                 reachableState, services, initiallyGoal),
                         ruleApp.posInOccurrence());
-        
+
         // Create the "Invariant Preserved and Used" goal
         presrvAndUCGoal.setBranchLabel("Invariant Preserved and Used");
         presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);
 
-        // TODO Create the transformed sequent formula
-        
+        // TODO XXX Create the transformed sequent formula
+        // The following is only a test for loop scope
+        presrvAndUCGoal.changeFormula(new SequentFormula(tb.prog(
+                (Modality) inst.progPost.op(),
+                JavaBlock.createJavaBlock(new StatementBlock(new LoopScopeBlock(
+                        new LocationVariable(new ProgramElementName("x"),
+                                services.getJavaInfo()
+                                        .getKeYJavaType("boolean")),
+                        ((StatementBlock) splitUpdates(ruleApp.posInOccurrence().subTerm(), services).second
+                                .javaBlock().program()).getInnerMostMethodFrame().getBody()))),
+                ruleApp.posInOccurrence().subTerm())),
+                ruleApp.posInOccurrence());
+
         return goals;
     }
 
