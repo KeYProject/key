@@ -139,6 +139,7 @@ import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
@@ -2303,7 +2304,6 @@ public class PrettyPrinter {
 
     public void printSynchronizedBlock(SynchronizedBlock x) 
 	throws java.io.IOException {
-
         printHeader(x);
         writeInternalIndentation(x);
         write("synchronized");
@@ -2315,6 +2315,22 @@ public class PrettyPrinter {
         if (x.getBody() != null) {
             writeElement(1, x.getBody());
         }
+        printFooter(x);
+    }
+
+
+    public void printLoopScopeBlock(LoopScopeBlock x) 
+    throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        write("\u21BB");
+        if (x.getIndexPV() != null) {
+            writeElement(x.getIndexPV());
+        }
+        if (x.getBody() != null) {
+            writeElement(1, x.getBody());
+        }
+        write("\u21BA");
         printFooter(x);
     }
 
