@@ -2323,14 +2323,16 @@ public class PrettyPrinter {
     throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        write("\u21BB");
+//        write("\u21BB"); // UTF-8 loop scope sign
+        write("loop-scope(");
         if (x.getIndexPV() != null) {
             writeElement(x.getIndexPV());
         }
+        write(")");
         if (x.getBody() != null) {
             writeElement(1, x.getBody());
         }
-        write("\u21BA");
+//        write("\u21BA"); // UTF-8 loop scope end sign
         printFooter(x);
     }
 
