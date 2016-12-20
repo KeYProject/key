@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
@@ -36,6 +38,7 @@ public class RuleCommand extends AbstractCommand {
         Term on;
         Term formula;
         int occ = -1;
+        Map<String, Term> instantiations = new HashMap<>();
     }
 
     private static class TacletNameFilter extends TacletFilter {
@@ -69,6 +72,16 @@ public class RuleCommand extends AbstractCommand {
         }
 
         theApp = assumesCandidates.head();
+        
+        for (SchemaVariable sv : theApp.uninstantiatedVars()) {
+			if (theApp.isInstantiationRequired(sv)) {
+				Term inst = p.instantiations.get(sv.name().toString());
+				if (inst == null) {
+					throw new ScriptException("missing instantiation for " + sv);
+				}
+				theApp = theApp.addInstantiation(sv, inst, true, proof.getServices());
+			}
+		}
 
         // instantiate remaining symbols
         theApp = theApp.tryToInstantiate(proof.getServices());
@@ -129,7 +142,7 @@ public class RuleCommand extends AbstractCommand {
         } else {
             if(p.occ >= matchingApps.size()) {
                 throw new ScriptException("Occurence " + p.occ
-                        + " has been specified, but there only "
+                        + " has been specified, but there are only "
                         + matchingApps.size() + " hits.");
             }
             return matchingApps.get(p.occ);
@@ -194,26 +207,42 @@ public class RuleCommand extends AbstractCommand {
         }
 
         try {
-            //
-            // on="term to apply to as find"
-            String onStr = args.get("on");
-            if(onStr != null) {
-                result.on = toTerm(proof, state, onStr, null);
-            }
-
-            //
-            // formula="toplevel formula in which it appears"
-            String formStr = args.get("formula");
-            if(formStr != null) {
-                result.formula = toTerm(proof, state, formStr, null);
-            }
-
-            //
-            // occurrence number;
-            String occStr = args.get("occ");
-            if(occStr != null) {
-                result.occ = Integer.parseInt(occStr);
-            }
+        	
+        	for (String s : args.keySet()) {
+        		switch(s) {
+        			case "on":
+        				result.on = toTerm(proof, state, args.get(s), null);
+        				break;
+        			case "formula":
+        				result.formula = toTerm(proof, state, args.get(s), null);
+        				break;
+        			case "occ": 
+        				result.occ = Integer.parseInt(args.get(s));
+        				break;
+        			default: if (s.startsWith("#")) break;
+        				result.instantiations.put(s, toTerm(proof, state, args.get(s), null));
+         		}
+        	}
+//            //
+//            // on="term to apply to as find"
+//            String onStr = args.get("on");
+//            if(onStr != null) {
+//                result.on = toTerm(proof, state, onStr, null);
+//            }
+//
+//            //
+//            // formula="toplevel formula in which it appears"
+//            String formStr = args.get("formula");
+//            if(formStr != null) {
+//                result.formula = toTerm(proof, state, formStr, null);
+//            }
+//
+//            //
+//            // occurrence number;
+//            String occStr = args.get("occ");
+//            if(occStr != null) {
+//                result.occ = Integer.parseInt(occStr);
+//            }
         } catch(Exception e) {
             throw new ScriptException(e);
         }
