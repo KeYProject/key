@@ -11,29 +11,16 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StackLayout;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.widgets.SharedScrolledComposite;
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
@@ -45,7 +32,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
@@ -284,7 +272,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          
          //get the initial state of the text fields.
          LoopInvariantBuiltInRuleApp loopApp = ((LoopInvariantBuiltInRuleApp) getApp()).tryToInstantiate(getGoal());
-         LoopInvariant loopInv = loopApp.getInvariant();
+         LoopSpecification loopInv = loopApp.getSpec();
 
          Map<LocationVariable, Term> atPres = loopInv.getInternalAtPres();
          int heapCnt = services.getTypeConverter().getHeapLDT().getAllHeaps().size();
@@ -619,9 +607,10 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          //FIXME: InfFlowSpecs are currently not implemented, thus there's little point in writing a UI for them.
          //The InfFlowSpecs code here does not actually do anything.
          Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs = new LinkedHashMap<LocationVariable, ImmutableList<InfFlowSpec>>();
+         Map<LocationVariable, Term> freeSpec = new LinkedHashMap<LocationVariable, Term>();
          
          //return the new Invariant
-         LoopInvariant newInvariant = loopApp.getInvariant().configurate(invMap, modMap, infFlowSpecs, variantTerm);
+         LoopSpecification newInvariant = loopApp.getSpec().configurate(invMap, freeSpec, modMap, infFlowSpecs, variantTerm);
          return loopApp.setLoopInvariant(newInvariant);
       }
 
