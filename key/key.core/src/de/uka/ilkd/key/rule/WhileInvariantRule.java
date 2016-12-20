@@ -823,6 +823,8 @@ public final class WhileInvariantRule implements BuiltInRule {
                 .getLocalIns(inst.loop, services);
         final ImmutableSet<ProgramVariable> localOuts = MiscTools
                 .getLocalOuts(inst.loop, services);
+        
+        // XXX (DS) This value (reachableIn) is never used!
         Term reachableIn = tb.tt();
         for (ProgramVariable pv : localIns) {
             reachableIn = tb.and(reachableIn, tb.reachableValue(pv));

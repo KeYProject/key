@@ -6,10 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -17,16 +15,14 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -48,7 +44,6 @@ import de.uka.ilkd.key.rule.metaconstruct.ReplaceWhileLoop;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 
 /**
  * TODO
@@ -57,7 +52,7 @@ import de.uka.ilkd.key.util.Triple;
  */
 public class LoopScopeInvariantRule implements BuiltInRule {
     /**
-     * TODO
+     * The Singleton instance of {@link LoopScopeInvariantRule}.
      */
     public static final LoopScopeInvariantRule INSTANCE = new LoopScopeInvariantRule();
 
@@ -93,8 +88,6 @@ public class LoopScopeInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final TermLabelState termLabelState = new TermLabelState();
         final LoopInvariantBuiltInRuleApp loopRuleApp = (LoopInvariantBuiltInRuleApp) ruleApp;
-        final KeYJavaType booleanKJT = services.getTypeConverter()
-                .getBooleanType();
 
         // Prepare the new goals
         ImmutableList<Goal> goals = goal.split(2);
@@ -117,68 +110,15 @@ public class LoopScopeInvariantRule implements BuiltInRule {
         heapContext.forEach(heap -> mods.put(heap,
                 inst.inv.getModifies(heap, inst.selfTerm, atPres, services)));
 
-        final Term variant = inst.inv.getVariant(inst.selfTerm, atPres,
-                services);
-
-        // collect input and output local variables,
-        // prepare reachableIn and reachableOut
-        final ImmutableSet<ProgramVariable> localIns = MiscTools
-                .getLocalIns(inst.loop, services);
+        // Collect input and output local variables,
+        // prepare reachableOut.
+        // TODO: reachableIn has been removed since it was not even used in the
+        // old invariant rule. Is that OK or was there an earlier mistake?
         final ImmutableSet<ProgramVariable> localOuts = MiscTools
                 .getLocalOuts(inst.loop, services);
 
-        final Term reachableIn = localIns.stream()
-                .map(pv -> tb.reachableValue(pv))
-                .reduce(tb.tt(), (Term acc, Term term) -> tb.and(acc, term));
-
-        final Term reachableOut = localOuts.stream()
-                .map(pv -> tb.reachableValue(pv))
-                .reduce(tb.tt(), (Term acc, Term term) -> tb.and(acc, term));
-
-        // prepare variant
-        final Pair<Term, Term> variantPair = prepareVariant(inst, variant,
-                services);
-        final Term variantUpdate = variantPair.first;
-        final Term variantPO = variantPair.second;
-
-        // prepare guard
-        final Triple<JavaBlock, Term, Term> guardStuff = prepareGuard(inst,
-                booleanKJT, loopRuleApp, services);
-        final JavaBlock guardJb = guardStuff.first;
-        final Term guardTrueTerm = guardStuff.second;
-        final Term guardFalseTerm = guardStuff.third;
-
-        Term beforeLoopUpdate = null;
-
-        final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop = new LinkedHashMap<LocationVariable, Map<Term, Term>>();
-
-        for (LocationVariable heap : heapContext) {
-            heapToBeforeLoop.put(heap, new LinkedHashMap<Term, Term>());
-            final LocationVariable lv = tb.heapAtPreVar(heap + "Before_LOOP",
-                    heap.sort(), true);
-            services.getNamespaces().programVariables().addSafely(lv);
-            final Term u = tb.elementary(lv, tb.var(heap));
-            if (beforeLoopUpdate == null) {
-                beforeLoopUpdate = u;
-            } else {
-                beforeLoopUpdate = tb.parallel(beforeLoopUpdate, u);
-            }
-            heapToBeforeLoop.get(heap).put(tb.var(heap), tb.var(lv));
-        }
-
-        for (ProgramVariable pv : localOuts) {
-            final String pvBeforeLoopName = tb
-                    .newName(pv.name().toString() + "Before_LOOP");
-            final LocationVariable pvBeforeLoop = new LocationVariable(
-                    new ProgramElementName(pvBeforeLoopName),
-                    pv.getKeYJavaType());
-            services.getNamespaces().programVariables().addSafely(pvBeforeLoop);
-            beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
-                    tb.elementary(pvBeforeLoop, tb.var(pv)));
-            heapToBeforeLoop
-                    .get(services.getTypeConverter().getHeapLDT().getHeap())
-                    .put(tb.var(pv), tb.var(pvBeforeLoop));
-        }
+        final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop = //
+                new LinkedHashMap<LocationVariable, Map<Term, Term>>();
 
         // prepare anon update, frame condition, etc.
         // can still be null
@@ -187,29 +127,22 @@ public class LoopScopeInvariantRule implements BuiltInRule {
             anonUpdate = tb.skip();
         }
 
+        // Create update for values before loop
+        Term beforeLoopUpdate = createBeforeLoopUpdate(services, heapContext,
+                localOuts, heapToBeforeLoop);
+
         Term wellFormedAnon = null;
         Term frameCondition = null;
         Term reachableState = null;
-        Term anonHeap = null;
-
-        ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList
-                .<AnonUpdateData> nil();
 
         for (LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon = createAnonUpdate(heap, mods.get(heap),
                     inst.inv, services);
 
-            anonUpdateDatas = anonUpdateDatas.append(tAnon);
             anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
 
             wellFormedAnon = and(tb, wellFormedAnon,
                     tb.wellFormed(tAnon.anonHeap));
-
-            // TODO DS: What's this if for? To just set at the first iteration?
-            // Looks slightly fishy...
-            if (anonHeap == null) {
-                anonHeap = tAnon.anonHeap;
-            }
 
             final Term m = mods.get(heap);
             final Term fc;
@@ -225,7 +158,19 @@ public class LoopScopeInvariantRule implements BuiltInRule {
             reachableState = and(tb, reachableState, tb.wellFormed(heap));
         }
 
+        // Prepare variant
+        final Term variant = //
+                inst.inv.getVariant(inst.selfTerm, atPres, services);
+        final Pair<Term, Term> variantPair = prepareVariant(inst, variant,
+                services);
+        final Term variantUpdate = variantPair.first;
+        final Term variantPO = variantPair.second;
+
         // Prepare common assumption
+        final Term reachableOut = localOuts.stream()
+                .map(pv -> tb.reachableValue(pv))
+                .reduce(tb.tt(), (Term acc, Term term) -> tb.and(acc, term));
+
         final Term[] uAnon = new Term[] { inst.u, anonUpdate };
         final Term[] uBeforeLoopDefAnonVariant = new Term[] { inst.u,
                 beforeLoopUpdate, anonUpdate, variantUpdate };
@@ -233,12 +178,8 @@ public class LoopScopeInvariantRule implements BuiltInRule {
                 tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
 
         // Set the "Initially" goal
-        initiallyGoal.setBranchLabel("Invariant Initially Valid");
-        initiallyGoal
-                .changeFormula(
-                        initFormula(termLabelState, inst, invTerm,
-                                reachableState, services, initiallyGoal),
-                        ruleApp.posInOccurrence());
+        constructInitiallyGoal(services, ruleApp, termLabelState, initiallyGoal,
+                inst, invTerm, reachableState);
 
         // Create the "Invariant Preserved and Used" goal
         constructPresrvAndUCGoal(services, ruleApp, tb, presrvAndUCGoal, inst,
@@ -246,6 +187,82 @@ public class LoopScopeInvariantRule implements BuiltInRule {
                 termLabelState, invTerm, uBeforeLoopDefAnonVariant);
 
         return goals;
+    }
+
+    /**
+     * Sets the content of the "initially valid" goal.
+     * 
+     * @param services
+     *            The {@link Services} object.
+     * @param ruleApp
+     *            The {@link RuleApp} for this {@link LoopScopeInvariantRule}
+     *            application.
+     * @param termLabelState
+     * @param initiallyGoal
+     * @param inst
+     * @param invTerm
+     * @param reachableState
+     */
+    private void constructInitiallyGoal(Services services, RuleApp ruleApp,
+            final TermLabelState termLabelState, Goal initiallyGoal,
+            final Instantiation inst, final Term invTerm, Term reachableState) {
+        initiallyGoal.setBranchLabel("Invariant Initially Valid");
+        initiallyGoal
+                .changeFormula(
+                        initFormula(termLabelState, inst, invTerm,
+                                reachableState, services, initiallyGoal),
+                        ruleApp.posInOccurrence());
+    }
+
+    /**
+     * TODO
+     * 
+     * @param services
+     * @param tb
+     * @param heapContext
+     * @param localOuts
+     * @param heapToBeforeLoop
+     * @return
+     */
+    private Term createBeforeLoopUpdate(Services services,
+            final List<LocationVariable> heapContext,
+            final ImmutableSet<ProgramVariable> localOuts,
+            final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop) {
+        final TermBuilder tb = services.getTermBuilder();
+        final Namespace progVarNS = services.getNamespaces().programVariables();
+
+        Term beforeLoopUpdate = null;
+        for (LocationVariable heap : heapContext) {
+            heapToBeforeLoop.put(heap, new LinkedHashMap<Term, Term>());
+            final LocationVariable lv = tb.heapAtPreVar(heap + "Before_LOOP",
+                    heap.sort(), true);
+            progVarNS.addSafely(lv);
+
+            final Term u = tb.elementary(lv, tb.var(heap));
+            if (beforeLoopUpdate == null) {
+                beforeLoopUpdate = u;
+            } else {
+                beforeLoopUpdate = tb.parallel(beforeLoopUpdate, u);
+            }
+
+            heapToBeforeLoop.get(heap).put(tb.var(heap), tb.var(lv));
+        }
+
+        for (ProgramVariable pv : localOuts) {
+            final String pvBeforeLoopName = tb
+                    .newName(pv.name().toString() + "Before_LOOP");
+            final LocationVariable pvBeforeLoop = new LocationVariable(
+                    new ProgramElementName(pvBeforeLoopName),
+                    pv.getKeYJavaType());
+            progVarNS.addSafely(pvBeforeLoop);
+            beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
+                    tb.elementary(pvBeforeLoop, tb.var(pv)));
+            heapToBeforeLoop
+                    .get(services.getTypeConverter().getHeapLDT().getHeap())
+                    .put(tb.var(pv), tb.var(pvBeforeLoop));
+        }
+
+        return beforeLoopUpdate;
     }
 
     /**
@@ -262,18 +279,19 @@ public class LoopScopeInvariantRule implements BuiltInRule {
      * @param variantPO
      * @param termLabelState
      * @param invTerm
-     * @param uBeforeLoopDefAnonVariant 
+     * @param uBeforeLoopDefAnonVariant
      */
     private void constructPresrvAndUCGoal(Services services, RuleApp ruleApp,
             final TermBuilder tb, Goal presrvAndUCGoal,
             final Instantiation inst, Term anonUpdate, Term wellFormedAnon,
             final Term uAnonInv, Term frameCondition, Term variantPO,
-            TermLabelState termLabelState, Term invTerm, Term[] uBeforeLoopDefAnonVariant) {
+            TermLabelState termLabelState, Term invTerm,
+            Term[] uBeforeLoopDefAnonVariant) {
         final While loop = inst.loop;
 
         final Term newFormula = formulaWithLoopScope(services, inst, anonUpdate,
-                loop, frameCondition, variantPO, termLabelState, presrvAndUCGoal,
-                uBeforeLoopDefAnonVariant, invTerm);
+                loop, frameCondition, variantPO, termLabelState,
+                presrvAndUCGoal, uBeforeLoopDefAnonVariant, invTerm);
 
         presrvAndUCGoal.setBranchLabel("Invariant Preserved and Used");
         presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);
@@ -297,10 +315,11 @@ public class LoopScopeInvariantRule implements BuiltInRule {
      * @param invTerm
      * @return
      */
-    private Term formulaWithLoopScope(Services services, final Instantiation inst,
-            Term anonUpdate, final While loop, Term frameCondition,
-            Term variantPO, TermLabelState termLabelState, Goal presrvAndUCGoal,
-            final Term[] uBeforeLoopDefAnonVariant, Term invTerm) {
+    private Term formulaWithLoopScope(Services services,
+            final Instantiation inst, Term anonUpdate, final While loop,
+            Term frameCondition, Term variantPO, TermLabelState termLabelState,
+            Goal presrvAndUCGoal, final Term[] uBeforeLoopDefAnonVariant,
+            Term invTerm) {
         final TermBuilder tb = services.getTermBuilder();
         final Term progPost = splitUpdates(inst.progPost, services).second;
 
@@ -323,8 +342,10 @@ public class LoopScopeInvariantRule implements BuiltInRule {
                 tb.imp(tb.equals(tb.var(loopScopeIdxVar), tb.FALSE()),
                         fullInvariant));
 
-        final Term newFormula = tb.applySequential(uBeforeLoopDefAnonVariant, tb.prog(modality,
-                JavaBlock.createJavaBlock((StatementBlock) newProg), newPost));
+        final Term newFormula = tb.applySequential(uBeforeLoopDefAnonVariant,
+                tb.prog(modality,
+                        JavaBlock.createJavaBlock((StatementBlock) newProg),
+                        newPost));
         return newFormula;
     }
 
@@ -456,21 +477,15 @@ public class LoopScopeInvariantRule implements BuiltInRule {
     private static Term createLocalAnonUpdate(
             ImmutableSet<ProgramVariable> localOuts, Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        Term anonUpdate = tb.skip();
 
-        for (ProgramVariable pv : localOuts) {
-            final Name anonFuncName = new Name(
-                    tb.newName(pv.name().toString()));
-            final Function anonFunc = //
-                    new Function(anonFuncName, pv.sort(), true);
+        return localOuts.stream().map(pv -> {
+            final Function anonFunc = new Function(
+                    new Name(tb.newName(pv.name().toString())), pv.sort(),
+                    true);
             services.getNamespaces().functions().addSafely(anonFunc);
-            final Term elemUpd = tb.elementary( //
-                    (LocationVariable) pv, tb.func(anonFunc));
 
-            anonUpdate = tb.parallel(anonUpdate, elemUpd);
-        }
-
-        return anonUpdate;
+            return tb.elementary((LocationVariable) pv, tb.func(anonFunc));
+        }).reduce(tb.skip(), (acc, t) -> tb.parallel(acc, t));
     }
 
     /**
@@ -689,42 +704,6 @@ public class LoopScopeInvariantRule implements BuiltInRule {
     /**
      * TODO
      * 
-     * @param inst
-     * @param booleanKJT
-     * @param loopRuleApp
-     * @param services
-     * @return
-     */
-    private Triple<JavaBlock, Term, Term> prepareGuard(final Instantiation inst,
-            final KeYJavaType booleanKJT,
-            LoopInvariantBuiltInRuleApp loopRuleApp,
-            final TermServices services) {
-        final TermBuilder tb = services.getTermBuilder();
-        final ProgramElementName guardVarName = new ProgramElementName(
-                tb.newName("b"));
-        final LocationVariable guardVar = new LocationVariable(guardVarName,
-                booleanKJT);
-        services.getNamespaces().programVariables().addSafely(guardVar);
-        loopRuleApp.setGuard(tb.var(guardVar));
-        final VariableSpecification guardVarSpec = new VariableSpecification(
-                guardVar, inst.loop.getGuardExpression(), booleanKJT);
-        final LocalVariableDeclaration guardVarDecl = new LocalVariableDeclaration(
-                new TypeRef(booleanKJT), guardVarSpec);
-        final Statement guardVarMethodFrame = inst.innermostExecutionContext == null
-                ? guardVarDecl
-                : new MethodFrame(null, inst.innermostExecutionContext,
-                        new StatementBlock(guardVarDecl));
-        final JavaBlock guardJb = JavaBlock
-                .createJavaBlock(new StatementBlock(guardVarMethodFrame));
-        final Term guardTrueTerm = tb.equals(tb.var(guardVar), tb.TRUE());
-        final Term guardFalseTerm = tb.equals(tb.var(guardVar), tb.FALSE());
-        return new Triple<JavaBlock, Term, Term>(guardJb, guardTrueTerm,
-                guardFalseTerm);
-    }
-
-    /**
-     * TODO
-     * 
      * @param termLabelState
      * @param inst
      * @param invTerm
@@ -758,7 +737,9 @@ public class LoopScopeInvariantRule implements BuiltInRule {
         public final While loop;
         public final LoopSpecification inv;
         public final Term selfTerm;
-        public final ExecutionContext innermostExecutionContext;
+        // TODO Removed this field; was however used in old invariant rule.
+        // Might be needed for IF or well-definedness or whatever...
+        // public final ExecutionContext innermostExecutionContext;
 
         public Instantiation(Term u, Term progPost, While loop,
                 LoopSpecification inv, Term selfTerm,
@@ -775,7 +756,7 @@ public class LoopScopeInvariantRule implements BuiltInRule {
             this.loop = loop;
             this.inv = inv;
             this.selfTerm = selfTerm;
-            this.innermostExecutionContext = innermostExecutionContext;
+            // this.innermostExecutionContext = innermostExecutionContext;
         }
     }
 
@@ -785,13 +766,16 @@ public class LoopScopeInvariantRule implements BuiltInRule {
      * @author Dominic Scheurer
      */
     private static class AnonUpdateData {
-        public final Term anonUpdate, anonHeap, loopHeap, loopHeapAtPre;
+        public final Term anonUpdate, anonHeap;
+        // TODO Removed these fields; were however used in old invariant rule.
+        // Might be needed for IF or well-definedness or whatever...
+        // public final Term loopHeap, loopHeapAtPre;
 
         public AnonUpdateData(Term anonUpdate, Term loopHeap,
                 Term loopHeapAtPre, Term anonHeap) {
             this.anonUpdate = anonUpdate;
-            this.loopHeap = loopHeap;
-            this.loopHeapAtPre = loopHeapAtPre;
+            // this.loopHeap = loopHeap;
+            // this.loopHeapAtPre = loopHeapAtPre;
             this.anonHeap = anonHeap;
         }
     }
