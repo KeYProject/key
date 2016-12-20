@@ -28,7 +28,9 @@ import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 /**
  * Loop scope block. TODO
@@ -38,7 +40,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 public class LoopScopeBlock extends JavaStatement
         implements StatementContainer, ExpressionContainer, ProgramPrefix {
 
-    protected final ProgramVariable indexPV;
+    protected final IProgramVariable indexPV;
     protected final StatementBlock body;
     private final MethodFrame innerMostMethodFrame;
     private final int prefixLength;
@@ -63,8 +65,8 @@ public class LoopScopeBlock extends JavaStatement
      * @param e
      * @param body
      */
-    public LoopScopeBlock(ProgramVariable indexPV, StatementBlock body) {
-        this.indexPV = indexPV;
+    public LoopScopeBlock(IProgramVariable iProgramVariable, StatementBlock body) {
+        this.indexPV = iProgramVariable;
         this.body = body;
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil
                 .computeEssentials(this);
@@ -81,7 +83,7 @@ public class LoopScopeBlock extends JavaStatement
      */
     public LoopScopeBlock(ExtList children) {
         super(children);
-        indexPV = children.get(ProgramVariable.class);
+        indexPV = children.get(IProgramVariable.class);
         body = children.get(StatementBlock.class);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil
                 .computeEssentials(this);
@@ -161,7 +163,7 @@ public class LoopScopeBlock extends JavaStatement
     @Override
     public Expression getExpressionAt(int index) {
         if (indexPV != null && index == 0) {
-            return indexPV;
+            return (ProgramVariable) indexPV; //XXX This cast may fail...
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -171,7 +173,7 @@ public class LoopScopeBlock extends JavaStatement
      * 
      * @return the expression.
      */
-    public ProgramVariable getIndexPV() {
+    public IProgramVariable getIndexPV() {
         return indexPV;
     }
 

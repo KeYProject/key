@@ -71,7 +71,7 @@ public class LoopScopeBlock extends JavaStatement
         this.indexPV = indexPV;
     }
 
-    public Expression getIndexVariable() {
+    public Expression getIndexPV() {
         return indexPV;
     }
 

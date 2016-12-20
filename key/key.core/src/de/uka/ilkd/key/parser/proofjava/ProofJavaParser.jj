@@ -4495,7 +4495,7 @@ SynchronizedBlock SynchronizedStatement() :
 LoopScopeBlock LoopScope() :
 {
     LoopScopeBlock result;
-    Expression expr;
+    Expression indexPV;
     StatementBlock block;
 }
 {
@@ -4504,10 +4504,10 @@ LoopScopeBlock LoopScope() :
       result = factory.createLoopScopeBlock();
       setPrefixInfo(result);
   }
-  "(" expr = Expression() ")"
+  "(" indexPV = Expression() ")"
   block = Block()
   {
-      result.setIndexPV(expr);
+      result.setIndexPV(indexPV);
       result.setBody(block);
       checkConstruction(result);
       setPostfixInfo(result);

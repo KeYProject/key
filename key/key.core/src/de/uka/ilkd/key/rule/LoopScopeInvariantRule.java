@@ -394,7 +394,12 @@ public class LoopScopeInvariantRule implements BuiltInRule {
                 KeYJavaASTFactory.block(newIf));
 
         final ReplaceWhileLoop rplLoopVisitor = new ReplaceWhileLoop(
-                origProg.program(), KeYJavaASTFactory.block(loopScope),
+                origProg.program(),
+                KeYJavaASTFactory.block(
+                        KeYJavaASTFactory.block(
+                                KeYJavaASTFactory.declare(loopScopeIdxVar,
+                                        KeYJavaASTFactory.falseLiteral())),
+                        loopScope),
                 services);
         rplLoopVisitor.start();
 
