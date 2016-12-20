@@ -200,7 +200,7 @@ public class RuleCommand extends AbstractCommand {
 
         try {
         	for (Entry<String, String> arg : args.entrySet()) {
-        		switch(arg.getKey()) {
+                switch (arg.getKey()) {
         		    case "#2":
         		        // rule name
         		        result.rulename = args.get("#2");
@@ -219,12 +219,12 @@ public class RuleCommand extends AbstractCommand {
         				break;
         			default:
         			    // instantiation
-        			    String s = arg.getValue();
+                    String s = arg.getKey();
         			    if (!s.startsWith("#")) {
-        			        if(s.startsWith("inst_")) {
+                        if (s.startsWith("inst_")) {
         			            s = s.substring(5);
         			        }
-        			        result.instantiations.put(s, toTerm(proof, state, args.get(s), null));
+                        result.instantiations.put(s, toTerm(proof, state, arg.getValue(), null));
         			    }
          		}
         	}

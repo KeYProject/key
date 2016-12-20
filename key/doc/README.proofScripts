@@ -162,6 +162,11 @@ the name of the taclet to be applied. If the taclet matches only once
 on the entire sequent, the rule is applied. If it matches more than
 once you need to specify more. In that case you can specify the
 sequence formula and the number of the occurrence in the formula.
+If a rule has schema variables which must be instantiated manually,
+such instantiations can be provided as arguments. A schema variable
+named sv can be instantiated by setting the argument sv="..." or by
+setting inst_sv="..." (the latter works also for conflict cases like
+inst_occ="...").
 
 Examples:
    rule andRight;
@@ -171,10 +176,13 @@ Examples:
        # changes sequent "a=b ==> c=d" to "b=a ==> c=d"
        # "rule eqSymm;" alone would have been ambiguous.
 
-   rule eqSymm formula="a=b->c=d" occ=2
+   rule eqSymm formula="a=b->c=d" occ=2;
        # changes sequent "a=b->c=d ==>" to "a=b->d=c ==>".
        # occurrence number needed since there are 
        # two possible applications on the formula
+
+   rule cut cutFormula="x > y";
+       # almost the same as 'cut "x>y"'
 
 -- script ----------------
 
