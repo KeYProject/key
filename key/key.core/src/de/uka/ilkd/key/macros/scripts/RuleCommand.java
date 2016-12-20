@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -72,7 +73,7 @@ public class RuleCommand extends AbstractCommand {
         }
 
         theApp = assumesCandidates.head();
-        
+
         for (SchemaVariable sv : theApp.uninstantiatedVars()) {
 			if (theApp.isInstantiationRequired(sv)) {
 				Term inst = p.instantiations.get(sv.name().toString());
@@ -116,10 +117,6 @@ public class RuleCommand extends AbstractCommand {
             Map<String, Object> state) {
 
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(taclet);
-
-        // TODO allow for sv instantiations at this point
-//        SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-        // app = app.addCheckedInstantiation(sv, formula, proof.getServices(), true);
 
         return app;
     }
@@ -201,50 +198,42 @@ public class RuleCommand extends AbstractCommand {
 
         Parameters result = new Parameters();
 
-        result.rulename = args.get("#2");
-        if(result.rulename == null) {
-            throw new ScriptException("Rule name must be set");
-        }
-
         try {
-        	
-        	for (String s : args.keySet()) {
-        		switch(s) {
+        	for (Entry<String, String> arg : args.entrySet()) {
+        		switch(arg.getKey()) {
+        		    case "#2":
+        		        // rule name
+        		        result.rulename = args.get("#2");
+        		        break;
         			case "on":
-        				result.on = toTerm(proof, state, args.get(s), null);
+        			    // on="term to apply to as find"
+        				result.on = toTerm(proof, state, arg.getValue(), null);
         				break;
         			case "formula":
-        				result.formula = toTerm(proof, state, args.get(s), null);
+        			    // formula="toplevel formula in which it appears"
+        				result.formula = toTerm(proof, state, arg.getValue(), null);
         				break;
-        			case "occ": 
-        				result.occ = Integer.parseInt(args.get(s));
+        			case "occ":
+        			    // occurrence number;
+        				result.occ = Integer.parseInt(arg.getValue());
         				break;
-        			default: if (s.startsWith("#")) break;
-        				result.instantiations.put(s, toTerm(proof, state, args.get(s), null));
+        			default:
+        			    // instantiation
+        			    String s = arg.getValue();
+        			    if (!s.startsWith("#")) {
+        			        if(s.startsWith("inst_")) {
+        			            s = s.substring(5);
+        			        }
+        			        result.instantiations.put(s, toTerm(proof, state, args.get(s), null));
+        			    }
          		}
         	}
-//            //
-//            // on="term to apply to as find"
-//            String onStr = args.get("on");
-//            if(onStr != null) {
-//                result.on = toTerm(proof, state, onStr, null);
-//            }
-//
-//            //
-//            // formula="toplevel formula in which it appears"
-//            String formStr = args.get("formula");
-//            if(formStr != null) {
-//                result.formula = toTerm(proof, state, formStr, null);
-//            }
-//
-//            //
-//            // occurrence number;
-//            String occStr = args.get("occ");
-//            if(occStr != null) {
-//                result.occ = Integer.parseInt(occStr);
-//            }
         } catch(Exception e) {
             throw new ScriptException(e);
+        }
+
+        if(result.rulename == null) {
+            throw new ScriptException("Rule name must be set");
         }
 
         return result;
