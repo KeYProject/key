@@ -4491,6 +4491,29 @@ SynchronizedBlock SynchronizedStatement() :
   }
 }
 
+LoopScopeBlock LoopScope() :
+{
+    LoopScopeBlock result;
+    Expression expr;
+    StatementBlock block;
+}
+{
+  "loop-scope"
+  {
+      result = factory.createLoopScopeBlock();
+      setPrefixInfo(result);
+  }
+  "(" expr = Expression() ")"
+  block = Block()
+  {
+      result.setIndexPV(expr);
+      result.setBody(block);
+      checkConstruction(result);
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
 Try TryStatement() :
 /*
  * Semantic check required here to make sure that at least one

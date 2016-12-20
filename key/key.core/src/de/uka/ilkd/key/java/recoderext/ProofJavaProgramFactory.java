@@ -402,6 +402,10 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 							 StatementBlock block) {
 	return new MethodCallStatement(resVar, ec, block);
     }
+    
+    public LoopScopeBlock createLoopScopeBlock() {
+        return new LoopScopeBlock();
+    }
 
     /**
      * Create a {@link MethodBodyStatement}.
