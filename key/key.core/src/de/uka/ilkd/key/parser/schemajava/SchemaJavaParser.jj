@@ -556,6 +556,7 @@ TOKEN :
 		    | < EVALARGS: "#evaluate-arguments" >
 		    | < REPLACEARGS: "#replace" >
 		    | < LONG: "long" >
+		    | < LOOPSCOPE: "loop-scope" >
 		    | < NATIVE: "native" >
 		    | < NEW: "new" >
 		    | < NULL: "null" >
@@ -3591,6 +3592,7 @@ Statement Statement() :
      | result = SwitchStatement()
      | result = IfStatement()
      | result = WhileStatement()
+     | result = LoopScopeStatement()
      | result = KeYMetaConstructStatement()
      | result = DoStatement()
      | result = ForStatement()
@@ -4433,6 +4435,27 @@ Statement stat;
     "(" expr = Expression() ")" stat = Statement()
     {
 	result.setGuard(expr);
+	result.setBody(stat);
+	checkConstruction(result);
+	return result;
+    }
+}
+
+LoopScopeBlock LoopScopeStatement() :
+{
+    LoopScopeBlock result;
+    Expression indexPV = null;
+	Statement stat;
+}
+{
+    "loop-scope"
+	{
+	    result = factory.createLoopScopeBlock();
+	    setPrefixInfo(result);
+	}
+    "(" indexPV = Expression() ")" stat = Statement()
+    {
+	result.setIndexPV(indexPV);
 	result.setBody(stat);
 	checkConstruction(result);
 	return result;
