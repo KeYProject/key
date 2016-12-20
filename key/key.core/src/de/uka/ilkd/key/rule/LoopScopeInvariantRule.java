@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +9,10 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -40,6 +44,7 @@ import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.metaconstruct.ReplaceWhileLoop;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -60,6 +65,11 @@ public class LoopScopeInvariantRule implements BuiltInRule {
      * The hint used to refactor the initial invariant.
      */
     public static final String INITIAL_INVARIANT_ONLY_HINT = "onlyInitialInvariant";
+
+    /**
+     * The hint used to refactor the full invariant.
+     */
+    public static final String FULL_INVARIANT_TERM_HINT = "fullInvariant";
 
     private static final Name NAME = new Name("Loop (Scope) Invariant");
 
@@ -231,23 +241,143 @@ public class LoopScopeInvariantRule implements BuiltInRule {
                         ruleApp.posInOccurrence());
 
         // Create the "Invariant Preserved and Used" goal
-        presrvAndUCGoal.setBranchLabel("Invariant Preserved and Used");
-        presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);
-
-        // TODO XXX Create the transformed sequent formula
-        // The following is only a test for loop scope
-        presrvAndUCGoal.changeFormula(new SequentFormula(tb.prog(
-                (Modality) inst.progPost.op(),
-                JavaBlock.createJavaBlock(new StatementBlock(new LoopScopeBlock(
-                        new LocationVariable(new ProgramElementName("x"),
-                                services.getJavaInfo()
-                                        .getKeYJavaType("boolean")),
-                        ((StatementBlock) splitUpdates(ruleApp.posInOccurrence().subTerm(), services).second
-                                .javaBlock().program()).getInnerMostMethodFrame().getBody()))),
-                ruleApp.posInOccurrence().subTerm())),
-                ruleApp.posInOccurrence());
+        constructPresrvAndUCGoal(services, ruleApp, tb, presrvAndUCGoal, inst,
+                anonUpdate, wellFormedAnon, uAnonInv, frameCondition, variantPO,
+                termLabelState, invTerm, uBeforeLoopDefAnonVariant);
 
         return goals;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param services
+     * @param ruleApp
+     * @param tb
+     * @param presrvAndUCGoal
+     * @param inst
+     * @param anonUpdate
+     * @param uAnonInv
+     * @param frameCondition
+     * @param variantPO
+     * @param termLabelState
+     * @param invTerm
+     * @param uBeforeLoopDefAnonVariant 
+     */
+    private void constructPresrvAndUCGoal(Services services, RuleApp ruleApp,
+            final TermBuilder tb, Goal presrvAndUCGoal,
+            final Instantiation inst, Term anonUpdate, Term wellFormedAnon,
+            final Term uAnonInv, Term frameCondition, Term variantPO,
+            TermLabelState termLabelState, Term invTerm, Term[] uBeforeLoopDefAnonVariant) {
+        final While loop = inst.loop;
+
+        final Term newFormula = formulaWithLoopScope(services, inst, anonUpdate,
+                loop, frameCondition, variantPO, termLabelState, presrvAndUCGoal,
+                uBeforeLoopDefAnonVariant, invTerm);
+
+        presrvAndUCGoal.setBranchLabel("Invariant Preserved and Used");
+        presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);
+        presrvAndUCGoal.addFormula(new SequentFormula(wellFormedAnon), true,
+                false);
+        presrvAndUCGoal.changeFormula(new SequentFormula(newFormula),
+                ruleApp.posInOccurrence());
+    }
+
+    /**
+     * TODO
+     * 
+     * @param services
+     * @param inst
+     * @param anonUpdate
+     * @param loop
+     * @param frameCondition
+     * @param variantPO
+     * @param termLabelState
+     * @param presrvAndUCGoal
+     * @param invTerm
+     * @return
+     */
+    private Term formulaWithLoopScope(Services services, final Instantiation inst,
+            Term anonUpdate, final While loop, Term frameCondition,
+            Term variantPO, TermLabelState termLabelState, Goal presrvAndUCGoal,
+            final Term[] uBeforeLoopDefAnonVariant, Term invTerm) {
+        final TermBuilder tb = services.getTermBuilder();
+        final Term progPost = splitUpdates(inst.progPost, services).second;
+
+        Term fullInvariant = tb.and(invTerm, frameCondition, variantPO);
+        fullInvariant = TermLabelManager.refactorTerm(termLabelState, services,
+                null, fullInvariant, this, presrvAndUCGoal,
+                FULL_INVARIANT_TERM_HINT, null);
+
+        final Term post = progPost.sub(0);
+        final Modality modality = (Modality) progPost.op();
+        final JavaBlock origJavaBlock = progPost.javaBlock();
+
+        final ProgramVariable loopScopeIdxVar = loopScopeIdxVar(services);
+
+        final ProgramElement newProg = newProgram(services, loop, origJavaBlock,
+                loopScopeIdxVar);
+
+        final Term newPost = tb.and(
+                tb.imp(tb.equals(tb.var(loopScopeIdxVar), tb.TRUE()), post),
+                tb.imp(tb.equals(tb.var(loopScopeIdxVar), tb.FALSE()),
+                        fullInvariant));
+
+        final Term newFormula = tb.applySequential(uBeforeLoopDefAnonVariant, tb.prog(modality,
+                JavaBlock.createJavaBlock((StatementBlock) newProg), newPost));
+        return newFormula;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param services
+     * @return
+     */
+    private ProgramVariable loopScopeIdxVar(Services services) {
+        final KeYJavaType booleanType = services.getJavaInfo()
+                .getKeYJavaType("boolean");
+
+        final ProgramVariable loopScopeIdxVar = //
+                KeYJavaASTFactory
+                        .localVariable( //
+                                services.getVariableNamer()
+                                        .getTemporaryNameProposal("x"),
+                                booleanType);
+
+        return loopScopeIdxVar;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param services
+     * @param loop
+     * @param progPost
+     * @param loopScopeIdxVar
+     * @return
+     */
+    private ProgramElement newProgram(Services services, final While loop,
+            final JavaBlock origProg, final ProgramVariable loopScopeIdxVar) {
+        final ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
+
+        ((StatementBlock) loop.getBody()).getBody()
+                .forEach(elem -> stmnt.add(elem));
+        stmnt.add(KeYJavaASTFactory.continueStatement(null));
+
+        final Statement newIf = KeYJavaASTFactory.ifThen(
+                loop.getGuardExpression(),
+                new StatementBlock(stmnt.toArray(new Statement[stmnt.size()])));
+
+        LoopScopeBlock loopScope = new LoopScopeBlock(loopScopeIdxVar,
+                KeYJavaASTFactory.block(newIf));
+
+        final ReplaceWhileLoop rplLoopVisitor = new ReplaceWhileLoop(
+                origProg.program(), KeYJavaASTFactory.block(loopScope),
+                services);
+        rplLoopVisitor.start();
+
+        return rplLoopVisitor.result();
     }
 
     @Override

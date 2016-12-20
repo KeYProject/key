@@ -37,7 +37,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  */
 public class LoopScopeBlock extends JavaStatement
         implements StatementContainer, ExpressionContainer, ProgramPrefix {
-    
+
     protected final ProgramVariable indexPV;
     protected final StatementBlock body;
     private final MethodFrame innerMostMethodFrame;
@@ -79,7 +79,6 @@ public class LoopScopeBlock extends JavaStatement
      * @param children
      *            a list with all children
      */
-
     public LoopScopeBlock(ExtList children) {
         super(children);
         indexPV = children.get(ProgramVariable.class);
@@ -133,6 +132,7 @@ public class LoopScopeBlock extends JavaStatement
         return StatementBlock.computePrefixElements(body.getBody(), this);
     }
 
+    @Override
     public PosInProgram getFirstActiveChildPos() {
         return getStatementCount() == 0 ? PosInProgram.TOP
                 : PosInProgram.TOP.down(getChildCount() - 1).down(0);
@@ -143,6 +143,7 @@ public class LoopScopeBlock extends JavaStatement
      * 
      * @return the number of expressions.
      */
+    @Override
     public int getExpressionCount() {
         return (indexPV != null) ? 1 : 0;
     }
@@ -157,6 +158,7 @@ public class LoopScopeBlock extends JavaStatement
      * @exception ArrayIndexOutOfBoundsException
      *                if <tt>index</tt> is out of bounds.
      */
+    @Override
     public Expression getExpressionAt(int index) {
         if (indexPV != null && index == 0) {
             return indexPV;
@@ -178,7 +180,7 @@ public class LoopScopeBlock extends JavaStatement
      * 
      * @return an int giving the number of children of this node
      */
-
+    @Override
     public int getChildCount() {
         int result = 0;
         if (indexPV != null)
@@ -198,6 +200,7 @@ public class LoopScopeBlock extends JavaStatement
      * @exception ArrayIndexOutOfBoundsException
      *                if <tt>index</tt> is out of bounds
      */
+    @Override
     public ProgramElement getChildAt(int index) {
         if (indexPV != null) {
             if (index == 0)
@@ -216,7 +219,6 @@ public class LoopScopeBlock extends JavaStatement
      * 
      * @return the statement block.
      */
-
     public StatementBlock getBody() {
         return body;
     }
@@ -226,7 +228,7 @@ public class LoopScopeBlock extends JavaStatement
      * 
      * @return the number of statements.
      */
-
+    @Override
     public int getStatementCount() {
         return (body != null) ? 1 : 0;
     }
@@ -235,13 +237,15 @@ public class LoopScopeBlock extends JavaStatement
      * Return the statement at the specified index in this node's "virtual"
      * statement array.
      * 
-     * @param index an index for a statement.
+     * @param index
+     *            an index for a statement.
      * 
      * @return the statement with the given index.
      * 
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of
-     * bounds.
+     * @exception ArrayIndexOutOfBoundsException
+     *                if <tt>index</tt> is out of bounds.
      */
+    @Override
     public Statement getStatementAt(int index) {
         if (body != null && index == 0) {
             return body;
@@ -249,6 +253,7 @@ public class LoopScopeBlock extends JavaStatement
         throw new ArrayIndexOutOfBoundsException();
     }
 
+    @Override
     public SourceElement getFirstElement() {
         return body.getFirstElement();
     }
@@ -260,10 +265,12 @@ public class LoopScopeBlock extends JavaStatement
      * @param v
      *            the Visitor
      */
+    @Override
     public void visit(Visitor v) {
         v.performActionOnLoopScopeBlock(this);
     }
 
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printLoopScopeBlock(this);
     }
