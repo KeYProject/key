@@ -3675,6 +3675,7 @@ Statement Statement() :
 | result = ReturnStatement()
 | result = ThrowStatement()
 | result = SynchronizedStatement()
+| result = LoopScope()
 | result = TryStatement()
 | result = AssertStatement()
 | result = KeYCatchAllStatement()
