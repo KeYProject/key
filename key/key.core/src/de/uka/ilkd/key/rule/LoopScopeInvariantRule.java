@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -15,7 +16,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
@@ -30,6 +34,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
@@ -44,6 +49,7 @@ import de.uka.ilkd.key.rule.metaconstruct.ReplaceWhileLoop;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * TODO
@@ -90,9 +96,10 @@ public class LoopScopeInvariantRule implements BuiltInRule {
         final LoopInvariantBuiltInRuleApp loopRuleApp = (LoopInvariantBuiltInRuleApp) ruleApp;
 
         // Prepare the new goals
-        ImmutableList<Goal> goals = goal.split(2);
-        Goal initiallyGoal = goals.tail().head();
-        Goal presrvAndUCGoal = goals.head();
+        ImmutableList<Goal> goals = goal.split(3);
+        Goal initiallyGoal = goals.tail().tail().head();
+        Goal preservesGoal = goals.tail().head();
+        Goal useCaseGoal = goals.head();
 
         // Get the Instantiation object
         final Instantiation inst = instantiate(loopRuleApp, services);
@@ -177,14 +184,26 @@ public class LoopScopeInvariantRule implements BuiltInRule {
         final Term uAnonInv = tb.applySequential(uAnon,
                 tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
 
-        // Set the "Initially" goal
+        // Create the "Initially" goal
         constructInitiallyGoal(services, ruleApp, termLabelState, initiallyGoal,
                 inst, invTerm, reachableState);
 
-        // Create the "Invariant Preserved and Used" goal
-        constructPresrvAndUCGoal(services, ruleApp, tb, presrvAndUCGoal, inst,
+        // Create the "Invariant Preserved" goal
+        constructPresrvAndUCGoal(services, ruleApp, tb, preservesGoal, inst,
                 anonUpdate, wellFormedAnon, uAnonInv, frameCondition, variantPO,
                 termLabelState, invTerm, uBeforeLoopDefAnonVariant);
+
+        // "Use Case":
+        // \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
+        // (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
+        // (#v1=FALSE -> \[{.. ...}\]post)),anon2))
+        final Triple<JavaBlock, Term, Term> guardStuff = prepareGuard(inst,
+                services.getTypeConverter().getBooleanType(), loopRuleApp,
+                services);
+
+        prepareUseCaseBranch(termLabelState, services, ruleApp, inst,
+                wellFormedAnon, useCaseGoal, guardStuff.first, guardStuff.third, uAnon,
+                uAnonInv);
 
         return goals;
     }
@@ -293,12 +312,112 @@ public class LoopScopeInvariantRule implements BuiltInRule {
                 loop, frameCondition, variantPO, termLabelState,
                 presrvAndUCGoal, uBeforeLoopDefAnonVariant, invTerm);
 
-        presrvAndUCGoal.setBranchLabel("Invariant Preserved and Used");
+        presrvAndUCGoal.setBranchLabel("Invariant Preserved");
         presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);
         presrvAndUCGoal.addFormula(new SequentFormula(wellFormedAnon), true,
                 false);
         presrvAndUCGoal.changeFormula(new SequentFormula(newFormula),
                 ruleApp.posInOccurrence());
+    }
+
+    /**
+     * 
+     * TODO
+     * 
+     * @param inst
+     * @param booleanKJT
+     * @param loopRuleApp
+     * @param services
+     * @return
+     */
+    private Triple<JavaBlock, Term, Term> prepareGuard(final Instantiation inst,
+            final KeYJavaType booleanKJT,
+            LoopInvariantBuiltInRuleApp loopRuleApp,
+            final TermServices services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final ProgramElementName guardVarName = new ProgramElementName(
+                tb.newName("b"));
+        final LocationVariable guardVar = new LocationVariable(guardVarName,
+                booleanKJT);
+        services.getNamespaces().programVariables().addSafely(guardVar);
+        loopRuleApp.setGuard(tb.var(guardVar));
+        final VariableSpecification guardVarSpec = new VariableSpecification(
+                guardVar, inst.loop.getGuardExpression(), booleanKJT);
+        final LocalVariableDeclaration guardVarDecl = new LocalVariableDeclaration(
+                new TypeRef(booleanKJT), guardVarSpec);
+        final Statement guardVarMethodFrame = inst.innermostExecutionContext == null
+                ? guardVarDecl
+                : new MethodFrame(null, inst.innermostExecutionContext,
+                        new StatementBlock(guardVarDecl));
+        final JavaBlock guardJb = JavaBlock
+                .createJavaBlock(new StatementBlock(guardVarMethodFrame));
+        final Term guardTrueTerm = tb.equals(tb.var(guardVar), tb.TRUE());
+        final Term guardFalseTerm = tb.equals(tb.var(guardVar), tb.FALSE());
+        return new Triple<JavaBlock, Term, Term>(guardJb, guardTrueTerm,
+                guardFalseTerm);
+    }
+
+    /**
+     * TODO
+     * 
+     * @param termLabelState
+     * @param services
+     * @param ruleApp
+     * @param inst
+     * @param wellFormedAnon
+     * @param useGoal
+     * @param guardJb
+     * @param guardFalseTerm
+     * @param uAnon
+     * @param uAnonInv
+     */
+    private void prepareUseCaseBranch(TermLabelState termLabelState,
+            Services services, RuleApp ruleApp, Instantiation inst,
+            Term wellFormedAnon, Goal useGoal, final JavaBlock guardJb,
+            final Term guardFalseTerm, final Term[] uAnon,
+            final Term uAnonInv) {
+        useGoal.setBranchLabel("Use Case");
+        useGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
+        useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
+        final TermBuilder tb = services.getTermBuilder();
+
+        Term guardFalseRestPsi = useCaseFormula(termLabelState, services,
+                ruleApp, inst, useGoal, guardJb, guardFalseTerm);
+        useGoal.changeFormula(
+                new SequentFormula(
+                        tb.applySequential(uAnon, guardFalseRestPsi)),
+                ruleApp.posInOccurrence());
+    }
+
+    /**
+     * TODO
+     * 
+     * @param termLabelState
+     * @param services
+     * @param ruleApp
+     * @param inst
+     * @param useGoal
+     * @param guardJb
+     * @param guardFalseTerm
+     * @return
+     */
+    private Term useCaseFormula(TermLabelState termLabelState,
+            Services services, RuleApp ruleApp, Instantiation inst,
+            Goal useGoal, final JavaBlock guardJb, final Term guardFalseTerm) {
+        final TermBuilder tb = services.getTermBuilder();
+        JavaBlock useJavaBlock = JavaTools
+                .removeActiveStatement(inst.progPost.javaBlock(), services);
+        final ImmutableArray<TermLabel> instantiateLabels = TermLabelManager
+                .instantiateLabels(termLabelState, services,
+                        ruleApp.posInOccurrence(), this, ruleApp, useGoal,
+                        "UseModality", null, inst.progPost.op(),
+                        new ImmutableArray<Term>(inst.progPost.sub(0)), null,
+                        useJavaBlock, inst.progPost.getLabels());
+        Term restPsi = tb.prog((Modality) inst.progPost.op(), useJavaBlock,
+                inst.progPost.sub(0), instantiateLabels);
+        Term guardFalseRestPsi = tb.box(guardJb,
+                tb.imp(guardFalseTerm, restPsi));
+        return guardFalseRestPsi;
     }
 
     /**
@@ -395,9 +514,8 @@ public class LoopScopeInvariantRule implements BuiltInRule {
 
         final ReplaceWhileLoop rplLoopVisitor = new ReplaceWhileLoop(
                 origProg.program(),
-                KeYJavaASTFactory.block(
-                        KeYJavaASTFactory.declare(loopScopeIdxVar,
-                                        KeYJavaASTFactory.falseLiteral()),
+                KeYJavaASTFactory.block(KeYJavaASTFactory.declare(
+                        loopScopeIdxVar, KeYJavaASTFactory.falseLiteral()),
                         loopScope),
                 services);
         rplLoopVisitor.start();
@@ -743,7 +861,7 @@ public class LoopScopeInvariantRule implements BuiltInRule {
         public final Term selfTerm;
         // TODO Removed this field; was however used in old invariant rule.
         // Might be needed for IF or well-definedness or whatever...
-        // public final ExecutionContext innermostExecutionContext;
+        public final ExecutionContext innermostExecutionContext;
 
         public Instantiation(Term u, Term progPost, While loop,
                 LoopSpecification inv, Term selfTerm,
@@ -760,7 +878,7 @@ public class LoopScopeInvariantRule implements BuiltInRule {
             this.loop = loop;
             this.inv = inv;
             this.selfTerm = selfTerm;
-            // this.innermostExecutionContext = innermostExecutionContext;
+            this.innermostExecutionContext = innermostExecutionContext;
         }
     }
 
