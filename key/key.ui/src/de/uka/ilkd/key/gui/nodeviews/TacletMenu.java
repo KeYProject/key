@@ -64,6 +64,7 @@ import de.uka.ilkd.key.proof.join.ProspectivePartner;
 import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -318,7 +319,8 @@ public class TacletMenu extends JMenu {
      */
     private void addBuiltInRuleItem(BuiltInRule builtInRule, MenuControl control) {
         JMenuItem item;
-        if (builtInRule == WhileInvariantRule.INSTANCE) {
+        if (builtInRule == WhileInvariantRule.INSTANCE ||
+                builtInRule == LoopScopeInvariantRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(
                     builtInRule.displayName(),
