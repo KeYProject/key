@@ -58,11 +58,14 @@ import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
  */
 public class StaticFeatureCollection {
 
-    protected static Feature loopInvFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(WhileInvariantRule.INSTANCE);
-        filter.addRuleToSet(LoopScopeInvariantRule.INSTANCE);
-        return ConditionalFeature.createConditional(filter, cost);
+    protected static Feature loopInvFeature(Feature costStdInv, Feature costLoopScopeInv) {
+        SetRuleFilter filterLoopInv = new SetRuleFilter();
+        filterLoopInv.addRuleToSet(WhileInvariantRule.INSTANCE);
+        
+        SetRuleFilter filterLoopScopeInv = new SetRuleFilter();
+        filterLoopScopeInv.addRuleToSet(LoopScopeInvariantRule.INSTANCE);
+                
+        return ConditionalFeature.createConditional(filterLoopInv, costStdInv, ConditionalFeature.createConditional(filterLoopScopeInv, costLoopScopeInv));
     }
 
     protected static Feature blockContractFeature(Feature cost) {

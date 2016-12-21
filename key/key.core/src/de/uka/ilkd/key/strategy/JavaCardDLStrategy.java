@@ -217,10 +217,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 strategyProperties
                         .getProperty(StrategyProperties.LOOP_OPTIONS_KEY);
         if (loopProp.equals(StrategyProperties.LOOP_INVARIANT)) {
-            loopInvF = loopInvFeature(longConst(0));
-        }
-        else {
-            loopInvF = loopInvFeature(inftyConst());
+            loopInvF = loopInvFeature(longConst(0), inftyConst());
+        } else if (loopProp.equals(StrategyProperties.LOOP_SCOPE_INVARIANT)) {
+            loopInvF = loopInvFeature(inftyConst(), longConst(0));
+        } else {
+            loopInvF = loopInvFeature(inftyConst(), inftyConst());
         }
 
         final Feature blockFeature;

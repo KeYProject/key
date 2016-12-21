@@ -232,7 +232,7 @@ public class LoopScopeBlock extends JavaStatement
      */
     @Override
     public int getStatementCount() {
-        return (body != null) ? 1 : 0;
+        return (body != null && !body.isEmpty()) ? 1 : 0;
     }
 
     /**

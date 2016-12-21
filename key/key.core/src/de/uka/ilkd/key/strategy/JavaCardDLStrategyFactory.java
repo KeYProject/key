@@ -63,6 +63,22 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "after arbitrarily many loop iterations (body preserves invariant).</li>"
             + "<li>Invariant holds after the loop terminates (use case).</li>"
             + "</ul></html>";
+    public static final String TOOL_TIP_LOOP_SCOPE_INVARIANT
+            = "<html>"
+            + "Use loop (scope) invariants for loops.<br>"
+            + "Three properties have to be shown:<br>"
+            + "<ul><li>Validity of invariant of a loop is preserved by the<br>"
+            + "loop guard and loop body (initially valid).</li>"
+            + "<li>If the invariant was valid at the start of the loop, it holds <br>"
+            + "after arbitrarily many loop iterations (body preserves invariant).</li>"
+            + "<li>Invariant holds after the loop terminates (use case).</li>"
+            + "</ul>"
+            + "<p>In the loop scope invariant rule, the last two are combined "
+            + "into a single goal.<br/>"
+            + "This rule is easier to comprehend than the traditional rule in "
+            + "the presence of<br/>"
+            + "potentially exceptional program behavior.</p>"
+            + "</html>";
     public static final String TOOL_TIP_LOOP_EXPAND = "<html>"
             + "Unroll loop body." + "</html>";
     public static final String TOOL_TIP_LOOP_NONE = "<html>"
@@ -288,6 +304,10 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                 = new OneOfStrategyPropertyDefinition(
                         StrategyProperties.LOOP_OPTIONS_KEY,
                         "Loop treatment",
+                        2,
+                        new StrategyPropertyValueDefinition(
+                                StrategyProperties.LOOP_SCOPE_INVARIANT,
+                                "Loop Scope Invariant", TOOL_TIP_LOOP_SCOPE_INVARIANT),
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.LOOP_INVARIANT,
                                 "Invariant", TOOL_TIP_LOOP_INVARIANT),

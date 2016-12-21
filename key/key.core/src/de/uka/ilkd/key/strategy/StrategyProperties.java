@@ -41,6 +41,7 @@ public final class StrategyProperties extends Properties {
     public final static String LOOP_EXPAND = "LOOP_EXPAND";
     public final static String LOOP_EXPAND_BOUNDED = "LOOP_EXPAND_BOUNDED"; //Used for test generation chrisg
     public final static String LOOP_INVARIANT = "LOOP_INVARIANT";
+    public final static String LOOP_SCOPE_INVARIANT = "LOOP_SCOPE_INVARIANT";
     public final static String LOOP_NONE = "LOOP_NONE";
     
     public final static String BLOCK_OPTIONS_KEY = "BLOCK_OPTIONS_KEY";
@@ -140,7 +141,7 @@ public final class StrategyProperties extends Properties {
         INF_FLOW_CHECK_PROPERTY, INF_FLOW_CHECK_TRUE, INF_FLOW_CHECK_FALSE,
         STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT, STOPMODE_NONCLOSE,
     	SPLITTING_OPTIONS_KEY, SPLITTING_NORMAL, SPLITTING_OFF, SPLITTING_DELAYED,
-    	LOOP_OPTIONS_KEY, LOOP_EXPAND, LOOP_EXPAND_BOUNDED, LOOP_INVARIANT, LOOP_NONE,
+    	LOOP_OPTIONS_KEY, LOOP_EXPAND, LOOP_EXPAND_BOUNDED, LOOP_INVARIANT, LOOP_SCOPE_INVARIANT, LOOP_NONE,
     	BLOCK_OPTIONS_KEY, BLOCK_CONTRACT, BLOCK_EXPAND, BLOCK_NONE,
     	METHOD_OPTIONS_KEY, METHOD_EXPAND, METHOD_CONTRACT, METHOD_NONE,
     	DEP_OPTIONS_KEY, DEP_ON, DEP_OFF,
@@ -161,7 +162,7 @@ public final class StrategyProperties extends Properties {
     
     static {
         defaultMap.setProperty(SPLITTING_OPTIONS_KEY, SPLITTING_DELAYED);
-        defaultMap.setProperty(LOOP_OPTIONS_KEY, LOOP_INVARIANT);
+        defaultMap.setProperty(LOOP_OPTIONS_KEY, LOOP_SCOPE_INVARIANT);
         defaultMap.setProperty(BLOCK_OPTIONS_KEY, BLOCK_CONTRACT);
         defaultMap.setProperty(METHOD_OPTIONS_KEY, METHOD_CONTRACT);
         defaultMap.setProperty(DEP_OPTIONS_KEY, DEP_ON);
@@ -321,7 +322,7 @@ public final class StrategyProperties extends Properties {
                                                     boolean blockTreatmentContract,
                                                     boolean nonExecutionBranchHidingSideProofs,
                                                     boolean aliasChecks) {
-       sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT : StrategyProperties.LOOP_EXPAND);
+       sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentInvariant ? StrategyProperties.LOOP_SCOPE_INVARIANT : StrategyProperties.LOOP_EXPAND);
        sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, blockTreatmentContract ? StrategyProperties.BLOCK_CONTRACT : StrategyProperties.BLOCK_EXPAND);
        sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatmentContract ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_RESTRICTED);
