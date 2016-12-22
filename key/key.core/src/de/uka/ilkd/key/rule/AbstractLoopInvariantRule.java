@@ -157,8 +157,6 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
         final Term progPost = splitUpdates(pio.subTerm(),
                 goal.proof().getServices()).second;
-
-        // active statement must be while loop
         JavaBlock javaBlock = progPost.javaBlock();
 
         return !javaBlock.isEmpty()
