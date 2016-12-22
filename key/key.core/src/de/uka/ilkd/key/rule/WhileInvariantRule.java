@@ -71,6 +71,26 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
+/**
+ * The "classic" loop invariant rule with three goals "Invariant Initially
+ * Valid", "Body Preserves Invariant" and "Use Case".
+ * 
+ * @deprecated
+ *             <p>
+ *             This rule is deprecated; consider using
+ *             {@link LoopScopeInvariantRule} instead. The sequents created by
+ *             the {@link WhileInvariantRule} are badly readable; furthermore,
+ *             there were several soundness issues in the past that induced some
+ *             quickly hacked-in fixes. The {@link LoopScopeInvariantRule}
+ *             offers a better treatment of complex loop behavior including
+ *             exceptions etc.
+ *             </p>
+ *             <p>
+ *             However, this is the only rule that currently supports
+ *             information flow proof obligations and Java Card transactions.
+ *             The new rule should be extended by this in the near future.
+ *             </p>
+ */
 public final class WhileInvariantRule extends AbstractLoopInvariantRule {
     /**
      * The hint used to refactor the initial invariant.
