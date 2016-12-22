@@ -5,58 +5,66 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
-import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.ReplaceWhileLoop;
-import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 
 /**
- * TODO
+ * <p>
+ * Implementation of the "<strong>loop scope invariant</strong>" rule as
+ * proposed in the PhD thesis by <em>Nathan Wasser</em>.
+ * </p>
+ * <p>
+ * Basically, the preserves and use case part are combined in one formula; the
+ * loop is transformed to an if statement including a trailing continue, and
+ * wrapped in an "indexed loop scope". The index of the loop scope, a
+ * {@link ProgramVariable}, will be set to TRUE if the loop is left and to FALSE
+ * if it isn't.
+ * </p>
+ * <p>
+ * Thus, all cases of loop exit, as breaks, returns, "pure" leaving and
+ * exceptional behavior, are handled (with some very simple additional taclets
+ * setting the index variable according to the situation, thereby eliminating
+ * the loop scope).
+ * </p>
+ * 
+ * <pre>
+ * \Gamma ==> {U}Inv, \Delta
+ * \Gamma, {U'}Inv ==> \Delta, {U'}[\pi
+ *    boolean x = false;
+ *    loop-scope(x){
+ *      if(nse) l1: ... ln:  { p continue; }
+ *    } \omega]
+ *    ((x = TRUE -> \phi) & (x = FALSE -> Inv))
+ * ------------------------------------------------------------------- loopInvariant
+ * \Gamma ==> {U}[\pi l1: ... ln: while (nse) { p } \omega]\phi, Delta
+ * </pre>
  *
  * @author Dominic Scheurer
  */
-public class LoopScopeInvariantRule implements BuiltInRule {
+public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     /**
      * The Singleton instance of {@link LoopScopeInvariantRule}.
      */
@@ -74,15 +82,10 @@ public class LoopScopeInvariantRule implements BuiltInRule {
 
     private static final Name NAME = new Name("Loop (Scope) Invariant");
 
-    /**
-     * TODO
-     */
-    private static Term lastFocusTerm;
-
-    /**
-     * TODO
-     */
-    private static Instantiation lastInstantiation;
+    @Override
+    public Name name() {
+        return NAME;
+    }
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services,
@@ -96,10 +99,9 @@ public class LoopScopeInvariantRule implements BuiltInRule {
         final LoopInvariantBuiltInRuleApp loopRuleApp = (LoopInvariantBuiltInRuleApp) ruleApp;
 
         // Prepare the new goals
-        ImmutableList<Goal> goals = goal.split(3);
-        Goal initiallyGoal = goals.tail().tail().head();
-        Goal preservesGoal = goals.tail().head();
-        Goal useCaseGoal = goals.head();
+        ImmutableList<Goal> goals = goal.split(2);
+        Goal initiallyGoal = goals.tail().head();
+        Goal preservesGoal = goals.head();
 
         // Get the Instantiation object
         final Instantiation inst = instantiate(loopRuleApp, services);
@@ -113,10 +115,6 @@ public class LoopScopeInvariantRule implements BuiltInRule {
         final Term invFreeTerm = conjunctFreeInv(services, inst, atPres,
                 heapContext);
 
-        final Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
-        heapContext.forEach(heap -> mods.put(heap,
-                inst.inv.getModifies(heap, inst.selfTerm, atPres, services)));
-
         // Collect input and output local variables,
         // prepare reachableOut.
         // TODO: reachableIn has been removed since it was not even used in the
@@ -127,20 +125,189 @@ public class LoopScopeInvariantRule implements BuiltInRule {
         final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop = //
                 new LinkedHashMap<LocationVariable, Map<Term, Term>>();
 
-        // prepare anon update, frame condition, etc.
-        // can still be null
-        Term anonUpdate = createLocalAnonUpdate(localOuts, services);
-        if (anonUpdate == null) {
-            anonUpdate = tb.skip();
-        }
-
         // Create update for values before loop
         Term beforeLoopUpdate = createBeforeLoopUpdate(services, heapContext,
                 localOuts, heapToBeforeLoop);
 
+        // prepare anon update, frame condition, etc.
+        AdditionalHeapTerms additionalHeapTerms = createAdditionalHeapTerms(
+                services, inst, heapContext, localOuts, heapToBeforeLoop,
+                atPres);
+
+        // Prepare variant
+        final Term variant = //
+                inst.inv.getVariant(inst.selfTerm, atPres, services);
+        final Pair<Term, Term> variantUpdAndPO = prepareVariant(inst, variant,
+                services);
+        final Term variantUpdate = variantUpdAndPO.first;
+        final Term variantPO = variantUpdAndPO.second;
+
+        // Prepare common assumption
+        final Term reachableOut = localOuts.stream()
+                .map(pv -> tb.reachableValue(pv))
+                .reduce(tb.tt(), (Term acc, Term term) -> tb.and(acc, term));
+
+        final Term[] uAnon = new Term[] { inst.u,
+                additionalHeapTerms.anonUpdate };
+        final Term[] uBeforeLoopDefAnonVariant = new Term[] { inst.u,
+                beforeLoopUpdate, additionalHeapTerms.anonUpdate,
+                variantUpdate };
+        final Term uAnonInv = tb.applySequential(uAnon,
+                tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
+
+        // Create the "Initially" goal
+        constructInitiallyGoal(services, ruleApp, termLabelState, initiallyGoal,
+                inst, invTerm, additionalHeapTerms.reachableState);
+
+        // Create the "Invariant Preserved and Use Case" goal
+        constructPresrvAndUCGoal(services, ruleApp, preservesGoal, inst,
+                additionalHeapTerms.anonUpdate,
+                additionalHeapTerms.wellFormedAnon, uAnonInv,
+                additionalHeapTerms.frameCondition, variantPO, termLabelState,
+                invTerm, uBeforeLoopDefAnonVariant);
+
+        return goals;
+    }
+
+    // -------------------------------------------------------------------------
+    // constructors
+    // -------------------------------------------------------------------------
+
+    /**
+     * Singleton constructor.
+     */
+    private LoopScopeInvariantRule() {
+    }
+
+    // -------------------------------------------------------------------------
+    // helper methods for apply()
+    // -------------------------------------------------------------------------
+    
+    /**
+     * Sets the content of the "initially valid" goal.
+     * 
+     * @param services
+     *            The {@link Services} object.
+     * @param ruleApp
+     *            The {@link RuleApp} for this {@link LoopScopeInvariantRule}
+     *            application.
+     * @param termLabelState
+     *            The {@link TermLabelState}.
+     * @param initiallyGoal
+     *            The {@link Goal} containing the "initially valid" PO.
+     * @param inst
+     *            The {@link Instantiation} of parameters for the
+     *            {@link LoopScopeInvariantRule} app.
+     * @param invTerm
+     *            The loop invariant formula.
+     * @param reachableState
+     *            The reachable state formula.
+     */
+    private void constructInitiallyGoal(Services services, RuleApp ruleApp,
+            final TermLabelState termLabelState, Goal initiallyGoal,
+            final Instantiation inst, final Term invTerm, Term reachableState) {
+        initiallyGoal.setBranchLabel("Invariant Initially Valid");
+        initiallyGoal
+                .changeFormula(
+                        initFormula(termLabelState, inst, invTerm,
+                                reachableState, services, initiallyGoal),
+                        ruleApp.posInOccurrence());
+    }
+
+    /**
+     * Creates the "Invariant Preserved and Used" goal subsuming the former
+     * preserved and use case goals.
+     * 
+     * @param services
+     *            The {@link Services} object.
+     * @param ruleApp
+     *            The {@link LoopInvariantBuiltInRuleApp} object for the current
+     *            rule application.
+     * @param presrvAndUCGoal
+     *            The {@link Goal} to serve as container for the new sequent.
+     * @param inst
+     *            The {@link Instantiation} of parameters for the
+     *            {@link LoopScopeInvariantRule} app.
+     * @param anonUpdate
+     *            The anonymized update {@link Term}.
+     * @param wellFormedAnon
+     *            The wellformed formula.
+     * @param uAnonInv
+     *            A formula containing the anonymized update and the loop
+     *            invariant.
+     * @param frameCondition
+     *            The frame condition.
+     * @param variantPO
+     *            The proof obligation for the variant.
+     * @param termLabelState
+     *            The {@link TermLabelState}.
+     * @param invTerm
+     *            The loop invariant formula.
+     * @param uBeforeLoopDefAnonVariant
+     *            An array containing the original update, the "before the loop"
+     *            update for reasoning about the variant, the anonymized update,
+     *            and the variant update.
+     */
+    private void constructPresrvAndUCGoal(Services services, RuleApp ruleApp,
+            Goal presrvAndUCGoal, final Instantiation inst, Term anonUpdate,
+            Term wellFormedAnon, final Term uAnonInv, Term frameCondition,
+            Term variantPO, TermLabelState termLabelState, Term invTerm,
+            Term[] uBeforeLoopDefAnonVariant) {
+        final While loop = inst.loop;
+
+        final Term newFormula = formulaWithLoopScope(services, inst, anonUpdate,
+                loop, frameCondition, variantPO, termLabelState,
+                presrvAndUCGoal, uBeforeLoopDefAnonVariant, invTerm);
+
+        presrvAndUCGoal.setBranchLabel("Invariant Preserved and Used");
+        presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);
+        presrvAndUCGoal.addFormula(new SequentFormula(wellFormedAnon), true,
+                false);
+        presrvAndUCGoal.changeFormula(new SequentFormula(newFormula),
+                ruleApp.posInOccurrence());
+    }
+
+    /**
+     * Prepare anon update, wellformed formula, frame condition and reachable
+     * state formula.
+     * 
+     * @param services
+     *            The {@link Services} object.
+     * @param inst
+     *            The {@link Instantiation} of parameters for the
+     *            {@link LoopScopeInvariantRule} app.
+     * @param heapContext
+     *            TODO
+     * @param localOuts
+     *            TODO
+     * @param heapToBeforeLoop
+     *            TODO
+     * @param atPres
+     *            TODO
+     * @return An {@link AdditionalHeapTerms} object containing the anonymized
+     *         update, the wellformed formula, the frame condition formula, and
+     *         the reachable state formula.
+     */
+    private AdditionalHeapTerms createAdditionalHeapTerms(Services services,
+            final Instantiation inst, final List<LocationVariable> heapContext,
+            final ImmutableSet<ProgramVariable> localOuts,
+            final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop,
+            Map<LocationVariable, Term> atPres) {
+        final TermBuilder tb = services.getTermBuilder();
+
+        Term anonUpdate = createLocalAnonUpdate(localOuts, services);
+        // can still be null
+        if (anonUpdate == null) {
+            anonUpdate = tb.skip();
+        }
+
         Term wellFormedAnon = null;
         Term frameCondition = null;
         Term reachableState = null;
+
+        final Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
+        heapContext.forEach(heap -> mods.put(heap,
+                inst.inv.getModifies(heap, inst.selfTerm, atPres, services)));
 
         for (LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon = createAnonUpdate(heap, mods.get(heap),
@@ -165,274 +332,134 @@ public class LoopScopeInvariantRule implements BuiltInRule {
             reachableState = and(tb, reachableState, tb.wellFormed(heap));
         }
 
-        // Prepare variant
-        final Term variant = //
-                inst.inv.getVariant(inst.selfTerm, atPres, services);
-        final Pair<Term, Term> variantPair = prepareVariant(inst, variant,
-                services);
-        final Term variantUpdate = variantPair.first;
-        final Term variantPO = variantPair.second;
-
-        // Prepare common assumption
-        final Term reachableOut = localOuts.stream()
-                .map(pv -> tb.reachableValue(pv))
-                .reduce(tb.tt(), (Term acc, Term term) -> tb.and(acc, term));
-
-        final Term[] uAnon = new Term[] { inst.u, anonUpdate };
-        final Term[] uBeforeLoopDefAnonVariant = new Term[] { inst.u,
-                beforeLoopUpdate, anonUpdate, variantUpdate };
-        final Term uAnonInv = tb.applySequential(uAnon,
-                tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
-
-        // Create the "Initially" goal
-        constructInitiallyGoal(services, ruleApp, termLabelState, initiallyGoal,
-                inst, invTerm, reachableState);
-
-        // Create the "Invariant Preserved" goal
-        constructPresrvAndUCGoal(services, ruleApp, tb, preservesGoal, inst,
-                anonUpdate, wellFormedAnon, uAnonInv, frameCondition, variantPO,
-                termLabelState, invTerm, uBeforeLoopDefAnonVariant);
-
-        // "Use Case":
-        // \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
-        // (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
-        // (#v1=FALSE -> \[{.. ...}\]post)),anon2))
-        final Triple<JavaBlock, Term, Term> guardStuff = prepareGuard(inst,
-                services.getTypeConverter().getBooleanType(), loopRuleApp,
-                services);
-
-        prepareUseCaseBranch(termLabelState, services, ruleApp, inst,
-                wellFormedAnon, useCaseGoal, guardStuff.first, guardStuff.third, uAnon,
-                uAnonInv);
-
-        return goals;
+        return new AdditionalHeapTerms(anonUpdate, wellFormedAnon,
+                frameCondition, reachableState);
     }
 
+    // -------------------------------------------------------------------------
+    // internal methods
+    // -------------------------------------------------------------------------
+
     /**
-     * Sets the content of the "initially valid" goal.
+     * Creates the variable used as a loop scope index.
      * 
      * @param services
      *            The {@link Services} object.
-     * @param ruleApp
-     *            The {@link RuleApp} for this {@link LoopScopeInvariantRule}
-     *            application.
-     * @param termLabelState
-     * @param initiallyGoal
-     * @param inst
-     * @param invTerm
-     * @param reachableState
+     * @return The variable used as a loop scope index.
      */
-    private void constructInitiallyGoal(Services services, RuleApp ruleApp,
-            final TermLabelState termLabelState, Goal initiallyGoal,
-            final Instantiation inst, final Term invTerm, Term reachableState) {
-        initiallyGoal.setBranchLabel("Invariant Initially Valid");
-        initiallyGoal
-                .changeFormula(
-                        initFormula(termLabelState, inst, invTerm,
-                                reachableState, services, initiallyGoal),
-                        ruleApp.posInOccurrence());
+    private ProgramVariable loopScopeIdxVar(Services services) {
+        final KeYJavaType booleanType = services.getJavaInfo()
+                .getKeYJavaType("boolean");
+
+        final ProgramVariable loopScopeIdxVar = //
+                KeYJavaASTFactory
+                        .localVariable( //
+                                services.getVariableNamer()
+                                        .getTemporaryNameProposal("x"),
+                                booleanType);
+
+        return loopScopeIdxVar;
     }
 
     /**
-     * TODO
+     * Creates the new program with the loop scope.
      * 
      * @param services
-     * @param tb
-     * @param heapContext
-     * @param localOuts
-     * @param heapToBeforeLoop
-     * @return
-     */
-    private Term createBeforeLoopUpdate(Services services,
-            final List<LocationVariable> heapContext,
-            final ImmutableSet<ProgramVariable> localOuts,
-            final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop) {
-        final TermBuilder tb = services.getTermBuilder();
-        final Namespace progVarNS = services.getNamespaces().programVariables();
-
-        Term beforeLoopUpdate = null;
-        for (LocationVariable heap : heapContext) {
-            heapToBeforeLoop.put(heap, new LinkedHashMap<Term, Term>());
-            final LocationVariable lv = tb.heapAtPreVar(heap + "Before_LOOP",
-                    heap.sort(), true);
-            progVarNS.addSafely(lv);
-
-            final Term u = tb.elementary(lv, tb.var(heap));
-            if (beforeLoopUpdate == null) {
-                beforeLoopUpdate = u;
-            } else {
-                beforeLoopUpdate = tb.parallel(beforeLoopUpdate, u);
-            }
-
-            heapToBeforeLoop.get(heap).put(tb.var(heap), tb.var(lv));
-        }
-
-        for (ProgramVariable pv : localOuts) {
-            final String pvBeforeLoopName = tb
-                    .newName(pv.name().toString() + "Before_LOOP");
-            final LocationVariable pvBeforeLoop = new LocationVariable(
-                    new ProgramElementName(pvBeforeLoopName),
-                    pv.getKeYJavaType());
-            progVarNS.addSafely(pvBeforeLoop);
-            beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
-                    tb.elementary(pvBeforeLoop, tb.var(pv)));
-            heapToBeforeLoop
-                    .get(services.getTypeConverter().getHeapLDT().getHeap())
-                    .put(tb.var(pv), tb.var(pvBeforeLoop));
-        }
-
-        return beforeLoopUpdate;
-    }
-
-    /**
-     * TODO
-     * 
-     * @param services
-     * @param ruleApp
-     * @param tb
-     * @param presrvAndUCGoal
-     * @param inst
-     * @param anonUpdate
-     * @param uAnonInv
-     * @param frameCondition
-     * @param variantPO
-     * @param termLabelState
-     * @param invTerm
-     * @param uBeforeLoopDefAnonVariant
-     */
-    private void constructPresrvAndUCGoal(Services services, RuleApp ruleApp,
-            final TermBuilder tb, Goal presrvAndUCGoal,
-            final Instantiation inst, Term anonUpdate, Term wellFormedAnon,
-            final Term uAnonInv, Term frameCondition, Term variantPO,
-            TermLabelState termLabelState, Term invTerm,
-            Term[] uBeforeLoopDefAnonVariant) {
-        final While loop = inst.loop;
-
-        final Term newFormula = formulaWithLoopScope(services, inst, anonUpdate,
-                loop, frameCondition, variantPO, termLabelState,
-                presrvAndUCGoal, uBeforeLoopDefAnonVariant, invTerm);
-
-        presrvAndUCGoal.setBranchLabel("Invariant Preserved");
-        presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);
-        presrvAndUCGoal.addFormula(new SequentFormula(wellFormedAnon), true,
-                false);
-        presrvAndUCGoal.changeFormula(new SequentFormula(newFormula),
-                ruleApp.posInOccurrence());
-    }
-
-    /**
-     * 
-     * TODO
-     * 
-     * @param inst
-     * @param booleanKJT
-     * @param loopRuleApp
-     * @param services
-     * @return
-     */
-    private Triple<JavaBlock, Term, Term> prepareGuard(final Instantiation inst,
-            final KeYJavaType booleanKJT,
-            LoopInvariantBuiltInRuleApp loopRuleApp,
-            final TermServices services) {
-        final TermBuilder tb = services.getTermBuilder();
-        final ProgramElementName guardVarName = new ProgramElementName(
-                tb.newName("b"));
-        final LocationVariable guardVar = new LocationVariable(guardVarName,
-                booleanKJT);
-        services.getNamespaces().programVariables().addSafely(guardVar);
-        loopRuleApp.setGuard(tb.var(guardVar));
-        final VariableSpecification guardVarSpec = new VariableSpecification(
-                guardVar, inst.loop.getGuardExpression(), booleanKJT);
-        final LocalVariableDeclaration guardVarDecl = new LocalVariableDeclaration(
-                new TypeRef(booleanKJT), guardVarSpec);
-        final Statement guardVarMethodFrame = inst.innermostExecutionContext == null
-                ? guardVarDecl
-                : new MethodFrame(null, inst.innermostExecutionContext,
-                        new StatementBlock(guardVarDecl));
-        final JavaBlock guardJb = JavaBlock
-                .createJavaBlock(new StatementBlock(guardVarMethodFrame));
-        final Term guardTrueTerm = tb.equals(tb.var(guardVar), tb.TRUE());
-        final Term guardFalseTerm = tb.equals(tb.var(guardVar), tb.FALSE());
-        return new Triple<JavaBlock, Term, Term>(guardJb, guardTrueTerm,
-                guardFalseTerm);
-    }
-
-    /**
-     * TODO
-     * 
-     * @param termLabelState
-     * @param services
-     * @param ruleApp
-     * @param inst
-     * @param wellFormedAnon
-     * @param useGoal
-     * @param guardJb
-     * @param guardFalseTerm
-     * @param uAnon
-     * @param uAnonInv
-     */
-    private void prepareUseCaseBranch(TermLabelState termLabelState,
-            Services services, RuleApp ruleApp, Instantiation inst,
-            Term wellFormedAnon, Goal useGoal, final JavaBlock guardJb,
-            final Term guardFalseTerm, final Term[] uAnon,
-            final Term uAnonInv) {
-        useGoal.setBranchLabel("Use Case");
-        useGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
-        useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
-        final TermBuilder tb = services.getTermBuilder();
-
-        Term guardFalseRestPsi = useCaseFormula(termLabelState, services,
-                ruleApp, inst, useGoal, guardJb, guardFalseTerm);
-        useGoal.changeFormula(
-                new SequentFormula(
-                        tb.applySequential(uAnon, guardFalseRestPsi)),
-                ruleApp.posInOccurrence());
-    }
-
-    /**
-     * TODO
-     * 
-     * @param termLabelState
-     * @param services
-     * @param ruleApp
-     * @param inst
-     * @param useGoal
-     * @param guardJb
-     * @param guardFalseTerm
-     * @return
-     */
-    private Term useCaseFormula(TermLabelState termLabelState,
-            Services services, RuleApp ruleApp, Instantiation inst,
-            Goal useGoal, final JavaBlock guardJb, final Term guardFalseTerm) {
-        final TermBuilder tb = services.getTermBuilder();
-        JavaBlock useJavaBlock = JavaTools
-                .removeActiveStatement(inst.progPost.javaBlock(), services);
-        final ImmutableArray<TermLabel> instantiateLabels = TermLabelManager
-                .instantiateLabels(termLabelState, services,
-                        ruleApp.posInOccurrence(), this, ruleApp, useGoal,
-                        "UseModality", null, inst.progPost.op(),
-                        new ImmutableArray<Term>(inst.progPost.sub(0)), null,
-                        useJavaBlock, inst.progPost.getLabels());
-        Term restPsi = tb.prog((Modality) inst.progPost.op(), useJavaBlock,
-                inst.progPost.sub(0), instantiateLabels);
-        Term guardFalseRestPsi = tb.box(guardJb,
-                tb.imp(guardFalseTerm, restPsi));
-        return guardFalseRestPsi;
-    }
-
-    /**
-     * TODO
-     * 
-     * @param services
-     * @param inst
-     * @param anonUpdate
+     *            The {@link Services} object.
      * @param loop
-     * @param frameCondition
-     * @param variantPO
+     *            The original {@link While} loop that is going to be replaced.
+     * @param origProg
+     *            The whole original program, starting with the {@link While}
+     *            loop.
+     * @param loopScopeIdxVar
+     *            The variable used as a loop scope index.
+     * @return The new program with the loop scope.
+     */
+    private ProgramElement newProgram(Services services, final While loop,
+            final JavaBlock origProg, final ProgramVariable loopScopeIdxVar) {
+        final ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
+
+        ((StatementBlock) loop.getBody()).getBody()
+                .forEach(elem -> stmnt.add(elem));
+        stmnt.add(KeYJavaASTFactory.continueStatement(null));
+
+        final Statement newIf = KeYJavaASTFactory.ifThen(
+                loop.getGuardExpression(),
+                new StatementBlock(stmnt.toArray(new Statement[stmnt.size()])));
+
+        LoopScopeBlock loopScope = new LoopScopeBlock(loopScopeIdxVar,
+                KeYJavaASTFactory.block(newIf));
+
+        final ReplaceWhileLoop rplLoopVisitor = new ReplaceWhileLoop(
+                origProg.program(),
+                KeYJavaASTFactory.block(KeYJavaASTFactory.declare(
+                        loopScopeIdxVar, KeYJavaASTFactory.falseLiteral()),
+                        loopScope),
+                services);
+        rplLoopVisitor.start();
+
+        return rplLoopVisitor.result();
+    }
+
+    /**
+     * Creates the {@link SequentFormula} for the "initially valid" goal.
+     * 
      * @param termLabelState
-     * @param presrvAndUCGoal
+     *            The {@link TermLabelState}.
+     * @param inst
+     *            The {@link Instantiation} for this rule application.
      * @param invTerm
-     * @return
+     *            The invariant formula.
+     * @param reachableState
+     *            The reachable state formula.
+     * @param services
+     *            The {@link Services} object.
+     * @param initGoal
+     *            The goal containing the "initially valid" PO.
+     * @return The {@link SequentFormula} for the "initially valid" goal.
+     */
+    private SequentFormula initFormula(TermLabelState termLabelState,
+            Instantiation inst, final Term invTerm, Term reachableState,
+            Services services, Goal initGoal) {
+        final TermBuilder tb = services.getTermBuilder();
+
+        Term sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
+        sfTerm = TermLabelManager.refactorTerm(termLabelState, services, null,
+                sfTerm, this, initGoal, INITIAL_INVARIANT_ONLY_HINT, null);
+
+        return new SequentFormula(sfTerm);
+    }
+
+    /**
+     * Creates the actual formula by which the original formula containing the
+     * loop is replaced in the "preserves and use case" branch.
+     * 
+     * @param services
+     *            The {@link Services} object.
+     * @param inst
+     *            The {@link Instantiation} of parameters for the
+     *            {@link LoopScopeInvariantRule} app.
+     * @param anonUpdate
+     *            The anonymized update {@link Term}.
+     * @param loop
+     *            The original {@link While} loop that is going to be replaced.
+     * @param frameCondition
+     *            The frame condition formula.
+     * @param variantPO
+     *            The proof obligation for the variant.
+     * @param termLabelState
+     *            The {@link TermLabelState}.
+     * @param presrvAndUCGoal
+     *            The {@link Goal} starting the new "preserves and use case"
+     *            branch.
+     * @param uBeforeLoopDefAnonVariant
+     *            An array containing the original update, the "before the loop"
+     *            update for reasoning about the variant, the anonymized update,
+     *            and the variant update.
+     * @param invTerm
+     *            The loop invariant formula {@link Term}.
+     * @return The formula by which the original formula containing the loop is
+     *         replaced in the "preserves and use case" branch.
      */
     private Term formulaWithLoopScope(Services services,
             final Instantiation inst, Term anonUpdate, final While loop,
@@ -468,437 +495,29 @@ public class LoopScopeInvariantRule implements BuiltInRule {
         return newFormula;
     }
 
-    /**
-     * TODO
-     * 
-     * @param services
-     * @return
-     */
-    private ProgramVariable loopScopeIdxVar(Services services) {
-        final KeYJavaType booleanType = services.getJavaInfo()
-                .getKeYJavaType("boolean");
-
-        final ProgramVariable loopScopeIdxVar = //
-                KeYJavaASTFactory
-                        .localVariable( //
-                                services.getVariableNamer()
-                                        .getTemporaryNameProposal("x"),
-                                booleanType);
-
-        return loopScopeIdxVar;
-    }
-
-    /**
-     * TODO
-     * 
-     * @param services
-     * @param loop
-     * @param progPost
-     * @param loopScopeIdxVar
-     * @return
-     */
-    private ProgramElement newProgram(Services services, final While loop,
-            final JavaBlock origProg, final ProgramVariable loopScopeIdxVar) {
-        final ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
-
-        ((StatementBlock) loop.getBody()).getBody()
-                .forEach(elem -> stmnt.add(elem));
-        stmnt.add(KeYJavaASTFactory.continueStatement(null));
-
-        final Statement newIf = KeYJavaASTFactory.ifThen(
-                loop.getGuardExpression(),
-                new StatementBlock(stmnt.toArray(new Statement[stmnt.size()])));
-
-        LoopScopeBlock loopScope = new LoopScopeBlock(loopScopeIdxVar,
-                KeYJavaASTFactory.block(newIf));
-
-        final ReplaceWhileLoop rplLoopVisitor = new ReplaceWhileLoop(
-                origProg.program(),
-                KeYJavaASTFactory.block(KeYJavaASTFactory.declare(
-                        loopScopeIdxVar, KeYJavaASTFactory.falseLiteral()),
-                        loopScope),
-                services);
-        rplLoopVisitor.start();
-
-        return rplLoopVisitor.result();
-    }
-
-    @Override
-    public Name name() {
-        return NAME;
-    }
-
-    @Override
-    public String displayName() {
-        return NAME.toString();
-    }
-
-    @Override
-    public String toString() {
-        return displayName();
-    }
-
-    @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        if (pio == null || !pio.isTopLevel() || pio.isInAntec()
-                || Transformer.inTransformer(pio)) {
-            return false;
-        }
-
-        final Term progPost = splitUpdates(pio.subTerm(),
-                goal.proof().getServices()).second;
-
-        // active statement must be while loop
-        JavaBlock javaBlock = progPost.javaBlock();
-
-        return !javaBlock.isEmpty()
-                && JavaTools.getActiveStatement(javaBlock) instanceof While;
-    }
-
-    @Override
-    public boolean isApplicableOnSubTerms() {
-        return false;
-    }
-
-    @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos,
-            TermServices services) {
-        return new LoopInvariantBuiltInRuleApp(this, pos, services);
-    }
-
-    // -------------------------------------------------------------------------
-    // constructors
-    // -------------------------------------------------------------------------
-
-    private LoopScopeInvariantRule() {
-    }
-
-    // -------------------------------------------------------------------------
-    // internal methods
-    // -------------------------------------------------------------------------
-
-    /**
-     * TODO
-     * 
-     * @param progPost
-     * @return
-     */
-    private static boolean isModalityTerm(final Term progPost) {
-        // focus (below update) must be modality term
-        // TODO isn't that the same as !progPost.javaBlock().isEmpty() ?
-        return progPost.op() instanceof Modality;
-    }
-
-    /**
-     * TODO
-     * 
-     * @param localOuts
-     * @param services
-     * @return
-     */
-    private static Term createLocalAnonUpdate(
-            ImmutableSet<ProgramVariable> localOuts, Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-
-        return localOuts.stream().map(pv -> {
-            final Function anonFunc = new Function(
-                    new Name(tb.newName(pv.name().toString())), pv.sort(),
-                    true);
-            services.getNamespaces().functions().addSafely(anonFunc);
-
-            return tb.elementary((LocationVariable) pv, tb.func(anonFunc));
-        }).reduce(tb.skip(), (acc, t) -> tb.parallel(acc, t));
-    }
-
-    /**
-     * TODO
-     * 
-     * @return (assumption, anon update, anon heap)
-     */
-    private static AnonUpdateData createAnonUpdate(LocationVariable heap,
-            Term mod, LoopSpecification inv, Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
-        final Function loopHeapFunc = new Function(loopHeapName,
-                heapLDT.targetSort(), true);
-        services.getNamespaces().functions().addSafely(loopHeapFunc);
-
-        final Term loopHeap = tb.func(loopHeapFunc);
-        final Name anonHeapName = new Name(
-                tb.newName("anon_" + heap + "_LOOP"));
-        final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
-        services.getNamespaces().functions().addSafely(anonHeapFunc);
-        final Term anonHeapTerm = tb.label(tb.func(anonHeapFunc),
-                ParameterlessTermLabel.ANON_HEAP_LABEL);
-
-        // check for strictly pure loops
-        final Term anonUpdate;
-        if (tb.strictlyNothing().equals(mod)) {
-            anonUpdate = tb.skip();
-        } else {
-            anonUpdate = tb.anonUpd(heap, mod, anonHeapTerm);
-        }
-
-        return new AnonUpdateData( //
-                anonUpdate, loopHeap, //
-                tb.getBaseHeap(), anonHeapTerm);
-    }
-
-    /**
-     * TODO
-     * 
-     * @param focusTerm
-     * @param services
-     * @return
-     */
-    private static Pair<Term, Term> splitUpdates(Term focusTerm,
-            TermServices services) {
-        if (focusTerm.op() instanceof UpdateApplication) {
-            return new Pair<Term, Term>(UpdateApplication.getUpdate(focusTerm),
-                    UpdateApplication.getTarget(focusTerm));
-        } else {
-            return new Pair<Term, Term>(services.getTermBuilder().skip(),
-                    focusTerm);
-        }
-    }
-
-    /**
-     * TODO
-     * 
-     * @param app
-     * @param services
-     * @return
-     * @throws RuleAbortException
-     */
-    private static Instantiation instantiate(
-            final LoopInvariantBuiltInRuleApp app, Services services)
-            throws RuleAbortException {
-        final Term focusTerm = app.posInOccurrence().subTerm();
-
-        if (focusTerm == lastFocusTerm && lastInstantiation.inv == services
-                .getSpecificationRepository()
-                .getLoopSpec(lastInstantiation.loop)) {
-            return lastInstantiation;
-        }
-
-        // leading update?
-        final Pair<Term, Term> update = splitUpdates(focusTerm, services);
-        final Term u = update.first;
-        final Term progPost = update.second;
-
-        // focus (below update) must be modality term
-        if (!isModalityTerm(progPost)) {
-            return null;
-        }
-
-        // active statement must be while loop
-        final While loop = app.getLoopStatement();
-
-        // try to get invariant from JML specification
-        LoopSpecification spec = app.getSpec();
-        if (spec == null) { // may happen after reloading proof
-            throw new RuleAbortException(
-                    "No invariant found. Probably broken after proof reloading...");
-        }
-
-        // collect self, execution context
-        final MethodFrame innermostMethodFrame = JavaTools
-                .getInnermostMethodFrame(progPost.javaBlock(), services);
-        if (innermostMethodFrame != null) {
-            spec = spec.setTarget(innermostMethodFrame.getProgramMethod());
-        }
-
-        final Term selfTerm = innermostMethodFrame == null ? null
-                : MiscTools.getSelfTerm(innermostMethodFrame, services);
-
-        final ExecutionContext innermostExecutionContext = //
-                innermostMethodFrame == null ? null
-                        : (ExecutionContext) innermostMethodFrame
-                                .getExecutionContext();
-        services.getSpecificationRepository().addLoopInvariant(spec);
-
-        // cache and return result
-        final Instantiation result = new Instantiation( //
-                u, progPost, loop, spec, selfTerm, innermostExecutionContext);
-
-        lastFocusTerm = focusTerm;
-        lastInstantiation = result;
-
-        return result;
-    }
-
-    /**
-     * TODO
-     * 
-     * @param tb
-     * @param term
-     * @return
-     */
-    private static Term and(TermBuilder tb, Term t1, Term t2) {
-        assert t2 != null;
-        return t1 == null ? t2 : tb.and(t1, t2);
-    }
-
-    // -------------------------------------------------------------------------
-    // helper methods for apply()
-    // -------------------------------------------------------------------------
-
-    /**
-     * TODO
-     * 
-     * @param services
-     * @param inst
-     * @param atPres
-     * @param heapContext
-     * @return
-     */
-    private Term conjunctInv(Services services, Instantiation inst,
-            final Map<LocationVariable, Term> atPres,
-            final List<LocationVariable> heapContext) {
-        return mapAndConjunct(services, (pv -> inst.inv.getInvariant(pv,
-                inst.selfTerm, atPres, services)), heapContext);
-    }
-
-    /**
-     * TODO
-     * 
-     * @param services
-     * @param inst
-     * @param atPres
-     * @param heapContext
-     * @return
-     */
-    private Term conjunctFreeInv(Services services, Instantiation inst,
-            final Map<LocationVariable, Term> atPres,
-            final List<LocationVariable> heapContext) {
-        return mapAndConjunct(services, (pv -> inst.inv.getFreeInvariant(pv,
-                inst.selfTerm, atPres, services)), heapContext);
-    }
-
-    /**
-     * TODO
-     * 
-     * @param services
-     * @param inst
-     * @param atPres
-     * @param listOfT
-     * @return
-     */
-    private <T> Term mapAndConjunct(Services services,
-            java.util.function.Function<T, Term> fct, final List<T> listOfT) {
-        final TermBuilder tb = services.getTermBuilder();
-
-        //@formatter:off
-        return listOfT.stream()
-                .map(t -> fct.apply(t))
-                .filter(term -> term != null)
-                .reduce(tb.tt(), (acc, term) -> tb.and(acc, term));
-        //@formatter:on
-    }
-
-    /**
-     * TODO
-     * 
-     * @param inst
-     * @param variant
-     * @param services
-     * @return
-     */
-    private Pair<Term, Term> prepareVariant(Instantiation inst, Term variant,
-            TermServices services) {
-        final TermBuilder tb = services.getTermBuilder();
-        final ProgramElementName variantName = new ProgramElementName(
-                tb.newName("variant"));
-        final LocationVariable variantPV = new LocationVariable(variantName,
-                Sort.ANY);
-        services.getNamespaces().programVariables().addSafely(variantPV);
-
-        final boolean dia = ((Modality) inst.progPost.op())
-                .terminationSensitive();
-        final Term variantUpdate = dia ? tb.elementary(variantPV, variant)
-                : tb.skip();
-        final Term variantPO = dia ? tb.prec(variant, tb.var(variantPV))
-                : tb.tt();
-        return new Pair<Term, Term>(variantUpdate, variantPO);
-    }
-
-    /**
-     * TODO
-     * 
-     * @param termLabelState
-     * @param inst
-     * @param invTerm
-     * @param reachableState
-     * @param services
-     * @param initGoal
-     * @return
-     */
-    private SequentFormula initFormula(TermLabelState termLabelState,
-            Instantiation inst, final Term invTerm, Term reachableState,
-            Services services, Goal initGoal) {
-        final TermBuilder tb = services.getTermBuilder();
-
-        Term sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
-        sfTerm = TermLabelManager.refactorTerm(termLabelState, services, null,
-                sfTerm, this, initGoal, INITIAL_INVARIANT_ONLY_HINT, null);
-
-        return new SequentFormula(sfTerm);
-    }
-
     // -------------------------------------------------------------------------
     // inner classes
     // -------------------------------------------------------------------------
 
     /**
-     * TODO
-     */
-    private static final class Instantiation {
-        public final Term u;
-        public final Term progPost;
-        public final While loop;
-        public final LoopSpecification inv;
-        public final Term selfTerm;
-        // TODO Removed this field; was however used in old invariant rule.
-        // Might be needed for IF or well-definedness or whatever...
-        public final ExecutionContext innermostExecutionContext;
-
-        public Instantiation(Term u, Term progPost, While loop,
-                LoopSpecification inv, Term selfTerm,
-                ExecutionContext innermostExecutionContext) {
-            assert u != null;
-            assert u.sort() == Sort.UPDATE;
-            assert progPost != null;
-            assert progPost.sort() == Sort.FORMULA;
-            assert loop != null;
-            assert inv != null;
-
-            this.u = u;
-            this.progPost = progPost;
-            this.loop = loop;
-            this.inv = inv;
-            this.selfTerm = selfTerm;
-            this.innermostExecutionContext = innermostExecutionContext;
-        }
-    }
-
-    /**
-     * TODO
+     * A container with data for the additional terms with assertions about the
+     * heap; that is, the anonymizing update, the wellformed term, the frame
+     * condition and the reachable state formula.
      *
      * @author Dominic Scheurer
      */
-    private static class AnonUpdateData {
-        public final Term anonUpdate, anonHeap;
-        // TODO Removed these fields; were however used in old invariant rule.
-        // Might be needed for IF or well-definedness or whatever...
-        // public final Term loopHeap, loopHeapAtPre;
+    private static class AdditionalHeapTerms {
+        public final Term anonUpdate;
+        public final Term wellFormedAnon;
+        public final Term frameCondition;
+        public final Term reachableState;
 
-        public AnonUpdateData(Term anonUpdate, Term loopHeap,
-                Term loopHeapAtPre, Term anonHeap) {
+        public AdditionalHeapTerms(Term anonUpdate, Term wellFormedAnon,
+                Term frameCondition, Term reachableState) {
             this.anonUpdate = anonUpdate;
-            // this.loopHeap = loopHeap;
-            // this.loopHeapAtPre = loopHeapAtPre;
-            this.anonHeap = anonHeap;
+            this.wellFormedAnon = wellFormedAnon;
+            this.frameCondition = frameCondition;
+            this.reachableState = reachableState;
         }
     }
 
