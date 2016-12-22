@@ -148,7 +148,7 @@ public final class WhileInvariantRule extends AbstractLoopInvariantRule {
         prepareInvInitiallyValidBranch(loopInvInfo.termLabelState,
                 loopInvInfo.services, loopInvInfo.ruleApp, loopInvInfo.inst,
                 loopInvInfo.invTerm, loopInvInfo.reachableState, initGoal);
-        // TODO Jonas: Ist die Doppelanwendung nötig?
+        // TODO Jonas: Ist die Doppelanwendung noetig?
 
         final ImmutableSet<ProgramVariable> localIns = MiscTools
                 .getLocalIns(loopInvInfo.inst.loop, loopInvInfo.services);
