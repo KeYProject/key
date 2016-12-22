@@ -94,7 +94,13 @@ public final class WhileInvariantRule extends AbstractLoopInvariantRule {
     }
 
     @Override
-    public void constructGoalContent(LoopInvariantInformation loopInvInfo) {
+    public ImmutableList<Goal> apply(Goal goal, Services services,
+            RuleApp ruleApp) throws RuleAbortException {
+        // Initial assertions
+        assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
+        
+        LoopInvariantInformation loopInvInfo = doPreparations(goal, services, ruleApp);
+        
         final ImmutableList<Goal> goals = loopInvInfo.goals;
         
         Goal wdGoal;
@@ -198,6 +204,8 @@ public final class WhileInvariantRule extends AbstractLoopInvariantRule {
                 loopInvInfo.ruleApp, loopInvInfo.inst,
                 loopInvInfo.wellFormedAnon, useGoal, guardJb, guardFalseTerm,
                 uAnon, loopInvInfo.uAnonInv);
+        
+        return goals;
     }
 
     private static InfFlowData prepareSetUpOfInfFlowValidityGoal(

@@ -62,28 +62,27 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     public abstract int getNrOfGoals();
 
     /**
-     * Fills the new goals with sequents.
+     * Constructs the data needed for the currently implemented loop invariants;
+     * also prepares the new set of goals, that is splitting the current goal is
+     * no longer required after calling this method.
      * 
-     * @param loopInvInfo
-     *            The {@link LoopInvariantInformation} for constructing the new
-     *            goals.
+     * @param goal
+     *            the Goal on which to apply <tt>ruleApp</tt>
+     * @param services
+     *            the Services with the necessary information about the java
+     *            programs
+     * @param ruleApp
+     *            the rule application to be executed
+     * @return The {@link LoopInvariantInformation} object containing the data
+     *         for the application of loop invariant rules.
+     * @throws RuleAbortException
      */
-    public abstract void constructGoalContent(
-            LoopInvariantInformation loopInvInfo);
-
-    @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services,
+    public LoopInvariantInformation doPreparations(Goal goal, Services services,
             RuleApp ruleApp) throws RuleAbortException {
-        // Initial assertions
-        assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
-
         // Basic objects needed for rule application
         final TermBuilder tb = services.getTermBuilder();
         final TermLabelState termLabelState = new TermLabelState();
         final LoopInvariantBuiltInRuleApp loopRuleApp = (LoopInvariantBuiltInRuleApp) ruleApp;
-
-        // Prepare the new goals
-        ImmutableList<Goal> goals = goal.split(getNrOfGoals());
 
         // Get the Instantiation object
         final Instantiation inst = instantiate(loopRuleApp, services);
@@ -137,17 +136,16 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Term uAnonInv = tb.applySequential(uAnon,
                 tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
 
-        LoopInvariantInformation info = new LoopInvariantInformation(goal,
-                services, inst, loopRuleApp, goals, termLabelState, invTerm,
-                variantPO, additionalHeapTerms.reachableState,
+        // Prepare the new goals
+        ImmutableList<Goal> goals = goal.split(getNrOfGoals());
+
+        return new LoopInvariantInformation(goal, services, inst, loopRuleApp,
+                goals, termLabelState, invTerm, variantPO,
+                additionalHeapTerms.reachableState,
                 additionalHeapTerms.anonUpdate,
                 additionalHeapTerms.wellFormedAnon, uAnonInv,
                 additionalHeapTerms.frameCondition, uBeforeLoopDefAnonVariant,
                 additionalHeapTerms.anonUpdateData);
-
-        constructGoalContent(info);
-
-        return goals;
     }
 
     @Override
