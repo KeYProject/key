@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -14,6 +15,7 @@ import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -88,6 +90,30 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     @Override
     public int getNrOfGoals() {
         return NR_GOALS;
+    }
+
+    /**
+     * <p>
+     * <strong>NOTE:</strong> The {@link LoopScopeInvariantRule} currently
+     * doesn't support Java Card transactions and information flow proof
+     * obligations.
+     * </p>
+     * 
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+        if (!super.isApplicable(goal, pio)) {
+            return false;
+        }
+
+        final Term progPost = splitUpdates(pio.subTerm(),
+                goal.proof().getServices()).second;
+        final Modality modality = (Modality) progPost.op();
+
+        return !InfFlowCheckInfo.isInfFlow(goal)
+                && !(modality == Modality.BOX_TRANSACTION
+                        || modality == Modality.DIA_TRANSACTION);
     }
 
     @Override
