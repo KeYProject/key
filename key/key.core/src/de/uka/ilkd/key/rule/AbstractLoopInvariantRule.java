@@ -37,8 +37,12 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * An abstract super class for loop invariant rules.
+ * An abstract super class for loop invariant rules. Extending rules should
+ * usually call {@link #doPreparations(Goal, Services, RuleApp)} directly at the
+ * beginning of the {@link #apply(Goal, Services, RuleApp)} method.
  *
+ * @see LoopScopeInvariantRule
+ * @see WhileInvariantRule
  * @author Dominic Scheurer
  */
 public abstract class AbstractLoopInvariantRule implements BuiltInRule {
