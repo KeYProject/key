@@ -142,6 +142,7 @@ import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopInit;
+import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
@@ -343,6 +344,8 @@ public interface SimultaneousVisitor {
     public void visit(LongLiteral x1, LongLiteral x2);
 
     public void visit(LoopInit x1, LoopInit x2);
+    
+    public void visit(LoopScopeBlock x1, LoopScopeBlock x2);
 
     public void visit(MetaClassReference x1, MetaClassReference x2);
 
