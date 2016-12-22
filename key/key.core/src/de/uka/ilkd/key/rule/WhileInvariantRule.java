@@ -87,8 +87,9 @@ import de.uka.ilkd.key.util.Triple;
  *             </p>
  *             <p>
  *             However, this is the only rule that currently supports
- *             information flow proof obligations and Java Card transactions.
- *             The new rule should be extended by this in the near future.
+ *             information flow proof obligations, Java Card transactions and
+ *             the "wellformed"-check. The new rule should be extended by this
+ *             in the near future.
  *             </p>
  */
 public final class WhileInvariantRule extends AbstractLoopInvariantRule {

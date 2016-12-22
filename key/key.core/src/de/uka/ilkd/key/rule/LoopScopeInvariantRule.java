@@ -44,6 +44,13 @@ import de.uka.ilkd.key.rule.metaconstruct.ReplaceWhileLoop;
  * setting the index variable according to the situation, thereby eliminating
  * the loop scope).
  * </p>
+ * <p>
+ * <strong>Important Note:</strong> The rule currently does not support (i)
+ * Information Flow proof obligations, (ii) Java Card transactions and (iii) the
+ * wellformedness check. For these things, you currently still have to use the
+ * old {@link WhileInvariantRule}. In the (near) future, these features should
+ * be built in of course..
+ * </p>
  * 
  * <pre>
  * \Gamma ==> {U}Inv, \Delta
