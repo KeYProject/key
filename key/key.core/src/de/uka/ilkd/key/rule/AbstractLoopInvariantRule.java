@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaTools;
@@ -21,6 +22,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -53,8 +55,97 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      */
     private static Instantiation lastInstantiation;
 
-    public AbstractLoopInvariantRule() {
-        super();
+    /**
+     * @return The number of generated goals by this invariant rule.
+     */
+    public abstract int getNrOfGoals();
+
+    /**
+     * Fills the new goals with sequents.
+     * 
+     * @param loopInvInfo
+     *            The {@link LoopInvariantInformation} for constructing the new
+     *            goals.
+     */
+    public abstract void constructGoalContent(
+            LoopInvariantInformation loopInvInfo);
+
+    @Override
+    public ImmutableList<Goal> apply(Goal goal, Services services,
+            RuleApp ruleApp) throws RuleAbortException {
+        // Initial assertions
+        assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
+
+        // Basic objects needed for rule application
+        final TermBuilder tb = services.getTermBuilder();
+        final TermLabelState termLabelState = new TermLabelState();
+        final LoopInvariantBuiltInRuleApp loopRuleApp = (LoopInvariantBuiltInRuleApp) ruleApp;
+
+        // Prepare the new goals
+        ImmutableList<Goal> goals = goal.split(getNrOfGoals());
+
+        // Get the Instantiation object
+        final Instantiation inst = instantiate(loopRuleApp, services);
+
+        // Get necessary parts of invariant and sequent
+        final Map<LocationVariable, Term> atPres = inst.inv.getInternalAtPres();
+        final List<LocationVariable> heapContext = ((IBuiltInRuleApp) ruleApp)
+                .getHeapContext();
+
+        final Term invTerm = conjunctInv(services, inst, atPres, heapContext);
+        final Term invFreeTerm = conjunctFreeInv(services, inst, atPres,
+                heapContext);
+
+        // Collect input and output local variables,
+        // prepare reachableOut.
+        // TODO: reachableIn has been removed since it was not even used in the
+        // old invariant rule. Is that OK or was there an earlier mistake?
+        final ImmutableSet<ProgramVariable> localOuts = MiscTools
+                .getLocalOuts(inst.loop, services);
+
+        final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop = //
+                new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+
+        // Create update for values before loop
+        Term beforeLoopUpdate = createBeforeLoopUpdate(services, heapContext,
+                localOuts, heapToBeforeLoop);
+
+        // prepare anon update, frame condition, etc.
+        AdditionalHeapTerms additionalHeapTerms = createAdditionalHeapTerms(
+                services, inst, heapContext, localOuts, heapToBeforeLoop,
+                atPres);
+
+        // Prepare variant
+        final Term variant = //
+                inst.inv.getVariant(inst.selfTerm, atPres, services);
+        final Pair<Term, Term> variantUpdAndPO = prepareVariant(inst, variant,
+                services);
+        final Term variantUpdate = variantUpdAndPO.first;
+        final Term variantPO = variantUpdAndPO.second;
+
+        // Prepare common assumption
+        final Term reachableOut = localOuts.stream()
+                .map(pv -> tb.reachableValue(pv))
+                .reduce(tb.tt(), (Term acc, Term term) -> tb.and(acc, term));
+
+        final Term[] uAnon = new Term[] { inst.u,
+                additionalHeapTerms.anonUpdate };
+        final Term[] uBeforeLoopDefAnonVariant = new Term[] { inst.u,
+                beforeLoopUpdate, additionalHeapTerms.anonUpdate,
+                variantUpdate };
+        final Term uAnonInv = tb.applySequential(uAnon,
+                tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
+
+        LoopInvariantInformation info = new LoopInvariantInformation(services,
+                inst, loopRuleApp, goals, termLabelState, invTerm, variantPO,
+                additionalHeapTerms.reachableState,
+                additionalHeapTerms.anonUpdate,
+                additionalHeapTerms.wellFormedAnon, uAnonInv,
+                additionalHeapTerms.frameCondition, uBeforeLoopDefAnonVariant);
+
+        constructGoalContent(info);
+
+        return goals;
     }
 
     @Override
@@ -172,7 +263,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             return tb.elementary((LocationVariable) pv, tb.func(anonFunc));
         }).reduce(tb.skip(), (acc, t) -> tb.parallel(acc, t));
     }
-    
+
     /**
      * Creates a conjunction of all invariant formulas for the
      * {@link LocationVariable}s in heapContext.
@@ -188,7 +279,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * @return A conjunction of all invariant formulas for the
      *         {@link LocationVariable}s in heapContext.
      */
-    protected Term conjunctInv(Services services, Instantiation inst,
+    protected static Term conjunctInv(Services services, Instantiation inst,
             final Map<LocationVariable, Term> atPres,
             final List<LocationVariable> heapContext) {
         return mapAndConjunct(services, (pv -> inst.inv.getInvariant(pv,
@@ -211,7 +302,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * @return A conjunction of all <em>free</em> invariant formulas for the
      *         {@link LocationVariable}s in heapContext.
      */
-    protected Term conjunctFreeInv(Services services, Instantiation inst,
+    protected static Term conjunctFreeInv(Services services, Instantiation inst,
             final Map<LocationVariable, Term> atPres,
             final List<LocationVariable> heapContext) {
         return mapAndConjunct(services, (pv -> inst.inv.getFreeInvariant(pv,
@@ -232,7 +323,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * @return A conjunction of Terms produced by fct for all elements in
      *         listOfT.
      */
-    protected <T> Term mapAndConjunct(Services services,
+    protected static <T> Term mapAndConjunct(Services services,
             java.util.function.Function<T, Term> fct, final List<T> listOfT) {
         final TermBuilder tb = services.getTermBuilder();
 
@@ -255,8 +346,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      *            The {@link Services} object.
      * @return The variant proof obligation and update.
      */
-    protected Pair<Term, Term> prepareVariant(Instantiation inst, Term variant,
-            TermServices services) {
+    protected static Pair<Term, Term> prepareVariant(Instantiation inst,
+            Term variant, TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
         final ProgramElementName variantName = new ProgramElementName(
                 tb.newName("variant"));
@@ -270,6 +361,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                 : tb.skip();
         final Term variantPO = dia ? tb.prec(variant, tb.var(variantPV))
                 : tb.tt();
+
         return new Pair<Term, Term>(variantUpdate, variantPO);
     }
 
@@ -442,9 +534,101 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                 tb.getBaseHeap(), anonHeapTerm);
     }
 
+    /**
+     * Prepare anon update, wellformed formula, frame condition and reachable
+     * state formula.
+     * 
+     * @param services
+     *            The {@link Services} object.
+     * @param inst
+     *            The {@link Instantiation} of parameters for the
+     *            {@link LoopScopeInvariantRule} app.
+     * @param heapContext
+     *            TODO
+     * @param localOuts
+     *            TODO
+     * @param heapToBeforeLoop
+     *            TODO
+     * @param atPres
+     *            TODO
+     * @return An {@link AdditionalHeapTerms} object containing the anonymized
+     *         update, the wellformed formula, the frame condition formula, and
+     *         the reachable state formula.
+     */
+    protected static AdditionalHeapTerms createAdditionalHeapTerms(
+            Services services, final Instantiation inst,
+            final List<LocationVariable> heapContext,
+            final ImmutableSet<ProgramVariable> localOuts,
+            final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop,
+            Map<LocationVariable, Term> atPres) {
+        final TermBuilder tb = services.getTermBuilder();
+
+        Term anonUpdate = createLocalAnonUpdate(localOuts, services);
+        // can still be null
+        if (anonUpdate == null) {
+            anonUpdate = tb.skip();
+        }
+
+        Term wellFormedAnon = null;
+        Term frameCondition = null;
+        Term reachableState = null;
+
+        final Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
+        heapContext.forEach(heap -> mods.put(heap,
+                inst.inv.getModifies(heap, inst.selfTerm, atPres, services)));
+
+        for (LocationVariable heap : heapContext) {
+            final AnonUpdateData tAnon = createAnonUpdate(heap, mods.get(heap),
+                    inst.inv, services);
+
+            anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
+
+            wellFormedAnon = and(tb, wellFormedAnon,
+                    tb.wellFormed(tAnon.anonHeap));
+
+            final Term m = mods.get(heap);
+            final Term fc;
+
+            if (tb.strictlyNothing().equals(m)) {
+                fc = tb.frameStrictlyEmpty(tb.var(heap),
+                        heapToBeforeLoop.get(heap));
+            } else {
+                fc = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), m);
+            }
+
+            frameCondition = and(tb, frameCondition, fc);
+            reachableState = and(tb, reachableState, tb.wellFormed(heap));
+        }
+
+        return new AdditionalHeapTerms(anonUpdate, wellFormedAnon,
+                frameCondition, reachableState);
+    }
+
     // -------------------------------------------------------------------------
     // inner classes
     // -------------------------------------------------------------------------
+
+    /**
+     * A container with data for the additional terms with assertions about the
+     * heap; that is, the anonymizing update, the wellformed term, the frame
+     * condition and the reachable state formula.
+     *
+     * @author Dominic Scheurer
+     */
+    protected static class AdditionalHeapTerms {
+        public final Term anonUpdate;
+        public final Term wellFormedAnon;
+        public final Term frameCondition;
+        public final Term reachableState;
+
+        public AdditionalHeapTerms(Term anonUpdate, Term wellFormedAnon,
+                Term frameCondition, Term reachableState) {
+            this.anonUpdate = anonUpdate;
+            this.wellFormedAnon = wellFormedAnon;
+            this.frameCondition = frameCondition;
+            this.reachableState = reachableState;
+        }
+    }
 
     /**
      * A container for an instantiation of this {@link LoopScopeInvariantRule}
@@ -497,6 +681,122 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             // this.loopHeap = loopHeap;
             // this.loopHeapAtPre = loopHeapAtPre;
             this.anonHeap = anonHeap;
+        }
+    }
+
+    /**
+     * A container object containing the information required for the concrete
+     * loop invariant rules to create the sequents for the new goals.
+     */
+    protected static class LoopInvariantInformation {
+        /** The {@link Services} object. */
+        public final Services services;
+        
+        /**
+         * The {@link Instantiation} of parameters for the
+         * {@link LoopScopeInvariantRule} app.
+         */
+        public final Instantiation inst;
+        
+        /**
+         * The {@link RuleApp} for this {@link LoopScopeInvariantRule}
+         * application.
+         */
+        public final RuleApp ruleApp;
+        
+        /**
+         * The goals created by the invariant rules application; those are
+         * filled with content by the concrete loop invariant rules.
+         */
+        public final ImmutableList<Goal> goals;
+        
+        /** The {@link TermLabelState}. */
+        public final TermLabelState termLabelState;
+        
+        /** The loop invariant formula. */
+        public final Term invTerm;
+        
+        /** The proof obligation for the variant. */
+        public final Term variantPO;
+        
+        /** The reachable state formula. */
+        public final Term reachableState;
+        
+        /** The anonymized update {@link Term}. */
+        public final Term anonUpdate;
+        
+        /** The wellformed formula. */
+        public final Term wellFormedAnon;
+        /**
+         * A formula containing the anonymized update and the loop invariant.
+         */
+        public final Term uAnonInv;
+        /** The frame condition. */
+        public final Term frameCondition;
+        /**
+         * An array containing the original update, the "before the loop" update
+         * for reasoning about the variant, the anonymized update, and the
+         * variant update.
+         */
+        public final Term[] uBeforeLoopDefAnonVariant;
+
+        /**
+         * Creates a new {@link LoopInvariantInformation} object.
+         * 
+         * @param services
+         *            The {@link Services} object.
+         * @param inst
+         *            The {@link Instantiation} of parameters for the
+         *            {@link LoopScopeInvariantRule} app.
+         * @param ruleApp
+         *            The {@link RuleApp} for this
+         *            {@link LoopScopeInvariantRule} application.
+         * @param goals
+         *            The goals created by the invariant rules application;
+         *            those are filled with content by the concrete loop
+         *            invariant rules.
+         * @param termLabelState
+         *            The {@link TermLabelState}.
+         * @param invTerm
+         *            The loop invariant formula.
+         * @param variantPO
+         *            The proof obligation for the variant.
+         * @param reachableState
+         *            The reachable state formula.
+         * @param anonUpdate
+         *            The anonymized update {@link Term}.
+         * @param wellFormedAnon
+         *            The wellformed formula.
+         * @param uAnonInv
+         *            A formula containing the anonymized update and the loop
+         *            invariant.
+         * @param frameCondition
+         *            The frame condition.
+         * @param uBeforeLoopDefAnonVariant
+         *            An array containing the original update, the "before the
+         *            loop" update for reasoning about the variant, the
+         *            anonymized update, and the variant update.
+         */
+        public LoopInvariantInformation(Services services, Instantiation inst,
+                RuleApp ruleApp, ImmutableList<Goal> goals,
+                TermLabelState termLabelState, Term invTerm, Term variantPO,
+                Term reachableState, Term anonUpdate, Term wellFormedAnon,
+                Term uAnonInv, Term frameCondition,
+                Term[] uBeforeLoopDefAnonVariant) {
+            super();
+            this.services = services;
+            this.inst = inst;
+            this.ruleApp = ruleApp;
+            this.goals = goals;
+            this.termLabelState = termLabelState;
+            this.invTerm = invTerm;
+            this.variantPO = variantPO;
+            this.reachableState = reachableState;
+            this.anonUpdate = anonUpdate;
+            this.wellFormedAnon = wellFormedAnon;
+            this.uAnonInv = uAnonInv;
+            this.frameCondition = frameCondition;
+            this.uBeforeLoopDefAnonVariant = uBeforeLoopDefAnonVariant;
         }
     }
 
