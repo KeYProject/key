@@ -95,9 +95,10 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             RuleApp ruleApp) throws RuleAbortException {
         // Initial assertions
         assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
-        
-        LoopInvariantInformation loopInvInfo = doPreparations(goal, services, ruleApp);
-        
+
+        LoopInvariantInformation loopInvInfo = doPreparations(goal, services,
+                ruleApp);
+
         ImmutableList<Goal> goals = loopInvInfo.goals;
         Goal initiallyGoal = goals.tail().head();
         Goal preservesGoal = goals.head();
@@ -114,7 +115,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                 loopInvInfo.frameCondition, loopInvInfo.variantPO,
                 loopInvInfo.termLabelState, loopInvInfo.invTerm,
                 loopInvInfo.uBeforeLoopDefAnonVariant);
-        
+
         return goals;
     }
 

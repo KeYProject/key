@@ -98,11 +98,12 @@ public final class WhileInvariantRule extends AbstractLoopInvariantRule {
             RuleApp ruleApp) throws RuleAbortException {
         // Initial assertions
         assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
-        
-        LoopInvariantInformation loopInvInfo = doPreparations(goal, services, ruleApp);
-        
+
+        LoopInvariantInformation loopInvInfo = doPreparations(goal, services,
+                ruleApp);
+
         final ImmutableList<Goal> goals = loopInvInfo.goals;
-        
+
         Goal wdGoal;
         if (WellDefinednessCheck.isOn()) {
             wdGoal = goals.tail().tail().tail().head();
@@ -110,7 +111,7 @@ public final class WhileInvariantRule extends AbstractLoopInvariantRule {
         } else {
             wdGoal = null;
         }
-        
+
         Goal initGoal = goals.tail().tail().head();
         Goal bodyGoal = goals.tail().head();
         Goal useGoal = goals.head();
@@ -204,7 +205,7 @@ public final class WhileInvariantRule extends AbstractLoopInvariantRule {
                 loopInvInfo.ruleApp, loopInvInfo.inst,
                 loopInvInfo.wellFormedAnon, useGoal, guardJb, guardFalseTerm,
                 uAnon, loopInvInfo.uAnonInv);
-        
+
         return goals;
     }
 
