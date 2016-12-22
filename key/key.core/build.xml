@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+?xml version="1.0"?>
 <project name="key.core" default="deploy" basedir=".">
 	<property name="src.dir"   value="${basedir}/src" />
 	<property name="gen.dir"  value="${basedir}/genSrc" />
@@ -7,7 +7,7 @@
 	<property name="ext.dir" value="${basedir}/lib" />
 
 	<property environment="env"/>
-	 <condition property="key.version" value="${env.KEY_VERSION}" else="2.5">
+	 <condition property="key.version" value="${env.KEY_VERSION}" else="2.7">
 	 	<isset property="env.KEY_VERSION"/>
 	 </condition>
 
