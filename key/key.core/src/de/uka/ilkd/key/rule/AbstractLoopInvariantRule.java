@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaTools;
@@ -136,12 +137,13 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Term uAnonInv = tb.applySequential(uAnon,
                 tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
 
-        LoopInvariantInformation info = new LoopInvariantInformation(services,
-                inst, loopRuleApp, goals, termLabelState, invTerm, variantPO,
-                additionalHeapTerms.reachableState,
+        LoopInvariantInformation info = new LoopInvariantInformation(goal,
+                services, inst, loopRuleApp, goals, termLabelState, invTerm,
+                variantPO, additionalHeapTerms.reachableState,
                 additionalHeapTerms.anonUpdate,
                 additionalHeapTerms.wellFormedAnon, uAnonInv,
-                additionalHeapTerms.frameCondition, uBeforeLoopDefAnonVariant);
+                additionalHeapTerms.frameCondition, uBeforeLoopDefAnonVariant,
+                additionalHeapTerms.anonUpdateData);
 
         constructGoalContent(info);
 
@@ -577,9 +579,12 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         heapContext.forEach(heap -> mods.put(heap,
                 inst.inv.getModifies(heap, inst.selfTerm, atPres, services)));
 
+        ImmutableList<AnonUpdateData> anonUpdateData = ImmutableSLList
+                .<AnonUpdateData> nil();
         for (LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon = createAnonUpdate(heap, mods.get(heap),
                     inst.inv, services);
+            anonUpdateData = anonUpdateData.append(tAnon);
 
             anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
 
@@ -601,7 +606,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         }
 
         return new AdditionalHeapTerms(anonUpdate, wellFormedAnon,
-                frameCondition, reachableState);
+                frameCondition, reachableState, anonUpdateData);
     }
 
     // -------------------------------------------------------------------------
@@ -620,13 +625,16 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         public final Term wellFormedAnon;
         public final Term frameCondition;
         public final Term reachableState;
+        public final ImmutableList<AnonUpdateData> anonUpdateData;
 
         public AdditionalHeapTerms(Term anonUpdate, Term wellFormedAnon,
-                Term frameCondition, Term reachableState) {
+                Term frameCondition, Term reachableState,
+                ImmutableList<AnonUpdateData> anonUpdateData) {
             this.anonUpdate = anonUpdate;
             this.wellFormedAnon = wellFormedAnon;
             this.frameCondition = frameCondition;
             this.reachableState = reachableState;
+            this.anonUpdateData = anonUpdateData;
         }
     }
 
@@ -644,7 +652,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         public final Term selfTerm;
         // TODO Removed this field; was however used in old invariant rule.
         // Could be needed for the information flow validity goal.
-        // public final ExecutionContext innermostExecutionContext;
+        public final ExecutionContext innermostExecutionContext;
 
         public Instantiation(Term u, Term progPost, While loop,
                 LoopSpecification inv, Term selfTerm,
@@ -661,7 +669,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             this.loop = loop;
             this.inv = inv;
             this.selfTerm = selfTerm;
-            // this.innermostExecutionContext = innermostExecutionContext;
+            this.innermostExecutionContext = innermostExecutionContext;
         }
     }
 
@@ -670,16 +678,13 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * actual update and the anonymized heap.
      */
     protected static class AnonUpdateData {
-        public final Term anonUpdate, anonHeap;
-        // TODO Removed these fields; were however used in old invariant rule.
-        // Might be needed for IF or well-definedness or whatever...
-        // public final Term loopHeap, loopHeapAtPre;
+        public final Term anonUpdate, anonHeap, loopHeap, loopHeapAtPre;
 
         public AnonUpdateData(Term anonUpdate, Term loopHeap,
                 Term loopHeapAtPre, Term anonHeap) {
             this.anonUpdate = anonUpdate;
-            // this.loopHeap = loopHeap;
-            // this.loopHeapAtPre = loopHeapAtPre;
+            this.loopHeap = loopHeap;
+            this.loopHeapAtPre = loopHeapAtPre;
             this.anonHeap = anonHeap;
         }
     }
@@ -689,50 +694,56 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * loop invariant rules to create the sequents for the new goals.
      */
     protected static class LoopInvariantInformation {
+        /** The original goal. */
+        public final Goal goal;
+
         /** The {@link Services} object. */
         public final Services services;
-        
+
         /**
          * The {@link Instantiation} of parameters for the
          * {@link LoopScopeInvariantRule} app.
          */
         public final Instantiation inst;
-        
+
         /**
          * The {@link RuleApp} for this {@link LoopScopeInvariantRule}
          * application.
          */
-        public final RuleApp ruleApp;
-        
+        public final LoopInvariantBuiltInRuleApp ruleApp;
+
         /**
          * The goals created by the invariant rules application; those are
          * filled with content by the concrete loop invariant rules.
          */
         public final ImmutableList<Goal> goals;
-        
+
         /** The {@link TermLabelState}. */
         public final TermLabelState termLabelState;
-        
+
         /** The loop invariant formula. */
         public final Term invTerm;
-        
+
         /** The proof obligation for the variant. */
         public final Term variantPO;
-        
+
         /** The reachable state formula. */
         public final Term reachableState;
-        
+
         /** The anonymized update {@link Term}. */
         public final Term anonUpdate;
-        
+
         /** The wellformed formula. */
         public final Term wellFormedAnon;
+
         /**
          * A formula containing the anonymized update and the loop invariant.
          */
         public final Term uAnonInv;
+
         /** The frame condition. */
         public final Term frameCondition;
+
         /**
          * An array containing the original update, the "before the loop" update
          * for reasoning about the variant, the anonymized update, and the
@@ -741,8 +752,15 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         public final Term[] uBeforeLoopDefAnonVariant;
 
         /**
+         * Anonymizing updates for all heaps.
+         */
+        public final ImmutableList<AnonUpdateData> anonUpdateData;
+
+        /**
          * Creates a new {@link LoopInvariantInformation} object.
          * 
+         * @param goal
+         *            TODO
          * @param services
          *            The {@link Services} object.
          * @param inst
@@ -776,14 +794,18 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
          *            An array containing the original update, the "before the
          *            loop" update for reasoning about the variant, the
          *            anonymized update, and the variant update.
+         * @param anonUpdateData
+         *            TODO
          */
-        public LoopInvariantInformation(Services services, Instantiation inst,
-                RuleApp ruleApp, ImmutableList<Goal> goals,
-                TermLabelState termLabelState, Term invTerm, Term variantPO,
-                Term reachableState, Term anonUpdate, Term wellFormedAnon,
-                Term uAnonInv, Term frameCondition,
-                Term[] uBeforeLoopDefAnonVariant) {
+        public LoopInvariantInformation(Goal goal, Services services,
+                Instantiation inst, LoopInvariantBuiltInRuleApp ruleApp,
+                ImmutableList<Goal> goals, TermLabelState termLabelState,
+                Term invTerm, Term variantPO, Term reachableState,
+                Term anonUpdate, Term wellFormedAnon, Term uAnonInv,
+                Term frameCondition, Term[] uBeforeLoopDefAnonVariant,
+                ImmutableList<AnonUpdateData> anonUpdateData) {
             super();
+            this.goal = goal;
             this.services = services;
             this.inst = inst;
             this.ruleApp = ruleApp;
@@ -797,6 +819,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             this.uAnonInv = uAnonInv;
             this.frameCondition = frameCondition;
             this.uBeforeLoopDefAnonVariant = uBeforeLoopDefAnonVariant;
+            this.anonUpdateData = anonUpdateData;
         }
     }
 

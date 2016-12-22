@@ -14,9 +14,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -32,16 +30,13 @@ import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowLoopInvariantTacletBuilder;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -63,9 +58,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
@@ -78,7 +71,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
-public final class WhileInvariantRule implements BuiltInRule {
+public final class WhileInvariantRule extends AbstractLoopInvariantRule {
     /**
      * The hint used to refactor the initial invariant.
      */
@@ -95,8 +88,117 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     public static final String BODY_PRESERVES_INVARIANT_LABEL = "Body Preserves Invariant";
 
-    private static Term lastFocusTerm;
-    private static Instantiation lastInstantiation;
+    @Override
+    public int getNrOfGoals() {
+        return WellDefinednessCheck.isOn() ? 4 : 3;
+    }
+
+    @Override
+    public void constructGoalContent(LoopInvariantInformation loopInvInfo) {
+        final ImmutableList<Goal> goals = loopInvInfo.goals;
+        
+        Goal wdGoal;
+        if (WellDefinednessCheck.isOn()) {
+            wdGoal = goals.tail().tail().tail().head();
+            wdGoal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
+        } else {
+            wdGoal = null;
+        }
+        
+        Goal initGoal = goals.tail().tail().head();
+        Goal bodyGoal = goals.tail().head();
+        Goal useGoal = goals.head();
+
+        final KeYJavaType booleanKJT = loopInvInfo.services.getTypeConverter()
+                .getBooleanType();
+
+        List<LocationVariable> heapContext = ((IBuiltInRuleApp) loopInvInfo.ruleApp)
+                .getHeapContext();
+
+        // "Invariant Initially Valid":
+        // \replacewith (==> inv );
+        prepareInvInitiallyValidBranch(loopInvInfo.termLabelState,
+                loopInvInfo.services, loopInvInfo.ruleApp, loopInvInfo.inst,
+                loopInvInfo.invTerm, loopInvInfo.reachableState, initGoal);
+        // TODO Jonas: Ist die Doppelanwendung nötig?
+
+        final ImmutableSet<ProgramVariable> localIns = MiscTools
+                .getLocalIns(loopInvInfo.inst.loop, loopInvInfo.services);
+        final ImmutableSet<ProgramVariable> localOuts = MiscTools
+                .getLocalOuts(loopInvInfo.inst.loop, loopInvInfo.services);
+
+        setupWdGoal(wdGoal, loopInvInfo.inst.inv, loopInvInfo.inst.u,
+                loopInvInfo.inst.selfTerm, heapContext.get(0),
+                loopInvInfo.anonUpdateData.head().anonHeap, localIns,
+                loopInvInfo.ruleApp.posInOccurrence(), loopInvInfo.services);
+
+        // prepare guard
+        final Triple<JavaBlock, Term, Term> guardStuff = prepareGuard(
+                loopInvInfo.inst, booleanKJT, loopInvInfo.ruleApp,
+                loopInvInfo.services);
+        final JavaBlock guardJb = guardStuff.first;
+        final Term guardTrueTerm = guardStuff.second;
+        final Term guardFalseTerm = guardStuff.third;
+
+        // "Body Preserves Invariant":
+        // \replacewith (==> #atPreEqs(anon1)
+        // -> #introNewAnonUpdate(#modifies, #locDepFunc(anon1, \[{.. while (#e)
+        // #s ...}\]post) & inv ->
+        // (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
+        // #whileInvRule(\[{.. while (#e) #s ...}\]post,
+        // #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post)
+        // & inv)),
+        // anon1));
+        prepareBodyPreservesBranch(loopInvInfo.termLabelState,
+                loopInvInfo.services, loopInvInfo.ruleApp,
+                loopInvInfo.goal.sequent(), loopInvInfo.inst,
+                loopInvInfo.invTerm, loopInvInfo.wellFormedAnon,
+                loopInvInfo.frameCondition, loopInvInfo.variantPO, bodyGoal,
+                guardJb, guardTrueTerm, loopInvInfo.uBeforeLoopDefAnonVariant,
+                loopInvInfo.uAnonInv);
+
+        if (InfFlowCheckInfo.isInfFlow(loopInvInfo.goal)
+                && loopInvInfo.inst.inv.hasInfFlowSpec(loopInvInfo.services)) {
+            // set up information flow validity goal
+            InfFlowData infFlowData;
+            try {
+                infFlowData = setUpInfFlowValidityGoal(bodyGoal,
+                        loopInvInfo.ruleApp, loopInvInfo.inst, guardJb,
+                        localIns, localOuts, loopInvInfo.anonUpdateData,
+                        loopInvInfo.anonUpdate, loopInvInfo.services);
+
+                // set up information flow part of useGoal:
+                // add infFlowAssumptions, add term and taclet to post goal
+                setUpInfFlowPartOfUseGoal(infFlowData,
+                        loopInvInfo.anonUpdateData.head().loopHeapAtPre,
+                        useGoal, loopInvInfo.services);
+            } catch (RuleAbortException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // "Invariant Initially Valid":
+        // \replacewith (==> inv );
+        prepareInvInitiallyValidBranch(loopInvInfo.termLabelState,
+                loopInvInfo.services, loopInvInfo.ruleApp, loopInvInfo.inst,
+                loopInvInfo.invTerm, loopInvInfo.reachableState, initGoal);
+
+        setupWdGoal(wdGoal, loopInvInfo.inst.inv, loopInvInfo.inst.u,
+                loopInvInfo.inst.selfTerm, heapContext.get(0),
+                loopInvInfo.anonUpdateData.head().anonHeap, localIns,
+                loopInvInfo.ruleApp.posInOccurrence(), loopInvInfo.services);
+
+        // "Use Case":
+        // \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
+        // (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
+        // (#v1=FALSE -> \[{.. ...}\]post)),anon2))
+        final Term[] uAnon = new Term[] { loopInvInfo.inst.u,
+                loopInvInfo.anonUpdate };
+        prepareUseCaseBranch(loopInvInfo.termLabelState, loopInvInfo.services,
+                loopInvInfo.ruleApp, loopInvInfo.inst,
+                loopInvInfo.wellFormedAnon, useGoal, guardJb, guardFalseTerm,
+                uAnon, loopInvInfo.uAnonInv);
+    }
 
     private static InfFlowData prepareSetUpOfInfFlowValidityGoal(
             final AnonUpdateData anonUpdateData, final Term guardTerm,
@@ -200,120 +302,6 @@ public final class WhileInvariantRule implements BuiltInRule {
     // -------------------------------------------------------------------------
 
     private WhileInvariantRule() {
-    }
-
-    // -------------------------------------------------------------------------
-    // internal methods
-    // -------------------------------------------------------------------------
-
-    private static Instantiation instantiate(
-            final LoopInvariantBuiltInRuleApp app, Services services)
-            throws RuleAbortException {
-        final Term focusTerm = app.posInOccurrence().subTerm();
-
-        if (focusTerm == lastFocusTerm && lastInstantiation.inv == services
-                .getSpecificationRepository()
-                .getLoopSpec(lastInstantiation.loop)) {
-            return lastInstantiation;
-        }
-
-        // leading update?
-        final Pair<Term, Term> update = applyUpdates(focusTerm, services);
-        final Term u = update.first;
-        final Term progPost = update.second;
-
-        // focus (below update) must be modality term
-        if (!checkFocus(progPost)) {
-            return null;
-        }
-
-        // active statement must be while loop
-        final While loop = app.getLoopStatement();
-
-        // try to get invariant from JML specification
-        LoopSpecification spec = app.getSpec();
-        if (spec == null) // may happen after reloading proof
-            throw new RuleAbortException("no invariant found");
-
-        // collect self, execution context
-        final MethodFrame innermostMethodFrame = JavaTools
-                .getInnermostMethodFrame(progPost.javaBlock(), services);
-        if (innermostMethodFrame != null) {
-            spec = spec.setTarget(innermostMethodFrame.getProgramMethod());
-        }
-
-        final Term selfTerm = innermostMethodFrame == null ? null
-                : MiscTools.getSelfTerm(innermostMethodFrame, services);
-
-        final ExecutionContext innermostExecutionContext = innermostMethodFrame == null
-                ? null
-                : (ExecutionContext) innermostMethodFrame.getExecutionContext();
-        services.getSpecificationRepository().addLoopInvariant(spec);
-
-        // cache and return result
-        final Instantiation result = new Instantiation(u, progPost, loop, spec,
-                selfTerm, innermostExecutionContext);
-        lastFocusTerm = focusTerm;
-        lastInstantiation = result;
-        return result;
-    }
-
-    private static Term createLocalAnonUpdate(
-            ImmutableSet<ProgramVariable> localOuts, Services services) {
-        Term anonUpdate = null;
-        final TermBuilder tb = services.getTermBuilder();
-        for (ProgramVariable pv : localOuts) {
-            final Name anonFuncName = new Name(
-                    tb.newName(pv.name().toString()));
-            final Function anonFunc = new Function(anonFuncName, pv.sort(),
-                    true);
-            services.getNamespaces().functions().addSafely(anonFunc);
-            final Term elemUpd = tb.elementary((LocationVariable) pv,
-                    tb.func(anonFunc));
-            if (anonUpdate == null) {
-                anonUpdate = elemUpd;
-            } else {
-                anonUpdate = tb.parallel(anonUpdate, elemUpd);
-            }
-        }
-        return anonUpdate;
-    }
-
-    /**
-     * @return (assumption, anon update, anon heap)
-     */
-    private static AnonUpdateData createAnonUpdate(LocationVariable heap,
-            Term mod, LoopSpecification inv, Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
-        final Function loopHeapFunc = new Function(loopHeapName,
-                heapLDT.targetSort(), true);
-        services.getNamespaces().functions().addSafely(loopHeapFunc);
-
-        final Term loopHeap = tb.func(loopHeapFunc);
-        final Name anonHeapName = new Name(
-                tb.newName("anon_" + heap + "_LOOP"));
-        final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
-        services.getNamespaces().functions().addSafely(anonHeapFunc);
-        final Term anonHeapTerm = tb.label(tb.func(anonHeapFunc),
-                ParameterlessTermLabel.ANON_HEAP_LABEL);
-
-        // check for strictly pure loops
-        final Term anonUpdate;
-        if (tb.strictlyNothing().equals(mod)) {
-            anonUpdate = tb.skip();
-        } else {
-            anonUpdate = tb.anonUpd(heap, mod, anonHeapTerm);
-        }
-
-        return new AnonUpdateData(anonUpdate, loopHeap, tb.getBaseHeap(),
-                anonHeapTerm);
-    }
-
-    private static boolean checkFocus(final Term progPost) {
-        // focus (below update) must be modality term
-        return progPost.op() instanceof Modality;
     }
 
     private static Term buildAtPostVar(Term varTerm, String suffix,
@@ -531,60 +519,6 @@ public final class WhileInvariantRule implements BuiltInRule {
     // helper methods for apply()
     // -------------------------------------------------------------------------
 
-    private Term conjunctInv(Services services, Instantiation inst,
-            final Map<LocationVariable, Term> atPres,
-            final List<LocationVariable> heapContext) {
-        Term invTerm = services.getTermBuilder().tt();
-        for (LocationVariable heap : heapContext) {
-            final Term i = inst.inv.getInvariant(heap, inst.selfTerm, atPres,
-                    services);
-            if (i == null)
-                continue;
-            if (invTerm == null) {
-                invTerm = i;
-            } else {
-                invTerm = services.getTermBuilder().and(invTerm, i);
-            }
-        }
-        return invTerm;
-    }
-
-    private Term conjunctFreeInv(Services services, Instantiation inst,
-            final Map<LocationVariable, Term> atPres,
-            final List<LocationVariable> heapContext) {
-        Term freeInvTerm = services.getTermBuilder().tt();
-        for (LocationVariable heap : heapContext) {
-            final Term i = inst.inv.getFreeInvariant(heap, inst.selfTerm,
-                    atPres, services);
-            if (i == null)
-                continue;
-            if (freeInvTerm == null) {
-                freeInvTerm = i;
-            } else {
-                freeInvTerm = services.getTermBuilder().and(freeInvTerm, i);
-            }
-        }
-        return freeInvTerm;
-    }
-
-    private Pair<Term, Term> prepareVariant(Instantiation inst, Term variant,
-            TermServices services) {
-        final TermBuilder tb = services.getTermBuilder();
-        final ProgramElementName variantName = new ProgramElementName(
-                tb.newName("variant"));
-        final LocationVariable variantPV = new LocationVariable(variantName,
-                Sort.ANY);
-        services.getNamespaces().programVariables().addSafely(variantPV);
-
-        final boolean dia = ((Modality) inst.progPost.op())
-                .terminationSensitive();
-        final Term variantUpdate = dia ? tb.elementary(variantPV, variant)
-                : tb.skip();
-        final Term variantPO = dia ? tb.prec(variant, tb.var(variantPV))
-                : tb.tt();
-        return new Pair<Term, Term>(variantUpdate, variantPO);
-    }
-
     private Term bodyTerm(TermLabelState termLabelState, Services services,
             RuleApp ruleApp, final Sequent applicationSequent,
             Instantiation inst, final Term invTerm, Term frameCondition,
@@ -723,35 +657,6 @@ public final class WhileInvariantRule implements BuiltInRule {
     // public interface
     // -------------------------------------------------------------------------
 
-    @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        return checkApplicability(goal, pio);
-    }
-
-    // focus must be top level succedent
-    static boolean checkApplicability(Goal g, PosInOccurrence pio) {
-        if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
-            return false;
-        }
-        // abort if inside of transformer
-        if (Transformer.inTransformer(pio)) {
-            return false;
-        }
-        Pair<Term, Term> up = applyUpdates(pio.subTerm(),
-                g.proof().getServices());
-        final Term progPost = up.second;
-        if (!checkFocus(progPost)) {
-            return false;
-        }
-        // active statement must be while loop
-        final SourceElement activeStatement = JavaTools
-                .getActiveStatement(progPost.javaBlock());
-        if (!(activeStatement instanceof While)) {
-            return false;
-        }
-        return true;
-    }
-
     static Pair<Term, Term> applyUpdates(Term focusTerm,
             TermServices services) {
         if (focusTerm.op() instanceof UpdateApplication) {
@@ -786,301 +691,13 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services,
-            final RuleApp ruleApp) throws RuleAbortException {
-        final TermLabelState termLabelState = new TermLabelState();
-        assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
-        LoopInvariantBuiltInRuleApp loopRuleApp = (LoopInvariantBuiltInRuleApp) ruleApp;
-        final Sequent applicationSequent = goal.sequent();
-        final KeYJavaType booleanKJT = services.getTypeConverter()
-                .getBooleanType();
-        final TermBuilder tb = services.getTermBuilder();
-
-        // get instantiation
-        final Instantiation inst = instantiate(loopRuleApp, services);
-
-        final Map<LocationVariable, Term> atPres = inst.inv.getInternalAtPres();
-        final List<LocationVariable> heapContext = ((IBuiltInRuleApp) ruleApp)
-                .getHeapContext();
-
-        final Term invTerm = conjunctInv(services, inst, atPres, heapContext);
-        final Term invFreeTerm = conjunctFreeInv(services, inst, atPres,
-                heapContext);
-
-        final Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
-        for (LocationVariable heap : heapContext) {
-            final Term m = inst.inv.getModifies(heap, inst.selfTerm, atPres,
-                    services);
-            mods.put(heap, m);
-        }
-
-        final Term variant = inst.inv.getVariant(inst.selfTerm, atPres,
-                services);
-
-        // collect input and output local variables,
-        // prepare reachableIn and reachableOut
-        final ImmutableSet<ProgramVariable> localIns = MiscTools
-                .getLocalIns(inst.loop, services);
-        final ImmutableSet<ProgramVariable> localOuts = MiscTools
-                .getLocalOuts(inst.loop, services);
-        
-        // XXX (DS) This value (reachableIn) is never used!
-        Term reachableIn = tb.tt();
-        for (ProgramVariable pv : localIns) {
-            reachableIn = tb.and(reachableIn, tb.reachableValue(pv));
-        }
-        Term reachableOut = tb.tt();
-
-        for (ProgramVariable pv : localOuts) {
-            reachableOut = tb.and(reachableOut, tb.reachableValue(pv));
-        }
-
-        // prepare variant
-        final Pair<Term, Term> variantPair = prepareVariant(inst, variant,
-                services);
-        final Term variantUpdate = variantPair.first;
-        final Term variantPO = variantPair.second;
-
-        // prepare guard
-        final Triple<JavaBlock, Term, Term> guardStuff = prepareGuard(inst,
-                booleanKJT, loopRuleApp, services);
-        final JavaBlock guardJb = guardStuff.first;
-        final Term guardTrueTerm = guardStuff.second;
-        final Term guardFalseTerm = guardStuff.third;
-
-        Term beforeLoopUpdate = null;
-
-        final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop = new LinkedHashMap<LocationVariable, Map<Term, Term>>();
-
-        for (LocationVariable heap : heapContext) {
-            heapToBeforeLoop.put(heap, new LinkedHashMap<Term, Term>());
-            final LocationVariable lv = tb.heapAtPreVar(heap + "Before_LOOP",
-                    heap.sort(), true);
-            services.getNamespaces().programVariables().addSafely(lv);
-            final Term u = tb.elementary(lv, tb.var(heap));
-            if (beforeLoopUpdate == null) {
-                beforeLoopUpdate = u;
-            } else {
-                beforeLoopUpdate = tb.parallel(beforeLoopUpdate, u);
-            }
-            heapToBeforeLoop.get(heap).put(tb.var(heap), tb.var(lv));
-        }
-
-        // This is needed because of the shallow access of \permission,
-        // heap references that are deeper than top-level have to be replaced
-        // to, but with heapBefore_....
-        final LocationVariable permissionHeap = services.getTypeConverter()
-                .getHeapLDT().getPermissionHeap();
-        if (permissionHeap != null && heapContext.contains(permissionHeap)) {
-            final LocationVariable baseHeap = services.getTypeConverter()
-                    .getHeapLDT().getHeap();
-            final Term baseHeapVar = services.getTermBuilder().var(baseHeap);
-            heapToBeforeLoop.get(permissionHeap).put(baseHeapVar,
-                    heapToBeforeLoop.get(baseHeap).get(baseHeapVar));
-        }
-
-        for (ProgramVariable pv : localOuts) {
-            final String pvBeforeLoopName = tb
-                    .newName(pv.name().toString() + "Before_LOOP");
-            final LocationVariable pvBeforeLoop = new LocationVariable(
-                    new ProgramElementName(pvBeforeLoopName),
-                    pv.getKeYJavaType());
-            services.getNamespaces().programVariables().addSafely(pvBeforeLoop);
-            beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
-                    tb.elementary(pvBeforeLoop, tb.var(pv)));
-            heapToBeforeLoop
-                    .get(services.getTypeConverter().getHeapLDT().getHeap())
-                    .put(tb.var(pv), tb.var(pvBeforeLoop));
-        }
-
-        // prepare anon update, frame condition, etc.
-        Term anonUpdate = createLocalAnonUpdate(localOuts, services); // can
-                                                                      // still
-                                                                      // be null
-        // Term anonAssumption = null;
-        Term wellFormedAnon = null;
-        Term frameCondition = null;
-        Term reachableState = null;
-        Term anonHeap = null;
-        ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList
-                .<AnonUpdateData> nil();
-        for (LocationVariable heap : heapContext) {
-            final AnonUpdateData tAnon = createAnonUpdate(heap, mods.get(heap),
-                    inst.inv, services);
-            anonUpdateDatas = anonUpdateDatas.append(tAnon);
-            if (anonUpdate == null) {
-                anonUpdate = tAnon.anonUpdate;
-            } else {
-                anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
-            }
-            if (wellFormedAnon == null) {
-                wellFormedAnon = tb.wellFormed(tAnon.anonHeap);
-            } else {
-                wellFormedAnon = tb.and(wellFormedAnon,
-                        tb.wellFormed(tAnon.anonHeap));
-            }
-            if (anonHeap == null) {
-                anonHeap = tAnon.anonHeap;
-            }
-            final Term m = mods.get(heap);
-            final Term fc;
-            if (tb.strictlyNothing().equals(m)) {
-                fc = tb.frameStrictlyEmpty(tb.var(heap),
-                        heapToBeforeLoop.get(heap));
-            } else {
-                fc = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), m);
-            }
-            if (frameCondition == null) {
-                frameCondition = fc;
-            } else {
-                frameCondition = tb.and(frameCondition, fc);
-            }
-            if (reachableState == null) {
-                reachableState = tb.wellFormed(heap);
-            } else {
-                reachableState = tb.and(reachableState, tb.wellFormed(heap));
-            }
-        }
-
-        // prepare common assumption
-        final Term[] uAnon = new Term[] { inst.u, anonUpdate };
-        final Term[] uBeforeLoopDefAnonVariant = new Term[] { inst.u,
-                beforeLoopUpdate, anonUpdate, variantUpdate };
-        final Term uAnonInv = tb.applySequential(uAnon,
-                tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
-
-        final ImmutableList<Goal> result;
-        Goal wdGoal;
-        if (WellDefinednessCheck.isOn()) {
-            // split goal into four branches
-            result = goal.split(4);
-            wdGoal = result.tail().tail().tail().head();
-            wdGoal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
-        } else {
-            // split goal into three branches
-            result = goal.split(3);
-            wdGoal = null;
-        }
-        Goal initGoal = result.tail().tail().head();
-        Goal bodyGoal = result.tail().head();
-        Goal useGoal = result.head();
-
-        // "Invariant Initially Valid":
-        // \replacewith (==> inv );
-        prepareInvInitiallyValidBranch(termLabelState, services, ruleApp, inst,
-                invTerm, reachableState, initGoal); // TODO Jonas: Ist die
-                                                    // doppelanwendung nötig?
-
-        setupWdGoal(wdGoal, inst.inv, inst.u, inst.selfTerm, heapContext.get(0),
-                anonHeap, localIns, ruleApp.posInOccurrence(), services);
-
-        // "Body Preserves Invariant":
-        // \replacewith (==> #atPreEqs(anon1)
-        // -> #introNewAnonUpdate(#modifies, #locDepFunc(anon1, \[{.. while (#e)
-        // #s ...}\]post) & inv ->
-        // (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
-        // #whileInvRule(\[{.. while (#e) #s ...}\]post,
-        // #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post)
-        // & inv)),
-        // anon1));
-        prepareBodyPreservesBranch(termLabelState, services, ruleApp,
-                applicationSequent, inst, invTerm, wellFormedAnon,
-                frameCondition, variantPO, bodyGoal, guardJb, guardTrueTerm,
-                uBeforeLoopDefAnonVariant, uAnonInv);
-
-        if (InfFlowCheckInfo.isInfFlow(goal)
-                && inst.inv.hasInfFlowSpec(services)) {
-            // set up information flow validity goal
-            InfFlowData infFlowData = setUpInfFlowValidityGoal(bodyGoal,
-                    loopRuleApp, inst, guardJb, localIns, localOuts,
-                    anonUpdateDatas, anonUpdate, services);
-
-            // set up information flow part of useGoal:
-            // add infFlowAssumptions, add term and taclet to post goal
-            setUpInfFlowPartOfUseGoal(infFlowData,
-                    anonUpdateDatas.head().loopHeapAtPre, useGoal, services);
-        }
-
-        // "Invariant Initially Valid":
-        // \replacewith (==> inv );
-        prepareInvInitiallyValidBranch(termLabelState, services, ruleApp, inst,
-                invTerm, reachableState, initGoal);
-
-        setupWdGoal(wdGoal, inst.inv, inst.u, inst.selfTerm, heapContext.get(0),
-                anonHeap, localIns, ruleApp.posInOccurrence(), services);
-
-        // "Use Case":
-        // \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
-        // (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
-        // (#v1=FALSE -> \[{.. ...}\]post)),anon2))
-        prepareUseCaseBranch(termLabelState, services, ruleApp, inst,
-                wellFormedAnon, useGoal, guardJb, guardFalseTerm, uAnon,
-                uAnonInv);
-        return result;
-    }
-
-    @Override
     public Name name() {
         return NAME;
-    }
-
-    @Override
-    public String displayName() {
-        return toString();
-    }
-
-    @Override
-    public String toString() {
-        return NAME.toString();
-    }
-
-    @Override
-    public LoopInvariantBuiltInRuleApp createApp(PosInOccurrence pos,
-            TermServices services) {
-        return new LoopInvariantBuiltInRuleApp(this, pos, services);
     }
 
     // -------------------------------------------------------------------------
     // inner classes
     // -------------------------------------------------------------------------
-
-    private static final class Instantiation {
-        public final Term u;
-        public final Term progPost;
-        public final While loop;
-        public final LoopSpecification inv;
-        public final Term selfTerm;
-        public final ExecutionContext innermostExecutionContext;
-
-        public Instantiation(Term u, Term progPost, While loop,
-                LoopSpecification inv, Term selfTerm,
-                ExecutionContext innermostExecutionContext) {
-            assert u != null;
-            assert u.sort() == Sort.UPDATE;
-            assert progPost != null;
-            assert progPost.sort() == Sort.FORMULA;
-            assert loop != null;
-            assert inv != null;
-            this.u = u;
-            this.progPost = progPost;
-            this.loop = loop;
-            this.inv = inv;
-            this.selfTerm = selfTerm;
-            this.innermostExecutionContext = innermostExecutionContext;
-        }
-    }
-
-    private static class AnonUpdateData {
-        public final Term anonUpdate, anonHeap, loopHeap, loopHeapAtPre;
-
-        public AnonUpdateData(Term anonUpdate, Term loopHeap,
-                Term loopHeapAtPre, Term anonHeap) {
-            this.anonUpdate = anonUpdate;
-            this.loopHeap = loopHeap;
-            this.loopHeapAtPre = loopHeapAtPre;
-            this.anonHeap = anonHeap;
-        }
-    }
 
     private static final class InfFlowData {
         public final ProofObligationVars symbExecVars;
@@ -1125,13 +742,5 @@ public final class WhileInvariantRule implements BuiltInRule {
             assert applPredTerm != null;
             assert infFlowApp != null;
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isApplicableOnSubTerms() {
-        return false;
     }
 }
