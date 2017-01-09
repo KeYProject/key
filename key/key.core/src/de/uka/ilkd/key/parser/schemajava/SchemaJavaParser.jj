@@ -4687,12 +4687,21 @@ Continue ContinueStatement() :
 	    result = factory.createContinue();
 	    setPrefixInfo(result);
 	}
-    [ <IDENTIFIER>
+    [ (<IDENTIFIER>
     {
 	id = factory.createIdentifier(token.image);
 	setPrefixInfo(id);
 	result.setIdentifier(id);
     }
+     ) | (
+	   <SVIDENTIFIER>
+    {
+	id = factory.getLabelSV(token.image);
+	setPrefixInfo(id);
+	result.setIdentifier(id);
+    }
+
+	   )
     ] ";"
 	{
 	    checkConstruction(result);

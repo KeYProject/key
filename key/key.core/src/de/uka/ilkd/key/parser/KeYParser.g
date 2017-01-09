@@ -3795,7 +3795,8 @@ varexp[TacletBuilder b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
-    | varcond_differentFields[b]  
+    | varcond_differentFields[b] 
+    | varcond_lastPrefixElementIsNotALabel[b] 
   ) 
   | 
   ( (NOT_ {negated = true;} )? 
@@ -3862,6 +3863,14 @@ varcond_differentFields [TacletBuilder b]
    RPAREN
    {
             b.addVariableCondition(new DifferentFields((SchemaVariable)x, (SchemaVariable)y));
+   }
+;
+
+varcond_lastPrefixElementIsNotALabel [TacletBuilder b]
+:
+   LASTPREFIXELEMISNOTALABEL
+   {
+            b.addVariableCondition(new LastPrefixElemNotALabelCondition());
    }
 ;
 
