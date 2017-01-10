@@ -28,12 +28,16 @@ public abstract class AbstractCommand implements ProofScriptCommand {
     protected static Goal getFirstOpenGoal(Proof proof, Map<String, Object> state) throws ScriptException {
 
         Object fixedGoal = state.get(GOAL_KEY);
+        if(fixedGoal instanceof Goal) {
+        	return (Goal) fixedGoal;
+        }
         if(fixedGoal instanceof Node) {
             Goal g = getGoal(proof.openGoals(), (Node)fixedGoal);
             if(g != null) {
                 return g;
             }
         }
+        
 
         Node node = proof.root();
 
