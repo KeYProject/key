@@ -481,6 +481,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                 labels.add(0, lastLabeledStatement.getLabel());
                 lastStatement = lastLabeledStatement;
                 cont = true;
+            } else {
+                break;
             }
         }
 
