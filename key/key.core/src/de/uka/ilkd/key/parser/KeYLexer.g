@@ -229,7 +229,6 @@ lexer grammar KeYLexer;
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
         DEPENDINGON : '\\dependingOn';
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
-	LASTPREFIXELEMISNOTALABEL : '\\lastPrefixElemIsNotALabel';
 	DROP_EFFECTLESS_ELEMENTARIES : '\\dropEffectlessElementaries';
 	DROP_EFFECTLESS_STORES : '\\dropEffectlessStores';
 	SIMPLIFY_IF_THEN_ELSE_UPDATE : '\\simplifyIfThenElseUpdate';
