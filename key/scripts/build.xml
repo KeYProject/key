@@ -5,7 +5,7 @@
 	<property name="javadoc.dir" value="${key.dir}/deployment/api/"/>
 	<property environment="env"/>
 
-	<condition property="key.version" value="${env.KEY_VERSION}" else="2.5">
+	<condition property="key.version" value="${env.KEY_VERSION}" else="2.7">
 		<isset property="env.KEY_VERSION"/>
 	</condition>
 
