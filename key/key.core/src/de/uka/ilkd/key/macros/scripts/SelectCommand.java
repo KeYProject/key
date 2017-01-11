@@ -26,11 +26,16 @@ public class SelectCommand extends AbstractCommand {
         if(formulaString == null) {
             throw new ScriptException("Missing 'formula' argument for select");
         }
+        boolean succOnly=false;
+        boolean anteOnly=false;
+        if (args.values().contains("succedent")) {
+        	succOnly = true;
+        } else if (args.values().contains("antecedent")) anteOnly = true;
 
         try {
             Term t = toTerm(proof, stateMap, formulaString, Sort.FORMULA);
 
-            Goal g = findGoalWith(t, proof);
+            Goal g = findGoalWith(t, proof, anteOnly, succOnly);
 
             stateMap.put(GOAL_KEY, g);
 
@@ -40,7 +45,7 @@ public class SelectCommand extends AbstractCommand {
 
     }
 
-    private Goal findGoalWith(Term formula, Proof proof) throws ScriptException {
+    private Goal findGoalWith(Term formula, Proof proof, boolean anteOnly, boolean succOnly) throws ScriptException {
 
         Goal g;
         Deque<Node> choices = new LinkedList<Node>();
@@ -52,15 +57,37 @@ public class SelectCommand extends AbstractCommand {
             Sequent seq;
             switch (childCount) {
             case 0:
-                seq = node.sequent();
-                if(contains(seq, formula)) {
-                    g = getGoal(proof.openGoals(), node);
-                    if(g.isAutomatic()) {
-                        return g;
-                    }
-                }
-                node = choices.pollLast();
-                break;
+            	if (!succOnly && !anteOnly) {
+	                seq = node.sequent();
+	                if(contains(seq, formula)) {
+	                    g = getGoal(proof.openGoals(), node);
+	                    if(g.isAutomatic()) {
+	                        return g;
+	                    }
+	                }
+	                node = choices.pollLast();
+	                break;
+            	} else if (anteOnly) {
+            		Semisequent s = node.sequent().antecedent();
+	                if(contains(s, formula)) {
+	                    g = getGoal(proof.openGoals(), node);
+	                    if(g.isAutomatic()) {
+	                        return g;
+	                    }
+	                }
+	                node = choices.pollLast();
+	                break;
+            	} else {
+            		Semisequent s = node.sequent().succedent();
+	                if(contains(s, formula)) {
+	                    g = getGoal(proof.openGoals(), node);
+	                    if(g.isAutomatic()) {
+	                        return g;
+	                    }
+	                }
+	                node = choices.pollLast();
+	                break;
+            	}
 
             case 1:
                 node = node.child(0);
