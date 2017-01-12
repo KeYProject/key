@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -319,7 +320,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         if (loop.getBody() instanceof StatementBlock) {
             ((StatementBlock) loop.getBody()).getBody()
-            .forEach(elem -> stmnt.add(elem));            
+                    .forEach(elem -> stmnt.add(elem));
         } else {
             stmnt.add(loop.getBody());
         }
@@ -439,15 +440,21 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final ProgramElement newProg = newProgram(services, loop, labels,
                 stmtToReplace, origJavaBlock, loopScopeIdxVar);
 
-        final Term newPost = tb.and(
-                tb.imp(tb.equals(tb.var(loopScopeIdxVar), tb.TRUE()), post),
-                tb.imp(tb.equals(tb.var(loopScopeIdxVar), tb.FALSE()),
-                        fullInvariant));
+        final Term labeledIdxVar = tb.label(tb.var(loopScopeIdxVar),
+                ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL);
 
+        final Term newPost = tb.and(
+                tb.imp(tb.equals(labeledIdxVar, tb.TRUE()), post),
+                tb.imp(tb.equals(labeledIdxVar, tb.FALSE()), fullInvariant));
+
+        final JavaBlock newJavaBlock = JavaBlock
+                .createJavaBlock((StatementBlock) newProg);
+
+        // TODO: The following handling of the term labels might be insufficient
+        // in general; probably, something involving the TermLabelManager should
+        // be used.
         final Term newFormula = tb.applySequential(uBeforeLoopDefAnonVariant,
-                tb.prog(modality,
-                        JavaBlock.createJavaBlock((StatementBlock) newProg),
-                        newPost));
+                tb.prog(modality, newJavaBlock, newPost, progPost.getLabels()));
         return newFormula;
     }
 

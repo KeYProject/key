@@ -19,9 +19,6 @@ import java.util.Set;
 
 public final class StrategyProperties extends Properties {
     
-    /**
-     * 
-     */
     private static final long serialVersionUID = -4647245742912258421L;
     public final static String INF_FLOW_CHECK_PROPERTY = "INF_FLOW_CHECK_PROPERTY";
     public final static String INF_FLOW_CHECK_TRUE = "INF_FLOW_CHECK_TRUE";
@@ -36,7 +33,7 @@ public final class StrategyProperties extends Properties {
     public final static String SPLITTING_NORMAL = "SPLITTING_NORMAL";
     public final static String SPLITTING_OFF = "SPLITTING_OFF";
     public final static String SPLITTING_DELAYED = "SPLITTING_DELAYED";
-
+    
     public final static String LOOP_OPTIONS_KEY = "LOOP_OPTIONS_KEY";
     public final static String LOOP_EXPAND = "LOOP_EXPAND";
     public final static String LOOP_EXPAND_BOUNDED = "LOOP_EXPAND_BOUNDED"; //Used for test generation chrisg
