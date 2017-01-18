@@ -40,7 +40,7 @@ public class SequentViewSearchBar extends SearchBar {
             new Color(255, 140, 0, 178);
     public static final Color SEARCH_HIGHLIGHT_COLOR_2 =
             new Color(255, 140, 0, 100);
-    public static final String[] SEARCH_MODES = {"highlight", "filter", "regroup"};
+    public static final String[] SEARCH_MODES = {"highlight", "hide", "regroup"};
     
     private final List<Pair<Integer,Object>> searchResults;
     private int resultIteratorPos;
