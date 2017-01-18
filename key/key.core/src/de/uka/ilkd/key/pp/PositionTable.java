@@ -313,7 +313,7 @@ public class PositionTable {
 		       SequentPrintFilter filter) {
 	int i = cfmaNo;
 	ImmutableList<SequentPrintFilterEntry> list =
-	    filter.getAntec().append(filter.getSucc());
+	    filter.getFilteredAntec().append(filter.getFilteredSucc());
         while (i-- != 0)
             list = list.tail();
 	return list.head ();

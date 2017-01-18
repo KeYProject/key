@@ -28,13 +28,18 @@ public interface SequentPrintFilter {
      * @return the original sequent
      */
     Sequent            getOriginalSequent                ();
+    
+    /**
+     * @return the filtered sequent
+     */
+    Sequent getFilteredSequent();
 
     /**
      * Get the formulas of the filtered sequent and the constraints to
      * use for instantiating metavariables when printing
      */
-    ImmutableList<SequentPrintFilterEntry> getAntec       ();
+    ImmutableList<SequentPrintFilterEntry> getFilteredAntec       ();
 
-    ImmutableList<SequentPrintFilterEntry> getSucc        ();
+    ImmutableList<SequentPrintFilterEntry> getFilteredSucc        ();
     
 }

@@ -27,7 +27,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
  */
 public class IdentitySequentPrintFilter implements SequentPrintFilter {
 
-    protected Sequent              originalSequent;
+    protected Sequent originalSequent;
+    protected Sequent filteredSequent;
 
     protected ImmutableList<SequentPrintFilterEntry> antec = null;
     protected ImmutableList<SequentPrintFilterEntry> succ  = null;
@@ -37,24 +38,24 @@ public class IdentitySequentPrintFilter implements SequentPrintFilter {
     }
 
     protected void filterSequent () {
-	if ( antec != null )
-	    return;
-
-	Iterator<SequentFormula> it;
-
-	antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
-	it    = originalSequent.antecedent ().iterator ();
-	while ( it.hasNext () )
-	    antec = antec.append ( filterFormula ( it.next () ) );
+		if ( antec != null )
+		    return;
 	
-	succ  = ImmutableSLList.<SequentPrintFilterEntry>nil();
-	it    = originalSequent.succedent ().iterator ();
-	while ( it.hasNext () )
-	    succ  = succ .append ( filterFormula ( it.next () ) );
+		Iterator<SequentFormula> it;
+	
+		antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
+		it    = originalSequent.antecedent ().iterator ();
+		while ( it.hasNext () )
+		    antec = antec.append ( filterFormula ( it.next () ) );
+		
+		succ  = ImmutableSLList.<SequentPrintFilterEntry>nil();
+		it    = originalSequent.succedent ().iterator ();
+		while ( it.hasNext () )
+		    succ  = succ .append ( filterFormula ( it.next () ) );
     }
 
     protected SequentPrintFilterEntry filterFormula ( SequentFormula p_cfma ) {
-	return new IdentityFilterEntry ( p_cfma );
+    	return new IdentityFilterEntry ( p_cfma );
     }
 
 
@@ -62,46 +63,53 @@ public class IdentitySequentPrintFilter implements SequentPrintFilter {
      * @return the original sequent
      */
     public Sequent      getOriginalSequent         () {
-	return originalSequent;
+    	return originalSequent;
     }
+
+    /**
+     * @return the original sequent because this filter does not change the sequent.
+     */
+	@Override
+	public Sequent getFilteredSequent() {
+		filterSequent();
+		return filteredSequent;
+	}
 
     /**
      * Get the formulas of the filtered sequent and the constraints to
      * use for instantiating metavariables when printing
      */
-    public ImmutableList<SequentPrintFilterEntry> getAntec       () {
-	filterSequent ();
-	return antec;
+    public ImmutableList<SequentPrintFilterEntry> getFilteredAntec       () {
+    	filterSequent ();
+    	return antec;
     }
 
-    public ImmutableList<SequentPrintFilterEntry> getSucc        () {
-	filterSequent ();
-	return succ;
+    public ImmutableList<SequentPrintFilterEntry> getFilteredSucc        () {
+		filterSequent ();
+		return succ;
     }
 
 
     private static class IdentityFilterEntry implements SequentPrintFilterEntry {
-	final SequentFormula originalFormula;
+    	final SequentFormula originalFormula;
 
+		public IdentityFilterEntry ( SequentFormula p_originalFormula) {
+		    originalFormula   = p_originalFormula;
+		}
 
-	public IdentityFilterEntry ( SequentFormula p_originalFormula) {
-	    originalFormula   = p_originalFormula;
-	}
-
-	/**
-	 * Formula to display
-	 */
-	public SequentFormula getFilteredFormula   () {
-	    return originalFormula;
-	}
-
-	/**
-	 * Original formula from sequent
-	 */
-	public SequentFormula getOriginalFormula   () {
-	    return originalFormula;
-	}
+		/**
+		 * Formula to display
+		 */
+		public SequentFormula getFilteredFormula   () {
+		    return originalFormula;
+		}
+	
+		/**
+		 * Original formula from sequent
+		 */
+		public SequentFormula getOriginalFormula   () {
+		    return originalFormula;
+		}
 
     }
-
 }

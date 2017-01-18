@@ -127,7 +127,7 @@ public class InitialPositionTable extends PositionTable{
     private int indexOfCfma(SequentFormula cfma,
 			    SequentPrintFilter filter) {
 	ImmutableList<SequentPrintFilterEntry> list =
-	    filter.getAntec().append(filter.getSucc());
+	    filter.getFilteredAntec().append(filter.getFilteredSucc());
 	int k;
 	for ( k=0 ; !list.isEmpty(); k++,list = list.tail() ) {
 	    if (list.head().getOriginalFormula()==cfma) {

@@ -723,8 +723,8 @@ public class LogicPrinter {
     public void printSequent(SequentPrintFilter filter,
                              boolean finalbreak) {
         try {
-            ImmutableList<SequentPrintFilterEntry> antec = filter.getAntec();
-            ImmutableList<SequentPrintFilterEntry> succ  = filter.getSucc();
+            ImmutableList<SequentPrintFilterEntry> antec = filter.getFilteredAntec();
+            ImmutableList<SequentPrintFilterEntry> succ  = filter.getFilteredSucc();
             markStartSub();
             startTerm(antec.size()+succ.size());
             layouter.beginC(1).ind();

@@ -33,13 +33,19 @@ public class RegroupSequentPrintFilter implements SequentPrintFilter {
 	}
 
 	@Override
-	public ImmutableList<SequentPrintFilterEntry> getAntec() {
+	public Sequent getFilteredSequent() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ImmutableList<SequentPrintFilterEntry> getSucc() {
+	public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
 		// TODO Auto-generated method stub
 		return null;
 	}

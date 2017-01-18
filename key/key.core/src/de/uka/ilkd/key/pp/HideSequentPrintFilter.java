@@ -31,18 +31,26 @@ public class HideSequentPrintFilter implements SequentPrintFilter {
 		return null;
 	}
 
+
+	@Override
+	public Sequent getFilteredSequent() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	@Override
-	public ImmutableList<SequentPrintFilterEntry> getAntec() {
+	public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	
 	@Override
-	public ImmutableList<SequentPrintFilterEntry> getSucc() {
+	public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
 
 }
