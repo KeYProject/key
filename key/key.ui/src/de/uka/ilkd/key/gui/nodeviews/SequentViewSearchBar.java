@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 
 import de.uka.ilkd.key.gui.SearchBar;
 import de.uka.ilkd.key.pp.Range;
@@ -39,11 +40,13 @@ public class SequentViewSearchBar extends SearchBar {
             new Color(255, 140, 0, 178);
     public static final Color SEARCH_HIGHLIGHT_COLOR_2 =
             new Color(255, 140, 0, 100);
+    public static final String[] SEARCH_MODES = {"highlight", "filter", "regroup"};
     
     private final List<Pair<Integer,Object>> searchResults;
     private int resultIteratorPos;
     private SequentView sequentView;
     JCheckBox regExpCheckBox;
+    JComboBox<String> searchModeBox;
 
     public SequentViewSearchBar(SequentView sequentView) {
         this.sequentView = sequentView;
@@ -73,6 +76,9 @@ public class SequentViewSearchBar extends SearchBar {
             });
             regExpCheckBox.setToolTipText("Evaluate as regular expression");
         add(regExpCheckBox);
+        
+        searchModeBox = new JComboBox<String>(SEARCH_MODES);
+        add(searchModeBox);
     }
 
     @Override
