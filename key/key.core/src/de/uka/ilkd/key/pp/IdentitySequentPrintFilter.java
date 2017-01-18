@@ -61,7 +61,7 @@ public class IdentitySequentPrintFilter implements SequentPrintFilter {
     /**
      * @return the original sequent
      */
-    public Sequent      getSequent         () {
+    public Sequent      getOriginalSequent         () {
 	return originalSequent;
     }
 

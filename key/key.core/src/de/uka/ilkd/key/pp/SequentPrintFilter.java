@@ -27,7 +27,7 @@ public interface SequentPrintFilter {
     /**
      * @return the original sequent
      */
-    Sequent            getSequent                ();
+    Sequent            getOriginalSequent                ();
 
     /**
      * Get the formulas of the filtered sequent and the constraints to
