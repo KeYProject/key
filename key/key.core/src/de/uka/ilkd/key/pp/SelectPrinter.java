@@ -42,15 +42,15 @@ class SelectPrinter extends FieldPrinter {
             final Term heapTerm = t.sub(0);
             final Term objectTerm = t.sub(1);
             final Term fieldTerm = t.sub(2);
-             if (fieldTerm.op() == heapLDT.getArr()) {
-            	 KeYJavaType kjt = lp.services.getJavaInfo().getKeYJavaType(objectTerm.sort());
-            	 Type jtype = kjt.getJavaType();
-            	 if (jtype instanceof ArrayType
-            			 && ((ArrayType)jtype).getBaseType().getKeYJavaType().getSort() == t.sort()) {
-            		 printArraySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
-            	 } else {
-            		 lp.printFunctionTerm(t);
-            	 }
+            if (fieldTerm.op() == heapLDT.getArr()) {
+		KeYJavaType kjt = lp.services.getJavaInfo().getKeYJavaType(objectTerm.sort());
+		Type jtype = kjt.getJavaType();
+		if (jtype instanceof ArrayType
+		    && ((ArrayType)jtype).getBaseType().getKeYJavaType().getSort() == t.sort()) {
+		    printArraySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
+		} else {
+		    lp.printFunctionTerm(t);
+		}
             } else if (t.sort().equals(Sort.ANY)) {
                 /*
                  * This section deals with PP of frame conditions (and similar).
@@ -62,7 +62,7 @@ class SelectPrinter extends FieldPrinter {
                 } else {
                     printAnySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
                 }
-            }  else if (isBuiltinObjectProperty(fieldTerm)) {
+            } else if (isBuiltinObjectProperty(fieldTerm)) {
                 // object properties denoted like o.<created>
                 printBuiltinObjectProperty(t, heapTerm, objectTerm, fieldTerm, tacitHeap);
             } else if (isStaticFieldConstant(objectTerm, fieldTerm)

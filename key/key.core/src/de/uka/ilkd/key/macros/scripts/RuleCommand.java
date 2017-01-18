@@ -185,7 +185,7 @@ public class RuleCommand extends AbstractCommand {
         for (TacletApp tacletApp : list) {
             if(tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;
-                if(p.on == null || pta.posInOccurrence().subTerm().equals(p.on)) {
+                if(p.on == null || pta.posInOccurrence().subTerm().equalsModRenaming(p.on)) {
                     matchingApps.add(pta);
                 }
             }
