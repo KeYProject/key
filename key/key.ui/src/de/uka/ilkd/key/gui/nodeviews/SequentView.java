@@ -34,6 +34,7 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.pp.HideSequentPrintFilter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
@@ -470,5 +471,9 @@ public abstract class SequentView extends JEditorPane {
     }
 
     public abstract void printSequent();
+
+	public void setFilter(SequentPrintFilter sequentPrintFilter) {
+		this.filter = sequentPrintFilter;
+	}
 
 }

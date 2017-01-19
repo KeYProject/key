@@ -26,7 +26,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 
 import de.uka.ilkd.key.gui.SearchBar;
+import de.uka.ilkd.key.pp.HideSequentPrintFilter;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.pp.RegroupSequentPrintFilter;
 import de.uka.ilkd.key.util.Pair;
 
 /*
@@ -40,13 +43,16 @@ public class SequentViewSearchBar extends SearchBar {
             new Color(255, 140, 0, 178);
     public static final Color SEARCH_HIGHLIGHT_COLOR_2 =
             new Color(255, 140, 0, 100);
-    public static final String[] SEARCH_MODES = {"highlight", "hide", "regroup"};
+    
+    public static enum SearchMode {
+    	Highlight, Hide, Regroup;
+    }
     
     private final List<Pair<Integer,Object>> searchResults;
     private int resultIteratorPos;
     private SequentView sequentView;
     JCheckBox regExpCheckBox;
-    JComboBox<String> searchModeBox;
+    JComboBox<SearchMode> searchModeBox;
 
     public SequentViewSearchBar(SequentView sequentView) {
         this.sequentView = sequentView;
@@ -77,7 +83,23 @@ public class SequentViewSearchBar extends SearchBar {
             regExpCheckBox.setToolTipText("Evaluate as regular expression");
         add(regExpCheckBox);
         
-        searchModeBox = new JComboBox<String>(SEARCH_MODES);
+        searchModeBox = new JComboBox<SearchMode>(SearchMode.values());
+        searchModeBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					switch ((SearchMode)searchModeBox.getSelectedItem()) {
+					case Hide : sequentView.setFilter(new HideSequentPrintFilter());
+							break;
+					case Regroup : sequentView.setFilter(new RegroupSequentPrintFilter());
+						break;
+					default: sequentView.setFilter(new IdentitySequentPrintFilter(sequentView));
+						break;
+					}
+						
+				}
+			}
+        });
         add(searchModeBox);
     }
 
