@@ -48,7 +48,14 @@ public class StatisticsFile implements Serializable {
                return statistics.totalRuleApps;
             }
 
-         }, new LongColumn("Nodes") {
+         }, new LongColumn("Symbolic execution rule apps") {
+
+             @Override
+             long getLongValueFromStatistics(Statistics statistics) {
+                return statistics.symbExApps;
+             }
+
+          }, new LongColumn("Nodes") {
 
             @Override
             long getLongValueFromStatistics(Statistics statistics) {

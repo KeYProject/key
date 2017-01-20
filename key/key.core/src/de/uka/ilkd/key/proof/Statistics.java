@@ -27,6 +27,7 @@ public class Statistics {
     public final int nodes;
     public final int branches;
     public final int interactiveSteps;
+    public final int symbExApps;
     public final int quantifierInstantiations;
     public final int ossApps;
     public final int joinRuleApps;
@@ -48,6 +49,7 @@ public class Statistics {
     protected Statistics(int nodes,
                        int branches,
                        int interactiveSteps,
+                       int symbExApps,
                        int quantifierInstantiations,
                        int ossApps,
                        int joinRuleApps,
@@ -57,11 +59,11 @@ public class Statistics {
                        int operationContractApps,
                        int loopInvApps,
                        long autoModeTimeInMillis,
-                       long timeInMillis,
-                       float timePerStepInMillis) {
+                       long timeInMillis, float timePerStepInMillis) {
         this.nodes = nodes;
         this.branches = branches;
         this.interactiveSteps = interactiveSteps;
+        this.symbExApps = symbExApps;
         this.quantifierInstantiations = quantifierInstantiations;
         this.ossApps = ossApps;
         this.joinRuleApps = joinRuleApps;
@@ -79,6 +81,7 @@ public class Statistics {
     	return new Statistics(side.nodes,
                                   side.branches,
                                   side.interactiveSteps,
+                                  side.symbExApps,
                                   side.quantifierInstantiations,
                                   side.ossApps,
                                   side.joinRuleApps,
@@ -88,8 +91,7 @@ public class Statistics {
                                   side.operationContractApps,
                                   side.loopInvApps,
                                   side.autoModeTimeInMillis,
-                                  System.currentTimeMillis() - creationTime,
-                                  side.timePerStepInMillis);
+                                  System.currentTimeMillis() - creationTime, side.timePerStepInMillis);
     }
 
     Statistics(Proof proof) {
@@ -102,6 +104,7 @@ public class Statistics {
         int tmpNodes = 0; // proof nodes
         int tmpBranches = 1; // proof branches
         int tmpInteractive = 0; // interactive steps
+        int tmpSymbExApps = 0; // symbolic execution steps
         int tmpQuant = 0; // quantifier instantiations
         int tmpOss = 0; // OSS applications
         int tmpJoinApps = 0; // join rule applications
@@ -132,6 +135,10 @@ public class Statistics {
                     interactiveAppsDetails.put(ruleAppName,
                             interactiveAppsDetails.get(ruleAppName) + 1);
                 }
+            }
+            
+            if (NodeInfo.isSymbolicExecutionRuleApplied(node)) {
+                tmpSymbExApps++;
             }
 
             final RuleApp ruleApp = node.getAppliedRuleApp();
@@ -168,6 +175,7 @@ public class Statistics {
         this.nodes = tmpNodes;
         this.branches = tmpBranches;
         this.interactiveSteps = tmpInteractive;
+        this.symbExApps = tmpSymbExApps;
         this.quantifierInstantiations = tmpQuant;
         this.ossApps = tmpOss;
         this.joinRuleApps = tmpJoinApps;
@@ -204,6 +212,8 @@ public class Statistics {
                         EnhancedStringBuffer.format(stat.branches).toString()));
         summaryList.add(new Pair<String, String>("Interactive steps", "" +
                         stat.interactiveSteps));
+        summaryList.add(new Pair<String, String>("Symbolic execution steps", "" +
+                stat.symbExApps));
         
         
         final long time = sideProofs ? stat.autoModeTimeInMillis : proof.getAutoModeTime();
