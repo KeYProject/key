@@ -43,14 +43,17 @@ class SelectPrinter extends FieldPrinter {
             final Term objectTerm = t.sub(1);
             final Term fieldTerm = t.sub(2);
             if (fieldTerm.op() == heapLDT.getArr()) {
-		KeYJavaType kjt = lp.services.getJavaInfo().getKeYJavaType(objectTerm.sort());
-		Type jtype = kjt.getJavaType();
-		if (jtype instanceof ArrayType
-		    && ((ArrayType)jtype).getBaseType().getKeYJavaType().getSort() == t.sort()) {
-		    printArraySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
-		} else {
-		    lp.printFunctionTerm(t);
-		}
+				KeYJavaType kjt = lp.services.getJavaInfo().getKeYJavaType(objectTerm.sort());
+				Type jtype = null;
+				if (kjt != null) {
+					jtype = kjt.getJavaType();
+				}
+				if (jtype instanceof ArrayType
+				    && ((ArrayType)jtype).getBaseType().getKeYJavaType().getSort() == t.sort()) {
+				    printArraySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
+				} else {
+				    lp.printFunctionTerm(t);
+				}
             } else if (t.sort().equals(Sort.ANY)) {
                 /*
                  * This section deals with PP of frame conditions (and similar).
