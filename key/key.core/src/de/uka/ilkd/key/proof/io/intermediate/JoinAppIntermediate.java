@@ -1,10 +1,21 @@
-/**
- * 
- */
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.proof.io.intermediate;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.util.Pair;
@@ -18,9 +29,12 @@ import de.uka.ilkd.key.util.Pair;
 public class JoinAppIntermediate extends BuiltInAppIntermediate {
 
     private int id = 0;
-    private String joinProc = null;
+    private String joinProc;
     private String distinguishingFormula = null;
     private int nrPartners = 0;
+    private String abstractionPredicates = null;
+    private String userChoices = null;
+    private Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType;
 
     /**
      * Constructs a new join rule.
@@ -43,10 +57,25 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
      *            application.
      * @param distinguishingFormula
      *            The user-supplied distinguishing formula for the join.
+     * @param predAbstrLatticeType
+     *            The type for the used predicate abstraction lattice which
+     *            determines how abstract domain elements are generated from
+     *            predicates.
+     * @param abstractionPredicates
+     *            The abstraction predicates, if predicate abstraction is used
+     *            as a join technique.
+     * @param currAbstractionPredicates
      */
-    public JoinAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos,
-            int id, String joinProc, int nrPartners,
-            ImmutableList<Name> newNames, String distinguishingFormula) {
+    public JoinAppIntermediate(
+            String ruleName,
+            Pair<Integer, PosInTerm> pos,
+            int id,
+            String joinProc,
+            int nrPartners,
+            ImmutableList<Name> newNames,
+            String distinguishingFormula,
+            Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType,
+            String abstractionPredicates, String userChoices) {
         super(ruleName, pos, null, null, newNames);
 
         assert ruleName.equals("JoinRule") : "This was somehow unexpected; are there other join rules than JoinRule?";
@@ -55,6 +84,9 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
         this.joinProc = joinProc;
         this.nrPartners = nrPartners;
         this.distinguishingFormula = distinguishingFormula;
+        this.abstractionPredicates = abstractionPredicates;
+        this.predAbstrLatticeType = predAbstrLatticeType;
+        this.userChoices = userChoices;
     }
 
     /**
@@ -85,6 +117,30 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
      */
     public String getDistinguishingFormula() {
         return distinguishingFormula;
+    }
+
+    /**
+     * @return The abstraction predicates, if predicate abstraction is used as a
+     *         join technique.
+     */
+    public Class<? extends AbstractPredicateAbstractionLattice> getPredAbstrLatticeType() {
+        return predAbstrLatticeType;
+    }
+
+    /**
+     * @return The abstraction predicates for predicate abstraction; null if
+     *         none given.
+     */
+    public String getAbstractionPredicates() {
+        return abstractionPredicates;
+    }
+
+    /**
+     * @return The abstraction predicates for program variables involved in a
+     *         join that are manually chosen by the user.
+     */
+    public String getUserChoices() {
+        return userChoices;
     }
 
 }

@@ -32,4 +32,9 @@ public class Pos extends SignAnalysisDomainElem {
       return services.getTermBuilder().gt(varOrConst, tb.zero());
    }
 
+   @Override
+   public String toParseableString(Services services) {
+       return toString();
+   }
+
 }

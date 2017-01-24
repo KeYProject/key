@@ -13,8 +13,14 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.countAtoms;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getDistinguishingFormula;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getUpdateRightSideFor;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.trySimplify;
+
+import java.util.LinkedHashSet;
+
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -25,9 +31,8 @@ import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
-import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils.Option;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
 /**
  * Rule that joins two sequents based on the if-then-else construction: If two
@@ -44,9 +49,11 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  */
 public class JoinIfThenElse extends JoinProcedure {
     private static JoinIfThenElse INSTANCE = null;
-    
-    /** Time in milliseconds after which a simplification attempt
-     *  of a distinguishing formula times out. */
+
+    /**
+     * Time in milliseconds after which a simplification attempt of a
+     * distinguishing formula times out.
+     */
     private static final int SIMPLIFICATION_TIMEOUT_MS = 1000;
 
     public static JoinIfThenElse instance() {
@@ -59,19 +66,29 @@ public class JoinIfThenElse extends JoinProcedure {
     private static final String DISPLAY_NAME = "JoinByIfThenElse";
     static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.rule.join.JoinProcedure#complete()
+     */
     @Override
-    public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-            Term v, SymbolicExecutionState state1,
-            Term valueInState1, SymbolicExecutionState state2,
-            Term valueInState2, Term distinguishingFormula, Services services) {
+    public boolean complete() {
+        return true;
+    }
 
-        return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
-                DefaultImmutableSet.<Term> nil(), createIfThenElseTerm(state1,
-                        state2, valueInState1, valueInState2,
-                        distinguishingFormula, services),
-                DefaultImmutableSet.<Name> nil());
+    @Override
+    public ValuesJoinResult joinValuesInStates(Term v,
+            SymbolicExecutionState state1, Term valueInState1,
+            SymbolicExecutionState state2, Term valueInState2,
+            Term distinguishingFormula, Services services) {
+
+        return new ValuesJoinResult(DefaultImmutableSet.<Term> nil(),
+                createIfThenElseTerm(state1, state2, valueInState1,
+                        valueInState2, distinguishingFormula, services),
+                new LinkedHashSet<Name>(), new LinkedHashSet<Term>());
 
     }
+
     @Override
     public boolean requiresDistinguishablePathConditions() {
         return true;
@@ -112,11 +129,12 @@ public class JoinIfThenElse extends JoinProcedure {
         TermBuilder tb = services.getTermBuilder();
 
         Term cond, ifForm, elseForm;
-        
+
         if (distinguishingFormula == null) {
-            Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd = createDistFormAndRightSidesForITEUpd(
-                        state1, state2, ifTerm, elseTerm, services);
-    
+            Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
+                    createDistFormAndRightSidesForITEUpd(state1, state2,
+                            ifTerm, elseTerm, services);
+
             cond = distFormAndRightSidesForITEUpd.first;
             ifForm = distFormAndRightSidesForITEUpd.second;
             elseForm = distFormAndRightSidesForITEUpd.third;
@@ -221,19 +239,24 @@ public class JoinIfThenElse extends JoinProcedure {
         // formula is implied by the original path condition; for completeness,
         // we add the common subformula in the new path condition, if it
         // is not already implied by that.
-        Option<Pair<Term, Term>> distinguishingAndEqualFormula1 = getDistinguishingFormula(
-                state1.second, state2.second, services);
-        Term distinguishingFormula = distinguishingAndEqualFormula1.isSome() ? distinguishingAndEqualFormula1
-                .getValue().first : null;
+        Option<Pair<Term, Term>> distinguishingAndEqualFormula1 =
+                getDistinguishingFormula(state1.second, state2.second, services);
+        Term distinguishingFormula =
+                distinguishingAndEqualFormula1.isSome() ? distinguishingAndEqualFormula1
+                        .getValue().first : null;
 
-        Option<Pair<Term, Term>> distinguishingAndEqualFormula2 = getDistinguishingFormula(
-                state2.second, state1.second, services);
-        Term distinguishingFormula2 = distinguishingAndEqualFormula2.isSome() ? distinguishingAndEqualFormula2
-                .getValue().first : null;
+        Option<Pair<Term, Term>> distinguishingAndEqualFormula2 =
+                getDistinguishingFormula(state2.second, state1.second, services);
+        Term distinguishingFormula2 =
+                distinguishingAndEqualFormula2.isSome() ? distinguishingAndEqualFormula2
+                        .getValue().first : null;
 
-        // NOTE (DS): This assertion does not prevent the joining of states with equal
-        // Symbolic State. This is intended behavior: In some proofs we have two identical
-        // nodes which we want to join (possibly after a hide right / hide left); this
+        // NOTE (DS): This assertion does not prevent the joining of states with
+        // equal
+        // Symbolic State. This is intended behavior: In some proofs we have two
+        // identical
+        // nodes which we want to join (possibly after a hide right / hide
+        // left); this
         // should be allowed (although they are of course indistinguishable).
         assert distinguishingFormula != null || distinguishingFormula2 != null : String
                 .format("\nA computed distinguishing formula is trivial (\"true\"); "
@@ -255,8 +278,9 @@ public class JoinIfThenElse extends JoinProcedure {
         }
 
         // Try an automatic simplification
-        distinguishingFormula = trySimplify(services.getProof(),
-                distinguishingFormula, true, SIMPLIFICATION_TIMEOUT_MS);
+        distinguishingFormula =
+                trySimplify(services.getProof(), distinguishingFormula, true,
+                        SIMPLIFICATION_TIMEOUT_MS);
 
         // Originally, here was a specific check of whether the equal parts
         // of the two path conditions was still included in the new path

@@ -20,6 +20,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.util,
  org.key_project.util.bean,
+ org.key_project.util.bitops,
  org.key_project.util.collection,
  org.key_project.util.eclipse,
  org.key_project.util.eclipse.job,

@@ -1,0 +1,37 @@
+<h4>Within this dialog, you can choose predicates used in joins by predicate abstraction.</h4>
+<p>
+	An <strong>abstraction predicate</strong> is a unary mapping from terms of suitable type to formulae.
+	You can construct such mappings here by registering <strong>placeholder variables</strong> (e.g., <code>int i</code>
+	or <code>java.lang.String s</code>) and using those in the <strong>predicate definition</strong> (e.g., <code>s = null</code>).
+	For each sort of placeholder predicates, a <strong>finite lattice</strong> for joins with abstraction is
+	constructed.
+</p>
+<p>
+	Thus, it does not make sense to register multiple placeholders of the same
+	type. Furthermore, <strong>each abstraction predicate definition must contain exactly one placeholder</strong>
+	which then also determines the type of the predicate.
+</p>
+<p>
+	There are three lattice types you can choose; your choice determines how abstract domain elements will be
+	constructed from the given abstraction predicates. Your options are:
+	<dl>
+		<dt>Simple Predicates Lattice</dt>
+		<dd>
+			This lattice type consists out of a bottom element, one abstract domain element for each of your
+			abstraction predicates, and a top element.
+		</dd>
+		<dt>Conjunctive Predicates Lattice</dt>
+		<dd>
+			In this lattice, all 2^n combinations of your predicates are combined using conjunction. The iterator
+			of this lattice returns a bottom element, then the conjunction of all n predicates, then all conjunctions
+			of length n-1 of the predicates, and so on. Finally, the top element is returned.
+		</dd>
+		<dt>Disjunctive Predicates Lattice</dt>
+		<dd>
+			Similar to the conjunctive lattice, but with disjunctions and reversed order: After the bottom element,
+			the next elements correspond to one predicate each, then follow all disjunctions of length 2, and so
+			on. You have to make sure that at most the disjunction of all predicates is valid, but no combination
+			before.
+		</dd>
+	</dl>
+</p>

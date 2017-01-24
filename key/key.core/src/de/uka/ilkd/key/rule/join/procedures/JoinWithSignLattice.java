@@ -13,11 +13,15 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
+import java.util.LinkedHashMap;
+
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.axiom_abstraction.boollattice.BooleanLattice;
 import de.uka.ilkd.key.axiom_abstraction.signanalysis.SignAnalysisLattice;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -26,8 +30,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * other types than int and boolean are unchanged if they are equal in both
  * states and set to fresh variables if they have different values.
  * 
- * TODO: Could also add a null / non-null lattice for objects.
- * 
+ * @deprecated You should use {@link JoinWithPredicateAbstraction} instead.
  * @author Dominic Scheurer
  */
 public class JoinWithSignLattice extends JoinWithLatticeAbstraction {
@@ -43,13 +46,24 @@ public class JoinWithSignLattice extends JoinWithLatticeAbstraction {
 
     private static final String DISPLAY_NAME = "JoinBySignLatticeAbstraction";
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.rule.join.JoinProcedure#complete()
+     */
     @Override
-    protected AbstractDomainLattice<?> getAbstractDomainForSort(Sort s,
+    public boolean complete() {
+        return true;
+    }
+
+    @Override
+    protected AbstractDomainLattice getAbstractDomainForSort(Sort s,
             Services services) {
-        final Sort intSort = (Sort) services.getNamespaces().sorts()
-                .lookup(new Name("int"));
-        final Sort booleanSort = (Sort) services.getNamespaces().sorts()
-                .lookup(new Name("boolean"));
+        final Sort intSort =
+                (Sort) services.getNamespaces().sorts().lookup(new Name("int"));
+        final Sort booleanSort =
+                (Sort) services.getNamespaces().sorts()
+                        .lookup(new Name("boolean"));
 
         if (s.equals(intSort)) {
             return SignAnalysisLattice.getInstance();
@@ -65,5 +79,10 @@ public class JoinWithSignLattice extends JoinWithLatticeAbstraction {
     @Override
     public String toString() {
         return DISPLAY_NAME;
+    }
+
+    @Override
+    public LinkedHashMap<ProgramVariable, AbstractDomainElement> getUserChoices() {
+        return new LinkedHashMap<ProgramVariable, AbstractDomainElement>();
     }
 }

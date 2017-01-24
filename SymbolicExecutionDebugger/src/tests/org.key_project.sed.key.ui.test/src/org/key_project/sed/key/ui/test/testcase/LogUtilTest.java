@@ -13,11 +13,11 @@
 
 package org.key_project.sed.key.ui.test.testcase;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.key_project.sed.key.ui.util.LogUtil;
 import org.key_project.util.eclipse.Logger;
+
+import junit.framework.TestCase;
 
 /**
  * Contains tests for {@link LogUtil}

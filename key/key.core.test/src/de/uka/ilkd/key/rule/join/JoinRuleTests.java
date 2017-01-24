@@ -1,6 +1,16 @@
-/**
- * 
- */
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.rule.join;
 
 import java.io.File;
@@ -33,11 +43,13 @@ import de.uka.ilkd.key.util.ProofStarter;
  */
 public class JoinRuleTests extends TestCase {
 
-    private static final String TEST_RESOURCES_DIR_PREFIX = "resources/testcase/join/";
+    private static final String TEST_RESOURCES_DIR_PREFIX =
+            "resources/testcase/join/";
 
     /**
      * Simple regression test case loading an existing closed proof (standard
-     * Gcd example) including two joins and trying to replay it.
+     * Gcd example) including two joins with ITE antecedent joins and trying to
+     * replay it.
      *
      * @throws ProblemLoaderException
      *             If the proof could not be loaded.
@@ -47,12 +59,40 @@ public class JoinRuleTests extends TestCase {
         Proof proof = loadProof("gcd.closed.proof");
         assertTrue(proof.closed());
     }
-    
+
     /**
-     * Runs the FullAutoPilotWithJMLSpecJoinsProofMacro on the problem with
-     * join blocks specified in JML, following by an automatic strategy finish.
-     * At the end, there should be two join applications, and the proof should
-     * be closed.
+     * Simple regression test case loading an existing closed proof (standard
+     * Gcd example) including two joins with predicate abstraction and trying to
+     * replay it.
+     *
+     * @throws ProblemLoaderException
+     *             If the proof could not be loaded.
+     */
+    @Test
+    public void testLoadGcdProofWithPredAbstr() {
+        Proof proof = loadProof("gcd.closed.predicateabstraction.proof");
+        assertTrue(proof.closed());
+    }
+
+    /**
+     * Simple regression test case loading an existing closed proof (standard
+     * Gcd example) including two joins with predicate abstraction (with lattice
+     * elements manually chosen by the user) and trying to replay it.
+     *
+     * @throws ProblemLoaderException
+     *             If the proof could not be loaded.
+     */
+    @Test
+    public void testLoadGcdProofWithPredAbstrAndUserChoices() {
+        Proof proof = loadProof("gcd.closed.predicateAbstractionWithUserChoices.proof");
+        assertTrue(proof.closed());
+    }
+
+    /**
+     * Runs the FullAutoPilotWithJMLSpecJoinsProofMacro on the problem with join
+     * blocks specified in JML, following by an automatic strategy finish. At
+     * the end, there should be two join applications, and the proof should be
+     * closed.
      */
     @Test
     public void testDoAutomaticGcdProofWithJoins() {
@@ -61,8 +101,8 @@ public class JoinRuleTests extends TestCase {
         startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());
-        assertEquals("There should be two join applications in the proof.",
-                proof.getStatistics().joinRuleApps, 2);
+        assertEquals("There should be two join applications in the proof.", 2,
+                proof.getStatistics().joinRuleApps);
     }
 
     /**
@@ -77,7 +117,8 @@ public class JoinRuleTests extends TestCase {
      * <li>Again run the macro on the one open goal</li>
      * <li>Do another join</li>
      * <li>Let the automatic strategy finish the proof</li>
-     * </ol><p>
+     * </ol>
+     * <p>
      * 
      * At the end, the proof should be closed.
      *
@@ -97,52 +138,55 @@ public class JoinRuleTests extends TestCase {
         startAutomaticStrategy(proof);
         assertTrue(proof.closed());
     }
-    
+
     /**
-     * Joins for SE states with different symbolic states are
-     * only allowed if the path conditions are distinguishable --
-     * for the case that if-then-else conditions are employed.
-     * This test case tries to join two states with equal path
-     * condition but different symbolic states -- therefore, the
-     * join should fail due to an incomplete rule application.
+     * Joins for SE states with different symbolic states are only allowed if
+     * the path conditions are distinguishable -- for the case that if-then-else
+     * conditions are employed. This test case tries to join two states with
+     * equal path condition but different symbolic states -- therefore, the join
+     * should fail due to an incomplete rule application.
      */
     @Test
     public void testJoinIndistinguishablePathConditionsWithITE() {
         final Proof proof = loadProof("IndistinguishablePathConditions.proof");
-        
+
         try {
             joinFirstGoal(proof, JoinIfThenElseAntecedent.instance());
             fail("The join operation should not be applicable.");
-        } catch (IncompleteRuleAppException e) {}
+        }
+        catch (IncompleteRuleAppException e) {
+        }
     }
-    
+
     /**
-     * Same as testJoinIndistinguishablePathConditionsWithITE(), but
-     * with two join partners.
+     * Same as testJoinIndistinguishablePathConditionsWithITE(), but with two
+     * join partners.
      */
     @Test
     public void testJoinThreeIndistinguishablePathConditionsWithITE() {
-        final Proof proof = loadProof("IndistinguishablePathConditions.twoJoins.proof");
-        
+        final Proof proof =
+                loadProof("IndistinguishablePathConditions.twoJoins.proof");
+
         try {
             joinFirstGoal(proof, JoinIfThenElseAntecedent.instance());
             fail("The join operation should not be applicable.");
-        } catch (IncompleteRuleAppException e) {}
+        }
+        catch (IncompleteRuleAppException e) {
+        }
     }
-    
+
     /**
-     * Joins two SE states with different symbolic states and
-     * equal path condition, but uses the "Full Anonymization"
-     * join method for which this is irrelevant. The join should
-     * succeed and the proof should be closable.
+     * Joins two SE states with different symbolic states and equal path
+     * condition, but uses the "Full Anonymization" join method for which this
+     * is irrelevant. The join should succeed and the proof should be closable.
      */
     @Test
     public void testJoinIndistinguishablePathConditionsWithFullAnonymization() {
         final Proof proof = loadProof("IndistinguishablePathConditions.proof");
-        
+
         joinFirstGoal(proof, JoinWeaken.instance());
         startAutomaticStrategy(proof);
-        
+
         assertTrue(proof.closed());
         assertEquals(1, proof.getStatistics().joinRuleApps);
     }
@@ -150,7 +194,8 @@ public class JoinRuleTests extends TestCase {
     /**
      * Runs the automatic JavaDL strategy on the given proof.
      *
-     * @param proof Proof to prove automatically.
+     * @param proof
+     *            Proof to prove automatically.
      */
     private void startAutomaticStrategy(final Proof proof) {
         ProofStarter starter = new ProofStarter(false);
@@ -173,8 +218,8 @@ public class JoinRuleTests extends TestCase {
         final Goal joinGoal = proof.openGoals().head();
         final Node joinNode = joinGoal.node();
         final PosInOccurrence joinPio = getPioFirstFormula(joinNode.sequent());
-        final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) joinRule
-                .createApp(joinPio, services);
+        final JoinRuleBuiltInRuleApp joinApp =
+                (JoinRuleBuiltInRuleApp) joinRule.createApp(joinPio, services);
 
         {
             joinApp.setJoinPartners(JoinRule.findPotentialJoinPartners(proof
@@ -186,7 +231,7 @@ public class JoinRuleTests extends TestCase {
         if (!joinApp.complete()) {
             throw new IncompleteRuleAppException();
         }
-        
+
         joinGoal.apply(joinApp);
     }
 
@@ -225,25 +270,25 @@ public class JoinRuleTests extends TestCase {
      *            The file name of the proof file to load.
      * @return The loaded proof.
      */
-    private Proof loadProof(String proofFileName) {
+    static Proof loadProof(String proofFileName) {
         File proofFile = new File(TEST_RESOURCES_DIR_PREFIX + proofFileName);
         assertTrue(proofFile.exists());
 
         try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(
-                    JavaProfile.getDefaultInstance(), proofFile, null, null,
-                    null, true);
+            KeYEnvironment<?> environment =
+                    KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+                            proofFile, null, null, null, true);
             Proof proof = environment.getLoadedProof();
             assertNotNull(proof);
 
             return proof;
         }
         catch (ProblemLoaderException e) {
-            fail("Proof could not be loaded.");
+            fail("Proof could not be loaded:\n" + e.getMessage());
             return null;
         }
     }
-    
+
     private class IncompleteRuleAppException extends RuntimeException {
         private static final long serialVersionUID = 774109478701810300L;
     }

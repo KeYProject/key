@@ -32,4 +32,9 @@ public class Neg extends SignAnalysisDomainElem {
       return services.getTermBuilder().lt(varOrConst, tb.zero());
    }
 
+   @Override
+   public String toParseableString(Services services) {
+       return toString();
+   }
+
 }
