@@ -15,7 +15,6 @@ package de.uka.ilkd.key.rule.join;
 
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.clearSemisequent;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.closeJoinPartnerGoal;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.createSimplifiedDisjunctivePathCondition;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getConjunctiveElementsFor;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getLocationVariables;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getUpdateLeftSideLocations;
@@ -67,6 +66,7 @@ import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithLatticeAbstraction;
+import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 import de.uka.ilkd.key.util.joinrule.ProgramVariablesMatchVisitor;
@@ -92,7 +92,7 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
  * @see JoinIfThenElse
  * @see JoinIfThenElseAntecedent
  * @see JoinWithLatticeAbstraction
- * @see JoinWithSignLattice
+ * @see JoinWithPredicateAbstraction
  * @see de.uka.ilkd.key.gui.joinrule.JoinRuleCompletion
  * @see de.uka.ilkd.key.gui.joinrule.JoinPartnerSelectionDialog
  */
@@ -397,9 +397,16 @@ public class JoinRule implements BuiltInRule {
                 new LinkedHashSet<Term>();
 
         // Construct path condition as (optimized) disjunction
-        final Term newPathCondition =
-                createSimplifiedDisjunctivePathCondition(state1.second,
-                        state2.second, services, SIMPLIFICATION_TIMEOUT_MS);
+        // NOTE: Deactivated this; This optimization can create shorter
+        // formulas, but is very time consumptive. At the end, the result does
+        // not always perform better than within the unoptimized version.
+        //@formatter:off
+//        final Term newPathCondition =
+//                createSimplifiedDisjunctivePathCondition(state1.second,
+//                        state2.second, services, SIMPLIFICATION_TIMEOUT_MS);
+        //@formatter:on
+        
+        final Term newPathCondition = tb.or(state1.second, state2.second);
 
         ImmutableSet<LocationVariable> progVars = DefaultImmutableSet.nil();
 
