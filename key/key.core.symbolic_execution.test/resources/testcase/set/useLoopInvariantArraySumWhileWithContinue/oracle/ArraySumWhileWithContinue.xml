@@ -34,7 +34,12 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                   <branchCondition name="equals(array,null)" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <loopCondition name="i&lt;array.length" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="false" blockOpened="false">
                         <callStackEntry path="/0"/>
-                        <termination name="&lt;loop body end&gt;" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                        <termination name="&lt;loop body end&gt;" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+                           <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call ArraySumWhileWithContinue.sum(array)&gt;&gt;" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="false" methodReturnCondition="false">
+                              <callStackEntry path="/0"/>
+                              <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                              </termination>
+                           </exceptionalMethodReturn>
                         </termination>
                      </loopCondition>
                   </branchCondition>
@@ -53,9 +58,11 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
             </loopInvariant>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/1/0/0/0"/>
       <methodReturnEntry path="/0/0/0/0/1/0/0"/>
    </methodCall>
    <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
    <terminationEntry path="/0/0/0/0/0/1/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/1/0/0/0/0"/>
    <terminationEntry path="/0/0/0/0/1/0/0/0"/>
 </start>
