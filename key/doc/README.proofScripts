@@ -160,8 +160,9 @@ directly.)
 Apply a single rule onto the current sequent. As unnamed argument add
 the name of the taclet to be applied. If the taclet matches only once
 on the entire sequent, the rule is applied. If it matches more than
-once you need to specify more. In that case you can specify the
-sequence formula and the number of the occurrence in the formula.
+once you need to specify more. In that case you can first specify the
+sequence formula and then the number of the occurrence in the formula
+or the specific subterm via the 'on' keyword.
 If a rule has schema variables which must be instantiated manually,
 such instantiations can be provided as arguments. A schema variable
 named sv can be instantiated by setting the argument sv="..." or by
@@ -181,6 +182,11 @@ Examples:
        # occurrence number needed since there are 
        # two possible applications on the formula
 
+   rule eqSymm formula="a=b->c=d" on="c=d";
+       # changes sequent "a=b->c=d ==>" to "a=b->d=c ==>".
+       # same as above, but using the option to specify a 
+       # subterm instead of an occurrence number.
+       
    rule cut cutFormula="x > y";
        # almost the same as 'cut "x>y"'
 
