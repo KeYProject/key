@@ -13,8 +13,15 @@
 
 package de.uka.ilkd.key.pp;
 
-import org.key_project.util.collection.ImmutableList;
-import de.uka.ilkd.key.logic.Sequent;
+import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import org.key_project.util.collection.ImmutableSLList;
+
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 /**
  * @author jschiffl
@@ -25,21 +32,48 @@ import de.uka.ilkd.key.logic.Sequent;
 public class HideSequentPrintFilter extends SearchSequentPrintFilter {
 
 	@Override
-	public Sequent getFilteredSequent() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	protected void filterSequent() {
+		
+		int searchFlag = 0;
+	    if (searchString.toLowerCase().equals(searchString)) {
+	        searchFlag = searchFlag | Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
+	    }
+	    
+	    if (!regex) {
+	        // search for literal string instead of regExp
+	        searchFlag = searchFlag | Pattern.LITERAL;
+	    }
 
-	
-	@Override
-	public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
-		// TODO Auto-generated method stub
-		return null;
+	    Pattern p;
+	    try {
+	        p = Pattern.compile(searchString.replace("\u00A0", "\u0020"), searchFlag);
+	    } catch (PatternSyntaxException pse) {
+	        return;
+	    } catch (IllegalArgumentException iae) {
+	        return;
+	    }
+	    
+		Iterator<SequentFormula> it;
+		
+		antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
+		it = originalSequent.antecedent().iterator();
+		while (it.hasNext()) {
+			SequentFormula sf = it.next();
+			Matcher m = p.matcher(sf.toString().replace("\u00A0", "\u0020")); //TODO toString is not sufficient here
+			if (m.find()) {
+				antec.append(new IdentityFilterEntry(sf));
+			}
+		}
+		
+		succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
+		it = originalSequent.succedent().iterator();
+		while (it.hasNext()) {
+			SequentFormula sf = it.next();
+			Matcher m = p.matcher(sf.toString().replace("\u00A0", "\u0020")); //TODO toString is not sufficient here
+			if (m.find()) {
+				succ.append(new IdentityFilterEntry(sf));
+			}
+		}
 	}
+	
 }

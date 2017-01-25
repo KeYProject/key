@@ -27,12 +27,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
  */
 public class IdentitySequentPrintFilter extends SequentPrintFilter {
 
-    protected Sequent originalSequent;
-    protected Sequent filteredSequent;
-
-    protected ImmutableList<SequentPrintFilterEntry> antec = null;
-    protected ImmutableList<SequentPrintFilterEntry> succ  = null;
-
     protected void filterSequent () {
 		if ( antec != null )
 		    return;
@@ -55,15 +49,6 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
     }
 
     /**
-     * @return the original sequent because this filter does not change the sequent.
-     */
-	@Override
-	public Sequent getFilteredSequent() {
-		filterSequent();
-		return filteredSequent;
-	}
-
-    /**
      * Get the formulas of the filtered sequent and the constraints to
      * use for instantiating metavariables when printing
      */
@@ -78,7 +63,7 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
     }
 
 
-    private static class IdentityFilterEntry implements SequentPrintFilterEntry {
+    public static class IdentityFilterEntry implements SequentPrintFilterEntry {
     	final SequentFormula originalFormula;
 
 		public IdentityFilterEntry ( SequentFormula p_originalFormula) {

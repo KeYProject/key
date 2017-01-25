@@ -45,7 +45,7 @@ public class SequentViewSearchBar extends SearchBar {
             new Color(255, 140, 0, 100);
     
     public static enum SearchMode {
-    	Highlight, Hide, Regroup;
+    	HIGHLIGHT, HIDE, REGROUP;
     }
     
     private final List<Pair<Integer,Object>> searchResults;
@@ -89,9 +89,9 @@ public class SequentViewSearchBar extends SearchBar {
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					switch ((SearchMode)searchModeBox.getSelectedItem()) {
-					case Hide : sequentView.setFilter(new HideSequentPrintFilter());
+					case HIDE : sequentView.setFilter(new HideSequentPrintFilter());
 							break;
-					case Regroup : sequentView.setFilter(new RegroupSequentPrintFilter());
+					case REGROUP : sequentView.setFilter(new RegroupSequentPrintFilter());
 						break;
 					default: sequentView.setFilter(new IdentitySequentPrintFilter());
 						break;

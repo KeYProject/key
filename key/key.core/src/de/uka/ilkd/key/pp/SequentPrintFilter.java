@@ -25,35 +25,42 @@ import de.uka.ilkd.key.logic.Sequent;
 public abstract class SequentPrintFilter {
 	
 	protected Sequent originalSequent;
-    protected Sequent filteredSequent;
 
     protected ImmutableList<SequentPrintFilterEntry> antec;
     protected ImmutableList<SequentPrintFilterEntry> succ;
+    
     /**
      * @return the original sequent
      */
     public Sequent getOriginalSequent() {
     	return originalSequent;
-    };
+    }
     
-    /**
-     * @return the filtered sequent
-     */
-    abstract Sequent getFilteredSequent();
+    protected abstract void filterSequent();
     
     /**
      * sets the (original) sequent of this filter
      */
     public void setSequent(Sequent s) {
     	originalSequent = s;
-    };
+    	antec = null;
+    	succ = null;
+    }
 
     /**
      * Get the formulas of the filtered sequent and the constraints to
      * use for instantiating metavariables when printing
      */
-    abstract ImmutableList<SequentPrintFilterEntry> getFilteredAntec();
-
-    abstract ImmutableList<SequentPrintFilterEntry> getFilteredSucc();
-    
+    public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
+    	if (antec == null) {
+    		filterSequent();
+    	}
+    	return antec;
+    }
+    public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
+    	if (succ == null) {
+    		filterSequent();
+    	}
+    	return succ;
+    }
 }
