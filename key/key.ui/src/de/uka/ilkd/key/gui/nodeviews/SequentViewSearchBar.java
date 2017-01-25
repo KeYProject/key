@@ -93,7 +93,7 @@ public class SequentViewSearchBar extends SearchBar {
 							break;
 					case Regroup : sequentView.setFilter(new RegroupSequentPrintFilter());
 						break;
-					default: sequentView.setFilter(new IdentitySequentPrintFilter(sequentView));
+					default: sequentView.setFilter(new IdentitySequentPrintFilter());
 						break;
 					}
 						

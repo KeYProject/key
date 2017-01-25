@@ -22,24 +22,38 @@ import de.uka.ilkd.key.logic.Sequent;
  * Filter a given sequent to prepare it for the SequentPrinter class
  * by adjusting constraints, deleting formulas, etc.
  */
-public interface SequentPrintFilter {
+public abstract class SequentPrintFilter {
+	
+	protected Sequent originalSequent;
+    protected Sequent filteredSequent;
 
+    protected ImmutableList<SequentPrintFilterEntry> antec;
+    protected ImmutableList<SequentPrintFilterEntry> succ;
     /**
      * @return the original sequent
      */
-    Sequent            getOriginalSequent                ();
+    public Sequent getOriginalSequent() {
+    	return originalSequent;
+    };
     
     /**
      * @return the filtered sequent
      */
-    Sequent getFilteredSequent();
+    abstract Sequent getFilteredSequent();
+    
+    /**
+     * sets the (original) sequent of this filter
+     */
+    public void setSequent(Sequent s) {
+    	originalSequent = s;
+    };
 
     /**
      * Get the formulas of the filtered sequent and the constraints to
      * use for instantiating metavariables when printing
      */
-    ImmutableList<SequentPrintFilterEntry> getFilteredAntec       ();
+    abstract ImmutableList<SequentPrintFilterEntry> getFilteredAntec();
 
-    ImmutableList<SequentPrintFilterEntry> getFilteredSucc        ();
+    abstract ImmutableList<SequentPrintFilterEntry> getFilteredSucc();
     
 }

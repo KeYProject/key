@@ -24,13 +24,7 @@ import de.uka.ilkd.key.logic.Sequent;
  * so that they can be viewed together.
  */
 
-public class RegroupSequentPrintFilter implements SequentPrintFilter {
-
-	@Override
-	public Sequent getOriginalSequent() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
 
 	@Override
 	public Sequent getFilteredSequent() {

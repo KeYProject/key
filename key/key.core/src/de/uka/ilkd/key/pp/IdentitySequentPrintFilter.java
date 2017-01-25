@@ -25,17 +25,13 @@ import de.uka.ilkd.key.logic.SequentFormula;
 /**
  * Identity Filter not doing anything 
  */
-public class IdentitySequentPrintFilter implements SequentPrintFilter {
+public class IdentitySequentPrintFilter extends SequentPrintFilter {
 
     protected Sequent originalSequent;
     protected Sequent filteredSequent;
 
     protected ImmutableList<SequentPrintFilterEntry> antec = null;
     protected ImmutableList<SequentPrintFilterEntry> succ  = null;
-
-    public IdentitySequentPrintFilter ( Sequent    p_s ) {
-	originalSequent = p_s;	
-    }
 
     protected void filterSequent () {
 		if ( antec != null )
@@ -58,14 +54,6 @@ public class IdentitySequentPrintFilter implements SequentPrintFilter {
     	return new IdentityFilterEntry ( p_cfma );
     }
 
-
-    /**
-     * @return the original sequent
-     */
-    public Sequent      getOriginalSequent         () {
-    	return originalSequent;
-    }
-
     /**
      * @return the original sequent because this filter does not change the sequent.
      */
@@ -80,12 +68,12 @@ public class IdentitySequentPrintFilter implements SequentPrintFilter {
      * use for instantiating metavariables when printing
      */
     public ImmutableList<SequentPrintFilterEntry> getFilteredAntec       () {
-    	filterSequent ();
+    	filterSequent();
     	return antec;
     }
 
     public ImmutableList<SequentPrintFilterEntry> getFilteredSucc        () {
-		filterSequent ();
+		filterSequent();
 		return succ;
     }
 

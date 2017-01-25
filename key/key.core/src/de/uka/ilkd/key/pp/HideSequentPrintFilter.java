@@ -22,15 +22,7 @@ import de.uka.ilkd.key.logic.Sequent;
  * a sequent containing only sequent formulas that 
  * match the search.
  */
-public class HideSequentPrintFilter implements SequentPrintFilter {
-
-	
-	@Override
-	public Sequent getOriginalSequent() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+public class HideSequentPrintFilter extends SearchSequentPrintFilter {
 
 	@Override
 	public Sequent getFilteredSequent() {
@@ -50,7 +42,4 @@ public class HideSequentPrintFilter implements SequentPrintFilter {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-
-
 }

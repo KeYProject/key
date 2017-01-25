@@ -71,7 +71,7 @@ public class InnerNodeView extends SequentView {
     public InnerNodeView(Node node, MainWindow mainWindow) {
         super(mainWindow);
         this.node = node;
-        filter = new IdentitySequentPrintFilter(node.sequent());
+        filter = new IdentitySequentPrintFilter();
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
                         mainWindow.getMediator().getNotationInfo(),
                         mainWindow.getMediator().getServices(),

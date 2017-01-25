@@ -255,7 +255,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      * sets the LogicPrinter to use
      */
     public void setPrinter(Goal goal) {
-        filter = new IdentitySequentPrintFilter(goal.sequent());
+        filter.setSequent(goal.sequent()); //TODO replace this by setting the sequent in the current filter
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(null),
                                                     getMediator().getNotationInfo(),
                                                     mediator.getServices(),
