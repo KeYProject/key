@@ -342,8 +342,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                 KeYJavaASTFactory.block(newIf));
 
         final StatementBlock newBlock = KeYJavaASTFactory
-                .block(KeYJavaASTFactory.declare(loopScopeIdxVar,
-                        KeYJavaASTFactory.falseLiteral()), loopScope);
+                .block(KeYJavaASTFactory.declare(loopScopeIdxVar), loopScope);
 
         final ProgramElement result = new ProgramElementReplacer(
                 origProg.program(), services).replace(stmtToReplace, newBlock);
