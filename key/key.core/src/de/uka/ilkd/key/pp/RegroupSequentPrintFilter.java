@@ -36,6 +36,23 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
 	@Override
 	protected void filterSequent() {
 		
+		Iterator<SequentFormula> it;
+		
+		if (searchString == null) {
+			antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
+			it = originalSequent.antecedent().iterator();
+			while (it.hasNext()) {
+				antec.append(new IdentityFilterEntry(it.next()));
+			}
+			
+			succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
+			it = originalSequent.succedent().iterator();
+			while (it.hasNext()) {
+				succ.append(new IdentityFilterEntry(it.next()));
+			}
+			return;
+		}
+		
 		int searchFlag = 0;
 	    if (searchString.toLowerCase().equals(searchString)) {
 	        searchFlag = searchFlag | Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
@@ -55,8 +72,6 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
 	        return;
 	    }
 	    
-		Iterator<SequentFormula> it;
-		
 		antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
 		it = originalSequent.antecedent().iterator();
 		while (it.hasNext()) {

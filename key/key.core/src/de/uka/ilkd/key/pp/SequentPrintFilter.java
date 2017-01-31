@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.pp;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.Sequent;
 
@@ -26,8 +27,8 @@ public abstract class SequentPrintFilter {
 	
 	protected Sequent originalSequent;
 
-    protected ImmutableList<SequentPrintFilterEntry> antec;
-    protected ImmutableList<SequentPrintFilterEntry> succ;
+    protected ImmutableList<SequentPrintFilterEntry> antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
+    protected ImmutableList<SequentPrintFilterEntry> succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
     
     /**
      * @return the original sequent
@@ -45,6 +46,7 @@ public abstract class SequentPrintFilter {
     	originalSequent = s;
     	antec = null;
     	succ = null;
+    	filterSequent();
     }
 
     /**
@@ -52,15 +54,9 @@ public abstract class SequentPrintFilter {
      * use for instantiating metavariables when printing
      */
     public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
-    	if (antec == null) {
-    		filterSequent();
-    	}
     	return antec;
     }
     public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
-    	if (succ == null) {
-    		filterSequent();
-    	}
     	return succ;
     }
 }
