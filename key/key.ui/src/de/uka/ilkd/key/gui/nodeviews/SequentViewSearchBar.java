@@ -89,9 +89,9 @@ public class SequentViewSearchBar extends SearchBar {
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					switch ((SearchMode)searchModeBox.getSelectedItem()) {
-					case HIDE : sequentView.setFilter(new HideSequentPrintFilter());
+					case HIDE : sequentView.setFilter(new HideSequentPrintFilter(sequentView.getLogicPrinter()));
 							break;
-					case REGROUP : sequentView.setFilter(new RegroupSequentPrintFilter());
+					case REGROUP : sequentView.setFilter(new RegroupSequentPrintFilter(sequentView.getLogicPrinter()));
 						break;
 					default: sequentView.setFilter(new IdentitySequentPrintFilter());
 						break;
