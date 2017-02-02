@@ -1512,11 +1512,22 @@ integerliteral returns [SLExpression ret=null] throws SLTranslationException
 
 hexintegerliteral returns [SLExpression result=null] throws SLTranslationException
 :
-    n=HEXNUMERAL
+    n=HEXLITERAL
     {
-	BigInteger decInteger = new BigInteger(n.getText().substring(2), 16);
-	result = new SLExpression(tb.zTerm(decInteger.toString()),
-	                          javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
+      String text = n.getText();
+      try {
+        if(text.endsWith("l") || text.endsWith("L")) {
+          Long val = Long.valueOf(Long.parseLong(text.substring(2, text.length()-1), 16));
+          result = new SLExpression(tb.zTerm(val.toString()),
+                                    javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LONG));
+        } else {
+          Integer val = Integer.valueOf(Integer.parseInt(text.substring(2), 16));
+          result = new SLExpression(tb.zTerm(val.toString()),
+  	                          javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
+	    }
+	  } catch(NumberFormatException ex) {
+	    raiseError("Number constant out of bounds", n);
+	  }
     }
 ;
 
@@ -1527,13 +1538,22 @@ decimalintegerliteral returns [SLExpression ret=null] throws SLTranslationExcept
 
 decimalnumeral returns [SLExpression result=null] throws SLTranslationException
 :
-    n=DIGITS
+    n=DECOCTLITERAL
     {
-      if(n.getText().startsWith("0")) {
-          n.setText(new java.math.BigInteger(n.getText(), 8).toString());
-      }
-	  result = new SLExpression(tb.zTerm(n.getText()),
-	                            javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
+      String text = n.getText();
+      try {
+        if(text.endsWith("l") || text.endsWith("L")) {
+          Long val = Long.decode(text.substring(0, text.length()-1));
+          result = new SLExpression(tb.zTerm(val.toString()),
+                                    javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LONG));
+        } else {
+          Integer val = Integer.valueOf(Integer.parseInt(text.substring(2), 16));
+          result = new SLExpression(tb.zTerm(val.toString()),
+  	                          javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
+	    }
+	  } catch(NumberFormatException ex) {
+	    raiseError("Number constant out of bounds", n);
+	  }
     }
 ;
 
