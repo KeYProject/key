@@ -1547,8 +1547,8 @@ decimalnumeral returns [SLExpression result=null] throws SLTranslationException
           result = new SLExpression(tb.zTerm(val.toString()),
                                     javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LONG));
         } else {
-          Integer val = Integer.valueOf(Integer.parseInt(text.substring(2), 16));
-          result = new SLExpression(tb.zTerm(val.toString()),
+          Integer val = Integer.decode(text);
+          result = new SLExpression(tb.zTerm(val.toString()), 
   	                          javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
 	    }
 	  } catch(NumberFormatException ex) {

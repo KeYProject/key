@@ -274,11 +274,6 @@ HEXLITERAL
         '0' ('x'|'X') (HEXDIGIT)+ ( 'l'|'L' )?
 ;
 
-DIGITS
-    :
-        (DIGIT)+
-;
-
 DECOCTLITERAL
     :
         (DIGIT)+ ( 'l'|'L' )?
