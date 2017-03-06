@@ -16,11 +16,9 @@ package de.uka.ilkd.key.logic;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 
@@ -28,10 +26,7 @@ import org.key_project.util.collection.ImmutableSet;
  * A Namespace keeps track of already used {@link Name}s and the objects
  * carrying these names. These objects have to implement the interface
  * {@link Named}. It is possible to have nested namespaces in order to
- * represent different visibility scopes. An instance of Namespace can
- * operate in normal and protocoled mode, where the protocoled mode
- * keeps track of all new added names since the last call of {@link
- * Namespace#startProtocol}.
+ * represent different visibility scopes.
  */
 public class Namespace<E extends Named> implements java.io.Serializable {
 
@@ -54,17 +49,11 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      */
     private boolean sealed;
 
-    /** Additions can be "recorded" here
-     * @deprecated */
-    @Deprecated
-    private Map<Name, E> protocol;
-
-
     /**
      * Construct an empty Namespace without a parent namespace.
      */
     public Namespace() {
-	this.parent = null;
+        this.parent = null;
     }
 
     /**
@@ -72,7 +61,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * for finding symbols not defined in this one.
      */
     public Namespace(Namespace<E> parent) {
-	this.parent = parent;
+        this.parent = parent;
     }
 
     /**
@@ -98,6 +87,13 @@ public class Namespace<E extends Named> implements java.io.Serializable {
             throw new IllegalStateException("This namespace has been sealed; addition is not possible.");
         }
 
+        /* TODO ... Investigate in a future version
+        Named old = lookup(sym.name());
+        if(old != null && old != sym) {
+            System.err.println("Clash! Name already used: " + sym.name().toString());
+        }
+        */
+
         if (symbols == null) {
             symbols = Collections.singletonMap(sym.name(), sym);
         } else {
@@ -107,9 +103,6 @@ public class Namespace<E extends Named> implements java.io.Serializable {
             symbols.put(sym.name(), sym);
         }
 
-        if (protocol != null) {
-	    protocol.put(sym.name(),sym);
-        }
     }
 
     public void add(Namespace<E> source) {
@@ -128,7 +121,8 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * already there.
      */
     public void addSafely(E sym) {
-        if(lookup(sym.name()) != null) {
+        Named old = lookup(sym.name());
+        if(old != null && old != sym) {
             throw new RuntimeException("Name already in namespace: "
                                        + sym.name());
         }
@@ -153,28 +147,6 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         if(symbols != null){
             symbols.remove(name);
         }
-        if(protocol != null){
-            protocol.remove(name);
-        }
-    }
-
-    /** "remember" all additions from now on */
-    public void startProtocol() {
-        protocol = new LinkedHashMap<Name, E>();
-    }
-
-    /** gets symbols added since last <code>startProtocol()</code>;
-     *  resets the protocol */
-    public Iterator<E> getProtocolled() {
-        if (protocol == null) {
-            return ImmutableSLList.<E>nil().iterator();
-        }
-
-        assert protocol.equals(symbols);
-
-        final Iterator<E> it = protocol.values().iterator();
-        protocol = null;
-        return it;
     }
 
     protected Named lookupLocally(Name name){
@@ -258,14 +230,11 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     public Namespace<E> copy() {
-	Namespace<E> copy = new Namespace<E>();
-	if(symbols != null)
-	    copy.addSafely(symbols.values());
-	if(protocol != null) {
-	    copy.protocol = new LinkedHashMap<Name, E>(copy.protocol);
-	}
+        Namespace<E> copy = new Namespace<E>();
+        if(symbols != null)
+            copy.add(symbols.values());
 
-	return copy;
+        return copy;
     }
 
     private void reset() {

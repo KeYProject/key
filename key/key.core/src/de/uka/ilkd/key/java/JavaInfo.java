@@ -909,11 +909,12 @@ public final class JavaInfo {
                       +" Not yet implemented.");
         }
         final NamespaceSet nss = services.getNamespaces().copy();
-        nss.startProtocol();
         final JavaBlock block = kpmi.readBlock(java, cd, nss);
         // if we are here everything is fine and we can add the
         // changes (may be new array types)
-        services.getNamespaces().addProtocolled(nss);
+        // Until end 2016, a protocol mode for namespaces was used here
+        // but was removed since unncessary. (mu 2016)
+        services.getNamespaces().add(nss);
         return block;
     }
 
@@ -922,11 +923,12 @@ public final class JavaInfo {
      */
     public JavaBlock readJavaBlock(String java) {
         NamespaceSet nss = services.getNamespaces().copy();
-        nss.startProtocol();
         final JavaBlock block = kpmi.readJavaBlock(java, nss);
-        // if we are here everything is fine nad wen can add the
+        // if we are here everything is fine and we can add the
         // changes (may be new array types)
-        services.getNamespaces().addProtocolled(nss);
+        // Until end 2016, a protocol mode for namespaces was used here
+        // but was removed since unncessary. (mu 2016)
+        services.getNamespaces().add(nss);
         return block;
     }
 
