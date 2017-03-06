@@ -192,7 +192,7 @@ public class Node  {
         return localProgVars;
     }
 
-    public void addLocalProgVars(Collection<IProgramVariable> elements) {
+    public void addLocalProgVars(Iterable<? extends IProgramVariable> elements) {
         for (IProgramVariable pv : elements) {
             localProgVars = localProgVars.prepend(pv);
         }

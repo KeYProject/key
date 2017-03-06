@@ -13,13 +13,11 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.Collections;
 import java.util.Iterator;
-
-import junit.framework.TestCase;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -48,6 +46,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
+import junit.framework.TestCase;
 
 
 public class TestVariableNamer extends TestCase {
@@ -122,19 +121,14 @@ public class TestVariableNamer extends TestCase {
     }
 
 
-    private void addGlobal(Goal goal, ProgramVariable globalVar) {
- 	ImmutableSet<ProgramVariable> globals = goal.getGlobalProgVars().add(globalVar);
-	goal.setGlobalProgVars(globals);
+    private void addGlobal(Goal goal, ProgramVariable var) {
+        goal.getLocalNamespaces().programVariables().addSafely(var);
+        goal.node().addLocalProgVars(Collections.singletonList(var));
     }
 
 
     private boolean inGlobals(Goal goal, ProgramVariable globalVar) {
-        for (ProgramVariable programVariable : goal.getGlobalProgVars()) {
-            if (programVariable == globalVar) {
-                return true;
-            }
-        }
-	return false;
+        return goal.node().getLocalProgVars().contains(globalVar);
     }
     
     private void addTacletApp(Goal goal, ProgramVariable containedVar) {
@@ -206,10 +200,10 @@ public class TestVariableNamer extends TestCase {
    	v = vn.rename(xx, goal, pio);
 	assertTrue(v.getProgramElementName().getProgramName().equals("x"));
 
-        proof.getNamespaces().programVariables().addSafely(v);
+//        proof.getNamespaces().programVariables().addSafely(v);
 	addGlobal(goal, v);
 	w = vn.rename(x, goal, pio);
-	assertFalse(w.getProgramElementName().getProgramName().equals("x"));
+        assertTrue(w.getProgramElementName().getProgramName().equals("x_1"));
 	assertTrue(inGlobals(goal, v));
 
 	// Reset progVar namespace which was altered due to addGlobal()
@@ -220,20 +214,20 @@ public class TestVariableNamer extends TestCase {
 
    
     
-//    public void testInnerRenameInTacletApps() {
-//     	VariableNamer vn = services.getVariableNamer();
-//	ProgramVariable v;
-//	
-//	PosInOccurrence pio = constructPIO(formulaWithX);
-//	Goal goal = constructGoal(formulaWithX);
-//        proof.getNamespaces().programVariables().addSafely(xx);
-//	addGlobal(goal, xx);
-//	addTacletApp(goal, x);
-//	
-//	v = vn.rename(x, goal, pio);
-//	assertFalse(inTacletApps(goal, x));
-//	assertTrue(inTacletApps(goal, v));
-//    }
+    //    public void testInnerRenameInTacletApps() {
+    //     	VariableNamer vn = services.getVariableNamer();
+    //	ProgramVariable v;
+    //
+    //	PosInOccurrence pio = constructPIO(formulaWithX);
+    //	Goal goal = constructGoal(formulaWithX);
+    //        proof.getNamespaces().programVariables().addSafely(xx);
+    //	addGlobal(goal, xx);
+    //	addTacletApp(goal, x);
+    //
+    //	v = vn.rename(x, goal, pio);
+    //	assertFalse(inTacletApps(goal, x));
+    //	assertTrue(inTacletApps(goal, v));
+    //    }
     
     public void testNameProposals() {
     	VariableNamer vn = services.getVariableNamer();
