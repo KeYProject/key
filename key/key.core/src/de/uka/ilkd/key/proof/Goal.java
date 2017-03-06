@@ -237,7 +237,7 @@ public final class Goal  {
 
   
     public void setGlobalProgVars(ImmutableSet<ProgramVariable> s) {
-        assert node.proof().getNamespaces().contains(names(s)) :
+        assert node.proof().getNamespaces().containsAll(names(s)) :
                     "\""+names(s)+ "\" not found in namespace.";
         node.setGlobalProgVars(s);
     }

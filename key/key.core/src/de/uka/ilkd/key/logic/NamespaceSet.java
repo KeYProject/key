@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -165,7 +163,7 @@ public class NamespaceSet {
      * @return the element with the given name if found in the
      * given namespaces, otherwise <tt>null</tt>
      */
-    private Named lookup(Name name, final Namespace[] spaces) {
+    private Named lookup(Name name, final Namespace<?>[] spaces) {
         for (Namespace<?> space : spaces) {
             final Named n = space.lookup(name);
             if (n != null) return n;
@@ -185,7 +183,7 @@ public class NamespaceSet {
     }
 
 
-    public <T extends Name> boolean contains(ImmutableSet<T> names) {
+    public <T extends Name> boolean containsAll(Iterable<T> names) {
         for (Name name : names) {
             if (lookupLogicSymbol(name) == null) {
                 return false;
