@@ -40,59 +40,59 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     /**
      * The fall-back namespace for symbols not present in this Namespace.
      */
-    private Namespace<E> parent;    
+    private Namespace<E> parent;
 
     /**
      * The map that maps a name to a symbols of that name if it is defined in
      * this Namespace.
      */
     private Map<Name, E> symbols;
-    
+
     /**
      * A namespace can be made immutable, this is called "sealing". This flag
      * indicates whether this namespace has been sealed or not.
      */
     private boolean sealed;
-     
-    /** Additions can be "recorded" here 
+
+    /** Additions can be "recorded" here
      * @deprecated */
     @Deprecated
     private Map<Name, E> protocol;
 
 
-    /** 
+    /**
      * Construct an empty Namespace without a parent namespace.
      */
     public Namespace() {
 	this.parent = null;
     }
 
-    /** 
+    /**
      * Construct a Namespace that uses <code>parent</code> as a fallback
-     * for finding symbols not defined in this one. 
+     * for finding symbols not defined in this one.
      */
     public Namespace(Namespace<E> parent) {
 	this.parent = parent;
     }
 
-    /** 
-     * Adds the object <code>sym</code> to this Namespace. 
-     * If an object with the same name is already there, it is quietly 
+    /**
+     * Adds the object <code>sym</code> to this Namespace.
+     * If an object with the same name is already there, it is quietly
      * replaced by <code>sym</code>. Use addSafely() instead if possible.
      *
      * TODO:The problem of saving to localSym, symbols, and symbolRefs is not solved yet.
-     *   (This is no longer self-explanatory. mu 2016) 
-     *   
-     * If the local table is empty, then the new symbol is added as 
-     * "singleton map". This has been adapted from an earlier 
+     *   (This is no longer self-explanatory. mu 2016)
+     *
+     * If the local table is empty, then the new symbol is added as
+     * "singleton map". This has been adapted from an earlier
      * implementation, done for memory efficiency reasons: Many namespaces
      * only contain a single element; no need to allocate a hash map.
      * The hash map is only created when the 2nd element is added.
-     * 
+     *
      * This is not threadsafe.
      */
     public void add(E sym) {
-        
+
         if(sealed) {
             System.err.println("SEALED");
             throw new IllegalStateException("This namespace has been sealed; addition is not possible.");
@@ -106,12 +106,12 @@ public class Namespace<E extends Named> implements java.io.Serializable {
             }
             symbols.put(sym.name(), sym);
         }
-        
+
         if (protocol != null) {
-	    protocol.put(sym.name(),sym); 
+	    protocol.put(sym.name(),sym);
         }
     }
-    
+
     public void add(Namespace<E> source) {
         add(source.elements());
     }
@@ -123,16 +123,16 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     /**
-     * Adds the object <code>sym</code> to this namespace. 
-     * Throws a runtime exception if an object with the same name is 
-     * already there. 
+     * Adds the object <code>sym</code> to this namespace.
+     * Throws a runtime exception if an object with the same name is
+     * already there.
      */
     public void addSafely(E sym) {
         if(lookup(sym.name()) != null) {
-            throw new RuntimeException("Name already in namespace: " 
+            throw new RuntimeException("Name already in namespace: "
                                        + sym.name());
         }
-        
+
         add(sym);
     }
 
@@ -144,9 +144,9 @@ public class Namespace<E extends Named> implements java.io.Serializable {
 
     /**
      * Remove a name from the namespace.
-     * 
+     *
      * Removal is not delegated to the parent namespace.
-     * 
+     *
      * @param name non-null name whose symbol is to be removed.
      */
     public void remove(Name name){
@@ -157,7 +157,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
             protocol.remove(name);
         }
     }
-    
+
     /** "remember" all additions from now on */
     public void startProtocol() {
         protocol = new LinkedHashMap<Name, E>();
@@ -169,9 +169,9 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         if (protocol == null) {
             return ImmutableSLList.<E>nil().iterator();
         }
-        
+
         assert protocol.equals(symbols);
-        
+
         final Iterator<E> it = protocol.values().iterator();
         protocol = null;
         return it;
@@ -183,7 +183,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         } else {
             return null;
         }
-    }  
+    }
 
 
     /** creates a new Namespace that has this as parent, and contains
@@ -195,36 +195,36 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     public Namespace<E> extended(Iterable<? extends E> ext) {
-	Namespace<E> result = new Namespace<E>(this);
-	result.addSafely(ext);
+        Namespace<E> result = new Namespace<E>(this);
+        result.add(ext);
         return result;
     }
 
-   /** 
+   /**
     * looks if a registered object is declared in this namespace, if
-    * negative it asks its parent 
+    * negative it asks its parent
     * @param name a Name representing the name of the symbol to look for
     * @return Object with name "name" or null if no such an object
     * has been found
-    */  
+    */
     public Named lookup(Name name) {
         Named symbol = lookupLocally(name);
         if (symbol != null) {
             return symbol;
         }
-        
+
         if (parent != null) {
             return parent.lookup(name);
         }
-        
+
         return null;
     }
-    
+
     /** Convenience method to look up. */
     public Named lookup(String name){
         return lookup(new Name(name));
     }
-    
+
     /** returns list of the elements (not the keys) in this
      * namespace (not about the one of the parent)
      * @return the list of the named objects
@@ -232,7 +232,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     public Collection<E> elements() {
         return Collections.unmodifiableCollection(symbols.values());
     }
-    
+
 
     public Collection<E> allElements() {
 	if (parent==null) {
@@ -264,10 +264,10 @@ public class Namespace<E extends Named> implements java.io.Serializable {
 	if(protocol != null) {
 	    copy.protocol = new LinkedHashMap<Name, E>(copy.protocol);
 	}
-	
+
 	return copy;
     }
-    
+
     private void reset() {
         parent = null;
         symbols = null;
