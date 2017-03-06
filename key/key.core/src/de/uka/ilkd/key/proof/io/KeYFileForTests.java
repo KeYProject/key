@@ -20,6 +20,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;
@@ -91,7 +92,7 @@ public class KeYFileForTests extends KeYFile {
 //        return result;
 //    }
     
-    public Namespace variables() {
+    public Namespace<QuantifiableVariable> variables() {
 	return variables;
     }
 }

@@ -152,7 +152,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         }
     }
 
-    protected Named lookupLocally(Name name){
+    protected E lookupLocally(Name name){
         if (symbols != null) {
             return symbols.get(name);
         } else {
@@ -182,8 +182,8 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     * @return Object with name "name" or null if no such an object
     * has been found
     */
-    public Named lookup(Name name) {
-        Named symbol = lookupLocally(name);
+    public E lookup(Name name) {
+        E symbol = lookupLocally(name);
         if (symbol != null) {
             return symbol;
         }

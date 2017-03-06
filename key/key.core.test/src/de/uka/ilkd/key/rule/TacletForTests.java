@@ -30,6 +30,9 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.KeYLexerF;
@@ -63,7 +66,7 @@ public class TacletForTests {
     public static InitConfig initConfig;
     public static File lastFile=null;
 
-    public static Namespace variables = null;
+    public static Namespace<QuantifiableVariable> variables = null;
 
     public static Profile profile = new JavaProfile() {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
@@ -146,7 +149,7 @@ public class TacletForTests {
         return scm;
     }
 
-    public static Namespace getSorts() {
+    public static Namespace<Sort> getSorts() {
 	return nss.sorts();
     }
 
@@ -155,20 +158,20 @@ public class TacletForTests {
     }
 
 
-    public static Namespace getHeuristics() {
+    public static Namespace<RuleSet> getHeuristics() {
 	return nss.ruleSets();
     }
 
-    public static Namespace getFunctions() {
+    public static Namespace<Operator> getFunctions() {
 	return nss.functions();
     }
 
 
-    public static Namespace getVariables() {
+    public static Namespace<?> getVariables() {
 	return variables;
     }
 
-    public static Namespace getProgramVariables() {
+    public static Namespace<IProgramVariable> getProgramVariables() {
 	return nss.programVariables();
     }
 
@@ -177,7 +180,7 @@ public class TacletForTests {
     }
 
     public static Function funcLookup(String name) {
-	return (Function)getFunctions().lookup(new Name(name));
+	return (Function) getFunctions().lookup(new Name(name));
     }
 
     public static SchemaVariable svLookup(String name) {
