@@ -33,6 +33,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
@@ -40,6 +41,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -76,9 +78,9 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
-import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
@@ -808,19 +810,20 @@ public class IntermediateProofReplayer {
      *            Proof object (for namespaces and Services object).
      * @param varNS
      *            Variable namespace.
-     * @param progVar_ns
+     * @param progVarNS
      *            Program variable namespace.
+     * @param funcNS
+     *            Functions (in particular skolem functions) namespace.
      * @return The parsed term.
      * @throws ParserException
      *             In case of an error.
      */
     public static Term parseTerm(String value, Proof proof, Namespace varNS,
-            Namespace progVar_ns) {
+            Namespace progVarNS, Namespace<Operator> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null,
-                    proof.getServices(), varNS, proof.getNamespaces()
-                            .functions(), proof.getNamespaces().sorts(),
-                    progVar_ns, new AbbrevMap());
+                    proof.getServices(), varNS, functNS, proof.getNamespaces().sorts(),
+                    progVarNS, new AbbrevMap());
         }
         catch (ParserException e) {
             throw new RuntimeException("Error while parsing value " + value
@@ -838,8 +841,11 @@ public class IntermediateProofReplayer {
      * @return The parsed term.
      */
     public static Term parseTerm(String value, Proof proof) {
-        return parseTerm(value, proof, proof.getNamespaces().variables(), proof
-                .getNamespaces().programVariables());
+        NamespaceSet nss = proof.getNamespaces();
+        return parseTerm(value, proof,
+                nss.variables(),
+                nss.programVariables(),
+                nss.functions());
     }
 
     /**
@@ -903,8 +909,9 @@ public class IntermediateProofReplayer {
         else {
             Namespace<QuantifiableVariable> varNS = p.getNamespaces().variables();
             Namespace<IProgramVariable> prgVarNS = targetGoal.getLocalNamespaces().programVariables();
+            Namespace<Operator> funcNS = targetGoal.getLocalNamespaces().functions();
             varNS = app.extendVarNamespaceForSV(varNS, sv);
-            Term instance = parseTerm(value, p, varNS, prgVarNS);
+            Term instance = parseTerm(value, p, varNS, prgVarNS, funcNS);
             result = app.addCheckedInstantiation(sv, instance, services, true);
         }
         return result;
