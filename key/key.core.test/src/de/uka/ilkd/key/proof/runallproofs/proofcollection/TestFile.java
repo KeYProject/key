@@ -3,6 +3,7 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -10,6 +11,7 @@ import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
@@ -279,8 +281,17 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
       KeYEnvironment<DefaultUserInterfaceControl> proofLoadEnvironment = null;
       Proof reloadedProof = null;
       try {
-         proofLoadEnvironment = KeYEnvironment
-               .load(proofFile);
+         proofLoadEnvironment = KeYEnvironment.load(proofFile);
+
+         ReplayResult result = proofLoadEnvironment.getReplayResult();
+         if(result.hasErrors()) {
+             List<Throwable> errorList = result.getErrorList();
+             for (Throwable ex : errorList) {
+                ex.printStackTrace();
+             }
+             throw errorList.get(0);
+         }
+
          reloadedProof = proofLoadEnvironment.getLoadedProof();
          assertTrue("Reloaded proof did not close: " + proofFile, reloadedProof.closed());
       }
