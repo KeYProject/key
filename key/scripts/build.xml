@@ -18,11 +18,11 @@
 	</condition>
 
 	 <!-- The following tasks are for KeY -->
-	<target name="start" depends="compileAll" description="Starts KeY.">
+	<target name="start" depends="compileAll" description="Starts KeY (after recompilation if necessary).">
 		<ant antfile="${key.dir}/key.ui/build.xml" target="start" dir="${key.dir}/key.ui" inheritall="false"/>
 	</target>
 
-	<target name="compileAll">
+	<target name="compileAll" description="Build all subprojects needed for KeY. (Calls 'ant compile' on production subprojects.)">
 		<ant antfile="${key.dir}/key.util/build.xml" target="compile" dir="${key.dir}/key.util" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core/build.xml" target="compile" dir="${key.dir}/key.core" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.testgen/build.xml" target="compile" dir="${key.dir}/key.core.testgen" inheritall="false"/>
@@ -34,7 +34,7 @@
 		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="compile" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
 	</target>
 
-	<target name="deployAll">
+	<target name="deployAll" description="Prepare KeY for shipping. Find results in directory 'deployment'. (Calls 'ant deploy' on production subprojects.)">
 		<!-- Update GIT revision s-->
 		<exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
 			<arg value="rev-parse"/>
@@ -70,7 +70,7 @@
 		 />
 	</target>
 
-	<target name="cleanAll">
+	<target name="cleanAll" description="Remove all generated files. (Clears deployment files and calls 'ant clean' on production subprojects.)">
 		<!-- Clean components -->
 		<ant antfile="${key.dir}/key.util/build.xml" target="clean" dir="${key.dir}/key.util" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core/build.xml" target="clean" dir="${key.dir}/key.core" inheritall="false"/>
@@ -95,7 +95,7 @@
 	     "test-deploy-all" when deploying (jenkins/hudson use test-deploy-all)	     
 	-->
 
-	<target name="runAllTests" depends="compileAllTests">
+	<target name="runAllTests" depends="compileAllTests" description="Run test of all subprojects. (Calls 'ant runTests' on test subprojects.)">
 		<ant antfile="${key.dir}/key.util.test/build.xml" target="runTests" dir="${key.dir}/key.util.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.test/build.xml" target="runTests" dir="${key.dir}/key.core.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="runTests" dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
@@ -104,7 +104,7 @@
 		<ant antfile="${key.dir}/key.removegenerics.test/build.xml" target="runTests" dir="${key.dir}/key.removegenerics.test" inheritall="false"/>
 	</target>
 
-	<target name="test-deploy-all" depends="deployAll, compileAllTests">
+	<target name="test-deploy-all" depends="deployAll, compileAllTests" description="Builds all projects, their tests and deploys the result.">
 		<ant antfile="${key.dir}/key.util.test/build.xml" target="test-deploy" dir="${key.dir}/key.util.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.test/build.xml" target="test-deploy" dir="${key.dir}/key.core.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="test-deploy" dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
@@ -113,7 +113,7 @@
 		<ant antfile="${key.dir}/key.removegenerics.test/build.xml" target="test-deploy" dir="${key.dir}/key.removegenerics.test" inheritall="false"/>
 	</target>
 
-	<target name="compileAllTests" depends="compileAll">
+	<target name="compileAllTests" depends="compileAll" description="Build testcases in all subprojects needed for KeY. (Calls 'ant compile' on test subprojects.)">
 		<ant antfile="${key.dir}/key.util.test/build.xml" target="compile" dir="${key.dir}/key.util.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.test/build.xml" target="compile" dir="${key.dir}/key.core.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="compile" dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
@@ -122,7 +122,7 @@
 		<ant antfile="${key.dir}/key.removegenerics.test/build.xml" target="compile" dir="${key.dir}/key.removegenerics.test" inheritall="false"/>
 	</target>
 
-	<target name="cleanAllTests">
+	<target name="cleanAllTests" description="Clean all generated files in the test packages. (Calls 'ant clean' on test subprojects.)">
 		<ant antfile="${key.dir}/key.util.test/build.xml" target="clean" dir="${key.dir}/key.util.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.test/build.xml" target="clean" dir="${key.dir}/key.core.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="clean" dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
@@ -132,7 +132,7 @@
 	</target>
 
 
-	<target name="generateDoc" depends="compileAll">
+	<target name="generateDoc" depends="compileAll" description="Build javadoc.">
    	  <mkdir dir="${javadoc.dir}"/>
   	  <!-- Update GIT revision s-->
 	  <exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
