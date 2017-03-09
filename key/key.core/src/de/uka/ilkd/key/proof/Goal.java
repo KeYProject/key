@@ -22,6 +22,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
@@ -259,15 +260,6 @@ public final class Goal  {
 	    node = p_node;
 	ruleAppIndex.setup ( this );
 
-        NamespaceSet newNS = proof().getServices().getNamespaces().copyWithParent();
-        for (IProgramVariable  pv : node.getLocalProgVars()) {
-            newNS.programVariables().add(pv);
-        }
-        for (Operator op : node.getLocalFunctions()) {
-            newNS.functions().add(op);
-        }
-
-        localNamespaces = newNS.copyWithParent();
     }
 
     /**
@@ -495,7 +487,10 @@ public final class Goal  {
     }
 
     /**
-     * clones the goal (with copy of tacletindex and ruleAppIndex)
+     * clones the goal (with copy of tacletindex and ruleAppIndex).
+     *
+     * The local symbols are reused. This is taken care of later.
+     *
      * @param node the new Node to which the goal is attached
      * @return Object the clone
      */
@@ -508,7 +503,7 @@ public final class Goal  {
                     appliedRuleApps,
                     ruleAppManager.copy(),
                     strategyInfos.clone(),
-                    localNamespaces.getParent().copy());
+                    localNamespaces);
         } else {
             clone = new Goal (node,
                     ruleAppIndex.copy(),
@@ -516,7 +511,7 @@ public final class Goal  {
                     getFormulaTagManager().copy(),
                     ruleAppManager.copy(),
                     strategyInfos.clone(),
-                    localNamespaces.getParent().copy());
+                    localNamespaces);
         }
         clone.listeners = (List<GoalListener>)
                 ((ArrayList<GoalListener>) listeners).clone();
@@ -570,11 +565,6 @@ public final class Goal  {
                 parent.sequent(),
                 parent);
 
-            newNode.addLocalProgVars(localNamespaces.programVariables().elements());
-            newNode.addLocalFunctions(localNamespaces.functions().elements());
-
-            flushNamespaces();
-
         parent.add(newNode);
         this.setNode(newNode);
         goalList = goalList.prepend(this);  
@@ -586,12 +576,9 @@ public final class Goal  {
 	        newNode[i] = new Node(parent.proof(),
 	                parent.sequent(),
 	                parent);
-                newNode[i].addLocalProgVars(localNamespaces.programVariables().elements());
-                newNode[i].addLocalFunctions(localNamespaces.functions().elements());
 	    }
 
         parent.addAll(newNode);
-            flushNamespaces();
 
         this.setNode(newNode[0]);
         goalList = goalList.prepend(this);      
@@ -606,12 +593,6 @@ public final class Goal  {
 	return goalList;
     }
 
-    private void flushNamespaces() {
-        NamespaceSet base = localNamespaces.getParent();
-        base.add(localNamespaces);
-        localNamespaces = base.copyWithParent();
-    }
-
     private void resetTagManager() {
         tagManager = new FormulaTagManager ( this );
     }
@@ -623,6 +604,22 @@ public final class Goal  {
     void pruneToParent(){
             setNode(node().parent());
             removeLastAppliedRuleApp();
+            resetLocalSymbols();
+    }
+
+    /*
+     * Set up the local namespaces table from the stored local symbols
+     */
+    private void resetLocalSymbols() {
+        NamespaceSet newNS = proof().getServices().getNamespaces().copyWithParent();
+        for (IProgramVariable  pv : node.getLocalProgVars()) {
+            newNS.programVariables().add(pv);
+        }
+        for (Operator op : node.getLocalFunctions()) {
+            newNS.functions().add(op);
+        }
+
+        localNamespaces = newNS.copyWithParent();
     }
 
     public ImmutableList<Goal> apply(final RuleApp ruleApp ) {
@@ -635,7 +632,13 @@ public final class Goal  {
 
         final Node n = node;
 
-        final ImmutableList<Goal> goalList = ruleApp.execute(this, proof.getServices());
+        /*
+         * wrap the services object into an overlay such that any addition to
+         * local symbols is caught.
+         */
+        NamespaceSet originalNamespaces = getLocalNamespaces();
+        Services overlayServices = proof.getServices().getOverlay(originalNamespaces);
+        final ImmutableList<Goal> goalList = ruleApp.execute(this, overlayServices);
 
         proof.getServices().saveNameRecorder(n);
 
@@ -651,11 +654,39 @@ public final class Goal  {
             }
         }
 
+        localNamespaces.flushToParent();
+
+        adaptNamespacesNewGoals(goalList);
+
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
 
         if ( goalList != null )
             proof.fireRuleApplied( new ProofEvent ( proof, ruleAppInfo ) );
         return goalList;
+    }
+
+    /*
+     * when the new goals are created during splitting, their namespaces cannot
+     * be fixed yet as new symbols may still be added.
+     *
+     * Now, remember the freshly created symbols in the nodes and set fresh
+     * local namespaces.
+     *
+     * The
+     */
+    private void adaptNamespacesNewGoals(final ImmutableList<Goal> goalList) {
+        boolean first = true;
+        for (Goal goal : goalList) {
+            goal.node().addLocalProgVars(localNamespaces.programVariables().elements());
+            goal.node().addLocalFunctions(localNamespaces.functions().elements());
+
+            if(first) {
+                first = false;
+            } else {
+                goal.localNamespaces = localNamespaces.copy();
+            }
+
+        }
     }
 
     public String toString() {

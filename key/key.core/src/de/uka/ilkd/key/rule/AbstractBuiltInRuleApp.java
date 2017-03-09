@@ -76,8 +76,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     goal.addAppliedRuleApp(this);
     ImmutableList<Goal> result = null;
     try {
-        Services overlayServices = services.getOverlay(goal.getLocalNamespaces());
-        result = builtInRule.apply(goal, overlayServices, this);
+        result = builtInRule.apply(goal, services, this);
     } catch (RuleAbortException rae) {
     }
     if (result == null){
