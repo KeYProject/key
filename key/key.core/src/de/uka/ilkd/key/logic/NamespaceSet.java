@@ -65,6 +65,7 @@ public class NamespaceSet {
                 programVariables());
     }
 
+    // TODO MU: Rename into sth with wrap or similar
     public NamespaceSet copyWithParent() {
         return new NamespaceSet(
                 new Namespace<QuantifiableVariable>(variables()),

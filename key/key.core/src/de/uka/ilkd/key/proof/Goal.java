@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -116,7 +117,7 @@ public final class Goal  {
         this.ruleAppIndex.setup(this);
         this.strategyInfos = strategyInfos;
         setRuleAppManager(ruleAppManager);
-        this.localNamespaces = localNamespace.copyWithParent();
+        this.localNamespaces = localNamespace;
     }
 
     private Goal(Node node,
@@ -133,7 +134,7 @@ public final class Goal  {
       this.strategyInfos = strategyInfos;
       setRuleAppManager ( ruleAppManager );
         this.tagManager      = new FormulaTagManager ( this );
-        this.localNamespaces = localNamespace.copyWithParent();
+        this.localNamespaces = localNamespace;
       }
     
     /**
@@ -147,7 +148,7 @@ public final class Goal  {
                null,
                new QueueRuleApplicationManager (),
                 new MapProperties(),
-                node.proof().getServices().getNamespaces().copyWithParent());
+                node.proof().getServices().getNamespaces().copyWithParent().copyWithParent());
         tagManager = new FormulaTagManager ( this );
     }
 
@@ -474,17 +475,17 @@ public final class Goal  {
         localNamespaces.programVariables().addSafely(pv);
     }
 
-    @Deprecated
-    public void setProgramVariables(Namespace ns) {
-//        final Iterator<Named> it=ns.elements().iterator();
-//        ImmutableSet<ProgramVariable> s = DefaultImmutableSet.<ProgramVariable>nil();
-//        while (it.hasNext()) {
-//            s = s.add((ProgramVariable)it.next());
+//    @Deprecated
+//    public void setProgramVariables(Namespace ns) {
+//        //        final Iterator<Named> it=ns.elements().iterator();
+//        //        ImmutableSet<ProgramVariable> s = DefaultImmutableSet.<ProgramVariable>nil();
+//        //        while (it.hasNext()) {
+//        //            s = s.add((ProgramVariable)it.next());
+//        //        }
+//        //        node().setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
+//        //        proof().getNamespaces().programVariables().set(s);
+//        //        setGlobalProgVars(s);
 //        }
-//        node().setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
-//        proof().getNamespaces().programVariables().set(s);
-//        setGlobalProgVars(s);
-    }
 
     /**
      * clones the goal (with copy of tacletindex and ruleAppIndex).
@@ -654,8 +655,6 @@ public final class Goal  {
             }
         }
 
-        localNamespaces.flushToParent();
-
         adaptNamespacesNewGoals(goalList);
 
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
@@ -675,15 +674,20 @@ public final class Goal  {
      * The
      */
     private void adaptNamespacesNewGoals(final ImmutableList<Goal> goalList) {
+        Collection<IProgramVariable> newProgVars = localNamespaces.programVariables().elements();
+        Collection<Operator> newFunctions = localNamespaces.functions().elements();
+
+        localNamespaces.flushToParent();
+
         boolean first = true;
         for (Goal goal : goalList) {
-            goal.node().addLocalProgVars(localNamespaces.programVariables().elements());
-            goal.node().addLocalFunctions(localNamespaces.functions().elements());
+            goal.node().addLocalProgVars(newProgVars);
+            goal.node().addLocalFunctions(newFunctions);
 
             if(first) {
                 first = false;
             } else {
-                goal.localNamespaces = localNamespaces.copy();
+                goal.localNamespaces = localNamespaces.getParent().copy().copyWithParent();
             }
 
         }

@@ -489,7 +489,7 @@ public class IntermediateProofReplayer {
             }
             catch (Exception e) {
                 throw new TacletConstructionException(
-                        "Wrong position information.");
+                        "Wrong position information.", e);
             }
         }
 
@@ -929,6 +929,10 @@ public class IntermediateProofReplayer {
 
         TacletConstructionException(Throwable cause) {
             super(cause);
+        }
+
+        TacletConstructionException(String s, Throwable cause) {
+            super(s, cause);
         }
     }
 
