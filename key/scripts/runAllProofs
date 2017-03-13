@@ -9,12 +9,15 @@ HELP_FLAG=--help
 RELOAD_ENABLED_FLAG=--reload-enabled
 FORK_MODE_FLAG=--fork-mode
 VERBOSE_FLAG=--verbose
+SKIP_FUNCTIONAL_FLAG=--skipFunctional
+SKIP_INFFLOW_FLAG=--skipInfFlow
 
 list_help() {
     echo "Usage: runAllProofs [$HELP_FLAG] | [$LIST_TESTS_FLAG] |"
     echo "                                     [ [$RELOAD_ENABLED_FLAG=<true|false>]"
     echo "                                       [$VERBOSE_FLAG]"
     echo "                                       [$FORK_MODE_FLAG=<perFile|perGroup|noFork>]"
+    echo "                                       [$SKIP_FUNCTIONAL_FLAG] [$SKIP_INFFLOW_FLAG]"
     echo "                                       [<groupNames>] ]"
     echo "Examples: runAllProofs $FORK_MODE_FLAG=perFile newBook comprehensions"
     echo "          runAllProofs $LIST_TESTS_FLAG"
@@ -77,6 +80,16 @@ while [ "$#" -ne 0 ]
       -h|-?|$HELP_FLAG)
         list_help
         exit
+        ;;
+      $SKIP_FUNCTIONAL_FLAG)
+        JAVA_ARGS="$JAVA_ARGS -Dkey.runallproofs.skipFunctional=true"
+        shift
+        continue
+        ;;
+      $SKIP_INFFLOW_FLAG)
+        JAVA_ARGS="$JAVA_ARGS -Dkey.runallproofs.skipInfFlow=true"
+        shift
+        continue
         ;;
       -*)
         echo Unrecognised option: $1
