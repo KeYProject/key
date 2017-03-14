@@ -351,8 +351,7 @@ public class Proof implements Named {
             throw new IllegalStateException("Proof: ProgVars set too late");
 
         Goal fstGoal = openGoals().head();
-        openGoals = ImmutableSLList.<Goal>nil().prepend(
-                new Goal(root, fstGoal.ruleAppIndex()));
+        fstGoal.makeLocalNamespacesFrom(ns);
     }
 
     public ProofEnvironment getEnv() {

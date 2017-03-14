@@ -735,4 +735,8 @@ public final class Goal  {
     public static boolean hasApplicableRules(Goal goal) {
        return goal.getRuleAppManager().peekNext() != null;
     }
+
+    public void makeLocalNamespacesFrom(NamespaceSet ns) {
+        this.localNamespaces = ns.copyWithParent().copyWithParent();
+    }
 }
