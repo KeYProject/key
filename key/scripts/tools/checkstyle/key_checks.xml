@@ -39,7 +39,7 @@
     -->
 
     <module name="GitDiffFilter">
-        <property name="filename" value="diff" />
+        <property name="filename" value="../../../../checkstyle-diff.txt" />
     </module>
 
     <property name="fileExtensions" value="java, properties, xml"/>
