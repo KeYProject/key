@@ -27,20 +27,12 @@ public class SelectCommand extends AbstractCommand {
             throw new ScriptException("Missing 'formula' argument for select");
         }
 
-        try {
-            Term t = toTerm(proof, stateMap, formulaString, Sort.FORMULA);
+        Goal g = findGoalWith(formulaString, stateMap, proof);
 
-            Goal g = findGoalWith(t, proof);
-
-            stateMap.put(GOAL_KEY, g);
-
-        } catch (ParserException e) {
-            throw new ScriptException("illegal formula: " + formulaString, e);
-        }
-
+        stateMap.put(GOAL_KEY, g);
     }
 
-    private Goal findGoalWith(Term formula, Proof proof) throws ScriptException {
+    private Goal findGoalWith(String formulaString, Map<String, Object> stateMap, Proof proof) throws ScriptException {
 
         Goal g;
         Deque<Node> choices = new LinkedList<Node>();
@@ -53,11 +45,17 @@ public class SelectCommand extends AbstractCommand {
             switch (childCount) {
             case 0:
                 seq = node.sequent();
-                if(contains(seq, formula)) {
+                Term formula;
+                try {
                     g = getGoal(proof.openGoals(), node);
-                    if(g.isAutomatic()) {
-                        return g;
+                    formula = toTerm(g, stateMap, formulaString, Sort.FORMULA);
+                    if(contains(seq, formula)) {
+                        if(g.isAutomatic()) {
+                            return g;
+                        }
                     }
+                } catch (ParserException e) {
+                    // Perhaps grep for ... (program) variable or constant #name not declared
                 }
                 node = choices.pollLast();
                 break;
@@ -84,7 +82,7 @@ public class SelectCommand extends AbstractCommand {
             }
         }
 
-        throw new ScriptException("There is no such goal");
+        throw new ScriptException("There is no goal which contains the formula " + formulaString);
     }
 
     private boolean contains(Sequent seq, Term formula) {
