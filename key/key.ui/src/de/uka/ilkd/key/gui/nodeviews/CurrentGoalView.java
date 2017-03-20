@@ -220,9 +220,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                     setText(getSyntaxHighlighter().process(
                             getLogicPrinter().toString(),
                             getMainWindow().getMediator().getSelectedNode()));
-                    MainWindow.getInstance().sequentViewSearchBar.search();
                 } catch (Error e) {
                     System.err.println("Error occurred while printing Sequent!");
+                    e.printStackTrace();
                     errorocc = true;
                 }
             } while (errorocc);

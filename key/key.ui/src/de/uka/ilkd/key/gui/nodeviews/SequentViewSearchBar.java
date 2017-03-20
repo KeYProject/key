@@ -14,8 +14,11 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -24,12 +27,15 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.SearchBar;
 import de.uka.ilkd.key.pp.HideSequentPrintFilter;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.RegroupSequentPrintFilter;
+import de.uka.ilkd.key.pp.SearchSequentPrintFilter;
 import de.uka.ilkd.key.util.Pair;
 
 /*
@@ -90,8 +96,10 @@ public class SequentViewSearchBar extends SearchBar {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					switch ((SearchMode)searchModeBox.getSelectedItem()) {
 					case HIDE : sequentView.setFilter(new HideSequentPrintFilter(sequentView.getLogicPrinter()));
-							break;
+						break;
 					case REGROUP : sequentView.setFilter(new RegroupSequentPrintFilter(sequentView.getLogicPrinter()));
+						break;
+					case HIGHLIGHT : sequentView.setFilter(new IdentitySequentPrintFilter());
 						break;
 					default: sequentView.setFilter(new IdentitySequentPrintFilter());
 						break;
@@ -146,6 +154,13 @@ public class SequentViewSearchBar extends SearchBar {
                 || !this.isVisible()) {
             return true;
         }
+        
+    	if (sequentView.filter instanceof SearchSequentPrintFilter) {
+    			((SearchSequentPrintFilter) sequentView.filter).setSearchString(searchField.getText());
+    			
+    	}
+    	
+    	sequentView.printSequent();
         
         resultIteratorPos = 0;
         int searchFlag = 0;

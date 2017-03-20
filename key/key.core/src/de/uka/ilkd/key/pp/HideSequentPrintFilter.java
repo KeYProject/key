@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.pp;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,22 +31,26 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
  * match the search.
  */
 public class HideSequentPrintFilter extends SearchSequentPrintFilter {
+	
+	public HideSequentPrintFilter(SequentViewLogicPrinter lp) {
+		this.lp = lp;
+	}
 
 	@Override
 	protected void filterSequent() {
 		Iterator<SequentFormula> it;
 
-		if (searchString == null) {
+		if (searchString == null || searchString.length() < 3) {
 			antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
 			it = originalSequent.antecedent().iterator();
 			while (it.hasNext()) {
-				antec.append(new IdentityFilterEntry(it.next()));
+				antec = antec.append(new IdentityFilterEntry(it.next()));
 			}
 			
 			succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
 			it = originalSequent.succedent().iterator();
 			while (it.hasNext()) {
-				succ.append(new IdentityFilterEntry(it.next()));
+				succ = succ.append(new IdentityFilterEntry(it.next()));
 			}
 			return;
 		}
@@ -73,21 +78,39 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
 		it = originalSequent.antecedent().iterator();
 		while (it.hasNext()) {
 			SequentFormula sf = it.next();
-			Matcher m = p.matcher(sf.toString().replace("\u00A0", "\u0020")); //TODO toString is not sufficient here
+			try {
+				lp.reset();
+				lp.printConstrainedFormula(sf);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			String formString = lp.toString();
+			Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
 			if (m.find()) {
-				antec.append(new IdentityFilterEntry(sf));
+				antec = antec.append(new IdentityFilterEntry(sf));
 			}
 		}
+		lp.reset();
 		
 		succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
 		it = originalSequent.succedent().iterator();
 		while (it.hasNext()) {
 			SequentFormula sf = it.next();
-			Matcher m = p.matcher(sf.toString().replace("\u00A0", "\u0020")); //TODO toString is not sufficient here
+			try {
+				lp.reset();
+				lp.printConstrainedFormula(sf);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			String formString = lp.toString();
+			Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
 			if (m.find()) {
-				succ.append(new IdentityFilterEntry(sf));
+				succ = succ.append(new IdentityFilterEntry(sf));
 			}
 		}
+		lp.reset();
 	}
 	
 }
