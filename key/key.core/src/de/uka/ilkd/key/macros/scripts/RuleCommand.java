@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
@@ -33,8 +34,8 @@ public class RuleCommand extends AbstractCommand {
 
     private static class Parameters {
         String rulename;
-        Term on;
-        Term formula;
+        String on;
+        String formula;
         int occ = -1;
     }
 
@@ -68,16 +69,17 @@ public class RuleCommand extends AbstractCommand {
             throw new ScriptException("Not a unique \\assumes instantiation");
         }
 
+        Goal g = getFirstOpenGoal(proof, state);
+
         theApp = assumesCandidates.head();
 
         // instantiate remaining symbols
-        theApp = theApp.tryToInstantiate(proof.getServices());
+        theApp = theApp.tryToInstantiate(proof.getServices().getOverlay(g.getLocalNamespaces()));
 
         if(theApp == null) {
             throw new ScriptException("Cannot instantiate this rule");
         }
 
-        Goal g = getFirstOpenGoal(proof, state);
         g.apply(theApp);
     }
 
@@ -115,7 +117,8 @@ public class RuleCommand extends AbstractCommand {
             throws ScriptException {
 
         ImmutableList<TacletApp> allApps = findAllTacletApps(proof, p, state);
-        List<TacletApp> matchingApps = filterList(p, allApps);
+        Goal goal = getFirstOpenGoal(proof, state);
+        List<TacletApp> matchingApps = filterList(p, allApps, goal, state);
 
         if(matchingApps.isEmpty()) {
             throw new ScriptException("No matching applications.");
@@ -141,12 +144,20 @@ public class RuleCommand extends AbstractCommand {
         Services services = proof.getServices();
         TacletFilter filter = new TacletNameFilter(p.rulename);
         Goal g = getFirstOpenGoal(proof, state);
+        Term formula = null;
+        try {
+            if(p.formula != null) {
+                formula = toTerm(g, state, p.formula, null);
+            }
+        } catch (ParserException e) {
+            throw new ScriptException(e);
+        }
         RuleAppIndex index = g.ruleAppIndex ();
         index.autoModeStopped ();
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if(p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
+            if(formula != null && !sf.formula().equalsModRenaming(formula)) {
                 continue;
             }
             allApps = allApps.append(
@@ -156,7 +167,7 @@ public class RuleCommand extends AbstractCommand {
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if(p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
+            if(formula != null && !sf.formula().equalsModRenaming(formula)) {
                 continue;
             }
             allApps = allApps.append(
@@ -170,13 +181,23 @@ public class RuleCommand extends AbstractCommand {
     /*
      * Filter those apps from a list that are according to the parameters.
      */
-    private List<TacletApp> filterList(Parameters p, ImmutableList<TacletApp> list) {
+    private List<TacletApp> filterList(Parameters p, ImmutableList<TacletApp> list, 
+            Goal goal, Map<String, Object> state) throws ScriptException {
         List<TacletApp> matchingApps = new ArrayList<TacletApp>();
         for (TacletApp tacletApp : list) {
             if(tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;
-                if(p.on == null || pta.posInOccurrence().subTerm().equals(p.on)) {
+                if(p.on == null) {
                     matchingApps.add(pta);
+                } else {
+                    try {
+                        Term on = toTerm(goal, state, p.on, null);
+                        if(pta.posInOccurrence().subTerm().equals(on)) {
+                            matchingApps.add(pta);
+                        }
+                    } catch (ParserException e) {
+                        throw new ScriptException(e);
+                    }
                 }
             }
         }
@@ -197,16 +218,12 @@ public class RuleCommand extends AbstractCommand {
             //
             // on="term to apply to as find"
             String onStr = args.get("on");
-            if(onStr != null) {
-                result.on = toTerm(proof, state, onStr, null);
-            }
+            result.on = onStr;
 
             //
             // formula="toplevel formula in which it appears"
             String formStr = args.get("formula");
-            if(formStr != null) {
-                result.formula = toTerm(proof, state, formStr, null);
-            }
+            result.formula = formStr;
 
             //
             // occurrence number;

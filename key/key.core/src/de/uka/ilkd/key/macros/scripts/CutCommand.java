@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -26,10 +27,11 @@ public class CutCommand extends AbstractCommand {
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
             Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
 
+        Goal goal = getFirstOpenGoal(proof, state);
         Term formula;
         try {
             String formString = args.get("#2");
-            formula = toTerm(proof, state, formString, Sort.FORMULA);
+            formula = toTerm(goal, state, formString, Sort.FORMULA);
         } catch (ParserException e) {
             throw new ScriptException(e);
         }
@@ -39,7 +41,7 @@ public class CutCommand extends AbstractCommand {
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
         app = app.addCheckedInstantiation(sv, formula, proof.getServices(), true);
-        getFirstOpenGoal(proof, state).apply(app);
+        goal.apply(app);
     }
 
 }
