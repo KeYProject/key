@@ -111,9 +111,9 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
 			String formString = lp.toString();
 			Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
 			if (m.find()) {
-				succ = succ.append(new IdentityFilterEntry(sf));
-			} else {
 				succ = succ.prepend(new IdentityFilterEntry(sf));
+			} else {
+				succ = succ.append(new IdentityFilterEntry(sf));
 			}
 		}
 	}

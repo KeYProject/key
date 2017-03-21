@@ -338,9 +338,11 @@ public class InnerNodeView extends SequentView {
         posTable = getLogicPrinter().getInitialPositionTable();
 
         RuleApp app = node.getAppliedRuleApp();
-        if (app != null) {
-            highlightRuleAppPosition(app);
-        }
+        
+        //TODO Jonas: Temporarily removed this so the filters can be tested more; breaks otherwise.
+        //if (app != null) {
+        //    highlightRuleAppPosition(app);
+        //}
     }
 
 }

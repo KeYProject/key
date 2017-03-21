@@ -51,7 +51,17 @@ public class SequentViewSearchBar extends SearchBar {
             new Color(255, 140, 0, 100);
     
     public static enum SearchMode {
-    	HIGHLIGHT, HIDE, REGROUP;
+    	HIGHLIGHT("Highlight"), HIDE("Hide"), REGROUP("Regroup");
+    	private String displayName;
+    	
+    	private SearchMode(String name) {
+    		this.displayName = name;
+    	}
+    	
+    	@Override
+    	public String toString() {
+            return this.displayName;
+        }
     }
     
     private final List<Pair<Integer,Object>> searchResults;
@@ -96,10 +106,13 @@ public class SequentViewSearchBar extends SearchBar {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					switch ((SearchMode)searchModeBox.getSelectedItem()) {
 					case HIDE : sequentView.setFilter(new HideSequentPrintFilter(sequentView.getLogicPrinter()));
+						search();
 						break;
 					case REGROUP : sequentView.setFilter(new RegroupSequentPrintFilter(sequentView.getLogicPrinter()));
+						search();
 						break;
 					case HIGHLIGHT : sequentView.setFilter(new IdentitySequentPrintFilter());
+						search();
 						break;
 					default: sequentView.setFilter(new IdentitySequentPrintFilter());
 						break;
@@ -108,6 +121,10 @@ public class SequentViewSearchBar extends SearchBar {
 				}
 			}
         });
+        searchModeBox.setToolTipText("Determines search behaviour. " + SearchMode.HIDE.displayName + " only shows sequent formulas that match the search. "
+        + SearchMode.REGROUP.displayName + " arranges the matching formulas around the sequence arrow. "
+        + SearchMode.HIGHLIGHT.displayName + " leaves the sequent unchanged.");
+        
         add(searchModeBox);
     }
 
@@ -157,7 +174,6 @@ public class SequentViewSearchBar extends SearchBar {
         
     	if (sequentView.filter instanceof SearchSequentPrintFilter) {
     			((SearchSequentPrintFilter) sequentView.filter).setSearchString(searchField.getText());
-    			
     	}
     	
     	sequentView.printSequent();
