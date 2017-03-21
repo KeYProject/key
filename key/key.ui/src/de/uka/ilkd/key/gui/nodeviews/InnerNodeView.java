@@ -72,6 +72,7 @@ public class InnerNodeView extends SequentView {
         super(mainWindow);
         this.node = node;
         filter = new IdentitySequentPrintFilter();
+        filter.setSequent(node.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
                         mainWindow.getMediator().getNotationInfo(),
                         mainWindow.getMediator().getServices(),
@@ -339,10 +340,9 @@ public class InnerNodeView extends SequentView {
 
         RuleApp app = node.getAppliedRuleApp();
         
-        //TODO Jonas: Temporarily removed this so the filters can be tested more; breaks otherwise.
-        //if (app != null) {
-        //    highlightRuleAppPosition(app);
-        //}
+        if (app != null) {
+            highlightRuleAppPosition(app);
+        }
     }
 
 }
