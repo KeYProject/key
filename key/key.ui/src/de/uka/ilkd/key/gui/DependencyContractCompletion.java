@@ -48,9 +48,9 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         cApp = cApp.tryToInstantiateContract(services);
 
         final List<PosInOccurrence> steps = UseDependencyContractRule.getSteps(
-        		app.getHeapContext(),
+                cApp.getHeapContext(),
                 cApp.posInOccurrence(), goal.sequent(), services);
-        PosInOccurrence step = letUserChooseStep(app.getHeapContext(), steps, forced, services);
+        PosInOccurrence step = letUserChooseStep(cApp.getHeapContext(), steps, forced, services);
         if (step == null) {
             return null;
         }
