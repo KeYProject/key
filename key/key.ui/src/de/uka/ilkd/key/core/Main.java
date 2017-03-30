@@ -20,11 +20,11 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.speclang.ContractFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
+import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
@@ -49,10 +49,7 @@ import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.rifl.RIFLTransformer;
-import org.xml.sax.SAXException;
 import recoder.ParserException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * The main entry point for KeY
