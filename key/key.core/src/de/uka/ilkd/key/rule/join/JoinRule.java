@@ -108,8 +108,7 @@ public class JoinRule implements BuiltInRule {
      * basis. If set to false, they are allowed to do a proof to check the
      * equivalence in the respective contexts.
      */
-    protected static final boolean RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL =
-            true;
+    protected static final boolean RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL = true;
 
     /**
      * Thresholds the maximum depth of right sides in updates for which an
@@ -154,8 +153,7 @@ public class JoinRule implements BuiltInRule {
     public final ImmutableList<Goal> apply(Goal goal, final Services services,
             RuleApp ruleApp) throws RuleAbortException {
 
-        final JoinRuleBuiltInRuleApp joinRuleApp =
-                (JoinRuleBuiltInRuleApp) ruleApp;
+        final JoinRuleBuiltInRuleApp joinRuleApp = (JoinRuleBuiltInRuleApp) ruleApp;
 
         if (!joinRuleApp.complete()) {
             return null;
@@ -166,79 +164,87 @@ public class JoinRule implements BuiltInRule {
 
         // The number of goals needed for side conditions related to
         // manually chosen lattice elements.
-        final int numSideConditionsToProve =
-                joinRuleApp.getConcreteRule() instanceof JoinWithLatticeAbstraction ? ((JoinWithLatticeAbstraction) joinRuleApp
-                        .getConcreteRule()).getUserChoices().size()
-                        * (joinRuleApp.getJoinPartners().size() + 1) : 0;
+        final int numSideConditionsToProve = joinRuleApp
+                .getConcreteRule() instanceof JoinWithLatticeAbstraction
+                        ? ((JoinWithLatticeAbstraction) joinRuleApp
+                                .getConcreteRule()).getUserChoices().size()
+                                * (joinRuleApp.getJoinPartners().size() + 1)
+                        : 0;
 
         // New goals are reversed to make sure that they are displayed in the
         // order expected by the user.
-        final ImmutableList<Goal> newGoals =
-                goal.split(1 + numSideConditionsToProve).reverse();
+        final ImmutableList<Goal> newGoals = goal
+                .split(1 + numSideConditionsToProve).reverse();
         final Goal newGoal = newGoals.head();
 
         final TermBuilder tb = services.getTermBuilder();
         final JoinProcedure joinRule = joinRuleApp.getConcreteRule();
         final Node currentNode = newGoal.node();
-        final ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners =
-                joinRuleApp.getJoinPartners();
+        final ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = joinRuleApp
+                .getJoinPartners();
 
-        final SymbolicExecutionStateWithProgCnt thisSEState =
-                joinRuleApp.getJoinSEState();
+        final SymbolicExecutionStateWithProgCnt thisSEState = joinRuleApp
+                .getJoinSEState();
 
-        ImmutableList<SymbolicExecutionState> joinPartnerStates =
-                ImmutableSLList.nil();
+        final ImmutableList<SymbolicExecutionState> joinPartnerStates = joinRuleApp
+                .getJoinPartnerStates();
 
-        // Unify names in join partner symbolic state and path condition
-        {
-            ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> tmpJoinPartners =
-                    joinPartners;
-            for (final SymbolicExecutionState joinPartnerState : joinRuleApp
-                    .getJoinPartnerStates()) {
-
-                final HashMap<ProgramVariable, ProgramVariable> replMap =
-                        tmpJoinPartners.head().third;
-                final ProgVarReplacer replacer =
-                        new ProgVarReplacer(replMap, services);
-
-                ImmutableList<Term> newElementaries = ImmutableSLList.nil();
-                final LinkedList<Term> elementaries =
-                        JoinRuleUtils.getElementaryUpdates(joinPartnerState
-                                .getSymbolicState());
-                for (final Term elementary : elementaries) {
-                    final ElementaryUpdate upd =
-                            (ElementaryUpdate) elementary.op();
-                    final LocationVariable lhs =
-                            replMap.containsKey((LocationVariable) upd.lhs()) ? (LocationVariable) replMap
-                                    .get((LocationVariable) upd.lhs())
-                                    : (LocationVariable) upd.lhs();
-
-                    newElementaries =
-                            newElementaries.prepend(tb.elementary(lhs,
-                                    elementary.sub(0)));
-                }
-
-                joinPartnerStates =
-                        joinPartnerStates.prepend(new SymbolicExecutionState(tb
-                                .parallel(newElementaries), replacer
-                                .replace(joinPartnerState.getPathCondition())));
-
-                tmpJoinPartners = tmpJoinPartners.tail();
-
-            }
-        }
+        //@formatter:off
+//        ImmutableList<SymbolicExecutionState> joinPartnerStates =
+//                ImmutableSLList.nil();
+//
+//        // Unify names in join partner symbolic state and path condition
+//        {
+//            ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> tmpJoinPartners =
+//                    joinPartners;
+//            for (final SymbolicExecutionState joinPartnerState : joinRuleApp
+//                    .getJoinPartnerStates()) {
+//
+//                final HashMap<ProgramVariable, ProgramVariable> replMap =
+//                        tmpJoinPartners.head().third;
+//                final ProgVarReplacer replacer =
+//                        new ProgVarReplacer(replMap, services);
+//
+//                ImmutableList<Term> newElementaries = ImmutableSLList.nil();
+//                final LinkedList<Term> elementaries =
+//                        JoinRuleUtils.getElementaryUpdates(joinPartnerState
+//                                .getSymbolicState());
+//                for (final Term elementary : elementaries) {
+//                    final ElementaryUpdate upd =
+//                            (ElementaryUpdate) elementary.op();
+//                    final LocationVariable lhs =
+//                            replMap.containsKey((LocationVariable) upd.lhs()) ? (LocationVariable) replMap
+//                                    .get((LocationVariable) upd.lhs())
+//                                    : (LocationVariable) upd.lhs();
+//
+//                    newElementaries =
+//                            newElementaries.prepend(tb.elementary(lhs,
+//                                    elementary.sub(0)));
+//                }
+//
+//                joinPartnerStates =
+//                        joinPartnerStates.prepend(new SymbolicExecutionState(tb
+//                                .parallel(newElementaries), replacer
+//                                .replace(joinPartnerState.getPathCondition())));
+//
+//                tmpJoinPartners = tmpJoinPartners.tail();
+//
+//            }
+//        }
+        //@formatter:on
 
         // The join loop
-        SymbolicExecutionState joinedState =
-                new SymbolicExecutionState(thisSEState.first,
-                        thisSEState.second, newGoal.node());
+        SymbolicExecutionState joinedState = new SymbolicExecutionState(
+                thisSEState.first, thisSEState.second, newGoal.node());
         LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
         LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<Term>();
 
+        int cnt = 0;
         for (SymbolicExecutionState state : joinPartnerStates) {
-            Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> joinResult =
-                    joinStates(joinRule, joinedState, state, thisSEState.third,
-                            joinRuleApp.getDistinguishingFormula(), services);
+            System.out.println("Merging state " + ++cnt + " from " + joinPartnerStates.size());
+            Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> joinResult = joinStates(
+                    joinRule, joinedState, state, thisSEState.third,
+                    joinRuleApp.getDistinguishingFormula(), services);
             newNames.addAll(joinResult.second);
             sideConditionsToProve.addAll(joinResult.third);
 
@@ -258,54 +264,48 @@ public class JoinRule implements BuiltInRule {
 
         // Close partner goals
         for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
-            closeJoinPartnerGoal(
-                    newGoal.node(),
-                    joinPartner.first,
-                    joinPartner.second,
-                    joinedState,
+            closeJoinPartnerGoal(newGoal.node(), joinPartner.first,
+                    joinPartner.second, joinedState,
                     sequentToSEPair(joinPartner.first.node(),
-                            joinPartner.second, services), thisSEState.third);
+                            joinPartner.second, services),
+                    thisSEState.third);
         }
 
         // Delete previous sequents
         clearSemisequent(newGoal, true);
         clearSemisequent(newGoal, false);
-        
+
         // We need to remove all partially instantiated no pos taclets from
         // the new goal that at least one of the join the partners does not
         // also have. Otherwise, this would be a soundness problem (e.g. in
         // the case of insert_hidden taclets). However, taclets that are present
         // in all partner goals may be safely kept.
-        final ArrayList<NoPosTacletApp> partInstNoPosTacletsToRemove =
-                new ArrayList<NoPosTacletApp>();
-        newGoal.indexOfTaclets()
-                .getPartialInstantiatedApps()
-                .forEach(
-                        app -> {
-                            for (final Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
-                                if (!joinPartner.first.indexOfTaclets()
-                                        .getPartialInstantiatedApps()
-                                        .contains(app)) {
-                                    partInstNoPosTacletsToRemove.add(app);
-                                    break;
-                                }
-                            }
-                        });
+        final ArrayList<NoPosTacletApp> partInstNoPosTacletsToRemove = new ArrayList<NoPosTacletApp>();
+        newGoal.indexOfTaclets().getPartialInstantiatedApps().forEach(app -> {
+            for (final Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
+                if (!joinPartner.first.indexOfTaclets()
+                        .getPartialInstantiatedApps().contains(app)) {
+                    partInstNoPosTacletsToRemove.add(app);
+                    break;
+                }
+            }
+        });
 
         newGoal.indexOfTaclets().removeTaclets(partInstNoPosTacletsToRemove);
 
         // Add new antecedent (path condition)
-        for (Term antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
-            final SequentFormula newAntecedent =
-                    new SequentFormula(antecedentFormula);
+        for (Term antecedentFormula : getConjunctiveElementsFor(
+                resultPathCondition)) {
+            final SequentFormula newAntecedent = new SequentFormula(
+                    antecedentFormula);
             newGoal.addFormula(newAntecedent, true, false);
         }
 
         // Add new succedent (symbolic state & program counter)
-        final Term succedentFormula =
-                tb.apply(joinedState.first, thisSEState.third);
-        final SequentFormula newSuccedent =
-                new SequentFormula(succedentFormula);
+        final Term succedentFormula = tb.apply(joinedState.first,
+                thisSEState.third);
+        final SequentFormula newSuccedent = new SequentFormula(
+                succedentFormula);
         newGoal.addFormula(newSuccedent, new PosInOccurrence(newSuccedent,
                 PosInTerm.getTopLevel(), false));
 
@@ -342,10 +342,9 @@ public class JoinRule implements BuiltInRule {
                 clearSemisequent(sideConditionGoal, false);
                 final Term sideCondition = sideCondIt.next();
 
-                sideConditionGoal.addFormula(
-                        new SequentFormula(sideCondition),
-                        new PosInOccurrence(newSuccedent, PosInTerm
-                                .getTopLevel(), false));
+                sideConditionGoal.addFormula(new SequentFormula(sideCondition),
+                        new PosInOccurrence(newSuccedent,
+                                PosInTerm.getTopLevel(), false));
 
                 i++;
             }
@@ -393,26 +392,21 @@ public class JoinRule implements BuiltInRule {
 
         // Side conditions remaining to be proven, e.g. after predicate
         // abstraction.
-        final LinkedHashSet<Term> sideConditionsToProve =
-                new LinkedHashSet<Term>();
+        final LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<Term>();
 
         // Construct path condition as (optimized) disjunction
         // NOTE: Deactivated this; This optimization can create shorter
         // formulas, but is very time consumptive. At the end, the result does
         // not always perform better than within the unoptimized version.
-        //@formatter:off
-//        final Term newPathCondition =
-//                createSimplifiedDisjunctivePathCondition(state1.second,
-//                        state2.second, services, SIMPLIFICATION_TIMEOUT_MS);
-        //@formatter:on
-        
-        final Term newPathCondition = tb.or(state1.second, state2.second);
+        final Term newPathCondition = JoinRuleUtils
+                .createSimplifiedDisjunctivePathCondition(state1.second,
+                        state2.second, services, SIMPLIFICATION_TIMEOUT_MS);
 
         ImmutableSet<LocationVariable> progVars = DefaultImmutableSet.nil();
 
         // Collect program variables in Java block
-        progVars =
-                progVars.union(getLocationVariables(programCounter, services));
+        progVars = progVars
+                .union(getLocationVariables(programCounter, services));
         // Collect program variables in update
         progVars = progVars.union(getUpdateLeftSideLocations(state1.first));
         progVars = progVars.union(getUpdateLeftSideLocations(state2.first));
@@ -449,17 +443,16 @@ public class JoinRule implements BuiltInRule {
                     && !proofClosed
                     && !JoinRule.RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL) {
 
-                Term predicateTerm =
-                        tb.func(new Function(new Name("P"), Sort.FORMULA, v
-                                .sort()), tb.var(v));
+                Term predicateTerm = tb.func(
+                        new Function(new Name("P"), Sort.FORMULA, v.sort()),
+                        tb.var(v));
                 Term appl1 = tb.apply(state1.first, predicateTerm);
                 Term appl2 = tb.apply(state2.first, predicateTerm);
-                Term toProve =
-                        tb.and(tb.imp(appl1, appl2), tb.imp(appl2, appl1));
+                Term toProve = tb.and(tb.imp(appl1, appl2),
+                        tb.imp(appl2, appl1));
 
-                proofClosed =
-                        isProvableWithSplitting(toProve, services,
-                                SIMPLIFICATION_TIMEOUT_MS);
+                proofClosed = isProvableWithSplitting(toProve, services,
+                        SIMPLIFICATION_TIMEOUT_MS);
             }
 
             if (proofClosed) {
@@ -467,66 +460,57 @@ public class JoinRule implements BuiltInRule {
                 // Arbitrary choice: Take value of first state if
                 // this does not equal the program variable itself
                 if (!rightSide1.equals(tb.var(v))) {
-                    newElementaryUpdates =
-                            newElementaryUpdates.prepend(tb.elementary(v,
-                                    rightSide1));
+                    newElementaryUpdates = newElementaryUpdates
+                            .prepend(tb.elementary(v, rightSide1));
                 }
 
-            }
-            else {
+            } else {
 
                 // Apply join procedure: Different values
 
-                Sort heapSort =
-                        (Sort) services.getNamespaces().sorts().lookup("Heap");
+                Sort heapSort = (Sort) services.getNamespaces().sorts()
+                        .lookup("Heap");
 
                 if (v.sort().equals(heapSort)) {
 
-                    ValuesJoinResult joinedHeaps =
-                            joinHeaps(joinRule, v, rightSide1, rightSide2,
-                                    state1, state2, distinguishingFormula,
-                                    services);
+                    ValuesJoinResult joinedHeaps = joinHeaps(joinRule, v,
+                            rightSide1, rightSide2, state1, state2,
+                            distinguishingFormula, services);
 
-                    newElementaryUpdates =
-                            newElementaryUpdates.prepend(tb.elementary(v,
-                                    joinedHeaps.getJoinVal()));
+                    newElementaryUpdates = newElementaryUpdates.prepend(
+                            tb.elementary(v, joinedHeaps.getJoinVal()));
                     if (newAdditionalConstraints == null) {
-                        newAdditionalConstraints =
-                                tb.and(joinedHeaps.getNewConstraints());
-                    }
-                    else {
-                        newAdditionalConstraints =
-                                tb.and(newAdditionalConstraints,
-                                        tb.and(joinedHeaps.getNewConstraints()));
+                        newAdditionalConstraints = tb
+                                .and(joinedHeaps.getNewConstraints());
+                    } else {
+                        newAdditionalConstraints = tb.and(
+                                newAdditionalConstraints,
+                                tb.and(joinedHeaps.getNewConstraints()));
                     }
 
                     newNames.addAll(joinedHeaps.getNewNames());
-                    sideConditionsToProve.addAll(joinedHeaps
-                            .getSideConditions());
+                    sideConditionsToProve
+                            .addAll(joinedHeaps.getSideConditions());
 
-                }
-                else {
+                } else {
 
-                    ValuesJoinResult joinedVal =
-                            joinRule.joinValuesInStates(tb.var(v), state1,
-                                    rightSide1, state2, rightSide2,
-                                    distinguishingFormula, services);
+                    ValuesJoinResult joinedVal = joinRule.joinValuesInStates(
+                            tb.var(v), state1, rightSide1, state2, rightSide2,
+                            distinguishingFormula, services);
 
                     newNames.addAll(joinedVal.getNewNames());
                     sideConditionsToProve.addAll(joinedVal.getSideConditions());
 
-                    newElementaryUpdates =
-                            newElementaryUpdates.prepend(tb.elementary(v,
-                                    joinedVal.getJoinVal()));
+                    newElementaryUpdates = newElementaryUpdates
+                            .prepend(tb.elementary(v, joinedVal.getJoinVal()));
 
                     if (newAdditionalConstraints == null) {
-                        newAdditionalConstraints =
-                                tb.and(joinedVal.getNewConstraints());
-                    }
-                    else {
-                        newAdditionalConstraints =
-                                tb.and(newAdditionalConstraints,
-                                        tb.and(joinedVal.getNewConstraints()));
+                        newAdditionalConstraints = tb
+                                .and(joinedVal.getNewConstraints());
+                    } else {
+                        newAdditionalConstraints = tb.and(
+                                newAdditionalConstraints,
+                                tb.and(joinedVal.getNewConstraints()));
                     }
 
                 } // end else of if (v.sort().equals(heapSort))
@@ -544,10 +528,10 @@ public class JoinRule implements BuiltInRule {
         return new Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>>(
                 new SymbolicExecutionState(newSymbolicState,
                         newAdditionalConstraints == null ? newPathCondition
-                                : tb.and(newPathCondition, tb.apply(
-                                        newSymbolicState,
-                                        newAdditionalConstraints))), newNames,
-                sideConditionsToProve);
+                                : tb.and(newPathCondition,
+                                        tb.apply(newSymbolicState,
+                                                newAdditionalConstraints))),
+                newNames, sideConditionsToProve);
 
     }
 
@@ -585,8 +569,7 @@ public class JoinRule implements BuiltInRule {
         ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
         LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
 
-        final LinkedHashSet<Term> sideConditionsToProve =
-                new LinkedHashSet<Term>();
+        final LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<Term>();
 
         if (heap1.equals(heap2)) {
             // Keep equal heaps
@@ -599,15 +582,14 @@ public class JoinRule implements BuiltInRule {
             // Covers the case of two different symbolic heaps
             return new ValuesJoinResult(newConstraints,
                     JoinIfThenElse.createIfThenElseTerm(state1, state2, heap1,
-                            heap2, distinguishingFormula, services), newNames,
-                    sideConditionsToProve);
+                            heap2, distinguishingFormula, services),
+                    newNames, sideConditionsToProve);
         }
 
-        final Function storeFunc =
-                (Function) services.getNamespaces().functions().lookup("store");
-        final Function createFunc =
-                (Function) services.getNamespaces().functions()
-                        .lookup("create");
+        final Function storeFunc = (Function) services.getNamespaces()
+                .functions().lookup("store");
+        final Function createFunc = (Function) services.getNamespaces()
+                .functions().lookup("create");
         // Note: Check if there are other functions that should be covered.
         // Unknown functions are treated by if-then-else procedure.
 
@@ -630,11 +612,11 @@ public class JoinRule implements BuiltInRule {
             if (pointer1.equals(pointer2) && field1.equals(field2)) {
                 // Potential for deep merge: Access of same object / field.
 
-                ValuesJoinResult joinedSubHeap =
-                        joinHeaps(joinRule, heapVar, subHeap1, subHeap2,
-                                state1, state2, distinguishingFormula, services);
-                newConstraints =
-                        newConstraints.union(joinedSubHeap.getNewConstraints());
+                ValuesJoinResult joinedSubHeap = joinHeaps(joinRule, heapVar,
+                        subHeap1, subHeap2, state1, state2,
+                        distinguishingFormula, services);
+                newConstraints = newConstraints
+                        .union(joinedSubHeap.getNewConstraints());
                 newNames.addAll(joinedSubHeap.getNewNames());
                 sideConditionsToProve.addAll(joinedSubHeap.getSideConditions());
 
@@ -644,33 +626,30 @@ public class JoinRule implements BuiltInRule {
                     // Idempotency...
                     joinedVal = value1;
 
-                }
-                else {
+                } else {
 
-                    ValuesJoinResult joinedValAndConstr =
-                            joinRule.joinValuesInStates(field1, state1, value1,
-                                    state2, value2, distinguishingFormula,
-                                    services);
+                    ValuesJoinResult joinedValAndConstr = joinRule
+                            .joinValuesInStates(field1, state1, value1, state2,
+                                    value2, distinguishingFormula, services);
 
-                    newConstraints =
-                            newConstraints.union(joinedValAndConstr
-                                    .getNewConstraints());
+                    newConstraints = newConstraints
+                            .union(joinedValAndConstr.getNewConstraints());
                     newNames.addAll(joinedValAndConstr.getNewNames());
-                    sideConditionsToProve.addAll(joinedValAndConstr
-                            .getSideConditions());
+                    sideConditionsToProve
+                            .addAll(joinedValAndConstr.getSideConditions());
                     joinedVal = joinedValAndConstr.getJoinVal();
 
                 }
 
-                return new ValuesJoinResult(newConstraints, tb.func(
-                        (Function) heap1.op(), joinedSubHeap.getJoinVal(),
-                        heap1.sub(1), field1, joinedVal), newNames,
-                        sideConditionsToProve);
+                return new ValuesJoinResult(newConstraints,
+                        tb.func((Function) heap1.op(),
+                                joinedSubHeap.getJoinVal(), heap1.sub(1),
+                                field1, joinedVal),
+                        newNames, sideConditionsToProve);
 
             } // end if (pointer1.equals(pointer2) && field1.equals(field2))
 
-        }
-        else if (((Function) heap1.op()).equals(createFunc)
+        } else if (((Function) heap1.op()).equals(createFunc)
                 && ((Function) heap2.op()).equals(createFunc)) {
 
             // Create operations.
@@ -685,17 +664,18 @@ public class JoinRule implements BuiltInRule {
             if (pointer1.equals(pointer2)) {
                 // Same objects are created: Join.
 
-                ValuesJoinResult joinedSubHeap =
-                        joinHeaps(joinRule, heapVar, subHeap1, subHeap2,
-                                state1, state2, distinguishingFormula, services);
-                newConstraints =
-                        newConstraints.union(joinedSubHeap.getNewConstraints());
+                ValuesJoinResult joinedSubHeap = joinHeaps(joinRule, heapVar,
+                        subHeap1, subHeap2, state1, state2,
+                        distinguishingFormula, services);
+                newConstraints = newConstraints
+                        .union(joinedSubHeap.getNewConstraints());
                 newNames.addAll(joinedSubHeap.getNewNames());
                 sideConditionsToProve.addAll(joinedSubHeap.getSideConditions());
 
-                return new ValuesJoinResult(newConstraints, tb.func(
-                        (Function) heap1.op(), joinedSubHeap.getJoinVal(),
-                        pointer1), newNames, sideConditionsToProve);
+                return new ValuesJoinResult(newConstraints,
+                        tb.func((Function) heap1.op(),
+                                joinedSubHeap.getJoinVal(), pointer1),
+                        newNames, sideConditionsToProve);
             }
 
             // "else" case is fallback at end of method:
@@ -706,8 +686,8 @@ public class JoinRule implements BuiltInRule {
 
         return new ValuesJoinResult(newConstraints,
                 JoinIfThenElse.createIfThenElseTerm(state1, state2, heap1,
-                        heap2, distinguishingFormula, services), newNames,
-                sideConditionsToProve);
+                        heap2, distinguishingFormula, services),
+                newNames, sideConditionsToProve);
 
     }
 
@@ -769,12 +749,10 @@ public class JoinRule implements BuiltInRule {
 
             if (isUpdateNormalForm(update) && selected.subs().size() > 1) {
                 termAfterUpdate = selected.sub(1);
-            }
-            else {
+            } else {
                 return false;
             }
-        }
-        else {
+        } else {
             // NOTE: This disallows joins for formulae without updates
             // in front. In principle, joins are possible for
             // arbitrary formulae, but this significantly slows
@@ -787,12 +765,10 @@ public class JoinRule implements BuiltInRule {
 
         // Term after update must have the form "phi" or "\<{...}\> phi" or
         // "\[{...}\]", where phi must not contain a Java block.
-        if (termAfterUpdate.op() instanceof Modality
-                && !termAfterUpdate.sub(0).javaBlock()
-                        .equals(JavaBlock.EMPTY_JAVABLOCK)) {
+        if (termAfterUpdate.op() instanceof Modality && !termAfterUpdate.sub(0)
+                .javaBlock().equals(JavaBlock.EMPTY_JAVABLOCK)) {
             return false;
-        }
-        else if (termAfterUpdate.op() instanceof UpdateApplication) {
+        } else if (termAfterUpdate.op() instanceof UpdateApplication) {
             return false;
         }
 
@@ -807,7 +783,8 @@ public class JoinRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pio, TermServices services) {
+    public IBuiltInRuleApp createApp(PosInOccurrence pio,
+            TermServices services) {
         return new JoinRuleBuiltInRuleApp(this, pio);
     }
 
@@ -845,13 +822,13 @@ public class JoinRule implements BuiltInRule {
 
         Services services = goal.proof().getServices();
 
-        ImmutableList<Goal> allGoals =
-                services.getProof().getSubtreeGoals(start);
+        ImmutableList<Goal> allGoals = services.getProof()
+                .getSubtreeGoals(start);
 
         // Find potential partners -- for which isApplicable is true and
         // they have the same program counter (and post condition).
-        ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> potentialPartners =
-                ImmutableSLList.nil();
+        ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> potentialPartners = ImmutableSLList
+                .nil();
         for (Goal g : allGoals) {
             if (!g.equals(goal) && !g.isLinked()) {
                 Semisequent succedent = g.sequent().succedent();
@@ -862,10 +839,10 @@ public class JoinRule implements BuiltInRule {
 
                     PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
                     if (isOfAdmissibleForm(g, gPio, false)) {
-                        Triple<Term, Term, Term> ownSEState =
-                                sequentToSETriple(goal.node(), pio, services);
-                        Triple<Term, Term, Term> partnerSEState =
-                                sequentToSETriple(g.node(), gPio, services);
+                        Triple<Term, Term, Term> ownSEState = sequentToSETriple(
+                                goal.node(), pio, services);
+                        Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
+                                g.node(), gPio, services);
 
                         // NOTE: The equality check for the Java blocks can be
                         // problematic, since KeY instantiates declared program
@@ -880,22 +857,22 @@ public class JoinRule implements BuiltInRule {
                         // unique) names.
                         // TODO: Update this comment above
 
-                        JavaProgramElement ownProgramElem =
-                                ownSEState.third.javaBlock().program();
-                        JavaProgramElement partnerProgramElem =
-                                partnerSEState.third.javaBlock().program();
+                        JavaProgramElement ownProgramElem = ownSEState.third
+                                .javaBlock().program();
+                        JavaProgramElement partnerProgramElem = partnerSEState.third
+                                .javaBlock().program();
 
-                        Term ownPostCond =
-                                ownSEState.third.op() instanceof Modality ? ownSEState.third
-                                        .sub(0) : ownSEState.third;
-                        Term partnerPostCond =
-                                partnerSEState.third.op() instanceof Modality ? partnerSEState.third
-                                        .sub(0) : partnerSEState.third;
+                        Term ownPostCond = ownSEState.third
+                                .op() instanceof Modality
+                                        ? ownSEState.third.sub(0)
+                                        : ownSEState.third;
+                        Term partnerPostCond = partnerSEState.third
+                                .op() instanceof Modality
+                                        ? partnerSEState.third.sub(0)
+                                        : partnerSEState.third;
 
-                        ProgramVariablesMatchVisitor matchVisitor =
-                                new ProgramVariablesMatchVisitor(
-                                        partnerProgramElem, ownProgramElem,
-                                        services);
+                        ProgramVariablesMatchVisitor matchVisitor = new ProgramVariablesMatchVisitor(
+                                partnerProgramElem, ownProgramElem, services);
                         matchVisitor.start();
 
                         // Requirement: Same post condition, matching program
@@ -907,12 +884,10 @@ public class JoinRule implements BuiltInRule {
                         if (ownPostCond.equals(partnerPostCond)
                                 && !matchVisitor.isIncompatible()) {
 
-                            potentialPartners =
-                                    potentialPartners
-                                            .prepend(new Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>(
-                                                    g, gPio, matchVisitor
-                                                            .getMatches()
-                                                            .getValue()));
+                            potentialPartners = potentialPartners.prepend(
+                                    new Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>(
+                                            g, gPio, matchVisitor.getMatches()
+                                                    .getValue()));
 
                         }
                     }
