@@ -28,13 +28,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodOrConstructorReference;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SuperConstructorReference;
-import de.uka.ilkd.key.java.reference.ThisConstructorReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -87,7 +81,7 @@ public class EvaluateArgs extends ProgramTransformer{
 	final ReferencePrefix invocationTarget = mr.getReferencePrefix();
 
 	if (invocationTarget instanceof Expression && 
-	    !(invocationTarget instanceof ThisReference)) {
+	    !(invocationTarget instanceof ThisReference || invocationTarget instanceof SuperReference)) {
 	    newCalled = evaluate
 		((Expression)invocationTarget, evalstat, services, ec);
 	} else {
