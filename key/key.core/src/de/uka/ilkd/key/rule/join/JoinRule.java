@@ -186,6 +186,10 @@ public class JoinRule implements BuiltInRule {
         final ImmutableList<SymbolicExecutionState> joinPartnerStates = joinRuleApp
                 .getJoinPartnerStates();
 
+        // Disabled the name unification for now -- probably that's unsound, and
+        // if not, it should be superseded by the attempts of making symbols
+        // branch-unique made by Mattias. If this doesn's introduce new
+        // unsoundness...
         //@formatter:off
 //        ImmutableList<SymbolicExecutionState> joinPartnerStates =
 //                ImmutableSLList.nil();
