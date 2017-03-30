@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -46,7 +45,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -55,7 +53,6 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -239,9 +236,7 @@ public class JoinRule implements BuiltInRule {
         LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
         LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<Term>();
 
-        int cnt = 0;
         for (SymbolicExecutionState state : joinPartnerStates) {
-            System.out.println("Merging state " + ++cnt + " from " + joinPartnerStates.size());
             Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> joinResult = joinStates(
                     joinRule, joinedState, state, thisSEState.third,
                     joinRuleApp.getDistinguishingFormula(), services);
