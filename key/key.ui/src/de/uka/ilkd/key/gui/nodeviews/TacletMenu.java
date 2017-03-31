@@ -301,14 +301,11 @@ public class TacletMenu extends JMenu {
      * nodes to join nodes.
      */
     private void createDefocusingJoinMenu() {
-        if (Main.isExperimentalMode()) {
-            if (JoinRule.isOfAdmissibleForm(mediator.getSelectedGoal(),
-                    pos.getPosInOccurrence(), false)) {
-                JMenuItem item = new JoinRuleMenuItem(
-                        mediator.getSelectedGoal(), pos.getPosInOccurrence(),
-                        mediator);
-                add(item);
-            }
+        if (JoinRule.isOfAdmissibleForm(mediator.getSelectedGoal(),
+                pos.getPosInOccurrence(), false)) {
+            JMenuItem item = new JoinRuleMenuItem(mediator.getSelectedGoal(),
+                    pos.getPosInOccurrence(), mediator);
+            add(item);
         }
     }
     

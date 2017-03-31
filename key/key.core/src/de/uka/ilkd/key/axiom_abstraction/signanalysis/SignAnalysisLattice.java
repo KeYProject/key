@@ -10,7 +10,7 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
  * 
  * @author Dominic Scheurer
  */
-public class SignAnalysisLattice extends AbstractDomainLattice<Integer> {
+public class SignAnalysisLattice extends AbstractDomainLattice {
    
    /**
     * All elements of this abstract domain.
@@ -40,23 +40,6 @@ public class SignAnalysisLattice extends AbstractDomainLattice<Integer> {
     */
    public static SignAnalysisLattice getInstance() {
       return INSTANCE;
-   }
-   
-   @Override
-   public AbstractDomainElement abstractFrom(Integer elem) {
-      if (elem == 0) {
-         return Zero.getInstance();
-      } else if (elem < 0) {
-         return Neg.getInstance();
-      } else if (elem > 0) {
-         return Pos.getInstance();
-      } else if (elem <= 0) {
-         return Geq.getInstance();
-      } else if (elem >= 0) {
-         return Leq.getInstance();
-      } else {
-         return Top.getInstance();
-      }
    }
 
    @Override

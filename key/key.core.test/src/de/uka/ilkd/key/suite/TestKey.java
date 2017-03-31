@@ -28,7 +28,8 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.util.TestNodePreorderIterator.class,
         de.uka.ilkd.key.util.TestSearchNodePreorderIterator.class,
         de.uka.ilkd.key.util.TestSearchNodeReversePreorderIterator.class,
-        de.uka.ilkd.key.util.TestProofUserManager.class
+        de.uka.ilkd.key.util.TestProofUserManager.class,
+        de.uka.ilkd.key.rule.join.PredicateAbstractionLatticeTests.class
     }; 
 
 

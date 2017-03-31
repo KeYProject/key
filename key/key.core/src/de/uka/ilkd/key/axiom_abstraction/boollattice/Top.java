@@ -32,4 +32,9 @@ public class Top extends BooleanDomainElem {
       return tb.tt();
    }
 
+   @Override
+   public String toParseableString(Services services) {
+       return toString();
+   }
+
 }

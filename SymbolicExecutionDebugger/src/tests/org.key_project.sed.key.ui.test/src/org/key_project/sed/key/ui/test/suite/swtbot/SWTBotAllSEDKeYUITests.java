@@ -15,24 +15,7 @@ package org.key_project.sed.key.ui.test.suite.swtbot;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotAddKeYWatchpointTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotCustomizationTabTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotGraphitiCustomizationTabTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotGraphitiKeYTabTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotGraphitiLoopInvariantTabTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotGraphitiMainTabTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotGraphitiPostconditionTabTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotGraphitiPreconditionTabTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotKeYSourceCodeLookupTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotKeYTabTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotLoopInvariantTabTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotMainTabTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotProofViewTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotOpenProofTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotPostconditionTabTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotPreconditionTabTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotSideProofsViewTest;
-import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotSymbolicExecutionTreePruneTest;
+import org.key_project.sed.key.ui.test.testcase.swtbot.*;
 
 /**
  * Run all contained JUnit 4 test cases that requires SWT Bot.

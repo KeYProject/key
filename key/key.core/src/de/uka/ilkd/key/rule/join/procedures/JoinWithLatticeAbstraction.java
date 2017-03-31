@@ -14,24 +14,23 @@
 package de.uka.ilkd.key.rule.join.procedures;
 
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getNewSkolemConstantForPrefix;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.isProvableWithSplitting;
 
-import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
-import de.uka.ilkd.key.axiom_abstraction.signanalysis.Top;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
 /**
@@ -43,9 +42,6 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
  * @author Dominic Scheurer
  */
 public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
-    /** Time in milliseconds after which a proof attempt of
-     *  a defining axiom times out. */
-    private static final int AXIOM_PROVE_TIMEOUT_MS = 1000;
 
     /**
      * Returns the abstract domain lattice for the given sort or null if there
@@ -55,14 +51,31 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
      *            The sort to return the matching lattice for.
      * @param services
      *            The services object.
-     * @return The abstract domain lattice suitable for the given sort.
+     * @return The abstract domain lattice suitable for the given sort. Return
+     *         null if there is no abstract domain for that sort; in this case,
+     *         an if-then-else join will be performed.
      */
-    protected abstract AbstractDomainLattice<?> getAbstractDomainForSort(
-            Sort s, Services services);
+    protected abstract AbstractDomainLattice getAbstractDomainForSort(Sort s,
+            Services services);
+
+    /**
+     * @return Manually chosen lattice elements for program variables.
+     */
+    public abstract LinkedHashMap<ProgramVariable, AbstractDomainElement> getUserChoices();
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.rule.join.JoinProcedure#complete()
+     */
+    @Override
+    public boolean complete() {
+        return true;
+    }
 
     @Override
-    public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-            Term v, SymbolicExecutionState state1, Term valueInState1,
+    public ValuesJoinResult joinValuesInStates(Term v,
+            SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
 
@@ -70,51 +83,71 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
 
         ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
 
-        AbstractDomainLattice<?> lattice = getAbstractDomainForSort(
-                valueInState1.sort(), services);
+        AbstractDomainLattice lattice =
+                getAbstractDomainForSort(valueInState1.sort(), services);
 
         if (lattice != null) {
 
-            // Join with abstract domain lattice.
-            AbstractDomainElement abstrElem1 = determineAbstractElem(state1,
-                    valueInState1, lattice, services);
-            AbstractDomainElement abstrElem2 = determineAbstractElem(state2,
-                    valueInState2, lattice, services);
+            AbstractDomainElement joinElem = null;
+            LinkedHashSet<Term> sideConditions = new LinkedHashSet<Term>();
 
-            AbstractDomainElement joinElem = lattice.join(abstrElem1,
-                    abstrElem2);
+            assert v.op() instanceof ProgramVariable;
 
-            Function newSkolemConst = getNewSkolemConstantForPrefix(
-                    joinElem.toString(), valueInState1.sort(), services);
-            ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
-            newNames = newNames.add(newSkolemConst.name());
+            if (getUserChoices().containsKey((ProgramVariable) v.op())) {
+                joinElem = getUserChoices().get((ProgramVariable) v.op());
 
-            newConstraints = newConstraints.add(joinElem.getDefiningAxiom(
-                    tb.func(newSkolemConst), services));
+                sideConditions
+                        .add(AbstractDomainLattice.getSideConditionForAxiom(
+                                state1, v, joinElem, services));
+                sideConditions
+                        .add(AbstractDomainLattice.getSideConditionForAxiom(
+                                state2, v, joinElem, services));
+            }
+            else {
+                // Join with abstract domain lattice.
+                AbstractDomainElement abstrElem1 =
+                        lattice.abstractFrom(state1, valueInState1, services);
+                AbstractDomainElement abstrElem2 =
+                        lattice.abstractFrom(state2, valueInState2, services);
+
+                joinElem = lattice.join(abstrElem1, abstrElem2);
+            }
+
+            Function newSkolemConst =
+                    getNewSkolemConstantForPrefix(joinElem.toString(),
+                            valueInState1.sort(), services);
+            LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
+            newNames.add(newSkolemConst.name());
+
+            newConstraints =
+                    newConstraints.add(joinElem.getDefiningAxiom(
+                            tb.func(newSkolemConst), services));
+            
             // NOTE: We also remember the precise values by if-then-else
-            // construction. This
-            // preserves completeness and should also not be harmful to
-            // performance in
-            // cases where completeness is also preserved by the lattice.
-            // However, if
-            // there are lattices where this construction is bad, it may be
-            // safely
+            // construction. This preserves completeness and should also
+            // not be harmful to performance in cases where completeness
+            // is also preserved by the lattice. However, if there are
+            // lattices where this construction is bad, it may be safely
             // removed (no harm to soundness!).
-            newConstraints = newConstraints.add(tb.equals(tb
-                    .func(newSkolemConst), JoinIfThenElse.createIfThenElseTerm(
-                    state1, state2, valueInState1, valueInState2, distinguishingFormula, services)));
-
-            return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
-                    newConstraints, tb.func(newSkolemConst), newNames);
+            /*
+            newConstraints =
+                    newConstraints.add(tb.equals(tb.func(newSkolemConst),
+                            JoinIfThenElse.createIfThenElseTerm(state1, state2,
+                                    valueInState1, valueInState2,
+                                    distinguishingFormula, services)));
+            */
+            
+            return new ValuesJoinResult(newConstraints,
+                    tb.func(newSkolemConst), newNames, sideConditions);
 
         }
         else {
 
-            return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
-                    DefaultImmutableSet.<Term> nil(),
+            return new ValuesJoinResult(DefaultImmutableSet.<Term> nil(),
                     JoinIfThenElse.createIfThenElseTerm(state1, state2,
-                            valueInState1, valueInState2, distinguishingFormula, services),
-                    DefaultImmutableSet.<Name> nil());
+                            valueInState1, valueInState2,
+                            distinguishingFormula, services),
+                    new LinkedHashSet<Name>(), new LinkedHashSet<Term>());
 
         }
 
@@ -123,44 +156,6 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
     @Override
     public boolean requiresDistinguishablePathConditions() {
         return false;
-    }
-
-    /**
-     * Determines the abstract element suitable for the given term. This is
-     * accomplished by iterating through the abstract elements (from bottom to
-     * top) and trying to verify the corresponding axiom instances.
-     * 
-     * @param state
-     *            State in which the evaluation of the defining axioms should be
-     *            tested.
-     * @param term
-     *            The term to find an abstract description for.
-     * @param lattice
-     *            The underlying abstract domain.
-     * @param services
-     *            The services object.
-     * @return A suitable abstract element for the given location variable.
-     */
-    private AbstractDomainElement determineAbstractElem(
-            SymbolicExecutionState state, Term term,
-            AbstractDomainLattice<?> lattice, Services services) {
-
-        TermBuilder tb = services.getTermBuilder();
-
-        Iterator<AbstractDomainElement> it = lattice.iterator();
-        while (it.hasNext()) {
-            AbstractDomainElement elem = it.next();
-
-            Term axiom = elem.getDefiningAxiom(term, services);
-            Term appl = tb.apply(state.first, axiom);
-            Term toProve = tb.imp(state.second, appl);
-
-            if (isProvableWithSplitting(toProve, services, AXIOM_PROVE_TIMEOUT_MS)) {
-                return elem;
-            }
-        }
-
-        return Top.getInstance();
     }
 
 }

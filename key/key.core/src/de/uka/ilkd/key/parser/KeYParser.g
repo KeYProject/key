@@ -133,10 +133,13 @@ options {
          prooflabel2tag.put("newnames", ProofElementID.NEW_NAMES);
          prooflabel2tag.put("autoModeTime", ProofElementID.AUTOMODE_TIME);  
          prooflabel2tag.put("joinProc", ProofElementID.JOIN_PROCEDURE);
+         prooflabel2tag.put("abstractionPredicates", ProofElementID.JOIN_ABSTRACTION_PREDICATES);
+         prooflabel2tag.put("latticeType", ProofElementID.JOIN_PREDICATE_ABSTRACTION_LATTICE_TYPE);
          prooflabel2tag.put("nrJoinPartners", ProofElementID.NUMBER_JOIN_PARTNERS);
          prooflabel2tag.put("distFormula", ProofElementID.JOIN_DIST_FORMULA);
          prooflabel2tag.put("joinNode", ProofElementID.JOIN_NODE);
          prooflabel2tag.put("joinId", ProofElementID.JOIN_ID);
+         prooflabel2tag.put("userChoices", ProofElementID.JOIN_USER_CHOICES);
          prooflabel2tag.put("opengoal", ProofElementID.OPEN_GOAL);
    }
 
