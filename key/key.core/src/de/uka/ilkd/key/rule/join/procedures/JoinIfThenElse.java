@@ -282,23 +282,6 @@ public class JoinIfThenElse extends JoinProcedure {
                 trySimplify(services.getProof(), distinguishingFormula, true,
                         SIMPLIFICATION_TIMEOUT_MS);
 
-        // Originally, here was a specific check of whether the equal parts
-        // of the two path conditions was still included in the new path
-        // condition.
-        // However, this should always be the case; it shouldn't vanish in
-        // the creation of the disjunction. Even if it did, soundness would
-        // not be affected, it only could be a completeness issue. Uncomment
-        // the code below if you want to test this measure.
-
-        /*
-         * Term equalSubFormula = distinguishingAndEqualFormula1.second; // Add
-         * common subformula to path condition, if necessary Term
-         * commonPartAlreadyImpliedForm = tb.imp(newPathCondition,
-         * equalSubFormula); if
-         * (!isProvableWithSplitting(commonPartAlreadyImpliedForm, services)) {
-         * newPathCondition = tb.and(newPathCondition, equalSubFormula); }
-         */
-
         return new Quadruple<Term, Term, Term, Boolean>(distinguishingFormula,
                 commuteSides ? elseTerm : ifTerm, commuteSides ? ifTerm
                         : elseTerm, commuteSides);
