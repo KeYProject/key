@@ -131,6 +131,6 @@ public class JoinRuleMenuItem extends JMenuItem {
 
     @Override
     public String toString() {
-        return "(Defocusing) Join Rule";
+        return "State Merging Rule";
     }
 }
