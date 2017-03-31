@@ -96,7 +96,6 @@ public abstract class AbstractCommand implements ProofScriptCommand {
     }
 
     final protected static Sort toSort(Proof proof, Map<String, Object> state, String string) throws ParserException, ScriptException {
-        StringReader reader = new StringReader(string);
         Services services = proof.getServices();
         Sort sort = (Sort) services.getNamespaces().sorts().lookup(string);
         return sort;

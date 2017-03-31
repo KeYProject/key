@@ -32,7 +32,7 @@ import de.uka.ilkd.key.rule.Taclet;
  */
 final class MultiThreadedTacletIndex extends TacletIndex {
 
-    private static ForkJoinPool execs = new ForkJoinPool();// ForkJoinPool.commonPool(); <- Use this once we switch to Java 8
+    private static ForkJoinPool execs = ForkJoinPool.commonPool(); // <- Use this once we switch to Java 8
 
     MultiThreadedTacletIndex(Iterable<Taclet> tacletSet) {
         super(tacletSet);
