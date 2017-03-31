@@ -156,9 +156,6 @@ public class JoinRule implements BuiltInRule {
             return null;
         }
 
-        // At the moment, the join rule is always applied interactively
-        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
-
         // The number of goals needed for side conditions related to
         // manually chosen lattice elements.
         final int numSideConditionsToProve = joinRuleApp
