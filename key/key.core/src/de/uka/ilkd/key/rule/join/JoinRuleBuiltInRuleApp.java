@@ -163,7 +163,11 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     public void registerProgressListener(JoinRule.MergeRuleProgressListener listener) {
         progressListeners.add(listener);
     }
-    
+
+    public void clearProgressListeners() {
+        progressListeners = new ArrayList<>();
+    }
+
     public boolean removeProgressListener(JoinRule.MergeRuleProgressListener listener) {
         return progressListeners.remove(listener);
     }

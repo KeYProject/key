@@ -102,12 +102,13 @@ public class JoinRuleMenuItem extends JMenuItem {
 
                             @Override
                             protected void done() {
-                                mediator.startInterface(true);
+                                completedApp.clearProgressListeners();
                                 mediator.getUI().taskFinished(
-                                        new DefaultTaskFinishedInfo(null, goal,
+                                        new DefaultTaskFinishedInfo(this, goal,
                                                 goal.proof(), duration, 1, 0));
+                                mediator.startInterface(true);
+                                mediator.getSelectionModel().setSelectedGoal(goal);
                             }
-
                         }.execute();
                     } catch (final Exception exc) {
                         signalError(exc, mediator);
