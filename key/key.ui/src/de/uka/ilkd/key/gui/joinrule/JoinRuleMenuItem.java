@@ -18,12 +18,16 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.DefaultTaskFinishedInfo;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 
@@ -68,25 +72,53 @@ public class JoinRuleMenuItem extends JMenuItem {
                 // possible (e.g., if no candidates were selected by the
                 // user in the displayed dialog).
                 if (completedApp != null && completedApp.complete()) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
+                    try {
+                        mediator.stopInterface(true);
+
+                        mediator.getUI()
+                                .taskStarted(new DefaultTaskStartedInfo(
+                                        TaskKind.Other,
+                                        "Merging " + (completedApp
+                                                .getJoinPartners().size() + 1)
+                                                + " nodes",
+                                        completedApp.getJoinPartners().size()));
+                        mediator.getUI().taskProgress(0);
+
+                        completedApp.registerProgressListener(progress -> {
+                            mediator.getUI().setProgress(progress);
+                        });
+
+                        new SwingWorker<Void, Void>() {
+                            private long duration;
+
+                            @Override
+                            protected Void doInBackground() throws Exception {
+                                long time = System.currentTimeMillis();
                                 goal.apply(completedApp);
+                                duration = System.currentTimeMillis() - time;
+
+                                return null;
                             }
-                            catch (final Exception e) {
-                                signalError(e, mediator);
+
+                            @Override
+                            protected void done() {
+                                mediator.startInterface(true);
+                                mediator.getUI().taskFinished(
+                                        new DefaultTaskFinishedInfo(null, goal,
+                                                goal.proof(), duration, 1, 0));
                             }
-                            catch (final AssertionError e) {
-                                signalError(e, mediator);
-                            }
-                        }
-                    });
+
+                        }.execute();
+                    } catch (final Exception exc) {
+                        signalError(exc, mediator);
+                    } catch (final AssertionError exc) {
+                        signalError(exc, mediator);
+                    }
                 }
             }
         });
     }
-    
+
     private void signalError(final Throwable e, final KeYMediator mediator) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override

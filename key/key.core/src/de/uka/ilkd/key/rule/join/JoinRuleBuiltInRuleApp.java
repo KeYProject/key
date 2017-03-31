@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.rule.join;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.key_project.util.collection.ImmutableList;
@@ -37,6 +38,8 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private SymbolicExecutionStateWithProgCnt thisSEState = null;
     private ImmutableList<SymbolicExecutionState> joinPartnerStates = null;
     private Term distForm = null;
+    
+    private ArrayList<JoinRule.MergeRuleProgressListener> progressListeners = new ArrayList<>();
 
 	public JoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
             PosInOccurrence pio) {
@@ -155,6 +158,18 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 	
     public ImmutableList<SymbolicExecutionState> getJoinPartnerStates() {
         return joinPartnerStates;
+    }
+    
+    public void registerProgressListener(JoinRule.MergeRuleProgressListener listener) {
+        progressListeners.add(listener);
+    }
+    
+    public boolean removeProgressListener(JoinRule.MergeRuleProgressListener listener) {
+        return progressListeners.remove(listener);
+    }
+    
+    public void fireProgressChange(int progress) {
+        progressListeners.forEach(l -> l.signalProgress(progress));
     }
 
 }

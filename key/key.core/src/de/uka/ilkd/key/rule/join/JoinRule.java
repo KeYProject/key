@@ -237,7 +237,10 @@ public class JoinRule implements BuiltInRule {
         LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
         LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<Term>();
 
+        int cnt = 0;
         for (SymbolicExecutionState state : joinPartnerStates) {
+            joinRuleApp.fireProgressChange(cnt++);
+            
             Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> joinResult = joinStates(
                     joinRule, joinedState, state, thisSEState.third,
                     joinRuleApp.getDistinguishingFormula(), services);
@@ -892,6 +895,11 @@ public class JoinRule implements BuiltInRule {
         }
 
         return potentialPartners;
+    }
+
+    @FunctionalInterface
+    public static interface MergeRuleProgressListener {
+        public void signalProgress(int progress);
     }
 
 }
