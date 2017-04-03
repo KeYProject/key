@@ -1321,7 +1321,7 @@ public class JMLSpecFactory {
                                         final StatementBlock block,
                                         final TextualJMLSpecCase specificationCase)
             throws SLTranslationException {
-        //TODO Take join_proc into account
+        //TODO Take merge_proc into account
         final Behavior behavior = specificationCase.getBehavior();
         final BlockContract.Variables variables =
                 BlockContract.Variables.create(block, labels, method, services);

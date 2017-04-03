@@ -1615,13 +1615,13 @@ joinproc_clause
 @init { result = r; }
 @after { r = result; }
 :
-   joinproc_keyword result=expression { result = result.prepend("join_proc "); }
+   mergeproc_keyword result=expression { result = result.prepend("merge_proc "); }
 ;
 
 
-joinproc_keyword
+mergeproc_keyword
 :
-   JOIN_PROC
+   MERGE_PROC
 ;
 
 

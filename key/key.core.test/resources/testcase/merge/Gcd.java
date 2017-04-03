@@ -47,13 +47,13 @@ public class Gcd {
       @*/
     public static int gcdJoinBlocks(int a, int b) {
 
-        /*@ join_proc "MergeByIfThenElseAntecedent"; @*/
+        /*@ merge_proc "MergeByIfThenElseAntecedent"; @*/
         {
             if (a < 0)
                 a = -a;
         }
         
-        /*@ join_proc "MergeByIfThenElseAntecedent"; @*/
+        /*@ merge_proc "MergeByIfThenElseAntecedent"; @*/
         {
             if (b < 0)
                 b = -b;
