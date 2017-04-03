@@ -389,39 +389,39 @@ public class OutputStreamProofSaver {
             }
 
             if (appliedRuleApp instanceof MergeRuleBuiltInRuleApp) {
-                MergeRuleBuiltInRuleApp joinApp =
+                MergeRuleBuiltInRuleApp mergeApp =
                         (MergeRuleBuiltInRuleApp) appliedRuleApp;
-                MergeProcedure concreteRule = joinApp.getConcreteRule();
+                MergeProcedure concreteRule = mergeApp.getConcreteRule();
 
                 tree.append(" (")
-                        .append(ProofElementID.JOIN_PROCEDURE.getRawName())
+                        .append(ProofElementID.MERGE_PROCEDURE.getRawName())
                         .append(" \"");
                 tree.append(concreteRule.toString());
                 tree.append("\")");
 
                 tree.append(" (")
-                        .append(ProofElementID.NUMBER_JOIN_PARTNERS
+                        .append(ProofElementID.NUMBER_MERGE_PARTNERS
                                 .getRawName()).append(" \"");
-                tree.append(joinApp.getMergePartners().size());
+                tree.append(mergeApp.getMergePartners().size());
                 tree.append("\")");
 
-                tree.append(" (").append(ProofElementID.JOIN_ID.getRawName())
+                tree.append(" (").append(ProofElementID.MERGE_ID.getRawName())
                         .append(" \"");
-                tree.append(joinApp.getMergeNode().serialNr());
+                tree.append(mergeApp.getMergeNode().serialNr());
                 tree.append("\")");
 
-                if (joinApp.getDistinguishingFormula() != null) {
+                if (mergeApp.getDistinguishingFormula() != null) {
                     tree.append(" (")
-                            .append(ProofElementID.JOIN_DIST_FORMULA
+                            .append(ProofElementID.MERGE_DIST_FORMULA
                                     .getRawName()).append(" \"");
                     tree.append(escapeCharacters(printAnything(
-                            joinApp.getDistinguishingFormula(),
+                            mergeApp.getDistinguishingFormula(),
                             proof.getServices(), false).toString().trim()
                             .replaceAll("(\\r|\\n|\\r\\n)+", "")));
                     tree.append("\")");
                 }
 
-                // Predicates for joins with predicate abstraction.
+                // Predicates for merges with predicate abstraction.
                 MergeWithPredicateAbstraction predAbstrRule;
                 if (concreteRule instanceof MergeWithPredicateAbstraction
                         && (predAbstrRule =
@@ -429,7 +429,7 @@ public class OutputStreamProofSaver {
                                 .getPredicates().size() > 0) {
 
                     tree.append(" (")
-                            .append(ProofElementID.JOIN_ABSTRACTION_PREDICATES
+                            .append(ProofElementID.MERGE_ABSTRACTION_PREDICATES
                                     .getRawName()).append(" \"");
                     for (Map.Entry<Sort, ArrayList<AbstractionPredicate>> predsForSorts : predAbstrRule
                             .getPredicates().entrySet()) {
@@ -446,7 +446,7 @@ public class OutputStreamProofSaver {
                     tree.append("\")");
 
                     tree.append(" (")
-                            .append(ProofElementID.JOIN_PREDICATE_ABSTRACTION_LATTICE_TYPE
+                            .append(ProofElementID.MERGE_PREDICATE_ABSTRACTION_LATTICE_TYPE
                                     .getRawName()).append(" \"");
                     tree.append(predAbstrRule.getLatticeType().getName());
                     tree.append("\")");
@@ -459,7 +459,7 @@ public class OutputStreamProofSaver {
                                     .getUserChoices();
                     if (!userChoices.isEmpty()) {
                         tree.append(" (")
-                                .append(ProofElementID.JOIN_USER_CHOICES
+                                .append(ProofElementID.MERGE_USER_CHOICES
                                         .getRawName()).append(" \"");
                         for (final ProgramVariable v : userChoices.keySet()) {
                             final AbstractDomainElement elem =
@@ -484,10 +484,10 @@ public class OutputStreamProofSaver {
                 CloseAfterMergeRuleBuiltInRuleApp closeApp =
                         (CloseAfterMergeRuleBuiltInRuleApp) appliedRuleApp;
 
-                // TODO (DS): There may be problems here if the join node is
+                // TODO (DS): There may be problems here if the merge node is
                 // pruned away. Need to test some cases and either check for
                 // null pointers at this place or find a better solution.
-                tree.append(" (").append(ProofElementID.JOIN_NODE.getRawName())
+                tree.append(" (").append(ProofElementID.MERGE_NODE.getRawName())
                         .append(" \"");
                 tree.append(closeApp.getCorrespondingMergeNode().parent()
                         .serialNr());

@@ -39,7 +39,7 @@ import de.uka.ilkd.key.util.Pair;
  * Parses a KeY proof file into an intermediate representation. The parsed
  * intermediate result can be processed by {@link IntermediateProofReplayer}.
  * This approach is more flexible than direct parsing; for instance, it is
- * capable of dealing with join rule applications.
+ * capable of dealing with merge rule applications.
  * <p>
  * 
  * The returned intermediate proof closely resembles the structure of the parsed
@@ -246,30 +246,30 @@ public class IntermediatePresentationProofFileParser implements
             }
             break;
 
-        case JOIN_PROCEDURE: // join procedure
-            ((BuiltinRuleInformation) ruleInfo).currJoinProc = str;
+        case MERGE_PROCEDURE: // merge procedure
+            ((BuiltinRuleInformation) ruleInfo).currMergeProc = str;
             break;
 
-        case NUMBER_JOIN_PARTNERS: // number of join partners
+        case NUMBER_MERGE_PARTNERS: // number of merge partners
             ((BuiltinRuleInformation) ruleInfo).currNrPartners =
                     Integer.parseInt(str);
             break;
 
-        case JOIN_NODE: // corresponding join node id
-            ((BuiltinRuleInformation) ruleInfo).currCorrespondingJoinNodeId =
+        case MERGE_NODE: // corresponding merge node id
+            ((BuiltinRuleInformation) ruleInfo).currCorrespondingMergeNodeId =
                     Integer.parseInt(str);
             break;
 
-        case JOIN_ID: // join node id
-            ((BuiltinRuleInformation) ruleInfo).currJoinNodeId =
+        case MERGE_ID: // merge node id
+            ((BuiltinRuleInformation) ruleInfo).currMergeNodeId =
                     Integer.parseInt(str);
             break;
 
-        case JOIN_DIST_FORMULA: // distinguishing formula for joins
+        case MERGE_DIST_FORMULA: // distinguishing formula for merges
             ((BuiltinRuleInformation) ruleInfo).currDistFormula = str;
             break;
 
-        case JOIN_PREDICATE_ABSTRACTION_LATTICE_TYPE: // type of predicate
+        case MERGE_PREDICATE_ABSTRACTION_LATTICE_TYPE: // type of predicate
                                                       // abstraction lattice
             try {
                 ((BuiltinRuleInformation) ruleInfo).currPredAbstraLatticeType =
@@ -281,11 +281,11 @@ public class IntermediatePresentationProofFileParser implements
             }
             break;
 
-        case JOIN_ABSTRACTION_PREDICATES:
+        case MERGE_ABSTRACTION_PREDICATES:
             ((BuiltinRuleInformation) ruleInfo).currAbstractionPredicates = str;
             break;
 
-        case JOIN_USER_CHOICES:
+        case MERGE_USER_CHOICES:
             ((BuiltinRuleInformation) ruleInfo).currUserChoices = str;
             break;
 
@@ -384,14 +384,14 @@ public class IntermediatePresentationProofFileParser implements
         BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
         BuiltInAppIntermediate result = null;
 
-        if (builtinInfo.currRuleName.equals("JoinRule")) {
+        if (builtinInfo.currRuleName.equals("MergeRule")) {
             result =
                     new MergeAppIntermediate(builtinInfo.currRuleName,
                             new Pair<Integer, PosInTerm>(
                                     builtinInfo.currFormula,
                                     builtinInfo.currPosInTerm),
-                            builtinInfo.currJoinNodeId,
-                            builtinInfo.currJoinProc,
+                            builtinInfo.currMergeNodeId,
+                            builtinInfo.currMergeProc,
                             builtinInfo.currNrPartners,
                             builtinInfo.currNewNames,
                             builtinInfo.currDistFormula,
@@ -399,13 +399,13 @@ public class IntermediatePresentationProofFileParser implements
                             builtinInfo.currAbstractionPredicates,
                             builtinInfo.currUserChoices);
         }
-        else if (builtinInfo.currRuleName.equals("CloseAfterJoin")) {
+        else if (builtinInfo.currRuleName.equals("CloseAfterMerge")) {
             result =
                     new MergePartnerAppIntermediate(builtinInfo.currRuleName,
                             new Pair<Integer, PosInTerm>(
                                     builtinInfo.currFormula,
                                     builtinInfo.currPosInTerm),
-                            builtinInfo.currCorrespondingJoinNodeId,
+                            builtinInfo.currCorrespondingMergeNodeId,
                             builtinInfo.currNewNames);
         }
         else {
@@ -493,11 +493,11 @@ public class IntermediatePresentationProofFileParser implements
         protected PosInTerm currIfInstPosInTerm;
         /* > Method Contract */
         protected String currContract = null;
-        /* > Join Rule */
-        protected String currJoinProc = null;
+        /* > Merge Rule */
+        protected String currMergeProc = null;
         protected int currNrPartners = 0;
-        protected int currCorrespondingJoinNodeId = 0;
-        protected int currJoinNodeId = 0;
+        protected int currCorrespondingMergeNodeId = 0;
+        protected int currMergeNodeId = 0;
         protected String currDistFormula = null;
         protected Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType =
                 null;
