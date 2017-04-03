@@ -51,7 +51,7 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
- * A dialog for choosing abstraction predicates for joins with predicate
+ * A dialog for choosing abstraction predicates for merges with predicate
  * abstraction.
  *
  * @author Dominic Scheurer
@@ -66,7 +66,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     private static final Dimension INITIAL_SIZE = new Dimension(850, 600);
 
     private static final String DIALOG_TITLE =
-            "Choose abstraction predicates for join";
+            "Choose abstraction predicates for merge";
 
     private AbstractionPredicatesChoiceDialogController ctrl = null;
     private Goal goal = null;
@@ -116,7 +116,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         final FXMLLoader loader = new FXMLLoader();
         final URL resource =
                 AbstractionPredicatesChoiceDialog.class
-                        .getResource("AbstractionPredicatesJoinDialog.fxml");
+                        .getResource("AbstractionPredicatesMergeDialog.fxml");
 
         assert resource != null : "Could not find FXML file for abstraction predicates choice dialog";
 
@@ -169,9 +169,9 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * goal is used to get information about the proof.
      *
      * @param goal
-     *            The goal on which the join rule is applied.
+     *            The goal on which the merge rule is applied.
      * @param differingLocVars
-     *            Location variables the values of which differ in the join
+     *            Location variables the values of which differ in the merge
      *            partner states.
      */
     public AbstractionPredicatesChoiceDialog(Goal goal,

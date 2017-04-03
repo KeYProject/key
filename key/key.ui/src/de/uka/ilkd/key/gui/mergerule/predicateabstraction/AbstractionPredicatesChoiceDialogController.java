@@ -259,7 +259,7 @@ public class AbstractionPredicatesChoiceDialogController {
                         resourcePath + "css/bootstrap/bootstrap-theme.min.css");
         final URL infoTextResource =
                 getURLForResourceFile(AbstractionPredicatesChoiceDialog.class,
-                        resourcePath + "help/abstrPredsJoinDialogInfo.html");
+                        resourcePath + "help/abstrPredsMergeDialogInfo.html");
         
         assert bootstrapCssResource != null
                 && bootstrapThemeCssResource != null
