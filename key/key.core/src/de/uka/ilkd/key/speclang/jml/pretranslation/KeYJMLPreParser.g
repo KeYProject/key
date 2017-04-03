@@ -44,7 +44,9 @@ options {
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLFieldDecl;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLInitially;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
@@ -268,6 +270,7 @@ methodlevel_element[ImmutableList<String> mods]
 :
         result=field_or_method_declaration[mods]
     |   result=set_statement[mods]
+    |   result=merge_point_statement[mods]
     |   result=loop_specification[mods]
     |   result=assert_statement[mods]
     |   result=assume_statement[mods]
@@ -733,7 +736,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
 	|   ps=ensures_free_clause   { sc.addEnsuresFree(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
-   |   ps=mergeproc_clause        { sc.addJoinProcs(ps); }
+    |   ps=mergeproc_clause        { sc.addJoinProcs(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
 	|   ps=measured_by_clause    { sc.addMeasuredBy(ps); }
@@ -1371,6 +1374,22 @@ set_statement[ImmutableList<String> mods]
     {
 	TextualJMLSetStatement ss = new TextualJMLSetStatement(mods, ps);
 	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ss);
+    }
+;
+
+//-----------------------------------------------------------------------------
+//merge point statement
+//-----------------------------------------------------------------------------
+
+merge_point_statement[ImmutableList<String> mods]
+	returns [ImmutableList<TextualJMLConstruct> result = null]
+:
+    MERGE_POINT
+    (MERGE_PROC (sl = STRING_LITERAL))?
+    SEMICOLON
+    {
+	TextualJMLMergePointDecl mpd = new TextualJMLMergePointDecl(mods, createPositionedString(sl.getText(), sl));
+	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(mpd);
     }
 ;
 
