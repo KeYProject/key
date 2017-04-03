@@ -33,7 +33,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -64,7 +63,6 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.util.Triple;
 import mergerule.MergeRuleUtils;
-import mergerule.ProgramVariablesMatchVisitor;
 import mergerule.SymbolicExecutionState;
 import mergerule.SymbolicExecutionStateWithProgCnt;
 
