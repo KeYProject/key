@@ -29,7 +29,6 @@ import java.awt.event.KeyEvent;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -65,14 +64,13 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.join.MergePartner;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
@@ -113,25 +111,25 @@ public class JoinPartnerSelectionDialog extends JDialog {
             .getInstance();
 
     /** Comparator for goals; sorts by serial nr. of the node */
-    private static Comparator<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> GOAL_COMPARATOR =
-            new Comparator<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>>() {
+    private static Comparator<MergePartner> GOAL_COMPARATOR =
+            new Comparator<MergePartner>() {
                 @Override
                 public int compare(
-                        Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> o1,
-                        Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> o2) {
-                    return o1.first.node().serialNr()
-                            - o2.first.node().serialNr();
+                        MergePartner o1,
+                        MergePartner o2) {
+                    return o1.getGoal().node().serialNr()
+                            - o2.getGoal().node().serialNr();
                 }
             };
 
-    private LinkedList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> candidates =
+    private LinkedList<MergePartner> candidates =
             null;
     private Services services = null;
     private Pair<Goal, PosInOccurrence> joinGoalPio = null;
 
     /** The chosen goals. */
-    private SortedSet<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> chosenGoals =
-            new TreeSet<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>>(
+    private SortedSet<MergePartner> chosenGoals =
+            new TreeSet<MergePartner>(
                     GOAL_COMPARATOR);
 
     /** The chosen join method. */
@@ -182,11 +180,11 @@ public class JoinPartnerSelectionDialog extends JDialog {
         cmbCandidates.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> selectedCandidate =
+                MergePartner selectedCandidate =
                         getSelectedCandidate();
 
-                setHighlightedSequentForArea(selectedCandidate.first,
-                        selectedCandidate.second, txtPartner2);
+                setHighlightedSequentForArea(selectedCandidate.getGoal(),
+                        selectedCandidate.getPio(), txtPartner2);
 
                 if (chosenGoals.contains(selectedCandidate)) {
                     cbSelectCandidate.setSelected(true);
@@ -350,7 +348,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
         chooseAllButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> candidate : candidates) {
+                for (MergePartner candidate : candidates) {
                     chosenGoals.add(candidate);
                 }
                 setVisible(false);
@@ -417,17 +415,17 @@ public class JoinPartnerSelectionDialog extends JDialog {
     public JoinPartnerSelectionDialog(
             Goal joinGoal,
             PosInOccurrence pio,
-            ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> candidates,
+            ImmutableList<MergePartner> candidates,
             Services services) {
 
         this();
         this.services = services;
 
         this.candidates =
-                new LinkedList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>>();
+                new LinkedList<MergePartner>();
         this.joinGoalPio = new Pair<Goal, PosInOccurrence>(joinGoal, pio);
 
-        for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> candidate : candidates) {
+        for (MergePartner candidate : candidates) {
             int insPos =
                     Collections.binarySearch(this.candidates, candidate,
                             GOAL_COMPARATOR);
@@ -444,8 +442,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
     /**
      * @return All chosen join partners.
      */
-    public ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> getChosenCandidates() {
-        ImmutableSLList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> result =
+    public ImmutableList<MergePartner> getChosenCandidates() {
+        ImmutableSLList<MergePartner> result =
                 ImmutableSLList.nil();
 
         if (chosenGoals != null) {
@@ -487,7 +485,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
      *         candidates is applicable.
      */
     private boolean isApplicableForCandidates(
-            ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> theCandidates) {
+            ImmutableList<MergePartner> theCandidates) {
         if (joinGoalPio != null && candidates != null && chosenRule != null) {
             JoinRuleBuiltInRuleApp joinRuleApp =
                     (JoinRuleBuiltInRuleApp) JoinRule.INSTANCE.createApp(
@@ -541,8 +539,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
         final TermBuilder tb = services.getTermBuilder();
 
         final Goal partnerGoal =
-                candidates.size() == 1 ? candidates.getFirst().first
-                        : (chosenGoals.size() == 1 ? chosenGoals.first().first
+                candidates.size() == 1 ? candidates.getFirst().getGoal()
+                        : (chosenGoals.size() == 1 ? chosenGoals.first().getGoal()
                                 : null);
 
         if (partnerGoal == null) {
@@ -604,7 +602,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
     /**
      * @return The candidate chosen at the moment (by the combo box).
      */
-    private Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> getSelectedCandidate() {
+    private MergePartner getSelectedCandidate() {
         return getNthCandidate(cmbCandidates.getSelectedIndex());
     }
 
@@ -615,10 +613,10 @@ public class JoinPartnerSelectionDialog extends JDialog {
      *            Index of the join candidate.
      * @return The n-th candidate in the list.
      */
-    private Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> getNthCandidate(
+    private MergePartner getNthCandidate(
             int n) {
         int i = 0;
-        for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> elem : candidates) {
+        for (MergePartner elem : candidates) {
             if (i == n) {
                 return elem;
             }
@@ -637,12 +635,12 @@ public class JoinPartnerSelectionDialog extends JDialog {
             return;
         }
 
-        for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> candidate : candidates) {
-            cmbCandidates.addItem("Node " + candidate.first.node().serialNr());
+        for (MergePartner candidate : candidates) {
+            cmbCandidates.addItem("Node " + candidate.getGoal().node().serialNr());
         }
 
-        setHighlightedSequentForArea(candidates.getFirst().first,
-                candidates.getFirst().second, txtPartner2);
+        setHighlightedSequentForArea(candidates.getFirst().getGoal(),
+                candidates.getFirst().getPio(), txtPartner2);
 
         checkApplicable();
     }

@@ -15,7 +15,6 @@ package de.uka.ilkd.key.gui.joinrule.predicateabstraction;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -26,12 +25,11 @@ import de.uka.ilkd.key.gui.joinrule.JoinProcedureCompletion;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.join.MergePartner;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
@@ -53,7 +51,7 @@ public class PredicateAbstractionCompletion extends
    public JoinWithPredicateAbstraction complete(
          JoinWithPredicateAbstraction proc,
          Pair<Goal, PosInOccurrence> joinGoalPio,
-         Collection<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> partners) {
+         Collection<MergePartner> partners) {
       final Services services = joinGoalPio.first.proof().getServices();
 
       // Compute the program variables that are different in the

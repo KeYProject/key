@@ -52,7 +52,6 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -65,6 +64,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.join.MergePartner;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
@@ -100,7 +100,6 @@ import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 
 /**
  * <p>
@@ -775,8 +774,8 @@ public class SymbolicExecutionTreeBuilder {
             JoinRuleBuiltInRuleApp ruleApp = (JoinRuleBuiltInRuleApp) node.getAppliedRuleApp();
             IExecutionNode<?> source = getBestExecutionNode(node);
             if (source != null) {
-               for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> partner : ruleApp.getJoinPartners()) {
-                  IExecutionNode<?> target = getBestExecutionNode(partner.first.node());
+               for (MergePartner partner : ruleApp.getJoinPartners()) {
+                  IExecutionNode<?> target = getBestExecutionNode(partner.getGoal().node());
                   // Ignore branch conditions below join node
                   while (target instanceof IExecutionBranchCondition) {
                      target = getBestExecutionNode(target.getProofNode().parent());

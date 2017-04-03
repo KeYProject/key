@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2017 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -25,7 +25,6 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSEPair;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSETriple;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
@@ -48,7 +47,6 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -174,7 +172,7 @@ public class JoinRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final JoinProcedure joinRule = joinRuleApp.getConcreteRule();
         final Node currentNode = newGoal.node();
-        final ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = joinRuleApp
+        final ImmutableList<MergePartner> joinPartners = joinRuleApp
                 .getJoinPartners();
 
         final SymbolicExecutionStateWithProgCnt thisSEState = joinRuleApp
@@ -182,54 +180,6 @@ public class JoinRule implements BuiltInRule {
 
         final ImmutableList<SymbolicExecutionState> joinPartnerStates = joinRuleApp
                 .getJoinPartnerStates();
-
-        // Disabled the name unification for now -- probably that's unsound, and
-        // if not, it should be superseded by the attempts of making symbols
-        // branch-unique made by Mattias. If this doesn's introduce new
-        // unsoundness...
-        //@formatter:off
-//        ImmutableList<SymbolicExecutionState> joinPartnerStates =
-//                ImmutableSLList.nil();
-//
-//        // Unify names in join partner symbolic state and path condition
-//        {
-//            ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> tmpJoinPartners =
-//                    joinPartners;
-//            for (final SymbolicExecutionState joinPartnerState : joinRuleApp
-//                    .getJoinPartnerStates()) {
-//
-//                final HashMap<ProgramVariable, ProgramVariable> replMap =
-//                        tmpJoinPartners.head().third;
-//                final ProgVarReplacer replacer =
-//                        new ProgVarReplacer(replMap, services);
-//
-//                ImmutableList<Term> newElementaries = ImmutableSLList.nil();
-//                final LinkedList<Term> elementaries =
-//                        JoinRuleUtils.getElementaryUpdates(joinPartnerState
-//                                .getSymbolicState());
-//                for (final Term elementary : elementaries) {
-//                    final ElementaryUpdate upd =
-//                            (ElementaryUpdate) elementary.op();
-//                    final LocationVariable lhs =
-//                            replMap.containsKey((LocationVariable) upd.lhs()) ? (LocationVariable) replMap
-//                                    .get((LocationVariable) upd.lhs())
-//                                    : (LocationVariable) upd.lhs();
-//
-//                    newElementaries =
-//                            newElementaries.prepend(tb.elementary(lhs,
-//                                    elementary.sub(0)));
-//                }
-//
-//                joinPartnerStates =
-//                        joinPartnerStates.prepend(new SymbolicExecutionState(tb
-//                                .parallel(newElementaries), replacer
-//                                .replace(joinPartnerState.getPathCondition())));
-//
-//                tmpJoinPartners = tmpJoinPartners.tail();
-//
-//            }
-//        }
-        //@formatter:on
 
         // The join loop
         SymbolicExecutionState joinedState = new SymbolicExecutionState(
@@ -262,11 +212,11 @@ public class JoinRule implements BuiltInRule {
         // trySimplify(services.getProof(), resultPathCondition, true);
 
         // Close partner goals
-        for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
-            closeJoinPartnerGoal(newGoal.node(), joinPartner.first,
-                    joinPartner.second, joinedState,
-                    sequentToSEPair(joinPartner.first.node(),
-                            joinPartner.second, services),
+        for (MergePartner joinPartner : joinPartners) {
+            closeJoinPartnerGoal(newGoal.node(), joinPartner.getGoal(),
+                    joinPartner.getPio(), joinedState,
+                    sequentToSEPair(joinPartner.getGoal().node(),
+                            joinPartner.getPio(), services),
                     thisSEState.third);
         }
 
@@ -281,8 +231,8 @@ public class JoinRule implements BuiltInRule {
         // in all partner goals may be safely kept.
         final ArrayList<NoPosTacletApp> partInstNoPosTacletsToRemove = new ArrayList<NoPosTacletApp>();
         newGoal.indexOfTaclets().getPartialInstantiatedApps().forEach(app -> {
-            for (final Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
-                if (!joinPartner.first.indexOfTaclets()
+            for (final MergePartner joinPartner : joinPartners) {
+                if (!joinPartner.getGoal().indexOfTaclets()
                         .getPartialInstantiatedApps().contains(app)) {
                     partInstNoPosTacletsToRemove.add(app);
                     break;
@@ -798,7 +748,7 @@ public class JoinRule implements BuiltInRule {
      *            The services object.
      * @return A list of suitable join partners. May be empty if none exist.
      */
-    public static ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> findPotentialJoinPartners(
+    public static ImmutableList<MergePartner> findPotentialJoinPartners(
             Goal goal, PosInOccurrence pio) {
         return findPotentialJoinPartners(goal, pio, goal.proof().root());
     }
@@ -816,7 +766,7 @@ public class JoinRule implements BuiltInRule {
      *            The services object.
      * @return A list of suitable join partners. May be empty if none exist.
      */
-    public static ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> findPotentialJoinPartners(
+    public static ImmutableList<MergePartner> findPotentialJoinPartners(
             Goal goal, PosInOccurrence pio, Node start) {
 
         Services services = goal.proof().getServices();
@@ -826,7 +776,7 @@ public class JoinRule implements BuiltInRule {
 
         // Find potential partners -- for which isApplicable is true and
         // they have the same program counter (and post condition).
-        ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> potentialPartners = ImmutableSLList
+        ImmutableList<MergePartner> potentialPartners = ImmutableSLList
                 .nil();
         for (Goal g : allGoals) {
             if (!g.equals(goal) && !g.isLinked()) {
@@ -884,9 +834,8 @@ public class JoinRule implements BuiltInRule {
                                 && !matchVisitor.isIncompatible()) {
 
                             potentialPartners = potentialPartners.prepend(
-                                    new Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>(
-                                            g, gPio, matchVisitor.getMatches()
-                                                    .getValue()));
+                                    new MergePartner(
+                                            g, gPio));
 
                         }
                     }

@@ -76,6 +76,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.join.CloseAfterJoin;
+import de.uka.ilkd.key.rule.join.MergePartner;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
@@ -1281,17 +1282,18 @@ public class JoinRuleUtils {
      * @return A list of symbolic execution states.
      */
     public static ImmutableList<SymbolicExecutionState> sequentsToSEPairs(
-            Iterable<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> sequentInfos) {
+            Iterable<MergePartner> sequentInfos) {
         ImmutableList<SymbolicExecutionState> result = ImmutableSLList.nil();
-        for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> sequentInfo : sequentInfos) {
-            final Services services = sequentInfo.first.proof().getServices();
+        for (MergePartner sequentInfo : sequentInfos) {
+            final Node node = sequentInfo.getGoal().node();
+            final Services services = sequentInfo.getGoal().proof().getServices();
 
             Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
-                    sequentInfo.first.node(), sequentInfo.second, services);
+                    node, sequentInfo.getPio(), services);
 
             result = result
                     .prepend(new SymbolicExecutionState(partnerSEState.first,
-                            partnerSEState.second, sequentInfo.first.node()));
+                            partnerSEState.second, node));
         }
 
         return result;
