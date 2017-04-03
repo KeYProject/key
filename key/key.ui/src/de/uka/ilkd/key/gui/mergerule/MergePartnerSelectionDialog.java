@@ -71,7 +71,7 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.util.Pair;
-import mergerule.MergeRuleUtils;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * JDialog for selecting a subset of candidate goals as partners for a {@link MergeRule}

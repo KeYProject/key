@@ -52,7 +52,7 @@ import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.Pair;
-import mergerule.MergeRuleUtils;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * Finishes symbolic execution while taking JML merge specifications into

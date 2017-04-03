@@ -9,7 +9,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import mergerule.SymbolicExecutionState;
+import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 /**
  * Rule application class for close-after-merge rule applications.

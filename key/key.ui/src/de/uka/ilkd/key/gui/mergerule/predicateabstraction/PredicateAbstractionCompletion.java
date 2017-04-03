@@ -30,8 +30,8 @@ import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.util.Pair;
-import mergerule.MergeRuleUtils;
-import mergerule.SymbolicExecutionState;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 /**
  * Completion class for {@link MergeWithPredicateAbstraction}.

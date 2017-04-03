@@ -31,7 +31,6 @@ import javafx.embed.swing.JFXPanel;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
-import mergerule.MergeRuleUtils;
 
 import javax.swing.JDialog;
 
@@ -49,6 +48,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * A dialog for choosing abstraction predicates for joins with predicate

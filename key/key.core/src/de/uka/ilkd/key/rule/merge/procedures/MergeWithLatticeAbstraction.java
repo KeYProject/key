@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.rule.merge.procedures;
 
-import static mergerule.MergeRuleUtils.getNewSkolemConstantForPrefix;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getNewSkolemConstantForPrefix;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -31,7 +31,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
-import mergerule.SymbolicExecutionState;
+import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 /**
  * Rule that merges two sequents based on a specified set of abstract domain

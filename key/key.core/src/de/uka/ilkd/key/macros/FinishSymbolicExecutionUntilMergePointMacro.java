@@ -59,7 +59,7 @@ import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.Strategy;
-import mergerule.MergeRuleUtils;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * The macro FinishSymbolicExecutionUntilJionPointMacro continues automatic rule

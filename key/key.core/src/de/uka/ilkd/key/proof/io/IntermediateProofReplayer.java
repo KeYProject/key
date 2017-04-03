@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.proof.io;
 
-import static mergerule.MergeRuleUtils.sequentToSETriple;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -96,7 +96,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
-import mergerule.MergeRuleUtils;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * This class is responsible for generating a KeY proof from an intermediate

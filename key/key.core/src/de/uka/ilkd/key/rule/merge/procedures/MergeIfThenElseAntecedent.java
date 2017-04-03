@@ -26,8 +26,8 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.util.Quadruple;
-import mergerule.MergeRuleUtils;
-import mergerule.SymbolicExecutionState;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 /**
  * Rule that merges two sequents based on the if-then-else construction: If two

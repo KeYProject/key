@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.NotUniqueException;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
-import mergerule.MergeRuleUtils;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * A lattice for all predicates accepting the given sort. This lattice consists

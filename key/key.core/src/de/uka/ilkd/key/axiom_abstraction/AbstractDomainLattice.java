@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.axiom_abstraction;
 
-import static mergerule.MergeRuleUtils.isProvableWithSplitting;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitting;
 
 import java.util.Iterator;
 
@@ -8,7 +8,7 @@ import de.uka.ilkd.key.axiom_abstraction.signanalysis.Top;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import mergerule.SymbolicExecutionState;
+import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 /**
  * An abstract domain is a countable lattice with a partial order relation and a

@@ -27,7 +27,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
-import mergerule.SymbolicExecutionState;
+import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 /**
  * Defines a concrete merge procedure, in particular the result of merging two

@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.rule.merge.procedures;
 
-import static mergerule.MergeRuleUtils.countAtoms;
-import static mergerule.MergeRuleUtils.getDistinguishingFormula;
-import static mergerule.MergeRuleUtils.getUpdateRightSideFor;
-import static mergerule.MergeRuleUtils.trySimplify;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.countAtoms;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getDistinguishingFormula;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateRightSideFor;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.trySimplify;
 
 import java.util.LinkedHashSet;
 
@@ -31,8 +31,8 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
-import mergerule.SymbolicExecutionState;
-import mergerule.MergeRuleUtils.Option;
+import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils.Option;
 
 /**
  * Rule that merges two sequents based on the if-then-else construction: If two

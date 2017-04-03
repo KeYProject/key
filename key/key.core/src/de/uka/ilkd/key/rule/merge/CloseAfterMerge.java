@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.rule.merge;
 
-import static mergerule.MergeRuleUtils.clearSemisequent;
-import static mergerule.MergeRuleUtils.getLocationVariables;
-import static mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
-import static mergerule.MergeRuleUtils.substConstantsByFreshVars;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.substConstantsByFreshVars;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,8 +48,8 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
-import mergerule.MergeRuleUtils;
-import mergerule.SymbolicExecutionState;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 /**
  * Rule for closing a partner goal after a merge operation. It does so by adding

@@ -13,16 +13,16 @@
 
 package de.uka.ilkd.key.rule.merge;
 
-import static mergerule.MergeRuleUtils.clearSemisequent;
-import static mergerule.MergeRuleUtils.closeMergePartnerGoal;
-import static mergerule.MergeRuleUtils.getConjunctiveElementsFor;
-import static mergerule.MergeRuleUtils.getLocationVariables;
-import static mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
-import static mergerule.MergeRuleUtils.getUpdateRightSideFor;
-import static mergerule.MergeRuleUtils.isProvableWithSplitting;
-import static mergerule.MergeRuleUtils.isUpdateNormalForm;
-import static mergerule.MergeRuleUtils.sequentToSEPair;
-import static mergerule.MergeRuleUtils.sequentToSETriple;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.closeMergePartnerGoal;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getConjunctiveElementsFor;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateRightSideFor;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitting;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isUpdateNormalForm;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSEPair;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -62,9 +62,9 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.util.Triple;
-import mergerule.MergeRuleUtils;
-import mergerule.SymbolicExecutionState;
-import mergerule.SymbolicExecutionStateWithProgCnt;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
 /**
  * Base for implementing merge rules. Extend this class, implement method

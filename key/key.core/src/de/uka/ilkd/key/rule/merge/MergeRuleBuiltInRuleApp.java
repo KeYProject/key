@@ -15,9 +15,9 @@ import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
-import mergerule.MergeRuleUtils;
-import mergerule.SymbolicExecutionState;
-import mergerule.SymbolicExecutionStateWithProgCnt;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
 /**
  * Rule application class for merge rule applications. Is complete iff the
