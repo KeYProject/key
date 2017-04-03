@@ -75,13 +75,11 @@ public class MergeRuleMenuItem extends JMenuItem {
                     try {
                         mediator.stopInterface(true);
 
-                        mediator.getUI()
-                                .taskStarted(new DefaultTaskStartedInfo(
-                                        TaskKind.Other,
-                                        "Merging " + (completedApp
-                                                .getMergePartners().size() + 1)
-                                                + " nodes",
-                                        completedApp.getMergePartners().size()));
+                        mediator.getUI().taskStarted(new DefaultTaskStartedInfo(
+                                TaskKind.Other,
+                                "Merging " + (completedApp.getMergePartners()
+                                        .size() + 1) + " nodes",
+                                completedApp.getMergePartners().size()));
                         mediator.getUI().taskProgress(0);
 
                         completedApp.registerProgressListener(progress -> {
@@ -94,7 +92,8 @@ public class MergeRuleMenuItem extends JMenuItem {
                             @Override
                             protected Void doInBackground() throws Exception {
                                 long time = System.currentTimeMillis();
-                                goal.apply(completedApp);
+                                mediator.getUI().getProofControl()
+                                        .applyInteractive(completedApp, goal);
                                 duration = System.currentTimeMillis() - time;
 
                                 return null;
@@ -107,7 +106,8 @@ public class MergeRuleMenuItem extends JMenuItem {
                                         new DefaultTaskFinishedInfo(this, goal,
                                                 goal.proof(), duration, 1, 0));
                                 mediator.startInterface(true);
-                                mediator.getSelectionModel().setSelectedGoal(goal);
+                                mediator.getSelectionModel()
+                                        .setSelectedGoal(goal);
                             }
                         }.execute();
                     } catch (final Exception exc) {

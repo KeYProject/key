@@ -98,7 +98,7 @@ public class MergePartnerSelectionDialog extends JDialog {
                     + "chosen goals and merge procedure.";
 
     /** The initial size of this dialog. */
-    private static final Dimension INITIAL_SIZE = new Dimension(850, 450);
+    private static final Dimension INITIAL_SIZE = new Dimension(900, 450);
 
     /**
      * The font for the JEditorPanes. Should resemble the standard font of KeY
