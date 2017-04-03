@@ -493,6 +493,9 @@ public class OutputStreamProofSaver {
                         .serialNr());
                 tree.append("\")");
             }
+            
+            tree.append("");
+            userInteraction2Proof(node, tree);
 
             tree.append(")\n");
         }
