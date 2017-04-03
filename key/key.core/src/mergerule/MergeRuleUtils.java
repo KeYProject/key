@@ -83,7 +83,7 @@ import de.uka.ilkd.key.util.SideProofUtil;
 import de.uka.ilkd.key.util.Triple;
 
 /**
- * This class encapsulates static methods used in the JoinRule implementation.
+ * This class encapsulates static methods used in the MergeRule implementation.
  * The methods are organized into different sections (see comments):
  * <p>
  * 
@@ -97,7 +97,7 @@ import de.uka.ilkd.key.util.Triple;
  * <li>Calculus</li>
  * </ol>
  * </li>
- * <li>JOIN RELATED</li>
+ * <li>MERGE RELATED</li>
  * <li>PRIVATE</li>
  * </ol>
  * 
@@ -996,7 +996,7 @@ public class MergeRuleUtils {
     }
 
     // /////////////////////////////////////////////////
-    // //////////////// JOIN RELATED //////////////////
+    // //////////////// MERGE RELATED //////////////////
     // /////////////////////////////////////////////////
 
     /**
@@ -1007,7 +1007,7 @@ public class MergeRuleUtils {
      * <p>
      * 
      * The underlying idea is based upon the observation that many path
-     * conditions that should be joined are conjunctions of mostly the same
+     * conditions that should be merged are conjunctions of mostly the same
      * elements and, in addition, formulae phi and !phi that vanish after
      * creating the disjunction of the path conditions. The corresponding valid
      * formula is <code>(phi & psi) | (phi & !psi) <-> phi</code>
@@ -1021,9 +1021,9 @@ public class MergeRuleUtils {
      * that occur in symbolic execution.<br>
      * 
      * @param cond1
-     *            First path condition to join.
+     *            First path condition to merge.
      * @param cond2
-     *            Second path condition to join.
+     *            Second path condition to merge.
      * @param services
      *            The services object.
      * @param timeout
@@ -1049,7 +1049,7 @@ public class MergeRuleUtils {
         final LinkedHashSet<Term> equalElements = commonAndSpecific.common;
 
         assert !cond1ConjElems.isEmpty() && !cond2ConjElems
-                .isEmpty() : "Possibly, this join is not sound: Cannot find distinguishing formulas!";
+                .isEmpty() : "Possibly, this merge is not sound: Cannot find distinguishing formulas!";
 
         final Term commonElemsTerm = joinConjuctiveElements(equalElements,
                 services);
@@ -1162,33 +1162,33 @@ public class MergeRuleUtils {
     }
 
     /**
-     * Closes the given partner goal, using the CloseAfterJoin rule.
+     * Closes the given partner goal, using the {@link CloseAfterMerge} rule.
      * 
-     * @param joinNodeParent
+     * @param mergeNodeParent
      *            Parent of remaining join node.
-     * @param joinPartner
+     * @param mergePartner
      *            Partner goal to close.
      */
-    public static void closeJoinPartnerGoal(Node joinNodeParent,
-            Goal joinPartner, PosInOccurrence pio,
-            SymbolicExecutionState joinState,
-            SymbolicExecutionState joinPartnerState, Term pc) {
+    public static void closeMergePartnerGoal(Node mergeNodeParent,
+            Goal mergePartner, PosInOccurrence pio,
+            SymbolicExecutionState mergeState,
+            SymbolicExecutionState mergePartnerState, Term pc) {
 
-        InitConfig initConfig = joinNodeParent.proof().getInitConfig();
+        InitConfig initConfig = mergeNodeParent.proof().getInitConfig();
 
         CloseAfterMerge closeRule = CloseAfterMerge.INSTANCE;
-        RuleApp app = closeRule.createApp(pio, joinPartner.node(),
-                joinNodeParent, joinState, joinPartnerState, pc);
+        RuleApp app = closeRule.createApp(pio, mergePartner.node(),
+                mergeNodeParent, mergeState, mergePartnerState, pc);
 
         // Register rule if not done yet.
         // This avoids error messages of the form
         // "no justification found for rule...".
         if (initConfig.getJustifInfo().getJustification(closeRule) == null) {
-            initConfig.registerRuleIntroducedAtNode(app, joinPartner.node(),
+            initConfig.registerRuleIntroducedAtNode(app, mergePartner.node(),
                     true);
         }
 
-        joinPartner.apply(app);
+        mergePartner.apply(app);
     }
 
     /**
@@ -1276,7 +1276,7 @@ public class MergeRuleUtils {
      * {@link #sequentToSETriple(Node, PosInOccurrence, Services)}.
      *
      * @param sequentInfos
-     *            Goals and PosInOccurrences specifying join partners and the
+     *            Goals and PosInOccurrences specifying merge partners and the
      *            positions of the program counter-post condition formulae in
      *            the goals.
      * @return A list of symbolic execution states.

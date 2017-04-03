@@ -218,7 +218,7 @@ public class TacletMenu extends JMenu {
 
 	createBuiltInRuleMenu(builtInList, control);
     createDelayedCutJoinMenu(control);
-    createDefocusingJoinMenu();
+    createMergeRuleMenu();
 
 	if(pos!= null && pos.isSequent()){
 	    createSMTMenu(control);
@@ -297,10 +297,10 @@ public class TacletMenu extends JMenu {
     }
     
     /**
-     * Creates the menu item for the "defocusing" join rule which links partner
-     * nodes to join nodes.
+     * Creates the menu item for the "defocusing" merge rule which links partner
+     * nodes to merge nodes.
      */
-    private void createDefocusingJoinMenu() {
+    private void createMergeRuleMenu() {
         if (MergeRule.isOfAdmissibleForm(mediator.getSelectedGoal(),
                 pos.getPosInOccurrence(), false)) {
             JMenuItem item = new MergeRuleMenuItem(mediator.getSelectedGoal(),
@@ -349,13 +349,7 @@ public class TacletMenu extends JMenu {
             add(item);
         }
         else if (builtInRule == MergeRule.INSTANCE) {
-            // (DS) At the moment, we want to use the join rule as an
-            // experimental feature only. However, it may not be removed
-            // from JavaProfile. Therefore, it is just not added as a menu item
-            // at this place.
-            // TODO (DS): Remove this if-branch and the registration of \\
-            // JoinRule as an experimental feature if it survived some \\
-            // serious case studies.
+            // (DS) MergeRule has a special menu item, and thus is not added here.
         }
         else {
             item = new DefaultBuiltInRuleMenuItem(builtInRule);

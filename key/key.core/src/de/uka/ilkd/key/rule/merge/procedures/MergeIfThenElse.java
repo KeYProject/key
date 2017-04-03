@@ -35,9 +35,9 @@ import mergerule.SymbolicExecutionState;
 import mergerule.MergeRuleUtils.Option;
 
 /**
- * Rule that joins two sequents based on the if-then-else construction: If two
+ * Rule that merges two sequents based on the if-then-else construction: If two
  * locations are assigned different values in the states, the value in the
- * joined state is chosen based on the path condition. This rule retains total
+ * merged state is chosen based on the path condition. This rule retains total
  * precision. The if-then-else distinction is realized by the respective
  * construct for the update / symbolic state of the symbolic execution state.
  * Note: Doing this not with updates, but in the antecedent / path condition can
@@ -63,13 +63,13 @@ public class MergeIfThenElse extends MergeProcedure {
         return INSTANCE;
     }
 
-    private static final String DISPLAY_NAME = "JoinByIfThenElse";
+    private static final String DISPLAY_NAME = "MergeByIfThenElse";
     static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
 
     /*
      * (non-Javadoc)
      * 
-     * @see de.uka.ilkd.key.rule.join.JoinProcedure#complete()
+     * @see de.uka.ilkd.key.rule.merge.MergeProcedure#complete()
      */
     @Override
     public boolean complete() {
@@ -77,12 +77,12 @@ public class MergeIfThenElse extends MergeProcedure {
     }
 
     @Override
-    public ValuesJoinResult joinValuesInStates(Term v,
+    public ValuesMergeResult mergeValuesInStates(Term v,
             SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
 
-        return new ValuesJoinResult(DefaultImmutableSet.<Term> nil(),
+        return new ValuesMergeResult(DefaultImmutableSet.<Term> nil(),
                 createIfThenElseTerm(state1, state2, valueInState1,
                         valueInState2, distinguishingFormula, services),
                 new LinkedHashSet<Name>(), new LinkedHashSet<Term>());
@@ -251,11 +251,11 @@ public class MergeIfThenElse extends MergeProcedure {
                 distinguishingAndEqualFormula2.isSome() ? distinguishingAndEqualFormula2
                         .getValue().first : null;
 
-        // NOTE (DS): This assertion does not prevent the joining of states with
+        // NOTE (DS): This assertion does not prevent the merging of states with
         // equal
         // Symbolic State. This is intended behavior: In some proofs we have two
         // identical
-        // nodes which we want to join (possibly after a hide right / hide
+        // nodes which we want to merge (possibly after a hide right / hide
         // left); this
         // should be allowed (although they are of course indistinguishable).
         assert distinguishingFormula != null || distinguishingFormula2 != null : String

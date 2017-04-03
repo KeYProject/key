@@ -34,7 +34,7 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import mergerule.SymbolicExecutionState;
 
 /**
- * Rule that joins two sequents based on a specified set of abstract domain
+ * Rule that merges two sequents based on a specified set of abstract domain
  * lattices. If no lattice is specified for a given sort, the rule proceeds such
  * that program variables are unchanged if they are equal in both states and
  * applies the if-then-else construction otherwise.
@@ -53,7 +53,7 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure {
      *            The services object.
      * @return The abstract domain lattice suitable for the given sort. Return
      *         null if there is no abstract domain for that sort; in this case,
-     *         an if-then-else join will be performed.
+     *         an if-then-else merge will be performed.
      */
     protected abstract AbstractDomainLattice getAbstractDomainForSort(Sort s,
             Services services);
@@ -66,7 +66,7 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure {
     /*
      * (non-Javadoc)
      * 
-     * @see de.uka.ilkd.key.rule.join.JoinProcedure#complete()
+     * @see de.uka.ilkd.key.rule.merge.MergeProcedure#complete()
      */
     @Override
     public boolean complete() {
@@ -74,7 +74,7 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure {
     }
 
     @Override
-    public ValuesJoinResult joinValuesInStates(Term v,
+    public ValuesMergeResult mergeValuesInStates(Term v,
             SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
@@ -88,39 +88,39 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure {
 
         if (lattice != null) {
 
-            AbstractDomainElement joinElem = null;
+            AbstractDomainElement mergeElem = null;
             LinkedHashSet<Term> sideConditions = new LinkedHashSet<Term>();
 
             assert v.op() instanceof ProgramVariable;
 
             if (getUserChoices().containsKey((ProgramVariable) v.op())) {
-                joinElem = getUserChoices().get((ProgramVariable) v.op());
+                mergeElem = getUserChoices().get((ProgramVariable) v.op());
 
                 sideConditions
                         .add(AbstractDomainLattice.getSideConditionForAxiom(
-                                state1, v, joinElem, services));
+                                state1, v, mergeElem, services));
                 sideConditions
                         .add(AbstractDomainLattice.getSideConditionForAxiom(
-                                state2, v, joinElem, services));
+                                state2, v, mergeElem, services));
             }
             else {
-                // Join with abstract domain lattice.
+                // Merge with abstract domain lattice.
                 AbstractDomainElement abstrElem1 =
                         lattice.abstractFrom(state1, valueInState1, services);
                 AbstractDomainElement abstrElem2 =
                         lattice.abstractFrom(state2, valueInState2, services);
 
-                joinElem = lattice.join(abstrElem1, abstrElem2);
+                mergeElem = lattice.join(abstrElem1, abstrElem2);
             }
 
             Function newSkolemConst =
-                    getNewSkolemConstantForPrefix(joinElem.toString(),
+                    getNewSkolemConstantForPrefix(mergeElem.toString(),
                             valueInState1.sort(), services);
             LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
             newNames.add(newSkolemConst.name());
 
             newConstraints =
-                    newConstraints.add(joinElem.getDefiningAxiom(
+                    newConstraints.add(mergeElem.getDefiningAxiom(
                             tb.func(newSkolemConst), services));
             
             // NOTE: We also remember the precise values by if-then-else
@@ -132,18 +132,18 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure {
             /*
             newConstraints =
                     newConstraints.add(tb.equals(tb.func(newSkolemConst),
-                            JoinIfThenElse.createIfThenElseTerm(state1, state2,
+                            MergeIfThenElse.createIfThenElseTerm(state1, state2,
                                     valueInState1, valueInState2,
                                     distinguishingFormula, services)));
             */
             
-            return new ValuesJoinResult(newConstraints,
+            return new ValuesMergeResult(newConstraints,
                     tb.func(newSkolemConst), newNames, sideConditions);
 
         }
         else {
 
-            return new ValuesJoinResult(DefaultImmutableSet.<Term> nil(),
+            return new ValuesMergeResult(DefaultImmutableSet.<Term> nil(),
                     MergeIfThenElse.createIfThenElseTerm(state1, state2,
                             valueInState1, valueInState2,
                             distinguishingFormula, services),

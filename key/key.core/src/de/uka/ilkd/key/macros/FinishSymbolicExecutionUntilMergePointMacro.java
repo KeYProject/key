@@ -57,12 +57,13 @@ import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.Strategy;
 import mergerule.MergeRuleUtils;
 
 /**
  * The macro FinishSymbolicExecutionUntilJionPointMacro continues automatic rule
- * application until a join point is reached (i.e. a point where a JoinRule can
+ * application until a merge point is reached (i.e. a point where a {@link MergeRule} can
  * be applied) or there is no more modality on the sequent.
  * <p>
  * 
@@ -73,7 +74,7 @@ import mergerule.MergeRuleUtils;
  * @author Dominic Scheurer
  * @see FinishSymbolicExecutionMacro
  */
-public class FinishSymbolicExecutionUntilJoinPointMacro extends
+public class FinishSymbolicExecutionUntilMergePointMacro extends
         StrategyProofMacro {
 
     private HashSet<ProgramElement> blockElems = new HashSet<ProgramElement>();
@@ -81,28 +82,28 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
 
     private UserInterfaceControl uic = null;
 
-    public FinishSymbolicExecutionUntilJoinPointMacro() {
+    public FinishSymbolicExecutionUntilMergePointMacro() {
     }
 
-    public FinishSymbolicExecutionUntilJoinPointMacro(
+    public FinishSymbolicExecutionUntilMergePointMacro(
             HashSet<ProgramElement> blockElems) {
         this.blockElems = blockElems;
     }
 
     @Override
     public String getName() {
-        return "Finish symbolic execution until join point";
+        return "Finish symbolic execution until merge point";
     }
 
     @Override
     public String getCategory() {
-        return "Join";
+        return "Merge";
     }
 
     @Override
     public String getDescription() {
         return "Continue automatic strategy application until a "
-                + "join point is reached or there is no more modality in the sequent.";
+                + "merge point is reached or there is no more modality in the sequent.";
     }
 
     /**
@@ -172,7 +173,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
     protected void doPostProcessing(Proof proof) {
         // This hack was introduced since in a "while loop with break"
         // I discovered that the execution stopped early, that is three
-        // automatic steps before a join would be possible.
+        // automatic steps before a merge would be possible.
         // So we do single automatic steps until our break point
         // vanishes; then we undo until the break point is there again.
 
@@ -251,7 +252,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
 
     /**
      * The Class FilterSymbexStrategy is a special strategy assigning to any
-     * rule infinite costs if the goal has no modality or if a join point is
+     * rule infinite costs if the goal has no modality or if a merge point is
      * reached.
      */
     private class FilterSymbexStrategy extends FilterStrategy {
@@ -296,7 +297,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
                 }
 
                 // Find break points
-                blockElems.addAll(findJoinPoints((StatementBlock) theJavaBlock
+                blockElems.addAll(findMergePoints((StatementBlock) theJavaBlock
                         .program(), goal.proof().getServices()));
 
                 if (app.rule().name().toString()
@@ -304,7 +305,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
 
                     // We allow One Step Simplification, otherwise we sometimes
                     // would have to do a simplification ourselves before
-                    // joining nodes.
+                    // merging nodes.
                     return true;
 
                 }
@@ -314,15 +315,15 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
         }
 
         /**
-         * Returns a set of join points for the given statement block. A join
+         * Returns a set of merge points for the given statement block. A merge
          * point is the statement in a program directly after an if-then-else or
          * a try-catch-finally block.
          * 
          * @param toSearch
-         *            The statement block to search for join points.
-         * @return A set of join points for the given statement block.
+         *            The statement block to search for merge points.
+         * @return A set of merge points for the given statement block.
          */
-        private HashSet<ProgramElement> findJoinPoints(StatementBlock toSearch,
+        private HashSet<ProgramElement> findMergePoints(StatementBlock toSearch,
                 Services services) {
             HashSet<ProgramElement> result = new HashSet<ProgramElement>();
             ImmutableArray<? extends Statement> stmts = toSearch.getBody();
@@ -336,7 +337,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
                 SourceElement stmt = stmts.get(0);
                 while (!stmt.getFirstElement().equals(stmt)) {
                     for (StatementBlock body : getBodies(stmt)) {
-                        result.addAll(findJoinPoints(body, services));
+                        result.addAll(findMergePoints(body, services));
                     }
                     stmt = stmt.getFirstElement();
                 }
@@ -355,7 +356,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
 
                 if ((stmt instanceof LoopStatement) && i < stmts.size() - 1) {
                     // If a loop statement contains a break, we also
-                    // have a potential join point.
+                    // have a potential merge point.
                     // Note: The FindBreakVisitor does not take care
                     // of potential nested loops, so there may occur
                     // an early stop in this case.

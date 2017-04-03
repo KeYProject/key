@@ -16,7 +16,7 @@ package de.uka.ilkd.key.gui.mergerule;
 import java.util.Collection;
 import java.util.function.Function;
 
-import de.uka.ilkd.key.gui.joinrule.predicateabstraction.PredicateAbstractionCompletion;
+import de.uka.ilkd.key.gui.mergerule.predicateabstraction.PredicateAbstractionCompletion;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
@@ -26,7 +26,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactor
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * A completion class for join procedures. Certain procedures, such as
+ * A completion class for merge procedures. Certain procedures, such as
  * {@link MergeWithPredicateAbstraction}, may not be complete initially and need
  * additional input.
  *
@@ -53,7 +53,7 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
             @Override
             public T complete(
                     T proc,
-                    Pair<Goal, PosInOccurrence> joinGoalPio,
+                    Pair<Goal, PosInOccurrence> mergeGoalPio,
                     Collection<MergePartner> partners) {
                 return completion.apply(proc);
             }
@@ -61,24 +61,24 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
     }
 
     /**
-     * Completes the given join procedure either automatically (if the procedure
+     * Completes the given merge procedure either automatically (if the procedure
      * is already complete) or by demanding input from the user in a GUI.
      *
      * @param proc
      *            {@link MergeProcedure} to complete.
-     * @param joinGoalPio
-     *            TODO
+     * @param mergeGoalPio
+     *            The {@link Goal} and {@link PosInOccurrence} identifying the merge goal.
      * @param partners
-     *            TODO
+     *            The {@link MergePartner}s chosen.
      * @return The completed {@link MergeProcedure}.
      */
     public abstract C complete(
             final C proc,
-            final Pair<Goal, PosInOccurrence> joinGoalPio,
+            final Pair<Goal, PosInOccurrence> mergeGoalPio,
             final Collection<MergePartner> partners);
 
     /**
-     * Returns the completion for the given join procedure class.
+     * Returns the completion for the given merge procedure class.
      * 
      * @return The requested completion.
      */

@@ -12,26 +12,26 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import mergerule.SymbolicExecutionState;
 
 /**
- * Rule application class for close-after-join rule applications.
+ * Rule application class for close-after-merge rule applications.
  * 
  * @author Dominic Scheurer
  */
 public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
-    private Node partnerNode, correspondingJoinNode;
+    private Node partnerNode, correspondingMergeNode;
 
-    private SymbolicExecutionState joinNodeState = null;
+    private SymbolicExecutionState mergeNodeState = null;
     private SymbolicExecutionState partnerState = null;
     private Term pc = null;
 
     public CloseAfterMergeRuleBuiltInRuleApp(BuiltInRule builtInRule,
             PosInOccurrence pio, Node thePartnerNode,
-            Node correspondingJoinNode, SymbolicExecutionState joinNodeState,
+            Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
             SymbolicExecutionState partnerState, Term pc) {
         this(builtInRule, pio);
         setThePartnerNode(thePartnerNode);
-        setCorrespondingJoinNode(correspondingJoinNode);
-        setJoinNodeState(joinNodeState);
+        setCorrespondingMergeNode(correspondingMergeNode);
+        setMergeNodeState(mergeNodeState);
         setPartnerState(partnerState);
         setPc(pc);
     }
@@ -59,8 +59,8 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public boolean complete() {
-        return partnerNode != null && correspondingJoinNode != null
-                && joinNodeState != null && partnerState != null && pc != null;
+        return partnerNode != null && correspondingMergeNode != null
+                && mergeNodeState != null && partnerState != null && pc != null;
     }
 
     // // GETTERS AND SETTERS // //
@@ -73,20 +73,20 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         this.partnerNode = thePartnerNode;
     }
 
-    public Node getCorrespondingJoinNode() {
-        return correspondingJoinNode;
+    public Node getCorrespondingMergeNode() {
+        return correspondingMergeNode;
     }
 
-    public void setCorrespondingJoinNode(Node correspondingJoinNode) {
-        this.correspondingJoinNode = correspondingJoinNode;
+    public void setCorrespondingMergeNode(Node correspondingMergeNode) {
+        this.correspondingMergeNode = correspondingMergeNode;
     }
 
-    public SymbolicExecutionState getJoinState() {
-        return joinNodeState;
+    public SymbolicExecutionState getMergeState() {
+        return mergeNodeState;
     }
 
-    public void setJoinNodeState(SymbolicExecutionState joinState) {
-        this.joinNodeState = joinState;
+    public void setMergeNodeState(SymbolicExecutionState mergeState) {
+        this.mergeNodeState = mergeState;
     }
 
     public SymbolicExecutionState getPartnerSEState() {

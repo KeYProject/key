@@ -28,7 +28,7 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import mergerule.SymbolicExecutionState;
 
 /**
- * Rule that joins two sequents based on "total" weakening: Replacement of
+ * Rule that merges two sequents based on "total" weakening: Replacement of
  * symbolic state by an update setting every program variable to a fresh Skolem
  * constant, if the respective program variable does not evaluate to the same
  * value in both states - in this case, the original value is preserved (->
@@ -47,12 +47,12 @@ public class MergeTotalWeakening extends MergeProcedure {
         return INSTANCE;
     }
 
-    private static final String DISPLAY_NAME = "JoinByFullAnonymization";
+    private static final String DISPLAY_NAME = "MergeByFullAnonymization";
 
     /*
      * (non-Javadoc)
      * 
-     * @see de.uka.ilkd.key.rule.join.JoinProcedure#complete()
+     * @see de.uka.ilkd.key.rule.merge.MergeProcedure#complete()
      */
     @Override
     public boolean complete() {
@@ -60,7 +60,7 @@ public class MergeTotalWeakening extends MergeProcedure {
     }
 
     @Override
-    public ValuesJoinResult joinValuesInStates(Term v,
+    public ValuesMergeResult mergeValuesInStates(Term v,
             SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
@@ -73,7 +73,7 @@ public class MergeTotalWeakening extends MergeProcedure {
         LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
         newNames.add(newSkolemConstant.name());
 
-        return new ValuesJoinResult(DefaultImmutableSet.<Term> nil(),
+        return new ValuesMergeResult(DefaultImmutableSet.<Term> nil(),
                 tb.func(newSkolemConstant), newNames, new LinkedHashSet<Term>());
 
     }

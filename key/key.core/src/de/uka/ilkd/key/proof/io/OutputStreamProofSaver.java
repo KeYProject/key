@@ -402,12 +402,12 @@ public class OutputStreamProofSaver {
                 tree.append(" (")
                         .append(ProofElementID.NUMBER_JOIN_PARTNERS
                                 .getRawName()).append(" \"");
-                tree.append(joinApp.getJoinPartners().size());
+                tree.append(joinApp.getMergePartners().size());
                 tree.append("\")");
 
                 tree.append(" (").append(ProofElementID.JOIN_ID.getRawName())
                         .append(" \"");
-                tree.append(joinApp.getJoinNode().serialNr());
+                tree.append(joinApp.getMergeNode().serialNr());
                 tree.append("\")");
 
                 if (joinApp.getDistinguishingFormula() != null) {
@@ -489,7 +489,7 @@ public class OutputStreamProofSaver {
                 // null pointers at this place or find a better solution.
                 tree.append(" (").append(ProofElementID.JOIN_NODE.getRawName())
                         .append(" \"");
-                tree.append(closeApp.getCorrespondingJoinNode().parent()
+                tree.append(closeApp.getCorrespondingMergeNode().parent()
                         .serialNr());
                 tree.append("\")");
             }

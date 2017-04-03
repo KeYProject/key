@@ -55,28 +55,28 @@ import de.uka.ilkd.key.util.Pair;
 import mergerule.MergeRuleUtils;
 
 /**
- * Finishes symbolic execution while taking JML join specifications into
- * account: Branches are joined at defined points during the execution.
+ * Finishes symbolic execution while taking JML merge specifications into
+ * account: Branches are merged at defined points during the execution.
  *
  * @author Dominic Scheurer
  * @see FinishSymbolicExecutionMacro
  */
-public class FinishSymbolicExecutionWithSpecJoinsMacro extends
+public class FinishSymbolicExecutionWithSpecMergesMacro extends
         AbstractProofMacro {
 
     @Override
     public String getName() {
-        return "Finish symbolic execution with join specifications";
+        return "Finish symbolic execution with merge specifications";
     }
 
     @Override
     public String getCategory() {
-        return "Join";
+        return "Merge";
     }
 
     @Override
     public String getDescription() {
-        return "Continue automatic strategy application and take join procedures "
+        return "Continue automatic strategy application and take merge procedures "
                 + "specified in block contracts into account.";
     }
 
@@ -129,13 +129,13 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals,
                 proof);
         try {
-            // Run symbolic execution and join until the execution finishes
-            // with no join applicable. Whenever the FilterSymbexStrategy
-            // finds a join point, it stops the execution such that we can
-            // apply the join at this place.
-            boolean joined;
+            // Run symbolic execution and merge until the execution finishes
+            // with no merge applicable. Whenever the FilterSymbexStrategy
+            // finds a merge point, it stops the execution such that we can
+            // apply the merge at this place.
+            boolean merged;
             do {
-                joined = false;
+                merged = false;
                 applyStrategy.start(proof, goals);
                 synchronized (applyStrategy) { // wait for applyStrategy to
                                                // finish its last rule
@@ -148,15 +148,15 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                     }
                 }
 
-                Pair<Goal, MergeRuleBuiltInRuleApp> joinInfo = strategy
-                        .getAndResetJoinInformation();
-                if (joinInfo != null) {
-                    // We are at a join point: Execute the join.
-                    joinInfo.first.apply(joinInfo.second);
-                    joined = true;
+                Pair<Goal, MergeRuleBuiltInRuleApp> mergeInfo = strategy
+                        .getAndResetMergeInformation();
+                if (mergeInfo != null) {
+                    // We are at a merge point: Execute the merge.
+                    mergeInfo.first.apply(mergeInfo.second);
+                    merged = true;
                 }
             }
-            while (joined);
+            while (merged);
         }
         finally {
             // This resets the proof strategy and the managers after the
@@ -313,7 +313,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
     /**
      * The Class FilterSymbexStrategy is a special strategy assigning to any
-     * rule infinite costs if the goal has no modality or if a join point is
+     * rule infinite costs if the goal has no modality or if a merge point is
      * reached.
      */
     private class FilterSymbexStrategy extends FilterStrategy {
@@ -321,29 +321,29 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         private final Name NAME = new Name(
                 FilterSymbexStrategy.class.getSimpleName());
 
-        private boolean enforceJoin = false;
+        private boolean enforceMerge = false;
 
-        private Pair<Goal, MergeRuleBuiltInRuleApp> joinInformation = null;
+        private Pair<Goal, MergeRuleBuiltInRuleApp> mergeInformation = null;
 
         private HashSet<ProgramElement> breakpoints = new HashSet<ProgramElement>();
         private HashMap<ProgramElement, Node> commonParents = new HashMap<ProgramElement, Node>();
-        private HashMap<ProgramElement, BlockContract> joinContracts = new HashMap<ProgramElement, BlockContract>();
+        private HashMap<ProgramElement, BlockContract> mergeContracts = new HashMap<ProgramElement, BlockContract>();
         private HashSet<Goal> stoppedGoals = new HashSet<Goal>();
         private HashSet<JavaBlock> alreadySeen = new HashSet<JavaBlock>();
 
         /**
-         * Returns the information for a join to apply if applicable, or null if
-         * there is no join to execute. Every call reset the join information,
+         * Returns the information for a merge to apply if applicable, or null if
+         * there is no merge to execute. Every call reset the merge information,
          * such that the strategy can continue.
          *
-         * @return The information for a join to apply if applicable, or null if
-         *         there is no join to execute.
+         * @return The information for a merge to apply if applicable, or null if
+         *         there is no merge to execute.
          */
-        public Pair<Goal, MergeRuleBuiltInRuleApp> getAndResetJoinInformation() {
-            final Pair<Goal, MergeRuleBuiltInRuleApp> oldJoinInformation = joinInformation;
-            enforceJoin = false;
-            joinInformation = null;
-            return oldJoinInformation;
+        public Pair<Goal, MergeRuleBuiltInRuleApp> getAndResetMergeInformation() {
+            final Pair<Goal, MergeRuleBuiltInRuleApp> oldMergeInformation = mergeInformation;
+            enforceMerge = false;
+            mergeInformation = null;
+            return oldMergeInformation;
         }
 
         /**
@@ -363,7 +363,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if (enforceJoin || stoppedGoals.contains(goal)
+            if (enforceMerge || stoppedGoals.contains(goal)
                     || !hasModality(goal.node())) {
                 return false;
             }
@@ -385,7 +385,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                     alreadySeen.add(theJavaBlock);
 
                     // Find break points
-                    breakpoints.addAll(findJoinPoints(
+                    breakpoints.addAll(findMergePoints(
                             (StatementBlock) theJavaBlock.program(), goal));
 
                     Statement breakpoint;
@@ -407,34 +407,34 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
                         if (allStopped && nrCandidates > 0) {
                             // We stopped all Goals potentially participating in
-                            // the join; now we collect the information about
-                            // the join. After a successful join app
+                            // the merge; now we collect the information about
+                            // the merge. After a successful merge app
                             // initialization, we do not allow any other rule
-                            // applications (realized by setting enforceJoin to
+                            // applications (realized by setting enforcemerge to
                             // true).
 
-                            final MergeRule joinRule = MergeRule.INSTANCE;
+                            final MergeRule mergeRule = MergeRule.INSTANCE;
 
-                            final Node joinNode = goal.node();
-                            final PosInOccurrence joinPio = getPioForBreakpoint(
+                            final Node mergeNode = goal.node();
+                            final PosInOccurrence mergePio = getPioForBreakpoint(
                                     breakpoint, goal.sequent());
-                            final MergeRuleBuiltInRuleApp joinApp = (MergeRuleBuiltInRuleApp) joinRule
-                                    .createApp(joinPio, goal.proof()
+                            final MergeRuleBuiltInRuleApp mergeApp = (MergeRuleBuiltInRuleApp) mergeRule
+                                    .createApp(mergePio, goal.proof()
                                             .getServices());
 
                             {
                                 // Consider only the partners below the common
                                 // parent node. Otherwise, we obtain
                                 // behavior that may be hard to understand.
-                                ImmutableList<MergePartner> joinPartners = MergeRule
-                                        .findPotentialJoinPartners(goal,
-                                                joinPio,
+                                ImmutableList<MergePartner> mergePartners = MergeRule
+                                        .findPotentialMergePartners(goal,
+                                                mergePio,
                                                 commonParents.get(breakpoint));
 
-                                joinApp.setJoinPartners(joinPartners);
-                                joinApp.setConcreteRule(joinContracts.get(
-                                        breakpoint).getJoinProcedure());
-                                joinApp.setJoinNode(joinNode);
+                                mergeApp.setMergePartners(mergePartners);
+                                mergeApp.setConcreteRule(mergeContracts.get(
+                                        breakpoint).getMergeProcedure());
+                                mergeApp.setMergeNode(mergeNode);
                             }
 
                             for (Goal subgoal : subtreeGoals) {
@@ -443,15 +443,15 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                             breakpoints.remove(breakpoint);
                             commonParents.remove(breakpoint);
 
-                            if (joinApp.getJoinPartners().isEmpty()) {
-                                // This is obviously not a real join point: May happen
+                            if (mergeApp.getMergePartners().isEmpty()) {
+                                // This is obviously not a real merge point: May happen
                                 // in certain more complicated scenarios. Stop trying to
-                                // join at this point.
+                                // merge at this point.
                                 return super.isApprovedApp(app, pio, goal);
                             } else {
-                                joinInformation = new Pair<Goal, MergeRuleBuiltInRuleApp>(
-                                        goal, joinApp);
-                                enforceJoin = true;
+                                mergeInformation = new Pair<Goal, MergeRuleBuiltInRuleApp>(
+                                        goal, mergeApp);
+                                enforceMerge = true;
                             }
                         }
                         else {
@@ -466,7 +466,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
                         // We allow One Step Simplification, otherwise we
                         // sometimes would have to do a simplification ourselves
-                        // before joining nodes.
+                        // before mergeing nodes.
                         return true;
 
                     }
@@ -515,16 +515,16 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         }
 
         /**
-         * Returns a set of join points for the given statement block. Join
+         * Returns a set of merge points for the given statement block. Merge
          * points are directly registered once they are found.
          *
          * @param toSearch
-         *            The statement block to search for join points.
+         *            The statement block to search for merge points.
          * @param goal
          *            The goal corresponding to the statement block.
-         * @return A set of join points for the given statement block.
+         * @return A set of merge points for the given statement block.
          */
-        private HashSet<ProgramElement> findJoinPoints(
+        private HashSet<ProgramElement> findMergePoints(
                 final StatementBlock toSearch, final Goal goal) {
             final Services services = goal.proof().getServices();
             final HashSet<ProgramElement> result = new HashSet<ProgramElement>();
@@ -540,7 +540,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                 if (breakpoint != null) {
                     breakpoints.add(breakpoint);
                     commonParents.put(breakpoint, goal.node());
-                    joinContracts.put(breakpoint, contractAndBreakpoint.first);
+                    mergeContracts.put(breakpoint, contractAndBreakpoint.first);
                 }
             }
 
@@ -548,7 +548,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         }
 
         /**
-         * Obtains the pair of block contract containing a join specification
+         * Obtains the pair of block contract containing a merge specification
          * and the corresponding breakpoint, if any, for the given statement. If
          * there is no such contract, null is returned.
          *
@@ -559,7 +559,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
          *            included.
          * @param services
          *            The services object.
-         * @return If any, a join block contract and corresponding break point
+         * @return If any, a merge block contract and corresponding break point
          *         for the given statement; null otherwise.
          */
         private Pair<BlockContract, Statement> getBlockContractFor(
@@ -571,7 +571,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                 ImmutableSet<BlockContract> contracts;
                 if (!(contracts = services.getSpecificationRepository()
                         .getBlockContracts((StatementBlock) stmt)).isEmpty()) {
-                    return contracts.iterator().next().hasJoinProcedure() ? new Pair<BlockContract, Statement>(
+                    return contracts.iterator().next().hasMergeProcedure() ? new Pair<BlockContract, Statement>(
                             contracts.iterator().next(), breakpoint) : null;
                 }
 

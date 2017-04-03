@@ -53,6 +53,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergePartner;
+import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
@@ -514,9 +515,9 @@ public class Proof implements Named {
      * Opens a previously closed node (the one corresponding to p_goal)
      * and all its closed parents.<p>
      * 
-     * This is, for instance, needed for the join rule: In
-     * a situation where a join node and its associated partners
-     * have been closed and the join node is then pruned away,
+     * This is, for instance, needed for the {@link MergeRule}: In
+     * a situation where a merge node and its associated partners
+     * have been closed and the merge node is then pruned away,
      * the partners have to be reopened again. Otherwise, we
      * have a soundness issue.
      *
@@ -630,14 +631,14 @@ public class Proof implements Named {
                         }
                     }
 
-                    // Join rule applications: Unlink all join partners.
+                    // Merge rule applications: Unlink all merge partners.
                     if (visitedNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
-                        final MergeRuleBuiltInRuleApp joinApp = (MergeRuleBuiltInRuleApp) visitedNode
+                        final MergeRuleBuiltInRuleApp mergeApp = (MergeRuleBuiltInRuleApp) visitedNode
                                 .getAppliedRuleApp();
 
-                        for (MergePartner joinPartner : joinApp
-                                .getJoinPartners()) {
-                            final Goal linkedGoal = joinPartner.getGoal();
+                        for (MergePartner mergePartner : mergeApp
+                                .getMergePartners()) {
+                            final Goal linkedGoal = mergePartner.getGoal();
 
                             if (linkedGoal.node().isClosed()) {
                                 // The partner node has already been closed; we
@@ -662,8 +663,8 @@ public class Proof implements Named {
             final Goal firstGoal = getGoal(firstLeaf);
             assert firstGoal != null;
             
-            // Cutting a linked goal (linked by a "defocusing" join
-            // operation, see {@link JoinRule}) unlinks this goal again.
+            // Cutting a linked goal (linked by a "defocusing" merge
+            // operation, see {@link MergeRule}) unlinks this goal again.
             if (firstGoal.isLinked()) {
                 firstGoal.setLinkedGoal(null);
             }

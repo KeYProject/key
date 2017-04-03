@@ -30,17 +30,17 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactor
 import mergerule.SymbolicExecutionState;
 
 /**
- * Defines a concrete join procedure, in particular the result of joining two
+ * Defines a concrete merge procedure, in particular the result of merging two
  * terms for a given location variable in two Symbolic Execution states.
  * <p>
  * 
- * For example, computing the join result for a variable x in one state where x
+ * For example, computing the merge result for a variable x in one state where x
  * is 42 and another one where x is 17, the result could be the update x := c,
  * where c is constrained to be positive by a formula in the returned
  * constraints set.
  * <p>
  * 
- * New join procedures need to be registered in the list CONCRETE_RULES!
+ * New merge procedures need to be registered in the list CONCRETE_RULES!
  * 
  * @author Dominic Scheurer
  * 
@@ -51,7 +51,7 @@ import mergerule.SymbolicExecutionState;
  */
 public abstract class MergeProcedure {
 
-    /** Concrete join procedures. */
+    /** Concrete merge procedures. */
     static ImmutableList<MergeProcedure> CONCRETE_RULES = ImmutableSLList
             .<MergeProcedure> nil();
 
@@ -65,11 +65,11 @@ public abstract class MergeProcedure {
     }
 
     /**
-     * Joins two values valueInState1 and valueInState2 of corresponding SE
-     * states state1 and state2 to a new value of a join state.
+     * Merges two values valueInState1 and valueInState2 of corresponding SE
+     * states state1 and state2 to a new value of a merge state.
      * 
      * @param v
-     *            The variable for which the values should be joined
+     *            The variable for which the values should be merged
      * @param state1
      *            First SE state.
      * @param valueInState1
@@ -83,9 +83,9 @@ public abstract class MergeProcedure {
      *            automatic generation).
      * @param services
      *            The services object.
-     * @return The join result.
+     * @return The merge result.
      */
-    public abstract ValuesJoinResult joinValuesInStates(
+    public abstract ValuesMergeResult mergeValuesInStates(
             Term v, SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services);
@@ -95,13 +95,13 @@ public abstract class MergeProcedure {
      * introduced for predicate abstraction (which is not complete if the
      * abstraction predicates are not set).
      *
-     * @return true iff the join procedure is complete (all neede parameters are
+     * @return true iff the merge procedure is complete (all neede parameters are
      *         set).
      */
     public abstract boolean complete();
 
     /**
-     * @return true iff the join procedure requires distinguishable path
+     * @return true iff the merge procedure requires distinguishable path
      *         conditions. This is usually the case for procedures working with
      *         concrete values of input states, and can be false for abstraction
      *         methods.
@@ -109,11 +109,11 @@ public abstract class MergeProcedure {
     public abstract boolean requiresDistinguishablePathConditions();
 
     /**
-     * Returns the join procedure for the given name.
+     * Returns the merge procedure for the given name.
      *
      * @param procName
-     *            Name of the join procedure.
-     * @return The join procedure of the given name; null if there is no such
+     *            Name of the merge procedure.
+     * @return The merge procedure of the given name; null if there is no such
      *         procedure.
      */
     public static MergeProcedure getProcedureByName(String procName) {
@@ -127,30 +127,30 @@ public abstract class MergeProcedure {
     }
 
     /**
-     * Returns all registered join procedures.
+     * Returns all registered merge procedures.
      *
      * @return
      */
-    public static ImmutableList<MergeProcedure> getJoinProcedures() {
+    public static ImmutableList<MergeProcedure> getMergeProcedures() {
         return CONCRETE_RULES;
     }
     
     /**
-     * Encapsulates the result of a join of values.
+     * Encapsulates the result of a merge of values.
      *
      * @author Dominic Scheurer
      */
-    public static class ValuesJoinResult {
+    public static class ValuesMergeResult {
         private ImmutableSet<Term> newConstraints;
-        private Term joinVal;
+        private Term mergeVal;
         private LinkedHashSet<Name> newNames;
         private LinkedHashSet<Term> sideConditions;
         
-        public ValuesJoinResult(ImmutableSet<Term> newConstraints,
-                Term joinVal, LinkedHashSet<Name> newNames,
+        public ValuesMergeResult(ImmutableSet<Term> newConstraints,
+                Term mergeVal, LinkedHashSet<Name> newNames,
                 LinkedHashSet<Term> sideConditions) {
             this.newConstraints = newConstraints;
-            this.joinVal = joinVal;
+            this.mergeVal = mergeVal;
             this.newNames = newNames;
             this.sideConditions = sideConditions;
         }
@@ -159,8 +159,8 @@ public abstract class MergeProcedure {
             return newConstraints;
         }
 
-        public Term getJoinVal() {
-            return joinVal;
+        public Term getMergeVal() {
+            return mergeVal;
         }
 
         public LinkedHashSet<Name> getNewNames() {

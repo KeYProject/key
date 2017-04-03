@@ -30,7 +30,7 @@ public class Statistics {
     public final int symbExApps;
     public final int quantifierInstantiations;
     public final int ossApps;
-    public final int joinRuleApps;
+    public final int mergeRuleApps;
     public final int totalRuleApps;
     public final int smtSolverApps;
     public final int dependencyContractApps;
@@ -52,7 +52,7 @@ public class Statistics {
                        int symbExApps,
                        int quantifierInstantiations,
                        int ossApps,
-                       int joinRuleApps,
+                       int mergeRuleApps,
                        int totalRuleApps,
                        int smtSolverApps,
                        int dependencyContractApps,
@@ -66,7 +66,7 @@ public class Statistics {
         this.symbExApps = symbExApps;
         this.quantifierInstantiations = quantifierInstantiations;
         this.ossApps = ossApps;
-        this.joinRuleApps = joinRuleApps;
+        this.mergeRuleApps = mergeRuleApps;
         this.totalRuleApps = totalRuleApps;
         this.smtSolverApps = smtSolverApps;
         this.dependencyContractApps = dependencyContractApps;
@@ -84,7 +84,7 @@ public class Statistics {
                                   side.symbExApps,
                                   side.quantifierInstantiations,
                                   side.ossApps,
-                                  side.joinRuleApps,
+                                  side.mergeRuleApps,
                                   side.totalRuleApps,
                                   side.smtSolverApps,
                                   side.dependencyContractApps,
@@ -107,7 +107,7 @@ public class Statistics {
         int tmpSymbExApps = 0; // symbolic execution steps
         int tmpQuant = 0; // quantifier instantiations
         int tmpOss = 0; // OSS applications
-        int tmpJoinApps = 0; // join rule applications
+        int tmpMergeApps = 0; // merge rule applications
         int tmpOssCaptured = 0; // rules apps in OSS protocol
         int tmpSmt = 0; // SMT rule apps
         int tmpDep = 0; // dependency contract apps
@@ -159,7 +159,7 @@ public class Statistics {
                 } else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
                     tmpInv++;
                 } else if (ruleApp instanceof MergeRuleBuiltInRuleApp) {
-                    tmpJoinApps++;
+                    tmpMergeApps++;
                 } else if (ruleApp instanceof TacletApp) {
                     final de.uka.ilkd.key.rule.Taclet t = ((TacletApp)ruleApp).taclet();
                     final String tName = t.name().toString();
@@ -178,7 +178,7 @@ public class Statistics {
         this.symbExApps = tmpSymbExApps;
         this.quantifierInstantiations = tmpQuant;
         this.ossApps = tmpOss;
-        this.joinRuleApps = tmpJoinApps;
+        this.mergeRuleApps = tmpMergeApps;
         this.totalRuleApps = tmpNodes + tmpOssCaptured -1;
         this.smtSolverApps = tmpSmt;
         this.dependencyContractApps = tmpDep;
@@ -245,8 +245,8 @@ public class Statistics {
                         stat.operationContractApps));
         summaryList.add(new Pair<String, String>("Loop invariant apps", "" +
                         stat.loopInvApps));
-        summaryList.add(new Pair<String, String>("Join Rule apps", "" +
-                stat.joinRuleApps));
+        summaryList.add(new Pair<String, String>("Merge Rule apps", "" +
+                stat.mergeRuleApps));
         summaryList.add(new Pair<String, String>("Total rule apps",
                         EnhancedStringBuffer.format(stat.totalRuleApps).toString()));
     }

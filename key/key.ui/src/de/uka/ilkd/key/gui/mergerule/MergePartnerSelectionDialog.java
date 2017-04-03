@@ -85,17 +85,17 @@ public class MergePartnerSelectionDialog extends JDialog {
 
     /** The tooltip hint for the checkbox. */
     private static final String CB_SELECT_CANDIDATE_HINT =
-            "Select to add shown state as a join partner.";
+            "Select to add shown state as a merge partner.";
 
     /** The tooltip for the OK button */
     private static final String CHOOSE_ALL_BTN_TOOLTIP_TXT =
-            "Select all proposed goals as join partners. "
-                    + "Only enabled if the join is applicable for all goals and the chosen join procedure.";
+            "Select all proposed goals as merge partners. "
+                    + "Only enabled if the merge is applicable for all goals and the chosen merge procedure.";
     /** The tooltip for the choose-all button */
     private static final String OK_BTN_TOOLTIP_TXT =
-            "Select the chosen goals as join partners. "
-                    + "Only enabled if at least one goal is chosen and the join is applicable for the "
-                    + "chosen goals and join procedure.";
+            "Select the chosen goals as merge partners. "
+                    + "Only enabled if at least one goal is chosen and the merge is applicable for the "
+                    + "chosen goals and merge procedure.";
 
     /** The initial size of this dialog. */
     private static final Dimension INITIAL_SIZE = new Dimension(850, 450);
@@ -125,15 +125,15 @@ public class MergePartnerSelectionDialog extends JDialog {
     private LinkedList<MergePartner> candidates =
             null;
     private Services services = null;
-    private Pair<Goal, PosInOccurrence> joinGoalPio = null;
+    private Pair<Goal, PosInOccurrence> mergeGoalPio = null;
 
     /** The chosen goals. */
     private SortedSet<MergePartner> chosenGoals =
             new TreeSet<MergePartner>(
                     GOAL_COMPARATOR);
 
-    /** The chosen join method. */
-    private MergeProcedure chosenRule = MergeProcedure.getJoinProcedures().head();
+    /** The chosen merge method. */
+    private MergeProcedure chosenRule = MergeProcedure.getMergeProcedures().head();
 
     /** The chosen distinguishing formula */
     private Term chosenDistForm = null;
@@ -142,7 +142,7 @@ public class MergePartnerSelectionDialog extends JDialog {
     private JEditorPane txtPartner2 = null;
     private JComboBox<String> cmbCandidates = null;
     private JCheckBox cbSelectCandidate = null;
-    private ButtonGroup bgJoinMethods = null;
+    private ButtonGroup bgMergeMethods = null;
     private final JTextField txtDistForm;
 
     private JScrollPane scrpPartner1 = null;
@@ -152,12 +152,12 @@ public class MergePartnerSelectionDialog extends JDialog {
     private JButton chooseAllButton = null;
 
     private MergePartnerSelectionDialog() {
-        super(MAIN_WINDOW_INSTANCE, "Select partner node for join operation",
+        super(MAIN_WINDOW_INSTANCE, "Select partner node for merge operation",
                 true);
 
         setLocation(MAIN_WINDOW_INSTANCE.getLocation());
 
-        // Text areas for goals to join
+        // Text areas for goals to merge
         txtPartner1 = new JEditorPane();
         txtPartner2 = new JEditorPane();
         for (JEditorPane jep : new JEditorPane[] { txtPartner1, txtPartner2 }) {
@@ -224,8 +224,8 @@ public class MergePartnerSelectionDialog extends JDialog {
             }
         });
 
-        bgJoinMethods = new ButtonGroup();
-        for (final MergeProcedure rule : MergeProcedure.getJoinProcedures()) {
+        bgMergeMethods = new ButtonGroup();
+        for (final MergeProcedure rule : MergeProcedure.getMergeProcedures()) {
             JRadioButton rb = new JRadioButton(rule.toString());
             rb.setSelected(true);
 
@@ -237,21 +237,21 @@ public class MergePartnerSelectionDialog extends JDialog {
                     checkApplicable();
                 }
             });
-            bgJoinMethods.add(rb);
+            bgMergeMethods.add(rb);
         }
 
-        // Join state container
-        JPanel joinStateContainer = new JPanel();
-        joinStateContainer.setLayout(new BoxLayout(joinStateContainer,
+        // Merge state container
+        JPanel mergeStateContainer = new JPanel();
+        mergeStateContainer.setLayout(new BoxLayout(mergeStateContainer,
                 BoxLayout.Y_AXIS));
-        joinStateContainer.add(scrpPartner1);
+        mergeStateContainer.add(scrpPartner1);
 
-        TitledBorder joinStateContainerTitle =
-                BorderFactory.createTitledBorder("State to join");
-        joinStateContainerTitle.setTitleJustification(TitledBorder.LEFT);
-        joinStateContainer.setBorder(joinStateContainerTitle);
+        TitledBorder mergeStateContainerTitle =
+                BorderFactory.createTitledBorder("State to merge");
+        mergeStateContainerTitle.setTitleJustification(TitledBorder.LEFT);
+        mergeStateContainer.setBorder(mergeStateContainerTitle);
 
-        // Join partner container
+        // Merge partner container
         JPanel partnerContainer = new JPanel();
         partnerContainer.setLayout(new BoxLayout(partnerContainer,
                 BoxLayout.Y_AXIS));
@@ -266,7 +266,7 @@ public class MergePartnerSelectionDialog extends JDialog {
         partnerContainer.add(selectionContainer);
 
         TitledBorder txtPartner2Title =
-                BorderFactory.createTitledBorder("Potential join partners");
+                BorderFactory.createTitledBorder("Potential merge partners");
         txtPartner2Title.setTitleJustification(TitledBorder.LEFT);
         partnerContainer.setBorder(txtPartner2Title);
 
@@ -274,24 +274,24 @@ public class MergePartnerSelectionDialog extends JDialog {
         JPanel upperContainer = new JPanel();
         upperContainer
                 .setLayout(new BoxLayout(upperContainer, BoxLayout.X_AXIS));
-        upperContainer.add(joinStateContainer);
+        upperContainer.add(mergeStateContainer);
         upperContainer.add(partnerContainer);
 
-        // Join rules container
-        JPanel joinRulesContainer = new JPanel();
-        joinRulesContainer.setLayout(new WrapLayout());
+        // Merge rules container
+        JPanel mergeRulesContainer = new JPanel();
+        mergeRulesContainer.setLayout(new WrapLayout());
 
-        for (Enumeration<AbstractButton> e = bgJoinMethods.getElements(); e
+        for (Enumeration<AbstractButton> e = bgMergeMethods.getElements(); e
                 .hasMoreElements();) {
             JRadioButton rb = (JRadioButton) e.nextElement();
-            joinRulesContainer.add(rb);
+            mergeRulesContainer.add(rb);
         }
 
-        TitledBorder joinRulesContainerTitle =
-                BorderFactory.createTitledBorder("Concrete join rule to apply");
-        joinRulesContainerTitle.setTitleJustification(TitledBorder.LEFT);
-        joinRulesContainerTitle.setBorder(joinStateContainerTitle);
-        joinRulesContainer.setBorder(joinRulesContainerTitle);
+        TitledBorder mergeRulesContainerTitle =
+                BorderFactory.createTitledBorder("Concrete merge procedure to apply");
+        mergeRulesContainerTitle.setTitleJustification(TitledBorder.LEFT);
+        mergeRulesContainerTitle.setBorder(mergeStateContainerTitle);
+        mergeRulesContainer.setBorder(mergeRulesContainerTitle);
 
         // Distinguishing method input field container
         txtDistForm = new JTextField();
@@ -379,7 +379,7 @@ public class MergePartnerSelectionDialog extends JDialog {
         Dimension verticalFillerDim = new Dimension(0, 10);
         lowerContainer
                 .setLayout(new BoxLayout(lowerContainer, BoxLayout.Y_AXIS));
-        lowerContainer.add(joinRulesContainer);
+        lowerContainer.add(mergeRulesContainer);
         lowerContainer.add(new Box.Filler(verticalFillerDim, verticalFillerDim,
                 verticalFillerDim));
         lowerContainer.add(distFormContainer);
@@ -395,20 +395,20 @@ public class MergePartnerSelectionDialog extends JDialog {
     }
 
     /**
-     * Creates a new join partner selection dialog.
+     * Creates a new merge partner selection dialog.
      * 
-     * @param joinGoal
-     *            The first (already chosen) join partner.
+     * @param mergeGoal
+     *            The first (already chosen) merge partner.
      * @param pio
      *            Position of Update-Modality-Postcondition formula in the
-     *            joinNode.
+     *            mergeNode.
      * @param candidates
-     *            Potential join candidates.
+     *            Potential merge candidates.
      * @param services
      *            The services object.
      */
     public MergePartnerSelectionDialog(
-            Goal joinGoal,
+            Goal mergeGoal,
             PosInOccurrence pio,
             ImmutableList<MergePartner> candidates,
             Services services) {
@@ -418,7 +418,7 @@ public class MergePartnerSelectionDialog extends JDialog {
 
         this.candidates =
                 new LinkedList<MergePartner>();
-        this.joinGoalPio = new Pair<Goal, PosInOccurrence>(joinGoal, pio);
+        this.mergeGoalPio = new Pair<Goal, PosInOccurrence>(mergeGoal, pio);
 
         for (MergePartner candidate : candidates) {
             int insPos =
@@ -429,13 +429,13 @@ public class MergePartnerSelectionDialog extends JDialog {
             this.candidates.add(insPos, candidate);
         }
 
-        setHighlightedSequentForArea(joinGoal, pio, txtPartner1);
+        setHighlightedSequentForArea(mergeGoal, pio, txtPartner1);
         loadCandidates();
 
     }
 
     /**
-     * @return All chosen join partners.
+     * @return All chosen merge partners.
      */
     public ImmutableList<MergePartner> getChosenCandidates() {
         ImmutableSLList<MergePartner> result =
@@ -451,15 +451,15 @@ public class MergePartnerSelectionDialog extends JDialog {
 
     /**
      * @param <T>
-     * @return The chosen join rule.
+     * @return The chosen merge rule.
      */
     @SuppressWarnings("unchecked")
-    public <T extends MergeProcedure> T getChosenJoinRule() {
+    public <T extends MergeProcedure> T getChosenMergeRule() {
         MergeProcedureCompletion<T> completion =
                 (MergeProcedureCompletion<T>) MergeProcedureCompletion
                         .getCompletionForClass(chosenRule.getClass());
 
-        return completion.complete((T) chosenRule, joinGoalPio, chosenGoals);
+        return completion.complete((T) chosenRule, mergeGoalPio, chosenGoals);
     }
 
     /**
@@ -471,26 +471,26 @@ public class MergePartnerSelectionDialog extends JDialog {
     }
 
     /**
-     * Checks whether the join rule is applicable for the given set of
+     * Checks whether the merge rule is applicable for the given set of
      * candidates.
      *
      * @param theCandidates
-     *            Candidates to instantiate the join rule application with.
-     * @return true iff the join rule instance induced by the given set of
+     *            Candidates to instantiate the merge rule application with.
+     * @return true iff the merge rule instance induced by the given set of
      *         candidates is applicable.
      */
     private boolean isApplicableForCandidates(
             ImmutableList<MergePartner> theCandidates) {
-        if (joinGoalPio != null && candidates != null && chosenRule != null) {
-            MergeRuleBuiltInRuleApp joinRuleApp =
+        if (mergeGoalPio != null && candidates != null && chosenRule != null) {
+            MergeRuleBuiltInRuleApp mergeRuleApp =
                     (MergeRuleBuiltInRuleApp) MergeRule.INSTANCE.createApp(
-                            joinGoalPio.second, services);
+                            mergeGoalPio.second, services);
 
-            joinRuleApp.setJoinNode(joinGoalPio.first.node());
-            joinRuleApp.setConcreteRule(chosenRule);
-            joinRuleApp.setJoinPartners(theCandidates);
+            mergeRuleApp.setMergeNode(mergeGoalPio.first.node());
+            mergeRuleApp.setConcreteRule(chosenRule);
+            mergeRuleApp.setMergePartners(theCandidates);
 
-            return joinRuleApp.complete();
+            return mergeRuleApp.complete();
         }
         else {
             return false;
@@ -499,7 +499,7 @@ public class MergePartnerSelectionDialog extends JDialog {
 
     /**
      * Enables / disables the OK and Choose all button depending on whether or
-     * not the currently chosen join rule instance is applicable.
+     * not the currently chosen merge rule instance is applicable.
      */
     private void checkApplicable() {
         okButton.setEnabled(chosenGoals.size() > 0
@@ -542,7 +542,7 @@ public class MergePartnerSelectionDialog extends JDialog {
             return false;
         }
 
-        return checkProvability(joinGoalPio.first.sequent(), chosenDistForm,
+        return checkProvability(mergeGoalPio.first.sequent(), chosenDistForm,
                 services)
                 && checkProvability(partnerGoal.sequent(),
                         tb.not(chosenDistForm), services);
@@ -605,7 +605,7 @@ public class MergePartnerSelectionDialog extends JDialog {
      * Returns the n-th candidate in the list.
      * 
      * @param n
-     *            Index of the join candidate.
+     *            Index of the merge candidate.
      * @return The n-th candidate in the list.
      */
     private MergePartner getNthCandidate(
@@ -622,7 +622,7 @@ public class MergePartnerSelectionDialog extends JDialog {
     }
 
     /**
-     * Loads the join candidates into the combo box, initializes the partner
+     * Loads the merge candidates into the combo box, initializes the partner
      * editor pane with the text of the first candidate.
      */
     private void loadCandidates() {

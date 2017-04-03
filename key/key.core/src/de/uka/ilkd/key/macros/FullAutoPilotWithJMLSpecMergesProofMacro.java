@@ -21,7 +21,7 @@ package de.uka.ilkd.key.macros;
  *
  * It performs the following steps:
  * <ol>
- * <li>Finish symbolic execution with join specifications
+ * <li>Finish symbolic execution with merge specifications
  * <li>Try to close all proof obligations
  * </ol>
  *
@@ -30,7 +30,7 @@ package de.uka.ilkd.key.macros;
  * 
  * @see FullAutoPilotProofMacro
  */
-public class FullAutoPilotWithJMLSpecJoinsProofMacro extends SequentialProofMacro {
+public class FullAutoPilotWithJMLSpecMergesProofMacro extends SequentialProofMacro {
 
     /**
      * The number of proof steps that should be run by the {@link TryCloseMacro}
@@ -41,24 +41,24 @@ public class FullAutoPilotWithJMLSpecJoinsProofMacro extends SequentialProofMacr
 
     @Override
     public String getName() {
-        return "Full Auto Pilot with joins specified in JML";
+        return "Full Auto Pilot with merges specified in JML";
     }
 
     @Override
     public String getCategory() {
-        return "Join";
+        return "Merge";
     }
 
     @Override
     public String getDescription() {
-        return "<html><ol><li>Finish symbolic execution (with joins specified by JML annotations)" +
+        return "<html><ol><li>Finish symbolic execution (with merges specified by JML annotations)" +
                 "<li>Try to close all proof obligations</ol>";
     }
 
     @Override
     protected ProofMacro[] createProofMacroArray() {
         return new ProofMacro[] {
-                new FinishSymbolicExecutionWithSpecJoinsMacro(),
+                new FinishSymbolicExecutionWithSpecMergesMacro(),
                 new TryCloseMacro(NUMBER_OF_TRY_STEPS)
         };
     }

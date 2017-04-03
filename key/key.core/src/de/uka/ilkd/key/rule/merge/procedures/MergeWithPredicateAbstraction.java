@@ -29,17 +29,18 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbs
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
 
 /**
- * Rule that joins two sequents based on a lattice of user-defined predicates.
+ * Rule that merges two sequents based on a lattice of user-defined predicates.
  * This procedure is no singleton since the set of predicates has to be defined
- * for each join application.
+ * for each merge application.
  * 
  * @author Dominic Scheurer
  */
 public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
 
-    private static final String DISPLAY_NAME = "JoinByPredicateAbstraction";
+    private static final String DISPLAY_NAME = "MergeByPredicateAbstraction";
 
     /**
      * Mapping from sorts (e.g., int) to predicates (functions parametric in one
@@ -69,7 +70,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
 
     /**
      * Creates a new instance of {@link MergeWithPredicateAbstraction}. This
-     * JoinProcedure cannot be a Singleton since it depends on the given list of
+     * {@link MergeProcedure} cannot be a Singleton since it depends on the given list of
      * predicates!
      *
      * @param predicates
@@ -98,7 +99,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
     /*
      * (non-Javadoc)
      * 
-     * @see de.uka.ilkd.key.rule.join.JoinProcedure#complete()
+     * @see de.uka.ilkd.key.rule.merge.MergeProcedure#complete()
      */
     @Override
     public boolean complete() {
@@ -132,9 +133,9 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
 
         if (applicablePredicates == null) {
             // A returned null value indicates to
-            // JoinWithLatticeAbstraction#joinValuesInStates(...) that the
-            // fallback procedure (usually if-then-else join) should be
-            // performed instead of a join with lattices
+            // MergeWithLatticeAbstraction#mergeValuesInStates(...) that the
+            // fallback procedure (usually if-then-else merge) should be
+            // performed instead of a merge with lattices
             return null;
         }
 

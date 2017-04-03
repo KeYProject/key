@@ -30,9 +30,9 @@ import mergerule.MergeRuleUtils;
 import mergerule.SymbolicExecutionState;
 
 /**
- * Rule that joins two sequents based on the if-then-else construction: If two
+ * Rule that merges two sequents based on the if-then-else construction: If two
  * locations are assigned different values in the states, the value in the
- * joined state is chosen based on the path condition. This rule retains total
+ * merged state is chosen based on the path condition. This rule retains total
  * precision. In contrast to the {@link MergeIfThenElse} rule, the distinction is
  * not realized in the update / symbolic state, but in the antecedent / path
  * condition. This can be much more efficient.
@@ -52,12 +52,12 @@ public class MergeIfThenElseAntecedent extends MergeProcedure {
         return INSTANCE;
     }
 
-    private static final String DISPLAY_NAME = "JoinByIfThenElseAntecedent";
+    private static final String DISPLAY_NAME = "MergeByIfThenElseAntecedent";
 
     /*
      * (non-Javadoc)
      * 
-     * @see de.uka.ilkd.key.rule.join.JoinProcedure#complete()
+     * @see de.uka.ilkd.key.rule.merge.MergeProcedure#complete()
      */
     @Override
     public boolean complete() {
@@ -65,7 +65,7 @@ public class MergeIfThenElseAntecedent extends MergeProcedure {
     }
 
     @Override
-    public ValuesJoinResult joinValuesInStates(Term v,
+    public ValuesMergeResult mergeValuesInStates(Term v,
             SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
@@ -84,7 +84,7 @@ public class MergeIfThenElseAntecedent extends MergeProcedure {
                         tb.func(newSkolemConst), valueInState1, valueInState2,
                         state1, state2, distinguishingFormula, services));
 
-        return new ValuesJoinResult(newConstraints, tb.func(newSkolemConst),
+        return new ValuesMergeResult(newConstraints, tb.func(newSkolemConst),
                 newNames, new LinkedHashSet<Term>());
 
     }

@@ -25,8 +25,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
-import de.uka.ilkd.key.macros.FinishSymbolicExecutionUntilJoinPointMacro;
-import de.uka.ilkd.key.macros.FullAutoPilotWithJMLSpecJoinsProofMacro;
+import de.uka.ilkd.key.macros.FinishSymbolicExecutionUntilMergePointMacro;
+import de.uka.ilkd.key.macros.FullAutoPilotWithJMLSpecMergesProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -100,12 +100,12 @@ public class MergeRuleTests extends TestCase {
     @Test
     public void testDoAutomaticGcdProofWithJoins() {
         final Proof proof = loadProof("gcd.joinBlocks.key");
-        runMacro(new FullAutoPilotWithJMLSpecJoinsProofMacro(), proof.root());
+        runMacro(new FullAutoPilotWithJMLSpecMergesProofMacro(), proof.root());
         startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());
         assertEquals("There should be two join applications in the proof.", 2,
-                proof.getStatistics().joinRuleApps);
+                proof.getStatistics().mergeRuleApps);
     }
 
     /**
@@ -114,7 +114,7 @@ public class MergeRuleTests extends TestCase {
      * <p>
      * 
      * <ol>
-     * <li>Run the {@link FinishSymbolicExecutionUntilJoinPointMacro} on the
+     * <li>Run the {@link FinishSymbolicExecutionUntilMergePointMacro} on the
      * root</li>
      * <li>Do one join</li>
      * <li>Again run the macro on the one open goal</li>
@@ -133,7 +133,7 @@ public class MergeRuleTests extends TestCase {
         final Proof proof = loadProof("gcd.key");
 
         for (int i = 0; i < 2; i++) {
-            runMacro(new FinishSymbolicExecutionUntilJoinPointMacro(), proof
+            runMacro(new FinishSymbolicExecutionUntilMergePointMacro(), proof
                     .openGoals().head().node());
             joinFirstGoal(proof, MergeIfThenElseAntecedent.instance());
         }
@@ -191,7 +191,7 @@ public class MergeRuleTests extends TestCase {
         startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());
-        assertEquals(1, proof.getStatistics().joinRuleApps);
+        assertEquals(1, proof.getStatistics().mergeRuleApps);
     }
 
     /**
@@ -225,10 +225,10 @@ public class MergeRuleTests extends TestCase {
                 (MergeRuleBuiltInRuleApp) mergeRule.createApp(joinPio, services);
 
         {
-            joinApp.setJoinPartners(MergeRule.findPotentialJoinPartners(proof
+            joinApp.setMergePartners(MergeRule.findPotentialMergePartners(proof
                     .openGoals().head(), joinPio));
             joinApp.setConcreteRule(joinProc);
-            joinApp.setJoinNode(joinNode);
+            joinApp.setMergeNode(joinNode);
         }
 
         if (!joinApp.complete()) {

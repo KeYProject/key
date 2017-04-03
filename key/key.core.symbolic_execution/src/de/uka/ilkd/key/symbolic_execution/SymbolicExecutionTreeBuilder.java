@@ -774,7 +774,7 @@ public class SymbolicExecutionTreeBuilder {
             MergeRuleBuiltInRuleApp ruleApp = (MergeRuleBuiltInRuleApp) node.getAppliedRuleApp();
             IExecutionNode<?> source = getBestExecutionNode(node);
             if (source != null) {
-               for (MergePartner partner : ruleApp.getJoinPartners()) {
+               for (MergePartner partner : ruleApp.getMergePartners()) {
                   IExecutionNode<?> target = getBestExecutionNode(partner.getGoal().node());
                   // Ignore branch conditions below join node
                   while (target instanceof IExecutionBranchCondition) {

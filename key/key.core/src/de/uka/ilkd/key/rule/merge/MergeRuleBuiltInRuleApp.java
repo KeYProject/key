@@ -20,25 +20,25 @@ import mergerule.SymbolicExecutionState;
 import mergerule.SymbolicExecutionStateWithProgCnt;
 
 /**
- * Rule application class for join rule applications. Is complete iff
- * the joinPartners field as well as the concrete join rule to be used
+ * Rule application class for merge rule applications. Is complete iff the
+ * mergePartners field as well as the concrete {@link MergeProcedure} to be used
  * have been set by the corresponding setter function.
  * 
  * @author Dominic Scheurer
  */
 public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
-    private Node joinNode = null;
-    private ImmutableList<MergePartner> joinPartners = null;
+    private Node mergeNode = null;
+    private ImmutableList<MergePartner> mergePartners = null;
     private MergeProcedure concreteRule = null;
-    
+
     private SymbolicExecutionStateWithProgCnt thisSEState = null;
-    private ImmutableList<SymbolicExecutionState> joinPartnerStates = null;
+    private ImmutableList<SymbolicExecutionState> mergePartnerStates = null;
     private Term distForm = null;
-    
+
     private ArrayList<MergeRule.MergeRuleProgressListener> progressListeners = new ArrayList<>();
 
-	public MergeRuleBuiltInRuleApp(BuiltInRule builtInRule,
+    public MergeRuleBuiltInRuleApp(BuiltInRule builtInRule,
             PosInOccurrence pio) {
         super(builtInRule, pio);
     }
@@ -63,20 +63,20 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
         return this;
     }
-    
+
     @Override
     public boolean complete() {
         // We do not check for the suitability of the distinguishing formula
-        // since this has already been dealt with in JoinRuleCompletion.
-        return joinPartners != null && concreteRule != null && joinNode != null
+        // since this has already been dealt with in MergeRuleCompletion.
+        return mergePartners != null && concreteRule != null && mergeNode != null
                 && distinguishablePathConditionsRequirement();
     }
-    
+
     private boolean distinguishablePathConditionsRequirement() {
-        final Services services = joinNode.proof().getServices();
+        final Services services = mergeNode.proof().getServices();
 
         // NOTE: Requiring distinguishable path conditions for the abstraction
-        // procedures here is an intermediate construction: JoinRule returns
+        // procedures here is an intermediate construction: MergeRule returns
         // if-then-else terms along with abstraction values when lattice
         // abstraction is applied; furthermore, if-then-else is a fallback
         // for unsupported data types.
@@ -84,14 +84,16 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         // affect completeness) and check for each variable in the symbolic
         // states whether the corresponding data types are supported by
         // the concrete lattice.
-        if (concreteRule.requiresDistinguishablePathConditions() ||
-                concreteRule instanceof MergeWithLatticeAbstraction) {
-            ImmutableList<SymbolicExecutionState> allStates = ImmutableSLList.nil();
-            allStates = allStates.prepend(joinPartnerStates);
-            allStates = allStates.prepend(thisSEState.toSymbolicExecutionState());
-            
+        if (concreteRule.requiresDistinguishablePathConditions()
+                || concreteRule instanceof MergeWithLatticeAbstraction) {
+            ImmutableList<SymbolicExecutionState> allStates = ImmutableSLList
+                    .nil();
+            allStates = allStates.prepend(mergePartnerStates);
+            allStates = allStates
+                    .prepend(thisSEState.toSymbolicExecutionState());
+
             for (SymbolicExecutionState state1 : allStates) {
-                for (SymbolicExecutionState state2: allStates) {
+                for (SymbolicExecutionState state2 : allStates) {
                     if (state1 != state2) {
                         if (!MergeRuleUtils.pathConditionsAreDistinguishable(
                                 state1.second, state2.second, services)) {
@@ -102,62 +104,63 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
             }
 
             return true;
-        }
-        else {
+        } else {
             return true;
         }
     }
-    
+
     // GETTERS AND SETTERS //
 
-    public ImmutableList<MergePartner> getJoinPartners() {
-        return joinPartners;
+    public ImmutableList<MergePartner> getMergePartners() {
+        return mergePartners;
     }
-    
-    public void setJoinPartners(ImmutableList<MergePartner> joinPartners) {
-        this.joinPartners = joinPartners;
-        joinPartnerStates = MergeRuleUtils.sequentsToSEPairs(joinPartners);
+
+    public void setMergePartners(ImmutableList<MergePartner> mergePartners) {
+        this.mergePartners = mergePartners;
+        mergePartnerStates = MergeRuleUtils.sequentsToSEPairs(mergePartners);
     }
 
     public MergeProcedure getConcreteRule() {
-		return concreteRule;
-	}
+        return concreteRule;
+    }
 
-	public void setConcreteRule(MergeProcedure concreteRule) {
-		this.concreteRule = concreteRule;
-	}
+    public void setConcreteRule(MergeProcedure concreteRule) {
+        this.concreteRule = concreteRule;
+    }
 
-	public Node getJoinNode() {
-		return joinNode;
-	}
+    public Node getMergeNode() {
+        return mergeNode;
+    }
 
-	public void setJoinNode(Node joinNode) {
-		this.joinNode = joinNode;
-		this.thisSEState = MergeRuleUtils.sequentToSETriple(joinNode, super.pio, joinNode.proof().getServices());
-	}
-	
-	public void setDistinguishingFormula(Term distForm) {
-	    // null is OK: In this case, we generate the distinguishing
-	    // formula automatically. Otherwise, the term must indeed be
-	    // a formula.
-	    assert distForm == null || distForm.sort() == Sort.FORMULA;
-	    
-	    this.distForm  = distForm;
-	}
-    
+    public void setMergeNode(Node mergeNode) {
+        this.mergeNode = mergeNode;
+        this.thisSEState = MergeRuleUtils.sequentToSETriple(mergeNode, super.pio,
+                mergeNode.proof().getServices());
+    }
+
+    public void setDistinguishingFormula(Term distForm) {
+        // null is OK: In this case, we generate the distinguishing
+        // formula automatically. Otherwise, the term must indeed be
+        // a formula.
+        assert distForm == null || distForm.sort() == Sort.FORMULA;
+
+        this.distForm = distForm;
+    }
+
     public Term getDistinguishingFormula() {
         return distForm;
     }
-	
-	public SymbolicExecutionStateWithProgCnt getJoinSEState() {
-	    return thisSEState;
-	}
-	
-    public ImmutableList<SymbolicExecutionState> getJoinPartnerStates() {
-        return joinPartnerStates;
+
+    public SymbolicExecutionStateWithProgCnt getMergeSEState() {
+        return thisSEState;
     }
-    
-    public void registerProgressListener(MergeRule.MergeRuleProgressListener listener) {
+
+    public ImmutableList<SymbolicExecutionState> getMergePartnerStates() {
+        return mergePartnerStates;
+    }
+
+    public void registerProgressListener(
+            MergeRule.MergeRuleProgressListener listener) {
         progressListeners.add(listener);
     }
 
@@ -165,10 +168,11 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         progressListeners = new ArrayList<>();
     }
 
-    public boolean removeProgressListener(MergeRule.MergeRuleProgressListener listener) {
+    public boolean removeProgressListener(
+            MergeRule.MergeRuleProgressListener listener) {
         return progressListeners.remove(listener);
     }
-    
+
     public void fireProgressChange(int progress) {
         progressListeners.forEach(l -> l.signalProgress(progress));
     }

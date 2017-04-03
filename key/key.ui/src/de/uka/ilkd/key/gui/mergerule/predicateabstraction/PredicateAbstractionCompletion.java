@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui.joinrule.predicateabstraction;
+package de.uka.ilkd.key.gui.mergerule.predicateabstraction;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -79,9 +79,9 @@ public class MergeRuleMenuItem extends JMenuItem {
                                 .taskStarted(new DefaultTaskStartedInfo(
                                         TaskKind.Other,
                                         "Merging " + (completedApp
-                                                .getJoinPartners().size() + 1)
+                                                .getMergePartners().size() + 1)
                                                 + " nodes",
-                                        completedApp.getJoinPartners().size()));
+                                        completedApp.getMergePartners().size()));
                         mediator.getUI().taskProgress(0);
 
                         completedApp.registerProgressListener(progress -> {

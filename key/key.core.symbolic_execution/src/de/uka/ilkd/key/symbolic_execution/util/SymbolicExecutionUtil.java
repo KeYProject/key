@@ -4191,7 +4191,7 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isJoin(RuleApp ruleApp) {
       return ruleApp instanceof MergeRuleBuiltInRuleApp &&
-             !((MergeRuleBuiltInRuleApp) ruleApp).getJoinPartners().isEmpty();
+             !((MergeRuleBuiltInRuleApp) ruleApp).getMergePartners().isEmpty();
    }
 
    /**
@@ -4210,8 +4210,8 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isWeakeningGoalEnabled(Proof proof) {
       if (proof != null && !proof.isDisposed()) {
-         String value = proof.getSettings().getChoiceSettings().getDefaultChoices().get(CloseAfterMerge.JOIN_GENERATE_IS_WEAKENING_GOAL_CFG);
-         return CloseAfterMerge.JOIN_GENERATE_IS_WEAKENING_GOAL_CFG_ON.equals(value);
+         String value = proof.getSettings().getChoiceSettings().getDefaultChoices().get(CloseAfterMerge.MERGE_GENERATE_IS_WEAKENING_GOAL_CFG);
+         return CloseAfterMerge.MERGE_GENERATE_IS_WEAKENING_GOAL_CFG_ON.equals(value);
       }
       else {
          return false;

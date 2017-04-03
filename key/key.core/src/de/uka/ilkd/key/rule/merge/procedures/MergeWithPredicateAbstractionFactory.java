@@ -26,8 +26,8 @@ import mergerule.SymbolicExecutionState;
 
 /**
  * A factory class for {@link MergeWithPredicateAbstraction} which is itself a
- * {@link MergeProcedure}. This class is used by the join rule completion GUI
- * which needs in instance for every join procedure (
+ * {@link MergeProcedure}. This class is used by the merge rule completion GUI
+ * which needs in instance for every merge procedure (
  * {@link MergeWithPredicateAbstraction} cannot be statically instantiated since
  * it depends on the list of predicates).
  * {@link MergeWithPredicateAbstractionFactory} is a Singleton.
@@ -53,32 +53,16 @@ public class MergeWithPredicateAbstractionFactory extends
     public static MergeWithPredicateAbstractionFactory instance() {
         return INSTANCE;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.uka.ilkd.key.rule.join.JoinProcedure#joinValuesInStates(de.uka.ilkd
-     * .key.logic.Term, de.uka.ilkd.key.util.joinrule.SymbolicExecutionState,
-     * de.uka.ilkd.key.logic.Term,
-     * de.uka.ilkd.key.util.joinrule.SymbolicExecutionState,
-     * de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term,
-     * de.uka.ilkd.key.java.Services)
-     */
+    
     @Override
-    public ValuesJoinResult joinValuesInStates(
+    public ValuesMergeResult mergeValuesInStates(
             Term v, SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
         throw new UnsupportedOperationException(
-                "You need to create an instance of JoinWithPredicateAbstraction.");
+                "You need to create an instance of MergeWithPredicateAbstraction.");
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.uka.ilkd.key.rule.join.JoinProcedure#complete()
-     */
     @Override
     public boolean complete() {
         return false;
@@ -103,7 +87,7 @@ public class MergeWithPredicateAbstractionFactory extends
 
     @Override
     public String toString() {
-        return "JoinByPredicateAbstraction";
+        return "MergeByPredicateAbstraction";
     }
 
 }

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui.joinrule.predicateabstraction;
+package de.uka.ilkd.key.gui.mergerule.predicateabstraction;
 
 /*
  * Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.

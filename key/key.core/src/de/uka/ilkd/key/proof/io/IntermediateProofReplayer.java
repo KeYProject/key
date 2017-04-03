@@ -801,8 +801,8 @@ public class IntermediateProofReplayer {
                             partnerNodeInfo.second));
         }
 
-        joinApp.setJoinNode(currNode);
-        joinApp.setJoinPartners(joinPartners);
+        joinApp.setMergeNode(currNode);
+        joinApp.setMergePartners(joinPartners);
 
         return joinApp;
     }

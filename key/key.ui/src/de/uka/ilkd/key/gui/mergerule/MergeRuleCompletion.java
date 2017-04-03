@@ -14,9 +14,9 @@ import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElse;
 
 /**
- * This class completes the instantiation for a join rule application. The user
- * is queried for partner goals and concrete join rule to choose. If in forced
- * mode, all potential partners and the if-then-else join method are chosen (no
+ * This class completes the instantiation for a merge rule application. The user
+ * is queried for partner goals and concrete merge rule to choose. If in forced
+ * mode, all potential partners and the if-then-else merge method are chosen (no
  * query is shown to the user).
  * 
  * @author Dominic Scheurer
@@ -26,7 +26,7 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
     /** Singleton instance */
     public static final MergeRuleCompletion INSTANCE = new MergeRuleCompletion();
 
-    private static final MergeProcedure STD_CONCRETE_JOIN_RULE = MergeIfThenElse
+    private static final MergeProcedure STD_CONCRETE_MERGE_RULE = MergeIfThenElse
             .instance();
 
     private MergeRuleCompletion() {
@@ -36,11 +36,11 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
     public IBuiltInRuleApp complete(final IBuiltInRuleApp app, final Goal goal,
             boolean forced) {
 
-        final MergeRuleBuiltInRuleApp joinApp = (MergeRuleBuiltInRuleApp) app;
-        final PosInOccurrence pio = joinApp.posInOccurrence();
+        final MergeRuleBuiltInRuleApp mergeApp = (MergeRuleBuiltInRuleApp) app;
+        final PosInOccurrence pio = mergeApp.posInOccurrence();
 
         final ImmutableList<MergePartner> candidates =
-                MergeRule.findPotentialJoinPartners(goal, pio);
+                MergeRule.findPotentialMergePartners(goal, pio);
 
         ImmutableList<MergePartner> chosenCandidates =
                 null;
@@ -50,7 +50,7 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
 
         if (forced) {
             chosenCandidates = candidates;
-            chosenRule = STD_CONCRETE_JOIN_RULE;
+            chosenRule = STD_CONCRETE_MERGE_RULE;
         }
         else {
             final MergePartnerSelectionDialog dialog =
@@ -59,7 +59,7 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
             dialog.setVisible(true);
             
             chosenCandidates = dialog.getChosenCandidates();
-            chosenRule = dialog.getChosenJoinRule();
+            chosenRule = dialog.getChosenMergeRule();
             chosenDistForm = dialog.getChosenDistinguishingFormula();
         }
 
@@ -69,10 +69,10 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
 
         final MergeRuleBuiltInRuleApp result =
                 new MergeRuleBuiltInRuleApp(app.rule(), pio);
-        result.setJoinPartners(chosenCandidates);
+        result.setMergePartners(chosenCandidates);
         result.setConcreteRule(chosenRule);
         result.setDistinguishingFormula(chosenDistForm);
-        result.setJoinNode(goal.node());
+        result.setMergeNode(goal.node());
 
         return result;
     }

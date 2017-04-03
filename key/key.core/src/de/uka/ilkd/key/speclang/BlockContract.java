@@ -91,7 +91,7 @@ public interface BlockContract extends SpecificationElement {
 
     public Term getAssignable(LocationVariable heap);
     
-    public MergeProcedure getJoinProcedure();
+    public MergeProcedure getMergeProcedure();
 
     public void visit(Visitor visitor);
 
@@ -107,7 +107,7 @@ public interface BlockContract extends SpecificationElement {
                                 Map<LocationVariable,Term> newPostconditions,
                                 Map<LocationVariable,Term> newModifiesClauses,
                                 final ImmutableList<InfFlowSpec> newInfFlowSpecs,
-                                final MergeProcedure newJoinProcedure,
+                                final MergeProcedure newMergeProcedure,
                                 Variables newVariables);
 
     public BlockContract setBlock(StatementBlock newBlock);
@@ -127,9 +127,9 @@ public interface BlockContract extends SpecificationElement {
     public boolean hasInfFlowSpecs();
     
     /**
-     * @return True iff a join procedure has been specified for this block contract.
+     * @return True iff a {@link MergeProcedure} has been specified for this block contract.
      */
-    public boolean hasJoinProcedure();
+    public boolean hasMergeProcedure();
 
 
     public void setInstantiationSelf(Term selfInstantiation);
