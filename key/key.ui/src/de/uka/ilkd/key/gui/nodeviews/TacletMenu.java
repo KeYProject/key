@@ -41,7 +41,7 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
-import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
+import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
@@ -303,7 +303,7 @@ public class TacletMenu extends JMenu {
     private void createDefocusingJoinMenu() {
         if (MergeRule.isOfAdmissibleForm(mediator.getSelectedGoal(),
                 pos.getPosInOccurrence(), false)) {
-            JMenuItem item = new JoinRuleMenuItem(mediator.getSelectedGoal(),
+            JMenuItem item = new MergeRuleMenuItem(mediator.getSelectedGoal(),
                     pos.getPosInOccurrence(), mediator);
             add(item);
         }

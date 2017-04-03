@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join;
+package de.uka.ilkd.key.rule.merge;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -43,7 +43,7 @@ public class PredicateAbstractionLatticeTests extends TestCase {
     @Test
     public void testCreateSignLatticeWithPredicates() {
         // Dummy proof to get a term builder.
-        final Proof p = JoinRuleTests.loadProof("dummy.key");
+        final Proof p = MergeRuleTests.loadProof("dummy.key");
         final Services services = p.getServices();
 
         final Sort intSort =
@@ -186,7 +186,7 @@ public class PredicateAbstractionLatticeTests extends TestCase {
 
     public void testToAndFromString() {
         // Dummy proof to get services etc.
-        final Proof p = JoinRuleTests.loadProof("dummy.key");
+        final Proof p = MergeRuleTests.loadProof("dummy.key");
         final Services services = p.getServices();
         final TermBuilder tb = services.getTermBuilder();
 

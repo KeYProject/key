@@ -18,18 +18,19 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * Encapsulates intermediate information for constructing a join rule
+ * Encapsulates intermediate information for constructing a {@link MergeRule}
  * application.
  *
  * @author Dominic Scheurer
  */
-public class JoinAppIntermediate extends BuiltInAppIntermediate {
+public class MergeAppIntermediate extends BuiltInAppIntermediate {
 
     private int id = 0;
-    private String joinProc;
+    private String mergeProc;
     private String distinguishingFormula = null;
     private int nrPartners = 0;
     private String abstractionPredicates = null;
@@ -66,7 +67,7 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
      *            as a join technique.
      * @param currAbstractionPredicates
      */
-    public JoinAppIntermediate(
+    public MergeAppIntermediate(
             String ruleName,
             Pair<Integer, PosInTerm> pos,
             int id,
@@ -81,7 +82,7 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
         assert ruleName.equals("JoinRule") : "This was somehow unexpected; are there other join rules than JoinRule?";
 
         this.id = id;
-        this.joinProc = joinProc;
+        this.mergeProc = joinProc;
         this.nrPartners = nrPartners;
         this.distinguishingFormula = distinguishingFormula;
         this.abstractionPredicates = abstractionPredicates;
@@ -102,7 +103,7 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
      * @return The name of the join procedure used during joining.
      */
     public String getJoinProc() {
-        return joinProc;
+        return mergeProc;
     }
 
     /**

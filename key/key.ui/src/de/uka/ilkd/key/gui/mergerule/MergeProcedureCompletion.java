@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui.joinrule;
+package de.uka.ilkd.key.gui.mergerule;
 
 import java.util.Collection;
 import java.util.function.Function;
@@ -32,24 +32,24 @@ import de.uka.ilkd.key.util.Pair;
  *
  * @author Dominic Scheurer
  */
-public abstract class JoinProcedureCompletion<C extends MergeProcedure> {
+public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
 
     /**
      * @return The default completion (identity mapping).
      */
-    public static <T extends MergeProcedure> JoinProcedureCompletion<T> defaultCompletion() {
+    public static <T extends MergeProcedure> MergeProcedureCompletion<T> defaultCompletion() {
         return create(proc -> proc);
     }
 
     /**
      * Default constructor is hidden. Use {@link #create(Function)} instead.
      */
-    protected JoinProcedureCompletion() {
+    protected MergeProcedureCompletion() {
     }
 
-    public static <T extends MergeProcedure> JoinProcedureCompletion<T> create(
+    public static <T extends MergeProcedure> MergeProcedureCompletion<T> create(
             final Function<T, T> completion) {
-        return new JoinProcedureCompletion<T>() {
+        return new MergeProcedureCompletion<T>() {
             @Override
             public T complete(
                     T proc,
@@ -82,7 +82,7 @@ public abstract class JoinProcedureCompletion<C extends MergeProcedure> {
      * 
      * @return The requested completion.
      */
-    public static JoinProcedureCompletion<? extends MergeProcedure> getCompletionForClass(
+    public static MergeProcedureCompletion<? extends MergeProcedure> getCompletionForClass(
             Class<? extends MergeProcedure> cls) {
         if (cls.equals(MergeWithPredicateAbstractionFactory.class)) {
             return new PredicateAbstractionCompletion();

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui.joinrule;
+package de.uka.ilkd.key.gui.mergerule;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -21,15 +21,15 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElse;
  * 
  * @author Dominic Scheurer
  */
-public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion {
+public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion {
 
     /** Singleton instance */
-    public static final JoinRuleCompletion INSTANCE = new JoinRuleCompletion();
+    public static final MergeRuleCompletion INSTANCE = new MergeRuleCompletion();
 
     private static final MergeProcedure STD_CONCRETE_JOIN_RULE = MergeIfThenElse
             .instance();
 
-    private JoinRuleCompletion() {
+    private MergeRuleCompletion() {
     }
 
     @Override
@@ -53,8 +53,8 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
             chosenRule = STD_CONCRETE_JOIN_RULE;
         }
         else {
-            final JoinPartnerSelectionDialog dialog =
-                    new JoinPartnerSelectionDialog(goal, pio, candidates, goal
+            final MergePartnerSelectionDialog dialog =
+                    new MergePartnerSelectionDialog(goal, pio, candidates, goal
                             .proof().getServices());
             dialog.setVisible(true);
             

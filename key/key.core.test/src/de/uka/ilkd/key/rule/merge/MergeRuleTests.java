@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join;
+package de.uka.ilkd.key.rule.merge;
 
 import java.io.File;
 
@@ -40,11 +40,11 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.util.ProofStarter;
 
 /**
- * Test suite for the join rule.
+ * Test suite for the {@link MergeRule}.
  *
  * @author Dominic Scheurer
  */
-public class JoinRuleTests extends TestCase {
+public class MergeRuleTests extends TestCase {
 
     private static final String TEST_RESOURCES_DIR_PREFIX =
             "resources/testcase/join/";

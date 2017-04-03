@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui.joinrule;
+package de.uka.ilkd.key.gui.mergerule;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -74,12 +74,12 @@ import de.uka.ilkd.key.util.Pair;
 import mergerule.MergeRuleUtils;
 
 /**
- * JDialog for selecting a subset of candidate goals as partners for a join rule
+ * JDialog for selecting a subset of candidate goals as partners for a {@link MergeRule}
  * application.
  * 
  * @author Dominic Scheurer
  */
-public class JoinPartnerSelectionDialog extends JDialog {
+public class MergePartnerSelectionDialog extends JDialog {
 
     private static final long serialVersionUID = -1460097562546341922L;
 
@@ -151,7 +151,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
     private JButton okButton = null;
     private JButton chooseAllButton = null;
 
-    private JoinPartnerSelectionDialog() {
+    private MergePartnerSelectionDialog() {
         super(MAIN_WINDOW_INSTANCE, "Select partner node for join operation",
                 true);
 
@@ -394,11 +394,6 @@ public class JoinPartnerSelectionDialog extends JDialog {
         setSize(INITIAL_SIZE);
     }
 
-    public static void main(String[] args) {
-        JoinPartnerSelectionDialog diag = new JoinPartnerSelectionDialog();
-        diag.setVisible(true);
-    }
-
     /**
      * Creates a new join partner selection dialog.
      * 
@@ -412,7 +407,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
      * @param services
      *            The services object.
      */
-    public JoinPartnerSelectionDialog(
+    public MergePartnerSelectionDialog(
             Goal joinGoal,
             PosInOccurrence pio,
             ImmutableList<MergePartner> candidates,
@@ -460,8 +455,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
      */
     @SuppressWarnings("unchecked")
     public <T extends MergeProcedure> T getChosenJoinRule() {
-        JoinProcedureCompletion<T> completion =
-                (JoinProcedureCompletion<T>) JoinProcedureCompletion
+        MergeProcedureCompletion<T> completion =
+                (MergeProcedureCompletion<T>) MergeProcedureCompletion
                         .getCompletionForClass(chosenRule.getClass());
 
         return completion.complete((T) chosenRule, joinGoalPio, chosenGoals);

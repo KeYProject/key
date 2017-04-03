@@ -21,7 +21,7 @@ import java.util.stream.StreamSupport;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
-import de.uka.ilkd.key.gui.joinrule.JoinProcedureCompletion;
+import de.uka.ilkd.key.gui.mergerule.MergeProcedureCompletion;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -39,7 +39,7 @@ import mergerule.SymbolicExecutionState;
  * @author Dominic Scheurer
  */
 public class PredicateAbstractionCompletion extends
-      JoinProcedureCompletion<MergeWithPredicateAbstraction> {
+      MergeProcedureCompletion<MergeWithPredicateAbstraction> {
 
    /*
     * (non-Javadoc)

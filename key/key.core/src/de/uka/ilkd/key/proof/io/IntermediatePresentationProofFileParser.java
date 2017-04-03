@@ -28,8 +28,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.JoinAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.JoinPartnerAppIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -386,7 +386,7 @@ public class IntermediatePresentationProofFileParser implements
 
         if (builtinInfo.currRuleName.equals("JoinRule")) {
             result =
-                    new JoinAppIntermediate(builtinInfo.currRuleName,
+                    new MergeAppIntermediate(builtinInfo.currRuleName,
                             new Pair<Integer, PosInTerm>(
                                     builtinInfo.currFormula,
                                     builtinInfo.currPosInTerm),
@@ -401,7 +401,7 @@ public class IntermediatePresentationProofFileParser implements
         }
         else if (builtinInfo.currRuleName.equals("CloseAfterJoin")) {
             result =
-                    new JoinPartnerAppIntermediate(builtinInfo.currRuleName,
+                    new MergePartnerAppIntermediate(builtinInfo.currRuleName,
                             new Pair<Integer, PosInTerm>(
                                     builtinInfo.currFormula,
                                     builtinInfo.currPosInTerm),

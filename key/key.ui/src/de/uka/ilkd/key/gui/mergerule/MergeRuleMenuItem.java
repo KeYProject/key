@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui.joinrule;
+package de.uka.ilkd.key.gui.mergerule;
 
 import java.awt.event.ActionEvent;
 
@@ -32,12 +32,12 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 
 /**
- * The menu item for the "defocusing" join rule.
+ * The menu item for the state merging rule.
  *
  * @author Dominic Scheurer
  * @see MergeRule
  */
-public class JoinRuleMenuItem extends JMenuItem {
+public class MergeRuleMenuItem extends JMenuItem {
     private static final long serialVersionUID = -8509570987542243690L;
 
     /**
@@ -51,7 +51,7 @@ public class JoinRuleMenuItem extends JMenuItem {
      * @param mediator
      *            The KeY mediator.
      */
-    public JoinRuleMenuItem(final Goal goal, final PosInOccurrence pio,
+    public MergeRuleMenuItem(final Goal goal, final PosInOccurrence pio,
             final KeYMediator mediator) {
         final Services services = goal.proof().getServices();
 
@@ -64,7 +64,7 @@ public class JoinRuleMenuItem extends JMenuItem {
                 final MergeRule joinRule = MergeRule.INSTANCE;
                 final MergeRuleBuiltInRuleApp app = (MergeRuleBuiltInRuleApp) joinRule
                         .createApp(pio, services);
-                final JoinRuleCompletion completion = JoinRuleCompletion.INSTANCE;
+                final MergeRuleCompletion completion = MergeRuleCompletion.INSTANCE;
                 final MergeRuleBuiltInRuleApp completedApp = (MergeRuleBuiltInRuleApp) completion
                         .complete(app, goal, false);
 

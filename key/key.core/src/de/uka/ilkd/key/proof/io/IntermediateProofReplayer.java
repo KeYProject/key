@@ -65,8 +65,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.JoinAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.JoinPartnerAppIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
@@ -232,10 +232,10 @@ public class IntermediateProofReplayer {
                         BuiltInAppIntermediate appInterm = (BuiltInAppIntermediate) currInterm
                                 .getIntermediateRuleApp();
 
-                        if (appInterm instanceof JoinAppIntermediate) {
-                            JoinAppIntermediate joinAppInterm = (JoinAppIntermediate) appInterm;
+                        if (appInterm instanceof MergeAppIntermediate) {
+                            MergeAppIntermediate joinAppInterm = (MergeAppIntermediate) appInterm;
                             HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo = joinPartnerNodes
-                                    .get(((JoinAppIntermediate) appInterm)
+                                    .get(((MergeAppIntermediate) appInterm)
                                             .getId());
 
                             if (partnerNodesInfo == null || partnerNodesInfo
@@ -311,16 +311,16 @@ public class IntermediateProofReplayer {
                                             + NOT_APPLICABLE, e);
                                 }
                             }
-                        } else if (appInterm instanceof JoinPartnerAppIntermediate) {
+                        } else if (appInterm instanceof MergePartnerAppIntermediate) {
                             // Register this partner node
-                            JoinPartnerAppIntermediate joinPartnerApp = (JoinPartnerAppIntermediate) appInterm;
+                            MergePartnerAppIntermediate joinPartnerApp = (MergePartnerAppIntermediate) appInterm;
                             HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodeInfo = joinPartnerNodes
-                                    .get(joinPartnerApp.getJoinNodeId());
+                                    .get(joinPartnerApp.getMergeNodeId());
 
                             if (partnerNodeInfo == null) {
                                 partnerNodeInfo = new HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>();
                                 joinPartnerNodes.put(
-                                        joinPartnerApp.getJoinNodeId(),
+                                        joinPartnerApp.getMergeNodeId(),
                                         partnerNodeInfo);
                             }
 
@@ -687,7 +687,7 @@ public class IntermediateProofReplayer {
      *             app.
      */
     private MergeRuleBuiltInRuleApp instantiateJoinApp(
-            final JoinAppIntermediate joinAppInterm, final Node currNode,
+            final MergeAppIntermediate joinAppInterm, final Node currNode,
             final Set<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo,
             final Services services)
             throws SkipSMTRuleException, BuiltInConstructionException {
