@@ -121,8 +121,8 @@ public class MergeRule implements BuiltInRule {
     private static final int SIMPLIFICATION_TIMEOUT_MS = 2000;
 
     /**
-     * {@link MergeRule} is a Singleton class, therefore constructor only package-wide
-     * visible.
+     * {@link MergeRule} is a Singleton class, therefore constructor only
+     * package-wide visible.
      */
     MergeRule() {
     }
@@ -188,7 +188,7 @@ public class MergeRule implements BuiltInRule {
         int cnt = 0;
         for (SymbolicExecutionState state : mergePartnerStates) {
             mergeRuleApp.fireProgressChange(cnt++);
-            
+
             Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> mergeResult = mergeStates(
                     mergeRule, mergedState, state, thisSEState.third,
                     mergeRuleApp.getDistinguishingFormula(), services);
@@ -767,35 +767,35 @@ public class MergeRule implements BuiltInRule {
     public static ImmutableList<MergePartner> findPotentialMergePartners(
             Goal goal, PosInOccurrence pio, Node start) {
 
-        Services services = goal.proof().getServices();
+        final Services services = goal.proof().getServices();
 
-        ImmutableList<Goal> allGoals = services.getProof()
+        final ImmutableList<Goal> allGoals = services.getProof()
                 .getSubtreeGoals(start);
+
+        final Triple<Term, Term, Term> ownSEState = sequentToSETriple(goal.node(),
+                pio, services);
 
         // Find potential partners -- for which isApplicable is true and
         // they have the same program counter (and post condition).
-        ImmutableList<MergePartner> potentialPartners = ImmutableSLList
-                .nil();
-        for (Goal g : allGoals) {
+        ImmutableList<MergePartner> potentialPartners = ImmutableSLList.nil();
+        
+        for (final Goal g : allGoals) {
             if (!g.equals(goal) && !g.isLinked()) {
                 Semisequent succedent = g.sequent().succedent();
                 for (int i = 0; i < succedent.size(); i++) {
-                    SequentFormula f = succedent.get(i);
+                    final SequentFormula f = succedent.get(i);
 
-                    PosInTerm pit = PosInTerm.getTopLevel();
+                    final PosInTerm pit = PosInTerm.getTopLevel();
 
-                    PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
+                    final PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
                     if (isOfAdmissibleForm(g, gPio, false)) {
-                        Triple<Term, Term, Term> ownSEState = sequentToSETriple(
-                                goal.node(), pio, services);
-                        Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
+                        final Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
                                 g.node(), gPio, services);
-                        
+
                         if (ownSEState.third.equals(partnerSEState.third)) {
 
-                            potentialPartners = potentialPartners.prepend(
-                                    new MergePartner(
-                                            g, gPio));
+                            potentialPartners = potentialPartners
+                                    .prepend(new MergePartner(g, gPio));
 
                         }
                     }
