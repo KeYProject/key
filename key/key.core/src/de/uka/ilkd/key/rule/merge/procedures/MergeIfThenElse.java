@@ -11,12 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join.procedures;
+package de.uka.ilkd.key.rule.merge.procedures;
 
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.countAtoms;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getDistinguishingFormula;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getUpdateRightSideFor;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.trySimplify;
+import static mergerule.MergeRuleUtils.countAtoms;
+import static mergerule.MergeRuleUtils.getDistinguishingFormula;
+import static mergerule.MergeRuleUtils.getUpdateRightSideFor;
+import static mergerule.MergeRuleUtils.trySimplify;
 
 import java.util.LinkedHashSet;
 
@@ -27,12 +27,12 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.rule.join.JoinRule;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
+import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils.Option;
-import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
+import mergerule.SymbolicExecutionState;
+import mergerule.MergeRuleUtils.Option;
 
 /**
  * Rule that joins two sequents based on the if-then-else construction: If two
@@ -41,14 +41,14 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
  * precision. The if-then-else distinction is realized by the respective
  * construct for the update / symbolic state of the symbolic execution state.
  * Note: Doing this not with updates, but in the antecedent / path condition can
- * be much more efficient: See {@link JoinIfThenElseAntecedent}.
+ * be much more efficient: See {@link MergeIfThenElseAntecedent}.
  * 
  * @author Dominic Scheurer
- * @see JoinIfThenElseAntecedent
- * @see JoinRule
+ * @see MergeIfThenElseAntecedent
+ * @see MergeRule
  */
-public class JoinIfThenElse extends JoinProcedure {
-    private static JoinIfThenElse INSTANCE = null;
+public class MergeIfThenElse extends MergeProcedure {
+    private static MergeIfThenElse INSTANCE = null;
 
     /**
      * Time in milliseconds after which a simplification attempt of a
@@ -56,9 +56,9 @@ public class JoinIfThenElse extends JoinProcedure {
      */
     private static final int SIMPLIFICATION_TIMEOUT_MS = 1000;
 
-    public static JoinIfThenElse instance() {
+    public static MergeIfThenElse instance() {
         if (INSTANCE == null) {
-            INSTANCE = new JoinIfThenElse();
+            INSTANCE = new MergeIfThenElse();
         }
         return INSTANCE;
     }

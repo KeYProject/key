@@ -34,7 +34,7 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
+import mergerule.MergeRuleUtils;
 
 /**
  * Interface for predicates used for predicate abstraction. An abstraction
@@ -112,7 +112,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
     public static AbstractionPredicate create(final Sort argSort,
             final Function<Term, Term> mapping, Services services) {
         LocationVariable placeholder =
-                JoinRuleUtils.getFreshLocVariableForPrefix("_ph", argSort,
+                MergeRuleUtils.getFreshLocVariableForPrefix("_ph", argSort,
                         services);
 
         return create(
@@ -267,7 +267,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
 
                 // Parse the placeholder
                 Pair<Sort, Name> ph = null;
-                ph = JoinRuleUtils.parsePlaceholder(phStr, false, services);
+                ph = MergeRuleUtils.parsePlaceholder(phStr, false, services);
 
                 // Add placeholder to namespaces, if necessary
                 if (services.getNamespaces().variables().lookup(ph.second) == null) {
@@ -278,8 +278,8 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
                 }
 
                 // Parse the predicate
-                result.add(JoinRuleUtils.parsePredicate(predStr,
-                        JoinRuleUtils.singletonArrayList(ph), services));
+                result.add(MergeRuleUtils.parsePredicate(predStr,
+                        MergeRuleUtils.singletonArrayList(ph), services));
             }
         }
 

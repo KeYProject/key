@@ -66,12 +66,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.rule.join.JoinRule;
-import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.MergePartner;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
+import de.uka.ilkd.key.rule.merge.MergeRule;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
+import mergerule.MergeRuleUtils;
 
 /**
  * JDialog for selecting a subset of candidate goals as partners for a join rule
@@ -133,7 +133,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
                     GOAL_COMPARATOR);
 
     /** The chosen join method. */
-    private JoinProcedure chosenRule = JoinProcedure.getJoinProcedures().head();
+    private MergeProcedure chosenRule = MergeProcedure.getJoinProcedures().head();
 
     /** The chosen distinguishing formula */
     private Term chosenDistForm = null;
@@ -225,7 +225,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
         });
 
         bgJoinMethods = new ButtonGroup();
-        for (final JoinProcedure rule : JoinProcedure.getJoinProcedures()) {
+        for (final MergeProcedure rule : MergeProcedure.getJoinProcedures()) {
             JRadioButton rb = new JRadioButton(rule.toString());
             rb.setSelected(true);
 
@@ -300,7 +300,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
             @Override
             public void keyReleased(KeyEvent e) {
                 chosenDistForm =
-                        JoinRuleUtils.translateToFormula(services,
+                        MergeRuleUtils.translateToFormula(services,
                                 txtDistForm.getText());
 
                 if (chosenDistForm == null || !isSuitableDistFormula()) {
@@ -459,7 +459,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
      * @return The chosen join rule.
      */
     @SuppressWarnings("unchecked")
-    public <T extends JoinProcedure> T getChosenJoinRule() {
+    public <T extends MergeProcedure> T getChosenJoinRule() {
         JoinProcedureCompletion<T> completion =
                 (JoinProcedureCompletion<T>) JoinProcedureCompletion
                         .getCompletionForClass(chosenRule.getClass());
@@ -487,8 +487,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
     private boolean isApplicableForCandidates(
             ImmutableList<MergePartner> theCandidates) {
         if (joinGoalPio != null && candidates != null && chosenRule != null) {
-            JoinRuleBuiltInRuleApp joinRuleApp =
-                    (JoinRuleBuiltInRuleApp) JoinRule.INSTANCE.createApp(
+            MergeRuleBuiltInRuleApp joinRuleApp =
+                    (MergeRuleBuiltInRuleApp) MergeRule.INSTANCE.createApp(
                             joinGoalPio.second, services);
 
             joinRuleApp.setJoinNode(joinGoalPio.first.node());
@@ -577,7 +577,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
             }
         }
 
-        if (!JoinRuleUtils.isProvable(Sequent.createSequent(antecedent,
+        if (!MergeRuleUtils.isProvable(Sequent.createSequent(antecedent,
                 new Semisequent(new SequentFormula(formulaToProve))), services,
                 1000)) {
             return false;

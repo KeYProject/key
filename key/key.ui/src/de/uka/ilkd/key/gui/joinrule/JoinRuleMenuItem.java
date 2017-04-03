@@ -28,14 +28,14 @@ import de.uka.ilkd.key.proof.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
-import de.uka.ilkd.key.rule.join.JoinRule;
-import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergeRule;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 
 /**
  * The menu item for the "defocusing" join rule.
  *
  * @author Dominic Scheurer
- * @see JoinRule
+ * @see MergeRule
  */
 public class JoinRuleMenuItem extends JMenuItem {
     private static final long serialVersionUID = -8509570987542243690L;
@@ -61,11 +61,11 @@ public class JoinRuleMenuItem extends JMenuItem {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                final JoinRule joinRule = JoinRule.INSTANCE;
-                final JoinRuleBuiltInRuleApp app = (JoinRuleBuiltInRuleApp) joinRule
+                final MergeRule joinRule = MergeRule.INSTANCE;
+                final MergeRuleBuiltInRuleApp app = (MergeRuleBuiltInRuleApp) joinRule
                         .createApp(pio, services);
                 final JoinRuleCompletion completion = JoinRuleCompletion.INSTANCE;
-                final JoinRuleBuiltInRuleApp completedApp = (JoinRuleBuiltInRuleApp) completion
+                final MergeRuleBuiltInRuleApp completedApp = (MergeRuleBuiltInRuleApp) completion
                         .complete(app, goal, false);
 
                 // The completedApp may be null if the completion was not

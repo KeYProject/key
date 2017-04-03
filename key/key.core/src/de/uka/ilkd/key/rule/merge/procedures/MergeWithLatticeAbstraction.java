@@ -11,9 +11,9 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join.procedures;
+package de.uka.ilkd.key.rule.merge.procedures;
 
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getNewSkolemConstantForPrefix;
+import static mergerule.MergeRuleUtils.getNewSkolemConstantForPrefix;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -30,8 +30,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
+import mergerule.SymbolicExecutionState;
 
 /**
  * Rule that joins two sequents based on a specified set of abstract domain
@@ -41,7 +41,7 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
  * 
  * @author Dominic Scheurer
  */
-public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
+public abstract class MergeWithLatticeAbstraction extends MergeProcedure {
 
     /**
      * Returns the abstract domain lattice for the given sort or null if there
@@ -144,7 +144,7 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
         else {
 
             return new ValuesJoinResult(DefaultImmutableSet.<Term> nil(),
-                    JoinIfThenElse.createIfThenElseTerm(state1, state2,
+                    MergeIfThenElse.createIfThenElseTerm(state1, state2,
                             valueInState1, valueInState2,
                             distinguishingFormula, services),
                     new LinkedHashSet<Name>(), new LinkedHashSet<Term>());

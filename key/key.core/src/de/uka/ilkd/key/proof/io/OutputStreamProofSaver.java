@@ -66,11 +66,11 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
-import de.uka.ilkd.key.rule.join.CloseAfterJoinRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithLatticeAbstraction;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
+import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
+import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -388,10 +388,10 @@ public class OutputStreamProofSaver {
                 tree.append("\")");
             }
 
-            if (appliedRuleApp instanceof JoinRuleBuiltInRuleApp) {
-                JoinRuleBuiltInRuleApp joinApp =
-                        (JoinRuleBuiltInRuleApp) appliedRuleApp;
-                JoinProcedure concreteRule = joinApp.getConcreteRule();
+            if (appliedRuleApp instanceof MergeRuleBuiltInRuleApp) {
+                MergeRuleBuiltInRuleApp joinApp =
+                        (MergeRuleBuiltInRuleApp) appliedRuleApp;
+                MergeProcedure concreteRule = joinApp.getConcreteRule();
 
                 tree.append(" (")
                         .append(ProofElementID.JOIN_PROCEDURE.getRawName())
@@ -422,10 +422,10 @@ public class OutputStreamProofSaver {
                 }
 
                 // Predicates for joins with predicate abstraction.
-                JoinWithPredicateAbstraction predAbstrRule;
-                if (concreteRule instanceof JoinWithPredicateAbstraction
+                MergeWithPredicateAbstraction predAbstrRule;
+                if (concreteRule instanceof MergeWithPredicateAbstraction
                         && (predAbstrRule =
-                                (JoinWithPredicateAbstraction) concreteRule)
+                                (MergeWithPredicateAbstraction) concreteRule)
                                 .getPredicates().size() > 0) {
 
                     tree.append(" (")
@@ -453,9 +453,9 @@ public class OutputStreamProofSaver {
 
                 }
 
-                if (concreteRule instanceof JoinWithLatticeAbstraction) {
+                if (concreteRule instanceof MergeWithLatticeAbstraction) {
                     final Map<ProgramVariable, AbstractDomainElement> userChoices =
-                            ((JoinWithLatticeAbstraction) concreteRule)
+                            ((MergeWithLatticeAbstraction) concreteRule)
                                     .getUserChoices();
                     if (!userChoices.isEmpty()) {
                         tree.append(" (")
@@ -480,9 +480,9 @@ public class OutputStreamProofSaver {
                 }
             }
 
-            if (appliedRuleApp instanceof CloseAfterJoinRuleBuiltInRuleApp) {
-                CloseAfterJoinRuleBuiltInRuleApp closeApp =
-                        (CloseAfterJoinRuleBuiltInRuleApp) appliedRuleApp;
+            if (appliedRuleApp instanceof CloseAfterMergeRuleBuiltInRuleApp) {
+                CloseAfterMergeRuleBuiltInRuleApp closeApp =
+                        (CloseAfterMergeRuleBuiltInRuleApp) appliedRuleApp;
 
                 // TODO (DS): There may be problems here if the join node is
                 // pruned away. Need to test some cases and either check for

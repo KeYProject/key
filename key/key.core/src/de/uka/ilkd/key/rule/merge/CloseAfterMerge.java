@@ -11,12 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join;
+package de.uka.ilkd.key.rule.merge;
 
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.clearSemisequent;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getLocationVariables;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getUpdateLeftSideLocations;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.substConstantsByFreshVars;
+import static mergerule.MergeRuleUtils.clearSemisequent;
+import static mergerule.MergeRuleUtils.getLocationVariables;
+import static mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
+import static mergerule.MergeRuleUtils.substConstantsByFreshVars;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,8 +48,8 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
-import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
+import mergerule.MergeRuleUtils;
+import mergerule.SymbolicExecutionState;
 
 /**
  * Rule for closing a partner goal after a join operation. It does so by adding
@@ -68,7 +68,7 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
  * 
  * @author Dominic Scheurer
  */
-public class CloseAfterJoin implements BuiltInRule {
+public class CloseAfterMerge implements BuiltInRule {
 
     public static final String JOIN_GENERATE_IS_WEAKENING_GOAL_CFG = "joinGenerateIsWeakeningGoal";
     public static final String JOIN_GENERATE_IS_WEAKENING_GOAL_CFG_ON =
@@ -78,14 +78,14 @@ public class CloseAfterJoin implements BuiltInRule {
     private static final String DISPLAY_NAME = "CloseAfterJoin";
     private static final Name RULE_NAME = new Name(DISPLAY_NAME);
 
-    public static final CloseAfterJoin INSTANCE = new CloseAfterJoin();
+    public static final CloseAfterMerge INSTANCE = new CloseAfterMerge();
     
     /**
      * Hint to refactor the final weakening term.
      */    
     public static final String FINAL_WEAKENING_TERM_HINT = "finalWeakeningTerm";
 
-    private CloseAfterJoin() {
+    private CloseAfterMerge() {
         /* Singleton class */
     }
 
@@ -104,9 +104,9 @@ public class CloseAfterJoin implements BuiltInRule {
             final RuleApp ruleApp) throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
 
-        assert ruleApp instanceof CloseAfterJoinRuleBuiltInRuleApp : "Rule app for CloseAfterJoin has to be an instance of CloseAfterJoinRuleBuiltInRuleApp";
+        assert ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp : "Rule app for CloseAfterJoin has to be an instance of CloseAfterJoinRuleBuiltInRuleApp";
 
-        CloseAfterJoinRuleBuiltInRuleApp closeApp = (CloseAfterJoinRuleBuiltInRuleApp) ruleApp;
+        CloseAfterMergeRuleBuiltInRuleApp closeApp = (CloseAfterMergeRuleBuiltInRuleApp) ruleApp;
 
         final boolean generateIsWeakeningGoal = goal.proof().getSettings()
                 .getChoiceSettings().getDefaultChoices()
@@ -180,7 +180,7 @@ public class CloseAfterJoin implements BuiltInRule {
      *         this.thisSEState.
      */
     private Term getSyntacticWeakeningFormula(Services services,
-            CloseAfterJoinRuleBuiltInRuleApp closeApp) {
+            CloseAfterMergeRuleBuiltInRuleApp closeApp) {
         TermBuilder tb = services.getTermBuilder();
 
         ImmutableSet<LocationVariable> allLocs = DefaultImmutableSet.nil();
@@ -216,10 +216,10 @@ public class CloseAfterJoin implements BuiltInRule {
                 origQfdVarTerms.toArray(new Term[] {}));
 
         // Obtain set of new Skolem constants in join state
-        HashSet<Function> constantsOrigState = JoinRuleUtils
+        HashSet<Function> constantsOrigState = MergeRuleUtils
                 .getSkolemConstants(closeApp.getPartnerSEState()
                         .getSymbolicState());
-        HashSet<Function> newConstants = JoinRuleUtils
+        HashSet<Function> newConstants = MergeRuleUtils
                 .getSkolemConstants(closeApp.getJoinState().getSymbolicState());
         newConstants.removeAll(constantsOrigState);
 
@@ -275,7 +275,7 @@ public class CloseAfterJoin implements BuiltInRule {
 
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        return new CloseAfterJoinRuleBuiltInRuleApp(this, pos);
+        return new CloseAfterMergeRuleBuiltInRuleApp(this, pos);
     }
 
     /**
@@ -298,13 +298,13 @@ public class CloseAfterJoin implements BuiltInRule {
      *            The program counter common to the two states -- a formula of
      *            the form U\<{...}\> PHI, where U is an update in normal form
      *            and PHI is a DL formula).
-     * @return A complete {@link CloseAfterJoinRuleBuiltInRuleApp}.
+     * @return A complete {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */
-    public CloseAfterJoinRuleBuiltInRuleApp createApp(PosInOccurrence pio,
+    public CloseAfterMergeRuleBuiltInRuleApp createApp(PosInOccurrence pio,
             Node thePartnerNode, Node correspondingJoinNode,
             SymbolicExecutionState joinNodeState,
             SymbolicExecutionState partnerState, Term pc) {
-        return new CloseAfterJoinRuleBuiltInRuleApp(this, pio, thePartnerNode,
+        return new CloseAfterMergeRuleBuiltInRuleApp(this, pio, thePartnerNode,
                 correspondingJoinNode, joinNodeState, partnerState, pc);
     }
 

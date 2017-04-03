@@ -11,18 +11,18 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join;
+package de.uka.ilkd.key.rule.merge;
 
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.clearSemisequent;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.closeJoinPartnerGoal;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getConjunctiveElementsFor;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getLocationVariables;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getUpdateLeftSideLocations;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getUpdateRightSideFor;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.isProvableWithSplitting;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.isUpdateNormalForm;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSEPair;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSETriple;
+import static mergerule.MergeRuleUtils.clearSemisequent;
+import static mergerule.MergeRuleUtils.closeJoinPartnerGoal;
+import static mergerule.MergeRuleUtils.getConjunctiveElementsFor;
+import static mergerule.MergeRuleUtils.getLocationVariables;
+import static mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
+import static mergerule.MergeRuleUtils.getUpdateRightSideFor;
+import static mergerule.MergeRuleUtils.isProvableWithSplitting;
+import static mergerule.MergeRuleUtils.isUpdateNormalForm;
+import static mergerule.MergeRuleUtils.sequentToSEPair;
+import static mergerule.MergeRuleUtils.sequentToSETriple;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -56,17 +56,17 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.join.JoinProcedure.ValuesJoinResult;
-import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
-import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
-import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithLatticeAbstraction;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
+import de.uka.ilkd.key.rule.merge.MergeProcedure.ValuesJoinResult;
+import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElse;
+import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
+import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
+import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
+import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.util.Triple;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
-import de.uka.ilkd.key.util.joinrule.ProgramVariablesMatchVisitor;
-import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
-import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
+import mergerule.MergeRuleUtils;
+import mergerule.ProgramVariablesMatchVisitor;
+import mergerule.SymbolicExecutionState;
+import mergerule.SymbolicExecutionStateWithProgCnt;
 
 /**
  * Base for implementing join rules. Extend this class, implement method
@@ -82,17 +82,17 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
  * 
  * @author Dominic Scheurer
  * 
- * @see JoinRuleUtils
- * @see JoinWeaken
- * @see JoinIfThenElse
- * @see JoinIfThenElseAntecedent
- * @see JoinWithLatticeAbstraction
- * @see JoinWithPredicateAbstraction
+ * @see MergeRuleUtils
+ * @see MergeTotalWeakening
+ * @see MergeIfThenElse
+ * @see MergeIfThenElseAntecedent
+ * @see MergeWithLatticeAbstraction
+ * @see MergeWithPredicateAbstraction
  * @see de.uka.ilkd.key.gui.joinrule.JoinRuleCompletion
  * @see de.uka.ilkd.key.gui.joinrule.JoinPartnerSelectionDialog
  */
-public class JoinRule implements BuiltInRule {
-    public static final JoinRule INSTANCE = new JoinRule();
+public class MergeRule implements BuiltInRule {
+    public static final MergeRule INSTANCE = new MergeRule();
 
     private static final String DISPLAY_NAME = "JoinRule";
     private static final Name RULE_NAME = new Name(DISPLAY_NAME);
@@ -126,7 +126,7 @@ public class JoinRule implements BuiltInRule {
      * JoinRule is a Singleton class, therefore constructor only package-wide
      * visible.
      */
-    JoinRule() {
+    MergeRule() {
     }
 
     @Override
@@ -148,7 +148,7 @@ public class JoinRule implements BuiltInRule {
     public final ImmutableList<Goal> apply(Goal goal, final Services services,
             RuleApp ruleApp) throws RuleAbortException {
 
-        final JoinRuleBuiltInRuleApp joinRuleApp = (JoinRuleBuiltInRuleApp) ruleApp;
+        final MergeRuleBuiltInRuleApp joinRuleApp = (MergeRuleBuiltInRuleApp) ruleApp;
 
         if (!joinRuleApp.complete()) {
             return null;
@@ -157,8 +157,8 @@ public class JoinRule implements BuiltInRule {
         // The number of goals needed for side conditions related to
         // manually chosen lattice elements.
         final int numSideConditionsToProve = joinRuleApp
-                .getConcreteRule() instanceof JoinWithLatticeAbstraction
-                        ? ((JoinWithLatticeAbstraction) joinRuleApp
+                .getConcreteRule() instanceof MergeWithLatticeAbstraction
+                        ? ((MergeWithLatticeAbstraction) joinRuleApp
                                 .getConcreteRule()).getUserChoices().size()
                                 * (joinRuleApp.getJoinPartners().size() + 1)
                         : 0;
@@ -170,7 +170,7 @@ public class JoinRule implements BuiltInRule {
         final Goal newGoal = newGoals.head();
 
         final TermBuilder tb = services.getTermBuilder();
-        final JoinProcedure joinRule = joinRuleApp.getConcreteRule();
+        final MergeProcedure joinRule = joinRuleApp.getConcreteRule();
         final Node currentNode = newGoal.node();
         final ImmutableList<MergePartner> joinPartners = joinRuleApp
                 .getJoinPartners();
@@ -304,7 +304,7 @@ public class JoinRule implements BuiltInRule {
 
     /**
      * Joins two SE states (U1,C1,p) and (U2,C2,p) according to the method
-     * {@link JoinRule#joinValuesInStates(LocationVariable, SymbolicExecutionState, Term, SymbolicExecutionState, Term, Services)}
+     * {@link MergeRule#joinValuesInStates(LocationVariable, SymbolicExecutionState, Term, SymbolicExecutionState, Term, Services)}
      * . p must be the same in both states, so it is supplied separately.
      * <p>
      * 
@@ -330,7 +330,7 @@ public class JoinRule implements BuiltInRule {
     @SuppressWarnings("unused")
     /* For deactivated equiv check */
     protected Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> joinStates(
-            JoinProcedure joinRule, SymbolicExecutionState state1,
+            MergeProcedure joinRule, SymbolicExecutionState state1,
             SymbolicExecutionState state2, Term programCounter,
             Term distinguishingFormula, Services services) {
 
@@ -347,7 +347,7 @@ public class JoinRule implements BuiltInRule {
         // NOTE: Deactivated this; This optimization can create shorter
         // formulas, but is very time consumptive. At the end, the result does
         // not always perform better than within the unoptimized version.
-        final Term newPathCondition = JoinRuleUtils
+        final Term newPathCondition = MergeRuleUtils
                 .createSimplifiedDisjunctivePathCondition(state1.second,
                         state2.second, services, SIMPLIFICATION_TIMEOUT_MS);
 
@@ -390,7 +390,7 @@ public class JoinRule implements BuiltInRule {
             if (rightSide1.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING
                     && rightSide2.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING
                     && !proofClosed
-                    && !JoinRule.RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL) {
+                    && !MergeRule.RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL) {
 
                 Term predicateTerm = tb.func(
                         new Function(new Name("P"), Sort.FORMULA, v.sort()),
@@ -508,7 +508,7 @@ public class JoinRule implements BuiltInRule {
      *            automatic generation).
      * @return A joined heap term.
      */
-    protected ValuesJoinResult joinHeaps(final JoinProcedure joinRule,
+    protected ValuesJoinResult joinHeaps(final MergeProcedure joinRule,
             final LocationVariable heapVar, final Term heap1, final Term heap2,
             final SymbolicExecutionState state1,
             final SymbolicExecutionState state2, Term distinguishingFormula,
@@ -530,7 +530,7 @@ public class JoinRule implements BuiltInRule {
                 || !(heap2.op() instanceof Function)) {
             // Covers the case of two different symbolic heaps
             return new ValuesJoinResult(newConstraints,
-                    JoinIfThenElse.createIfThenElseTerm(state1, state2, heap1,
+                    MergeIfThenElse.createIfThenElseTerm(state1, state2, heap1,
                             heap2, distinguishingFormula, services),
                     newNames, sideConditionsToProve);
         }
@@ -634,7 +634,7 @@ public class JoinRule implements BuiltInRule {
           // ((Function) heap2.op()).equals(createFunc))
 
         return new ValuesJoinResult(newConstraints,
-                JoinIfThenElse.createIfThenElseTerm(state1, state2, heap1,
+                MergeIfThenElse.createIfThenElseTerm(state1, state2, heap1,
                         heap2, distinguishingFormula, services),
                 newNames, sideConditionsToProve);
 
@@ -734,7 +734,7 @@ public class JoinRule implements BuiltInRule {
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pio,
             TermServices services) {
-        return new JoinRuleBuiltInRuleApp(this, pio);
+        return new MergeRuleBuiltInRuleApp(this, pio);
     }
 
     /**
@@ -792,46 +792,8 @@ public class JoinRule implements BuiltInRule {
                                 goal.node(), pio, services);
                         Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
                                 g.node(), gPio, services);
-
-                        // NOTE: The equality check for the Java blocks can be
-                        // problematic, since KeY instantiates declared program
-                        // variables with different identifiers; e.g.
-                        // {int x = 10; if (x...)} could get
-                        // {x_1 = 10; if (x_1...)}
-                        // in one and {x_2 = 10; if (x_2...)} in the other
-                        // branch. This cannot be circumvented with
-                        // equalsModRenaming, since at this point, the PVs are
-                        // already declared. We therefore check equality
-                        // modulo switching to branch-unique (and not globally
-                        // unique) names.
-                        // TODO: Update this comment above
-
-                        JavaProgramElement ownProgramElem = ownSEState.third
-                                .javaBlock().program();
-                        JavaProgramElement partnerProgramElem = partnerSEState.third
-                                .javaBlock().program();
-
-                        Term ownPostCond = ownSEState.third
-                                .op() instanceof Modality
-                                        ? ownSEState.third.sub(0)
-                                        : ownSEState.third;
-                        Term partnerPostCond = partnerSEState.third
-                                .op() instanceof Modality
-                                        ? partnerSEState.third.sub(0)
-                                        : partnerSEState.third;
-
-                        ProgramVariablesMatchVisitor matchVisitor = new ProgramVariablesMatchVisitor(
-                                partnerProgramElem, ownProgramElem, services);
-                        matchVisitor.start();
-
-                        // Requirement: Same post condition, matching program
-                        // parts.
-                        // NOTE: If we have a modality in the post condition,
-                        // the equality of post conditions may be too strict,
-                        // so some legal cases will be excluded from the join
-                        // partners list.
-                        if (ownPostCond.equals(partnerPostCond)
-                                && !matchVisitor.isIncompatible()) {
+                        
+                        if (ownSEState.third.equals(partnerSEState.third)) {
 
                             potentialPartners = potentialPartners.prepend(
                                     new MergePartner(

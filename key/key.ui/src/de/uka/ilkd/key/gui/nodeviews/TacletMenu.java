@@ -71,7 +71,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.rule.join.JoinRule;
+import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -301,7 +301,7 @@ public class TacletMenu extends JMenu {
      * nodes to join nodes.
      */
     private void createDefocusingJoinMenu() {
-        if (JoinRule.isOfAdmissibleForm(mediator.getSelectedGoal(),
+        if (MergeRule.isOfAdmissibleForm(mediator.getSelectedGoal(),
                 pos.getPosInOccurrence(), false)) {
             JMenuItem item = new JoinRuleMenuItem(mediator.getSelectedGoal(),
                     pos.getPosInOccurrence(), mediator);
@@ -348,7 +348,7 @@ public class TacletMenu extends JMenu {
             item.addActionListener(control);
             add(item);
         }
-        else if (builtInRule == JoinRule.INSTANCE) {
+        else if (builtInRule == MergeRule.INSTANCE) {
             // (DS) At the moment, we want to use the join rule as an
             // experimental feature only. However, it may not be removed
             // from JavaProfile. Therefore, it is just not added as a menu item

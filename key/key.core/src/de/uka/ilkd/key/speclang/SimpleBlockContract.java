@@ -43,7 +43,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.rule.join.JoinProcedure;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -64,7 +64,7 @@ public final class SimpleBlockContract implements BlockContract {
     private final Map<LocationVariable, Term> postconditions;
     private final Map<LocationVariable, Term> modifiesClauses;
     private ImmutableList<InfFlowSpec> infFlowSpecs;
-    private JoinProcedure joinProcedure;
+    private MergeProcedure joinProcedure;
 
 
     private final Variables variables;
@@ -81,7 +81,7 @@ public final class SimpleBlockContract implements BlockContract {
                                final Map<LocationVariable, Term> postconditions,
                                final Map<LocationVariable, Term> modifiesClauses,
                                final ImmutableList<InfFlowSpec> infFlowSpecs,
-                               final JoinProcedure joinProcedure,
+                               final MergeProcedure joinProcedure,
                                final Variables variables,
                                final boolean transactionApplicable,
                                final Map<LocationVariable,Boolean> hasMod)
@@ -329,7 +329,7 @@ public final class SimpleBlockContract implements BlockContract {
         return modifiesClauses.get(heap);
     }
     
-    public JoinProcedure getJoinProcedure() {
+    public MergeProcedure getJoinProcedure() {
         return joinProcedure;
     }
 
@@ -502,7 +502,7 @@ public final class SimpleBlockContract implements BlockContract {
                                 final Map<LocationVariable,Term> newPostconditions,
                                 final Map<LocationVariable,Term> newModifiesClauses,
                                 final ImmutableList<InfFlowSpec> newinfFlowSpecs,
-                                final JoinProcedure newJoinProcedure,
+                                final MergeProcedure newJoinProcedure,
                                 final Variables newVariables) {
         return new SimpleBlockContract(newBlock, labels, method, modality,
                                        newPreconditions, newPostconditions,
@@ -866,7 +866,7 @@ public final class SimpleBlockContract implements BlockContract {
         private final Map<LocationVariable, Term> requires;
         private final Map<LocationVariable, Term> ensures;
         private final ImmutableList<InfFlowSpec> infFlowSpecs;
-        private final JoinProcedure joinProcedure;
+        private final MergeProcedure joinProcedure;
         private final Map<Label, Term> breaks;
         private final Map<Label, Term> continues;
         private final Term returns;
@@ -885,7 +885,7 @@ public final class SimpleBlockContract implements BlockContract {
                        final Map<LocationVariable, Term> requires,
                        final Map<LocationVariable, Term> ensures,
                        final ImmutableList<InfFlowSpec> infFlowSpecs,
-                       final JoinProcedure joinProcedure,
+                       final MergeProcedure joinProcedure,
                        final Map<Label, Term> breaks,
                        final Map<Label, Term> continues,
                        final Term returns,
@@ -1112,7 +1112,7 @@ public final class SimpleBlockContract implements BlockContract {
                            final Map<LocationVariable, Term> postconditions,
                            final Map<LocationVariable, Term> modifiesClauses,
                            final ImmutableList<InfFlowSpec> infFlowSpecs,
-                           final JoinProcedure joinProcedure) {
+                           final MergeProcedure joinProcedure) {
             ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
             final boolean transactionApplicable =
                     modifiesClauses.get(

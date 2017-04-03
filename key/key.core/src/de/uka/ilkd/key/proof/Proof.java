@@ -51,8 +51,8 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.MergePartner;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
@@ -631,8 +631,8 @@ public class Proof implements Named {
                     }
 
                     // Join rule applications: Unlink all join partners.
-                    if (visitedNode.getAppliedRuleApp() instanceof JoinRuleBuiltInRuleApp) {
-                        final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) visitedNode
+                    if (visitedNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
+                        final MergeRuleBuiltInRuleApp joinApp = (MergeRuleBuiltInRuleApp) visitedNode
                                 .getAppliedRuleApp();
 
                         for (MergePartner joinPartner : joinApp

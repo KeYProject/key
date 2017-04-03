@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join;
+package de.uka.ilkd.key.rule.merge;
 
 import java.util.LinkedHashSet;
 
@@ -23,11 +23,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
-import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
-import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
-import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
+import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElse;
+import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
+import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
+import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
+import mergerule.SymbolicExecutionState;
 
 /**
  * Defines a concrete join procedure, in particular the result of joining two
@@ -44,24 +44,24 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
  * 
  * @author Dominic Scheurer
  * 
- * @see JoinIfThenElse
- * @see JoinIfThenElseAntecedent
- * @see JoinWeaken
- * @see JoinWithSignLattice
+ * @see MergeIfThenElse
+ * @see MergeIfThenElseAntecedent
+ * @see MergeTotalWeakening
+ * @see MergeWithSignLattice
  */
-public abstract class JoinProcedure {
+public abstract class MergeProcedure {
 
     /** Concrete join procedures. */
-    static ImmutableList<JoinProcedure> CONCRETE_RULES = ImmutableSLList
-            .<JoinProcedure> nil();
+    static ImmutableList<MergeProcedure> CONCRETE_RULES = ImmutableSLList
+            .<MergeProcedure> nil();
 
     static {
         CONCRETE_RULES =
-                ImmutableSLList.<JoinProcedure> nil()
-                        .prepend(JoinWeaken.instance())
-                        .prepend(JoinWithPredicateAbstractionFactory.instance())
-                        .prepend(JoinIfThenElseAntecedent.instance())
-                        .prepend(JoinIfThenElse.instance());
+                ImmutableSLList.<MergeProcedure> nil()
+                        .prepend(MergeTotalWeakening.instance())
+                        .prepend(MergeWithPredicateAbstractionFactory.instance())
+                        .prepend(MergeIfThenElseAntecedent.instance())
+                        .prepend(MergeIfThenElse.instance());
     }
 
     /**
@@ -116,8 +116,8 @@ public abstract class JoinProcedure {
      * @return The join procedure of the given name; null if there is no such
      *         procedure.
      */
-    public static JoinProcedure getProcedureByName(String procName) {
-        for (JoinProcedure proc : CONCRETE_RULES) {
+    public static MergeProcedure getProcedureByName(String procName) {
+        for (MergeProcedure proc : CONCRETE_RULES) {
             if (proc.toString().equals(procName)) {
                 return proc;
             }
@@ -131,7 +131,7 @@ public abstract class JoinProcedure {
      *
      * @return
      */
-    public static ImmutableList<JoinProcedure> getJoinProcedures() {
+    public static ImmutableList<MergeProcedure> getJoinProcedures() {
         return CONCRETE_RULES;
     }
     

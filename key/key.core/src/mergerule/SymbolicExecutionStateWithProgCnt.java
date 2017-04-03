@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.util.joinrule;
+package mergerule;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;

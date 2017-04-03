@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.rule.join;
+package de.uka.ilkd.key.rule.merge;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -9,14 +9,14 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
+import mergerule.SymbolicExecutionState;
 
 /**
  * Rule application class for close-after-join rule applications.
  * 
  * @author Dominic Scheurer
  */
-public class CloseAfterJoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
+public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private Node partnerNode, correspondingJoinNode;
 
@@ -24,7 +24,7 @@ public class CloseAfterJoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private SymbolicExecutionState partnerState = null;
     private Term pc = null;
 
-    public CloseAfterJoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
+    public CloseAfterMergeRuleBuiltInRuleApp(BuiltInRule builtInRule,
             PosInOccurrence pio, Node thePartnerNode,
             Node correspondingJoinNode, SymbolicExecutionState joinNodeState,
             SymbolicExecutionState partnerState, Term pc) {
@@ -36,7 +36,7 @@ public class CloseAfterJoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         setPc(pc);
     }
 
-    public CloseAfterJoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
+    public CloseAfterMergeRuleBuiltInRuleApp(BuiltInRule builtInRule,
             PosInOccurrence pio) {
         super(builtInRule, pio);
     }

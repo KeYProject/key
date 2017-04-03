@@ -19,25 +19,25 @@ import java.util.function.Function;
 import de.uka.ilkd.key.gui.joinrule.predicateabstraction.PredicateAbstractionCompletion;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.rule.join.MergePartner;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
+import de.uka.ilkd.key.rule.merge.MergePartner;
+import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
+import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.util.Pair;
 
 /**
  * A completion class for join procedures. Certain procedures, such as
- * {@link JoinWithPredicateAbstraction}, may not be complete initially and need
+ * {@link MergeWithPredicateAbstraction}, may not be complete initially and need
  * additional input.
  *
  * @author Dominic Scheurer
  */
-public abstract class JoinProcedureCompletion<C extends JoinProcedure> {
+public abstract class JoinProcedureCompletion<C extends MergeProcedure> {
 
     /**
      * @return The default completion (identity mapping).
      */
-    public static <T extends JoinProcedure> JoinProcedureCompletion<T> defaultCompletion() {
+    public static <T extends MergeProcedure> JoinProcedureCompletion<T> defaultCompletion() {
         return create(proc -> proc);
     }
 
@@ -47,7 +47,7 @@ public abstract class JoinProcedureCompletion<C extends JoinProcedure> {
     protected JoinProcedureCompletion() {
     }
 
-    public static <T extends JoinProcedure> JoinProcedureCompletion<T> create(
+    public static <T extends MergeProcedure> JoinProcedureCompletion<T> create(
             final Function<T, T> completion) {
         return new JoinProcedureCompletion<T>() {
             @Override
@@ -65,12 +65,12 @@ public abstract class JoinProcedureCompletion<C extends JoinProcedure> {
      * is already complete) or by demanding input from the user in a GUI.
      *
      * @param proc
-     *            {@link JoinProcedure} to complete.
+     *            {@link MergeProcedure} to complete.
      * @param joinGoalPio
      *            TODO
      * @param partners
      *            TODO
-     * @return The completed {@link JoinProcedure}.
+     * @return The completed {@link MergeProcedure}.
      */
     public abstract C complete(
             final C proc,
@@ -82,9 +82,9 @@ public abstract class JoinProcedureCompletion<C extends JoinProcedure> {
      * 
      * @return The requested completion.
      */
-    public static JoinProcedureCompletion<? extends JoinProcedure> getCompletionForClass(
-            Class<? extends JoinProcedure> cls) {
-        if (cls.equals(JoinWithPredicateAbstractionFactory.class)) {
+    public static JoinProcedureCompletion<? extends MergeProcedure> getCompletionForClass(
+            Class<? extends MergeProcedure> cls) {
+        if (cls.equals(MergeWithPredicateAbstractionFactory.class)) {
             return new PredicateAbstractionCompletion();
         }
         else {

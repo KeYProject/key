@@ -63,8 +63,8 @@ import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.MergePartner;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
@@ -771,7 +771,7 @@ public class SymbolicExecutionTreeBuilder {
        */
       public void injectLinks() {
          for (Node node : joinNodes) {
-            JoinRuleBuiltInRuleApp ruleApp = (JoinRuleBuiltInRuleApp) node.getAppliedRuleApp();
+            MergeRuleBuiltInRuleApp ruleApp = (MergeRuleBuiltInRuleApp) node.getAppliedRuleApp();
             IExecutionNode<?> source = getBestExecutionNode(node);
             if (source != null) {
                for (MergePartner partner : ruleApp.getJoinPartners()) {

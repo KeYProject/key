@@ -7,11 +7,11 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.rule.join.JoinRule;
-import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.MergePartner;
-import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
+import de.uka.ilkd.key.rule.merge.MergeRule;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergePartner;
+import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElse;
 
 /**
  * This class completes the instantiation for a join rule application. The user
@@ -26,7 +26,7 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
     /** Singleton instance */
     public static final JoinRuleCompletion INSTANCE = new JoinRuleCompletion();
 
-    private static final JoinProcedure STD_CONCRETE_JOIN_RULE = JoinIfThenElse
+    private static final MergeProcedure STD_CONCRETE_JOIN_RULE = MergeIfThenElse
             .instance();
 
     private JoinRuleCompletion() {
@@ -36,15 +36,15 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
     public IBuiltInRuleApp complete(final IBuiltInRuleApp app, final Goal goal,
             boolean forced) {
 
-        final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) app;
+        final MergeRuleBuiltInRuleApp joinApp = (MergeRuleBuiltInRuleApp) app;
         final PosInOccurrence pio = joinApp.posInOccurrence();
 
         final ImmutableList<MergePartner> candidates =
-                JoinRule.findPotentialJoinPartners(goal, pio);
+                MergeRule.findPotentialJoinPartners(goal, pio);
 
         ImmutableList<MergePartner> chosenCandidates =
                 null;
-        final JoinProcedure chosenRule;
+        final MergeProcedure chosenRule;
         Term chosenDistForm = null; // null is admissible standard ==> auto
                                     // generation
 
@@ -67,8 +67,8 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
             return null;
         }
 
-        final JoinRuleBuiltInRuleApp result =
-                new JoinRuleBuiltInRuleApp(app.rule(), pio);
+        final MergeRuleBuiltInRuleApp result =
+                new MergeRuleBuiltInRuleApp(app.rule(), pio);
         result.setJoinPartners(chosenCandidates);
         result.setConcreteRule(chosenRule);
         result.setDistinguishingFormula(chosenDistForm);
@@ -83,7 +83,7 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
     }
 
     public static boolean checkCanComplete(IBuiltInRuleApp app) {
-        return app instanceof JoinRuleBuiltInRuleApp;
+        return app instanceof MergeRuleBuiltInRuleApp;
     }
 
 }

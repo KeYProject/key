@@ -58,7 +58,7 @@ import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
+import mergerule.MergeRuleUtils;
 
 /**
  * The macro FinishSymbolicExecutionUntilJionPointMacro continues automatic rule
@@ -240,7 +240,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
         for (SequentFormula formula : succedent.asList()) {
             if (blockElems
                     .contains(JavaTools
-                            .getActiveStatement(JoinRuleUtils.getJavaBlockRecursive(formula
+                            .getActiveStatement(MergeRuleUtils.getJavaBlockRecursive(formula
                                     .formula())))) {
                 return true;
             }
@@ -279,7 +279,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
             }
 
             if (pio != null) {
-                JavaBlock theJavaBlock = JoinRuleUtils.getJavaBlockRecursive(pio.subTerm());
+                JavaBlock theJavaBlock = MergeRuleUtils.getJavaBlockRecursive(pio.subTerm());
                 SourceElement activeStmt = JavaTools
                         .getActiveStatement(theJavaBlock);
 

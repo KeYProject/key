@@ -26,20 +26,20 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.join.MergePartner;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
+import de.uka.ilkd.key.rule.merge.MergePartner;
+import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
+import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
-import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
+import mergerule.MergeRuleUtils;
+import mergerule.SymbolicExecutionState;
 
 /**
- * Completion class for {@link JoinWithPredicateAbstraction}.
+ * Completion class for {@link MergeWithPredicateAbstraction}.
  *
  * @author Dominic Scheurer
  */
 public class PredicateAbstractionCompletion extends
-      JoinProcedureCompletion<JoinWithPredicateAbstraction> {
+      JoinProcedureCompletion<MergeWithPredicateAbstraction> {
 
    /*
     * (non-Javadoc)
@@ -48,8 +48,8 @@ public class PredicateAbstractionCompletion extends
     * ilkd.key.rule.join.JoinProcedure, de.uka.ilkd.key.proof.Goal)
     */
    @Override
-   public JoinWithPredicateAbstraction complete(
-         JoinWithPredicateAbstraction proc,
+   public MergeWithPredicateAbstraction complete(
+         MergeWithPredicateAbstraction proc,
          Pair<Goal, PosInOccurrence> joinGoalPio,
          Collection<MergePartner> partners) {
       final Services services = joinGoalPio.first.proof().getServices();
@@ -58,16 +58,16 @@ public class PredicateAbstractionCompletion extends
       // respective states.
 
       final SymbolicExecutionState joinState =
-            JoinRuleUtils.sequentToSEPair(joinGoalPio.first.node(),
+            MergeRuleUtils.sequentToSEPair(joinGoalPio.first.node(),
                   joinGoalPio.second, services);
 
       final ImmutableList<SymbolicExecutionState> partnerStates =
-            JoinRuleUtils.sequentsToSEPairs(partners);
+            MergeRuleUtils.sequentsToSEPairs(partners);
 
       final ArrayList<LocationVariable> differingLocVars =
             new ArrayList<LocationVariable>();
 
-      JoinRuleUtils
+      MergeRuleUtils
             .getUpdateLeftSideLocations(joinState.first)
             .forEach(v -> {
                // The meaning of the following statement corresponds to
@@ -79,13 +79,13 @@ public class PredicateAbstractionCompletion extends
                                     Collectors
                                           .reducing(
                                                 false,
-                                                partner -> !JoinRuleUtils
+                                                partner -> !MergeRuleUtils
                                                       .getUpdateRightSideForSafe(
                                                             partner
                                                                   .getSymbolicState(),
                                                             v)
                                                       .equals(
-                                                            JoinRuleUtils
+                                                            MergeRuleUtils
                                                                   .getUpdateRightSideForSafe(
                                                                         joinState
                                                                               .getSymbolicState(),
@@ -101,10 +101,10 @@ public class PredicateAbstractionCompletion extends
             new AbstractionPredicatesChoiceDialog(joinGoalPio.first,
                   differingLocVars);
 
-      assert proc instanceof JoinWithPredicateAbstractionFactory : "Exptected an procedure of type JoinWithPredicateAbstractionFactory.";
+      assert proc instanceof MergeWithPredicateAbstractionFactory : "Exptected an procedure of type JoinWithPredicateAbstractionFactory.";
 
-      final JoinWithPredicateAbstractionFactory procF =
-            (JoinWithPredicateAbstractionFactory) proc;
+      final MergeWithPredicateAbstractionFactory procF =
+            (MergeWithPredicateAbstractionFactory) proc;
 
       dialog.setVisible(true);
 

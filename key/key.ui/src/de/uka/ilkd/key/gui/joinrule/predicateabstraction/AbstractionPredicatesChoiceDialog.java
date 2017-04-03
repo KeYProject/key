@@ -31,6 +31,7 @@ import javafx.embed.swing.JFXPanel;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
+import mergerule.MergeRuleUtils;
 
 import javax.swing.JDialog;
 
@@ -48,7 +49,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
  * A dialog for choosing abstraction predicates for joins with predicate
@@ -303,20 +303,20 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
     /**
      * Parses a placeholder using
-     * {@link JoinRuleUtils#parsePlaceholder(String, Services)}.
+     * {@link MergeRuleUtils#parsePlaceholder(String, Services)}.
      * 
      * @param input
      *            The input to parse.
      * @return The parsed placeholder (sort and name).
      */
     private Pair<Sort, Name> parsePlaceholder(String input) {
-        return JoinRuleUtils
+        return MergeRuleUtils
                 .parsePlaceholder(input, goal.proof().getServices());
     }
 
     /**
      * Parses an abstraction predicate using
-     * {@link JoinRuleUtils#parsePredicate(String, ArrayList, Services)}.
+     * {@link MergeRuleUtils#parsePredicate(String, ArrayList, Services)}.
      * 
      * @param input
      *            The input to parse.
@@ -326,7 +326,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      */
     private AbstractionPredicate parsePredicate(String input)
             throws ParserException {
-        return JoinRuleUtils.parsePredicate(input, registeredPlaceholders, goal
+        return MergeRuleUtils.parsePredicate(input, registeredPlaceholders, goal
                 .proof().getServices());
     }
 

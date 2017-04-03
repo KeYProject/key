@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join.procedures;
+package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -37,7 +37,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * 
  * @author Dominic Scheurer
  */
-public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
+public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
 
     private static final String DISPLAY_NAME = "JoinByPredicateAbstraction";
 
@@ -64,11 +64,11 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
     /**
      * Default constructor for subclasses.
      */
-    protected JoinWithPredicateAbstraction() {
+    protected MergeWithPredicateAbstraction() {
     }
 
     /**
-     * Creates a new instance of {@link JoinWithPredicateAbstraction}. This
+     * Creates a new instance of {@link MergeWithPredicateAbstraction}. This
      * JoinProcedure cannot be a Singleton since it depends on the given list of
      * predicates!
      *
@@ -78,7 +78,7 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
      *            The concrete lattice type which determines how abstract
      *            elements are generated from abstraction predicates.
      */
-    public JoinWithPredicateAbstraction(
+    public MergeWithPredicateAbstraction(
             Iterable<AbstractionPredicate> predicates,
             Class<? extends AbstractPredicateAbstractionLattice> latticeType,
             LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices) {

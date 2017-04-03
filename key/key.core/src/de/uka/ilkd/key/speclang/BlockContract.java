@@ -40,7 +40,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.rule.join.JoinProcedure;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
@@ -91,7 +91,7 @@ public interface BlockContract extends SpecificationElement {
 
     public Term getAssignable(LocationVariable heap);
     
-    public JoinProcedure getJoinProcedure();
+    public MergeProcedure getJoinProcedure();
 
     public void visit(Visitor visitor);
 
@@ -107,7 +107,7 @@ public interface BlockContract extends SpecificationElement {
                                 Map<LocationVariable,Term> newPostconditions,
                                 Map<LocationVariable,Term> newModifiesClauses,
                                 final ImmutableList<InfFlowSpec> newInfFlowSpecs,
-                                final JoinProcedure newJoinProcedure,
+                                final MergeProcedure newJoinProcedure,
                                 Variables newVariables);
 
     public BlockContract setBlock(StatementBlock newBlock);

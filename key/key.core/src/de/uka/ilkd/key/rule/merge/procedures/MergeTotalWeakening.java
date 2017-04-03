@@ -11,9 +11,9 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join.procedures;
+package de.uka.ilkd.key.rule.merge.procedures;
 
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getNewSkolemConstantForPrefix;
+import static mergerule.MergeRuleUtils.getNewSkolemConstantForPrefix;
 
 import java.util.LinkedHashSet;
 
@@ -24,8 +24,8 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
+import mergerule.SymbolicExecutionState;
 
 /**
  * Rule that joins two sequents based on "total" weakening: Replacement of
@@ -36,13 +36,13 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
  * 
  * @author Dominic Scheurer
  */
-public class JoinWeaken extends JoinProcedure {
+public class MergeTotalWeakening extends MergeProcedure {
 
-    private static JoinWeaken INSTANCE = null;
+    private static MergeTotalWeakening INSTANCE = null;
 
-    public static JoinWeaken instance() {
+    public static MergeTotalWeakening instance() {
         if (INSTANCE == null) {
-            INSTANCE = new JoinWeaken();
+            INSTANCE = new MergeTotalWeakening();
         }
         return INSTANCE;
     }

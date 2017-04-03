@@ -32,8 +32,11 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
-import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
+import de.uka.ilkd.key.rule.merge.MergeRule;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
+import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.util.ProofStarter;
 
 /**
@@ -132,7 +135,7 @@ public class JoinRuleTests extends TestCase {
         for (int i = 0; i < 2; i++) {
             runMacro(new FinishSymbolicExecutionUntilJoinPointMacro(), proof
                     .openGoals().head().node());
-            joinFirstGoal(proof, JoinIfThenElseAntecedent.instance());
+            joinFirstGoal(proof, MergeIfThenElseAntecedent.instance());
         }
 
         startAutomaticStrategy(proof);
@@ -151,7 +154,7 @@ public class JoinRuleTests extends TestCase {
         final Proof proof = loadProof("IndistinguishablePathConditions.proof");
 
         try {
-            joinFirstGoal(proof, JoinIfThenElseAntecedent.instance());
+            joinFirstGoal(proof, MergeIfThenElseAntecedent.instance());
             fail("The join operation should not be applicable.");
         }
         catch (IncompleteRuleAppException e) {
@@ -168,7 +171,7 @@ public class JoinRuleTests extends TestCase {
                 loadProof("IndistinguishablePathConditions.twoJoins.proof");
 
         try {
-            joinFirstGoal(proof, JoinIfThenElseAntecedent.instance());
+            joinFirstGoal(proof, MergeIfThenElseAntecedent.instance());
             fail("The join operation should not be applicable.");
         }
         catch (IncompleteRuleAppException e) {
@@ -184,7 +187,7 @@ public class JoinRuleTests extends TestCase {
     public void testJoinIndistinguishablePathConditionsWithFullAnonymization() {
         final Proof proof = loadProof("IndistinguishablePathConditions.proof");
 
-        joinFirstGoal(proof, JoinWeaken.instance());
+        joinFirstGoal(proof, MergeTotalWeakening.instance());
         startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());
@@ -211,18 +214,18 @@ public class JoinRuleTests extends TestCase {
      *            The proof the first goal of which to join with suitable
      *            partner(s).
      */
-    private void joinFirstGoal(final Proof proof, JoinProcedure joinProc) {
+    private void joinFirstGoal(final Proof proof, MergeProcedure joinProc) {
         final Services services = proof.getServices();
-        final JoinRule joinRule = JoinRule.INSTANCE;
+        final MergeRule mergeRule = MergeRule.INSTANCE;
 
         final Goal joinGoal = proof.openGoals().head();
         final Node joinNode = joinGoal.node();
         final PosInOccurrence joinPio = getPioFirstFormula(joinNode.sequent());
-        final JoinRuleBuiltInRuleApp joinApp =
-                (JoinRuleBuiltInRuleApp) joinRule.createApp(joinPio, services);
+        final MergeRuleBuiltInRuleApp joinApp =
+                (MergeRuleBuiltInRuleApp) mergeRule.createApp(joinPio, services);
 
         {
-            joinApp.setJoinPartners(JoinRule.findPotentialJoinPartners(proof
+            joinApp.setJoinPartners(MergeRule.findPotentialJoinPartners(proof
                     .openGoals().head(), joinPio));
             joinApp.setConcreteRule(joinProc);
             joinApp.setJoinNode(joinNode);

@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join.procedures;
+package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.util.LinkedHashSet;
 
@@ -23,31 +23,31 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.rule.join.JoinRule;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
+import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.util.Quadruple;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
-import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
+import mergerule.MergeRuleUtils;
+import mergerule.SymbolicExecutionState;
 
 /**
  * Rule that joins two sequents based on the if-then-else construction: If two
  * locations are assigned different values in the states, the value in the
  * joined state is chosen based on the path condition. This rule retains total
- * precision. In contrast to the {@link JoinIfThenElse} rule, the distinction is
+ * precision. In contrast to the {@link MergeIfThenElse} rule, the distinction is
  * not realized in the update / symbolic state, but in the antecedent / path
  * condition. This can be much more efficient.
  * 
  * @author Dominic Scheurer
- * @see JoinIfThenElse
- * @see JoinRule
+ * @see MergeIfThenElse
+ * @see MergeRule
  */
-public class JoinIfThenElseAntecedent extends JoinProcedure {
+public class MergeIfThenElseAntecedent extends MergeProcedure {
 
-    private static JoinIfThenElseAntecedent INSTANCE = null;
+    private static MergeIfThenElseAntecedent INSTANCE = null;
 
-    public static JoinIfThenElseAntecedent instance() {
+    public static MergeIfThenElseAntecedent instance() {
         if (INSTANCE == null) {
-            INSTANCE = new JoinIfThenElseAntecedent();
+            INSTANCE = new MergeIfThenElseAntecedent();
         }
         return INSTANCE;
     }
@@ -73,7 +73,7 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
         final TermBuilder tb = services.getTermBuilder();
 
         Function newSkolemConst =
-                JoinRuleUtils.getNewSkolemConstantForPrefix(v.op().name()
+                MergeRuleUtils.getNewSkolemConstantForPrefix(v.op().name()
                         .toString(), v.sort(), services);
         LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
         newNames.add(newSkolemConst.name());
@@ -126,7 +126,7 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
 
         if (distinguishingFormula == null) {
             final Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
-                    JoinIfThenElse.createDistFormAndRightSidesForITEUpd(state1,
+                    MergeIfThenElse.createDistFormAndRightSidesForITEUpd(state1,
                             state2, ifTerm, elseTerm, services);
 
             final Term cond = distFormAndRightSidesForITEUpd.first;

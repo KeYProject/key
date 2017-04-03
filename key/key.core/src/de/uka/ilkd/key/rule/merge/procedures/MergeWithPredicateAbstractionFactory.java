@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join.procedures;
+package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.util.LinkedHashMap;
 
@@ -21,36 +21,36 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredica
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
+import mergerule.SymbolicExecutionState;
 
 /**
- * A factory class for {@link JoinWithPredicateAbstraction} which is itself a
- * {@link JoinProcedure}. This class is used by the join rule completion GUI
+ * A factory class for {@link MergeWithPredicateAbstraction} which is itself a
+ * {@link MergeProcedure}. This class is used by the join rule completion GUI
  * which needs in instance for every join procedure (
- * {@link JoinWithPredicateAbstraction} cannot be statically instantiated since
+ * {@link MergeWithPredicateAbstraction} cannot be statically instantiated since
  * it depends on the list of predicates).
- * {@link JoinWithPredicateAbstractionFactory} is a Singleton.
+ * {@link MergeWithPredicateAbstractionFactory} is a Singleton.
  *
  * @author Dominic Scheurer
  */
-public class JoinWithPredicateAbstractionFactory extends
-        JoinWithPredicateAbstraction {
+public class MergeWithPredicateAbstractionFactory extends
+        MergeWithPredicateAbstraction {
 
-    private static final JoinWithPredicateAbstractionFactory INSTANCE =
-            new JoinWithPredicateAbstractionFactory();
+    private static final MergeWithPredicateAbstractionFactory INSTANCE =
+            new MergeWithPredicateAbstractionFactory();
 
     /**
      * Hidden constructor since this class is a Singleton.
      */
-    private JoinWithPredicateAbstractionFactory() {
+    private MergeWithPredicateAbstractionFactory() {
     }
 
     /**
      * @return The Singleton instance of
-     *         {@link JoinWithPredicateAbstractionFactory}.
+     *         {@link MergeWithPredicateAbstractionFactory}.
      */
-    public static JoinWithPredicateAbstractionFactory instance() {
+    public static MergeWithPredicateAbstractionFactory instance() {
         return INSTANCE;
     }
 
@@ -85,20 +85,20 @@ public class JoinWithPredicateAbstractionFactory extends
     }
 
     /**
-     * Creates a complete instance of {@link JoinWithPredicateAbstraction}.
+     * Creates a complete instance of {@link MergeWithPredicateAbstraction}.
      *
      * @param predicates
      *            The predicates for the lattices to create.
      * @param latticeType
      *            The concrete lattice type which determines how abstract
      *            elements are generated from abstraction predicates.
-     * @return A complete instance of {@link JoinWithPredicateAbstraction}.
+     * @return A complete instance of {@link MergeWithPredicateAbstraction}.
      */
-    public JoinWithPredicateAbstraction instantiate(
+    public MergeWithPredicateAbstraction instantiate(
             Iterable<AbstractionPredicate> predicates,
             Class<? extends AbstractPredicateAbstractionLattice> latticeType,
             LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices) {
-        return new JoinWithPredicateAbstraction(predicates, latticeType, userChoices);
+        return new MergeWithPredicateAbstraction(predicates, latticeType, userChoices);
     }
 
     @Override

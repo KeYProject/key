@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.proof.io;
 
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSETriple;
+import static mergerule.MergeRuleUtils.sequentToSETriple;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -80,11 +80,11 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.MergePartner;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergePartner;
+import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
+import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
@@ -96,7 +96,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
+import mergerule.MergeRuleUtils;
 
 /**
  * This class is responsible for generating a KeY proof from an intermediate
@@ -265,7 +265,7 @@ public class IntermediateProofReplayer {
                                     final Services services = proof
                                             .getServices();
 
-                                    JoinRuleBuiltInRuleApp joinApp = instantiateJoinApp(
+                                    MergeRuleBuiltInRuleApp joinApp = instantiateJoinApp(
                                             joinAppInterm, currNode,
                                             partnerNodesInfo, services);
 
@@ -686,21 +686,21 @@ public class IntermediateProofReplayer {
      *             In case of an error during construction of the builtin rule
      *             app.
      */
-    private JoinRuleBuiltInRuleApp instantiateJoinApp(
+    private MergeRuleBuiltInRuleApp instantiateJoinApp(
             final JoinAppIntermediate joinAppInterm, final Node currNode,
             final Set<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo,
             final Services services)
             throws SkipSMTRuleException, BuiltInConstructionException {
-        final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) constructBuiltinApp(
+        final MergeRuleBuiltInRuleApp joinApp = (MergeRuleBuiltInRuleApp) constructBuiltinApp(
                 joinAppInterm, currGoal);
         joinApp.setConcreteRule(
-                JoinProcedure.getProcedureByName(joinAppInterm.getJoinProc()));
-        joinApp.setDistinguishingFormula(JoinRuleUtils.translateToFormula(
+                MergeProcedure.getProcedureByName(joinAppInterm.getJoinProc()));
+        joinApp.setDistinguishingFormula(MergeRuleUtils.translateToFormula(
                 services, joinAppInterm.getDistinguishingFormula()));
 
         // Predicate abstraction join rule
         if (joinApp
-                .getConcreteRule() instanceof JoinWithPredicateAbstractionFactory) {
+                .getConcreteRule() instanceof MergeWithPredicateAbstractionFactory) {
             List<AbstractionPredicate> predicates = new ArrayList<AbstractionPredicate>();
 
             // It may happen that the abstraction predicates are null -- in this
@@ -740,7 +740,7 @@ public class IntermediateProofReplayer {
                         final String abstrElemStr = m.group(i + 1);
 
                         // Parse the program variable
-                        final Pair<Sort, Name> ph = JoinRuleUtils
+                        final Pair<Sort, Name> ph = MergeRuleUtils
                                 .parsePlaceholder(progVarStr, false, services);
 
                         final List<AbstractionPredicate> applicablePredicates = StreamSupport
@@ -750,7 +750,7 @@ public class IntermediateProofReplayer {
                                 .collect(Collectors.toList());
 
                         // Parse the abstract domain element
-                        final AbstractDomainElement elem = JoinWithPredicateAbstraction
+                        final AbstractDomainElement elem = MergeWithPredicateAbstraction
                                 .instantiateAbstractDomain(ph.first,
                                         applicablePredicates, latticeType,
                                         services)
@@ -775,7 +775,7 @@ public class IntermediateProofReplayer {
 
             // Instantiate the join procedure
             joinApp.setConcreteRule(
-                    ((JoinWithPredicateAbstractionFactory) joinApp
+                    ((MergeWithPredicateAbstractionFactory) joinApp
                             .getConcreteRule()).instantiate(
                                     predicates,
                                     latticeType == null

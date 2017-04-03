@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join.procedures;
+package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.util.LinkedHashMap;
 
@@ -30,16 +30,16 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * other types than int and boolean are unchanged if they are equal in both
  * states and set to fresh variables if they have different values.
  * 
- * @deprecated You should use {@link JoinWithPredicateAbstraction} instead.
+ * @deprecated You should use {@link MergeWithPredicateAbstraction} instead.
  * @author Dominic Scheurer
  */
-public class JoinWithSignLattice extends JoinWithLatticeAbstraction {
+public class MergeWithSignLattice extends MergeWithLatticeAbstraction {
 
-    private static JoinWithSignLattice INSTANCE = null;
+    private static MergeWithSignLattice INSTANCE = null;
 
-    public static JoinWithSignLattice instance() {
+    public static MergeWithSignLattice instance() {
         if (INSTANCE == null) {
-            INSTANCE = new JoinWithSignLattice();
+            INSTANCE = new MergeWithSignLattice();
         }
         return INSTANCE;
     }

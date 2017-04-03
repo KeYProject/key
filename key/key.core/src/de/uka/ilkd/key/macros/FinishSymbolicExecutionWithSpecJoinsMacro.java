@@ -44,15 +44,15 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.join.JoinRule;
-import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.MergePartner;
+import de.uka.ilkd.key.rule.merge.MergeRule;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
+import mergerule.MergeRuleUtils;
 
 /**
  * Finishes symbolic execution while taking JML join specifications into
@@ -148,7 +148,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                     }
                 }
 
-                Pair<Goal, JoinRuleBuiltInRuleApp> joinInfo = strategy
+                Pair<Goal, MergeRuleBuiltInRuleApp> joinInfo = strategy
                         .getAndResetJoinInformation();
                 if (joinInfo != null) {
                     // We are at a join point: Execute the join.
@@ -323,7 +323,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
         private boolean enforceJoin = false;
 
-        private Pair<Goal, JoinRuleBuiltInRuleApp> joinInformation = null;
+        private Pair<Goal, MergeRuleBuiltInRuleApp> joinInformation = null;
 
         private HashSet<ProgramElement> breakpoints = new HashSet<ProgramElement>();
         private HashMap<ProgramElement, Node> commonParents = new HashMap<ProgramElement, Node>();
@@ -339,8 +339,8 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
          * @return The information for a join to apply if applicable, or null if
          *         there is no join to execute.
          */
-        public Pair<Goal, JoinRuleBuiltInRuleApp> getAndResetJoinInformation() {
-            final Pair<Goal, JoinRuleBuiltInRuleApp> oldJoinInformation = joinInformation;
+        public Pair<Goal, MergeRuleBuiltInRuleApp> getAndResetJoinInformation() {
+            final Pair<Goal, MergeRuleBuiltInRuleApp> oldJoinInformation = joinInformation;
             enforceJoin = false;
             joinInformation = null;
             return oldJoinInformation;
@@ -369,7 +369,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             }
 
             if (pio != null) {
-                JavaBlock theJavaBlock = JoinRuleUtils.getJavaBlockRecursive(pio.subTerm());
+                JavaBlock theJavaBlock = MergeRuleUtils.getJavaBlockRecursive(pio.subTerm());
                 SourceElement activeStmt = JavaTools
                         .getActiveStatement(theJavaBlock);
 
@@ -413,12 +413,12 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                             // applications (realized by setting enforceJoin to
                             // true).
 
-                            final JoinRule joinRule = JoinRule.INSTANCE;
+                            final MergeRule joinRule = MergeRule.INSTANCE;
 
                             final Node joinNode = goal.node();
                             final PosInOccurrence joinPio = getPioForBreakpoint(
                                     breakpoint, goal.sequent());
-                            final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) joinRule
+                            final MergeRuleBuiltInRuleApp joinApp = (MergeRuleBuiltInRuleApp) joinRule
                                     .createApp(joinPio, goal.proof()
                                             .getServices());
 
@@ -426,7 +426,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                                 // Consider only the partners below the common
                                 // parent node. Otherwise, we obtain
                                 // behavior that may be hard to understand.
-                                ImmutableList<MergePartner> joinPartners = JoinRule
+                                ImmutableList<MergePartner> joinPartners = MergeRule
                                         .findPotentialJoinPartners(goal,
                                                 joinPio,
                                                 commonParents.get(breakpoint));
@@ -449,7 +449,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                                 // join at this point.
                                 return super.isApprovedApp(app, pio, goal);
                             } else {
-                                joinInformation = new Pair<Goal, JoinRuleBuiltInRuleApp>(
+                                joinInformation = new Pair<Goal, MergeRuleBuiltInRuleApp>(
                                         goal, joinApp);
                                 enforceJoin = true;
                             }
@@ -501,7 +501,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
             for (SequentFormula formula : succedent) {
                 SourceElement activeStmt = JavaTools
-                        .getActiveStatement(JoinRuleUtils.getJavaBlockRecursive(formula
+                        .getActiveStatement(MergeRuleUtils.getJavaBlockRecursive(formula
                                 .formula()));
 
                 if (activeStmt != null
@@ -597,7 +597,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
          */
         private Statement getBreakPoint(Semisequent succedent, Services services) {
             for (SequentFormula formula : succedent.asList()) {
-                JavaBlock javaBlock = JoinRuleUtils.getJavaBlockRecursive(
+                JavaBlock javaBlock = MergeRuleUtils.getJavaBlockRecursive(
                         formula.formula());
 
                 StatementBlock blockWithoutMethodFrame = stripMethodFrame((StatementBlock) javaBlock.program(), services);
@@ -643,7 +643,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
          */
         private boolean hasStmtForWhichPredicateHolds(final Semisequent succedent, final Services services, final Predicate<Statement> pred) {
             for (SequentFormula formula : succedent.asList()) {
-                JavaBlock javaBlock = JoinRuleUtils.getJavaBlockRecursive(
+                JavaBlock javaBlock = MergeRuleUtils.getJavaBlockRecursive(
                         formula.formula());
 
                 StatementBlock blockWithoutMethodFrame = stripMethodFrame((StatementBlock) javaBlock.program(), services);

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.rule.join;
+package de.uka.ilkd.key.rule.merge;
 
 import java.util.ArrayList;
 
@@ -14,10 +14,10 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithLatticeAbstraction;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
-import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
-import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
+import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
+import mergerule.MergeRuleUtils;
+import mergerule.SymbolicExecutionState;
+import mergerule.SymbolicExecutionStateWithProgCnt;
 
 /**
  * Rule application class for join rule applications. Is complete iff
@@ -26,24 +26,24 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
  * 
  * @author Dominic Scheurer
  */
-public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
+public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private Node joinNode = null;
     private ImmutableList<MergePartner> joinPartners = null;
-    private JoinProcedure concreteRule = null;
+    private MergeProcedure concreteRule = null;
     
     private SymbolicExecutionStateWithProgCnt thisSEState = null;
     private ImmutableList<SymbolicExecutionState> joinPartnerStates = null;
     private Term distForm = null;
     
-    private ArrayList<JoinRule.MergeRuleProgressListener> progressListeners = new ArrayList<>();
+    private ArrayList<MergeRule.MergeRuleProgressListener> progressListeners = new ArrayList<>();
 
-	public JoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
+	public MergeRuleBuiltInRuleApp(BuiltInRule builtInRule,
             PosInOccurrence pio) {
         super(builtInRule, pio);
     }
 
-    protected JoinRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
+    protected MergeRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
             ImmutableList<PosInOccurrence> ifInsts) {
         super(rule, pio, ifInsts);
     }
@@ -85,7 +85,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         // states whether the corresponding data types are supported by
         // the concrete lattice.
         if (concreteRule.requiresDistinguishablePathConditions() ||
-                concreteRule instanceof JoinWithLatticeAbstraction) {
+                concreteRule instanceof MergeWithLatticeAbstraction) {
             ImmutableList<SymbolicExecutionState> allStates = ImmutableSLList.nil();
             allStates = allStates.prepend(joinPartnerStates);
             allStates = allStates.prepend(thisSEState.toSymbolicExecutionState());
@@ -93,7 +93,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
             for (SymbolicExecutionState state1 : allStates) {
                 for (SymbolicExecutionState state2: allStates) {
                     if (state1 != state2) {
-                        if (!JoinRuleUtils.pathConditionsAreDistinguishable(
+                        if (!MergeRuleUtils.pathConditionsAreDistinguishable(
                                 state1.second, state2.second, services)) {
                             return false;
                         }
@@ -116,14 +116,14 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     
     public void setJoinPartners(ImmutableList<MergePartner> joinPartners) {
         this.joinPartners = joinPartners;
-        joinPartnerStates = JoinRuleUtils.sequentsToSEPairs(joinPartners);
+        joinPartnerStates = MergeRuleUtils.sequentsToSEPairs(joinPartners);
     }
 
-    public JoinProcedure getConcreteRule() {
+    public MergeProcedure getConcreteRule() {
 		return concreteRule;
 	}
 
-	public void setConcreteRule(JoinProcedure concreteRule) {
+	public void setConcreteRule(MergeProcedure concreteRule) {
 		this.concreteRule = concreteRule;
 	}
 
@@ -133,7 +133,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
 	public void setJoinNode(Node joinNode) {
 		this.joinNode = joinNode;
-		this.thisSEState = JoinRuleUtils.sequentToSETriple(joinNode, super.pio, joinNode.proof().getServices());
+		this.thisSEState = MergeRuleUtils.sequentToSETriple(joinNode, super.pio, joinNode.proof().getServices());
 	}
 	
 	public void setDistinguishingFormula(Term distForm) {
@@ -157,7 +157,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         return joinPartnerStates;
     }
     
-    public void registerProgressListener(JoinRule.MergeRuleProgressListener listener) {
+    public void registerProgressListener(MergeRule.MergeRuleProgressListener listener) {
         progressListeners.add(listener);
     }
 
@@ -165,7 +165,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         progressListeners = new ArrayList<>();
     }
 
-    public boolean removeProgressListener(JoinRule.MergeRuleProgressListener listener) {
+    public boolean removeProgressListener(MergeRule.MergeRuleProgressListener listener) {
         return progressListeners.remove(listener);
     }
     

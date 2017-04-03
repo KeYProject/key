@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
+import mergerule.MergeRuleUtils;
 
 /**
  * A super class for predicates abstraction lattices. Implements basic join
@@ -147,11 +147,11 @@ public abstract class AbstractPredicateAbstractionLattice extends
             ImmutableFixedLengthBitSet bitSet =
                     new ImmutableFixedLengthBitSet(numApplPreds);
 
-            for (int i = 0; i < JoinRuleUtils.intPow(2, numApplPreds); i++) {
+            for (int i = 0; i < MergeRuleUtils.intPow(2, numApplPreds); i++) {
                 int numZeroes = bitSet.getNumOfZeroBits();
                 bitSetsByNumZeroes.get(numZeroes).add(bitSet);
 
-                if (i < JoinRuleUtils.intPow(2, numApplPreds) - 1) {
+                if (i < MergeRuleUtils.intPow(2, numApplPreds) - 1) {
                     bitSet = bitSet.inc();
                 }
             }

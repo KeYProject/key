@@ -68,7 +68,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
+import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 
@@ -661,7 +661,7 @@ public class AbstractionPredicatesChoiceDialogController {
                             .get().sort();
 
             final AbstractDomainLattice lattice =
-                    new JoinWithPredicateAbstraction(
+                    new MergeWithPredicateAbstraction(
                             availableAbstractionPreds,
                             latticeType.get(),
                             new LinkedHashMap<ProgramVariable, AbstractDomainElement>())

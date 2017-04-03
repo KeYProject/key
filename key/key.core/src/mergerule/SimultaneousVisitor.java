@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.util.joinrule;
+package mergerule;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.CompilationUnit;

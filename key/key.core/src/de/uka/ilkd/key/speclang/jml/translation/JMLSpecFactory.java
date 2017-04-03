@@ -51,7 +51,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.rule.join.JoinProcedure;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassAxiomImpl;
@@ -212,7 +212,7 @@ public class JMLSpecFactory {
         public Term returns;
         public Map<LocationVariable,Boolean> hasMod  = new LinkedHashMap<LocationVariable,Boolean>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
-        public JoinProcedure joinProcedure;
+        public MergeProcedure joinProcedure;
     }
 
     //-------------------------------------------------------------------------
@@ -530,14 +530,14 @@ public class JMLSpecFactory {
         }
     }
     
-    private JoinProcedure translateJoinProcedure(ImmutableList<PositionedString> originalClauses) throws SLTranslationException {
+    private MergeProcedure translateJoinProcedure(ImmutableList<PositionedString> originalClauses) throws SLTranslationException {
         if (originalClauses == null || originalClauses.size() == 0) {
             return null;
         }
         
         // Extract the name of the join procedure: Remove beginning <code>"join_proc<code> and trailing <code>;"</code>.
         String joinProcName = originalClauses.head().text.substring(11, originalClauses.head().text.length() - 2);
-        JoinProcedure chosenProc = JoinProcedure.getProcedureByName(joinProcName);
+        MergeProcedure chosenProc = MergeProcedure.getProcedureByName(joinProcName);
         
         if (chosenProc == null) {
             throw new SLTranslationException("Unknown join procedure: \"" + joinProcName + "\"",

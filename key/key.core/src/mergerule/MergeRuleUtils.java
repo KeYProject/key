@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.util.joinrule;
+package mergerule;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -75,8 +75,8 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.join.CloseAfterJoin;
-import de.uka.ilkd.key.rule.join.MergePartner;
+import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
+import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
@@ -105,7 +105,7 @@ import de.uka.ilkd.key.util.Triple;
  * 
  * @author Dominic Scheurer
  */
-public class JoinRuleUtils {
+public class MergeRuleUtils {
 
     // ////////////////////////////////////////////////
     // ///////////// SIMPLE AUXILIARIES ///////////////
@@ -1176,7 +1176,7 @@ public class JoinRuleUtils {
 
         InitConfig initConfig = joinNodeParent.proof().getInitConfig();
 
-        CloseAfterJoin closeRule = CloseAfterJoin.INSTANCE;
+        CloseAfterMerge closeRule = CloseAfterMerge.INSTANCE;
         RuleApp app = closeRule.createApp(pio, joinPartner.node(),
                 joinNodeParent, joinState, joinPartnerState, pc);
 
@@ -1391,7 +1391,7 @@ public class JoinRuleUtils {
                 services, services.getNamespaces(),
                 services.getProof().abbreviations());
 
-        ImmutableSet<LocationVariable> containedLocVars = JoinRuleUtils
+        ImmutableSet<LocationVariable> containedLocVars = MergeRuleUtils
                 .getLocationVariables(formula, services);
 
         int nrContainedPlaceholders = 0;
