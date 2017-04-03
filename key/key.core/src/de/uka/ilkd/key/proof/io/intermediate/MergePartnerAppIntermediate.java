@@ -7,6 +7,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -19,11 +20,11 @@ public class MergePartnerAppIntermediate extends BuiltInAppIntermediate {
     private int mergeNodeId = 0;
     
     /**
-     * Constructs a new close-join-partner intermediate application.
+     * Constructs a new close-merge-partner intermediate application.
      *
-     * @param ruleName The name of the rule; should be "CloseAfterJoin".
-     * @param pos Position information for the join rule application (Symbolic State - Program Counter formula).
-     * @param mergeNodeId The ID of the corresponding join node.
+     * @param ruleName The name of the rule; should be "MergeAfterJoin".
+     * @param pos Position information for the merge rule application (Symbolic State - Program Counter formula).
+     * @param mergeNodeId The ID of the corresponding merge node.
      * @param newNames New names registered in the course of partner goal closing.
      */
     public MergePartnerAppIntermediate(String ruleName,
@@ -31,8 +32,8 @@ public class MergePartnerAppIntermediate extends BuiltInAppIntermediate {
             int mergeNodeId, ImmutableList<Name> newNames) {
         super(ruleName, pos, null, null, newNames);
         
-        assert ruleName.equals("CloseAfterJoin") :
-            "Check if something should be changed when implementing a new rule for join partners.";
+        assert ruleName.equals(CloseAfterMerge.INSTANCE.name().toString()) :
+            "Check if something should be changed when implementing a new rule for merge partners.";
         
         this.mergeNodeId = mergeNodeId;
     }

@@ -138,7 +138,7 @@ options {
          prooflabel2tag.put("nrMergePartners", ProofElementID.NUMBER_MERGE_PARTNERS);
          prooflabel2tag.put("distFormula", ProofElementID.MERGE_DIST_FORMULA);
          prooflabel2tag.put("mergeNode", ProofElementID.MERGE_NODE);
-         prooflabel2tag.put("emrgeId", ProofElementID.MERGE_ID);
+         prooflabel2tag.put("mergeId", ProofElementID.MERGE_ID);
          prooflabel2tag.put("userChoices", ProofElementID.MERGE_USER_CHOICES);
          prooflabel2tag.put("opengoal", ProofElementID.OPEN_GOAL);
    }

@@ -68,7 +68,8 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     public boolean complete() {
         // We do not check for the suitability of the distinguishing formula
         // since this has already been dealt with in MergeRuleCompletion.
-        return mergePartners != null && concreteRule != null && mergeNode != null
+        return mergePartners != null && !mergePartners.isEmpty()
+                && concreteRule != null && mergeNode != null
                 && distinguishablePathConditionsRequirement();
     }
 
@@ -134,8 +135,8 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     public void setMergeNode(Node mergeNode) {
         this.mergeNode = mergeNode;
-        this.thisSEState = MergeRuleUtils.sequentToSETriple(mergeNode, super.pio,
-                mergeNode.proof().getServices());
+        this.thisSEState = MergeRuleUtils.sequentToSETriple(mergeNode,
+                super.pio, mergeNode.proof().getServices());
     }
 
     public void setDistinguishingFormula(Term distForm) {

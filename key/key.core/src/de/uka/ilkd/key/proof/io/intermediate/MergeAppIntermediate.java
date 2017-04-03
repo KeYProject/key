@@ -79,7 +79,8 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
             String abstractionPredicates, String userChoices) {
         super(ruleName, pos, null, null, newNames);
 
-        assert ruleName.equals("JoinRule") : "This was somehow unexpected; are there other join rules than JoinRule?";
+        String mergeRuleName = MergeRule.INSTANCE.name().toString();
+        assert ruleName.equals(mergeRuleName) : "This was somehow unexpected; are there other join rules than " + mergeRuleName + "?";
 
         this.id = id;
         this.mergeProc = joinProc;

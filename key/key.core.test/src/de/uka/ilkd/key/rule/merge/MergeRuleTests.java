@@ -47,11 +47,11 @@ import de.uka.ilkd.key.util.ProofStarter;
 public class MergeRuleTests extends TestCase {
 
     private static final String TEST_RESOURCES_DIR_PREFIX =
-            "resources/testcase/join/";
+            "resources/testcase/merge/";
 
     /**
      * Simple regression test case loading an existing closed proof (standard
-     * Gcd example) including two joins with ITE antecedent joins and trying to
+     * Gcd example) including two merges with ITE antecedent merges and trying to
      * replay it.
      *
      * @throws ProblemLoaderException
@@ -65,7 +65,7 @@ public class MergeRuleTests extends TestCase {
 
     /**
      * Simple regression test case loading an existing closed proof (standard
-     * Gcd example) including two joins with predicate abstraction and trying to
+     * Gcd example) including two merges with predicate abstraction and trying to
      * replay it.
      *
      * @throws ProblemLoaderException
@@ -79,7 +79,7 @@ public class MergeRuleTests extends TestCase {
 
     /**
      * Simple regression test case loading an existing closed proof (standard
-     * Gcd example) including two joins with predicate abstraction (with lattice
+     * Gcd example) including two merges with predicate abstraction (with lattice
      * elements manually chosen by the user) and trying to replay it.
      *
      * @throws ProblemLoaderException
@@ -92,33 +92,33 @@ public class MergeRuleTests extends TestCase {
     }
 
     /**
-     * Runs the FullAutoPilotWithJMLSpecJoinsProofMacro on the problem with join
+     * Runs the FullAutoPilotWithJMLSpecMergesProofMacro on the problem with merge
      * blocks specified in JML, following by an automatic strategy finish. At
-     * the end, there should be two join applications, and the proof should be
+     * the end, there should be two merge applications, and the proof should be
      * closed.
      */
     @Test
-    public void testDoAutomaticGcdProofWithJoins() {
+    public void testDoAutomaticGcdProofWithMerges() {
         final Proof proof = loadProof("gcd.joinBlocks.key");
         runMacro(new FullAutoPilotWithJMLSpecMergesProofMacro(), proof.root());
         startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());
-        assertEquals("There should be two join applications in the proof.", 2,
+        assertEquals("There should be two merge rule applications in the proof.", 2,
                 proof.getStatistics().mergeRuleApps);
     }
 
     /**
-     * This test case semi-automatically proves the Gcd problem with two joins
+     * This test case semi-automatically proves the Gcd problem with two merges
      * in the following way:
      * <p>
      * 
      * <ol>
      * <li>Run the {@link FinishSymbolicExecutionUntilMergePointMacro} on the
      * root</li>
-     * <li>Do one join</li>
+     * <li>Do one merge</li>
      * <li>Again run the macro on the one open goal</li>
-     * <li>Do another join</li>
+     * <li>Do another merge</li>
      * <li>Let the automatic strategy finish the proof</li>
      * </ol>
      * <p>
@@ -135,7 +135,7 @@ public class MergeRuleTests extends TestCase {
         for (int i = 0; i < 2; i++) {
             runMacro(new FinishSymbolicExecutionUntilMergePointMacro(), proof
                     .openGoals().head().node());
-            joinFirstGoal(proof, MergeIfThenElseAntecedent.instance());
+            mergeFirstGoal(proof, MergeIfThenElseAntecedent.instance());
         }
 
         startAutomaticStrategy(proof);
@@ -143,51 +143,51 @@ public class MergeRuleTests extends TestCase {
     }
 
     /**
-     * Joins for SE states with different symbolic states are only allowed if
+     * Merges for SE states with different symbolic states are only allowed if
      * the path conditions are distinguishable -- for the case that if-then-else
-     * conditions are employed. This test case tries to join two states with
-     * equal path condition but different symbolic states -- therefore, the join
+     * conditions are employed. This test case tries to merge two states with
+     * equal path condition but different symbolic states -- therefore, the merge
      * should fail due to an incomplete rule application.
      */
     @Test
-    public void testJoinIndistinguishablePathConditionsWithITE() {
+    public void testMergeIndistinguishablePathConditionsWithITE() {
         final Proof proof = loadProof("IndistinguishablePathConditions.proof");
 
         try {
-            joinFirstGoal(proof, MergeIfThenElseAntecedent.instance());
-            fail("The join operation should not be applicable.");
+            mergeFirstGoal(proof, MergeIfThenElseAntecedent.instance());
+            fail("The merge operation should not be applicable.");
         }
         catch (IncompleteRuleAppException e) {
         }
     }
 
     /**
-     * Same as testJoinIndistinguishablePathConditionsWithITE(), but with two
-     * join partners.
+     * Same as testMergeIndistinguishablePathConditionsWithITE(), but with two
+     * merge partners.
      */
     @Test
-    public void testJoinThreeIndistinguishablePathConditionsWithITE() {
+    public void testMergeThreeIndistinguishablePathConditionsWithITE() {
         final Proof proof =
                 loadProof("IndistinguishablePathConditions.twoJoins.proof");
 
         try {
-            joinFirstGoal(proof, MergeIfThenElseAntecedent.instance());
-            fail("The join operation should not be applicable.");
+            mergeFirstGoal(proof, MergeIfThenElseAntecedent.instance());
+            fail("The merge operation should not be applicable.");
         }
         catch (IncompleteRuleAppException e) {
         }
     }
 
     /**
-     * Joins two SE states with different symbolic states and equal path
-     * condition, but uses the "Full Anonymization" join method for which this
-     * is irrelevant. The join should succeed and the proof should be closable.
+     * Merges two SE states with different symbolic states and equal path
+     * condition, but uses the "Full Anonymization" merge method for which this
+     * is irrelevant. The merge should succeed and the proof should be closable.
      */
     @Test
-    public void testJoinIndistinguishablePathConditionsWithFullAnonymization() {
+    public void testMergeIndistinguishablePathConditionsWithFullAnonymization() {
         final Proof proof = loadProof("IndistinguishablePathConditions.proof");
 
-        joinFirstGoal(proof, MergeTotalWeakening.instance());
+        mergeFirstGoal(proof, MergeTotalWeakening.instance());
         startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());
@@ -207,35 +207,35 @@ public class MergeRuleTests extends TestCase {
     }
 
     /**
-     * Joins the first open goal in the given proof. Asserts that the
-     * constructed join rule application is complete.
+     * Merges the first open goal in the given proof. Asserts that the
+     * constructed merge rule application is complete.
      *
      * @param proof
-     *            The proof the first goal of which to join with suitable
+     *            The proof the first goal of which to merge with suitable
      *            partner(s).
      */
-    private void joinFirstGoal(final Proof proof, MergeProcedure joinProc) {
+    private void mergeFirstGoal(final Proof proof, MergeProcedure mergeProc) {
         final Services services = proof.getServices();
         final MergeRule mergeRule = MergeRule.INSTANCE;
 
-        final Goal joinGoal = proof.openGoals().head();
-        final Node joinNode = joinGoal.node();
-        final PosInOccurrence joinPio = getPioFirstFormula(joinNode.sequent());
-        final MergeRuleBuiltInRuleApp joinApp =
-                (MergeRuleBuiltInRuleApp) mergeRule.createApp(joinPio, services);
+        final Goal mergeGoal = proof.openGoals().head();
+        final Node mergeNode = mergeGoal.node();
+        final PosInOccurrence mergePio = getPioFirstFormula(mergeNode.sequent());
+        final MergeRuleBuiltInRuleApp mergeApp =
+                (MergeRuleBuiltInRuleApp) mergeRule.createApp(mergePio, services);
 
         {
-            joinApp.setMergePartners(MergeRule.findPotentialMergePartners(proof
-                    .openGoals().head(), joinPio));
-            joinApp.setConcreteRule(joinProc);
-            joinApp.setMergeNode(joinNode);
+            mergeApp.setMergePartners(MergeRule.findPotentialMergePartners(proof
+                    .openGoals().head(), mergePio));
+            mergeApp.setConcreteRule(mergeProc);
+            mergeApp.setMergeNode(mergeNode);
         }
 
-        if (!joinApp.complete()) {
+        if (!mergeApp.complete()) {
             throw new IncompleteRuleAppException();
         }
 
-        joinGoal.apply(joinApp);
+        mergeGoal.apply(mergeApp);
     }
 
     /**
