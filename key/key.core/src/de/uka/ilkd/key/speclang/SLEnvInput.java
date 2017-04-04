@@ -253,13 +253,9 @@ public final class SLEnvInput extends AbstractEnvInput {
                 final JavaASTCollector mpsCollector =
                         new JavaASTCollector(pm.getBody(), MergePointStatement.class);
                 mpsCollector.start();
-                for (ProgramElement block : mpsCollector.getNodes()) {
-                    // TODO (DS): Extend
-                    final ImmutableSet<BlockContract> blockContracts =
-                            specExtractor.extractBlockContracts(pm, (StatementBlock) block);
-                    for (BlockContract specification : blockContracts) {
-                        specRepos.addBlockContract(specification);
-                    }
+                for (ProgramElement mps : mpsCollector.getNodes()) {
+                    //TODO (DS)
+                    mps.getComments();
                 }
 
                 final JavaASTCollector labeledCollector =

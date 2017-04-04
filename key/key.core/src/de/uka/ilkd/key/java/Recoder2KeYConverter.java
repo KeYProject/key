@@ -1080,7 +1080,12 @@ public class Recoder2KeYConverter {
                 services.getVariableNamer().getTemporaryNameProposal("x"),
                 (Sort) services.getNamespaces().sorts().lookup("boolean"));
         
-        return new MergePointStatement(locVar);
+        final Comment[] comments = new Comment[mps.getComments().size()];
+        for (int i = 0; i < mps.getComments().size(); i++) {
+            comments[i] = convert(mps.getComments().get(i));
+        }
+        
+        return new MergePointStatement(locVar, comments);
     }
 
     public CatchAllStatement convert(

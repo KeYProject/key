@@ -98,6 +98,21 @@ public class MergeRuleTests extends TestCase {
      * closed.
      */
     @Test
+    public void testDoAutomaticGcdProofWithMergePointStatements() {
+        final Proof proof = loadProof("gcd.mergePointStatements.key");
+        startAutomaticStrategy(proof);
+
+        assertTrue(proof.closed());
+        //TODO (DS): Assert that there is the expected number of merge rule applications
+    }
+
+    /**
+     * Runs the FullAutoPilotWithJMLSpecMergesProofMacro on the problem with merge
+     * blocks specified in JML, following by an automatic strategy finish. At
+     * the end, there should be two merge applications, and the proof should be
+     * closed.
+     */
+    @Test
     public void testDoAutomaticGcdProofWithMerges() {
         final Proof proof = loadProof("gcd.joinBlocks.key");
         runMacro(new FullAutoPilotWithJMLSpecMergesProofMacro(), proof.root());
@@ -287,6 +302,7 @@ public class MergeRuleTests extends TestCase {
             return proof;
         }
         catch (ProblemLoaderException e) {
+            e.printStackTrace();
             fail("Proof could not be loaded:\n" + e.getMessage());
             return null;
         }

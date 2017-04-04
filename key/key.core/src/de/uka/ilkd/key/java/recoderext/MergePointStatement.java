@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
+import de.uka.ilkd.key.speclang.PositionedString;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
 import recoder.java.SourceElement;
@@ -25,9 +26,13 @@ import recoder.java.statement.JavaStatement;
 public class MergePointStatement extends JavaStatement {
 
     private StatementContainer astParent;
+    private final PositionedString mergeProc;
+    private final PositionedString mergeParams;
 
-    public MergePointStatement() {
+    public MergePointStatement(PositionedString mergeProc, PositionedString mergeParams) {
         makeParentRoleValid();
+        this.mergeProc = mergeProc;
+        this.mergeParams = mergeParams;
     }
 
     @Override
@@ -43,6 +48,14 @@ public class MergePointStatement extends JavaStatement {
     @Override
     public void setStatementContainer(StatementContainer parent) {
         astParent = parent;
+    }
+
+    public PositionedString getMergeProc() {
+        return mergeProc;
+    }
+
+    public PositionedString getMergeParams() {
+        return mergeParams;
     }
 
     /**

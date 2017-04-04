@@ -15,6 +15,7 @@ package de.uka.ilkd.key.java.statement;
 
 import org.key_project.util.ExtList;
 
+import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ExpressionContainer;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -31,19 +32,23 @@ public class MergePointStatement extends JavaStatement
         implements ExpressionContainer {
 
     protected final Expression expression;
+    protected final Comment[] comments;
 
-    public MergePointStatement() {
-        this.expression = null;
-    }
-
-    public MergePointStatement(Expression expression) {
+    public MergePointStatement(Expression expression, Comment[] comments) {
         this.expression = expression;
+        this.comments = comments;
     }
 
     public MergePointStatement(ExtList children) {
         super(children);
         expression = children.get(Expression.class);
         assert expression instanceof IProgramVariable;
+        comments = children.get(Comment[].class);
+    }
+    
+    @Override
+    public Comment[] getComments() {
+        return comments;
     }
 
     @Override

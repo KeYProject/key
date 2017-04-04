@@ -1,19 +1,19 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 public class Gcd {
-    
+
     /*@
       @ public normal_behavior
       @   ensures (a != 0 || b != 0) ==>
@@ -37,7 +37,36 @@ public class Gcd {
 
         return gcdHelp(big, small);
     }
-    
+
+    /*@
+      @ public normal_behavior
+      @   ensures (a != 0 || b != 0) ==>
+      @           (a % \result == 0 && b % \result == 0 &&
+      @            (\forall int x; x > 0 && a % x == 0 && b % x == 0;
+      @                            \result % x == 0));
+      @*/
+    public static int gcdMPS(int a, int b) {
+        if (a < 0) a = -a;
+
+        //@ merge_point
+        //@ merge_proc "MergeByPredicateAbstraction";
+        // merge_params "conjunctive; (int x) -> {a >= 0, (a == \old(a) || a == -\old(a))}" ;
+
+        if (b < 0) b = -b;
+
+        int big, small;
+        if (a > b) {
+            big = a;
+            small = b;
+        }
+        else {
+            big = b;
+            small = a;
+        }
+
+        return gcdHelp(big, small);
+    }
+
     /*@
       @ public normal_behavior
       @   ensures (a != 0 || b != 0) ==>
@@ -52,7 +81,7 @@ public class Gcd {
             if (a < 0)
                 a = -a;
         }
-        
+
         /*@ merge_proc "MergeByIfThenElseAntecedent"; @*/
         {
             if (b < 0)
@@ -102,5 +131,5 @@ public class Gcd {
 
         return big;
     }
-    
+
 }

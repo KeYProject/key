@@ -1386,7 +1386,7 @@ merge_point_statement[ImmutableList<String> mods]
 :
     MERGE_POINT
     (MERGE_PROC   (mpr = STRING_LITERAL))?
-    (MERGE_PARAMS (mpa = STRING_LITERAL))?
+    (MERGE_PARAMS (mpa = expression))?
     SEMICOLON
     {
 	TextualJMLMergePointDecl mpd =
@@ -1394,7 +1394,7 @@ merge_point_statement[ImmutableList<String> mods]
 		new TextualJMLMergePointDecl(mods) :
 		(mpa == null ?
 		 new TextualJMLMergePointDecl(mods, createPositionedString(mpr.getText(), mpr)) :
-		 new TextualJMLMergePointDecl(mods, createPositionedString(mpr.getText(), mpr), createPositionedString(mpa.getText(), mpa)));
+		 new TextualJMLMergePointDecl(mods, createPositionedString(mpr.getText(), mpr), mpa));
 	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(mpd);
     }
 ;

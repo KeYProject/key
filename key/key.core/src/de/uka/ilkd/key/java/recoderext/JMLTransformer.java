@@ -461,9 +461,13 @@ public final class JMLTransformer extends RecoderModelTransformer {
         int childIndex = astParent
                 .getIndexOfChild(originalComments[0].getParent());
 
-        // parse statement, attach to AST
+        // create MPS, attach to AST
         try {
-            MergePointStatement mps = new MergePointStatement();
+            MergePointStatement mps = new MergePointStatement(
+                    stat.getMergeProc(), stat.getMergeParams());
+            mps.setComments(
+                    new ASTArrayList<Comment>(Arrays.asList(originalComments)));
+
             Position startPosition = astParent.getChildAt(childIndex)
                     .getStartPosition();
             // Note (DS): I don't really know what I do here (concerning the
