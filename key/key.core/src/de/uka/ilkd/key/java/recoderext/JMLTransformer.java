@@ -25,7 +25,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
@@ -465,9 +464,10 @@ public final class JMLTransformer extends RecoderModelTransformer {
         // parse statement, attach to AST
         try {
             MergePointStatement mps = new MergePointStatement();
-            // TODO (DS): Check if we need to update the position information
             Position startPosition = astParent.getChildAt(childIndex)
                     .getStartPosition();
+            // Note (DS): I don't really know what I do here (concerning the
+            // position information), but it seems to work...
             updatePositionInformation(mps, new de.uka.ilkd.key.java.Position(
                     startPosition.getLine(), startPosition.getColumn()));
             doAttach(mps, astParent, childIndex);

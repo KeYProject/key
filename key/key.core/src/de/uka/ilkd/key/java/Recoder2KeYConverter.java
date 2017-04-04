@@ -25,12 +25,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import recoder.CrossReferenceServiceConfiguration;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.Type;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
@@ -189,8 +183,13 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.Debug;
+import recoder.CrossReferenceServiceConfiguration;
+import recoder.abstraction.ClassType;
+import recoder.abstraction.Type;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.declaration.TypeDeclaration;
+import recoder.list.generic.ASTList;
 
 /**
  * Objects of this class can be used to transform an AST returned by the recoder

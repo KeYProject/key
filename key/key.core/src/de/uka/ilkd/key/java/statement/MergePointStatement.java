@@ -127,7 +127,6 @@ public class MergePointStatement extends JavaStatement
      *            the Visitor
      */
     public void visit(Visitor v) {
-        //TODO (DS): Probably have to do something with ProgramElementReplaceVisitor or the like
         v.performActionOnMergePointStatement(this);
     }
 

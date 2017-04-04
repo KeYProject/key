@@ -35,6 +35,7 @@ import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -245,6 +246,19 @@ public final class SLEnvInput extends AbstractEnvInput {
                             specExtractor.extractBlockContracts(pm, (StatementBlock) block);
                     for (BlockContract specification : blockContracts) {
                     	specRepos.addBlockContract(specification);
+                    }
+                }
+
+                //merge point statements
+                final JavaASTCollector mpsCollector =
+                        new JavaASTCollector(pm.getBody(), MergePointStatement.class);
+                mpsCollector.start();
+                for (ProgramElement block : mpsCollector.getNodes()) {
+                    // TODO (DS): Extend
+                    final ImmutableSet<BlockContract> blockContracts =
+                            specExtractor.extractBlockContracts(pm, (StatementBlock) block);
+                    for (BlockContract specification : blockContracts) {
+                        specRepos.addBlockContract(specification);
                     }
                 }
 

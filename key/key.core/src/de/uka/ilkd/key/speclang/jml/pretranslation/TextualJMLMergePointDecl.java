@@ -27,17 +27,39 @@ import de.uka.ilkd.key.speclang.PositionedString;
 public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
 
     private final PositionedString mergeProc;
+    private final PositionedString mergeParams;
 
-    public TextualJMLMergePointDecl(ImmutableList<String> mods,
-            PositionedString decl) {
+    public TextualJMLMergePointDecl(ImmutableList<String> mods) {
         super(mods);
-        // TODO Could be null.
-        assert decl != null;
-        this.mergeProc = decl;
-        setPosition(decl);
+        mergeProc = null;
+        mergeParams = null;
     }
 
-    public PositionedString getDecl() {
+    public TextualJMLMergePointDecl(ImmutableList<String> mods,
+            PositionedString mergeProc) {
+        super(mods);
+        assert mergeProc != null;
+        this.mergeProc = mergeProc;
+        mergeParams = null;
+        setPosition(mergeProc);
+    }
+
+    public TextualJMLMergePointDecl(ImmutableList<String> mods,
+            PositionedString mergeProc, PositionedString mergeParams) {
+        super(mods);
+        assert mergeProc != null;
+        assert mergeParams != null;
+        this.mergeProc = mergeProc;
+        this.mergeParams = mergeParams;
+        setPosition(mergeProc);
+    }
+
+
+    public PositionedString getMergeParams() {
+        return mergeParams;
+    }
+
+    public PositionedString getMergeProc() {
         return mergeProc;
     }
 

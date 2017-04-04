@@ -90,6 +90,7 @@ lexer grammar KeYJMLPreLexer;
     MEASURED_BY_REDUNDANTLY     : 'measured_by_redundantly';
     MERGE_POINT         : 'merge_point';
     MERGE_PROC          : 'merge_proc';
+    MERGE_PARAMS        : 'merge_params';
     MODEL 			: 'model';
     MODEL_BEHAVIOR 		: 'model_behavior' ;
     MODEL_BEHAVIOUR 		: 'model_behaviour' ;
@@ -314,6 +315,8 @@ ESC
         
 LPAREN : '(';
 RPAREN : ')';
+LBRACE : '{';
+RBRACE : '}';
 EQUALITY : '=';
 EMPTYBRACKETS : '[]';
         
