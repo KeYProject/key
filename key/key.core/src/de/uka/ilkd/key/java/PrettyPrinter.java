@@ -139,6 +139,7 @@ import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
@@ -1294,6 +1295,15 @@ public class PrettyPrinter {
         printHeader(x);
         writeInternalIndentation(x);
         write(x.getValue());
+        printFooter(x);
+    }
+    
+    public void printMergePointStatementBlock(MergePointStatement x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        write("//@ merge_point (");
+        write(x.getExpression().toString());
+        write(");");
         printFooter(x);
     }
 

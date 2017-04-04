@@ -472,7 +472,8 @@ public class JMLSpecFactory {
                 translateInfFlowSpecClauses(pm, progVars.selfVar,
                                             progVars.paramVars, progVars.resultVar, progVars.excVar,
                                             textualSpecCase.getInfFlowSpecs());
-        clauses.joinProcedure = translateMergeProcedure(textualSpecCase.getJoinProcs());
+        //TODO (DS): Remove this and everything around macro-based block contracts when done with integrating merge point statements
+//        clauses.joinProcedure = translateMergeProcedure(textualSpecCase.getJoinProcs());
         return clauses;
     }
 
@@ -530,6 +531,7 @@ public class JMLSpecFactory {
         }
     }
     
+    // TODO (DS): Remove this when done with integrating Merge Point Statements, but maybe keep some of the things included
     private MergeProcedure translateMergeProcedure(ImmutableList<PositionedString> originalClauses) throws SLTranslationException {
         if (originalClauses == null || originalClauses.size() == 0) {
             return null;

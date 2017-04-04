@@ -136,6 +136,9 @@ public class HTMLSyntaxHighlighter {
     private static final String PROGVAR_REPLACEMENT =
             "$1<span class=\"progvar_highlight\">$2</span>$3";
 
+    private static final Pattern SINGLE_LINE_COMMENT_PATTERN = Pattern.compile("(//.*?)<br>");
+    private static final String SINGLE_LINE_COMMENT_REPLACEMENT = "<span class=\"comment_highlight\">$1</span><br>";
+
     /**
      * Creates a new {@link HTMLSyntaxHighlighter} for this HTMLDocument.
      *
@@ -152,11 +155,14 @@ public class HTMLSyntaxHighlighter {
                 ".java_highlight { color: #7F0055; font-weight: bold; }";
         final String progVarHighlightRule =
                 ".progvar_highlight { color: #6A3E3E; }";
+        final String commentHighlightRule = 
+                ".comment_highlight { color: #3F7F5F; }";
 
         document.getStyleSheet().addRule(propLogicHighlightRule);
         document.getStyleSheet().addRule(progVarHighlightRule);
         document.getStyleSheet().addRule(javaHighlightRule);
         document.getStyleSheet().addRule(foLogicHighlightRule);
+        document.getStyleSheet().addRule(commentHighlightRule);
     }
 
     /**
@@ -248,6 +254,9 @@ public class HTMLSyntaxHighlighter {
             modality =
                     JAVA_KEYWORDS_PATTERN.matcher(modality).replaceAll(
                             JAVA_KEYWORDS_REPLACEMENT);
+
+            modality = SINGLE_LINE_COMMENT_PATTERN.matcher(modality)
+                    .replaceAll(SINGLE_LINE_COMMENT_REPLACEMENT);
 
             htmlString = htmlString.replace(modalityMatcher.group(), modality);
         }

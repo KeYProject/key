@@ -132,6 +132,7 @@ import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopInit;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
@@ -404,6 +405,8 @@ public interface Visitor {
     void performActionOnArrayReference(ArrayReference x); 
 
     void performActionOnMetaClassReference(MetaClassReference x); 
+    
+    void performActionOnMergePointStatement(MergePointStatement x);
 
     void performActionOnMethodReference(MethodReference x); 
 
