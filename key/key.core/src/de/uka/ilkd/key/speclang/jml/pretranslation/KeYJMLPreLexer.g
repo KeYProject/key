@@ -317,6 +317,7 @@ LPAREN : '(';
 RPAREN : ')';
 LBRACE : '{';
 RBRACE : '}';
+ARROW  : '->';
 EQUALITY : '=';
 EMPTYBRACKETS : '[]';
         
