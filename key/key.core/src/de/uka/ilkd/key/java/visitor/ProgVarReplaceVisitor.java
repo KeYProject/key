@@ -254,6 +254,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         performActionOnProgramVariable(x);
     }
 
+    @Override
     public void performActionOnBlockContract(final StatementBlock oldBlock,
             final StatementBlock newBlock) {
         ImmutableSet<BlockContract> oldContracts = services
@@ -263,6 +264,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     .addBlockContract(createNewBlockContract(oldContract,
                             newBlock, !oldBlock.equals(newBlock)));
         }
+    }
+
+    @Override
+    public void performActionOnMergeContract(MergeContract oldContract) {
+        services.getSpecificationRepository()
+                .addMergeContract(createNewMergeContract(oldContract,
+                        oldContract.getMergePointStatement(), false));
     }
 
     @Override
@@ -296,16 +304,19 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                             services))
                     .collect(Collectors.toCollection(() -> new ArrayList<>()));
 
-            if (newPreds
+            if (changed || !newPreds
                     .equals(((PredicateAbstractionMergeContract) oldContract)
                             .getAbstractionPredicates())) {
                 return new PredicateAbstractionMergeContract(newMps,
                         oldContract.getKJT(),
-                        MergeWithPredicateAbstractionFactory.instance()
-                                .toString(),
+                        pamc.getLatticeTypeName(),
                         newPreds);
             }
         } else {
+            if (!changed) {
+                return oldContract;
+            }
+            
             assert false : "ProgVarReplaceVisitor: Unknown type of MergeContract ("
                     + oldContract.getClass().getName() + ")";
         }

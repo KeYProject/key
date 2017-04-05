@@ -31,6 +31,7 @@ import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.speclang.MergeContract;
 
 /**
  * Extends the JavaASTWalker to use the visitor mechanism. The methods inherited
@@ -70,6 +71,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
             for (BlockContract bc : bcs) {
                 performActionOnBlockContract(bc);
             }
+        } else if (node instanceof MergePointStatement && services != null) {
+            ImmutableSet<MergeContract> mcs = services
+                    .getSpecificationRepository()
+                    .getMergeContracts((MergePointStatement) node);
+            mcs.forEach(mc -> performActionOnMergeContract(mc));
         }
     }
 
@@ -853,6 +859,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnBlockContract(BlockContract x) {
+        // do nothing
+    }
+
+    @Override
+    public void performActionOnMergeContract(MergeContract x) {
         // do nothing
     }
 

@@ -444,10 +444,6 @@ public class JMLSpecFactory {
         clauses.infFlowSpecs = translateInfFlowSpecClauses(pm, progVars.selfVar,
                 progVars.paramVars, progVars.resultVar, progVars.excVar,
                 textualSpecCase.getInfFlowSpecs());
-        // TODO (DS): Remove this and everything around macro-based block
-        // contracts when done with integrating merge point statements
-        // clauses.joinProcedure =
-        // translateMergeProcedure(textualSpecCase.getJoinProcs());
         return clauses;
     }
 
@@ -1225,7 +1221,7 @@ public class JMLSpecFactory {
 
             final MergeParamsSpec specs = JMLTranslator.translate(
                     mergeParamsParseStr, kjt, progVars.selfVar,
-                    progVars.paramVars, progVars.resultVar, progVars.excVar,
+                    collectParameters(method), progVars.resultVar, progVars.excVar,
                     progVars.atPres, MergeParamsSpec.class, services);
 
             result = result.add(new PredicateAbstractionMergeContract(mps, kjt,
@@ -1262,8 +1258,8 @@ public class JMLSpecFactory {
                 variables, clauses.requires, clauses.ensures,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues,
                 clauses.returns, clauses.signals, clauses.signalsOnly,
-                clauses.diverges, clauses.assignables, clauses.hasMod,
-                services).create();
+                clauses.diverges, clauses.assignables, clauses.hasMod, services)
+                        .create();
     }
 
     private ProgramVariableCollection createProgramVariables(

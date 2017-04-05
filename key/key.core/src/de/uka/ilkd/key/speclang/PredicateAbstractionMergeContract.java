@@ -38,6 +38,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     private final MergePointStatement mps;
     private final KeYJavaType kjt;
     private final Class<? extends AbstractPredicateAbstractionLattice> latticeType;
+    private final String latticeTypeName;
     private final ArrayList<AbstractionPredicate> abstractionPredicates;
 
     public PredicateAbstractionMergeContract(MergePointStatement mps,
@@ -46,6 +47,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
         this.mps = mps;
         this.kjt = kjt;
         this.latticeType = latticeTypeFromString(latticeType);
+        this.latticeTypeName = latticeType;
         this.abstractionPredicates = abstractionPredicates;
     }
 
@@ -61,6 +63,10 @@ public class PredicateAbstractionMergeContract implements MergeContract {
 
     public Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {
         return latticeType;
+    }
+
+    public String getLatticeTypeName() {
+        return latticeTypeName;
     }
 
     public ArrayList<AbstractionPredicate> getAbstractionPredicates() {

@@ -154,6 +154,7 @@ import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.speclang.MergeContract;
 
 /**
  * This class is implemented by visitors/walkers.
@@ -469,6 +470,8 @@ public interface Visitor {
     void performActionOnLoopInvariant(LoopSpecification x);
     
     void performActionOnBlockContract(BlockContract x);
+    
+    void performActionOnMergeContract(MergeContract x);
 
     void performActionOnSeqLength(SeqLength seqLength);
 
