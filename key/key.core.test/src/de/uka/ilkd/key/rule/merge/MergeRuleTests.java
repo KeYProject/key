@@ -26,7 +26,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionUntilMergePointMacro;
-import de.uka.ilkd.key.macros.FullAutoPilotWithJMLSpecMergesProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -104,23 +103,6 @@ public class MergeRuleTests extends TestCase {
 
         assertTrue(proof.closed());
         //TODO (DS): Assert that there is the expected number of merge rule applications
-    }
-
-    /**
-     * Runs the FullAutoPilotWithJMLSpecMergesProofMacro on the problem with merge
-     * blocks specified in JML, following by an automatic strategy finish. At
-     * the end, there should be two merge applications, and the proof should be
-     * closed.
-     */
-    @Test
-    public void testDoAutomaticGcdProofWithMerges() {
-        final Proof proof = loadProof("gcd.joinBlocks.key");
-        runMacro(new FullAutoPilotWithJMLSpecMergesProofMacro(), proof.root());
-        startAutomaticStrategy(proof);
-
-        assertTrue(proof.closed());
-        assertEquals("There should be two merge rule applications in the proof.", 2,
-                proof.getStatistics().mergeRuleApps);
     }
 
     /**

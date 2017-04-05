@@ -144,7 +144,7 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure impleme
         else {
 
             return new ValuesMergeResult(DefaultImmutableSet.<Term> nil(),
-                    MergeIfThenElse.createIfThenElseTerm(state1, state2,
+                    MergeByIfThenElse.createIfThenElseTerm(state1, state2,
                             valueInState1, valueInState2,
                             distinguishingFormula, services),
                     new LinkedHashSet<Name>(), new LinkedHashSet<Term>());

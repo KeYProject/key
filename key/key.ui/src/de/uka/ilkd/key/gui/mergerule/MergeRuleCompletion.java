@@ -11,7 +11,7 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergePartner;
-import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElse;
+import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 
 /**
  * This class completes the instantiation for a merge rule application. The user
@@ -26,7 +26,7 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
     /** Singleton instance */
     public static final MergeRuleCompletion INSTANCE = new MergeRuleCompletion();
 
-    private static final MergeProcedure STD_CONCRETE_MERGE_RULE = MergeIfThenElse
+    private static final MergeProcedure STD_CONCRETE_MERGE_RULE = MergeByIfThenElse
             .instance();
 
     private MergeRuleCompletion() {

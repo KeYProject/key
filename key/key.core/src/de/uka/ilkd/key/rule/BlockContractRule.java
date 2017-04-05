@@ -258,7 +258,7 @@ public class BlockContractRule implements BuiltInRule {
         }
         final ImmutableSet<BlockContract> contracts =
                 getApplicableContracts(instantiation, goal, goal.proof().getServices());
-        return !contracts.isEmpty() && !contracts.iterator().next().hasMergeProcedure();
+        return !contracts.isEmpty();
     }
 
     private static Term buildInfFlowPreAssumption(ProofObligationVars instVars,

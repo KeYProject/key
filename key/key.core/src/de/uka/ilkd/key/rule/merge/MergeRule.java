@@ -56,7 +56,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeProcedure.ValuesMergeResult;
-import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElse;
+import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
@@ -82,7 +82,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
  * 
  * @see MergeRuleUtils
  * @see MergeTotalWeakening
- * @see MergeIfThenElse
+ * @see MergeByIfThenElse
  * @see MergeIfThenElseAntecedent
  * @see MergeWithLatticeAbstraction
  * @see MergeWithPredicateAbstraction
@@ -530,7 +530,7 @@ public class MergeRule implements BuiltInRule {
                 || !(heap2.op() instanceof Function)) {
             // Covers the case of two different symbolic heaps
             return new ValuesMergeResult(newConstraints,
-                    MergeIfThenElse.createIfThenElseTerm(state1, state2, heap1,
+                    MergeByIfThenElse.createIfThenElseTerm(state1, state2, heap1,
                             heap2, distinguishingFormula, services),
                     newNames, sideConditionsToProve);
         }
@@ -634,7 +634,7 @@ public class MergeRule implements BuiltInRule {
           // ((Function) heap2.op()).equals(createFunc))
 
         return new ValuesMergeResult(newConstraints,
-                MergeIfThenElse.createIfThenElseTerm(state1, state2, heap1,
+                MergeByIfThenElse.createIfThenElseTerm(state1, state2, heap1,
                         heap2, distinguishingFormula, services),
                 newNames, sideConditionsToProve);
 

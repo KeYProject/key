@@ -49,7 +49,7 @@ public class Gcd {
         if (a < 0) a = -a;
 
         //@ merge_point
-        //@ merge_proc "MergeIfThenElse";
+        //@ merge_proc "MergeByIfThenElse";
 
         if (b < 0) b = -b;
 

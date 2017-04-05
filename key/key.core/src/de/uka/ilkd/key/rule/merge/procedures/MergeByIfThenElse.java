@@ -47,8 +47,8 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils.Option;
  * @see MergeIfThenElseAntecedent
  * @see MergeRule
  */
-public class MergeIfThenElse extends MergeProcedure implements UnparametricMergeProcedure {
-    private static MergeIfThenElse INSTANCE = null;
+public class MergeByIfThenElse extends MergeProcedure implements UnparametricMergeProcedure {
+    private static MergeByIfThenElse INSTANCE = null;
 
     /**
      * Time in milliseconds after which a simplification attempt of a
@@ -56,9 +56,9 @@ public class MergeIfThenElse extends MergeProcedure implements UnparametricMerge
      */
     private static final int SIMPLIFICATION_TIMEOUT_MS = 1000;
 
-    public static MergeIfThenElse instance() {
+    public static MergeByIfThenElse instance() {
         if (INSTANCE == null) {
-            INSTANCE = new MergeIfThenElse();
+            INSTANCE = new MergeByIfThenElse();
         }
         return INSTANCE;
     }

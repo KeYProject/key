@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -50,7 +49,6 @@ import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -74,9 +72,9 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.InitiallyClauseImpl;
+import de.uka.ilkd.key.speclang.LoopSpecImpl;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.LoopSpecImpl;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
@@ -1187,10 +1185,12 @@ public class JMLSpecFactory {
 
         final String mergeProcStr = mergePointDecl.getMergeProc().text
                 .replaceAll("\"", "");
-        final String mergeParamsStr = mergePointDecl.getMergeParams().text;
-        final PositionedString mergeParamsParseStr = new PositionedString(
-                "merge_params " + mergeParamsStr.substring(1,
-                        mergeParamsStr.length() - 1));
+        final String mergeParamsStr = mergePointDecl.getMergeParams() == null
+                ? null : mergePointDecl.getMergeParams().text;
+        final PositionedString mergeParamsParseStr = mergeParamsStr == null
+                ? null
+                : new PositionedString("merge_params " + mergeParamsStr
+                        .substring(1, mergeParamsStr.length() - 1));
 
         MergeProcedure mergeProc = MergeProcedure
                 .getProcedureByName(mergeProcStr);
@@ -1252,7 +1252,6 @@ public class JMLSpecFactory {
             final StatementBlock block,
             final TextualJMLSpecCase specificationCase)
             throws SLTranslationException {
-        // TODO Take merge_proc into account
         final Behavior behavior = specificationCase.getBehavior();
         final BlockContract.Variables variables = BlockContract.Variables
                 .create(block, labels, method, services);
@@ -1262,10 +1261,10 @@ public class JMLSpecFactory {
                 specificationCase, programVariables, behavior);
         return new SimpleBlockContract.Creator(block, labels, method, behavior,
                 variables, clauses.requires, clauses.ensures,
-                clauses.infFlowSpecs, clauses.joinProcedure, clauses.breaks,
-                clauses.continues, clauses.returns, clauses.signals,
-                clauses.signalsOnly, clauses.diverges, clauses.assignables,
-                clauses.hasMod, services).create();
+                clauses.infFlowSpecs, clauses.breaks, clauses.continues,
+                clauses.returns, clauses.signals, clauses.signalsOnly,
+                clauses.diverges, clauses.assignables, clauses.hasMod,
+                services).create();
     }
 
     private ProgramVariableCollection createProgramVariables(
