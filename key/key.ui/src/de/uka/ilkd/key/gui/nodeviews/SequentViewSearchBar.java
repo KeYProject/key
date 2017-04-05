@@ -121,9 +121,10 @@ public class SequentViewSearchBar extends SearchBar {
 				}
 			}
         });
-        searchModeBox.setToolTipText("Determines search behaviour. " + SearchMode.HIDE.displayName + " only shows sequent formulas that match the search. "
-        + SearchMode.REGROUP.displayName + " arranges the matching formulas around the sequence arrow. "
-        + SearchMode.HIGHLIGHT.displayName + " leaves the sequent unchanged.");
+        searchModeBox.setToolTipText("<html>Determines search behaviour: <br>" + SearchMode.HIDE.displayName + 
+        		" only shows sequent formulas that match the search. <br>"
+        + SearchMode.REGROUP.displayName + " arranges the matching formulas around the sequence arrow. <br>"
+        + SearchMode.HIGHLIGHT.displayName + " leaves the sequent unchanged.</html>");
         
         add(searchModeBox);
     }
@@ -156,12 +157,16 @@ public class SequentViewSearchBar extends SearchBar {
                 search();
             } else {
                 clearSearchResults();
+                if (sequentView.filter instanceof SearchSequentPrintFilter) {
+        			((SearchSequentPrintFilter) sequentView.filter).setSearchString("");
+        			sequentView.printSequent();
+                }
             }
         }
     }
     
     /**
-     * searches for the occurence of the specified string
+     * searches for the occurrence of the specified string
      */
     @Override
     public boolean search(String search) {

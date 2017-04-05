@@ -34,6 +34,7 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.pp.SearchSequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
@@ -350,6 +351,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
     @Override
     public String getTitle() {
+    	if (filter instanceof SearchSequentPrintFilter) {
+    		return "Current Goal - Sequent View modified by Search Filter";
+    	}
         return "Current Goal";
     }
 
