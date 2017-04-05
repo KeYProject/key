@@ -843,7 +843,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     
     @Override
     public void performActionOnMergePointStatement(MergePointStatement x) {
-        // do nothing
+        doDefaultAction(x);
     }
 
     @Override
