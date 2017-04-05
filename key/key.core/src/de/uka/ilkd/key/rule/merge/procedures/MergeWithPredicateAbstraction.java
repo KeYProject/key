@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
@@ -82,7 +83,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
     public MergeWithPredicateAbstraction(
             Iterable<AbstractionPredicate> predicates,
             Class<? extends AbstractPredicateAbstractionLattice> latticeType,
-            LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices) {
+            Map<ProgramVariable, AbstractDomainElement> userChoices) {
         for (AbstractionPredicate pred : predicates) {
             if (!this.predicates.containsKey(pred.getArgSort())) {
                 this.predicates.put(pred.getArgSort(),
@@ -93,7 +94,8 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
         }
 
         this.latticeType = latticeType;
-        this.userChoices = userChoices;
+        this.userChoices = new LinkedHashMap<>();
+        this.userChoices.putAll(userChoices);
     }
 
     /*

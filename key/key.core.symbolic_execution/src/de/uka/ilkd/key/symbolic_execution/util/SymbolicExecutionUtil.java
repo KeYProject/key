@@ -66,7 +66,7 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.java.visitor.ContainsStatementVisitor;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -3881,51 +3881,6 @@ public final class SymbolicExecutionUtil {
       }
       else {
          return false;
-      }
-   }
-   
-   /**
-    * Utilits class used by {@link SymbolicExecutionUtil#containsStatement(MethodFrame, ProgramElement, Services)}.
-    * @author Martin Hentschel
-    */
-   private static class ContainsStatementVisitor extends JavaASTVisitor {
-      /**
-       * The {@link ProgramElement} to search.
-       */
-      private final SourceElement toSearch;
-      
-      /**
-       * The result.
-       */
-      private boolean contained = false;
-      
-      /**
-       * Constructor.
-       * @param root The {@link ProgramElement} to start search in.
-       * @param toSearch The {@link SourceElement} to search.
-       * @param services The {@link Services} to use.
-       */
-      public ContainsStatementVisitor(ProgramElement root, SourceElement toSearch, Services services) {
-         super(root, services);
-         this.toSearch = toSearch;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      protected void doDefaultAction(SourceElement se) {
-         if (equalsWithPosition(se, toSearch)) { // Comparison by == is not possible since loops are recreated
-            contained = true;
-         }
-      }
-
-      /**
-       * Returns the result.
-       * @return {@code true} contained, {@code false} not contained.
-       */
-      public boolean isContained() {
-         return contained;
       }
    }
    

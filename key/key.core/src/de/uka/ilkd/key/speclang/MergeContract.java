@@ -34,6 +34,11 @@ public interface MergeContract extends SpecificationElement {
      */
     Class<? extends MergeProcedure> getMergeProcedure();
     
+    /**
+     * @return The instantiated {@link MergeProcedure}.
+     */
+    MergeProcedure getInstantiatedMergeProcedure();
+    
     default VisibilityModifier getVisibility() {
         assert false : "Method getVisibility() is unimplemented for MergeContract";
         return null;

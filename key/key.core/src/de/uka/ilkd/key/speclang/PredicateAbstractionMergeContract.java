@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.speclang;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
@@ -54,6 +55,11 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     @Override
     public Class<? extends MergeProcedure> getMergeProcedure() {
         return MergeWithPredicateAbstraction.class;
+    }
+
+    public MergeProcedure getInstantiatedMergeProcedure() {
+        return new MergeWithPredicateAbstraction(abstractionPredicates,
+                latticeType, Collections.emptyMap());
     }
 
     @Override

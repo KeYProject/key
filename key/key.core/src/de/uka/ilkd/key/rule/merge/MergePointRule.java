@@ -13,28 +13,27 @@
 
 package de.uka.ilkd.key.rule.merge;
 
-import java.util.HashMap;
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.visitor.ContainsStatementVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.speclang.MergeContract;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
@@ -43,12 +42,12 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * @author Dominic Scheurer
  */
 public class MergePointRule implements BuiltInRule {
-    public static final JoinPointRule INSTANCE = new MergePointRule();
+    public static final MergePointRule INSTANCE = new MergePointRule();
 
-    private static final String DISPLAY_NAME = "Join Point";
+    private static final String DISPLAY_NAME = "Merge Point Rule";
     private static final Name RULE_NAME = new Name(DISPLAY_NAME);
 
-    public JoinPointRule() {
+    public MergePointRule() {
 
     }
 
@@ -57,21 +56,26 @@ public class MergePointRule implements BuiltInRule {
             RuleApp ruleApp) throws RuleAbortException {
 
         PosInOccurrence pio = ruleApp.posInOccurrence();
-        JoinRuleBuiltInRuleApp app = new JoinRuleBuiltInRuleApp(new JoinRule(),
-                pio);
+        MergeRuleBuiltInRuleApp app = new MergeRuleBuiltInRuleApp(
+                MergeRule.INSTANCE, pio);
 
-        MergePointStatement jPS = (MergePointStatement) JavaTools
+        MergePointStatement mps = (MergePointStatement) JavaTools
                 .getActiveStatement(
                         MergeRuleUtils.getJavaBlockRecursive(pio.subTerm()));
 
-        ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
-                .findPotentialJoinPartners(goal, pio, goal.proof().root());
+        ImmutableList<MergePartner> mergePartners = MergeRule
+                .findPotentialMergePartners(goal, pio, goal.proof().root());
 
-        app.setJoinNode(goal.node());
-        app.setConcreteRule(
-                services.getSpecificationRepository().getJoinPointMergeSpec(jPS)
-                        .getInstantiatedJoinProcedure(services));
-        app.setJoinPartners(joinPartners);
+        app.setMergeNode(goal.node());
+        final ImmutableSet<MergeContract> mergeContracts = services
+                .getSpecificationRepository().getMergeContracts(mps);
+
+        assert mergeContracts != null && mergeContracts
+                .size() == 1 : "There should be exactly one MergeContract for each MergePointStatement";
+
+        app.setConcreteRule(mergeContracts.iterator().next()
+                .getInstantiatedMergeProcedure());
+        app.setMergePartners(mergePartners);
 
         ImmutableList<Goal> newGoals = goal.split(1);
         Goal g = newGoals.head();
@@ -108,22 +112,22 @@ public class MergePointRule implements BuiltInRule {
                     .getActiveStatement(TermBuilder
                             .goBelowUpdates(pio.subTerm()).javaBlock()));
 
-            ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
-                    .findPotentialJoinPartners(goal, pio);
+            ImmutableList<MergePartner> mergePartners = MergeRule
+                    .findPotentialMergePartners(goal, pio);
 
-            if (!joinPartners.isEmpty()) {
+            if (!mergePartners.isEmpty()) {
 
-                ImmutableList<Goal> joinPartnersGoal = ImmutableSLList.nil();
+                ImmutableList<Goal> emrgePartnersGoal = ImmutableSLList.nil();
 
-                for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> p : joinPartners) {
-                    joinPartnersGoal = joinPartnersGoal.append(p.first);
+                for (MergePartner p : mergePartners) {
+                    emrgePartnersGoal = emrgePartnersGoal.append(p.getGoal());
                 }
 
                 ImmutableList<Goal> openGoals = goal.node().proof().openGoals();
                 for (Goal g : openGoals) {
                     if (!g.equals(goal) && !g.isLinked()
-                            && !joinPartnersGoal.contains(g)
-                            && containsNonActiveJPS(g, jps)) {
+                            && !emrgePartnersGoal.contains(g)
+                            && containsNonActiveMPS(g, jps)) {
                         return false;
                     }
                 }
@@ -140,8 +144,8 @@ public class MergePointRule implements BuiltInRule {
      * @param jps
      * @return
      */
-    static boolean containsNonActiveJPS(Goal g, MergePointStatement jps) {
-        return containsJPS(g, jps, true);
+    static boolean containsNonActiveMPS(Goal g, MergePointStatement jps) {
+        return containsMPS(g, jps, true);
     }
 
     /**
@@ -151,8 +155,8 @@ public class MergePointRule implements BuiltInRule {
      * @param jps
      * @return
      */
-    static boolean containsJPS(Goal g, MergePointStatement jps) {
-        return containsJPS(g, jps, false);
+    static boolean containsMPS(Goal g, MergePointStatement jps) {
+        return containsMPS(g, jps, false);
     }
 
     /**
@@ -163,7 +167,7 @@ public class MergePointRule implements BuiltInRule {
      * @param onlyNonActive
      * @return
      */
-    private static boolean containsJPS(Goal g, MergePointStatement jps,
+    private static boolean containsMPS(Goal g, MergePointStatement jps,
             boolean onlyNonActive) {
         for (SequentFormula sf : g.node().sequent().succedent()) {
             JavaBlock jb = MergeRuleUtils.getJavaBlockRecursive(sf.formula());
@@ -200,6 +204,6 @@ public class MergePointRule implements BuiltInRule {
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos,
             TermServices services) {
-        return new JoinPointBuiltInRuleApp(this, pos);
+        return new MergePointBuiltInRuleApp(this, pos);
     }
 }
