@@ -204,7 +204,6 @@ public class JMLSpecFactory {
         public Term returns;
         public Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
-        public MergeProcedure joinProcedure;
     }
 
     // -------------------------------------------------------------------------
