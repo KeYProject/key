@@ -41,7 +41,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
  * 
  * @author Dominic Scheurer
  */
-public abstract class MergeWithLatticeAbstraction extends MergeProcedure {
+public abstract class MergeWithLatticeAbstraction extends MergeProcedure implements ParametricMergeProcedure {
 
     /**
      * Returns the abstract domain lattice for the given sort or null if there

@@ -36,7 +36,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
  * 
  * @author Dominic Scheurer
  */
-public class MergeTotalWeakening extends MergeProcedure {
+public class MergeTotalWeakening extends MergeProcedure implements UnparametricMergeProcedure {
 
     private static MergeTotalWeakening INSTANCE = null;
 

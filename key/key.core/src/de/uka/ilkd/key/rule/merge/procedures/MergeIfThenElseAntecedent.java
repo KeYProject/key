@@ -41,7 +41,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
  * @see MergeIfThenElse
  * @see MergeRule
  */
-public class MergeIfThenElseAntecedent extends MergeProcedure {
+public class MergeIfThenElseAntecedent extends MergeProcedure implements UnparametricMergeProcedure {
 
     private static MergeIfThenElseAntecedent INSTANCE = null;
 

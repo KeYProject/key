@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
@@ -26,43 +27,56 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
  * Extracts specifications from comments.
  */
 public interface SpecExtractor {
-    
+
     /**
      * Returns the operation contracts for the passed operation.
      */
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm)
-        throws SLTranslationException;
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(
+            IProgramMethod pm) throws SLTranslationException;
 
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm, boolean addInvariant)
-        throws SLTranslationException;
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(
+            IProgramMethod pm, boolean addInvariant)
+            throws SLTranslationException;
 
     /**
      * Returns the class invariants for the passed type.
      */
     public ImmutableSet<SpecificationElement> extractClassSpecs(KeYJavaType kjt)
-        throws SLTranslationException;
-        
+            throws SLTranslationException;
+
     /**
      * Returns the loop invariant for the passed loop (if any).
      */
-    public LoopSpecification extractLoopInvariant(IProgramMethod pm, 
-                                              LoopStatement loop)
-        throws SLTranslationException;
+    public LoopSpecification extractLoopInvariant(IProgramMethod pm,
+            LoopStatement loop) throws SLTranslationException;
 
     /**
      * Returns the block contracts for the passed block.
      */
-    public ImmutableSet<BlockContract> extractBlockContracts(IProgramMethod method, StatementBlock block) throws SLTranslationException;
+    public ImmutableSet<BlockContract> extractBlockContracts(
+            IProgramMethod method, StatementBlock block)
+            throws SLTranslationException;
 
     /**
-     * Returns the block contracts for the passed labeled statement if it labels a block.
+     * Returns the {@link MergeContract}s for the given
+     * {@link MergePointStatement}.
      */
-    public ImmutableSet<BlockContract> extractBlockContracts(IProgramMethod method, LabeledStatement labeled) throws SLTranslationException;
+    public ImmutableSet<MergeContract> extractMergeContracts(
+            IProgramMethod method, MergePointStatement mps)
+            throws SLTranslationException;
 
     /**
-     * Returns all warnings generated so far in the translation process.
-     * (e.g. this may warn about unsupported features which have been ignored 
-     * by the translation)
+     * Returns the block contracts for the passed labeled statement if it labels
+     * a block.
+     */
+    public ImmutableSet<BlockContract> extractBlockContracts(
+            IProgramMethod method, LabeledStatement labeled)
+            throws SLTranslationException;
+
+    /**
+     * Returns all warnings generated so far in the translation process. (e.g.
+     * this may warn about unsupported features which have been ignored by the
+     * translation)
      */
     public ImmutableSet<PositionedString> getWarnings();
 }

@@ -47,7 +47,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils.Option;
  * @see MergeIfThenElseAntecedent
  * @see MergeRule
  */
-public class MergeIfThenElse extends MergeProcedure {
+public class MergeIfThenElse extends MergeProcedure implements UnparametricMergeProcedure {
     private static MergeIfThenElse INSTANCE = null;
 
     /**

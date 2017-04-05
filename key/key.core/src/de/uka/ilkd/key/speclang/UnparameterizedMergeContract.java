@@ -17,9 +17,10 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElse;
+import de.uka.ilkd.key.rule.merge.procedures.UnparametricMergeProcedure;
 
 /**
- * A {@link MergeContract} for unparameterized {@link MergeProcedure}s like
+ * A {@link MergeContract} for {@link UnparametricMergeProcedure}s like
  * {@link MergeIfThenElse}.
  *
  * @author Dominic Scheurer
@@ -28,12 +29,12 @@ public class UnparameterizedMergeContract implements MergeContract {
 
     private final static String NAME = "Unparametrized Merge Contract";
 
-    private final Class<? extends MergeProcedure> mergeProcedure;
+    private final MergeProcedure mergeProcedure;
     private final MergePointStatement mps;
     private final KeYJavaType kjt;
 
     public UnparameterizedMergeContract(
-            Class<? extends MergeProcedure> mergeProcedure,
+            MergeProcedure mergeProcedure,
             MergePointStatement mps, KeYJavaType kjt) {
         this.mergeProcedure = mergeProcedure;
         this.mps = mps;
@@ -42,6 +43,10 @@ public class UnparameterizedMergeContract implements MergeContract {
 
     @Override
     public Class<? extends MergeProcedure> getMergeProcedure() {
+        return mergeProcedure.getClass();
+    }
+    
+    public MergeProcedure getInstantiatedMergeProcedure() {
         return mergeProcedure;
     }
 

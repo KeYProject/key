@@ -13,7 +13,10 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.ArrayList;
+
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.DisjunctivePredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
@@ -35,12 +38,15 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     private final MergePointStatement mps;
     private final KeYJavaType kjt;
     private final Class<? extends AbstractPredicateAbstractionLattice> latticeType;
+    private final ArrayList<AbstractionPredicate> abstractionPredicates;
 
     public PredicateAbstractionMergeContract(MergePointStatement mps,
-            KeYJavaType kjt, String latticeType) {
+            KeYJavaType kjt, String latticeType,
+            ArrayList<AbstractionPredicate> abstractionPredicates) {
         this.mps = mps;
         this.kjt = kjt;
         this.latticeType = latticeTypeFromString(latticeType);
+        this.abstractionPredicates = abstractionPredicates;
     }
 
     @Override
@@ -51,6 +57,14 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     @Override
     public MergePointStatement getMergePointStatement() {
         return mps;
+    }
+
+    public Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {
+        return latticeType;
+    }
+
+    public ArrayList<AbstractionPredicate> getAbstractionPredicates() {
+        return abstractionPredicates;
     }
 
     @Override
@@ -66,10 +80,6 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     @Override
     public KeYJavaType getKJT() {
         return kjt;
-    }
-
-    public Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {
-        return latticeType;
     }
 
     private static Class<? extends AbstractPredicateAbstractionLattice> latticeTypeFromString(

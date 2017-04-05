@@ -277,7 +277,8 @@ SEMICOLON
 ;
 
 STRING_LITERAL
-    : '"' ( ESC | ~('"'|'\\') )* '"'
+    //: '"' ( ESC | ~('"'|'\\') )* '"'
+    : '"' ( ESC | ~('"') )* '"'
     ;
 
 fragment
