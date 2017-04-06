@@ -54,8 +54,6 @@ public abstract class AbstractDomainLattice implements
 
             Term toProve =
                     getSideConditionForAxiom(state, term, elem, services);
-            
-            System.out.println(LogicPrinter.quickPrintTerm(toProve, services));
 
             if (isProvableWithSplitting(toProve, services,
                     AXIOM_PROVE_TIMEOUT_MS)) {

@@ -14,9 +14,6 @@
 package de.uka.ilkd.key.rule.merge;
 
 import java.io.File;
-import java.io.IOException;
-
-import junit.framework.TestCase;
 
 import org.junit.Test;
 
@@ -32,13 +29,10 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.rule.merge.MergeProcedure;
-import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.util.ProofStarter;
+import junit.framework.TestCase;
 
 /**
  * Test suite for the {@link MergeRule}.
