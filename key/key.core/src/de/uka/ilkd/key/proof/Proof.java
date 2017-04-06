@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EventObject;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,12 +38,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
@@ -54,14 +51,15 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergePartner;
+import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.Triple;
 
 
 /**
@@ -517,9 +515,9 @@ public class Proof implements Named {
      * Opens a previously closed node (the one corresponding to p_goal)
      * and all its closed parents.<p>
      * 
-     * This is, for instance, needed for the join rule: In
-     * a situation where a join node and its associated partners
-     * have been closed and the join node is then pruned away,
+     * This is, for instance, needed for the {@link MergeRule}: In
+     * a situation where a merge node and its associated partners
+     * have been closed and the merge node is then pruned away,
      * the partners have to be reopened again. Otherwise, we
      * have a soundness issue.
      *
@@ -633,14 +631,14 @@ public class Proof implements Named {
                         }
                     }
 
-                    // Join rule applications: Unlink all join partners.
-                    if (visitedNode.getAppliedRuleApp() instanceof JoinRuleBuiltInRuleApp) {
-                        final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) visitedNode
+                    // Merge rule applications: Unlink all merge partners.
+                    if (visitedNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
+                        final MergeRuleBuiltInRuleApp mergeApp = (MergeRuleBuiltInRuleApp) visitedNode
                                 .getAppliedRuleApp();
 
-                        for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinApp
-                                .getJoinPartners()) {
-                            final Goal linkedGoal = joinPartner.first;
+                        for (MergePartner mergePartner : mergeApp
+                                .getMergePartners()) {
+                            final Goal linkedGoal = mergePartner.getGoal();
 
                             if (linkedGoal.node().isClosed()) {
                                 // The partner node has already been closed; we
@@ -665,8 +663,8 @@ public class Proof implements Named {
             final Goal firstGoal = getGoal(firstLeaf);
             assert firstGoal != null;
             
-            // Cutting a linked goal (linked by a "defocusing" join
-            // operation, see {@link JoinRule}) unlinks this goal again.
+            // Cutting a linked goal (linked by a "defocusing" merge
+            // operation, see {@link MergeRule}) unlinks this goal again.
             if (firstGoal.isLinked()) {
                 firstGoal.setLinkedGoal(null);
             }

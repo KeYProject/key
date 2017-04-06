@@ -10,10 +10,10 @@ import de.uka.ilkd.key.informationflow.proof.SideProofStatistics;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
-import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
 import de.uka.ilkd.key.util.Pair;
 
@@ -27,9 +27,10 @@ public class Statistics {
     public final int nodes;
     public final int branches;
     public final int interactiveSteps;
+    public final int symbExApps;
     public final int quantifierInstantiations;
     public final int ossApps;
-    public final int joinRuleApps;
+    public final int mergeRuleApps;
     public final int totalRuleApps;
     public final int smtSolverApps;
     public final int dependencyContractApps;
@@ -48,23 +49,24 @@ public class Statistics {
     protected Statistics(int nodes,
                        int branches,
                        int interactiveSteps,
+                       int symbExApps,
                        int quantifierInstantiations,
                        int ossApps,
-                       int joinRuleApps,
+                       int mergeRuleApps,
                        int totalRuleApps,
                        int smtSolverApps,
                        int dependencyContractApps,
                        int operationContractApps,
                        int loopInvApps,
                        long autoModeTimeInMillis,
-                       long timeInMillis,
-                       float timePerStepInMillis) {
+                       long timeInMillis, float timePerStepInMillis) {
         this.nodes = nodes;
         this.branches = branches;
         this.interactiveSteps = interactiveSteps;
+        this.symbExApps = symbExApps;
         this.quantifierInstantiations = quantifierInstantiations;
         this.ossApps = ossApps;
-        this.joinRuleApps = joinRuleApps;
+        this.mergeRuleApps = mergeRuleApps;
         this.totalRuleApps = totalRuleApps;
         this.smtSolverApps = smtSolverApps;
         this.dependencyContractApps = dependencyContractApps;
@@ -79,17 +81,17 @@ public class Statistics {
     	return new Statistics(side.nodes,
                                   side.branches,
                                   side.interactiveSteps,
+                                  side.symbExApps,
                                   side.quantifierInstantiations,
                                   side.ossApps,
-                                  side.joinRuleApps,
+                                  side.mergeRuleApps,
                                   side.totalRuleApps,
                                   side.smtSolverApps,
                                   side.dependencyContractApps,
                                   side.operationContractApps,
                                   side.loopInvApps,
                                   side.autoModeTimeInMillis,
-                                  System.currentTimeMillis() - creationTime,
-                                  side.timePerStepInMillis);
+                                  System.currentTimeMillis() - creationTime, side.timePerStepInMillis);
     }
 
     Statistics(Proof proof) {
@@ -102,9 +104,10 @@ public class Statistics {
         int tmpNodes = 0; // proof nodes
         int tmpBranches = 1; // proof branches
         int tmpInteractive = 0; // interactive steps
+        int tmpSymbExApps = 0; // symbolic execution steps
         int tmpQuant = 0; // quantifier instantiations
         int tmpOss = 0; // OSS applications
-        int tmpJoinApps = 0; // join rule applications
+        int tmpMergeApps = 0; // merge rule applications
         int tmpOssCaptured = 0; // rules apps in OSS protocol
         int tmpSmt = 0; // SMT rule apps
         int tmpDep = 0; // dependency contract apps
@@ -133,6 +136,10 @@ public class Statistics {
                             interactiveAppsDetails.get(ruleAppName) + 1);
                 }
             }
+            
+            if (NodeInfo.isSymbolicExecutionRuleApplied(node)) {
+                tmpSymbExApps++;
+            }
 
             final RuleApp ruleApp = node.getAppliedRuleApp();
             if (ruleApp != null) {
@@ -151,8 +158,8 @@ public class Statistics {
                     tmpContr++;
                 } else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
                     tmpInv++;
-                } else if (ruleApp instanceof JoinRuleBuiltInRuleApp) {
-                    tmpJoinApps++;
+                } else if (ruleApp instanceof MergeRuleBuiltInRuleApp) {
+                    tmpMergeApps++;
                 } else if (ruleApp instanceof TacletApp) {
                     final de.uka.ilkd.key.rule.Taclet t = ((TacletApp)ruleApp).taclet();
                     final String tName = t.name().toString();
@@ -168,9 +175,10 @@ public class Statistics {
         this.nodes = tmpNodes;
         this.branches = tmpBranches;
         this.interactiveSteps = tmpInteractive;
+        this.symbExApps = tmpSymbExApps;
         this.quantifierInstantiations = tmpQuant;
         this.ossApps = tmpOss;
-        this.joinRuleApps = tmpJoinApps;
+        this.mergeRuleApps = tmpMergeApps;
         this.totalRuleApps = tmpNodes + tmpOssCaptured -1;
         this.smtSolverApps = tmpSmt;
         this.dependencyContractApps = tmpDep;
@@ -204,6 +212,8 @@ public class Statistics {
                         EnhancedStringBuffer.format(stat.branches).toString()));
         summaryList.add(new Pair<String, String>("Interactive steps", "" +
                         stat.interactiveSteps));
+        summaryList.add(new Pair<String, String>("Symbolic execution steps", "" +
+                stat.symbExApps));
         
         
         final long time = sideProofs ? stat.autoModeTimeInMillis : proof.getAutoModeTime();
@@ -235,8 +245,8 @@ public class Statistics {
                         stat.operationContractApps));
         summaryList.add(new Pair<String, String>("Loop invariant apps", "" +
                         stat.loopInvApps));
-        summaryList.add(new Pair<String, String>("Join Rule apps", "" +
-                stat.joinRuleApps));
+        summaryList.add(new Pair<String, String>("Merge Rule apps", "" +
+                stat.mergeRuleApps));
         summaryList.add(new Pair<String, String>("Total rule apps",
                         EnhancedStringBuffer.format(stat.totalRuleApps).toString()));
     }

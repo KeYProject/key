@@ -24,7 +24,7 @@
 [Strategy]Timeout=-1
 [Strategy]MaximumNumberOfAutomaticApplications=10000
 [SMTSettings]integersMaximum=2147483645
-[Choice]DefaultChoices=assertions-assertions\\:on , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:allow , JavaCard-JavaCard\\:off , Strings-Strings\\:on , modelFields-modelFields\\:showSatisfiability , bigint-bigint\\:on , sequences-sequences\\:on , moreSeqRules-moreSeqRules\\:off , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , permissions-permissions\\:off , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , joinGenerateIsWeakeningGoal-joinGenerateIsWeakeningGoal\\:off
+[Choice]DefaultChoices=assertions-assertions\\:on , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:allow , JavaCard-JavaCard\\:off , Strings-Strings\\:on , modelFields-modelFields\\:showSatisfiability , bigint-bigint\\:on , sequences-sequences\\:on , moreSeqRules-moreSeqRules\\:off , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , permissions-permissions\\:off , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off
 [SMTSettings]useConstantsForBigOrSmallIntegers=true
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
@@ -71,7 +71,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
    (rule "variableDeclaration" (formula "5") (term "1,1") (newnames "result_1") (userinteraction))
    (rule "assignment" (formula "5") (term "1,1") (userinteraction))
    (builtin "One Step Simplification" (formula "5"))
-   (builtin "JoinRule" (formula "5") (joinProc "JoinByIfThenElse") (nrJoinPartners "1") (joinId "25"))
+   (builtin "MergeRule" (formula "5") (mergeProc "MergeByIfThenElse") (nrMergePartners "1") (mergeId "25"))
    (opengoal " ")
 )
 (branch "if x_1 false"
@@ -80,7 +80,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
    (rule "variableDeclaration" (formula "5") (term "1") (newnames "result_2") (userinteraction))
    (rule "assignment" (formula "5") (term "1") (userinteraction))
    (builtin "One Step Simplification" (formula "5"))
-   (builtin "CloseAfterJoin" (formula "5") (joinNode "25"))
+   (builtin "CloseAfterMerge" (formula "5") (mergeNode "25"))
    (opengoal " ")
 )
 )

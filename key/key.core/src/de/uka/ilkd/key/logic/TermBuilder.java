@@ -31,7 +31,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -156,10 +155,23 @@ public class TermBuilder {
     }
     return result.toLowerCase();
     }
-
+    
     /**
      * Returns an available name constructed by affixing a counter to the passed
      * base name.
+     * <p>
+     * 
+     * Warning (DS): This method ignores the baseName if there are free name
+     * proposals. This can, for instance, cause troubles in loading proofs
+     * containing rule apps with more than one introduced (and saved) new name.
+     * In this case, the order of new names in the saved proof file matters (the
+     * first unused name is returned, regardless of the baseName).
+     * 
+     * @param baseName
+     *            The base name (prefix) for the name to generate.
+     * @return An available name constructed by affixing a counter to the passed
+     *         base name, or some available free name (please consult comment
+     *         above).
      */
     public String newName(String baseName) {
         final Name savedName = services.getNameRecorder().getProposal();

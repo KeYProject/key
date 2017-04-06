@@ -13,8 +13,6 @@
 
 package org.key_project.sed.key.ui.test.testcase.swtbot;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
@@ -24,11 +22,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.swtbot.swt.finder.widgets.*;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.After;
 import org.junit.Before;
@@ -38,6 +32,8 @@ import org.key_project.sed.key.core.test.util.TestBreakpointsUtil;
 import org.key_project.sed.key.ui.test.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
+
+import junit.framework.TestCase;
 
 public class SWTBotAddKeYWatchpointTest extends TestCase {
    public static final String ADD_WATCHPOINT_ID = "org.key_project.sed.key.ui.addWatchpointCommand";

@@ -237,7 +237,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature oneStepSimplificationF =
                 oneStepSimplificationFeature(longConst(-11000));
 
-        final Feature joinRuleF = setupJoinRule();
+        final Feature mergeRuleF = setupMergeRule();
 
         // final Feature smtF = smtFeature(inftyConst());
 
@@ -246,7 +246,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 NonDuplicateAppFeature.INSTANCE,
                 // splitF,
                 // strengthenConstraints,
-                AgeFeature.INSTANCE, oneStepSimplificationF, joinRuleF,
+                AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF,
                 // smtF,
                 methodSpecF, queryF, depSpecF, loopInvF, blockFeature,
                 ifMatchedF, dispatcher);

@@ -9,7 +9,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
-import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
  * The abstract class DoWhileFinallyMacro can be used to create compound macros

@@ -32,4 +32,9 @@ public class Zero extends SignAnalysisDomainElem {
       return services.getTermBuilder().equals(varOrConst, tb.zero());
    }
 
+   @Override
+   public String toParseableString(Services services) {
+       return toString();
+   }
+
 }
