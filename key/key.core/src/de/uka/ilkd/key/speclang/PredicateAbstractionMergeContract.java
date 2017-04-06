@@ -15,14 +15,21 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.DisjunctivePredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 
@@ -37,15 +44,18 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     private final static String NAME = "Predicate Abstraction Merge Contract";
 
     private final MergePointStatement mps;
+    private final Map<ProgramVariable, ProgramVariable> atPres;
     private final KeYJavaType kjt;
     private final Class<? extends AbstractPredicateAbstractionLattice> latticeType;
     private final String latticeTypeName;
     private final ArrayList<AbstractionPredicate> abstractionPredicates;
 
     public PredicateAbstractionMergeContract(MergePointStatement mps,
-            KeYJavaType kjt, String latticeType,
+            Map<ProgramVariable, ProgramVariable> atPres, KeYJavaType kjt,
+            String latticeType,
             ArrayList<AbstractionPredicate> abstractionPredicates) {
         this.mps = mps;
+        this.atPres = atPres;
         this.kjt = kjt;
         this.latticeType = latticeTypeFromString(latticeType);
         this.latticeTypeName = latticeType;
@@ -57,14 +67,36 @@ public class PredicateAbstractionMergeContract implements MergeContract {
         return MergeWithPredicateAbstraction.class;
     }
 
-    public MergeProcedure getInstantiatedMergeProcedure() {
-        return new MergeWithPredicateAbstraction(abstractionPredicates,
+    @Override
+    public MergeProcedure getInstantiatedMergeProcedure(Services services) {
+        final ArrayList<AbstractionPredicate> abstrPredsWOOldReplacers = abstractionPredicates
+                .stream().map(pred -> {
+                    Term newPred = pred
+                            .getPredicateFormWithPlaceholder().second;
+                    for (ProgramVariable var : atPres.keySet()) {
+                        newPred = OpReplacer.replace(var, atPres.get(var),
+                                newPred, services.getTermFactory());
+                    }
+                    return AbstractionPredicate.create(newPred,
+                            pred.getPredicateFormWithPlaceholder().first,
+                            services);
+                }).collect(Collectors.toCollection(() -> new ArrayList<>()));
+        
+        return new MergeWithPredicateAbstraction(abstrPredsWOOldReplacers,
                 latticeType, Collections.emptyMap());
     }
 
     @Override
     public MergePointStatement getMergePointStatement() {
         return mps;
+    }
+
+    /**
+     * @return A mapping from renamed program variables to the corresponding
+     *         values at the beginning of the method execution.
+     */
+    public Map<ProgramVariable, ProgramVariable> getAtPres() {
+        return atPres;
     }
 
     public Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {

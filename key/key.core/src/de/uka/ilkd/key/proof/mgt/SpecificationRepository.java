@@ -1515,7 +1515,8 @@ public final class SpecificationRepository {
         }
     }
 
-    public ImmutableSet<MergeContract> getMergeContracts(MergePointStatement mps) {
+    public ImmutableSet<MergeContract> getMergeContracts(
+            MergePointStatement mps) {
         final ImmutableSet<MergeContract> contracts = mergeContracts.get(mps);
         if (contracts == null) {
             return DefaultImmutableSet.<MergeContract> nil();
@@ -1553,10 +1554,20 @@ public final class SpecificationRepository {
      *            The {@link MergeContract} to register.
      */
     public void addMergeContract(final MergeContract mc) {
-        // TODO (DS): Will have to take care that we're informaed about changes
-        // in program variables names.
         final MergePointStatement mps = mc.getMergePointStatement();
         mergeContracts.put(mps, getMergeContracts(mps).add(mc));
+    }
+
+    /**
+     * Deletes the {@link MergeContract}s for a given
+     * {@link MergePointStatement}.
+     * 
+     * @param mps
+     *            The {@link MergePointStatement} to delete the registered
+     *            contracts for.
+     */
+    public void removeMergeContracts(final MergePointStatement mps) {
+        mergeContracts.put(mps, DefaultImmutableSet.nil());
     }
 
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {

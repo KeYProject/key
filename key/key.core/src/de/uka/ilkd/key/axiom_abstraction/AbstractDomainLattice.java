@@ -8,6 +8,7 @@ import de.uka.ilkd.key.axiom_abstraction.signanalysis.Top;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 /**
@@ -28,7 +29,7 @@ public abstract class AbstractDomainLattice implements
      * Time in milliseconds after which a proof attempt of a defining axiom
      * times out.
      */
-    private static final int AXIOM_PROVE_TIMEOUT_MS = 1000;
+    private static final int AXIOM_PROVE_TIMEOUT_MS = 10000;
 
     /**
      * Abstracts from a given element of the concrete domain by returning a
@@ -53,6 +54,8 @@ public abstract class AbstractDomainLattice implements
 
             Term toProve =
                     getSideConditionForAxiom(state, term, elem, services);
+            
+            System.out.println(LogicPrinter.quickPrintTerm(toProve, services));
 
             if (isProvableWithSplitting(toProve, services,
                     AXIOM_PROVE_TIMEOUT_MS)) {

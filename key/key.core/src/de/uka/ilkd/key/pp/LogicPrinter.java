@@ -696,7 +696,7 @@ public class LogicPrinter {
      */
     public void printProgramVariable(ProgramVariable pv) throws IOException {
 	Debug.log4jDebug("PP PV " + pv.name(), LogicPrinter.class.getName());
-        layouter.beginC().print(pv.name().toString()).end();
+        layouter.beginC().print(pv.name().toString() + System.identityHashCode(pv)).end();
     }
 
     /**

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.speclang;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
@@ -46,7 +47,7 @@ public class UnparameterizedMergeContract implements MergeContract {
         return mergeProcedure.getClass();
     }
     
-    public MergeProcedure getInstantiatedMergeProcedure() {
+    public MergeProcedure getInstantiatedMergeProcedure(Services services) {
         return mergeProcedure;
     }
 

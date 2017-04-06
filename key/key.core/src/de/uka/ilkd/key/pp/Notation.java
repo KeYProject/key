@@ -502,7 +502,7 @@ public abstract class Notation {
 	    if (t.op() instanceof ProgramVariable) {
 		sp
 			.printConstant(t.op().name().toString().replaceAll(
-				"::", "."));
+				"::", ".") + System.identityHashCode(t.op()));
 	    } else {
 		Debug.out("Unknown variable type");
 		sp.printConstant(t.op().name().toString());

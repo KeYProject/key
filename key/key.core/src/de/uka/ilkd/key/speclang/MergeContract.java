@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.speclang;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
@@ -35,9 +36,10 @@ public interface MergeContract extends SpecificationElement {
     Class<? extends MergeProcedure> getMergeProcedure();
     
     /**
+     * @param services TODO
      * @return The instantiated {@link MergeProcedure}.
      */
-    MergeProcedure getInstantiatedMergeProcedure();
+    MergeProcedure getInstantiatedMergeProcedure(Services services);
     
     default VisibilityModifier getVisibility() {
         assert false : "Method getVisibility() is unimplemented for MergeContract";

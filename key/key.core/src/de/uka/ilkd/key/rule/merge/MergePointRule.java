@@ -74,7 +74,7 @@ public class MergePointRule implements BuiltInRule {
                 .size() == 1 : "There should be exactly one MergeContract for each MergePointStatement";
 
         app.setConcreteRule(mergeContracts.iterator().next()
-                .getInstantiatedMergeProcedure());
+                .getInstantiatedMergeProcedure(services));
         app.setMergePartners(mergePartners);
 
         ImmutableList<Goal> newGoals = goal.split(1);

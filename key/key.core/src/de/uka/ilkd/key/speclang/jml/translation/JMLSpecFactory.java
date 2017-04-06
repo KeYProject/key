@@ -1175,7 +1175,7 @@ public class JMLSpecFactory {
 
     public ImmutableSet<MergeContract> createJMLMergeContracts(
             final IProgramMethod method, final MergePointStatement mps,
-            final TextualJMLMergePointDecl mergePointDecl)
+            final TextualJMLMergePointDecl mergePointDecl, ImmutableList<ProgramVariable> methodParams)
             throws SLTranslationException {
 
         final String mergeProcStr = mergePointDecl.getMergeProc().text
@@ -1219,13 +1219,32 @@ public class JMLSpecFactory {
             final ProgramVariableCollection progVars = createProgramVariables(
                     method);
 
+            // Determine the variables in "\old(...)" expressions and register
+            // remembrance variables for them
+            Map<LocationVariable, Term> atPres = new LinkedHashMap<>();
+            Map<ProgramVariable, ProgramVariable> atPresLocVars = new LinkedHashMap<>();
+            final String atPreSuffix = "_atPreMPS_" + mps.getExpression().toString();
+                methodParams.forEach(locVar -> {
+                    if (!atPres.containsKey(locVar)) {
+                        LocationVariable atPreVar = new LocationVariable(
+                                new ProgramElementName(
+                                        locVar.name().toString() + atPreSuffix),
+                                locVar.getKeYJavaType());
+                        atPres.put((LocationVariable) locVar,
+                                services.getTermBuilder().var(atPreVar));
+                        atPresLocVars.put(atPreVar, locVar);
+                    }
+                });
+
+            atPres.putAll(progVars.atPres);
+
             final MergeParamsSpec specs = JMLTranslator.translate(
                     mergeParamsParseStr, kjt, progVars.selfVar,
-                    collectParameters(method), progVars.resultVar, progVars.excVar,
-                    progVars.atPres, MergeParamsSpec.class, services);
+                    collectParameters(method), progVars.resultVar,
+                    progVars.excVar, atPres, MergeParamsSpec.class, services);
 
-            result = result.add(new PredicateAbstractionMergeContract(mps, kjt,
-                    specs.getLatticeType(),
+            result = result.add(new PredicateAbstractionMergeContract(mps,
+                    atPresLocVars, kjt, specs.getLatticeType(),
                     StreamSupport
                             .stream(specs.getPredicates().spliterator(), true)
                             .map(t -> AbstractionPredicate.create(t,

@@ -256,7 +256,9 @@ public final class SLEnvInput extends AbstractEnvInput {
                 for (ProgramElement mps : mpsCollector.getNodes()) {
                     final ImmutableSet<MergeContract> mergeContracts = //
                             specExtractor.extractMergeContracts(pm,
-                                    (MergePointStatement) mps);
+                                    (MergePointStatement) mps,
+                                    ((Contract) methodSpecs.iterator().next())
+                                            .getOrigVars().params);
 
                     mergeContracts
                             .forEach(mc -> specRepos.addMergeContract(mc));

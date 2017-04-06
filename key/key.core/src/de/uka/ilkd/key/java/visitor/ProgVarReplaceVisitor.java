@@ -45,7 +45,6 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
-import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
@@ -269,6 +268,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     @Override
     public void performActionOnMergeContract(MergeContract oldContract) {
         services.getSpecificationRepository()
+                .removeMergeContracts(oldContract.getMergePointStatement());
+        services.getSpecificationRepository()
                 .addMergeContract(createNewMergeContract(oldContract,
                         oldContract.getMergePointStatement(), false));
     }
@@ -278,6 +279,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             MergePointStatement newMps) {
         ImmutableSet<MergeContract> oldContracts = services
                 .getSpecificationRepository().getMergeContracts(oldMps);
+        services.getSpecificationRepository().removeMergeContracts(oldMps);
         oldContracts.forEach(c -> services.getSpecificationRepository()
                 .addMergeContract(createNewMergeContract(c, newMps,
                         !oldMps.equals(newMps))));
@@ -290,33 +292,33 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         if (oldContract instanceof UnparameterizedMergeContract && changed) {
             return new UnparameterizedMergeContract(
                     ((UnparameterizedMergeContract) oldContract)
-                            .getInstantiatedMergeProcedure(),
+                            .getInstantiatedMergeProcedure(services),
                     newMps, oldContract.getKJT());
         } else if (oldContract instanceof PredicateAbstractionMergeContract) {
             final PredicateAbstractionMergeContract pamc = (PredicateAbstractionMergeContract) oldContract;
             final ArrayList<AbstractionPredicate> newPreds = pamc
-                    .getAbstractionPredicates().stream()
-                    .map(pred -> AbstractionPredicate.create(
-                            replaceVariablesInTerm(
-                                    pred.getPredicateFormWithPlaceholder().second),
-                            (LocationVariable) replaceVariable(
-                                    pred.getPredicateFormWithPlaceholder().first),
-                            services))
+                    .getAbstractionPredicates().stream().map(pred -> {
+                        AbstractionPredicate result = AbstractionPredicate
+                                .create(replaceVariablesInTerm(
+                                        pred.getPredicateFormWithPlaceholder().second),
+                                        pred.getPredicateFormWithPlaceholder().first,
+                                        services);
+                        return result;
+                    })
                     .collect(Collectors.toCollection(() -> new ArrayList<>()));
 
             if (changed || !newPreds
                     .equals(((PredicateAbstractionMergeContract) oldContract)
                             .getAbstractionPredicates())) {
                 return new PredicateAbstractionMergeContract(newMps,
-                        oldContract.getKJT(),
-                        pamc.getLatticeTypeName(),
-                        newPreds);
+                        pamc.getAtPres(), oldContract.getKJT(),
+                        pamc.getLatticeTypeName(), newPreds);
             }
         } else {
             if (!changed) {
                 return oldContract;
             }
-            
+
             assert false : "ProgVarReplaceVisitor: Unknown type of MergeContract ("
                     + oldContract.getClass().getName() + ")";
         }
