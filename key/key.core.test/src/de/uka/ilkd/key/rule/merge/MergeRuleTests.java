@@ -102,13 +102,6 @@ public class MergeRuleTests extends TestCase {
     public void testDoAutomaticGcdProofWithMergePointStatements() {
         final Proof proof = loadProof("gcd.mergePointStatements.key");
         startAutomaticStrategy(proof);
-        
-        try {
-            new ProofSaver(proof, new java.io.File("theProof.proof")).save();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
 
         assertTrue(proof.closed());
         //TODO (DS): Assert that there is the expected number of merge rule applications

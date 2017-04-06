@@ -1758,51 +1758,10 @@ public class MergeRuleUtils {
     private static boolean isProvable(Term toProve, Services services,
             boolean doSplit, int timeout) {
 
-        // ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(false);
-
         final ApplyStrategyInfo proofResult = tryToProve(toProve, services,
                 doSplit, "Provability check", timeout);
         final Proof proof = proofResult.getProof();
         boolean result = proof.closed();
-
-        // if (!result) {
-        // SMTCommand smt = new SMTCommand();
-        // for (Goal g : proof.openGoals()) {
-        // Node n = g.node();
-        // try {
-        // proof.getSettings()
-        // .getSMTSettings().supportedTaclets = new SupportedTaclets(
-        // SupportedTaclets.REFERENCE.getTacletNames()
-        // .toArray(new String[0]));
-        // smt.execute(null, proof,
-        // Collections.singletonMap("solver", "Z3"),
-        // Collections.singletonMap("goal", g));
-        // if (!n.isClosed()) {
-        // break;
-        // }
-        // } catch (ScriptException | InterruptedException e) {
-        // e.printStackTrace();
-        // break;
-        // }
-        // }
-        //
-        // if (proof.closed()) {
-        // result = true;
-        // }
-        // }
-        //
-        // if (!result) {
-        // java.io.File file = new java.io.File(
-        // "sideProof_" + System.nanoTime() + ".proof");
-        // try {
-        // new ProofSaver(proof, file).save(new FileOutputStream(file));
-        // } catch (IOException e) {
-        // // TODO Auto-generated catch block
-        // e.printStackTrace();
-        // }
-        // }
-        //
-        // ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(false);
 
         return result;
 
