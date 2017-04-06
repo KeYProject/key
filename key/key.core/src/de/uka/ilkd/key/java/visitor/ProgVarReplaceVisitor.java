@@ -296,24 +296,33 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     newMps, oldContract.getKJT());
         } else if (oldContract instanceof PredicateAbstractionMergeContract) {
             final PredicateAbstractionMergeContract pamc = (PredicateAbstractionMergeContract) oldContract;
-            final ArrayList<AbstractionPredicate> newPreds = pamc
-                    .getAbstractionPredicates().stream().map(pred -> {
-                        AbstractionPredicate result = AbstractionPredicate
-                                .create(replaceVariablesInTerm(
-                                        pred.getPredicateFormWithPlaceholder().second),
-                                        pred.getPredicateFormWithPlaceholder().first,
-                                        services);
-                        return result;
-                    })
-                    .collect(Collectors.toCollection(() -> new ArrayList<>()));
+            final Map<LocationVariable, Term> atPres = pamc.getAtPres();
 
-            if (changed || !newPreds
-                    .equals(((PredicateAbstractionMergeContract) oldContract)
-                            .getAbstractionPredicates())) {
-                return new PredicateAbstractionMergeContract(newMps,
-                        pamc.getAtPres(), oldContract.getKJT(),
-                        pamc.getLatticeTypeName(), newPreds);
+            final Map<LocationVariable, Term> saveCopy = new HashMap<LocationVariable, Term>(
+                    atPres);
+            for (Entry<LocationVariable, Term> h : saveCopy.entrySet()) {
+                LocationVariable pv = h.getKey();
+                final Term t = h.getValue();
+                if (t == null)
+                    continue;
+                if (replaceMap.containsKey(pv)) {
+                    atPres.remove(pv);
+                    pv = (LocationVariable) replaceMap.get(pv);
+                }
+                atPres.put(pv, replaceVariablesInTerm(t));
             }
+
+            return new PredicateAbstractionMergeContract(newMps, atPres,
+                    pamc.getKJT(), pamc.getLatticeTypeName(),
+                    pamc.getAbstractionPredicates(saveCopy, services).stream()
+                            .map(pred -> AbstractionPredicate.create(
+                                    replaceVariablesInTerm(
+                                            pred.getPredicateFormWithPlaceholder().second),
+                                    pred.getPredicateFormWithPlaceholder().first,
+                                    services))
+                            .collect(Collectors.toCollection(
+                                    () -> new ArrayList<AbstractionPredicate>())));
+
         } else {
             if (!changed) {
                 return oldContract;

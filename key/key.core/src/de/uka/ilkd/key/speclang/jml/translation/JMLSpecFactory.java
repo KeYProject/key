@@ -1175,7 +1175,8 @@ public class JMLSpecFactory {
 
     public ImmutableSet<MergeContract> createJMLMergeContracts(
             final IProgramMethod method, final MergePointStatement mps,
-            final TextualJMLMergePointDecl mergePointDecl, ImmutableList<ProgramVariable> methodParams)
+            final TextualJMLMergePointDecl mergePointDecl,
+            ImmutableList<ProgramVariable> methodParams)
             throws SLTranslationException {
 
         final String mergeProcStr = mergePointDecl.getMergeProc().text
@@ -1221,30 +1222,29 @@ public class JMLSpecFactory {
 
             // Determine the variables in "\old(...)" expressions and register
             // remembrance variables for them
-            Map<LocationVariable, Term> atPres = new LinkedHashMap<>();
-            Map<ProgramVariable, ProgramVariable> atPresLocVars = new LinkedHashMap<>();
-            final String atPreSuffix = "_atPreMPS_" + mps.getExpression().toString();
-                methodParams.forEach(locVar -> {
-                    if (!atPres.containsKey(locVar)) {
-                        LocationVariable atPreVar = new LocationVariable(
-                                new ProgramElementName(
-                                        locVar.name().toString() + atPreSuffix),
-                                locVar.getKeYJavaType());
-                        atPres.put((LocationVariable) locVar,
-                                services.getTermBuilder().var(atPreVar));
-                        atPresLocVars.put(atPreVar, locVar);
-                    }
-                });
-
-            atPres.putAll(progVars.atPres);
+            final ImmutableList<LocationVariable> params = extractParamVars(
+                    method);
+            final Map<LocationVariable, Term> atPres = new LinkedHashMap<LocationVariable, Term>();
+            final ImmutableList<LocationVariable> allHeaps = services
+                    .getTypeConverter().getHeapLDT().getAllHeaps();
+            final String atPrePrefix = "AtPre";
+            allHeaps.forEach(heap -> {
+                atPres.put(heap, TB.var(TB.heapAtPreVar(heap + atPrePrefix,
+                        heap.sort(), false)));
+            });
+            params.forEach(param -> {
+                atPres.put(param, TB.var(TB.heapAtPreVar(param + atPrePrefix,
+                        param.sort(), false)));
+            });
 
             final MergeParamsSpec specs = JMLTranslator.translate(
                     mergeParamsParseStr, kjt, progVars.selfVar,
-                    collectParameters(method), progVars.resultVar,
-                    progVars.excVar, atPres, MergeParamsSpec.class, services);
+                    append(ImmutableSLList.<ProgramVariable> nil(), params),
+                    progVars.resultVar, progVars.excVar, atPres,
+                    MergeParamsSpec.class, services);
 
             result = result.add(new PredicateAbstractionMergeContract(mps,
-                    atPresLocVars, kjt, specs.getLatticeType(),
+                    atPres, kjt, specs.getLatticeType(),
                     StreamSupport
                             .stream(specs.getPredicates().spliterator(), true)
                             .map(t -> AbstractionPredicate.create(t,
@@ -1386,17 +1386,7 @@ public class JMLSpecFactory {
         // (disguised as parameters to the translator) and the map for
         // atPre-Functions
         ProgramVariable selfVar = TB.selfVar(pm, pm.getContainerType(), false);
-        ImmutableList<LocationVariable> paramVars = ImmutableSLList
-                .<LocationVariable> nil();
-        int numParams = pm.getParameterDeclarationCount();
-        for (int i = numParams - 1; i >= 0; i--) {
-            ParameterDeclaration pd = pm.getParameterDeclarationAt(i);
-            IProgramVariable paramProgVar = pd.getVariableSpecification()
-                    .getProgramVariable();
-            assert paramProgVar instanceof LocationVariable : "Parameter declaration expected to be location var!";
-            LocationVariable paramLocVar = (LocationVariable) paramProgVar;
-            paramVars = paramVars.prepend(paramLocVar);
-        }
+        final ImmutableList<LocationVariable> paramVars = extractParamVars(pm);
         ProgramVariable resultVar = TB.resultVar(pm, false);
         ProgramVariable excVar = TB.excVar(pm, false); // only for information
                                                        // flow
@@ -1522,6 +1512,28 @@ public class JMLSpecFactory {
         return new LoopSpecImpl(loop, pm, pm.getContainerType(), invariants,
                 freeInvariants, mods, infFlowSpecs, variant, selfTerm, localIns,
                 localOuts, atPres);
+    }
+
+    /**
+     * TODO
+     * 
+     * @param pm
+     * @return
+     */
+    private static ImmutableList<LocationVariable> extractParamVars(
+            IProgramMethod pm) {
+        ImmutableList<LocationVariable> paramVars = ImmutableSLList
+                .<LocationVariable> nil();
+        int numParams = pm.getParameterDeclarationCount();
+        for (int i = numParams - 1; i >= 0; i--) {
+            ParameterDeclaration pd = pm.getParameterDeclarationAt(i);
+            IProgramVariable paramProgVar = pd.getVariableSpecification()
+                    .getProgramVariable();
+            assert paramProgVar instanceof LocationVariable : "Parameter declaration expected to be location var!";
+            LocationVariable paramLocVar = (LocationVariable) paramProgVar;
+            paramVars = paramVars.prepend(paramLocVar);
+        }
+        return paramVars;
     }
 
     // ImmutableList does not accept lists of subclasses to #append and cannot

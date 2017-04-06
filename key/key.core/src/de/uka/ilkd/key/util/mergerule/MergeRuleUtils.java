@@ -13,12 +13,9 @@
 
 package de.uka.ilkd.key.util.mergerule;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,7 +40,6 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
@@ -69,8 +65,6 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.macros.scripts.SMTCommand;
-import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
@@ -83,14 +77,11 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.rule.merge.MergePartner;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
@@ -1694,7 +1685,8 @@ public class MergeRuleUtils {
      * @param sideProofName
      *            name for the generated side proof.
      * @param timeout
-     *            A timeout for the proof in milliseconds.
+     *            A timeout for the proof in milliseconds. Set to -1 for no
+     *            timeout.
      * @return The proof result.
      */
     private static ApplyStrategyInfo tryToProve(Sequent toProve,
@@ -1702,8 +1694,7 @@ public class MergeRuleUtils {
             int timeout) {
         final ProofEnvironment sideProofEnv = SideProofUtil
                 .cloneProofEnvironmentWithOwnOneStepSimplifier(
-                        services.getProof(), // Parent Proof
-                        new Choice[] {}); // useSimplifyTermProfile
+                        services.getProof());
 
         ApplyStrategyInfo proofResult = null;
         try {
@@ -1712,8 +1703,7 @@ public class MergeRuleUtils {
                                   // environment
                     toProve, sideProofName); // Proof name
 
-//            proofStarter.setTimeout(timeout * 1000000);
-            proofStarter.setTimeout(-1);
+            proofStarter.setTimeout(timeout);
             proofStarter.setStrategyProperties(setupStrategy());
 
             proofResult = proofStarter.start();
@@ -1722,22 +1712,32 @@ public class MergeRuleUtils {
 
         return proofResult;
     }
-    
+
     /**
      * creates the strategy configuration to be used for the side proof
+     * 
      * @return the StrategyProperties
      */
     private static StrategyProperties setupStrategy() {
         final StrategyProperties sp = new StrategyProperties();
-        sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_OFF);
-        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_OFF);
-        sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-        sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
-        sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_NORMAL);
-        sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
-        sp.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY, StrategyProperties.CLASS_AXIOM_OFF);
-        sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_NONE);
-        sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_NONE);
+        sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY,
+                StrategyProperties.AUTO_INDUCTION_OFF);
+        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
+                StrategyProperties.QUERY_OFF);
+        sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
+                StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+        sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
+                StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+        sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
+                StrategyProperties.SPLITTING_NORMAL);
+        sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
+                StrategyProperties.DEP_OFF);
+        sp.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
+                StrategyProperties.CLASS_AXIOM_OFF);
+        sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
+                StrategyProperties.METHOD_NONE);
+        sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
+                StrategyProperties.LOOP_NONE);
         return sp;
     }
 
@@ -1758,51 +1758,51 @@ public class MergeRuleUtils {
     private static boolean isProvable(Term toProve, Services services,
             boolean doSplit, int timeout) {
 
-        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(false);
-        
+        // ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(false);
+
         final ApplyStrategyInfo proofResult = tryToProve(toProve, services,
                 doSplit, "Provability check", timeout);
         final Proof proof = proofResult.getProof();
         boolean result = proof.closed();
 
-        if (!result) {
-            SMTCommand smt = new SMTCommand();
-            for (Goal g : proof.openGoals()) {
-                Node n = g.node();
-                try {
-                    proof.getSettings()
-                            .getSMTSettings().supportedTaclets = new SupportedTaclets(
-                                    SupportedTaclets.REFERENCE.getTacletNames()
-                                            .toArray(new String[0]));
-                    smt.execute(null, proof,
-                            Collections.singletonMap("solver", "Z3"),
-                            Collections.singletonMap("goal", g));
-                    if (!n.isClosed()) {
-                        break;
-                    }
-                } catch (ScriptException | InterruptedException e) {
-                    e.printStackTrace();
-                    break;
-                }
-            }
-
-            if (proof.closed()) {
-                result = true;
-            }
-        }
-
-        if (!result) {
-            java.io.File file = new java.io.File(
-                    "sideProof_" + System.nanoTime() + ".proof");
-            try {
-                new ProofSaver(proof, file).save(new FileOutputStream(file));
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-
-        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(false);
+        // if (!result) {
+        // SMTCommand smt = new SMTCommand();
+        // for (Goal g : proof.openGoals()) {
+        // Node n = g.node();
+        // try {
+        // proof.getSettings()
+        // .getSMTSettings().supportedTaclets = new SupportedTaclets(
+        // SupportedTaclets.REFERENCE.getTacletNames()
+        // .toArray(new String[0]));
+        // smt.execute(null, proof,
+        // Collections.singletonMap("solver", "Z3"),
+        // Collections.singletonMap("goal", g));
+        // if (!n.isClosed()) {
+        // break;
+        // }
+        // } catch (ScriptException | InterruptedException e) {
+        // e.printStackTrace();
+        // break;
+        // }
+        // }
+        //
+        // if (proof.closed()) {
+        // result = true;
+        // }
+        // }
+        //
+        // if (!result) {
+        // java.io.File file = new java.io.File(
+        // "sideProof_" + System.nanoTime() + ".proof");
+        // try {
+        // new ProofSaver(proof, file).save(new FileOutputStream(file));
+        // } catch (IOException e) {
+        // // TODO Auto-generated catch block
+        // e.printStackTrace();
+        // }
+        // }
+        //
+        // ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(false);
 
         return result;
 

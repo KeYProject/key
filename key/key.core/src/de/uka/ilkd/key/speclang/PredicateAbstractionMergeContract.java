@@ -15,6 +15,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
@@ -44,14 +44,14 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     private final static String NAME = "Predicate Abstraction Merge Contract";
 
     private final MergePointStatement mps;
-    private final Map<ProgramVariable, ProgramVariable> atPres;
+    private final Map<LocationVariable, Term> atPres;
     private final KeYJavaType kjt;
     private final Class<? extends AbstractPredicateAbstractionLattice> latticeType;
     private final String latticeTypeName;
     private final ArrayList<AbstractionPredicate> abstractionPredicates;
 
     public PredicateAbstractionMergeContract(MergePointStatement mps,
-            Map<ProgramVariable, ProgramVariable> atPres, KeYJavaType kjt,
+            Map<LocationVariable, Term> atPres, KeYJavaType kjt,
             String latticeType,
             ArrayList<AbstractionPredicate> abstractionPredicates) {
         this.mps = mps;
@@ -69,21 +69,9 @@ public class PredicateAbstractionMergeContract implements MergeContract {
 
     @Override
     public MergeProcedure getInstantiatedMergeProcedure(Services services) {
-        final ArrayList<AbstractionPredicate> abstrPredsWOOldReplacers = abstractionPredicates
-                .stream().map(pred -> {
-                    Term newPred = pred
-                            .getPredicateFormWithPlaceholder().second;
-                    for (ProgramVariable var : atPres.keySet()) {
-                        newPred = OpReplacer.replace(var, atPres.get(var),
-                                newPred, services.getTermFactory());
-                    }
-                    return AbstractionPredicate.create(newPred,
-                            pred.getPredicateFormWithPlaceholder().first,
-                            services);
-                }).collect(Collectors.toCollection(() -> new ArrayList<>()));
-        
-        return new MergeWithPredicateAbstraction(abstrPredsWOOldReplacers,
-                latticeType, Collections.emptyMap());
+        return new MergeWithPredicateAbstraction(
+                getAbstractionPredicates(atPres, services), latticeType,
+                Collections.emptyMap());
     }
 
     @Override
@@ -91,11 +79,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
         return mps;
     }
 
-    /**
-     * @return A mapping from renamed program variables to the corresponding
-     *         values at the beginning of the method execution.
-     */
-    public Map<ProgramVariable, ProgramVariable> getAtPres() {
+    public Map<LocationVariable, Term> getAtPres() {
         return atPres;
     }
 
@@ -107,8 +91,25 @@ public class PredicateAbstractionMergeContract implements MergeContract {
         return latticeTypeName;
     }
 
-    public ArrayList<AbstractionPredicate> getAbstractionPredicates() {
-        return abstractionPredicates;
+    /**
+     * TODO
+     * 
+     * @param atPres
+     * @param services
+     * @return
+     */
+    public ArrayList<AbstractionPredicate> getAbstractionPredicates(
+            Map<LocationVariable, Term> atPres, Services services) {
+        final Map<Term, Term> replaceMap = getReplaceMap(atPres, services);
+        final OpReplacer or = new OpReplacer(replaceMap,
+                services.getTermFactory());
+
+        return abstractionPredicates.stream().map(pred -> {
+            final Term newPred = or
+                    .replace(pred.getPredicateFormWithPlaceholder().second);
+            return AbstractionPredicate.create(newPred,
+                    pred.getPredicateFormWithPlaceholder().first, services);
+        }).collect(Collectors.toCollection(() -> new ArrayList<>()));
     }
 
     @Override
@@ -124,6 +125,36 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     @Override
     public KeYJavaType getKJT() {
         return kjt;
+    }
+
+    // -------------------------------------------------------------------------
+    // internal methods
+    // -------------------------------------------------------------------------
+
+    /**
+     * TODO
+     * 
+     * @param atPres
+     * @param services
+     * @return
+     */
+    private Map<Term, Term> getReplaceMap(Map<LocationVariable, Term> atPres,
+            Services services) {
+        final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
+
+        if (atPres != null) {
+            for (Map.Entry<LocationVariable, Term> en : this.atPres.entrySet()) {
+                LocationVariable var = en.getKey();
+                Term replace = atPres.get(var);
+                Term origReplace = en.getValue();
+                if (replace != null && origReplace != null) {
+                    assert replace.sort().equals(origReplace.sort());
+                    result.put(origReplace, replace);
+                }
+            }
+        }
+
+        return result;
     }
 
     private static Class<? extends AbstractPredicateAbstractionLattice> latticeTypeFromString(

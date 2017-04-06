@@ -46,7 +46,7 @@ public class Gcd {
       @                            \result % x == 0));
       @*/
     public static int gcdMPS(int a, int b) {
-        //@ ghost int oldB = b;
+        final int oldA = a;
         
         if (a < 0) a = -a;
 
