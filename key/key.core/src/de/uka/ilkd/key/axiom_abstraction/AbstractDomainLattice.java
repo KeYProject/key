@@ -8,7 +8,6 @@ import de.uka.ilkd.key.axiom_abstraction.signanalysis.Top;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 /**
