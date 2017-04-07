@@ -148,9 +148,8 @@ public class ExecutionBlockContract extends AbstractExecutionNode<SourceElement>
     */
    protected Term declaredVariableAsTerm(StatementBlock sb, int statementIndex) {
       Statement resultInitStatement = sb.getStatementAt(statementIndex);
-      assert resultInitStatement instanceof LocalVariableDeclaration : "Block Contract Rule has changed.";
-      String name = ((LocalVariableDeclaration) resultInitStatement).getVariables().get(0).getName();
-      Named var = getServices().getNamespaces().lookup(new Name(name));
+      assert resultInitStatement instanceof LocalVariableDeclaration : "Block Contract Rule has changed.";      
+      Named var =  ((LocalVariableDeclaration) resultInitStatement).getVariables().get(0).getProgramVariable();
       assert var != null : "Block Contract Rule has changed.";
       return getServices().getTermBuilder().var((ProgramVariable) var);
    }
