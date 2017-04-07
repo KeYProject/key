@@ -315,8 +315,8 @@
                                     </variable>
                                  </value>
                               </variable>
-                              <variable name="n_7" isArrayIndex="false">
-                                 <value name="n_7 {true}" typeString="java.lang.NullPointerException" valueString="n_10" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <variable name="n_3" isArrayIndex="false">
+                                 <value name="n_3 {true}" typeString="java.lang.NullPointerException" valueString="n_6" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
@@ -333,7 +333,7 @@
                                     </value>
                                  </variable>
                                  <variable name="exc" isArrayIndex="false">
-                                    <value name="exc {true}" typeString="java.lang.NullPointerException" valueString="n_10" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    <value name="exc {true}" typeString="java.lang.NullPointerException" valueString="n_6" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </termination>

@@ -6,10 +6,10 @@
 pre: x &gt;= 10 &amp; obj.&lt;inv&gt;
 | x &lt; javaUnaryMinusInt(22)
 &amp; obj.&lt;inv&gt;
-post: (   x &gt;= 10 &amp; obj.&lt;inv&gt;@heapBefore_magic_0
+post: (   x &gt;= 10 &amp; obj.&lt;inv&gt;@heapBefore_magic
    -&gt; result_0 = 10 &amp; obj.&lt;inv&gt; &amp; exc_0 = null)
 &amp; (     x &lt; javaUnaryMinusInt(22)
-      &amp; obj.&lt;inv&gt;@heapBefore_magic_0
+      &amp; obj.&lt;inv&gt;@heapBefore_magic
    -&gt;   result_0 = javaUnaryMinusInt(22)
       &amp; obj.&lt;inv&gt;
       &amp; exc_0 = null)

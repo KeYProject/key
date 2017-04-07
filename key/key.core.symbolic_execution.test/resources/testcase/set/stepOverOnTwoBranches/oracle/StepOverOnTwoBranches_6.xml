@@ -13,7 +13,7 @@
          <branchCondition name="not(equals(a,Z(0(#))))" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="true" branchCondition="not(equals(a,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="int i = 2;" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false">
                <statement name="int j = 3;" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false">
-                  <statement name="int x = value(i_1);" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false">
+                  <statement name="int x = value(i);" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false">
                   </statement>
                </statement>
             </statement>
