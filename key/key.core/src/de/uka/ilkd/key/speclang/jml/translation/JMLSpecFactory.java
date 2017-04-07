@@ -52,7 +52,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -1222,8 +1221,8 @@ public class JMLSpecFactory {
 
             // Determine the variables in "\old(...)" expressions and register
             // remembrance variables for them
-            final ImmutableList<LocationVariable> params = extractParamVars(
-                    method);
+            final ImmutableList<LocationVariable> params = method
+                    .collectParameters();
             final Map<LocationVariable, Term> atPres = new LinkedHashMap<LocationVariable, Term>();
             final ImmutableList<LocationVariable> allHeaps = services
                     .getTypeConverter().getHeapLDT().getAllHeaps();
@@ -1287,7 +1286,7 @@ public class JMLSpecFactory {
         final Map<LocationVariable, LocationVariable> remembranceVariables = variables
                 .combineRemembranceVariables();
         return new ProgramVariableCollection(variables.self,
-                collectParameters(method)
+                append(ImmutableSLList.nil(), method.collectParameters())
                         .append(collectLocalVariablesVisibleTo(block, method)),
                 variables.result, variables.exception, remembranceVariables,
                 termify(remembranceVariables));
@@ -1300,20 +1299,6 @@ public class JMLSpecFactory {
                 .entrySet()) {
             result.put(remembranceVariable.getKey(),
                     TB.var(remembranceVariable.getValue()));
-        }
-        return result;
-    }
-
-    // TODO Move to IProgramMethod interface and its implementations.
-    private ImmutableList<ProgramVariable> collectParameters(
-            final IProgramMethod method) {
-        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
-        final int parameterCount = method.getParameterDeclarationCount();
-        for (int i = parameterCount - 1; i >= 0; i--) {
-            ParameterDeclaration parameter = method
-                    .getParameterDeclarationAt(i);
-            result = result.prepend((ProgramVariable) parameter
-                    .getVariableSpecification().getProgramVariable());
         }
         return result;
     }
@@ -1386,7 +1371,8 @@ public class JMLSpecFactory {
         // (disguised as parameters to the translator) and the map for
         // atPre-Functions
         ProgramVariable selfVar = TB.selfVar(pm, pm.getContainerType(), false);
-        final ImmutableList<LocationVariable> paramVars = extractParamVars(pm);
+        final ImmutableList<LocationVariable> paramVars = pm
+                .collectParameters();
         ProgramVariable resultVar = TB.resultVar(pm, false);
         ProgramVariable excVar = TB.excVar(pm, false); // only for information
                                                        // flow
@@ -1512,28 +1498,6 @@ public class JMLSpecFactory {
         return new LoopSpecImpl(loop, pm, pm.getContainerType(), invariants,
                 freeInvariants, mods, infFlowSpecs, variant, selfTerm, localIns,
                 localOuts, atPres);
-    }
-
-    /**
-     * TODO
-     * 
-     * @param pm
-     * @return
-     */
-    private static ImmutableList<LocationVariable> extractParamVars(
-            IProgramMethod pm) {
-        ImmutableList<LocationVariable> paramVars = ImmutableSLList
-                .<LocationVariable> nil();
-        int numParams = pm.getParameterDeclarationCount();
-        for (int i = numParams - 1; i >= 0; i--) {
-            ParameterDeclaration pd = pm.getParameterDeclarationAt(i);
-            IProgramVariable paramProgVar = pd.getVariableSpecification()
-                    .getProgramVariable();
-            assert paramProgVar instanceof LocationVariable : "Parameter declaration expected to be location var!";
-            LocationVariable paramLocVar = (LocationVariable) paramProgVar;
-            paramVars = paramVars.prepend(paramLocVar);
-        }
-        return paramVars;
     }
 
     // ImmutableList does not accept lists of subclasses to #append and cannot

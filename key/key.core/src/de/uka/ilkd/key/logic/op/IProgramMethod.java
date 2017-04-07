@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
@@ -26,68 +27,77 @@ import de.uka.ilkd.key.java.declaration.Throws;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
-public interface IProgramMethod extends IObserverFunction, SourceElement, ProgramElement, MemberDeclaration {
+public interface IProgramMethod extends IObserverFunction, SourceElement,
+        ProgramElement, MemberDeclaration {
 
-   public abstract MethodDeclaration getMethodDeclaration();
+    public abstract MethodDeclaration getMethodDeclaration();
 
-   /**     
-    * returns the KeYJavaType of the <tt>i</tt>-th parameter declaration. This method
-    * does not care about the invoker as argSort does.      
-    * @param i the int specifying the parameter position
-    * @return the KeYJavaType of the <tt>i</tt>-th parameter
-    */
-   public abstract KeYJavaType getParameterType(int i);
+    /**
+     * returns the KeYJavaType of the <tt>i</tt>-th parameter declaration. This
+     * method does not care about the invoker as argSort does.
+     * 
+     * @param i
+     *            the int specifying the parameter position
+     * @return the KeYJavaType of the <tt>i</tt>-th parameter
+     */
+    public abstract KeYJavaType getParameterType(int i);
 
-   public abstract StatementBlock getBody();
+    public abstract StatementBlock getBody();
 
-   /**
-    * Test whether the declaration is a constructor.
-    */
-   public abstract boolean isConstructor();
+    /**
+     * Test whether the declaration is a constructor.
+     */
+    public abstract boolean isConstructor();
 
-   /**
-    * Test whether the declaration is model.
-    */
-   public abstract boolean isModel();
+    /**
+     * Test whether the declaration is model.
+     */
+    public abstract boolean isModel();
 
-   public abstract boolean isVoid();
+    public abstract boolean isVoid();
 
-   /**
-    * @return the return type
-    */
-   public abstract KeYJavaType getReturnType();
+    /**
+     * @return the return type
+     */
+    public abstract KeYJavaType getReturnType();
 
-   public abstract ProgramElementName getProgramElementName();
+    public abstract ProgramElementName getProgramElementName();
 
-   public abstract String getUniqueName();
+    public abstract String getUniqueName();
 
-   public abstract String getFullName();
+    public abstract String getFullName();
 
-   public abstract String getName();
+    public abstract String getName();
 
-   public abstract boolean isAbstract();
+    public abstract boolean isAbstract();
 
-   public abstract boolean isImplicit();
+    public abstract boolean isImplicit();
 
-   public abstract boolean isNative();
+    public abstract boolean isNative();
 
-   public abstract boolean isFinal();
+    public abstract boolean isFinal();
 
-   public abstract boolean isSynchronized();
+    public abstract boolean isSynchronized();
 
-   public abstract Throws getThrown();
+    public abstract Throws getThrown();
 
-   public abstract ParameterDeclaration getParameterDeclarationAt(int index);
+    public abstract ParameterDeclaration getParameterDeclarationAt(int index);
 
-   /** 
-    * Returns the variablespecification of the i-th parameterdeclaration 
-    */
-   public abstract VariableSpecification getVariableSpecification(int index);
+    /**
+     * Returns the variablespecification of the i-th parameterdeclaration
+     */
+    public abstract VariableSpecification getVariableSpecification(int index);
 
-   public abstract int getParameterDeclarationCount();
+    public abstract int getParameterDeclarationCount();
 
-   public abstract ImmutableArray<ParameterDeclaration> getParameters();
+    public abstract ImmutableArray<ParameterDeclaration> getParameters();
 
-   // Methods from OberverFunction, TODO Create interface for ObersverFunction
-   public ImmutableArray<KeYJavaType> getParamTypes();
+    // Methods from OberverFunction, TODO Create interface for ObersverFunction
+    public ImmutableArray<KeYJavaType> getParamTypes();
+
+    /**
+     * @return The list of {@link LocationVariable}s passed as parameters to
+     *         this {@link IProgramMethod}.
+     */
+    public ImmutableList<LocationVariable> collectParameters();
 }
