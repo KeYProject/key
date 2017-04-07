@@ -18,6 +18,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -609,13 +610,16 @@ public final class JMLSpecExtractor implements SpecExtractor {
             IProgramMethod method, MergePointStatement mps,
             ImmutableList<ProgramVariable> methodParams)
             throws SLTranslationException {
-        final TextualJMLConstruct[] constructs = parseMethodLevelComments(
-                mps.getComments(), getFileName(method));
-
-        // Currently, we expect only, and at least, one construct to be there
-        assert constructs != null && constructs.length == 1
-                && constructs[0] instanceof TextualJMLMergePointDecl : //
-        "JMLSpecExtractor: Expected exactly one merge contract";
+        // In cases of specifications immediately following each other (like a
+        // merge_point and a block contract / loop invariant), it might happen
+        // that we're passed multiple constructs here. Therefore, we filter the
+        // merge point specific parts here
+        final TextualJMLConstruct[] constructs = Arrays
+                .stream(parseMethodLevelComments(mps.getComments(),
+                        getFileName(method)))
+                .filter(c -> c instanceof TextualJMLMergePointDecl)
+                .collect(Collectors.toList())
+                .toArray(new TextualJMLConstruct[0]);
 
         return jsf.createJMLMergeContracts(method, mps,
                 (TextualJMLMergePointDecl) constructs[0], methodParams);

@@ -77,15 +77,14 @@ public class Gcd {
       @            (\forall int x; x > 0 && a % x == 0 && b % x == 0;
       @                            \result % x == 0));
       @*/
-    public static int gcdBlockContract(int a, int b) {
-        //@ ghost int oldB = b;
+    public static int gcdMPSAndBlockContract(int a, int b) {
         if (a < 0)
             a = -a;
         
-        // merge_point;
+        //@ merge_point;
 
         /*@ normal_behavior
-          @ ensures b >= 0 && (b == oldB || b == -\old(b)); 
+          @ ensures b >= 0 && (b == \old(b) || b == -\old(b)); 
           @*/
         {
             if (b < 0)

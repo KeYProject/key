@@ -133,6 +133,29 @@ public class MergeRuleTests extends TestCase {
     }
 
     /**
+     * Automatic proof of the Gcd problem with two merges triggered by merge
+     * point statements.
+     */
+    @Test
+    public void testDoAutomaticGcdProofWithMergePointStatementAndBlockContract() {
+        final Proof proof = loadProof("gcd.MPSAndBlockContract.key");
+        startAutomaticStrategy(proof);
+
+        assertTrue(proof.closed());
+
+        Iterator<Node> it = proof.root().subtreeIterator();
+        int mergeAppsCnt = 0;
+        while (it.hasNext()) {
+            if (it.next()
+                    .getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
+                mergeAppsCnt++;
+            }
+        }
+
+        assertEquals("There should be one merge app.", 1, mergeAppsCnt);
+    }
+
+    /**
      * This test case semi-automatically proves the Gcd problem with two merges
      * in the following way:
      * <p>
