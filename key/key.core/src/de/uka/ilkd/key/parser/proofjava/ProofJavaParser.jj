@@ -3675,6 +3675,7 @@ Statement Statement() :
 | result = ReturnStatement()
 | result = ThrowStatement()
 | result = SynchronizedStatement()
+| result = MergePointStatement()
 | result = TryStatement()
 | result = AssertStatement()
 | result = KeYCatchAllStatement()
@@ -4488,6 +4489,30 @@ SynchronizedBlock SynchronizedStatement() :
       checkConstruction(result);
       setPostfixInfo(result);
       return result;
+  }
+}
+
+MergePointStatement MergePointStatement() :
+{
+    Expression expr = null;
+    MergePointStatement result;
+}
+{
+  "merge_point"
+  {
+      result = factory.createMergePointStatement();
+      setPrefixInfo(result);
+  }
+  "(" expr = Expression()
+    {
+        result.setIndexPV(expr);
+    }
+  ")"
+  ";"
+  {
+    checkConstruction(result);
+    setPostfixInfo(result);
+    return result;
   }
 }
 

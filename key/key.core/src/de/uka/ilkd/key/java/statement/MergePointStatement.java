@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 
 /**
  * A statement indicating a merge point.
@@ -31,21 +32,27 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 public class MergePointStatement extends JavaStatement
         implements ExpressionContainer {
 
-    protected final Expression expression;
+    // Those are used for JML to JavaDL conversions
+    protected final IProgramVariable identifier;
     protected final Comment[] comments;
 
-    public MergePointStatement(Expression expression, Comment[] comments) {
-        this.expression = expression;
+    public MergePointStatement(IProgramVariable indexPV) {
+        this.identifier = indexPV;
+        this.comments = null;
+    }
+
+    public MergePointStatement(LocationVariable identifier, Comment[] comments) {
+        this.identifier = identifier;
         this.comments = comments;
     }
 
     public MergePointStatement(ExtList children) {
         super(children);
-        expression = children.get(Expression.class);
-        assert expression instanceof IProgramVariable;
+        identifier = children.get(IProgramVariable.class);
+        assert identifier instanceof IProgramVariable;
         comments = children.get(Comment[].class);
     }
-    
+
     @Override
     public Comment[] getComments() {
         return comments;
@@ -53,7 +60,7 @@ public class MergePointStatement extends JavaStatement
 
     @Override
     public int hashCode() {
-        return 17 * super.hashCode() + expression.hashCode();
+        return 17 * super.hashCode() + identifier.hashCode();
     }
 
     /**
@@ -62,7 +69,7 @@ public class MergePointStatement extends JavaStatement
      * @return the number of expressions.
      */
     public int getExpressionCount() {
-        return (expression != null) ? 1 : 0;
+        return (identifier != null) ? 1 : 0;
     }
 
     /**
@@ -78,8 +85,8 @@ public class MergePointStatement extends JavaStatement
      *                if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (expression != null && index == 0) {
-            return expression;
+        if (identifier != null && index == 0) {
+            return (Expression) identifier;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -90,7 +97,7 @@ public class MergePointStatement extends JavaStatement
      * @return the expression.
      */
     public Expression getExpression() {
-        return expression;
+        return (Expression) identifier;
     }
 
     /**
@@ -100,7 +107,7 @@ public class MergePointStatement extends JavaStatement
      */
     public int getChildCount() {
         int result = 0;
-        if (expression != null)
+        if (identifier != null)
             result++;
         return result;
     }
@@ -116,9 +123,9 @@ public class MergePointStatement extends JavaStatement
      *                if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (expression != null) {
+        if (identifier != null) {
             if (index == 0)
-                return expression;
+                return identifier;
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();

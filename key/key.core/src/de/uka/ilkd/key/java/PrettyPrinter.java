@@ -1301,9 +1301,17 @@ public class PrettyPrinter {
     public void printMergePointStatementBlock(MergePointStatement x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
+
+        // Mark statement start ...
+        markStart(0, x);
+        
         write("//@ merge_point (");
         write(x.getExpression().toString());
         write(");");
+
+        // Mark statement end ...
+        markEnd(0, x);
+        
         printFooter(x);
     }
 

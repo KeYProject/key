@@ -1075,7 +1075,7 @@ public class Recoder2KeYConverter {
     }
 
     public MergePointStatement convert(
-            de.uka.ilkd.key.java.recoderext.MergePointStatement mps) {
+        de.uka.ilkd.key.java.recoderext.MergePointStatement mps) {
         final LocationVariable locVar = new LocationVariable(
                 services.getVariableNamer().getTemporaryNameProposal("x"),
                 (Sort) services.getNamespaces().sorts().lookup("boolean"));

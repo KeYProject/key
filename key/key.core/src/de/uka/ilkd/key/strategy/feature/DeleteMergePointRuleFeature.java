@@ -13,43 +13,38 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.recoderext.MergePointStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 /**
- * Costs for the {@link MergeRule}; cheap if the first statement in the chosen
- * top-level formula is a {@link MergePointStatement}, otherwise, infinitely
- * expensive.
+ * Costs for the {@link DeleteMergePointRule}; incredibly cheap if the previous
+ * rule application was a {@link MergeRule} app, infinitely expensive otherwise.
+ * The alternative would be to always check whether there's another {@link Goal}
+ * around with the same {@link MergePointStatement} (then we may not delete),
+ * which is much more time intensive.
  *
  * @author Dominic Scheurer
  */
-public class MergeRuleFeature implements Feature {
-    public static final Feature INSTANCE = new MergeRuleFeature();
+public class DeleteMergePointRuleFeature implements Feature {
+    public static final Feature INSTANCE = new DeleteMergePointRuleFeature();
 
-    private MergeRuleFeature() {
+    private DeleteMergePointRuleFeature() {
         // Singleton constructor
     }
 
     @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
             Goal goal) {
-        final Term t = pos.subTerm();
-        if (!pos.isTopLevel() || !t.containsJavaBlockRecursive()) {
-            return TopRuleAppCost.INSTANCE;
-        }
-
-        return JavaTools.getActiveStatement(TermBuilder.goBelowUpdates(t)
-                .javaBlock()) instanceof MergePointStatement
-                        ? NumberRuleAppCost.create(-4000)
+        return goal.node().parent()
+                .getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
+                        ? NumberRuleAppCost.create(Long.MIN_VALUE)
                         : TopRuleAppCost.INSTANCE;
     }
 

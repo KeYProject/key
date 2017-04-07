@@ -13,6 +13,11 @@
 
 package de.uka.ilkd.key.strategy;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.Name;
@@ -26,6 +31,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
@@ -237,7 +243,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature oneStepSimplificationF =
                 oneStepSimplificationFeature(longConst(-11000));
 
+        // State merging related features
         final Feature mergeRuleF = setupMergeRule();
+        final Optional<Taclet> deleteMergePointTaclet = StreamSupport
+                .stream(super.getProof().getInitConfig().activatedTaclets()
+                        .spliterator(), true)
+                .filter(t -> t.name().toString().equals("deleteMergePoint"))
+                .collect(Collectors.reducing((a, b) -> a));
+        assert deleteMergePointTaclet.isPresent() : "Cannot finde deleteMergePoint rule";
+        final Feature deleteMergeRuleF = setupDeleteMergePointRule(deleteMergePointTaclet.get());
 
         // final Feature smtF = smtFeature(inftyConst());
 
@@ -246,7 +260,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 NonDuplicateAppFeature.INSTANCE,
                 // splitF,
                 // strengthenConstraints,
-                AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF,
+                AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF, deleteMergeRuleF,
                 // smtF,
                 methodSpecF, queryF, depSpecF, loopInvF, blockFeature,
                 ifMatchedF, dispatcher);

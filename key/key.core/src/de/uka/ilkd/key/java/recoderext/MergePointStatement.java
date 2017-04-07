@@ -14,6 +14,8 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.speclang.PositionedString;
+import recoder.java.Expression;
+import recoder.java.ExpressionContainer;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
 import recoder.java.SourceElement;
@@ -23,16 +25,37 @@ import recoder.java.StatementContainer;
 import recoder.java.statement.JavaStatement;
 
 @SuppressWarnings("serial")
-public class MergePointStatement extends JavaStatement {
+public class MergePointStatement extends JavaStatement
+        implements ExpressionContainer {
 
     private StatementContainer astParent;
     private final PositionedString mergeProc;
     private final PositionedString mergeParams;
 
-    public MergePointStatement(PositionedString mergeProc, PositionedString mergeParams) {
+    // The indexPV is not used when parsing JML specs, but only for taclets
+    protected Expression indexPV;
+
+    public MergePointStatement(PositionedString mergeProc,
+            PositionedString mergeParams) {
         makeParentRoleValid();
         this.mergeProc = mergeProc;
         this.mergeParams = mergeParams;
+        this.indexPV = null;
+    }
+
+    public MergePointStatement() {
+        this(null, null);
+    }
+
+    /**
+     * @param expr
+     *            The index variable of the MergePointStatement
+     */
+    public MergePointStatement(Expression expr) {
+        this.indexPV = expr;
+
+        this.mergeProc = null;
+        this.mergeParams = null;
     }
 
     @Override
@@ -57,6 +80,10 @@ public class MergePointStatement extends JavaStatement {
     public PositionedString getMergeParams() {
         return mergeParams;
     }
+    
+    public void setIndexPV(Expression indexPV) {
+        this.indexPV = indexPV;
+    }
 
     /**
      * Finds the source element that occurs first in the source.
@@ -77,7 +104,7 @@ public class MergePointStatement extends JavaStatement {
      */
     @Override
     public SourceElement getLastElement() {
-        return getChildAt(getChildCount() - 1).getLastElement();
+        return getChildCount() == 0 ? this : indexPV;
     }
 
     /**
@@ -87,7 +114,7 @@ public class MergePointStatement extends JavaStatement {
      */
     @Override
     public int getChildCount() {
-        return 0;
+        return indexPV == null ? 0 : 1;
     }
 
     /**
@@ -102,11 +129,22 @@ public class MergePointStatement extends JavaStatement {
      */
     @Override
     public ProgramElement getChildAt(int index) {
+        if (indexPV != null && index == 0) {
+            return indexPV;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     @Override
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
+        if (indexPV == p) {
+            Expression r = (Expression) q;
+            indexPV = r;
+            if (r != null) {
+                r.setExpressionContainer(this);
+            }
+            return true;
+        }
         return false;
     }
 
@@ -120,6 +158,9 @@ public class MergePointStatement extends JavaStatement {
 
     @Override
     public int getChildPositionCode(ProgramElement child) {
+        if (indexPV != null && indexPV == child) {
+            return 0;
+        }
         return -1;
     }
 
@@ -135,5 +176,18 @@ public class MergePointStatement extends JavaStatement {
     @Override
     public Statement deepClone() {
         throw new RuntimeException("Unimplemented");
+    }
+
+    @Override
+    public Expression getExpressionAt(int index) {
+        if (indexPV != null && index == 0) {
+            return indexPV;
+        }
+        throw new ArrayIndexOutOfBoundsException();
+    }
+
+    @Override
+    public int getExpressionCount() {
+        return (indexPV != null) ? 1 : 0;
     }
 }

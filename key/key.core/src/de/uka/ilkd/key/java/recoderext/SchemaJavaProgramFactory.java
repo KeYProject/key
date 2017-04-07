@@ -136,6 +136,14 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 	return new PassiveExpression(e);
     }
 
+    public MergePointStatement createMergePointStatement() {
+        return new MergePointStatement();
+    }
+
+    public MergePointStatement createMergePointStatement(Expression e) {
+        return new MergePointStatement(e);
+    }
+
     /**
      * Create a {@link PassiveExpression}.
      */
