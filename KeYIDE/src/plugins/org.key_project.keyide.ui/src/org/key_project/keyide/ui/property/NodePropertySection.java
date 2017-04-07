@@ -88,7 +88,7 @@ public class NodePropertySection extends AbstractNodePropertySection {
    /**
     * The global program variables.
     */
-   private List globalProgVarList;
+   private List localProgVarList;
    
    /**
     * The introduced rules.
@@ -140,11 +140,11 @@ public class NodePropertySection extends AbstractNodePropertySection {
       nodesText = factory.createText(composite, StringUtil.EMPTY_STRING);
       addControlRow(factory, composite, branchesText, nodesText, "Nodes Count: ");
       
-      globalProgVarList = factory.createList(composite, SWT.BORDER | SWT.MULTI);
-      addControlRow(factory, composite, nodesText, globalProgVarList, "Global Program Variables: ");
+      localProgVarList = factory.createList(composite, SWT.BORDER | SWT.MULTI);
+      addControlRow(factory, composite, nodesText, localProgVarList, "Global Program Variables: ");
       
       introducedRulesList = factory.createList(composite, SWT.BORDER | SWT.MULTI);
-      addControlRow(factory, composite, globalProgVarList, introducedRulesList, "Introduced Rules: ");
+      addControlRow(factory, composite, localProgVarList, introducedRulesList, "Introduced Rules: ");
       
       renamingsList = factory.createList(composite, SWT.BORDER | SWT.MULTI);
       addControlRow(factory, composite, introducedRulesList, renamingsList, "Renaming Tables: ");
@@ -167,7 +167,7 @@ public class NodePropertySection extends AbstractNodePropertySection {
          SWTUtil.setText(branchesText, ObjectUtil.toString(node.countBranches()));
          SWTUtil.setText(nodesText, ObjectUtil.toString(node.countNodes()));
 
-         setListValues(globalProgVarList, node.getGlobalProgVars());
+         setListValues(localProgVarList, node.getLocalProgVars());
          
          setListValues(introducedRulesList, node.getLocalIntroducedRules());
          
@@ -184,7 +184,7 @@ public class NodePropertySection extends AbstractNodePropertySection {
          activeStatementPositionText.setText(StringUtil.EMPTY_STRING);
          branchesText.setText(StringUtil.EMPTY_STRING);
          nodesText.setText(StringUtil.EMPTY_STRING);
-         globalProgVarList.removeAll();
+         localProgVarList.removeAll();
          introducedRulesList.removeAll();
          renamingsList.removeAll();
       }

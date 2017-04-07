@@ -79,7 +79,7 @@ public class SWTBotNodePropertySectionTest extends AbstractSWTBotKeYEditorProper
             assertEquals(validate(ObjectUtil.toString(node.getNodeInfo().getExecStatementPosition())), propertiesView.bot().text(5).getText());
             assertEquals(validate(ObjectUtil.toString(node.countBranches())), propertiesView.bot().text(6).getText());
             assertEquals(validate(ObjectUtil.toString(node.countNodes())), propertiesView.bot().text(7).getText());
-            assertList(node.getGlobalProgVars(), propertiesView.bot().list(0));
+            assertList(node.getLocalProgVars(), propertiesView.bot().list(0));
             assertList(node.getLocalIntroducedRules(), propertiesView.bot().list(1));
             assertList(node.getRenamingTable(), propertiesView.bot().list(2));
          }
