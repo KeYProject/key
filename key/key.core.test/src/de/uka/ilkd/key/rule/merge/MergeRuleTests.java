@@ -97,15 +97,38 @@ public class MergeRuleTests extends TestCase {
         startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());
-        
+
         Iterator<Node> it = proof.root().subtreeIterator();
         int mergeAppsCnt = 0;
         while (it.hasNext()) {
-            if (it.next().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
+            if (it.next()
+                    .getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
                 mergeAppsCnt++;
             }
         }
-        
+
+        assertEquals("There should be two merge apps.", 2, mergeAppsCnt);
+    }
+
+    /**
+     * Replays a closed proof of the Gcd problem with two merges triggered by
+     * merge point statements.
+     */
+    @Test
+    public void testLoadClosedGcdProofWithMergePointStatements() {
+        final Proof proof = loadProof("gcd.mergePointStatements.closed.proof");
+
+        assertTrue(proof.closed());
+
+        Iterator<Node> it = proof.root().subtreeIterator();
+        int mergeAppsCnt = 0;
+        while (it.hasNext()) {
+            if (it.next()
+                    .getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
+                mergeAppsCnt++;
+            }
+        }
+
         assertEquals("There should be two merge apps.", 2, mergeAppsCnt);
     }
 
