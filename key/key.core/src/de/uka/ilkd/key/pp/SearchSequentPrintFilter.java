@@ -11,4 +11,8 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
 		filterSequent();
 	}
 
+	public void setLogicPrinter(SequentViewLogicPrinter logicPrinter) {
+		this.lp = logicPrinter;
+	}
+
 }

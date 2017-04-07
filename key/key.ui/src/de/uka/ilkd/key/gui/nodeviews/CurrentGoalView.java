@@ -351,9 +351,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
     @Override
     public String getTitle() {
-    	if (filter instanceof SearchSequentPrintFilter) {
-    		return "Current Goal - Sequent View modified by Search Filter";
-    	}
         return "Current Goal";
     }
 

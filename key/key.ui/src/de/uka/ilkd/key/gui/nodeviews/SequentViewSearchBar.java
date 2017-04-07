@@ -14,11 +14,8 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -27,9 +24,6 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
-
 import de.uka.ilkd.key.gui.SearchBar;
 import de.uka.ilkd.key.pp.HideSequentPrintFilter;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
@@ -121,11 +115,10 @@ public class SequentViewSearchBar extends SearchBar {
 				}
 			}
         });
-        searchModeBox.setToolTipText("<html>Determines search behaviour: <br>" + SearchMode.HIDE.displayName + 
-        		" only shows sequent formulas that match the search. <br>"
-        + SearchMode.REGROUP.displayName + " arranges the matching formulas around the sequence arrow. <br>"
-        + SearchMode.HIGHLIGHT.displayName + " leaves the sequent unchanged.</html>");
-        
+        searchModeBox.setToolTipText("<html>Determines search behaviour: <b>" + SearchMode.HIDE.displayName + 
+        		"</b> only shows sequent formulas that match the search. <b>"
+        + SearchMode.REGROUP.displayName + "</b> arranges the matching formulas around the sequence arrow. <b>"
+        + SearchMode.HIGHLIGHT.displayName + "</b> leaves the sequent unchanged.</html>");
         add(searchModeBox);
     }
 
@@ -171,18 +164,20 @@ public class SequentViewSearchBar extends SearchBar {
     @Override
     public boolean search(String search) {
         clearSearchResults();
-
+        
+        if (sequentView.filter instanceof SearchSequentPrintFilter) {
+			SearchSequentPrintFilter searchSequentPrintFilter = (SearchSequentPrintFilter) sequentView.filter;
+			searchSequentPrintFilter.setSearchString(searchField.getText());
+			searchSequentPrintFilter.setLogicPrinter(sequentView.getLogicPrinter());
+        }
+        
+        sequentView.printSequent();
+        
         if (sequentView == null || sequentView.getText() == null || search.equals("")
                 || !this.isVisible()) {
             return true;
         }
-        
-    	if (sequentView.filter instanceof SearchSequentPrintFilter) {
-    			((SearchSequentPrintFilter) sequentView.filter).setSearchString(searchField.getText());
-    	}
     	
-    	sequentView.printSequent();
-        
         resultIteratorPos = 0;
         int searchFlag = 0;
         if (search.toLowerCase().equals(search)) {

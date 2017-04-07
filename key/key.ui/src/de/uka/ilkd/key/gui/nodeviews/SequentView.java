@@ -79,7 +79,7 @@ public abstract class SequentView extends JEditorPane {
     }
 
     private final ConfigChangeListener configChangeListener;
-    SequentPrintFilter filter;
+    protected SequentPrintFilter filter;
     private SequentViewLogicPrinter printer;
     private HTMLSyntaxHighlighter syntaxHighlighter;
     public boolean refreshHighlightning = true;
