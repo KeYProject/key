@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.QueryExpand;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.MergeRule;
@@ -18,7 +17,6 @@ import de.uka.ilkd.key.strategy.feature.CompareCostsFeature;
 import de.uka.ilkd.key.strategy.feature.ComprehendedSumFeature;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
 import de.uka.ilkd.key.strategy.feature.ConstFeature;
-import de.uka.ilkd.key.strategy.feature.DeleteMergePointRuleFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.ImplicitCastNecessary;
 import de.uka.ilkd.key.strategy.feature.InstantiatedSVFeature;
@@ -89,13 +87,6 @@ public class StaticFeatureCollection {
         filter.addRuleToSet(MergeRule.INSTANCE);
         return ConditionalFeature.createConditional(filter,
                 MergeRuleFeature.INSTANCE);
-    }
-
-    protected static Feature setupDeleteMergePointRule(Rule deleteMergePointRule) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(deleteMergePointRule);
-        return ConditionalFeature.createConditional(filter,
-                DeleteMergePointRuleFeature.INSTANCE);
     }
 
     protected static Feature sequentContainsNoPrograms() {

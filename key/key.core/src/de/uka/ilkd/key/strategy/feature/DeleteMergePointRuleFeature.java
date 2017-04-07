@@ -44,7 +44,7 @@ public class DeleteMergePointRuleFeature implements Feature {
             Goal goal) {
         return goal.node().parent()
                 .getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
-                        ? NumberRuleAppCost.create(Long.MIN_VALUE)
+                        ? NumberRuleAppCost.create(-50000)
                         : TopRuleAppCost.INSTANCE;
     }
 

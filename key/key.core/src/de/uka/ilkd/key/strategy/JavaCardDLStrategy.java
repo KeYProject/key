@@ -13,13 +13,13 @@
 
 package de.uka.ilkd.key.strategy;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.*;
+import de.uka.ilkd.key.ldt.BooleanLDT;
+import de.uka.ilkd.key.ldt.CharListLDT;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -31,7 +31,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
@@ -42,6 +41,7 @@ import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
 import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
 import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
 import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
+import de.uka.ilkd.key.strategy.feature.DeleteMergePointRuleFeature;
 import de.uka.ilkd.key.strategy.feature.DependencyContractFeature;
 import de.uka.ilkd.key.strategy.feature.DiffFindAndIfFeature;
 import de.uka.ilkd.key.strategy.feature.DiffFindAndReplacewithFeature;
@@ -243,15 +243,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature oneStepSimplificationF =
                 oneStepSimplificationFeature(longConst(-11000));
 
-        // State merging related features
         final Feature mergeRuleF = setupMergeRule();
-        final Optional<Taclet> deleteMergePointTaclet = StreamSupport
-                .stream(super.getProof().getInitConfig().activatedTaclets()
-                        .spliterator(), true)
-                .filter(t -> t.name().toString().equals("deleteMergePoint"))
-                .collect(Collectors.reducing((a, b) -> a));
-        assert deleteMergePointTaclet.isPresent() : "Cannot finde deleteMergePoint rule";
-        final Feature deleteMergeRuleF = setupDeleteMergePointRule(deleteMergePointTaclet.get());
 
         // final Feature smtF = smtFeature(inftyConst());
 
@@ -260,7 +252,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 NonDuplicateAppFeature.INSTANCE,
                 // splitF,
                 // strengthenConstraints,
-                AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF, deleteMergeRuleF,
+                AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF,
                 // smtF,
                 methodSpecF, queryF, depSpecF, loopInvF, blockFeature,
                 ifMatchedF, dispatcher);
@@ -289,6 +281,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
+        bindRuleSet(d, "merge_point", DeleteMergePointRuleFeature.INSTANCE);
+        
         bindRuleSet(d, "semantics_blasting", inftyConst());
         bindRuleSet(d, "simplify_heap_high_costs", inftyConst());
 
