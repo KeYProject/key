@@ -539,24 +539,24 @@ public class TestTermLabelManager extends TestCase {
     }
       TermLabelManager manager = TermLabelManager.getTermLabelManager(services);
       // Test null parameter
-      TermLabel label = manager.parseLabel("ONE", null);
+      TermLabel label = manager.parseLabel("ONE", null, services);
       assertTrue(label instanceof LoggingTermLabel);
       assertEquals("ONE", label.name().toString());
       assertEquals(0, label.getChildCount());
       // Test empty parameter
-      label = manager.parseLabel("TWO", null);
+      label = manager.parseLabel("TWO", null, services);
       assertTrue(label instanceof LoggingTermLabel);
       assertEquals("TWO", label.name().toString());
       assertEquals(0, label.getChildCount());
       // Test with parameter
-      label = manager.parseLabel("THREE", Collections.singletonList("Param"));
+      label = manager.parseLabel("THREE", Collections.singletonList("Param"), services);
       assertTrue(label instanceof LoggingTermLabel);
       assertEquals("THREE", label.name().toString());
       assertEquals(1, label.getChildCount());
       assertEquals("Param", label.getChild(0));
       // Test unsupported
       try {
-         manager.parseLabel("UNKNOWN", null);
+         manager.parseLabel("UNKNOWN", null, services);
       }
       catch (TermLabelException e) {
          assertEquals("No TermLabelFactory available for term label name \"UNKNOWN\".", e.getMessage());
@@ -788,7 +788,7 @@ public class TestTermLabelManager extends TestCase {
       }
 
       @Override
-      public TermLabel parseInstance(List<String> arguments) throws TermLabelException {
+      public TermLabel parseInstance(List<String> arguments, TermServices services) throws TermLabelException {
          return new LoggingTermLabel(label, arguments);
       }
    }

@@ -15,6 +15,8 @@ package de.uka.ilkd.key.logic.label;
 
 import java.util.List;
 
+import de.uka.ilkd.key.logic.TermServices;
+
 /**
  * A factory for creating {@link FormulaTermLabel} objects.
  */
@@ -26,7 +28,7 @@ public class FormulaTermLabelFactory implements TermLabelFactory<FormulaTermLabe
     * This method accepts single arguments which can be parsed as an integer.
     */
    @Override
-   public FormulaTermLabel parseInstance(List<String> parameters) throws TermLabelException {
+   public FormulaTermLabel parseInstance(List<String> parameters, TermServices services) throws TermLabelException {
       if (parameters != null && parameters.size() == 1) {
          return new FormulaTermLabel(parameters.get(0));
       }

@@ -3154,7 +3154,7 @@ single_label returns [TermLabel label=null]
           }
           if (label == null) {
                 label = getServices().getProfile()
-                                .getTermLabelManager().parseLabel(labelName, parameters);
+                                .getTermLabelManager().parseLabel(labelName, parameters, getServices());
           }
       } catch(TermLabelException ex) {
           raiseException

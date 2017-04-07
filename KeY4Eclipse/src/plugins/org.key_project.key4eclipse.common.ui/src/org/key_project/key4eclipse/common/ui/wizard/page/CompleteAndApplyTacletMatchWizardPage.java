@@ -21,7 +21,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.key_project.key4eclipse.common.ui.wizard.CompleteAndApplyTacletMatchWizard;
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.InstantiationFileHandler;
 import de.uka.ilkd.key.control.instantiation_model.TacletAssumesModel;

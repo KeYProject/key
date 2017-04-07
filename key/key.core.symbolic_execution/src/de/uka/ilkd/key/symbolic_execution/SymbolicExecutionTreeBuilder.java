@@ -13,51 +13,27 @@
 
 package de.uka.ilkd.key.symbolic_execution;
 
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.ArrayUtil;
 
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.NodeInfo;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofVisitor;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
@@ -65,39 +41,14 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLink;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionBlockStartNode;
-import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBlockContract;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchStatement;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionExceptionalMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionJoin;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLink;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopCondition;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopStatement;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodCall;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionOperationContract;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStart;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStatement;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
-import de.uka.ilkd.key.symbolic_execution.model.impl.TreeSettings;
+import de.uka.ilkd.key.symbolic_execution.model.impl.*;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -1065,7 +1016,7 @@ public class SymbolicExecutionTreeBuilder {
       }
       return result;
    }
-
+   
    /**
     * Creates a new execution tree model representation ({@link IExecutionNode}) 
     * if possible for the given {@link Node} in KeY's proof tree.
@@ -1093,7 +1044,7 @@ public class SymbolicExecutionTreeBuilder {
                   BlockContractValidityTermLabel bcLabel = (BlockContractValidityTermLabel) modalityTerm.getLabel(BlockContractValidityTermLabel.NAME);
                   result = new ExecutionTermination(settings, 
                                                     node, 
-                                                    bcLabel != null ? (IProgramVariable) proof.getServices().getNamespaces().programVariables().lookup(bcLabel.getExceptionVariableName()) : exceptionVariable, 
+                                                    bcLabel != null ? MiscTools.findActualVariable(bcLabel.getExceptionVariable(), node) : exceptionVariable, 
                                                     null);
                   startNode.addTermination((ExecutionTermination)result);
                }

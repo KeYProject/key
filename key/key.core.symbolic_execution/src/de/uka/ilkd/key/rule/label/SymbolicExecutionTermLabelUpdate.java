@@ -20,7 +20,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
-import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -31,6 +30,7 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BlockContractRule;
@@ -74,7 +74,9 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
                             JavaBlock newTermJavaBlock,
                             Set<TermLabel> labels) {
       if (rule instanceof WhileInvariantRule && "LoopBodyModality".equals(hint) ||
-          rule instanceof BlockContractRule && StringUtil.startsWith(hint, "ValidityModality: exceptionVar=")) {
+          ( rule instanceof BlockContractRule && 
+                  ((BlockContractRule.BlockContractHint)hint).getExcecptionalVariable() != null) 
+          ) {
          TermLabel label = CollectionUtil.searchAndRemove(labels, new IFilter<TermLabel>() {
             @Override
             public boolean select(TermLabel element) {
