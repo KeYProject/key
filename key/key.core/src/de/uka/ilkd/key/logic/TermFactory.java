@@ -150,7 +150,7 @@ public final class TermFactory {
         // Check if caching is possible. It is not possible if a non empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
-        if (!newTerm.isContainsJavaBlockRecursive()) {
+        if (!newTerm.containsJavaBlockRecursive()) {
            
            Term term;  
            synchronized(cache) { 

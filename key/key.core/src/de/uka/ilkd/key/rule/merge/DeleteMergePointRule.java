@@ -93,7 +93,7 @@ public class DeleteMergePointRule implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 
-        if (pio == null || !pio.subTerm().isContainsJavaBlockRecursive()) {
+        if (pio == null || !pio.subTerm().containsJavaBlockRecursive()) {
             return false;
         }
 

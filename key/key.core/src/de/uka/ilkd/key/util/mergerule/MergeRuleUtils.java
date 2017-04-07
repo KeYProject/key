@@ -771,7 +771,7 @@ public class MergeRuleUtils {
      *         there is no non-empty Java block.
      */
     public static JavaBlock getJavaBlockRecursive(Term term) {
-        if (!term.isContainsJavaBlockRecursive()) {
+        if (!term.containsJavaBlockRecursive()) {
             return JavaBlock.EMPTY_JAVABLOCK;
         }
 

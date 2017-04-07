@@ -102,7 +102,7 @@ public class MergePointRule implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 
-        if (pio != null && pio.subTerm().isContainsJavaBlockRecursive()
+        if (pio != null && pio.subTerm().containsJavaBlockRecursive()
                 && !goal.isLinked()
                 && JavaTools.getActiveStatement(
                         TermBuilder.goBelowUpdates(pio.subTerm())

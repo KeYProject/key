@@ -11,8 +11,6 @@ import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-
-import static de.uka.ilkd.key.strategy.AbstractFeatureStrategy.let;
 import de.uka.ilkd.key.strategy.feature.ApplyTFFeature;
 import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.CompareCostsFeature;
@@ -23,6 +21,7 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.ImplicitCastNecessary;
 import de.uka.ilkd.key.strategy.feature.InstantiatedSVFeature;
 import de.uka.ilkd.key.strategy.feature.LetFeature;
+import de.uka.ilkd.key.strategy.feature.MergeRuleFeature;
 import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
 import de.uka.ilkd.key.strategy.feature.ShannonFeature;
@@ -86,7 +85,7 @@ public class StaticFeatureCollection {
     protected static Feature setupMergeRule() {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(MergeRule.INSTANCE);
-        return ConditionalFeature.createConditional(filter, inftyConst());
+        return ConditionalFeature.createConditional(filter, MergeRuleFeature.INSTANCE);
     }
 
     protected static Feature sequentContainsNoPrograms() {

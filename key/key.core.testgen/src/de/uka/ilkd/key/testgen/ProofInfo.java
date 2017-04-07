@@ -232,13 +232,13 @@ public class ProofInfo {
 	}
 
 	public JavaBlock getJavaBlock(Term t){		
-		if(t.isContainsJavaBlockRecursive()){
+		if(t.containsJavaBlockRecursive()){
 			if(!t.javaBlock().isEmpty()){
 				return t.javaBlock();
 			}
 			else{
 				for(Term s : t.subs()){
-					if(s.isContainsJavaBlockRecursive()){
+					if(s.containsJavaBlockRecursive()){
 						return getJavaBlock(s);
 					}
 				}

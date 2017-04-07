@@ -653,14 +653,7 @@ public class MergeRule implements BuiltInRule {
      */
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        // Note: We do not check for merge partner existence
-        // to save time during automatic execution.
-        // As a result, the rule is applicable for any
-        // formula of suitable form, but then with empty
-        // list of candidates.
-
-        return isOfAdmissibleForm(goal, pio, false); // Don't do the check for
-                                                     // partner existence
+        return isOfAdmissibleForm(goal, pio, true);
     }
 
     /**

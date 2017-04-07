@@ -176,5 +176,5 @@ public interface Term extends SVSubstitute, Sorted {
      * contains a non empty {@link JavaBlock}. 
      * @return {@code true} The {@link Term} or one of its direct or indirect children contains a non empty {@link JavaBlock}, {@code false} no {@link JavaBlock} available.
      */
-    public boolean isContainsJavaBlockRecursive();
+    public boolean containsJavaBlockRecursive();
 }
