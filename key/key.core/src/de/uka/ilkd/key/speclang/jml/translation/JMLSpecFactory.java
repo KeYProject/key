@@ -56,6 +56,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
+import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.ParametricMergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.UnparametricMergeProcedure;
@@ -1178,8 +1179,9 @@ public class JMLSpecFactory {
             ImmutableList<ProgramVariable> methodParams)
             throws SLTranslationException {
 
-        final String mergeProcStr = mergePointDecl.getMergeProc().text
-                .replaceAll("\"", "");
+        final String mergeProcStr = mergePointDecl.getMergeProc() == null
+                ? MergeByIfThenElse.instance().toString()
+                : mergePointDecl.getMergeProc().text.replaceAll("\"", "");
         final String mergeParamsStr = mergePointDecl.getMergeParams() == null
                 ? null : mergePointDecl.getMergeParams().text;
         final PositionedString mergeParamsParseStr = mergeParamsStr == null
