@@ -276,15 +276,21 @@ SEMICOLON
     ';'
 ;
 
+//TODO (DS): I wanted two enable the usage of "\old" in STRING_LITERALs for merge params specifications.
+//           Therefore, I changed the definition like it can be seen below. Now, however, ANTLR is reporting
+//           issues like:
+//             Decision can match input such as "'\\''r'" using multiple alternatives: 1, 2
+//             As a result, alternative(s) 2 were disabled for that input
+//           This probably should be resolved...
 STRING_LITERAL
-    : '"' ( ESC | ~('"'|'\\') )* '"'
+    //: '"' ( ESC | ~('"'|'\\') )* '"'
+    : '"' ( ESC | ~('"') )* '"'
     ;
 
 fragment
 ESC
     :	'\\'
     (	'n'         { setText("\n"); }
-    |   'o' { setText("\\o"); }
 	|	'r' { setText("\r"); }
 	|	't' { setText("\t"); }
 	|	'b' { setText("\b"); }
