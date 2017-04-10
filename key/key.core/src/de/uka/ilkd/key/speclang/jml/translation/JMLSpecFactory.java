@@ -536,7 +536,7 @@ public class JMLSpecFactory {
         }
         
         // Extract the name of the merge procedure: Remove beginning <code>"merge_proc<code> and trailing <code>;"</code>.
-        String mergeProcName = originalClauses.head().text.substring(11, originalClauses.head().text.length() - 2);
+        String mergeProcName = originalClauses.head().text.substring(12, originalClauses.head().text.length() - 2);
         MergeProcedure chosenProc = MergeProcedure.getProcedureByName(mergeProcName);
         
         if (chosenProc == null) {
@@ -1321,7 +1321,7 @@ public class JMLSpecFactory {
                                         final StatementBlock block,
                                         final TextualJMLSpecCase specificationCase)
             throws SLTranslationException {
-        //TODO Take join_proc into account
+        //TODO Take merge_proc into account
         final Behavior behavior = specificationCase.getBehavior();
         final BlockContract.Variables variables =
                 BlockContract.Variables.create(block, labels, method, services);

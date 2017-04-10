@@ -302,7 +302,7 @@ public class TacletMenu extends JMenu {
      */
     private void createMergeRuleMenu() {
         if (MergeRule.isOfAdmissibleForm(mediator.getSelectedGoal(),
-                pos.getPosInOccurrence(), false)) {
+                pos.getPosInOccurrence(), true)) {
             JMenuItem item = new MergeRuleMenuItem(mediator.getSelectedGoal(),
                     pos.getPosInOccurrence(), mediator);
             add(item);
