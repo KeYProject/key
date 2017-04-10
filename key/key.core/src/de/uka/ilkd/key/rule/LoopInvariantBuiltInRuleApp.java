@@ -41,7 +41,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
  * The built in rule app for the loop invariant rule.
@@ -50,7 +50,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private final While loop;
 
-    private LoopInvariant inv;
+    private LoopSpecification spec;
     private final List<LocationVariable> heapContext;
     private IFProofObligationVars infFlowVars;
     private ExecutionContext executionContext;
@@ -64,13 +64,13 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
-            LoopInvariant inv, List<LocationVariable> heapContext, TermServices services) {
+            LoopSpecification inv, List<LocationVariable> heapContext, TermServices services) {
         super(rule, pio, ifInsts);
         assert pio != null;
         this.loop = (While) JavaTools.getActiveStatement(programTerm()
                 .javaBlock());
         assert loop != null;
-        this.inv = instantiateIndexValues(inv, services);
+        this.spec = instantiateIndexValues(inv, services);
         this.heapContext = heapContext;
         this.services = services;
     }
@@ -86,9 +86,10 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
      * otherwise <code>rawInv</code> is returned.
     * @param services TODO
      */
-    private LoopInvariant instantiateIndexValues(LoopInvariant rawInv, TermServices services){
+    private LoopSpecification instantiateIndexValues(LoopSpecification rawInv, TermServices services){
     	if (rawInv == null) return null;
     	Map<LocationVariable,Term> invs = rawInv.getInternalInvariants();
+    	Map<LocationVariable,Term> freeInvs = rawInv.getInternalFreeInvariants();
     	Term var = rawInv.getInternalVariant();
         final TermBuilder tb = services.getTermBuilder();
     	boolean skipIndex = false;
@@ -100,8 +101,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     	// the guard is expected to be of the form "i < x" and we want to retrieve "i".
     	assert guard.getChildCount() == 1 : "child count: "+guard.getChildCount();
     	ProgramElement guardStatement = guard.getChildAt(0);
-	skipIndex = !(guardStatement instanceof LessThan);
-	Expression loopIndex = skipIndex ? null :
+    	skipIndex = !(guardStatement instanceof LessThan);
+    	Expression loopIndex = skipIndex ? null :
 	    (Expression) ((LessThan)guard.getChildAt(0)).getChildAt(0);
     	skipIndex = skipIndex || !( loopIndex instanceof ProgramVariable);
 		final Term loopIdxVar = skipIndex? null: tb.var((ProgramVariable)loopIndex);
@@ -182,19 +183,37 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         // replace index
         Map<LocationVariable,Term> newInvs = new LinkedHashMap<LocationVariable,Term>(invs);
 		if (!skipIndex){
-		IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();
-                for(LocationVariable heap : invs.keySet()) {
-                   Term inv = invs.get(heap);
-		   if (inv != null) {
-		     v.visit(inv);
-		     inv = v.getResult();
-                     newInvs.put(heap, inv);
-  		   }                   
-                }
-		if (var != null) {
-		    v.visit(var);
-		    var = v.getResult();
-		}}
+			IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();
+			for(LocationVariable heap : invs.keySet()) {
+				Term inv = invs.get(heap);
+				if (inv != null) {
+					v.visit(inv);
+					inv = v.getResult();
+					newInvs.put(heap, inv);
+                }                   
+			}
+			if (var != null) {
+				v.visit(var);
+				var = v.getResult();
+			}
+		}
+		
+		Map<LocationVariable,Term> newFreeInvs = new LinkedHashMap<LocationVariable,Term>(freeInvs);
+		if (!skipIndex){
+			IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();
+			for(LocationVariable heap : freeInvs.keySet()) {
+				Term inv = freeInvs.get(heap);
+				if (inv != null) {
+					v.visit(inv);
+					inv = v.getResult();
+					newFreeInvs.put(heap, inv);
+				}                   
+			}
+			if (var != null) {
+				v.visit(var);
+				var = v.getResult();
+			}
+		}
 		
 		// replace values
         if (!skipValues){
@@ -211,21 +230,21 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             v.visit(var);
             var = v.getResult();
         }}
-        return rawInv.instantiate(newInvs, var);    	
+        return rawInv.instantiate(newInvs, newFreeInvs, var);    	
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence pio, LoopInvariant inv, TermServices services) {
+            PosInOccurrence pio, LoopSpecification inv, TermServices services) {
         this(rule, pio, null, inv, null, services);
     }
 
     public boolean complete() {
-        return inv != null && loop != null && invariantAvailable()
+        return spec != null && loop != null && invariantAvailable()
                 && (!variantRequired() || variantAvailable());
     }
 
-    public LoopInvariant getInvariant() {
-        return inv;
+    public LoopSpecification getSpec() {
+        return spec;
     }
 
     public While getLoopStatement() {
@@ -233,12 +252,13 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public boolean invariantAvailable() {
-        boolean result = inv != null && inv.getInternalInvariants() != null;
+        boolean result = spec != null && spec.getInternalInvariants() != null;
         if(result) {
-          Map<LocationVariable,Term> invs = inv.getInternalInvariants();
+          Map<LocationVariable,Term> invs = spec.getInternalInvariants();
+          Map<LocationVariable,Term> freeInvs = spec.getInternalFreeInvariants();
           result = false;
           for(LocationVariable heap : heapContext) {
-            if(invs.get(heap) != null) {
+            if(invs.get(heap) != null || freeInvs.get(heap) != null) {
               result = true;
               break;
             }
@@ -260,12 +280,12 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public LoopInvariantBuiltInRuleApp replacePos(PosInOccurrence newPos) {
-        return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, inv, heapContext, services);
+        return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, spec, heapContext, services);
     }
 
-    public LoopInvariant retrieveLoopInvariantFromSpecification(
+    public LoopSpecification retrieveLoopInvariantFromSpecification(
             Services services) {
-        return services.getSpecificationRepository().getLoopInvariant(loop);
+        return services.getSpecificationRepository().getLoopSpec(loop);
     }
 
     @Override
@@ -276,10 +296,10 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     }
 
-    public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopInvariant inv) {
+    public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopSpecification inv) {
         assert inv != null;
         if (this.loop == (While)inv.getLoop())
-            this.inv = inv;
+            this.spec = inv;
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext, services);
     }
     
@@ -297,11 +317,11 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public LoopInvariantBuiltInRuleApp tryToInstantiate(Goal goal) {
-        if (inv != null) {
+        if (spec != null) {
             return this;
         }
         final Services services = goal.proof().getServices();
-        LoopInvariant inv = retrieveLoopInvariantFromSpecification(services);
+        LoopSpecification inv = retrieveLoopInvariantFromSpecification(services);
         Modality m = (Modality)programTerm().op();
         boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION); 
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv,
@@ -311,7 +331,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public boolean variantAvailable() {
-        return inv != null && inv.getInternalVariant() != null;
+        return spec != null && spec.getInternalVariant() != null;
     }
 
     public boolean variantRequired() {

@@ -45,7 +45,7 @@ public interface SpecExtractor {
     /**
      * Returns the loop invariant for the passed loop (if any).
      */
-    public LoopInvariant extractLoopInvariant(IProgramMethod pm, 
+    public LoopSpecification extractLoopInvariant(IProgramMethod pm, 
                                               LoopStatement loop)
         throws SLTranslationException;
 

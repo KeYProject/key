@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -14,6 +16,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -37,6 +40,7 @@ public class RuleCommand extends AbstractCommand {
         String on;
         String formula;
         int occ = -1;
+        Map<String, String> instantiations = new HashMap<>();
     }
 
     private static class TacletNameFilter extends TacletFilter {
@@ -72,6 +76,21 @@ public class RuleCommand extends AbstractCommand {
         Goal g = getFirstOpenGoal(proof, state);
 
         theApp = assumesCandidates.head();
+        for (SchemaVariable sv : theApp.uninstantiatedVars()) {
+            if (theApp.isInstantiationRequired(sv)) {
+                String str = p.instantiations.get(sv.name().toString());
+                Term inst;
+                try {
+                    inst = toTerm(g, state, str, null);
+                } catch (ParserException e) {
+                    throw new ScriptException(e);
+                }
+                if (inst == null) {
+                    throw new ScriptException("missing instantiation for " + sv);
+                }
+                theApp = theApp.addInstantiation(sv, inst, true, proof.getServices());
+            }
+        }
 
         // instantiate remaining symbols
         theApp = theApp.tryToInstantiate(proof.getServices().getOverlay(g.getLocalNamespaces()));
@@ -132,7 +151,7 @@ public class RuleCommand extends AbstractCommand {
         } else {
             if(p.occ >= matchingApps.size()) {
                 throw new ScriptException("Occurence " + p.occ
-                        + " has been specified, but there only "
+                        + " has been specified, but there are only "
                         + matchingApps.size() + " hits.");
             }
             return matchingApps.get(p.occ);
@@ -181,7 +200,7 @@ public class RuleCommand extends AbstractCommand {
     /*
      * Filter those apps from a list that are according to the parameters.
      */
-    private List<TacletApp> filterList(Parameters p, ImmutableList<TacletApp> list, 
+    private List<TacletApp> filterList(Parameters p, ImmutableList<TacletApp> list,
             Goal goal, Map<String, Object> state) throws ScriptException {
         List<TacletApp> matchingApps = new ArrayList<TacletApp>();
         for (TacletApp tacletApp : list) {
@@ -209,30 +228,42 @@ public class RuleCommand extends AbstractCommand {
 
         Parameters result = new Parameters();
 
-        result.rulename = args.get("#2");
-        if(result.rulename == null) {
-            throw new ScriptException("Rule name must be set");
-        }
-
         try {
-            //
-            // on="term to apply to as find"
-            String onStr = args.get("on");
-            result.on = onStr;
-
-            //
-            // formula="toplevel formula in which it appears"
-            String formStr = args.get("formula");
-            result.formula = formStr;
-
-            //
-            // occurrence number;
-            String occStr = args.get("occ");
-            if(occStr != null) {
-                result.occ = Integer.parseInt(occStr);
+            for (Entry<String, String> arg : args.entrySet()) {
+                switch (arg.getKey()) {
+                case "#2":
+                    // rule name
+                    result.rulename = args.get("#2");
+                    break;
+                case "on":
+                    // on="term to apply to as find"
+                    result.on = arg.getValue();
+                    break;
+                case "formula":
+                    // formula="toplevel formula in which it appears"
+                    result.formula = arg.getValue();
+                    break;
+                case "occ":
+                    // occurrence number;
+                    result.occ = Integer.parseInt(arg.getValue());
+                    break;
+                default:
+                    // instantiation
+                    String s = arg.getKey();
+                    if (!s.startsWith("#")) {
+                        if (s.startsWith("inst_")) {
+                            s = s.substring(5);
+                        }
+                        result.instantiations.put(s, arg.getValue());
+                    }
+                }
             }
         } catch(Exception e) {
             throw new ScriptException(e);
+        }
+
+        if(result.rulename == null) {
+            throw new ScriptException("Rule name must be set");
         }
 
         return result;

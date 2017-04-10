@@ -23,8 +23,8 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
+import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.speclang.LoopSpecImpl;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -48,11 +48,11 @@ public class LoopInvariantRuleCompletion implements
         Term progPost = loopApp.programTerm();
         final While loop = loopApp.getLoopStatement();
 
-        LoopInvariant inv = loopApp.getInvariant();
+        LoopSpecification inv = loopApp.getSpec();
         if (inv == null) { // no invariant present, get it interactively
             MethodFrame mf = JavaTools.getInnermostMethodFrame(progPost.javaBlock(),
                                                                services);
-            inv = new LoopInvariantImpl(loop,
+            inv = new LoopSpecImpl(loop,
                                         mf == null ?
                                                 null : mf.getProgramMethod(),
                                         mf == null || mf.getProgramMethod() == null ?

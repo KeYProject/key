@@ -19,7 +19,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 public class FinishAuxiliaryLoopComputationMacro extends
         AbstractFinishAuxiliaryComputationMacro {
@@ -60,8 +60,8 @@ public class FinishAuxiliaryLoopComputationMacro extends
 
         final LoopInvariantBuiltInRuleApp loopInvRuleApp = 
                 (LoopInvariantBuiltInRuleApp) initiatingGoal.node().parent().getAppliedRuleApp();
-        LoopInvariant loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
-        loopInv = loopInv != null ? loopInv : loopInvRuleApp.getInvariant();
+        LoopSpecification loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
+        loopInv = loopInv != null ? loopInv : loopInvRuleApp.getSpec();
         IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
         ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
 

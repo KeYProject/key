@@ -132,11 +132,14 @@ options {
          prooflabel2tag.put("userinteraction", ProofElementID.USER_INTERACTION);
          prooflabel2tag.put("newnames", ProofElementID.NEW_NAMES);
          prooflabel2tag.put("autoModeTime", ProofElementID.AUTOMODE_TIME);  
-         prooflabel2tag.put("joinProc", ProofElementID.JOIN_PROCEDURE);
-         prooflabel2tag.put("nrJoinPartners", ProofElementID.NUMBER_JOIN_PARTNERS);
-         prooflabel2tag.put("distFormula", ProofElementID.JOIN_DIST_FORMULA);
-         prooflabel2tag.put("joinNode", ProofElementID.JOIN_NODE);
-         prooflabel2tag.put("joinId", ProofElementID.JOIN_ID);
+         prooflabel2tag.put("mergeProc", ProofElementID.MERGE_PROCEDURE);
+         prooflabel2tag.put("abstractionPredicates", ProofElementID.MERGE_ABSTRACTION_PREDICATES);
+         prooflabel2tag.put("latticeType", ProofElementID.MERGE_PREDICATE_ABSTRACTION_LATTICE_TYPE);
+         prooflabel2tag.put("nrMergePartners", ProofElementID.NUMBER_MERGE_PARTNERS);
+         prooflabel2tag.put("distFormula", ProofElementID.MERGE_DIST_FORMULA);
+         prooflabel2tag.put("mergeNode", ProofElementID.MERGE_NODE);
+         prooflabel2tag.put("mergeId", ProofElementID.MERGE_ID);
+         prooflabel2tag.put("userChoices", ProofElementID.MERGE_USER_CHOICES);
          prooflabel2tag.put("opengoal", ProofElementID.OPEN_GOAL);
    }
 

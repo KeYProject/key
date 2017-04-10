@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
@@ -17,6 +15,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
@@ -51,13 +50,13 @@ public class InstantiateCommand extends AbstractCommand {
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
             Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
 
-        Parameters params = parseParameters(proof, args, state);
+        Goal goal = getFirstOpenGoal(proof, state);
+
+        Parameters params = parseParameters(proof, goal, args, state);
 
         if((params.var == null) == (params.formula == null)) {
             throw new ScriptException("One of 'var' or 'formula' must be specified");
         }
-
-        Goal goal = getFirstOpenGoal(proof, state);
 
         if(params.var != null) {
             computeFormula(params, goal);
@@ -67,7 +66,7 @@ public class InstantiateCommand extends AbstractCommand {
 
         TacletApp theApp = findTacletApp(proof, params, state);
         if(theApp == null) {
-            throw new ScriptException("No taclet applicatin found");
+            throw new ScriptException("No taclet application found");
         }
 
         SchemaVariable sv = theApp.uninstantiatedVars().iterator().next();
@@ -139,11 +138,11 @@ public class InstantiateCommand extends AbstractCommand {
 
         return allApps;
     }
+
     /*
      * Filter those apps from a list that are according to the parameters.
      */
     private TacletApp filterList(Parameters p, ImmutableList<TacletApp> list) {
-        List<TacletApp> matchingApps = new ArrayList<TacletApp>();
         for (TacletApp tacletApp : list) {
             if(tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;
@@ -178,8 +177,9 @@ public class InstantiateCommand extends AbstractCommand {
         int occ = params.occ;
         for(SequentFormula form : seq.antecedent().asList()) {
             Term term = form.formula();
-            if(term.op() == Quantifier.ALL) {
-                String varName = term.boundVars().get(0).name().toString();
+            Term stripped = stripUpdates(term);
+            if(stripped.op() == Quantifier.ALL) {
+                String varName = stripped.boundVars().get(0).name().toString();
                 if(params.var.equals(varName)) {
                     occ --;
                     if(occ == 0) {
@@ -192,8 +192,9 @@ public class InstantiateCommand extends AbstractCommand {
 
         for(SequentFormula form : seq.succedent().asList()) {
             Term term = form.formula();
-            if(term.op() == Quantifier.EX) {
-                String varName = term.boundVars().get(0).name().toString();
+            Term stripped = stripUpdates(term);
+            if(stripped.op() == Quantifier.EX) {
+                String varName = stripped.boundVars().get(0).name().toString();
                 if(params.var.equals(varName)) {
                     occ --;
                     if(occ == 0) {
@@ -208,7 +209,14 @@ public class InstantiateCommand extends AbstractCommand {
                 "' has no occurrence no. '" + params.occ + "'.");
     }
 
-    private Parameters parseParameters(Proof proof, Map<String, String> args, Map<String, Object> state)
+    private Term stripUpdates(Term term) {
+        while(term.op() == UpdateApplication.UPDATE_APPLICATION) {
+            term = term.sub(1);
+        }
+        return term;
+    }
+
+    private Parameters parseParameters(Proof proof, Goal goal, Map<String, String> args, Map<String, Object> state)
             throws ScriptException {
         Parameters params = new Parameters();
 

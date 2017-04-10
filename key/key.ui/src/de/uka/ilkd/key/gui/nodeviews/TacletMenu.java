@@ -41,7 +41,7 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
-import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
+import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
@@ -71,7 +71,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.rule.join.JoinRule;
+import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -218,7 +218,7 @@ public class TacletMenu extends JMenu {
 
 	createBuiltInRuleMenu(builtInList, control);
     createDelayedCutJoinMenu(control);
-    createDefocusingJoinMenu();
+    createMergeRuleMenu();
 
 	if(pos!= null && pos.isSequent()){
 	    createSMTMenu(control);
@@ -297,18 +297,15 @@ public class TacletMenu extends JMenu {
     }
     
     /**
-     * Creates the menu item for the "defocusing" join rule which links partner
-     * nodes to join nodes.
+     * Creates the menu item for the "defocusing" merge rule which links partner
+     * nodes to merge nodes.
      */
-    private void createDefocusingJoinMenu() {
-        if (Main.isExperimentalMode()) {
-            if (JoinRule.isOfAdmissibleForm(mediator.getSelectedGoal(),
-                    pos.getPosInOccurrence(), false)) {
-                JMenuItem item = new JoinRuleMenuItem(
-                        mediator.getSelectedGoal(), pos.getPosInOccurrence(),
-                        mediator);
-                add(item);
-            }
+    private void createMergeRuleMenu() {
+        if (MergeRule.isOfAdmissibleForm(mediator.getSelectedGoal(),
+                pos.getPosInOccurrence(), true)) {
+            JMenuItem item = new MergeRuleMenuItem(mediator.getSelectedGoal(),
+                    pos.getPosInOccurrence(), mediator);
+            add(item);
         }
     }
     
@@ -351,14 +348,8 @@ public class TacletMenu extends JMenu {
             item.addActionListener(control);
             add(item);
         }
-        else if (builtInRule == JoinRule.INSTANCE) {
-            // (DS) At the moment, we want to use the join rule as an
-            // experimental feature only. However, it may not be removed
-            // from JavaProfile. Therefore, it is just not added as a menu item
-            // at this place.
-            // TODO (DS): Remove this if-branch and the registration of \\
-            // JoinRule as an experimental feature if it survived some \\
-            // serious case studies.
+        else if (builtInRule == MergeRule.INSTANCE) {
+            // (DS) MergeRule has a special menu item, and thus is not added here.
         }
         else {
             item = new DefaultBuiltInRuleMenuItem(builtInRule);

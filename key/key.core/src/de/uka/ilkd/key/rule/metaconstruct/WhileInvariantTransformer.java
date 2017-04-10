@@ -488,9 +488,12 @@ public final class WhileInvariantTransformer {
             if (contFlagTerm != null)
                 premiss = TB.imp(contFlagTerm, premiss);            
             
-            ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, Junctor.IMP, new ImmutableArray<Term>(premiss, inv), applicationSequent);
-            return TB.imp(premiss, inv, labels);
-        }       
+            ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(
+                    termLabelState, services, applicationPos, rule, ruleApp,
+                    goal, Junctor.IMP, new ImmutableArray<Term>(premiss, inv),
+                    applicationSequent);
+            return TB.imp(premiss, contFlagTerm == null ? inv : TB.imp(contFlagTerm, inv), labels);
+        }
     }
     
     /**

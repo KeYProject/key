@@ -127,9 +127,9 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.join.CloseAfterJoin;
-import de.uka.ilkd.key.rule.join.CloseAfterJoinRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
+import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -4185,22 +4185,22 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the {@link JoinRuleBuiltInRuleApp} is applied.
+    * Checks if the {@link MergeRuleBuiltInRuleApp} is applied.
     * @param ruleApp The {@link RuleApp} to check.
-    * @return {@code true} is {@link JoinRuleBuiltInRuleApp}, {@code false} otherwise.
+    * @return {@code true} is {@link MergeRuleBuiltInRuleApp}, {@code false} otherwise.
     */
    public static boolean isJoin(RuleApp ruleApp) {
-      return ruleApp instanceof JoinRuleBuiltInRuleApp &&
-             !((JoinRuleBuiltInRuleApp) ruleApp).getJoinPartners().isEmpty();
+      return ruleApp instanceof MergeRuleBuiltInRuleApp &&
+             !((MergeRuleBuiltInRuleApp) ruleApp).getMergePartners().isEmpty();
    }
 
    /**
-    * Checks if the {@link CloseAfterJoinRuleBuiltInRuleApp} is applied.
+    * Checks if the {@link CloseAfterMergeRuleBuiltInRuleApp} is applied.
     * @param ruleApp The {@link RuleApp} to check.
-    * @return {@code true} is {@link CloseAfterJoinRuleBuiltInRuleApp}, {@code false} otherwise.
+    * @return {@code true} is {@link CloseAfterMergeRuleBuiltInRuleApp}, {@code false} otherwise.
     */
    public static boolean isCloseAfterJoin(RuleApp ruleApp) {
-      return ruleApp instanceof CloseAfterJoinRuleBuiltInRuleApp;
+      return ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp;
    }
 
    /**
@@ -4210,8 +4210,8 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isWeakeningGoalEnabled(Proof proof) {
       if (proof != null && !proof.isDisposed()) {
-         String value = proof.getSettings().getChoiceSettings().getDefaultChoices().get(CloseAfterJoin.JOIN_GENERATE_IS_WEAKENING_GOAL_CFG);
-         return CloseAfterJoin.JOIN_GENERATE_IS_WEAKENING_GOAL_CFG_ON.equals(value);
+         String value = proof.getSettings().getChoiceSettings().getDefaultChoices().get(CloseAfterMerge.MERGE_GENERATE_IS_WEAKENING_GOAL_CFG);
+         return CloseAfterMerge.MERGE_GENERATE_IS_WEAKENING_GOAL_CFG_ON.equals(value);
       }
       else {
          return false;

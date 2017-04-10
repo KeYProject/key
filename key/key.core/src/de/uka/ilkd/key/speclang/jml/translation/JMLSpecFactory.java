@@ -51,7 +51,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.rule.join.JoinProcedure;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassAxiomImpl;
@@ -64,8 +64,8 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.InitiallyClauseImpl;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
+import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.speclang.LoopSpecImpl;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.speclang.SimpleBlockContract;
@@ -212,7 +212,7 @@ public class JMLSpecFactory {
         public Term returns;
         public Map<LocationVariable,Boolean> hasMod  = new LinkedHashMap<LocationVariable,Boolean>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
-        public JoinProcedure joinProcedure;
+        public MergeProcedure joinProcedure;
     }
 
     //-------------------------------------------------------------------------
@@ -472,7 +472,7 @@ public class JMLSpecFactory {
                 translateInfFlowSpecClauses(pm, progVars.selfVar,
                                             progVars.paramVars, progVars.resultVar, progVars.excVar,
                                             textualSpecCase.getInfFlowSpecs());
-        clauses.joinProcedure = translateJoinProcedure(textualSpecCase.getJoinProcs());
+        clauses.joinProcedure = translateMergeProcedure(textualSpecCase.getJoinProcs());
         return clauses;
     }
 
@@ -530,17 +530,17 @@ public class JMLSpecFactory {
         }
     }
     
-    private JoinProcedure translateJoinProcedure(ImmutableList<PositionedString> originalClauses) throws SLTranslationException {
+    private MergeProcedure translateMergeProcedure(ImmutableList<PositionedString> originalClauses) throws SLTranslationException {
         if (originalClauses == null || originalClauses.size() == 0) {
             return null;
         }
         
-        // Extract the name of the join procedure: Remove beginning <code>"join_proc<code> and trailing <code>;"</code>.
-        String joinProcName = originalClauses.head().text.substring(11, originalClauses.head().text.length() - 2);
-        JoinProcedure chosenProc = JoinProcedure.getProcedureByName(joinProcName);
+        // Extract the name of the merge procedure: Remove beginning <code>"merge_proc<code> and trailing <code>;"</code>.
+        String mergeProcName = originalClauses.head().text.substring(12, originalClauses.head().text.length() - 2);
+        MergeProcedure chosenProc = MergeProcedure.getProcedureByName(mergeProcName);
         
         if (chosenProc == null) {
-            throw new SLTranslationException("Unknown join procedure: \"" + joinProcName + "\"",
+            throw new SLTranslationException("Unknown merge procedure: \"" + mergeProcName + "\"",
                     originalClauses.head().fileName,
                     originalClauses.head().pos);
         }
@@ -1321,7 +1321,7 @@ public class JMLSpecFactory {
                                         final StatementBlock block,
                                         final TextualJMLSpecCase specificationCase)
             throws SLTranslationException {
-        //TODO Take join_proc into account
+        //TODO Take merge_proc into account
         final Behavior behavior = specificationCase.getBehavior();
         final BlockContract.Variables variables =
                 BlockContract.Variables.create(block, labels, method, services);
@@ -1429,10 +1429,12 @@ public class JMLSpecFactory {
         return null;
     }
 
-    private LoopInvariant createJMLLoopInvariant(IProgramMethod pm,
+    private LoopSpecification createJMLLoopInvariant(IProgramMethod pm,
                                                  LoopStatement loop,
                                                  Map<String,ImmutableList<PositionedString>>
                                                         originalInvariants,
+                                                 Map<String,ImmutableList<PositionedString>>
+    													originalFreeInvariants,
                                                  Map<String,ImmutableList<PositionedString>>
                                                         originalAssignables,
                                                  ImmutableList<PositionedString>
@@ -1502,6 +1504,28 @@ public class JMLSpecFactory {
           }
           invariants.put(heap, invariant);
         }
+        
+        Map<LocationVariable,Term> freeInvariants = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable heap : allHeaps) {
+          Term freeInvariant;
+          ImmutableList<PositionedString> originalFreeInvariant =
+                  originalFreeInvariants.get(heap.name().toString());
+          if (originalFreeInvariant.isEmpty()) {
+            freeInvariant = null;
+          } else {
+        	freeInvariant = TB.tt();
+            for (PositionedString expr : originalFreeInvariant) {
+                Term translated =
+                        JMLTranslator.translate(expr, pm.getContainerType(),
+                                                selfVar, allVars, null,
+                                                null, atPres,
+                                                Term.class, services);
+                freeInvariant = TB.andSC(freeInvariant, TB.convertToFormula(translated));
+            }
+          }
+          freeInvariants.put(heap, freeInvariant);
+        }
+        
         //translateToTerm assignable
         Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
         for(String h : originalAssignables.keySet()) {
@@ -1562,10 +1586,11 @@ public class JMLSpecFactory {
         //create loop invariant annotation
         Term selfTerm = selfVar == null ? null : TB.var(selfVar);
 
-        return new LoopInvariantImpl(loop,
+        return new LoopSpecImpl(loop,
                                      pm,
                                      pm.getContainerType(),
                                      invariants,
+                                     freeInvariants,
                                      mods,
                                      infFlowSpecs,
                                      variant,
@@ -1589,13 +1614,14 @@ public class JMLSpecFactory {
         return result.prepend(localVars);
     }
 
-    public LoopInvariant createJMLLoopInvariant(IProgramMethod pm,
+    public LoopSpecification createJMLLoopInvariant(IProgramMethod pm,
                                                 LoopStatement loop,
                                                 TextualJMLLoopSpec textualLoopSpec)
             throws SLTranslationException {
         return createJMLLoopInvariant(pm,
                                       loop,
                                       textualLoopSpec.getInvariants(),
+                                      textualLoopSpec.getFreeInvariants(),
                                       textualLoopSpec.getAssignables(),
                                       textualLoopSpec.getInfFlowSpecs(),
                                       textualLoopSpec.getVariant());

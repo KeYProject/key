@@ -115,8 +115,7 @@ public final class BigintLiteral extends Literal {
      */
     @Override
     public void visit(Visitor v) {
-        assert false : "unexpected visitor "+v+" of "+v.getClass();
-//        v.performActionOnBigintLiteral(this);
+        v.performActionOnBigintLiteral(this);
     }
 
     @Override

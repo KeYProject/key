@@ -392,7 +392,7 @@ top returns [Object ret = null] throws  SLTranslationException
     |   representsclause { ret = $representsclause.result; }
     |   axiomsclause { ret = $axiomsclause.ret; }
     |   requiresclause { ret = $requiresclause.ret; }
-    |   joinprocclause { ret = $joinprocclause.ret; }
+    |   mergeprocclause { ret = $mergeprocclause.ret; }
     |   requiresfreeclause { ret = $requiresfreeclause.ret; }
     |   decreasesclause { ret = $decreasesclause.ret; }
     |   separatesclause { ret = $separatesclause.result; } // old information flow syntax
@@ -455,9 +455,9 @@ requiresfreeclause returns [Term ret = null] throws SLTranslationException
             { ret = translator.translate(req.getText(), Term.class, result, services); }
     ;
 
-joinprocclause returns [Term ret = null] throws SLTranslationException
+mergeprocclause returns [Term ret = null] throws SLTranslationException
 :
-    jpr=JOIN_PROC result=predornot
+    jpr=MERGE_PROC result=predornot
             { ret = translator.translate(jpr.getText(), Term.class, result, services); }
     ;
 

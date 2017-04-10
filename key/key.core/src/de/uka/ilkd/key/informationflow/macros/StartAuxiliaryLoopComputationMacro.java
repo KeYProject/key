@@ -20,7 +20,7 @@ import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro implements StartSideProofMacro {
 
@@ -64,7 +64,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro imple
         }
         final LoopInvariantBuiltInRuleApp loopInvRuleApp =
                 (LoopInvariantBuiltInRuleApp) app;
-        final LoopInvariant loopInv = loopInvRuleApp.getInvariant();
+        final LoopSpecification loopInv = loopInvRuleApp.getSpec();
         final IFProofObligationVars ifVars =
                 loopInvRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {
@@ -95,7 +95,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro imple
 
         final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
 
-        final LoopInvariant loopInv = loopInvRuleApp.getInvariant();
+        final LoopSpecification loopInv = loopInvRuleApp.getSpec();
         final IFProofObligationVars ifVars =
                 loopInvRuleApp.getInformationFlowProofObligationVars();
         final ExecutionContext executionContext =

@@ -35,6 +35,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.merge.MergeRule;
 
 public class Node  {
     private static final String RULE_WITHOUT_NAME = "rule without name";
@@ -596,9 +597,9 @@ public class Node  {
      * Opens a previously closed node and all its closed
      * parents.<p>
      * 
-     * This is, for instance, needed for the join rule: In
-     * a situation where a join node and its associated partners
-     * have been closed and the join node is then pruned away,
+     * This is, for instance, needed for the {@link MergeRule}: In
+     * a situation where a merge node and its associated partners
+     * have been closed and the merge node is then pruned away,
      * the partners have to be reopened again. Otherwise, we
      * have a soundness issue.
      */

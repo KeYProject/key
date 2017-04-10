@@ -32,4 +32,9 @@ public class True extends BooleanDomainElem {
       return tb.equals(varOrConst, tb.tt());
    }
 
+   @Override
+   public String toParseableString(Services services) {
+       return toString();
+   }
+
 }

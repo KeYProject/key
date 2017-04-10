@@ -32,7 +32,7 @@
 		<javac srcdir= "${src.dir}" 
 		       destdir="${build.dir}" 
 		       includeantruntime="false" 
-		       source="1.7" 
+		       source="1.8" 
 		       deprecation="off" 
 		       debug="on" 
 		       depend="${build.depend}" 

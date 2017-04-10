@@ -26,7 +26,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * Performs a simple pattern-based syntax highlighting for KeY sequents by
@@ -199,7 +199,7 @@ public class HTMLSyntaxHighlighter {
                 programVariables = displayedNode.getLocalProgVars();
             } else if (initConfig != null
                     && displayedNode.sequent().size() < NUM_FORMULAE_IN_SEQ_THRESHOLD) {
-                programVariables = JoinRuleUtils
+                programVariables = MergeRuleUtils
                         .getLocationVariablesHashSet(displayedNode.sequent(),
                                                      initConfig.getServices());
             } else {

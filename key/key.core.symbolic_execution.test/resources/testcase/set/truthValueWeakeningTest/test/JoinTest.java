@@ -4,7 +4,7 @@ public class JoinTest {
      @ assignable \strictly_nothing;
      @*/
    public static int zero(int value) {
-      //@ join_proc "JoinByIfThenElse";
+      //@ merge_proc "MergeByIfThenElse";
       {
          if (value < 0) {
             value = value * -1;

@@ -32,4 +32,9 @@ public class Top extends SignAnalysisDomainElem {
       return tb.inInt(varOrConst);
    }
 
+   @Override
+   public String toParseableString(Services services) {
+       return toString();
+   }
+
 }

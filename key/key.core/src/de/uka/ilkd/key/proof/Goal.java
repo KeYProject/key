@@ -43,6 +43,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
+import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -90,7 +92,7 @@ public final class Goal  {
     /** a goal has been excluded from automatic rule application iff automatic == false */
     private boolean automatic = true;
     
-    /** Marks this goal as linked (-> join rules) */
+    /** Marks this goal as linked (-> {@link MergeRule}) */
     private Goal linkedGoal   = null;
 
     /**
@@ -334,7 +336,7 @@ public final class Goal  {
 
     /**
      * Checks if is this node is linked to another
-     * node (for example due to a join operation).
+     * node (for example due to a {@link MergeRule}).
      *
      * @return true iff this goal is linked to another node.
      */

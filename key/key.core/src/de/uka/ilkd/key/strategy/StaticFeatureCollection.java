@@ -10,7 +10,8 @@ import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.rule.join.JoinRule;
+import de.uka.ilkd.key.rule.merge.MergeRule;
+
 import static de.uka.ilkd.key.strategy.AbstractFeatureStrategy.let;
 import de.uka.ilkd.key.strategy.feature.ApplyTFFeature;
 import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
@@ -82,9 +83,9 @@ public class StaticFeatureCollection {
         return ConditionalFeature.createConditional(filter, cost);
     }
 
-    protected static Feature setupJoinRule() {
+    protected static Feature setupMergeRule() {
         SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(JoinRule.INSTANCE);
+        filter.addRuleToSet(MergeRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, inftyConst());
     }
 

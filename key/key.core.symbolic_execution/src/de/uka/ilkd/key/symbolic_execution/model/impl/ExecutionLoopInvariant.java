@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -75,8 +75,8 @@ public class ExecutionLoopInvariant extends AbstractExecutionNode<SourceElement>
     * {@inheritDoc}
     */
    @Override
-   public LoopInvariant getLoopInvariant() {
-      return ((LoopInvariantBuiltInRuleApp)getProofNode().getAppliedRuleApp()).getInvariant();
+   public LoopSpecification getLoopInvariant() {
+      return ((LoopInvariantBuiltInRuleApp)getProofNode().getAppliedRuleApp()).getSpec();
    }
 
    /**

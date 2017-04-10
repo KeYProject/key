@@ -227,7 +227,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                     = new JavaASTCollector(pm.getBody(), LoopStatement.class);
                 collector.start();
                 for(ProgramElement loop : collector.getNodes()) {
-                    LoopInvariant inv =
+                    LoopSpecification inv =
                             specExtractor.extractLoopInvariant(pm,
                         			               (LoopStatement) loop);
                     if(inv != null) {

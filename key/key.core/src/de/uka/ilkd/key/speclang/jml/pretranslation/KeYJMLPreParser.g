@@ -733,7 +733,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
 	|   ps=ensures_free_clause   { sc.addEnsuresFree(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
-   |   ps=joinproc_clause        { sc.addJoinProcs(ps); }
+   |   ps=mergeproc_clause        { sc.addJoinProcs(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
 	|   ps=measured_by_clause    { sc.addMeasuredBy(ps); }
@@ -1388,11 +1388,13 @@ loop_specification[ImmutableList<String> mods]
    result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ls);
 }
 :
-    ps=loop_invariant       { ls.addInvariant(ps); }
+    (ps=loop_invariant       { ls.addInvariant(ps); }
+    | 	ps=loop_invariant_free       { ls.addFreeInvariant(ps); })
     (
 	options { greedy = true; }
 	:
             ps=loop_invariant       { ls.addInvariant(ps); }
+        |   ps=loop_invariant_free       { ls.addFreeInvariant(ps); }
         |   ps=loop_separates_clause      { ls.addInfFlowSpecs(ps); }
         |   ps=loop_determines_clause      { ls.addInfFlowSpecs(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
@@ -1406,6 +1408,12 @@ loop_invariant returns [PositionedString r = null]
 @after { r = result; }
 :
     maintaining_keyword result=expression { result = flipHeaps("", result); }
+;
+loop_invariant_free returns [PositionedString r = null]
+@init { result = r; }
+@after { r = result; }
+:
+    LOOP_INVARIANT_FREE result=expression { result = flipHeaps("", result); }
 ;
 
 maintaining_keyword
@@ -1601,19 +1609,19 @@ returns_keyword
 	RETURNS
 ;
 
-joinproc_clause
+mergeproc_clause
    returns [PositionedString r = null]
    throws SLTranslationException
 @init { result = r; }
 @after { r = result; }
 :
-   joinproc_keyword result=expression { result = result.prepend("join_proc "); }
+   mergeproc_keyword result=expression { result = result.prepend("merge_proc "); }
 ;
 
 
-joinproc_keyword
+mergeproc_keyword
 :
-   JOIN_PROC
+   MERGE_PROC
 ;
 
 
