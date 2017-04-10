@@ -45,6 +45,7 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.pp.SearchSequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Node;
@@ -337,7 +338,7 @@ public class InnerNodeView extends SequentView {
         getLogicPrinter().update(filter, getLineWidth());
         setText(getSyntaxHighlighter().process(getLogicPrinter().toString(), node));
         posTable = getLogicPrinter().getInitialPositionTable();
-
+        if (filter instanceof SearchSequentPrintFilter) return;
         RuleApp app = node.getAppliedRuleApp();
         
         if (app != null) {
