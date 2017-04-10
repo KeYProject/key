@@ -7,7 +7,7 @@ public class JoinTest {
         if (value < 0) {
             value = value * -1;
         }
-        // @ merge_point;
+        //@ merge_point;
         int result = value;
         return result;
     }
