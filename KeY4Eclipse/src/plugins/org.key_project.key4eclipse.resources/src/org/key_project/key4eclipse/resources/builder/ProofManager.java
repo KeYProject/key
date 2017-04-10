@@ -16,29 +16,11 @@ package org.key_project.key4eclipse.resources.builder;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.resources.*;
+import org.eclipse.core.runtime.*;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaCore;
@@ -47,16 +29,8 @@ import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
 import org.key_project.key4eclipse.resources.io.ProofMetaReferencesComparator;
 import org.key_project.key4eclipse.resources.log.LogManager;
 import org.key_project.key4eclipse.resources.marker.MarkerUtil;
-import org.key_project.key4eclipse.resources.projectinfo.AbstractContractContainer;
-import org.key_project.key4eclipse.resources.projectinfo.AbstractTypeContainer;
-import org.key_project.key4eclipse.resources.projectinfo.ContractInfo;
+import org.key_project.key4eclipse.resources.projectinfo.*;
 import org.key_project.key4eclipse.resources.projectinfo.ContractInfo.ContractModality;
-import org.key_project.key4eclipse.resources.projectinfo.MethodInfo;
-import org.key_project.key4eclipse.resources.projectinfo.ObserverFunctionInfo;
-import org.key_project.key4eclipse.resources.projectinfo.PackageInfo;
-import org.key_project.key4eclipse.resources.projectinfo.ProjectInfo;
-import org.key_project.key4eclipse.resources.projectinfo.ProjectInfoManager;
-import org.key_project.key4eclipse.resources.projectinfo.TypeInfo;
 import org.key_project.key4eclipse.resources.property.KeYProjectBuildProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
@@ -94,7 +68,7 @@ import de.uka.ilkd.key.util.Pair;
 /**
  * The ProofManager is responsible for the maintasks during the build. It runs and saves the 
  * proofs, creates marker, initializes threads and manages the folderstructure.
- * @author Stefan K�sdorf
+ * @author Stefan Käsdorf
  */
 public class ProofManager {
 
@@ -234,7 +208,7 @@ public class ProofManager {
             JavaSourceElement javaElement = (JavaSourceElement) javaType;
             javaFile = searchFile(javaElement.getPositionInfo());
             typeScl = KeYUtil.convertToSourceLocation(javaElement.getPositionInfo());
-            typeScl = KeYUtil.updateToTypeNameLocation(javaFile, typeScl, JavaCore.create(project));
+            typeScl = KeYUtil.updateToTypeNameLocation(javaFile, typeScl);
          }
          // Find parent
          AbstractTypeContainer parentTypeContainer = null;
@@ -411,8 +385,7 @@ public class ProofManager {
       if (positionInfo != null && !PositionInfo.UNDEFINED.equals(positionInfo)) {
          String fileName = MiscTools.getSourcePath(positionInfo);
          IPath location = new Path(fileName);
-         return ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(location);
-         
+         return ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(location);         
       }
       return null;
    }
