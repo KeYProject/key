@@ -30,18 +30,7 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
     protected void filterSequent () {
 		if ( antec != null )
 		    return;
-	
-		Iterator<SequentFormula> it;
-	
-		antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
-		it    = originalSequent.antecedent ().iterator ();
-		while ( it.hasNext () )
-		    antec = antec.append ( filterFormula ( it.next () ) );
-		
-		succ  = ImmutableSLList.<SequentPrintFilterEntry>nil();
-		it    = originalSequent.succedent ().iterator ();
-		while ( it.hasNext () )
-		    succ  = succ .append ( filterFormula ( it.next () ) );
+		filterIdentity();
     }
 
     protected SequentPrintFilterEntry filterFormula ( SequentFormula p_cfma ) {
