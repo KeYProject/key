@@ -68,7 +68,7 @@ import de.uka.ilkd.key.util.Pair;
 /**
  * The ProofManager is responsible for the maintasks during the build. It runs and saves the 
  * proofs, creates marker, initializes threads and manages the folderstructure.
- * @author Stefan Käsdorf
+ * @author Stefan Kaesdorf
  */
 public class ProofManager {
 
@@ -208,7 +208,7 @@ public class ProofManager {
             JavaSourceElement javaElement = (JavaSourceElement) javaType;
             javaFile = searchFile(javaElement.getPositionInfo());
             typeScl = KeYUtil.convertToSourceLocation(javaElement.getPositionInfo());
-            typeScl = KeYUtil.updateToTypeNameLocation(javaFile, typeScl);
+            typeScl = KeYUtil.updateToTypeNameLocation(javaFile, typeScl, JavaCore.create(project));
          }
          // Find parent
          AbstractTypeContainer parentTypeContainer = null;
@@ -385,7 +385,7 @@ public class ProofManager {
       if (positionInfo != null && !PositionInfo.UNDEFINED.equals(positionInfo)) {
          String fileName = MiscTools.getSourcePath(positionInfo);
          IPath location = new Path(fileName);
-         return ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(location);         
+         return ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(location);
       }
       return null;
    }
