@@ -71,6 +71,7 @@ public class SequentViewSearchBar extends SearchBar {
     
     public void setSequentView(SequentView sequentView){
         this.sequentView = sequentView;
+        searchModeBox.setSelectedIndex(0);
         search();
     }
 
@@ -111,7 +112,6 @@ public class SequentViewSearchBar extends SearchBar {
 					default: sequentView.setFilter(new IdentitySequentPrintFilter());
 						break;
 					}
-						
 				}
 			}
         });
@@ -167,8 +167,8 @@ public class SequentViewSearchBar extends SearchBar {
         
         if (sequentView.filter instanceof SearchSequentPrintFilter) {
 			SearchSequentPrintFilter searchSequentPrintFilter = (SearchSequentPrintFilter) sequentView.filter;
-			searchSequentPrintFilter.setSearchString(searchField.getText());
 			searchSequentPrintFilter.setLogicPrinter(sequentView.getLogicPrinter());
+			searchSequentPrintFilter.setSearchString(searchField.getText());
         }
         
         sequentView.printSequent();
