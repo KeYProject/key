@@ -32,20 +32,20 @@ mod: false" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" i
                <loopInvariant name="invariant: x &lt;= 0;
 variant: javaSubInt(originalX, x)
 mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initiallyValid="true">
-                  <branchCondition name="lt(x_4,Z(0(#)))" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_4,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="lt(x_4,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
-                     <loopCondition name="x&lt;0" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_4,Z(neglit(1(#)))))" pathConditionChanged="false" blockOpened="false">
-                        <statement name="x++;" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_4,Z(neglit(1(#)))))" pathConditionChanged="false">
-                           <termination name="&lt;loop body end&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_4,Z(neglit(1(#)))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                  <branchCondition name="lt(x_0,Z(0(#)))" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_0,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="lt(x_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                     <loopCondition name="x&lt;0" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_0,Z(neglit(1(#)))))" pathConditionChanged="false" blockOpened="false">
+                        <statement name="x++;" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_0,Z(neglit(1(#)))))" pathConditionChanged="false">
+                           <termination name="&lt;loop body end&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_0,Z(neglit(1(#)))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                            </termination>
                         </statement>
                      </loopCondition>
                   </branchCondition>
-                  <branchCondition name="equals(x_4,Z(0(#)))" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_4,Z(0(#))))" pathConditionChanged="true" branchCondition="equals(x_4,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
-                     <statement name="return x;" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_4,Z(0(#))))" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of main&gt;" signature="&lt;return of TwoLoops.main(x)&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_4,Z(0(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(0(#)) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(0(#)) as result of TwoLoops.main(x)&gt;" isReturnValueComputed="true" methodReturnCondition="and(leq(x,Z(neglit(1(#)))),equals(x_4,Z(0(#))))">
+                  <branchCondition name="equals(x_0,Z(0(#)))" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_0,Z(0(#))))" pathConditionChanged="true" branchCondition="equals(x_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                     <statement name="return x;" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_0,Z(0(#))))" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of main&gt;" signature="&lt;return of TwoLoops.main(x)&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_0,Z(0(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(0(#)) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(0(#)) as result of TwoLoops.main(x)&gt;" isReturnValueComputed="true" methodReturnCondition="and(leq(x,Z(neglit(1(#)))),equals(x_0,Z(0(#))))">
                            <methodReturnValue name="Z(0(#))" returnValueString="Z(0(#))" hasCondition="false">
                            </methodReturnValue>
-                           <termination name="&lt;end&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_4,Z(0(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           <termination name="&lt;end&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_0,Z(0(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>

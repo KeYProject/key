@@ -15,6 +15,8 @@ package de.uka.ilkd.key.logic.label;
 
 import java.util.List;
 
+import de.uka.ilkd.key.logic.TermServices;
+
 /**
  * A factory for creating TermLabel objects.
  *
@@ -58,5 +60,5 @@ public interface TermLabelFactory<T extends TermLabel> {
      * @throws TermLabelException
      *             if the parameters were illegally formatted
      */
-    public T parseInstance(List<String> arguments) throws TermLabelException;
+    public T parseInstance(List<String> arguments, TermServices services) throws TermLabelException;
 }

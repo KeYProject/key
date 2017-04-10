@@ -15,6 +15,8 @@ package de.uka.ilkd.key.logic.label;
 
 import java.util.List;
 
+import de.uka.ilkd.key.logic.TermServices;
+
 /**
  * A factory for creating singleton {@link TermLabel}.
  *
@@ -49,7 +51,7 @@ public final class SingletonLabelFactory<T extends TermLabel> implements TermLab
      * <p>This implementation does not accept arguments and returns the stored label
      */
     @Override
-    public T parseInstance(List<String> arguments) throws TermLabelException {
+    public T parseInstance(List<String> arguments, TermServices services) throws TermLabelException {
         if (arguments.isEmpty()) {
             return singletonLabel;
         } else {

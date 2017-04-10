@@ -1,6 +1,7 @@
 package org.key_project.key4eclipse.common.ui.wizard.page;
 
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,17 +18,9 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.*;
 import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.key_project.key4eclipse.common.ui.wizard.CompleteAndApplyTacletMatchWizard;
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.InstantiationFileHandler;
 import de.uka.ilkd.key.control.instantiation_model.TacletAssumesModel;
@@ -35,6 +28,7 @@ import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
@@ -198,7 +192,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       Text status = new Text(statusGrp, SWT.WRAP | SWT.V_SCROLL);
       status.setLayoutData(new GridData(GridData.FILL_BOTH));
       status.setEditable(false);
-      ImmutableList<Named> vars = models[0].programVariables().elements();
+      Collection<IProgramVariable> vars = models[0].programVariables().elements();
       String text;
       if (vars.size() > 0) {
          text = vars.toString();
