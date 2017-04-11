@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -48,24 +46,8 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
 			return;
 		}
 		
-		int searchFlag = 0;
-	    if (searchString.toLowerCase().equals(searchString)) {
-	        searchFlag = searchFlag | Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
-	    }
-	    
-	    if (!regex) {
-	        // search for literal string instead of regExp
-	        searchFlag = searchFlag | Pattern.LITERAL;
-	    }
-
-	    Pattern p;
-	    try {
-	        p = Pattern.compile(searchString.replace("\u00A0", "\u0020"), searchFlag);
-	    } catch (PatternSyntaxException pse) {
-	        return;
-	    } catch (IllegalArgumentException iae) {
-	        return;
-	    }
+		Pattern p = createPattern();
+		if (p == null) return;
 	    
 		antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
 		it = originalSequent.antecedent().iterator();
@@ -75,7 +57,6 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
 				lp.reset();
 				lp.printConstrainedFormula(sf);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			String formString = lp.toString();
@@ -95,7 +76,6 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
 				lp.reset();
 				lp.printConstrainedFormula(sf);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			String formString = lp.toString();
