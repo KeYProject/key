@@ -39,26 +39,24 @@ import de.uka.ilkd.key.util.Pair;
 public class SequentViewSearchBar extends SearchBar {
 
     private static final long serialVersionUID = 9102464983776181771L;
-    public static final Color SEARCH_HIGHLIGHT_COLOR_1 =
-            new Color(255, 140, 0, 178);
-    public static final Color SEARCH_HIGHLIGHT_COLOR_2 =
-            new Color(255, 140, 0, 100);
-    
+    public static final Color SEARCH_HIGHLIGHT_COLOR_1 = new Color(255, 140, 0, 178);
+    public static final Color SEARCH_HIGHLIGHT_COLOR_2 = new Color(255, 140, 0, 100);
+
     public static enum SearchMode {
-    	HIGHLIGHT("Highlight"), HIDE("Hide"), REGROUP("Regroup");
-    	private String displayName;
-    	
-    	private SearchMode(String name) {
-    		this.displayName = name;
-    	}
-    	
-    	@Override
-    	public String toString() {
+        HIGHLIGHT("Highlight"), HIDE("Hide"), REGROUP("Regroup");
+        private String displayName;
+
+        private SearchMode(String name) {
+            this.displayName = name;
+        }
+
+        @Override
+        public String toString() {
             return this.displayName;
         }
     }
-    
-    private final List<Pair<Integer,Object>> searchResults;
+
+    private final List<Pair<Integer, Object>> searchResults;
     private int resultIteratorPos;
     private SequentView sequentView;
     JCheckBox regExpCheckBox;
@@ -66,10 +64,10 @@ public class SequentViewSearchBar extends SearchBar {
 
     public SequentViewSearchBar(SequentView sequentView) {
         this.sequentView = sequentView;
-        searchResults = new ArrayList<Pair<Integer,Object>>();
+        searchResults = new ArrayList<Pair<Integer, Object>>();
     }
-    
-    public void setSequentView(SequentView sequentView){
+
+    public void setSequentView(SequentView sequentView) {
         this.sequentView = sequentView;
         searchModeBox.setSelectedIndex(0);
         search();
@@ -80,45 +78,49 @@ public class SequentViewSearchBar extends SearchBar {
     }
 
     @Override
-    public void createUI(){
+    public void createUI() {
         super.createUI();
         regExpCheckBox = new JCheckBox("RegExp", false);
         regExpCheckBox.setName("toggleRegExpSearch");
-            regExpCheckBox.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    searchField.requestFocus();
-                    search();
-                }
-            });
-            regExpCheckBox.setToolTipText("Evaluate as regular expression");
+        regExpCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                searchField.requestFocus();
+                search();
+            }
+        });
+        regExpCheckBox.setToolTipText("Evaluate as regular expression");
         add(regExpCheckBox);
-        
+
         searchModeBox = new JComboBox<SearchMode>(SearchMode.values());
         searchModeBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					switch ((SearchMode)searchModeBox.getSelectedItem()) {
-					case HIDE : sequentView.setFilter(new HideSequentPrintFilter(sequentView.getLogicPrinter()));
-						search();
-						break;
-					case REGROUP : sequentView.setFilter(new RegroupSequentPrintFilter(sequentView.getLogicPrinter()));
-						search();
-						break;
-					case HIGHLIGHT : sequentView.setFilter(new IdentitySequentPrintFilter());
-						search();
-						break;
-					default: sequentView.setFilter(new IdentitySequentPrintFilter());
-						break;
-					}
-				}
-			}
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    switch ((SearchMode) searchModeBox.getSelectedItem()) {
+                    case HIDE:
+                        sequentView.setFilter(new HideSequentPrintFilter(sequentView.getLogicPrinter()));
+                        search();
+                        break;
+                    case REGROUP:
+                        sequentView.setFilter(new RegroupSequentPrintFilter(sequentView.getLogicPrinter()));
+                        search();
+                        break;
+                    case HIGHLIGHT:
+                        sequentView.setFilter(new IdentitySequentPrintFilter());
+                        search();
+                        break;
+                    default:
+                        sequentView.setFilter(new IdentitySequentPrintFilter());
+                        break;
+                    }
+                }
+            }
         });
-        searchModeBox.setToolTipText("<html>Determines search behaviour: <b>" + SearchMode.HIDE.displayName + 
-        		"</b> only shows sequent formulas that match the search. <b>"
-        + SearchMode.REGROUP.displayName + "</b> arranges the matching formulas around the sequence arrow. <b>"
-        + SearchMode.HIGHLIGHT.displayName + "</b> leaves the sequent unchanged.</html>");
+        searchModeBox.setToolTipText("<html>Determines search behaviour: <b>" + SearchMode.HIDE.displayName
+                + "</b> only shows sequent formulas that match the search. <b>" + SearchMode.REGROUP.displayName
+                + "</b> arranges the matching formulas around the sequence arrow. <b>"
+                + SearchMode.HIGHLIGHT.displayName + "</b> leaves the sequent unchanged.</html>");
         add(searchModeBox);
     }
 
@@ -151,39 +153,37 @@ public class SequentViewSearchBar extends SearchBar {
             } else {
                 clearSearchResults();
                 if (sequentView.filter instanceof SearchSequentPrintFilter) {
-        			((SearchSequentPrintFilter) sequentView.filter).setSearchString("");
-        			sequentView.printSequent();
+                    ((SearchSequentPrintFilter) sequentView.filter).setSearchString("");
+                    sequentView.printSequent();
                 }
             }
         }
     }
-    
+
     /**
      * searches for the occurrence of the specified string
      */
     @Override
     public boolean search(String search) {
         clearSearchResults();
-        
+
         if (sequentView.filter instanceof SearchSequentPrintFilter) {
-			SearchSequentPrintFilter searchSequentPrintFilter = (SearchSequentPrintFilter) sequentView.filter;
-			searchSequentPrintFilter.setLogicPrinter(sequentView.getLogicPrinter());
-			searchSequentPrintFilter.setSearchString(searchField.getText());
+            SearchSequentPrintFilter searchSequentPrintFilter = (SearchSequentPrintFilter) sequentView.filter;
+            searchSequentPrintFilter.setLogicPrinter(sequentView.getLogicPrinter());
+            searchSequentPrintFilter.setSearchString(searchField.getText());
         }
-        
+
         sequentView.printSequent();
-        
-        if (sequentView == null || sequentView.getText() == null || search.equals("")
-                || !this.isVisible()) {
+
+        if (sequentView == null || sequentView.getText() == null || search.equals("") || !this.isVisible()) {
             return true;
         }
-    	
+
         resultIteratorPos = 0;
         int searchFlag = 0;
         if (search.toLowerCase().equals(search)) {
             // no capital letters used --> case insensitive matching
-            searchFlag = searchFlag | Pattern.CASE_INSENSITIVE
-                    | Pattern.UNICODE_CASE;
+            searchFlag = searchFlag | Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
         }
         if (!regExpCheckBox.isSelected()) {
             // search for literal string instead of regExp
@@ -191,9 +191,9 @@ public class SequentViewSearchBar extends SearchBar {
         }
 
         // (DS) We replace non-breaking space ("&nbsp;") by ordinary space.
-        //      This became necessary due to the change to HTML Documents
-        //      in the course of the introduction of syntax highlighting.
-        
+        // This became necessary due to the change to HTML Documents
+        // in the course of the introduction of syntax highlighting.
+
         Pattern p;
         try {
             p = Pattern.compile(search.replace("\u00A0", "\u0020"), searchFlag);
@@ -202,41 +202,37 @@ public class SequentViewSearchBar extends SearchBar {
         } catch (IllegalArgumentException iae) {
             return false;
         }
-        
+
         Matcher m = p.matcher(sequentView.getText().replace("\u00A0", "\u0020"));
 
         boolean loopEnterd = false;
         while (m.find()) {
-                int foundAt = m.start();
-                Object highlight = sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2);
-                searchResults.add(new Pair<Integer,Object>(foundAt, highlight));
-                sequentView.paintHighlight(new Range(foundAt, m.end()), highlight);
-                loopEnterd = true;
+            int foundAt = m.start();
+            Object highlight = sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2);
+            searchResults.add(new Pair<Integer, Object>(foundAt, highlight));
+            sequentView.paintHighlight(new Range(foundAt, m.end()), highlight);
+            loopEnterd = true;
         }
         return loopEnterd;
     }
-    
+
     private void setExtraHighlight(int resultIndex) {
-        resetHighlight(resultIndex,
-                       sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_1));
+        resetHighlight(resultIndex, sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_1));
         sequentView.setCaretPosition(searchResults.get(resultIndex).first);
     }
 
-
     private void resetExtraHighlight() {
-        resetHighlight(resultIteratorPos,
-                       sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2));
+        resetHighlight(resultIteratorPos, sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2));
     }
-    
+
     private void resetHighlight(int resultIndex, Object highlight) {
         int pos = searchResults.get(resultIndex).first;
         sequentView.removeHighlight(searchResults.get(resultIndex).second);
-        Pair<Integer, Object> highlightPair =
-                new Pair<Integer, Object>(pos, highlight);
+        Pair<Integer, Object> highlightPair = new Pair<Integer, Object>(pos, highlight);
         sequentView.paintHighlight(new Range(pos, pos + searchField.getText().length()), highlight);
         searchResults.set(resultIndex, highlightPair);
     }
-    
+
     private void clearSearchResults() {
         for (Pair<Integer, Object> result : searchResults) {
             sequentView.removeHighlight(result.second);

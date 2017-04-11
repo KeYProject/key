@@ -17,70 +17,66 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 /**
- * @author jschiffl
- * This filter takes a search string and yields
- * a sequent containing only sequent formulas that 
- * match the search.
+ * @author jschiffl This filter takes a search string and yields a sequent
+ *         containing only sequent formulas that match the search.
  */
 public class HideSequentPrintFilter extends SearchSequentPrintFilter {
-	
-	public HideSequentPrintFilter(SequentViewLogicPrinter lp) {
-		this.lp = lp;
-	}
 
-	@Override
-	protected void filterSequent() {
-		Iterator<SequentFormula> it;
+    public HideSequentPrintFilter(SequentViewLogicPrinter lp) {
+        this.lp = lp;
+    }
 
-		if (searchString == null || searchString.length() < 3) {
-			filterIdentity();
-			return;
-		}
-		
-		Pattern p = createPattern();
-		if (p == null) return;
-	    		
-		antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
-		it = originalSequent.antecedent().iterator();
-		while (it.hasNext()) {
-			SequentFormula sf = it.next();
-			try {
-				lp.reset();
-				lp.printConstrainedFormula(sf);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			String formString = lp.toString();
-			Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
-			if (m.find()) {
-				antec = antec.append(new IdentityFilterEntry(sf));
-			}
-		}
-		
-		succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
-		it = originalSequent.succedent().iterator();
-		while (it.hasNext()) {
-			SequentFormula sf = it.next();
-			try {
-				lp.reset();
-				lp.printConstrainedFormula(sf);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			String formString = lp.toString();
-			Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
-			if (m.find()) {
-				succ = succ.append(new IdentityFilterEntry(sf));
-			}
-		}
-	}
-	
+    @Override
+    protected void filterSequent() {
+        Iterator<SequentFormula> it;
+
+        if (searchString == null || searchString.length() < 3) {
+            filterIdentity();
+            return;
+        }
+
+        Pattern p = createPattern();
+        if (p == null)
+            return;
+
+        antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
+        it = originalSequent.antecedent().iterator();
+        while (it.hasNext()) {
+            SequentFormula sf = it.next();
+            try {
+                lp.reset();
+                lp.printConstrainedFormula(sf);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String formString = lp.toString();
+            Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
+            if (m.find()) {
+                antec = antec.append(new IdentityFilterEntry(sf));
+            }
+        }
+
+        succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
+        it = originalSequent.succedent().iterator();
+        while (it.hasNext()) {
+            SequentFormula sf = it.next();
+            try {
+                lp.reset();
+                lp.printConstrainedFormula(sf);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String formString = lp.toString();
+            Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
+            if (m.find()) {
+                succ = succ.append(new IdentityFilterEntry(sf));
+            }
+        }
+    }
 }

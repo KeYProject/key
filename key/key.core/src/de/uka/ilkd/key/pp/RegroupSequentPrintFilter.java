@@ -23,69 +23,67 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 /**
- * @author jschiffl
- * This filter takes a search string and regroups
- * the sequent so that the sequent formulas matching
- * the search are grouped around the sequent arrow,
- * so that they can be viewed together.
+ * @author jschiffl This filter takes a search string and regroups the sequent
+ *         so that the sequent formulas matching the search are grouped around
+ *         the sequent arrow, so that they can be viewed together.
  */
 
 public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
-	
-	public RegroupSequentPrintFilter(SequentViewLogicPrinter lp) {
-		this.lp = lp;
-	}
 
-	@Override
-	protected void filterSequent() {
-		
-		Iterator<SequentFormula> it;
-		
-		if (searchString == null || searchString.length() < 3) {
-			filterIdentity();
-			return;
-		}
-		
-		Pattern p = createPattern();
-		if (p == null) return;
-	    
-		antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
-		it = originalSequent.antecedent().iterator();
-		while (it.hasNext()) {
-			SequentFormula sf = it.next();
-			try {
-				lp.reset();
-				lp.printConstrainedFormula(sf);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			String formString = lp.toString();
-			Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
-			if (m.find()) {
-				antec = antec.append(new IdentityFilterEntry(sf));
-			} else {
-				antec = antec.prepend(new IdentityFilterEntry(sf));
-			}
-		}
-		
-		succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
-		it = originalSequent.succedent().iterator();
-		while (it.hasNext()) {
-			SequentFormula sf = it.next();
-			try {
-				lp.reset();
-				lp.printConstrainedFormula(sf);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			String formString = lp.toString();
-			Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
-			if (m.find()) {
-				succ = succ.prepend(new IdentityFilterEntry(sf));
-			} else {
-				succ = succ.append(new IdentityFilterEntry(sf));
-			}
-		}
-	}
+    public RegroupSequentPrintFilter(SequentViewLogicPrinter lp) {
+        this.lp = lp;
+    }
 
+    @Override
+    protected void filterSequent() {
+
+        Iterator<SequentFormula> it;
+
+        if (searchString == null || searchString.length() < 3) {
+            filterIdentity();
+            return;
+        }
+
+        Pattern p = createPattern();
+        if (p == null)
+            return;
+
+        antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
+        it = originalSequent.antecedent().iterator();
+        while (it.hasNext()) {
+            SequentFormula sf = it.next();
+            try {
+                lp.reset();
+                lp.printConstrainedFormula(sf);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String formString = lp.toString();
+            Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
+            if (m.find()) {
+                antec = antec.append(new IdentityFilterEntry(sf));
+            } else {
+                antec = antec.prepend(new IdentityFilterEntry(sf));
+            }
+        }
+
+        succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
+        it = originalSequent.succedent().iterator();
+        while (it.hasNext()) {
+            SequentFormula sf = it.next();
+            try {
+                lp.reset();
+                lp.printConstrainedFormula(sf);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String formString = lp.toString();
+            Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
+            if (m.find()) {
+                succ = succ.prepend(new IdentityFilterEntry(sf));
+            } else {
+                succ = succ.append(new IdentityFilterEntry(sf));
+            }
+        }
+    }
 }

@@ -16,57 +16,55 @@ package de.uka.ilkd.key.pp;
 import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.logic.SequentFormula;
 
-
 /**
- * Identity Filter not doing anything 
+ * Identity Filter not doing anything
  */
 public class IdentitySequentPrintFilter extends SequentPrintFilter {
 
-    protected void filterSequent () {
-		if ( antec != null )
-		    return;
-		filterIdentity();
+    protected void filterSequent() {
+        if (antec != null)
+            return;
+        filterIdentity();
     }
 
-    protected SequentPrintFilterEntry filterFormula ( SequentFormula p_cfma ) {
-    	return new IdentityFilterEntry ( p_cfma );
+    protected SequentPrintFilterEntry filterFormula(SequentFormula p_cfma) {
+        return new IdentityFilterEntry(p_cfma);
     }
 
     /**
-     * Get the formulas of the filtered sequent and the constraints to
-     * use for instantiating metavariables when printing
+     * Get the formulas of the filtered sequent and the constraints to use for
+     * instantiating metavariables when printing
      */
-    public ImmutableList<SequentPrintFilterEntry> getFilteredAntec       () {
-    	filterSequent();
-    	return antec;
+    public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
+        filterSequent();
+        return antec;
     }
 
-    public ImmutableList<SequentPrintFilterEntry> getFilteredSucc        () {
-		filterSequent();
-		return succ;
+    public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
+        filterSequent();
+        return succ;
     }
-
 
     public static class IdentityFilterEntry implements SequentPrintFilterEntry {
-    	final SequentFormula originalFormula;
+        final SequentFormula originalFormula;
 
-		public IdentityFilterEntry ( SequentFormula p_originalFormula) {
-		    originalFormula   = p_originalFormula;
-		}
-		
-		/**
-		 * Formula to display
-		 */
-		public SequentFormula getFilteredFormula   () {
-		    return originalFormula;
-		}
-	
-		/**
-		 * Original formula from sequent
-		 */
-		public SequentFormula getOriginalFormula   () {
-		    return originalFormula;
-		}
+        public IdentityFilterEntry(SequentFormula p_originalFormula) {
+            originalFormula = p_originalFormula;
+        }
+
+        /**
+         * Formula to display
+         */
+        public SequentFormula getFilteredFormula() {
+            return originalFormula;
+        }
+
+        /**
+         * Original formula from sequent
+         */
+        public SequentFormula getOriginalFormula() {
+            return originalFormula;
+        }
 
     }
 }
