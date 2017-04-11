@@ -345,8 +345,9 @@ public class Proof implements Named {
     /** sets the variable, function, sort, heuristics namespaces */
     public void setNamespaces(NamespaceSet ns) {
         getServices().setNamespaces(ns);
-        if (!root.leaf())
+        if (!root.leaf()) {
             throw new IllegalStateException("Proof: ProgVars set too late");
+        }
 
         Goal fstGoal = openGoals().head();
         fstGoal.makeLocalNamespacesFrom(ns);

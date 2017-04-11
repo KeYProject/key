@@ -15,7 +15,6 @@ package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -26,7 +25,6 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -43,7 +41,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
@@ -83,7 +80,7 @@ public final class Goal  {
     /** the strategy object that determines automated application of rules */
     private Strategy goalStrategy = null;
 
-    /** */
+    /** This is the object which keeps book about all applicable rules. */
     private AutomatedRuleApplicationManager ruleAppManager;
 
     /** goal listeners  */
@@ -101,9 +98,12 @@ public final class Goal  {
      */
     private final Properties strategyInfos;
 
+    /** The namespaces local to this goal. This may evolve over time. */
     private NamespaceSet localNamespaces;
 
-    /** creates a new goal referencing the given node */
+    /*
+     * creates a new goal referencing the given node.
+     */
     private Goal(Node node,
                  RuleAppIndex ruleAppIndex,
                  ImmutableList<RuleApp> appliedRuleApps,
@@ -132,10 +132,10 @@ public final class Goal  {
       this.ruleAppIndex    = ruleAppIndex;
       this.appliedRuleApps = appliedRuleApps;
       this.goalStrategy    = null;
-      this.ruleAppIndex.setup ( this );
+        this.ruleAppIndex.setup(this);
       this.strategyInfos = strategyInfos;
-      setRuleAppManager ( ruleAppManager );
-        this.tagManager      = new FormulaTagManager ( this );
+        setRuleAppManager(ruleAppManager);
+        this.tagManager      = new FormulaTagManager(this);
         this.localNamespaces = localNamespace;
       }
     
@@ -199,6 +199,10 @@ public final class Goal  {
 	return node;
     }
 
+    /**
+     * returns the namespaces for this goal.
+     * @returns an up-to-date non-null namespaces-set.
+     */
     public NamespaceSet getLocalNamespaces() {
         return localNamespaces;
     }
@@ -738,6 +742,12 @@ public final class Goal  {
        return goal.getRuleAppManager().peekNext() != null;
     }
 
+    /**
+     * Update the local namespaces from a namespace set.
+     *
+     * The parameter is copied and stored locally.
+     * @param ns a non-null set of namesspaces which applies to this goal.
+     */
     public void makeLocalNamespacesFrom(NamespaceSet ns) {
         this.localNamespaces = ns.copyWithParent().copyWithParent();
     }

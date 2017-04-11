@@ -255,6 +255,12 @@ public class Services implements TermServices {
     	return s;
     }
     
+    /**
+     * Generate a copy of this object.
+     * All references are copied w/o duplicating their content.
+     *
+     * @return a freshly created Services object
+     */
     public Services shallowCopy() {
         return new Services(this);
     }

@@ -65,8 +65,19 @@ public class Node  {
 
     private NameRecorder         nameRecorder;
 
-    private ImmutableList<IProgramVariable> localProgVars      = ImmutableSLList.<IProgramVariable>nil();
-    private ImmutableList<Operator> localFunctions      = ImmutableSLList.<Operator>nil();
+    /**
+     * a linked list of the locally generated program variables.
+     * It extends the list of the parent node.
+     */
+    private ImmutableList<IProgramVariable> localProgVars
+        = ImmutableSLList.<IProgramVariable>nil();
+
+    /**
+     * a linked list of the locally generated function symbols.
+     * It extends the list of the parent node.
+     */
+    private ImmutableList<Operator> localFunctions
+        = ImmutableSLList.<Operator>nil();
 
     private boolean              closed              = false;
 
@@ -189,6 +200,13 @@ public class Node  {
 	return localIntroducedRules;
     }
 
+    /**
+     * Returns the set of created program variables known in this node.
+     *
+     * In the resulting list, the newest additions come first.
+     *
+     * @returns a non-null immutable list of program variables.
+     */
     public ImmutableList<IProgramVariable> getLocalProgVars() {
         return localProgVars;
     }
@@ -199,6 +217,13 @@ public class Node  {
         }
     }
 
+    /**
+     * Returns the set of freshly created function symbols known to this node.
+     *
+     * In the resulting list, the newest additions come first.
+     *
+     * @return a non-null immutable list of function symbols.
+     */
     public Iterable<Operator> getLocalFunctions() {
         return localFunctions;
     }

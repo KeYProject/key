@@ -39,11 +39,11 @@ import de.uka.ilkd.key.rule.TacletApp;
 public class InstantiateCommand extends AbstractCommand {
 
     private static class Parameters {
-        Term formula;
-        String var;
-        int occ = 1;
-        boolean hide;
-        String with;
+        private Term formula;
+        private String var;
+        private int occ = 1;
+        private boolean hide;
+        private String with;
     }
 
     @Override

@@ -341,8 +341,9 @@ public class InitConfig {
         return services.getNamespaces();
     }
 
-
-    /** returns the function namespace of this initial configuration
+    /**
+     * returns the function namespace of this initial configuration.
+     * @return a non-null namespace
      */
     public Namespace<Operator> funcNS() {
         return namespaces().functions();
