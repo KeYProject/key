@@ -55,7 +55,7 @@ public class Gcd {
 
         //@ merge_point
         //@ merge_proc "MergeByPredicateAbstraction"
-        //@ merge_params "conjunctive: (int x) -> {x >= 0, (x == \old(b) || x == -\old(b))}";
+        //@ merge_params {conjunctive: (int x) -> {x >= 0, (x == \old(b) || x == -\old(b))}};
 
         int big, small;
         if (a > b) {

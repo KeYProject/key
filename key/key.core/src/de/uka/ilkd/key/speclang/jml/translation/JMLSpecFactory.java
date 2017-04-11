@@ -1186,8 +1186,7 @@ public class JMLSpecFactory {
                 ? null : mergePointDecl.getMergeParams().text;
         final PositionedString mergeParamsParseStr = mergeParamsStr == null
                 ? null
-                : new PositionedString("merge_params " + mergeParamsStr
-                        .substring(1, mergeParamsStr.length() - 1));
+                : new PositionedString("merge_params " + mergeParamsStr);
 
         MergeProcedure mergeProc = MergeProcedure
                 .getProcedureByName(mergeProcStr);

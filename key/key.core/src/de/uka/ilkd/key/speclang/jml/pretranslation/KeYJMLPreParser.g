@@ -1385,7 +1385,7 @@ merge_point_statement[ImmutableList<String> mods]
 :
     MERGE_POINT
     (MERGE_PROC   (mpr = STRING_LITERAL))?
-    (MERGE_PARAMS (mpa = STRING_LITERAL))?
+    (MERGE_PARAMS (mpa = BODY))?
     SEMICOLON
     {
 	TextualJMLMergePointDecl mpd =

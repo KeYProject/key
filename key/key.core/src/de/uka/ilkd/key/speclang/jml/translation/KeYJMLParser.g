@@ -637,34 +637,38 @@ mergeparamsspec returns [MergeParamsSpec result = null] throws SLTranslationExce
 }
 :
 	MERGE_PARAMS
+	
+	LBRACE
 
-	(latticetype = IDENT)
+		(latticetype = IDENT)
+		
+		COLON
 	
-	COLON
-	
-    LPAREN
-    	(phType = typespec)
-    	(phName = IDENT)
-    	{
-            placeholder = new LocationVariable(new ProgramElementName(phName.getText()), phType);
-            resolverManager.putIntoTopLocalVariablesNamespace(placeholder);
-    	}
-    RPAREN
-    
-    RARROW
-    
-    LBRACE
-    	(abstrPred = predicate)
-    	{
-    		preds = preds.prepend(abstrPred);
-    	}
-    	(
-    		COMMA
-    		(abstrPred = predicate)
+	    LPAREN
+	    	(phType = typespec)
+	    	(phName = IDENT)
+	    	{
+	            placeholder = new LocationVariable(new ProgramElementName(phName.getText()), phType);
+	            resolverManager.putIntoTopLocalVariablesNamespace(placeholder);
+	    	}
+	    RPAREN
+	    
+	    RARROW
+	    
+	    LBRACE
+	    	(abstrPred = predicate)
 	    	{
 	    		preds = preds.prepend(abstrPred);
 	    	}
-    	)*
+	    	(
+	    		COMMA
+	    		(abstrPred = predicate)
+		    	{
+		    		preds = preds.prepend(abstrPred);
+		    	}
+	    	)*
+	    RBRACE
+	    
     RBRACE
     {
     	result = new MergeParamsSpec(latticetype.getText(), placeholder, preds);
