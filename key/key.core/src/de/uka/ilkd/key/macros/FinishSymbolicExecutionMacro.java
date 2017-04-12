@@ -23,7 +23,10 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.Strategy;
 
 /**
@@ -36,6 +39,8 @@ import de.uka.ilkd.key.strategy.Strategy;
  * @author mattias ulbrich
  */
 public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
+
+    private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("notHumanReadable");
 
     @Override
     public String getName() {
@@ -93,6 +98,24 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
         return false;
     }
 
+    /*
+     * Checks if a rule is marked as not suited for interaction.
+     */
+    private static boolean isNonHumanInteractionTagged(Rule rule) {
+        return isInRuleSet(rule, NON_HUMAN_INTERACTION_RULESET);
+    }
+
+    private static boolean isInRuleSet(Rule rule, Name ruleSetName) {
+        if (rule instanceof Taclet) {
+            Taclet taclet = (Taclet) rule;
+            for (RuleSet rs : taclet.getRuleSets()) {
+                if (ruleSetName.equals(rs.name()))
+                    return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
         return new FilterSymbexStrategy(
@@ -119,6 +142,9 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
             if(!hasModality(goal.node())) {
+                return false;
+            }
+            if(isNonHumanInteractionTagged(app.rule())) {
                 return false;
             }
 
