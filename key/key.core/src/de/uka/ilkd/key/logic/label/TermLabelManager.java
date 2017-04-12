@@ -351,6 +351,7 @@ public class TermLabelManager {
     * </p>
     * @param name The name of the term label, not <code>null</code>
     * @param args The arguments, not <code>null</code>, no entry <code>null</code>
+    * @services a non-<code>null</code> services object to look up symbols
     * @return term label of kind {@code name} with parameters as parsed.
     * @throws TermLabelException if name is not a registered label name or the arguments cannot be parsed.
     */

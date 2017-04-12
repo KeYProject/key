@@ -576,9 +576,9 @@ public final class MiscTools {
           return null;
        }
     }
-    
+
     /**
-     * Returns the actual variable for a given one (this means it returns the renamed variable)
+     * Returns the actual variable for a given one (this means it returns the renamed variable).
      * @param node the Node where to look up the actual variable (result from renaming)
      * @return The renamed variable
      */

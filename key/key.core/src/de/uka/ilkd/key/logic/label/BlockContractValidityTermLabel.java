@@ -32,17 +32,10 @@ public class BlockContractValidityTermLabel implements TermLabel {
 
     /**
      * Constructor.
-     * @param exceptionVariableName The name of the exception variable to distinguish normal from exceptional termination.
+     * @param exceptionVariable the exception variable to distinguish normal from exceptional termination.
      */
     public BlockContractValidityTermLabel(ProgramVariable exceptionVariable) {
         this.exceptionVariable = exceptionVariable;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean equals(Object o) {
-        return this == o;
     }
 
     /**

@@ -1166,7 +1166,7 @@ public class BlockContractRule implements BuiltInRule {
                                                                application,
                                                                goal, 
                                                                BlockContractHint.
-                                                               createValidityBranchHint(variables.exception), 
+                                                               createValidityBranchHint(variables.exception),
                                                                null, 
                                                                instantiation.modality,
                                                                new ImmutableArray<Term>(newPost), 
@@ -1248,7 +1248,7 @@ public class BlockContractRule implements BuiltInRule {
                                                    application.rule(), 
                                                    application,
                                                    goal, 
-                                                   BlockContractHint.USAGE_BRANCH, 
+                                                   BlockContractHint.USAGE_BRANCH,
                                                    null, 
                                                    instantiation.modality,
                                                    new ImmutableArray<Term>(instantiation.formula.sub(0)), 
@@ -1411,9 +1411,9 @@ public class BlockContractRule implements BuiltInRule {
         }
     }
 
-    
+
     public static class BlockContractHint {
-        private static BlockContractHint USAGE_BRANCH = new BlockContractHint("Usage Branch");
+        private final static BlockContractHint USAGE_BRANCH = new BlockContractHint("Usage Branch");
         private final ProgramVariable excVar;
 
         private final String description;

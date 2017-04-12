@@ -53,6 +53,8 @@ public interface TermLabelFactory<T extends TermLabel> {
      * @param arguments
      *            the arguments for parsing, not <code>null</code>, no entry
      *            <code>null</code>
+     * @param services
+     *            a non-<code>null</code> services object to look up symbols.
      *
      * @return the according term label with the given arguments, not
      *         <code>null</code>
