@@ -20,6 +20,7 @@ public final class GitDiffFilter extends AutomaticBean implements Filter {
         private final int from;
         private final int to;
         private Interval(int from, int to) {
+            assert from > 0 && to >= from: from + "-" + to;
             this.from = from;
             this.to = to;
         }
@@ -51,7 +52,8 @@ public final class GitDiffFilter extends AutomaticBean implements Filter {
         this.changedLines = null;
     }
 
-    @Override public boolean accept(AuditEvent event) {
+    @Override
+    public boolean accept(AuditEvent event) {
         if(changedLines == null) {
             computeChangedLines();
         }
@@ -71,15 +73,6 @@ public final class GitDiffFilter extends AutomaticBean implements Filter {
         assert find(intervals, event.getLine()) == findSimple(intervals, event.getLine());
 
         return find(intervals, event.getLine());
-    }
-
-    private boolean findSimple(List<Interval> intervals, int value) {
-        for (Interval interval : intervals) {
-            if(interval.compareTo(value) == 0) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void computeChangedLines() {
@@ -106,13 +99,16 @@ public final class GitDiffFilter extends AutomaticBean implements Filter {
                     String toString = m.group(2);
                     int len = toString != null ? Integer.parseInt(toString) : 1;
 
-                    if(filename == null) {
-                        throw new RuntimeException();
+                    // store this interval only if it is not a deletion.
+                    if(len > 0) {
+                        if(filename == null) {
+                            throw new RuntimeException();
+                        }
+
+                        List<Interval> list = result.get(filename);
+
+                        list.add(new Interval(from, from+len-1));
                     }
-
-                    List<Interval> list = result.get(filename);
-
-                    list.add(new Interval(from, from+len-1));
                 }
             }
 
@@ -140,4 +136,15 @@ public final class GitDiffFilter extends AutomaticBean implements Filter {
         return false;
 //        return intervals.get(lo).compareTo(value) == 0;
     }
+
+    // A comparison implementation to ensure binsearch works correctly
+    private boolean findSimple(List<Interval> intervals, int value) {
+        for (Interval interval : intervals) {
+            if(interval.compareTo(value) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
