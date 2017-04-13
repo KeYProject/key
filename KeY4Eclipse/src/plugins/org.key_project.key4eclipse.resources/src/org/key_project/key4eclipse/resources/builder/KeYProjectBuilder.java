@@ -29,7 +29,7 @@ import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
 /**
  * The KeYProject builder.
- * @author Stefan Käsdorf
+ * @author Stefan Kaesdorf
  */
 public class KeYProjectBuilder extends IncrementalProjectBuilder {
 
