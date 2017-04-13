@@ -35,9 +35,9 @@ import java.util.Set;
 
 public class KeYResourceManager {
 
-    private static final String DEFAULT_VERSION = "x.z.y";
+    private static final String DEFAULT_VERSION = "2.6.2";
     private static final Set<String> INVISIBLE_BRANCHES =
-            Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(new String[]{"master"})));
+            Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(new String[]{"master","keybook2"})));
 
     /** the unique instance */
     private static final KeYResourceManager instance 
