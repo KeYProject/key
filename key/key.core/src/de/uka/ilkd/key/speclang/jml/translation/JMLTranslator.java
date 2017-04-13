@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
@@ -48,9 +48,11 @@ import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -1386,11 +1388,11 @@ public final class JMLTranslator {
 
                 // prepare namespaces
                 NamespaceSet namespaces = services.getNamespaces().copy();
-                Namespace programVariables = namespaces.programVariables();
+                Namespace<IProgramVariable> programVariables = namespaces.programVariables();
 
                 if (heapAtPre != null
                     && heapAtPre.op() instanceof ProgramVariable) {
-                    programVariables.add(heapAtPre.op());
+                    programVariables.add((ProgramVariable)heapAtPre.op());
                 }
 
                 if (selfVar != null) {
@@ -1856,7 +1858,7 @@ public final class JMLTranslator {
      */
     SLExpression createSkolemExprBool(Token jmlKeyWord) {
         addUnderspecifiedWarning(jmlKeyWord);
-        final Namespace fns = services.getNamespaces().functions();
+        final Namespace<Operator> fns = services.getNamespaces().functions();
         final String shortName = jmlKeyWord.getText().replace("\\", "");
         int x = -1;
         Name name = null;
@@ -1939,7 +1941,7 @@ public final class JMLTranslator {
     private SLExpression skolemExprHelper(Token jmlKeyWord, KeYJavaType type, TermServices services) {
         addUnderspecifiedWarning(jmlKeyWord);
         assert services != null;
-        final Namespace fns = services.getNamespaces().functions();
+        final Namespace<Operator> fns = services.getNamespaces().functions();
         final Sort sort = type.getSort();
         final String shortName = jmlKeyWord.getText().replace("\\", "");
         int x = -1;
@@ -2406,7 +2408,7 @@ public final class JMLTranslator {
             TermBuilder tb,
             ImmutableList<SLExpression> list,
             SLTranslationExceptionManager excManager) throws SLTranslationException {
-        Namespace funcs = services.getNamespaces().functions();
+        Namespace<Operator> funcs = services.getNamespaces().functions();
         Named symbol = funcs.lookup(new Name(functName));
 
         if (symbol != null) {
@@ -2458,7 +2460,7 @@ public final class JMLTranslator {
 
         assert symbol == null;  // no function symbol found
 
-        Namespace progVars = services.getNamespaces().programVariables();
+        Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
         symbol = progVars.lookup(new Name(functName));
 
         if (symbol == null) {

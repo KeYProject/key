@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -133,10 +134,10 @@ public class ProofObligationCreator {
                                 }                                      
                         }
                         if(term.op() instanceof LogicVariable){
-                                userDefinedSymbols.addVariable(term.op());
+                                userDefinedSymbols.addVariable((LogicVariable) term.op());
                         } 
                         if(term.op() instanceof SchemaVariable){
-                                userDefinedSymbols.addSchemaVariable(term.op());
+                                userDefinedSymbols.addSchemaVariable((SchemaVariable) term.op());
                         }
        
                 }   

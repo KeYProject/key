@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -408,7 +409,7 @@ public class TestDeclParser extends TestCase {
 
 	// TODO Add generic parameters.
 	// Degraded to raw class to avoid class cast exceptions afterwards.
-	Namespace variables = nss.variables();
+	Namespace<QuantifiableVariable> variables = nss.variables();
 
 	assertEquals("find SV x", new Name("x"),
 		     variables.lookup(new Name("x")).name());

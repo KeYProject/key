@@ -28,7 +28,9 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Node;
@@ -40,6 +42,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -359,28 +362,28 @@ public class InitConfig {
 
     /** returns the heuristics namespace of this initial configuration
      */
-    public Namespace ruleSetNS() {
+    public Namespace<RuleSet> ruleSetNS() {
         return namespaces().ruleSets();
     }
 
 
     /** returns the variable namespace of this initial configuration
      */
-    public Namespace varNS() {
+    public Namespace<QuantifiableVariable> varNS() {
         return namespaces().variables();
     }
 
 
     /** returns the program variable namespace of this initial configuration
      */
-    public Namespace progVarNS() {
+    public Namespace<IProgramVariable> progVarNS() {
         return namespaces().programVariables();
     }
 
 
     /** returns the choice namespace of this initial configuration
      */
-    public Namespace choiceNS() {
+    public Namespace<Choice> choiceNS() {
         return namespaces().choices();
     }
 

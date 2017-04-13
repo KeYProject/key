@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -103,8 +104,8 @@ public final class HeapLDT extends LDT {
     
     public HeapLDT(TermServices services) {
 	super(NAME, services);
-	final Namespace sorts    = services.getNamespaces().sorts();
-	final Namespace progVars = services.getNamespaces().programVariables();
+	final Namespace<Sort> sorts    = services.getNamespaces().sorts();
+	final Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
 	
         fieldSort         = (Sort) sorts.lookup(new Name("Field"));	
         select            = addSortDependingFunction(services, SELECT_NAME.toString());

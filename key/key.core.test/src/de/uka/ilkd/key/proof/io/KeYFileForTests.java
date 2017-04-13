@@ -35,7 +35,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
  */
 public class KeYFileForTests extends KeYFile {
     
-    private Namespace variables;
+    private Namespace<QuantifiableVariable> variables;
 
     /** creates a new representation for a given file by indicating a name
      * and a file representing the physical source of the .key file.

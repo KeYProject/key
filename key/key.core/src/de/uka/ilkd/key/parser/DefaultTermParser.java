@@ -21,11 +21,16 @@ import org.antlr.runtime.RecognitionException;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.rule.RuleSet;
 
 
 /** This class wraps the default KeY-Term-Parser.
@@ -46,10 +51,10 @@ public final class DefaultTermParser {
     public Term parse(Reader in, 
 	    	      Sort sort, 
 	    	      Services services,
-                      Namespace var_ns,
-                      Namespace func_ns, 
-                      Namespace sort_ns,
-                      Namespace progVar_ns, 
+                      Namespace<QuantifiableVariable> var_ns,
+                      Namespace<Operator> func_ns,
+                      Namespace<Sort> sort_ns,
+                      Namespace<IProgramVariable> progVar_ns,
                       AbbrevMap scm)
         throws ParserException
     {
@@ -57,8 +62,8 @@ public final class DefaultTermParser {
 		     new NamespaceSet(var_ns,
 				      func_ns, 
 				      sort_ns, 
-				      new Namespace(),
-				      new Namespace(),
+				      new Namespace<RuleSet>(),
+				      new Namespace<Choice>(),
 				      progVar_ns),		     
 		     scm);
     }

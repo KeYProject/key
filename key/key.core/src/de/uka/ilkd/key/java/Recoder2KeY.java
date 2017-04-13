@@ -32,25 +32,6 @@ import java.util.List;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import recoder.ParserException;
-import recoder.ProgramFactory;
-import recoder.bytecode.ByteCodeParser;
-import recoder.bytecode.ClassFile;
-import recoder.convenience.TreeWalker;
-import recoder.io.DataFileLocation;
-import recoder.io.DataLocation;
-import recoder.io.PropertyNames;
-import recoder.java.CompilationUnit;
-import recoder.java.ProgramElement;
-import recoder.java.declaration.ClassInitializer;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.list.generic.ASTArrayList;
-import recoder.list.generic.ASTList;
-import recoder.parser.ParseException;
-import recoder.service.ChangeHistory;
-import recoder.service.CrossReferenceSourceInfo;
-import recoder.service.KeYCrossReferenceSourceInfo;
-import recoder.service.UnresolvedReferenceException;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.NullType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -79,6 +60,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -89,6 +71,25 @@ import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.ZipFileCollection;
+import recoder.ParserException;
+import recoder.ProgramFactory;
+import recoder.bytecode.ByteCodeParser;
+import recoder.bytecode.ClassFile;
+import recoder.convenience.TreeWalker;
+import recoder.io.DataFileLocation;
+import recoder.io.DataLocation;
+import recoder.io.PropertyNames;
+import recoder.java.CompilationUnit;
+import recoder.java.ProgramElement;
+import recoder.java.declaration.ClassInitializer;
+import recoder.java.declaration.MethodDeclaration;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
+import recoder.parser.ParseException;
+import recoder.service.ChangeHistory;
+import recoder.service.CrossReferenceSourceInfo;
+import recoder.service.KeYCrossReferenceSourceInfo;
+import recoder.service.UnresolvedReferenceException;
 
 /**
  * This class is the bridge between recoder ast data structures and KeY data
@@ -1207,8 +1208,8 @@ public class Recoder2KeY implements JavaReader {
      *            a String describing a java block
      * @return the parsed and resolved JavaBlock
      */
-    public JavaBlock readBlockWithProgramVariables(Namespace varns, String s) {
-        Iterator<Named> it = varns.allElements().iterator();
+    public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> varns, String s) {
+        Iterator<IProgramVariable> it = varns.allElements().iterator();
         ImmutableList<ProgramVariable> pvs = ImmutableSLList.<ProgramVariable>nil();
         while (it.hasNext()) {
             Named n = it.next();

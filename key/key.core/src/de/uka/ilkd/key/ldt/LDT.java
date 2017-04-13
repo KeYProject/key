@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -46,7 +47,7 @@ public abstract class LDT implements Named {
     private final Sort sort;   
     
     /** the namespace of functions this LDT feels responsible for */
-    private final Namespace functions = new Namespace();
+    private final Namespace<Operator> functions = new Namespace<>();
     
     //-------------------------------------------------------------------------
     // constructors
@@ -88,7 +89,7 @@ public abstract class LDT implements Named {
      * @return the added function (for convenience reasons)
      */
     protected final Function addFunction(TermServices services, String funcName) {
-	final Namespace funcNS = services.getNamespaces().functions();
+	final Namespace<Operator> funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name(funcName));
         if (f == null)
         	throw new RuntimeException("LDT: Function " + funcName + " not found.\n" +
@@ -111,7 +112,7 @@ public abstract class LDT implements Named {
     /** returns the basic functions of the model
      * @return the basic functions of the model
      */
-    protected final Namespace functions() {
+    protected final Namespace<Operator> functions() {
 	return functions;
     }
 

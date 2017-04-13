@@ -167,7 +167,7 @@ public class TacletForTests {
     }
 
 
-    public static Namespace<?> getVariables() {
+    public static Namespace<QuantifiableVariable> getVariables() {
 	return variables;
     }
 
@@ -188,7 +188,7 @@ public class TacletForTests {
     }
 
     public static Sort sortLookup(String name) {
-	return (Sort)getSorts().lookup(new Name(name));
+	return getSorts().lookup(new Name(name));
     }
 
     public static Term parseTerm(String termstr, Services services) {

@@ -346,7 +346,7 @@ public final class JavaInfo {
 	
 	if(result == null) {
 	    Name ldtName = type.getCorrespondingLDTName();
-	    final Namespace sorts = services.getNamespaces().sorts();
+	    final Namespace<Sort> sorts = services.getNamespaces().sorts();
 	    final Sort sort;
 	    sort = (Sort) sorts.lookup(ldtName);
 	    assert sort != null : "could not find sort for type: " + type;

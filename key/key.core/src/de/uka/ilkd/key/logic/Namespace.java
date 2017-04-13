@@ -21,10 +21,6 @@ import java.util.Map;
 
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-
 /**
  * A Namespace keeps track of already used {@link Name}s and the objects
  * carrying these names. These objects have to implement the interface
@@ -196,7 +192,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     /** Convenience method to look up. */
-    public Named lookup(String name){
+    public E lookup(String name){
         return lookup(new Name(name));
     }
 

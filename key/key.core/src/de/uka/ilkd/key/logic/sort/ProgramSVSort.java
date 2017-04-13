@@ -1072,8 +1072,8 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    //String Literal has SideEffects, but SimpleExpressionSort will not match
 	    //if (check instanceof StringLiteral) return false;
 	    if (check instanceof ProgramVariable) {
-		Namespace ns = services.getNamespaces().sorts();
-		Sort stringSort = (Sort)ns.lookup(new Name("java.lang.String"));
+		Namespace<Sort> ns = services.getNamespaces().sorts();
+		Sort stringSort = ns.lookup(new Name("java.lang.String"));
 		return ((ProgramVariable)check).getKeYJavaType().getSort().equals(stringSort);
 	    }
 	    return false;
@@ -1096,8 +1096,8 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    }
 	    if (check instanceof ProgramVariable) {
 		final Sort checkSort = ((ProgramVariable)check).sort();
-		Namespace ns = services.getNamespaces().sorts();
-		Sort stringSort = (Sort)ns.lookup(new Name("java.lang.String"));
+		Namespace<Sort> ns = services.getNamespaces().sorts();
+		Sort stringSort = ns.lookup(new Name("java.lang.String"));
 		return checkSort.extendsTrans(services.getJavaInfo().objectSort()) 
 		       && !checkSort.equals(stringSort);
 	    }

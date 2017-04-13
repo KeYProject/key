@@ -1188,11 +1188,11 @@ public abstract class TacletApp implements RuleApp {
      * 
      * @author mulbrich
      * @param func_ns
-     *            the original function namespace
+     *            the original function namespace, not <code>null</code>
      * @return the new function namespace that bases on the original one
      */
-    public Namespace extendedFunctionNameSpace(Namespace func_ns) {
-	Namespace ns = new Namespace(func_ns);
+    public Namespace<Operator> extendedFunctionNameSpace(Namespace<Operator> func_ns) {
+	Namespace<Operator> ns = new Namespace<Operator>(func_ns);
 	Iterator<SchemaVariable> it = instantiations.svIterator();
 	while (it.hasNext()) {
 	    SchemaVariable sv = it.next();

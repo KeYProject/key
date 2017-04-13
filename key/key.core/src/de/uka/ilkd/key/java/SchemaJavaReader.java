@@ -13,8 +13,10 @@
 
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.logic.Namespace;
 
 public interface SchemaJavaReader extends JavaReader{
 
-    void setSVNamespace(de.uka.ilkd.key.logic.Namespace ns);
+    // FIXME: This breaks generics for namespaces
+    void setSVNamespace(Namespace ns);
 }

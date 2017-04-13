@@ -943,8 +943,10 @@ public class IntermediateProofReplayer {
      * @throws ParserException
      *             In case of an error.
      */
-    public static Term parseTerm(String value, Proof proof, Namespace varNS,
-            Namespace progVarNS, Namespace<Operator> functNS) {
+    public static Term parseTerm(String value, Proof proof,
+            Namespace<QuantifiableVariable> varNS,
+            Namespace<IProgramVariable> progVarNS,
+            Namespace<Operator> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null,
                     proof.getServices(), varNS,
