@@ -25,8 +25,6 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import recoder.io.PathList;
-import recoder.io.ProjectSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -38,7 +36,6 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -47,9 +44,12 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.JavaModel;
@@ -68,6 +68,8 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import recoder.io.PathList;
+import recoder.io.ProjectSettings;
 
 
 public final class ProblemInitializer {
@@ -329,15 +331,15 @@ public final class ProblemInitializer {
      * See bug report #1185, #1189
      */
     private void cleanupNamespaces(InitConfig initConfig) {
-        Namespace newVarNS = new Namespace();
-        Namespace newSortNS = new Namespace();
-        Namespace newFuncNS = new Namespace();
-        for(Named n : initConfig.sortNS().allElements()) {
+        Namespace<QuantifiableVariable> newVarNS = new Namespace<>();
+        Namespace<Sort> newSortNS = new Namespace<>();
+        Namespace<Operator> newFuncNS = new Namespace<>();
+        for(Sort n : initConfig.sortNS().allElements()) {
             if(!(n instanceof GenericSort)) {
                 newSortNS.addSafely(n);
             }
         }
-        for(Named n : initConfig.funcNS().allElements()) {
+        for(Operator n : initConfig.funcNS().allElements()) {
             if(!(n instanceof SortDependingFunction
                     && ((SortDependingFunction)n).getSortDependingOn()
                     instanceof GenericSort)) {
@@ -366,7 +368,7 @@ public final class ProblemInitializer {
             warnings = warnings.union(envInput.read());
 
             // reset the variables namespace
-            initConfig.namespaces().setVariables(new Namespace());
+            initConfig.namespaces().setVariables(new Namespace<QuantifiableVariable>());
         }
     }
 
@@ -508,7 +510,7 @@ public final class ProblemInitializer {
 
         //register function and predicate symbols defined by Java program
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
-        final Namespace functions 
+        final Namespace<Operator> functions
         = initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT 
         = initConfig.getServices().getTypeConverter().getHeapLDT();

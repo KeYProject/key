@@ -144,6 +144,7 @@ options {
    }
 
    private NamespaceSet nss;
+   private Namespace<SchemaVariable> schemaVariablesNamespace;
    private HashMap<String, String> category2Default = new LinkedHashMap<String, String>();
    private boolean onlyWith=false;
    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
@@ -429,28 +430,32 @@ options {
         return nss;
     }
 
-    private Namespace sorts() {
+    private Namespace<Sort> sorts() {
         return namespaces().sorts();
     }
 
-    private Namespace functions() {
+    private Namespace<Operator> functions() {
         return namespaces().functions();
     }
 
-    private Namespace ruleSets() {
+    private Namespace<RuleSet> ruleSets() {
         return namespaces().ruleSets();
     }
 
-    private Namespace variables() {
+    private Namespace<QuantifiableVariable> variables() {
         return namespaces().variables();
     }
 
-    private Namespace programVariables() {
+    private Namespace<IProgramVariable> programVariables() {
         return namespaces().programVariables();
     }
 
-    private Namespace choices(){
+    private Namespace<Choice> choices(){
         return namespaces().choices();
+    }
+
+    private Namespace<SchemaVariable> schemaVariables() {
+        return schemaVariablesNamespace;
     }
 
     public ImmutableList<Taclet> getTaclets(){
@@ -752,12 +757,12 @@ options {
             	  				  getLine(), 
             	  				  getColumn());
                }
-               variables().add(v);
+               schemaVariables().add(v);
             }
         }
     }
 
-    private Term toZNotation(String number, Namespace functions){    
+    private Term toZNotation(String number, Namespace<Operator> functions) {
 	String s = number;
         final boolean negative = (s.charAt(0) == '-');
 	if (negative) {
@@ -956,7 +961,7 @@ options {
         return reference.sort().name().equals(IntegerLDT.NAME);
     }
     
-    private void unbindVars(Namespace orig) {
+    private void unbindVars(Namespace<QuantifiableVariable> orig) {
         if(isGlobalDeclTermParser()) {
             Debug.fail("unbindVars was called in Global Declaration Term parser.");
         }
@@ -1024,7 +1029,7 @@ options {
                 if(isProblemParser()) // Alt jr==null;
                 jr = new SchemaRecoder2KeY(parserConfig.services(), 
                     parserConfig.namespaces());
-                ((SchemaJavaReader)jr).setSVNamespace(variables());
+                ((SchemaJavaReader)jr).setSVNamespace(schemaVariables());
             } else{
                 if(isProblemParser()) // Alt jr==null;
                 jr = new Recoder2KeY(parserConfig.services(), 
@@ -1403,7 +1408,7 @@ options {
     
     private ImmutableSet<Modality> lookupOperatorSV(String opName, ImmutableSet<Modality> modalities) 
     		throws RecognitionException/*KeYSemanticException*/ {
-	ModalOperatorSV osv = (ModalOperatorSV)variables().lookup(new Name(opName));
+	ModalOperatorSV osv = (ModalOperatorSV)schemaVariables().lookup(new Name(opName));
         if(osv == null) {
 	    semanticError("Schema variable "+opName+" not defined.");
 	}
@@ -2018,7 +2023,7 @@ one_schema_modal_op_decl
                         sort, modalities);
             
             if (inSchemaMode()) {
-                variables().add(osv);
+                schemaVariables().add(osv);
                 //functions().add(osv);
             }
         }
@@ -3209,7 +3214,7 @@ ifExThenElseTerm returns [Term _if_ex_then_else_term = null]
 @init{
     exVars 
     	= ImmutableSLList.<QuantifiableVariable>nil();
-    Namespace orig = variables();
+    Namespace<QuantifiableVariable> orig = variables();
     Term result = null;
 }
 @after{ _if_ex_then_else_term = result; }
@@ -3262,7 +3267,7 @@ argument returns [Term _argument = null]
 quantifierterm returns [Term _quantifier_term = null]
 @init{
     Operator op = null;
-    Namespace orig = variables();  
+    Namespace<QuantifiableVariable> orig = variables();  
     Term a = null;
 }
 @after{ _quantifier_term = a; }
@@ -3308,7 +3313,7 @@ location_term returns[Term result]
 substitutionterm returns [Term _substitution_term = null] 
 @init{
   SubstOp op = WarySubstOp.SUBST;
-   Namespace orig = variables();  
+   Namespace<QuantifiableVariable> orig = variables();  
   Term result = null;
 }
 @after{ _substitution_term = result; }
@@ -3476,7 +3481,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
 @init{
     String neg = "";
     boolean opSV = false;
-    Namespace orig = variables();
+    Namespace<QuantifiableVariable> orig = variables();
     boolean limited = false;  
 }
 @after { _func_pred_var_term = a; }
@@ -4417,7 +4422,7 @@ contracts
 
 invariants
 @init{
-  Namespace orig = variables();  
+  Namespace<QuantifiableVariable> orig = variables();  
 }
 :
    INVARIANTS LPAREN selfVar=one_logic_bound_variable RPAREN
