@@ -168,7 +168,7 @@ abstract class ReplaceAndRegisterMethod {
 
     final void register(Function f,
                         Services services) {
-        Namespace<Operator> functionNames = services.getNamespaces().functions();
+        Namespace<Function> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != Sort.UPDATE;
             functionNames.addSafely(f);

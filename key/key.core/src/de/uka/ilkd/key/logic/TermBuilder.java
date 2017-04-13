@@ -874,7 +874,7 @@ public class TermBuilder {
     //------------------------------
 
     public Term pair(Term first, Term second) {
-        final Namespace<Operator> funcNS = services.getNamespaces().functions();
+        final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name("pair"));
         if (f == null)
             throw new RuntimeException("LDT: Function pair not found.\n" +
@@ -885,7 +885,7 @@ public class TermBuilder {
     }
 
     public Term prec(Term mby, Term mbyAtPre) {
-        final Namespace<Operator> funcNS = services.getNamespaces().functions();
+        final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name("prec"));
         if (f == null)
                 throw new RuntimeException("LDT: Function prec not found.\n" +
@@ -895,7 +895,7 @@ public class TermBuilder {
     }
 
     public Term measuredByCheck(Term mby) {
-        final Namespace<Operator> funcNS = services.getNamespaces().functions();
+        final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name("measuredByCheck"));
         if (f == null)
                 throw new RuntimeException("LDT: Function measuredByCheck not found.\n" +
@@ -904,7 +904,7 @@ public class TermBuilder {
     }
 
     public Term measuredBy(Term mby) {
-        final Namespace<Operator> funcNS = services.getNamespaces().functions();
+        final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name("measuredBy"));
         if (f == null)
                 throw new RuntimeException("LDT: Function measuredBy not found.\n" +
@@ -912,7 +912,7 @@ public class TermBuilder {
         return func(f, mby);
     }
     public Function getMeasuredByEmpty(){
-       final Namespace<Operator> funcNS = services.getNamespaces().functions();
+       final Namespace<Function> funcNS = services.getNamespaces().functions();
        final Function f = (Function)funcNS.lookup(new Name("measuredByEmpty"));
        if (f == null)
                throw new RuntimeException("LDT: Function measuredByEmpty not found.\n" +

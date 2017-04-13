@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -148,7 +149,7 @@ public class KeYMediator {
     /** returns the function namespace
      * @return the function namespace
      */
-    public Namespace<Operator> func_ns() {
+    public Namespace<Function> func_ns() {
        NamespaceSet namespaces = namespaces();
        return namespaces != null ? namespaces.functions() : null;
     }

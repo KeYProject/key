@@ -75,7 +75,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
                                                TermBuilder tb,
                                                Services services) {
         final Name name = new Name(nameString);
-        Namespace<Operator> functionNS = services.getNamespaces().functions();
+        Namespace<Function> functionNS = services.getNamespaces().functions();
 
         /* This predicate needs to present on all branches and, therefore, must be added
          * to the toplevel function namespace. Hence, we rewind to the parent namespace here.

@@ -56,6 +56,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -122,13 +123,13 @@ public final class JavaInfo {
     private ProgramVariable invProgVar;
 
     /** caches the observer for {@code <inv>} */
-    private IObserverFunction inv;
+    private ObserverFunction inv;
 
     /** the name of the class used as default execution context */
     protected static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
     protected static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
 
-    private HashMap<KeYJavaType,IObserverFunction> staticInvs = new LinkedHashMap<KeYJavaType,IObserverFunction>();
+    private HashMap<KeYJavaType,ObserverFunction> staticInvs = new LinkedHashMap<KeYJavaType,ObserverFunction>();
 
 
     /**
@@ -528,7 +529,7 @@ public final class JavaInfo {
     /**
      * returns all methods declared in the given Type as IProgramMethods
      */
-    public ImmutableList<IProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {
+    public ImmutableList<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {
         return kpmi.getAllProgramMethodsLocallyDeclared(kjt);
     }
 
@@ -1423,7 +1424,7 @@ public final class JavaInfo {
     public IObserverFunction getInv() {
        // TODO: Create function when source code is parsed and register it in namespace. Return only function from namespace here. No lazy creation to ensure that all proofs of the same proof environment have the same <inv> symbol.
        if(inv == null || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) { // TODO: Why is the initial check with the heaps needed?
-          inv = (IObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<inv>", getJavaLangObject()));
+          inv = (ObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<inv>", getJavaLangObject()));
           if (inv == null) {
              inv = new ObserverFunction("<inv>",
                           Sort.FORMULA,
@@ -1461,9 +1462,9 @@ public final class JavaInfo {
      */
     public IObserverFunction getStaticInv(KeYJavaType target) {
        // TODO: Create functions when source code is parsed and register them in namespace. Return only functions from namespace here. No lazy creation to ensure that all proofs of the same proof environment have the same <$inv> symbols.
-       IObserverFunction inv = staticInvs.get(target);
+       ObserverFunction inv = staticInvs.get(target);
         if (inv == null) {
-           inv = (IObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<$inv>", target));
+           inv = (ObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<$inv>", target));
            if (inv == null) {
               inv = new ObserverFunction("<$inv>",
                     Sort.FORMULA,

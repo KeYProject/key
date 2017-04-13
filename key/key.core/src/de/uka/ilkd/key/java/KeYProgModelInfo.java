@@ -25,9 +25,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import recoder.abstraction.ClassType;
-import recoder.abstraction.Constructor;
-import recoder.java.CompilationUnit;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -45,8 +42,12 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import recoder.abstraction.ClassType;
+import recoder.abstraction.Constructor;
+import recoder.java.CompilationUnit;
 
 public class KeYProgModelInfo{
 
@@ -440,18 +441,18 @@ public class KeYProgModelInfo{
     }
 
 	/**
-	 * Returns the IProgramMethods locally defined within the given
+	 * Returns the ProgramMethods locally defined within the given
 	 * class type. If the type is represented in source code,
 	 * the returned list matches the syntactic order.
 	 * @param ct a class type.
 	 */
-    public ImmutableList<IProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType ct){
+    public ImmutableList<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType ct){
         List<recoder.abstraction.Method> rml = getRecoderMethods(ct);
-        ImmutableList<IProgramMethod> result = ImmutableSLList.<IProgramMethod>nil();
+        ImmutableList<ProgramMethod> result = ImmutableSLList.<ProgramMethod>nil();
         for (int i=rml.size()-1; i>=0; i--) {
             recoder.abstraction.Method rm=rml.get(i);
 	    if(!(rm instanceof recoder.bytecode.MethodInfo)){
-		result = result.prepend((IProgramMethod) rec2key().toKeY(rm));
+		result = result.prepend((ProgramMethod) rec2key().toKeY(rm));
 	    }
         }
         return result;

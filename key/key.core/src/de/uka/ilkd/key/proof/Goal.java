@@ -30,6 +30,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -622,7 +623,7 @@ public final class Goal  {
         for (IProgramVariable  pv : node.getLocalProgVars()) {
             newNS.programVariables().add(pv);
         }
-        for (Operator op : node.getLocalFunctions()) {
+        for (Function op : node.getLocalFunctions()) {
             newNS.functions().add(op);
         }
 
@@ -681,7 +682,7 @@ public final class Goal  {
      */
     private void adaptNamespacesNewGoals(final ImmutableList<Goal> goalList) {
         Collection<IProgramVariable> newProgVars = localNamespaces.programVariables().elements();
-        Collection<Operator> newFunctions = localNamespaces.functions().elements();
+        Collection<Function> newFunctions = localNamespaces.functions().elements();
 
         localNamespaces.flushToParent();
 

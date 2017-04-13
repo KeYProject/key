@@ -162,7 +162,7 @@ public class TacletForTests {
 	return nss.ruleSets();
     }
 
-    public static Namespace<Operator> getFunctions() {
+    public static Namespace<Function> getFunctions() {
 	return nss.functions();
     }
 

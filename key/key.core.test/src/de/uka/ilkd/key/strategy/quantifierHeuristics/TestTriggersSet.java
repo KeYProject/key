@@ -46,7 +46,7 @@ public class TestTriggersSet extends TestCase {
     
 	private Namespace<QuantifiableVariable> variables = new Namespace<>();
 
-	private Namespace<Operator> functions = new Namespace<>();
+	private Namespace<Function> functions = new Namespace<>();
 
 	private Namespace<Sort> sorts = new Namespace<>();
 

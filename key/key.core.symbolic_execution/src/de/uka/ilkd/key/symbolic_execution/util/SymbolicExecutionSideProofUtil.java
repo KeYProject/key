@@ -313,14 +313,14 @@ public final class SymbolicExecutionSideProofUtil {
     * @param term The {@link Term} to check its {@link Name}s.
     */
    public static void addNewNamesToNamespace(Services services, Term term) {
-      final Namespace<Operator> functions = services.getNamespaces().functions();
+      final Namespace<Function> functions = services.getNamespaces().functions();
       final Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
       // LogicVariables are always local bound
       term.execPreOrder(new DefaultVisitor() {
          @Override
          public void visit(Term visited) {
             if (visited.op() instanceof Function) {
-               functions.add(visited.op());
+               functions.add((Function) visited.op());
             }
             else if (visited.op() instanceof IProgramVariable) {
                progVars.add((IProgramVariable) visited.op());

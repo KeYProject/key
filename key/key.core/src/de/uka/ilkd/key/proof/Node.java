@@ -30,9 +30,8 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
@@ -76,8 +75,8 @@ public class Node  {
      * a linked list of the locally generated function symbols.
      * It extends the list of the parent node.
      */
-    private ImmutableList<Operator> localFunctions
-        = ImmutableSLList.<Operator>nil();
+    private ImmutableList<Function> localFunctions
+        = ImmutableSLList.<Function>nil();
 
     private boolean              closed              = false;
 
@@ -224,12 +223,12 @@ public class Node  {
      *
      * @return a non-null immutable list of function symbols.
      */
-    public Iterable<Operator> getLocalFunctions() {
+    public Iterable<Function> getLocalFunctions() {
         return localFunctions;
     }
 
-    public void addLocalFunctions(Collection<? extends Operator> elements) {
-        for (Operator op : elements) {
+    public void addLocalFunctions(Collection<? extends Function> elements) {
+        for (Function op : elements) {
             localFunctions = localFunctions.prepend(op);
         }
     }

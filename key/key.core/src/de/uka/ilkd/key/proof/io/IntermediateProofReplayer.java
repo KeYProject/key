@@ -50,6 +50,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -946,7 +947,7 @@ public class IntermediateProofReplayer {
     public static Term parseTerm(String value, Proof proof,
             Namespace<QuantifiableVariable> varNS,
             Namespace<IProgramVariable> progVarNS,
-            Namespace<Operator> functNS) {
+            Namespace<Function> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null,
                     proof.getServices(), varNS,
@@ -1034,7 +1035,7 @@ public class IntermediateProofReplayer {
         } else {
             Namespace<QuantifiableVariable> varNS = p.getNamespaces().variables();
             Namespace<IProgramVariable> prgVarNS = targetGoal.getLocalNamespaces().programVariables();
-            Namespace<Operator> funcNS = targetGoal.getLocalNamespaces().functions();
+            Namespace<Function> funcNS = targetGoal.getLocalNamespaces().functions();
             varNS = app.extendVarNamespaceForSV(varNS, sv);
             Term instance = parseTerm(value, p, varNS, prgVarNS, funcNS);
             result = app.addCheckedInstantiation(sv, instance, services, true);

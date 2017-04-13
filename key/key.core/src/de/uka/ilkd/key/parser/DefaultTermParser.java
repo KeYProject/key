@@ -25,8 +25,8 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -52,7 +52,7 @@ public final class DefaultTermParser {
 	    	      Sort sort, 
 	    	      Services services,
                       Namespace<QuantifiableVariable> var_ns,
-                      Namespace<Operator> func_ns,
+                      Namespace<Function> func_ns,
                       Namespace<Sort> sort_ns,
                       Namespace<IProgramVariable> progVar_ns,
                       AbbrevMap scm)

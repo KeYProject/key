@@ -128,9 +128,9 @@ public class ProofObligationCreator {
                         
                         if(term.op() instanceof Function){
                                 if(sort == Sort.FORMULA){
-                                     userDefinedSymbols.addPredicate(term.op());
+                                     userDefinedSymbols.addPredicate((Function) term.op());
                                 }else{
-                                     userDefinedSymbols.addFunction(term.op());  
+                                     userDefinedSymbols.addFunction((Function) term.op());
                                 }                                      
                         }
                         if(term.op() instanceof LogicVariable){

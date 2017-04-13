@@ -1858,7 +1858,7 @@ public final class JMLTranslator {
      */
     SLExpression createSkolemExprBool(Token jmlKeyWord) {
         addUnderspecifiedWarning(jmlKeyWord);
-        final Namespace<Operator> fns = services.getNamespaces().functions();
+        final Namespace<Function> fns = services.getNamespaces().functions();
         final String shortName = jmlKeyWord.getText().replace("\\", "");
         int x = -1;
         Name name = null;
@@ -1941,7 +1941,7 @@ public final class JMLTranslator {
     private SLExpression skolemExprHelper(Token jmlKeyWord, KeYJavaType type, TermServices services) {
         addUnderspecifiedWarning(jmlKeyWord);
         assert services != null;
-        final Namespace<Operator> fns = services.getNamespaces().functions();
+        final Namespace<Function> fns = services.getNamespaces().functions();
         final Sort sort = type.getSort();
         final String shortName = jmlKeyWord.getText().replace("\\", "");
         int x = -1;
@@ -2408,7 +2408,7 @@ public final class JMLTranslator {
             TermBuilder tb,
             ImmutableList<SLExpression> list,
             SLTranslationExceptionManager excManager) throws SLTranslationException {
-        Namespace<Operator> funcs = services.getNamespaces().functions();
+        Namespace<Function> funcs = services.getNamespaces().functions();
         Named symbol = funcs.lookup(new Name(functName));
 
         if (symbol != null) {

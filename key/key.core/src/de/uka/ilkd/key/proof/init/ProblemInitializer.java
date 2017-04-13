@@ -42,9 +42,9 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -333,7 +333,7 @@ public final class ProblemInitializer {
     private void cleanupNamespaces(InitConfig initConfig) {
         Namespace<QuantifiableVariable> newVarNS = new Namespace<>();
         Namespace<Sort> newSortNS = new Namespace<>();
-        Namespace<Operator> newFuncNS = new Namespace<>();
+        Namespace<Function> newFuncNS = new Namespace<>();
         for(Sort n : initConfig.sortNS().allElements()) {
             if(!(n instanceof GenericSort)) {
                 newSortNS.addSafely(n);
@@ -343,7 +343,7 @@ public final class ProblemInitializer {
             if(!(n instanceof SortDependingFunction
                     && ((SortDependingFunction)n).getSortDependingOn()
                     instanceof GenericSort)) {
-                newFuncNS.addSafely(n);
+                newFuncNS.addSafely((SortDependingFunction) n);
             }
         }
         //System.out.println(initConfig.funcNS().hashCode() + " ---> " + newFuncNS.hashCode());
@@ -381,7 +381,7 @@ public final class ProblemInitializer {
         }
 
         if(term.op() instanceof Function) {
-            namespaces.functions().add(term.op());
+            namespaces.functions().add((Function) term.op());
         } else if(term.op() instanceof ProgramVariable) {
             final ProgramVariable pv = (ProgramVariable) term.op();
             if(namespaces.programVariables().lookup(pv.name()) == null) {
@@ -510,7 +510,7 @@ public final class ProblemInitializer {
 
         //register function and predicate symbols defined by Java program
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
-        final Namespace<Operator> functions
+        final Namespace<Function> functions
         = initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT 
         = initConfig.getServices().getTypeConverter().getHeapLDT();
@@ -529,7 +529,7 @@ public final class ProblemInitializer {
                         }
                     }
                 }
-                for(IProgramMethod pm
+                for(ProgramMethod pm
                         : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
                     if(!(pm.isVoid() || pm.isConstructor())) {
                         functions.add(pm);

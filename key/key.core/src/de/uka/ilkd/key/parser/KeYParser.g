@@ -435,7 +435,7 @@ options {
         return namespaces().sorts();
     }
 
-    private Namespace<Operator> functions() {
+    private Namespace<Function> functions() {
         return namespaces().functions();
     }
 
@@ -455,7 +455,7 @@ options {
         return namespaces().choices();
     }
 
-    private Namespace<SchemaVariable> schemaVariables() {
+    public Namespace<SchemaVariable> schemaVariables() {
         return schemaVariablesNamespace;
     }
 
@@ -763,7 +763,7 @@ options {
         }
     }
 
-    private Term toZNotation(String number, Namespace<Operator> functions) {
+    private Term toZNotation(String number, Namespace<Function> functions) {
 	String s = number;
         final boolean negative = (s.charAt(0) == '-');
 	if (negative) {

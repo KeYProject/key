@@ -37,6 +37,7 @@ import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractEnvInput;
@@ -214,7 +215,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             }
 
             //contracts, loop invariants
-            final ImmutableList<IProgramMethod> pms 
+            final ImmutableList<ProgramMethod> pms
                 = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
             for(IProgramMethod pm : pms) {
                 //contracts

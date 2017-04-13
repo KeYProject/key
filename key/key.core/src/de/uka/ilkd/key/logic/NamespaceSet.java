@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -23,7 +23,7 @@ public class NamespaceSet {
 
     private Namespace<QuantifiableVariable> varNS = new Namespace<QuantifiableVariable>();
     private Namespace<IProgramVariable> progVarNS = new Namespace<IProgramVariable>();
-    private Namespace<Operator> funcNS = new Namespace<Operator>();
+    private Namespace<Function> funcNS = new Namespace<Function>();
     private Namespace<RuleSet> ruleSetNS = new Namespace<RuleSet>();
     private Namespace<Sort> sortNS = new Namespace<Sort>();
     private Namespace<Choice> choiceNS = new Namespace<Choice>();
@@ -32,7 +32,7 @@ public class NamespaceSet {
     }
 
     public NamespaceSet(Namespace<QuantifiableVariable> varNS,
-	    		Namespace<Operator> funcNS,
+	    		Namespace<Function> funcNS,
                         Namespace<Sort> sortNS,
                         Namespace<RuleSet> ruleSetNS,
 			Namespace<Choice> choiceNS,
@@ -69,7 +69,7 @@ public class NamespaceSet {
     public NamespaceSet copyWithParent() {
         return new NamespaceSet(
                 new Namespace<QuantifiableVariable>(variables()),
-                new Namespace<Operator>(functions()),
+                new Namespace<Function>(functions()),
                 new Namespace<Sort>(sorts()),
                 new Namespace<RuleSet>(ruleSets()),
                 new Namespace<Choice>(choices()),
@@ -93,11 +93,11 @@ public class NamespaceSet {
 	this.progVarNS = progVarNS;
     }
 
-    public Namespace<Operator> functions() {
+    public Namespace<Function> functions() {
 	return funcNS;
     }
 
-    public void setFunctions(Namespace<Operator> funcNS) {
+    public void setFunctions(Namespace<Function> funcNS) {
 	this.funcNS = funcNS;
     }
 

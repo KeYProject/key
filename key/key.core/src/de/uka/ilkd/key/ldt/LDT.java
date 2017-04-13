@@ -89,7 +89,7 @@ public abstract class LDT implements Named {
      * @return the added function (for convenience reasons)
      */
     protected final Function addFunction(TermServices services, String funcName) {
-	final Namespace<Operator> funcNS = services.getNamespaces().functions();
+	final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name(funcName));
         if (f == null)
         	throw new RuntimeException("LDT: Function " + funcName + " not found.\n" +

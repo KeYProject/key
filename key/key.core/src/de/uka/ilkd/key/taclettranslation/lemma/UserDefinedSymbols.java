@@ -31,7 +31,6 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
@@ -55,9 +54,9 @@ public class UserDefinedSymbols {
         }
 
         final UserDefinedSymbols parent;
-        final Set<Operator> usedExtraFunctions = new TreeSet<Operator>(
+        final Set<Function> usedExtraFunctions = new TreeSet<Function>(
                         NamedComparator.INSTANCE);
-        final Set<Operator> usedExtraPredicates = new TreeSet<Operator>(
+        final Set<Function> usedExtraPredicates = new TreeSet<Function>(
                         NamedComparator.INSTANCE);
         final Set<Sort> usedExtraSorts = new TreeSet<Sort>(
                         NamedComparator.INSTANCE);
@@ -104,12 +103,12 @@ public class UserDefinedSymbols {
                 return set.contains(symbol);
         }
 
-        public void addFunction(Operator symbol) {
+        public void addFunction(Function symbol) {
                 addUserDefiniedSymbol(symbol, usedExtraFunctions,
                                 referenceNamespaces.functions());
         }
 
-        public void addPredicate(Operator symbol) {
+        public void addPredicate(Function symbol) {
                 addUserDefiniedSymbol(symbol, usedExtraPredicates,
                                 referenceNamespaces.functions());
         }

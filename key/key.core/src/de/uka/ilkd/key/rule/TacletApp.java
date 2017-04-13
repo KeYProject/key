@@ -792,12 +792,12 @@ public abstract class TacletApp implements RuleApp {
 	    final SchemaVariable sv = svIt.next();
 	    if(sv instanceof SkolemTermSV) {
 		final Term inst = (Term) insts.getInstantiation(sv);
-                final Namespace<Operator> functions = nss.functions();
+                final Namespace<Function> functions = nss.functions();
 
                 // skolem constant might already be registered in
                 // case it is used in the \addrules() section of a rule
                 if (functions.lookup(inst.op().name()) == null) {
-                    functions.addSafely(inst.op());
+                    functions.addSafely((Function) inst.op());
                 }
 	    }
 	}
@@ -1191,14 +1191,18 @@ public abstract class TacletApp implements RuleApp {
      *            the original function namespace, not <code>null</code>
      * @return the new function namespace that bases on the original one
      */
-    public Namespace<Operator> extendedFunctionNameSpace(Namespace<Operator> func_ns) {
-	Namespace<Operator> ns = new Namespace<Operator>(func_ns);
+    public Namespace<Function> extendedFunctionNameSpace(Namespace<Function> func_ns) {
+	Namespace<Function> ns = new Namespace<Function>(func_ns);
 	Iterator<SchemaVariable> it = instantiations.svIterator();
 	while (it.hasNext()) {
 	    SchemaVariable sv = it.next();
 	    if (sv instanceof SkolemTermSV) {
 		Term inst = (Term) instantiations.getInstantiation(sv);
-		ns.addSafely(inst.op());
+		Operator op = inst.op();
+		assert op instanceof Function :
+		    "At this point the skolem instantiation is expected to "
+		    + "be a function symbol, not " + inst;
+        ns.addSafely((Function) op);
 	    }
 	}
 	return ns;

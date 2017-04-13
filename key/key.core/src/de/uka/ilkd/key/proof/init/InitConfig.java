@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -348,7 +349,7 @@ public class InitConfig {
      * returns the function namespace of this initial configuration.
      * @return a non-null namespace
      */
-    public Namespace<Operator> funcNS() {
+    public Namespace<Function> funcNS() {
         return namespaces().functions();
     }
 

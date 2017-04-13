@@ -183,7 +183,7 @@ public abstract class AbstractPO implements IPersistablePO {
  
 
     protected final void register(Function f, Services services) {
-         Namespace<Operator> functionNames = services.getNamespaces().functions();
+         Namespace<Function> functionNames = services.getNamespaces().functions();
          if (f != null && functionNames.lookup(f.name()) == null) {
              assert f.sort() != Sort.UPDATE;
              if (f.sort() == Sort.FORMULA) {

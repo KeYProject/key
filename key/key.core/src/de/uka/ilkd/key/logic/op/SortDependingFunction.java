@@ -134,7 +134,7 @@ public final class SortDependingFunction extends Function {
 	                	      		      sort));
 	
 	//ugly: multiple generic sorts with the same name may exist over time 
-	Namespace<Operator> functions = services.getNamespaces().functions();
+	Namespace<Function> functions = services.getNamespaces().functions();
 	if(result != null 
 	   && sort instanceof GenericSort
 	   && result.getSortDependingOn() != sort) {
