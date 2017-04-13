@@ -56,7 +56,7 @@ import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 
 public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
-    protected Namespace svns;
+    protected Namespace<SchemaVariable> svns;
 
     /**
      Protected constructor - use {@link #getInstance} instead.
@@ -560,7 +560,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
 
 
-    public void setSVNamespace(Namespace ns) {
+    public void setSVNamespace(Namespace<SchemaVariable> ns) {
 	svns=ns;
     }
 }

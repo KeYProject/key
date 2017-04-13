@@ -236,6 +236,7 @@ options {
         this.parserMode = mode;
  	this.services = services;
 	this.nss = nss;
+	this.schemaVariablesNamespace = new Namespace<>();
     if (this.isTacletParser()) {
         switchToSchemaMode();
     } else {

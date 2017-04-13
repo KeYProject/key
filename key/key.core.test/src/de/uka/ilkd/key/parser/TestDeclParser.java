@@ -43,6 +43,7 @@ public class TestDeclParser extends TestCase {
 
     NamespaceSet nss;
     Services serv;
+    private Namespace<SchemaVariable> parsedSchemaVars;
 
     public TestDeclParser(String name) {
 	super(name);
@@ -74,10 +75,11 @@ public class TestDeclParser extends TestCase {
 		serv, nss);
     }
 
-    public void parseDecls(String s) {
+    private void parseDecls(String s) {
 	try {
 	    KeYParserF p = stringParser(s);
 	    p.decls();
+	    this.parsedSchemaVars = p.schemaVariables();
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);
@@ -272,7 +274,7 @@ public class TestDeclParser extends TestCase {
 		   "\\functions {\n" +
 		   "  aSort[][] f(aSort);\n" +
 		   "}\n");
-	Sort aSort = (Sort)nss.sorts().lookup(new Name("aSort"));
+	Sort aSort = nss.sorts().lookup(new Name("aSort"));
 	Sort objectSort = serv.getJavaInfo().objectSort();
 	Sort cloneableSort = serv.getJavaInfo().cloneableSort();
         Sort serializableSort = serv.getJavaInfo().serializableSort();
@@ -303,8 +305,8 @@ public class TestDeclParser extends TestCase {
 		   "  list cons(elem,list);\n" +
 		   "}\n");
 	
-	Sort elem = (Sort)nss.sorts().lookup(new Name("elem"));
-	Sort list = (Sort)nss.sorts().lookup(new Name("list"));
+	Sort elem = nss.sorts().lookup(new Name("elem"));
+	Sort list = nss.sorts().lookup(new Name("list"));
 
         Sort objectSort = serv.getJavaInfo().objectSort();
         Sort cloneableSort = serv.getJavaInfo().cloneableSort();
@@ -362,8 +364,8 @@ public class TestDeclParser extends TestCase {
 		   "  maybe;\n" +
 		   "}\n");
 	
-	Sort elem = (Sort)nss.sorts().lookup(new Name("elem"));
-	Sort list = (Sort)nss.sorts().lookup(new Name("list"));
+	Sort elem = nss.sorts().lookup(new Name("elem"));
+	Sort list = nss.sorts().lookup(new Name("list"));
 
 
 	assertEquals("find isEmpty predicate", new Name("isEmpty"),
@@ -404,12 +406,10 @@ public class TestDeclParser extends TestCase {
 		   "}\n");
 	
 	
-	Sort elem = (Sort)nss.sorts().lookup(new Name("elem"));
-	Sort list = (Sort)nss.sorts().lookup(new Name("list"));
+	Sort elem = nss.sorts().lookup(new Name("elem"));
+	Sort list = nss.sorts().lookup(new Name("list"));
 
-	// TODO Add generic parameters.
-	// Degraded to raw class to avoid class cast exceptions afterwards.
-	Namespace<QuantifiableVariable> variables = nss.variables();
+	Namespace<SchemaVariable> variables = parsedSchemaVars;
 
 	assertEquals("find SV x", new Name("x"),
 		     variables.lookup(new Name("x")).name());
