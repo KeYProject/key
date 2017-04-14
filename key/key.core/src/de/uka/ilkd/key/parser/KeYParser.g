@@ -459,6 +459,10 @@ options {
         return schemaVariablesNamespace;
     }
 
+    public void setSchemaVariablesNamespace(Namespace<SchemaVariable> ns) {
+        this.schemaVariablesNamespace = ns;
+    }
+
     public ImmutableList<Taclet> getTaclets(){
         ImmutableList<Taclet> result = ImmutableSLList.<Taclet>nil();
 	
@@ -749,10 +753,11 @@ options {
                 					mods.rigid(), 
                 					mods.strict());
                 }
-            }          
+            }
 
             if (inSchemaMode()) {
-               if (variables().lookup(v.name()) != null) {
+               if (variables().lookup(v.name()) != null ||
+                   schemaVariables().lookup(v.name()) != null) {
             	 throw new AmbigiousDeclException(v.name().toString(), 
             	 			          getSourceName(), 
             	  				  getLine(), 
@@ -808,7 +813,7 @@ options {
         
         if (inSchemaMode()) {
             // if we are currently reading taclets we look for schema variables first
-            result = (SchemaVariable)variables().lookup(new Name(attributeName));
+            result = schemaVariables().lookup(new Name(attributeName));
         }
         
         assert inSchemaMode() || result == null; 
@@ -1112,8 +1117,14 @@ options {
     private Operator lookupVarfuncId(String varfunc_name, Term[] args) 
         throws RecognitionException/*NotDeclException, SemanticException*/ {
 
-        // case 1: variable
-        Operator v = (Operator) variables().lookup(new Name(varfunc_name));
+        // case 1a: variable
+        // case 1b: schema variable
+        Name name = new Name(varfunc_name);
+        Operator v = variables().lookup(name);
+        if(v == null) {
+            v = schemaVariables().lookup(name);
+        }
+
         if (v != null && (args == null || (inSchemaMode() && v instanceof ModalOperatorSV))) {
             return v;
         }
@@ -1409,10 +1420,11 @@ options {
     
     private ImmutableSet<Modality> lookupOperatorSV(String opName, ImmutableSet<Modality> modalities) 
     		throws RecognitionException/*KeYSemanticException*/ {
-	ModalOperatorSV osv = (ModalOperatorSV)schemaVariables().lookup(new Name(opName));
-        if(osv == null) {
-	    semanticError("Schema variable "+opName+" not defined.");
-	}
+        SchemaVariable sv = schemaVariables().lookup(new Name(opName));
+        if(sv == null || !(sv instanceof ModalOperatorSV)) {
+            semanticError("Schema variable "+opName+" not defined.");
+        }
+        ModalOperatorSV osv = (ModalOperatorSV)sv;
         modalities = modalities.union(osv.getModalities());
         return modalities;
     } 
@@ -2016,7 +2028,7 @@ one_schema_modal_op_decl
             while(it1.hasNext()) {
   	      modalities = opSVHelper(it1.next(), modalities);
   	    }
-            SchemaVariable osv = (SchemaVariable)variables().lookup(new Name(id));
+            SchemaVariable osv = schemaVariables().lookup(new Name(id));
             if(osv != null)
               semanticError("Schema variable "+id+" already defined.");
 
@@ -3156,7 +3168,7 @@ single_label returns [TermLabel label=null]
   {
       try {
           if (inSchemaMode()) {
-               Named var = variables().lookup(new Name(labelName));
+               SchemaVariable var = schemaVariables().lookup(new Name(labelName));
                if (var instanceof TermLabel) {
                     label = (TermLabel)var;
                }
@@ -3390,7 +3402,7 @@ one_schema_bound_variable returns[QuantifiableVariable v=null]
 }
 :
    id = simple_ident {
-      ts = (Operator) variables().lookup(new Name(id));   
+      ts = schemaVariables().lookup(new Name(id));   
       if ( ! (ts instanceof VariableSV)) {
         semanticError(ts+" is not allowed in a quantifier. Note, that you can't "
         + "use the normal syntax for quantifiers of the form \"\\exists int i;\""
@@ -3434,7 +3446,7 @@ modality_dl_term returns [Term _modality_dl_term = null]
            semanticError
              ("No schema elements allowed outside taclet declarations ("+sjb.opName+")");
          }
-         op = (SchemaVariable)variables().lookup(new Name(sjb.opName));
+         op = schemaVariables().lookup(new Name(sjb.opName));
        } else {
          op = Modality.getModality(sjb.opName);
        }
@@ -3602,7 +3614,10 @@ varId returns [ParsableVariable v = null]
     :
         id=IDENT 
         {   
-            v = (ParsableVariable) variables().lookup(new Name(id.getText()));
+            v = variables().lookup(new Name(id.getText()));
+            if (v == null) {
+                v = schemaVariables().lookup(new Name(id.getText()));
+            }
             if (v == null) {
                 throw new NotDeclException(input, "variable", id.getText());
             }
@@ -3620,6 +3635,9 @@ varIds returns [LinkedList list = new LinkedList()]
 	    String id = it.next();
             v = (ParsableVariable) variables().lookup(new Name(id));
             if (v == null) {
+                v = schemaVariables().lookup(new Name(id));
+            }
+            if (v == null) {
                semanticError("Variable " +id + " not declared.");
             }
 	    list.add(v);
@@ -3631,22 +3649,22 @@ triggers[TacletBuilder b]
 @init {
    id = null;
    t = null;
-   Named triggerVar = null;
+   SchemaVariable triggerVar = null;
    avoidCond = null;
    ImmutableList<Term> avoidConditions = ImmutableSLList.<Term>nil();
 } :
    TRIGGER
      LBRACE id = simple_ident 
      	{  
-     	  triggerVar = variables().lookup(new Name(id));
-     	  if (triggerVar == null || !(triggerVar instanceof SchemaVariable)) {
+     	  triggerVar = schemaVariables().lookup(new Name(id));
+     	  if (triggerVar == null) {
      	  	semanticError("Undeclared schemavariable: " + id);
      	  }  
      	}   RBRACE     
      t=term (AVOID avoidCond=term {avoidConditions = avoidConditions.append(avoidCond);} 
       (COMMA avoidCond=term {avoidConditions = avoidConditions.append(avoidCond);})*)? SEMI
    {
-     b.setTrigger(new Trigger((SchemaVariable)triggerVar, t, avoidConditions));
+     b.setTrigger(new Trigger(triggerVar, t, avoidConditions));
    }
 ;
 
@@ -3684,7 +3702,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
         {
            switchToSchemaMode();
            //  schema var decls
-           namespaces().setVariables(new Namespace(variables()));
+           schemaVariablesNamespace = new Namespace(schemaVariables());
         }
         ( SCHEMAVAR one_schema_var_decl ) *
         ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
@@ -3708,8 +3726,8 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
             b.setAnnotations(tacletAnnotations);
             r = b.getTaclet(); 
             taclet2Builder.put(r,b);
-	  // dump local schema var decls
-	  namespaces().setVariables(variables().parent());
+            // dump local schema var decls
+            schemaVariablesNamespace = schemaVariables().parent();
         }
     )
     RBRACE

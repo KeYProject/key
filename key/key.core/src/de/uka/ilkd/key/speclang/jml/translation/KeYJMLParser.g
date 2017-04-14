@@ -1000,7 +1000,7 @@ relationalexpr returns [SLExpression ret=null] throws SLTranslationException
 		if (result.getTerm() == null) {
 		    addIgnoreWarning("subtype expression <: only supported for" +
 			" \\typeof() arguments on the left side.", st);
-			final Namespace<Operator> fns = services.getNamespaces().functions();
+			final Namespace<Function> fns = services.getNamespaces().functions();
 			int x = -1; Name name = null;
 			do name = new Name("subtype_"+ ++x);
 			while (fns.lookup(name)!= null);
