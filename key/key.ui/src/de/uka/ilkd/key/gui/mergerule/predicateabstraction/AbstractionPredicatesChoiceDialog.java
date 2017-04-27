@@ -24,14 +24,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
-import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener.Change;
-import javafx.embed.swing.JFXPanel;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
-
 import javax.swing.JDialog;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
@@ -43,14 +35,21 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener.Change;
+import javafx.embed.swing.JFXPanel;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 
 /**
  * A dialog for choosing abstraction predicates for merges with predicate
@@ -227,8 +226,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
         ctrl.registerPlaceholderListListener((Change<? extends String> event) -> {
             while (event.next()) {
-                // FIXME for Dominic: generic namespaces
-                Namespace variables = services.getNamespaces().variables();
+                Namespace<IProgramVariable> variables = services.getNamespaces().programVariables();
                 if (event.wasRemoved()) {
                     Pair<Sort, Name> removedPlaceholder =
                             registeredPlaceholders.get(event.getFrom());

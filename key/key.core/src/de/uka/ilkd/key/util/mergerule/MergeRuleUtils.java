@@ -536,10 +536,10 @@ public class MergeRuleUtils {
 
         do {
             newName = services.getTermBuilder().newName(prefix);
-            result = new LocationVariable(new ProgramElementName(newName),
-                    sort);
-            // FIXME for Dominic: generic namespaces
-            Namespace variables = services.getNamespaces().variables();
+            result = new LocationVariable(//
+                    new ProgramElementName(newName), sort);
+            Namespace<IProgramVariable> variables = //
+                    services.getNamespaces().programVariables();
             variables.add(result);
         } while (newName.equals(prefix));
 
@@ -1401,9 +1401,8 @@ public class MergeRuleUtils {
         int nrContainedPlaceholders = 0;
         LocationVariable usedPlaceholder = null;
         for (Pair<Sort, Name> placeholder : registeredPlaceholders) {
-            // FIXME for Dominic: generic namespaces
-            LocationVariable placeholderVariable = (LocationVariable) ((Namespace)services
-                    .getNamespaces().variables()).lookup(placeholder.second);
+            LocationVariable placeholderVariable = (LocationVariable) (services
+                    .getNamespaces().programVariables().lookup(placeholder.second));
 
             if (containedLocVars.contains(placeholderVariable)) {
                 nrContainedPlaceholders++;
