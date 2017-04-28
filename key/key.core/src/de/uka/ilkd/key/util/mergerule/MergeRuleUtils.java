@@ -1129,7 +1129,7 @@ public class MergeRuleUtils {
             if (!distCandidates.isEmpty()) {
                 // Just take the first, any one should be good enough, at least
                 // with the present knowledge
-                theOneDistinguishingTerm = distCandidates.get(0);
+                theOneDistinguishingTerm = t;
             }
         }
 
