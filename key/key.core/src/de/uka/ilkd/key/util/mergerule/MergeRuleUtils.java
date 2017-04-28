@@ -44,6 +44,7 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -59,6 +60,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -72,6 +74,7 @@ import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -1301,6 +1304,89 @@ public class MergeRuleUtils {
         }
 
         return result;
+    }
+
+    /**
+     * Due to the introduction of local namespaces, we run into trouble when
+     * applying state merging in the presence of locally introduced symbols.
+     * These include program variables as well as Skolem constants. This method
+     * finds all name clashes and renames the corresponding entities in the
+     * {@link SymbolicExecutionState} state.
+     * 
+     * @param thisGoal
+     *            The {@link Goal} of the first merge partner
+     * @param mergePartnerState
+     *            The {@link SymbolicExecutionState} of the second merge
+     *            partner.
+     * @return The renamed {@link SymbolicExecutionState} of the second merge
+     *         partner.
+     */
+    public static SymbolicExecutionState handleNameClashes(Goal thisGoal,
+            SymbolicExecutionState mergePartnerState) {
+        final TermBuilder tb = thisGoal.proof().getServices().getTermBuilder();
+    
+        // This goal
+        final Collection<Operator> thisGoalSymbols = new ArrayList<>();
+        final NamespaceSet thisGoalNamespaces = thisGoal.getLocalNamespaces();
+        thisGoalSymbols
+                .addAll(thisGoalNamespaces.programVariables().allElements());
+        thisGoalSymbols.addAll(thisGoalNamespaces.functions().allElements());
+        final List<Name> thisGoalNames = thisGoalSymbols.parallelStream()
+                .map(pv -> pv.name()).collect(Collectors.toList());
+    
+        // Partner goal
+        final Collection<Operator> partnerGoalSymbols = new ArrayList<>();
+        final NamespaceSet partnerGoalNamespaces = thisGoal.proof()
+                .getGoal(mergePartnerState.getCorrespondingNode())
+                .getLocalNamespaces();
+        partnerGoalSymbols
+                .addAll(partnerGoalNamespaces.programVariables().allElements());
+        partnerGoalSymbols
+                .addAll(partnerGoalNamespaces.functions().allElements());
+        final List<Name> partnerGoalNames = partnerGoalSymbols.parallelStream()
+                .map(pv -> pv.name()).collect(Collectors.toList());
+    
+        // Construct intersection: Common names
+        thisGoalNames.retainAll(partnerGoalNames);
+    
+        if (!thisGoalNames.isEmpty()) {
+            // There are conflicts... So let's do something
+    
+            final List<Operator> problematicOps = partnerGoalSymbols
+                    .parallelStream()
+                    .filter(pv -> thisGoalNames.contains(pv.name()))
+                    .filter(pv -> !thisGoalSymbols.contains(pv))
+                    .collect(Collectors.toList());
+    
+            // Loop over all problematic operators and rename them in the
+            // partner state.
+            for (Operator op : problematicOps) {
+                Operator newOp;
+                if (op instanceof Function) {
+                    newOp = ((Function) op)
+                            .rename(new Name(tb.newName(op.name().toString())));
+                    thisGoal.getLocalNamespaces().functions()
+                            .add((Function) newOp);
+                } else if (op instanceof LocationVariable) {
+                    newOp = ((LocationVariable) op)
+                            .rename(new Name(tb.newName(op.name().toString())));
+                    thisGoal.getLocalNamespaces().programVariables()
+                            .add((LocationVariable) newOp);
+                } else {
+                    throw new RuntimeException(
+                            "MergeRule: Unexpected type of Operator involved in name clash: "
+                                    + op.getClass().getSimpleName());
+                }
+    
+                mergePartnerState = new SymbolicExecutionState(
+                        OpReplacer.replace(op, newOp,
+                                mergePartnerState.getSymbolicState(), tb.tf()),
+                        OpReplacer.replace(op, newOp,
+                                mergePartnerState.getPathCondition(), tb.tf()),
+                        mergePartnerState.getCorrespondingNode());
+            }
+        }
+        return mergePartnerState;
     }
 
     /**

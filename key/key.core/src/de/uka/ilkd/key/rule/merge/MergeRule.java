@@ -189,6 +189,8 @@ public class MergeRule implements BuiltInRule {
         for (SymbolicExecutionState state : mergePartnerStates) {
             mergeRuleApp.fireProgressChange(cnt++);
 
+            state = MergeRuleUtils.handleNameClashes(goal, state);
+
             Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> mergeResult = mergeStates(
                     mergeRule, mergedState, state, thisSEState.third,
                     mergeRuleApp.getDistinguishingFormula(), services);
@@ -772,13 +774,13 @@ public class MergeRule implements BuiltInRule {
         final ImmutableList<Goal> allGoals = services.getProof()
                 .getSubtreeGoals(start);
 
-        final Triple<Term, Term, Term> ownSEState = sequentToSETriple(goal.node(),
-                pio, services);
+        final Triple<Term, Term, Term> ownSEState = sequentToSETriple(
+                goal.node(), pio, services);
 
         // Find potential partners -- for which isApplicable is true and
         // they have the same program counter (and post condition).
         ImmutableList<MergePartner> potentialPartners = ImmutableSLList.nil();
-        
+
         for (final Goal g : allGoals) {
             if (!g.equals(goal) && !g.isLinked()) {
                 Semisequent succedent = g.sequent().succedent();
@@ -787,7 +789,8 @@ public class MergeRule implements BuiltInRule {
 
                     final PosInTerm pit = PosInTerm.getTopLevel();
 
-                    final PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
+                    final PosInOccurrence gPio = new PosInOccurrence(f, pit,
+                            false);
                     if (isOfAdmissibleForm(g, gPio, false)) {
                         final Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
                                 g.node(), gPio, services);
