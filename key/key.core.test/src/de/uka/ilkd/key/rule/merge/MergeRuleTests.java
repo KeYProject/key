@@ -156,6 +156,21 @@ public class MergeRuleTests extends TestCase {
     }
 
     /**
+     * Regression test for a case where a merge with MPS is done after two
+     * branches with a variable "result_0", which is not the same (one time an
+     * integer and one time an Object). This clash has to result in a renaming.
+     * An interactive cut in the proof should make sure that the renaming works
+     * and resolves the clashes. The test case includes a "is weakening" goal.
+     * Underlying Java file: "A.java".
+     */
+    @Test
+    public void testLoadProofWithDiffVarsWithSameNameAndMPS() {
+        Proof proof = loadProof(
+                "A.differentVarsWithSameName.MPS.cut.closed.proof");
+        assertTrue(proof.closed());
+    }
+
+    /**
      * This test case semi-automatically proves the Gcd problem with two merges
      * in the following way:
      * <p>
