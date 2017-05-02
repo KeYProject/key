@@ -21,10 +21,10 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateLeftSideLoc
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateRightSideFor;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitting;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isUpdateNormalForm;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSEPair;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
@@ -185,6 +185,7 @@ public class MergeRule implements BuiltInRule {
                 thisSEState.first, thisSEState.second, newGoal.node());
         LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
         LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<Term>();
+        HashMap<Node, SymbolicExecutionState> mergePartnerNodesToStates = new HashMap<>();
 
         int cnt = 0;
         for (SymbolicExecutionState state : mergePartnerStates) {
@@ -193,9 +194,11 @@ public class MergeRule implements BuiltInRule {
             final Pair<SymbolicExecutionState, SymbolicExecutionState> noClash = //
                     MergeRuleUtils.handleNameClashes(mergedState, state,
                             services);
-            
+
             mergedState = noClash.first;
             state = noClash.second;
+
+            mergePartnerNodesToStates.put(state.getCorrespondingNode(), state);
 
             Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> mergeResult = mergeStates(
                     mergeRule, mergedState, state, thisSEState.third,
@@ -221,8 +224,8 @@ public class MergeRule implements BuiltInRule {
         for (MergePartner mergePartner : mergePartners) {
             closeMergePartnerGoal(newGoal.node(), mergePartner.getGoal(),
                     mergePartner.getPio(), mergedState,
-                    sequentToSEPair(mergePartner.getGoal().node(),
-                            mergePartner.getPio(), services),
+                    mergePartnerNodesToStates
+                            .get(mergePartner.getGoal().node()),
                     thisSEState.third, newNames);
         }
 

@@ -45,6 +45,7 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -183,10 +184,11 @@ public class CloseAfterMerge implements BuiltInRule {
      * @param closeApp
      *            The rule application containing the required data.
      * @param isWeakeningGoal
-     *            TODO
+     *            The {@link Proof} {@link Goal} for the logical weakening
+     *            formula.
      * 
-     * @return The syntactic weakening formula for this.mergeState and
-     *         this.thisSEState.
+     * @return The syntactic weakening formula for the instantiated
+     *         {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */
     private Term getSyntacticWeakeningFormula(
             CloseAfterMergeRuleBuiltInRuleApp closeApp, Goal isWeakeningGoal) {
@@ -236,8 +238,8 @@ public class CloseAfterMerge implements BuiltInRule {
         HashSet<Function> newConstants = closeApp.getNewNames().stream()
                 .map(name -> isWeakeningGoal.getLocalNamespaces().functions()
                         .lookup(name))
-                .collect(
-                        Collectors.toCollection(() -> new LinkedHashSet<Function>()));
+                .collect(Collectors
+                        .toCollection(() -> new LinkedHashSet<Function>()));
 
         //@formatter:off
         // Create the formula \forall v1,...,vn. (C2 -> {U2}P(...)) -> (C1 -> {U1}P(...))
