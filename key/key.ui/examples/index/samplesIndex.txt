@@ -19,6 +19,7 @@ firstTouch/08-Java5/README.txt
 heap/removeDups/README.txt
 firstTouch/09-Quicktour/README.txt
 firstTouch/10-SITA/README.txt
+firstTouch/11-StateMerging/README.txt
 
 heap/SmansEtAl/README.txt
 heap/Transactions/README.txt
