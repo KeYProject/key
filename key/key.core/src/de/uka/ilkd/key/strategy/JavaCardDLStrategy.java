@@ -243,7 +243,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature oneStepSimplificationF =
                 oneStepSimplificationFeature(longConst(-11000));
 
-        final Feature mergeRuleF = setupMergeRule();
+        final Feature mergeRuleF;
+        final String mpsProperty =
+                strategyProperties
+                        .getProperty(StrategyProperties.MPS_OPTIONS_KEY);
+        if (mpsProperty.equals(StrategyProperties.MPS_MERGE)) {
+            mergeRuleF = mergeRuleFeature(longConst(-4000));
+        }
+        else {
+            mergeRuleF = mergeRuleFeature(inftyConst());
+        }
 
         // final Feature smtF = smtFeature(inftyConst());
 
@@ -280,8 +289,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 getServices().getTypeConverter().getLocSetLDT();
 
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-
-        bindRuleSet(d, "merge_point", DeleteMergePointRuleFeature.INSTANCE);
         
         bindRuleSet(d, "semantics_blasting", inftyConst());
         bindRuleSet(d, "simplify_heap_high_costs", inftyConst());
@@ -495,6 +502,30 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             throw new RuntimeException("Unexpected strategy property "
                     + methProp);
         }
+
+        final String mpsProp =
+                strategyProperties
+                        .getProperty(StrategyProperties.MPS_OPTIONS_KEY);
+
+        switch (mpsProp) {
+        case StrategyProperties.MPS_MERGE:
+            /*
+             * For this case, we use a special feature, since deleting merge
+             * points should only be done after a merge rule application.
+             */
+            bindRuleSet(d, "merge_point", DeleteMergePointRuleFeature.INSTANCE);
+            break;
+        case StrategyProperties.MPS_SKIP:
+            bindRuleSet(d, "merge_point", longConst(-5000));
+            break;
+        case StrategyProperties.MPS_NONE:
+            bindRuleSet(d, "merge_point", inftyConst());
+            break;
+        default:
+            throw new RuntimeException("Unexpected strategy property "
+                    + methProp);
+        }
+
 
         final String queryAxProp =
                 strategyProperties

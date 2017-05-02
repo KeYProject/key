@@ -49,7 +49,7 @@ public class MergeRuleFeature implements Feature {
 
         return JavaTools.getActiveStatement(TermBuilder.goBelowUpdates(t)
                 .javaBlock()) instanceof MergePointStatement
-                        ? NumberRuleAppCost.create(-4000)
+                        ? NumberRuleAppCost.create(0)
                         : TopRuleAppCost.INSTANCE;
     }
 
