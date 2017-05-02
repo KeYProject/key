@@ -217,7 +217,7 @@ public class MergeRule implements BuiltInRule {
                     mergePartner.getPio(), mergedState,
                     sequentToSEPair(mergePartner.getGoal().node(),
                             mergePartner.getPio(), services),
-                    thisSEState.third);
+                    thisSEState.third, newNames);
         }
 
         // Delete previous sequents

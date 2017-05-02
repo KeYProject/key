@@ -609,7 +609,7 @@ public class MergeRuleUtils {
             LinkedList<Term> transfSubs = new LinkedList<Term>();
             for (Term sub : term.subs()) {
                 transfSubs
-                        .add(substConstantsByFreshVars(sub, replMap, services));
+                        .add(substConstantsByFreshVars(sub, restrictTo, replMap, services));
             }
 
             return services.getTermFactory().createTerm(term.op(),
@@ -1175,17 +1175,21 @@ public class MergeRuleUtils {
      *            Parent of remaining join node.
      * @param mergePartner
      *            Partner goal to close.
+     * @param newNames
+     *            The set of new names (of Skolem constants) introduced in the
+     *            merge.
      */
     public static void closeMergePartnerGoal(Node mergeNodeParent,
             Goal mergePartner, PosInOccurrence pio,
             SymbolicExecutionState mergeState,
-            SymbolicExecutionState mergePartnerState, Term pc) {
+            SymbolicExecutionState mergePartnerState, Term pc,
+            Set<Name> newNames) {
 
         InitConfig initConfig = mergeNodeParent.proof().getInitConfig();
 
         CloseAfterMerge closeRule = CloseAfterMerge.INSTANCE;
         RuleApp app = closeRule.createApp(pio, mergePartner.node(),
-                mergeNodeParent, mergeState, mergePartnerState, pc);
+                mergeNodeParent, mergeState, mergePartnerState, pc, newNames);
 
         // Register rule if not done yet.
         // This avoids error messages of the form
@@ -1336,8 +1340,9 @@ public class MergeRuleUtils {
 
         // Partner goal
         final Collection<Operator> partnerGoalSymbols = new ArrayList<>();
-        final NamespaceSet partnerGoalNamespaces = thisGoal.proof()
-                .getGoal(mergePartnerState.getCorrespondingNode())
+        final Goal partnerGoal = thisGoal.proof()
+                .getGoal(mergePartnerState.getCorrespondingNode());
+        final NamespaceSet partnerGoalNamespaces = partnerGoal
                 .getLocalNamespaces();
         partnerGoalSymbols
                 .addAll(partnerGoalNamespaces.programVariables().allElements());
@@ -1364,14 +1369,20 @@ public class MergeRuleUtils {
                 Operator newOp;
                 if (op instanceof Function) {
                     newOp = ((Function) op)
-                            .rename(new Name(tb.newName(op.name().toString())));
+                            .rename(new Name(tb.newName(op.name().toString(),
+                                    thisGoal.getLocalNamespaces())));
                     thisGoal.getLocalNamespaces().functions()
                             .add((Function) newOp);
+                    
+                    partnerGoalNamespaces.functions().parent().remove(op.name());
                 } else if (op instanceof LocationVariable) {
                     newOp = ((LocationVariable) op)
-                            .rename(new Name(tb.newName(op.name().toString())));
+                            .rename(new Name(tb.newName(op.name().toString(),
+                                    thisGoal.getLocalNamespaces())));
                     thisGoal.getLocalNamespaces().programVariables()
                             .add((LocationVariable) newOp);
+                    
+                    partnerGoalNamespaces.programVariables().parent().remove(op.name());
                 } else {
                     throw new RuntimeException(
                             "MergeRule: Unexpected type of Operator involved in name clash: "
@@ -1386,6 +1397,7 @@ public class MergeRuleUtils {
                         mergePartnerState.getCorrespondingNode());
             }
         }
+
         return mergePartnerState;
     }
 
