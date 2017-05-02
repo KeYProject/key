@@ -53,7 +53,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -314,8 +313,8 @@ public class IntermediateProofReplayer {
                                             + ", rule "
                                             + appInterm.getRuleName()
                                             + NOT_APPLICABLE, e);
+                                }
                             }
-                        }
                         } else if (appInterm instanceof MergePartnerAppIntermediate) {
                             // Register this partner node
                             MergePartnerAppIntermediate joinPartnerApp = (MergePartnerAppIntermediate) appInterm;
@@ -557,7 +556,7 @@ public class IntermediateProofReplayer {
             builtinIfInsts = ImmutableSLList.nil();
             for (final Pair<Integer, PosInTerm> ifInstP : currInterm
                     .getBuiltInIfInsts()) {
-                final int currIfInstFormula         = ifInstP.first;
+                final int currIfInstFormula = ifInstP.first;
                 final PosInTerm currIfInstPosInTerm = ifInstP.second;
 
                 try {
@@ -567,12 +566,12 @@ public class IntermediateProofReplayer {
                     builtinIfInsts = builtinIfInsts.append(ifInst);
                 } catch (RuntimeException e) {
                     reportError(ERROR_LOADING_PROOF_LINE + "Line "
-                                    + currInterm.getLineNr() + ", goal "
+                            + currInterm.getLineNr() + ", goal "
                             + currGoal.node().serialNr() + ", rule " + ruleName
                             + NOT_APPLICABLE, e);
                 } catch (AssertionError e) {
                     reportError(ERROR_LOADING_PROOF_LINE + "Line "
-                                    + currInterm.getLineNr() + ", goal "
+                            + currInterm.getLineNr() + ", goal "
                             + currGoal.node().serialNr() + ", rule " + ruleName
                             + NOT_APPLICABLE, e);
                 }
@@ -715,11 +714,12 @@ public class IntermediateProofReplayer {
             if (joinAppInterm.getAbstractionPredicates() != null) {
                 try {
                     predicates = AbstractionPredicate.fromString(
-                            joinAppInterm.getAbstractionPredicates(), services);
+                            joinAppInterm.getAbstractionPredicates(), services,
+                            services.getProof().getGoal(currNode)
+                                    .getLocalNamespaces());
                 } catch (ParserException e) {
                     errors.add(e);
                 }
-
             }
 
             final Class<? extends AbstractPredicateAbstractionLattice> latticeType = joinAppInterm
@@ -950,11 +950,9 @@ public class IntermediateProofReplayer {
             Namespace<Function> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null,
-                    proof.getServices(), varNS,
-                    functNS,
+                    proof.getServices(), varNS, functNS,
                     proof.getNamespaces().sorts(), progVarNS, new AbbrevMap());
-        }
-        catch (ParserException e) {
+        } catch (ParserException e) {
             throw new RuntimeException("Error while parsing value " + value
                     + "\nVar namespace is: " + varNS + "\n", e);
         }
@@ -971,9 +969,7 @@ public class IntermediateProofReplayer {
      */
     public static Term parseTerm(String value, Proof proof) {
         NamespaceSet nss = proof.getNamespaces();
-        return parseTerm(value, proof,
-                nss.variables(),
-                nss.programVariables(),
+        return parseTerm(value, proof, nss.variables(), nss.programVariables(),
                 nss.functions());
     }
 
@@ -1033,9 +1029,12 @@ public class IntermediateProofReplayer {
         } else if (sv instanceof SkolemTermSV) {
             result = app.createSkolemConstant(value, sv, true, services);
         } else {
-            Namespace<QuantifiableVariable> varNS = p.getNamespaces().variables();
-            Namespace<IProgramVariable> prgVarNS = targetGoal.getLocalNamespaces().programVariables();
-            Namespace<Function> funcNS = targetGoal.getLocalNamespaces().functions();
+            Namespace<QuantifiableVariable> varNS = p.getNamespaces()
+                    .variables();
+            Namespace<IProgramVariable> prgVarNS = targetGoal
+                    .getLocalNamespaces().programVariables();
+            Namespace<Function> funcNS = targetGoal.getLocalNamespaces()
+                    .functions();
             varNS = app.extendVarNamespaceForSV(varNS, sv);
             Term instance = parseTerm(value, p, varNS, prgVarNS, funcNS);
             result = app.addCheckedInstantiation(sv, instance, services, true);

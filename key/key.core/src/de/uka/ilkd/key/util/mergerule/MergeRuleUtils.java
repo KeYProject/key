@@ -725,10 +725,10 @@ public class MergeRuleUtils {
         int newCounter = 0;
         String branchUniqueName = base;
         Iterable<IProgramVariable> progVars = intrNode.getLocalProgVars();
-        while (!isUniqueInGlobals(branchUniqueName.toString(),
-                progVars)
-                || (lookupVarInNS(branchUniqueName, services) != null && !lookupVarInNS(
-                        branchUniqueName, services).sort().equals(var.sort()))) {
+        while (!isUniqueInGlobals(branchUniqueName.toString(), progVars)
+                || (lookupVarInNS(branchUniqueName, services) != null
+                        && !lookupVarInNS(branchUniqueName, services).sort()
+                                .equals(var.sort()))) {
             newCounter += 1;
             branchUniqueName = base + "_" + newCounter;
         }
@@ -1324,7 +1324,7 @@ public class MergeRuleUtils {
     public static SymbolicExecutionState handleNameClashes(Goal thisGoal,
             SymbolicExecutionState mergePartnerState) {
         final TermBuilder tb = thisGoal.proof().getServices().getTermBuilder();
-    
+
         // This goal
         final Collection<Operator> thisGoalSymbols = new ArrayList<>();
         final NamespaceSet thisGoalNamespaces = thisGoal.getLocalNamespaces();
@@ -1333,7 +1333,7 @@ public class MergeRuleUtils {
         thisGoalSymbols.addAll(thisGoalNamespaces.functions().allElements());
         final List<Name> thisGoalNames = thisGoalSymbols.parallelStream()
                 .map(pv -> pv.name()).collect(Collectors.toList());
-    
+
         // Partner goal
         final Collection<Operator> partnerGoalSymbols = new ArrayList<>();
         final NamespaceSet partnerGoalNamespaces = thisGoal.proof()
@@ -1345,19 +1345,19 @@ public class MergeRuleUtils {
                 .addAll(partnerGoalNamespaces.functions().allElements());
         final List<Name> partnerGoalNames = partnerGoalSymbols.parallelStream()
                 .map(pv -> pv.name()).collect(Collectors.toList());
-    
+
         // Construct intersection: Common names
         thisGoalNames.retainAll(partnerGoalNames);
-    
+
         if (!thisGoalNames.isEmpty()) {
             // There are conflicts... So let's do something
-    
+
             final List<Operator> problematicOps = partnerGoalSymbols
                     .parallelStream()
                     .filter(pv -> thisGoalNames.contains(pv.name()))
                     .filter(pv -> !thisGoalSymbols.contains(pv))
                     .collect(Collectors.toList());
-    
+
             // Loop over all problematic operators and rename them in the
             // partner state.
             for (Operator op : problematicOps) {
@@ -1377,7 +1377,7 @@ public class MergeRuleUtils {
                             "MergeRule: Unexpected type of Operator involved in name clash: "
                                     + op.getClass().getSimpleName());
                 }
-    
+
                 mergePartnerState = new SymbolicExecutionState(
                         OpReplacer.replace(op, newOp,
                                 mergePartnerState.getSymbolicState(), tb.tf()),
@@ -1469,17 +1469,19 @@ public class MergeRuleUtils {
      *
      * @param input
      *            The predicate to parse (contains exactly one placeholder).
+     * @param localNamespaces
+     *            The local {@link NamespaceSet}.
      * @return The parsed {@link AbstractionPredicate}.
      * @throws ParserException
      *             If there is a syntax error.
      */
     public static AbstractionPredicate parsePredicate(String input,
             ArrayList<Pair<Sort, Name>> registeredPlaceholders,
-            Services services) throws ParserException {
+            NamespaceSet localNamespaces, Services services)
+            throws ParserException {
         DefaultTermParser parser = new DefaultTermParser();
         Term formula = parser.parse(new StringReader(input), Sort.FORMULA,
-                services, services.getNamespaces(),
-                services.getProof().abbreviations());
+                services, localNamespaces, services.getProof().abbreviations());
 
         ImmutableSet<LocationVariable> containedLocVars = MergeRuleUtils
                 .getLocationVariables(formula, services);
@@ -1488,7 +1490,8 @@ public class MergeRuleUtils {
         LocationVariable usedPlaceholder = null;
         for (Pair<Sort, Name> placeholder : registeredPlaceholders) {
             LocationVariable placeholderVariable = (LocationVariable) (services
-                    .getNamespaces().programVariables().lookup(placeholder.second));
+                    .getNamespaces().programVariables()
+                    .lookup(placeholder.second));
 
             if (containedLocVars.contains(placeholderVariable)) {
                 nrContainedPlaceholders++;

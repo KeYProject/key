@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -235,6 +236,8 @@ public abstract class AbstractionPredicate
      *            {@link String} to parse.
      * @param services
      *            The {@link Services} object.
+     * @param localNamespaces
+     *            The local {@link NamespaceSet}.
      * @return The parsed {@link String}.
      * @throws ParserException
      *             If there is a syntax error.
@@ -244,7 +247,8 @@ public abstract class AbstractionPredicate
      *             If the given sort is not known to the system.
      */
     public static List<AbstractionPredicate> fromString(final String s,
-            final Services services) throws ParserException {
+            final Services services, NamespaceSet localNamespaces)
+            throws ParserException {
         final ArrayList<AbstractionPredicate> result = new ArrayList<AbstractionPredicate>();
 
         Pattern p = Pattern.compile("\\('(.+?)', '(.+?)'\\)");
@@ -277,7 +281,8 @@ public abstract class AbstractionPredicate
 
                 // Parse the predicate
                 result.add(MergeRuleUtils.parsePredicate(predStr,
-                        MergeRuleUtils.singletonArrayList(ph), services));
+                        MergeRuleUtils.singletonArrayList(ph), localNamespaces,
+                        services));
             }
         }
 
