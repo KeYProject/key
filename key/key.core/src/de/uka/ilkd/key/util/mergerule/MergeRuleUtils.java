@@ -608,8 +608,8 @@ public class MergeRuleUtils {
 
             LinkedList<Term> transfSubs = new LinkedList<Term>();
             for (Term sub : term.subs()) {
-                transfSubs
-                        .add(substConstantsByFreshVars(sub, restrictTo, replMap, services));
+                transfSubs.add(substConstantsByFreshVars(sub, restrictTo,
+                        replMap, services));
             }
 
             return services.getTermFactory().createTerm(term.op(),
@@ -1317,20 +1317,27 @@ public class MergeRuleUtils {
      * finds all name clashes and renames the corresponding entities in the
      * {@link SymbolicExecutionState} state.
      * 
-     * @param thisGoal
-     *            The {@link Goal} of the first merge partner
+     * @param mergeState
+     *            The {@link SymbolicExecutionState} in which the partners
+     *            should be merged.
      * @param mergePartnerState
      *            The {@link SymbolicExecutionState} of the second merge
      *            partner.
+     * @param services
+     *            The {@link Services} object.
+     * 
      * @return The renamed {@link SymbolicExecutionState} of the second merge
      *         partner.
      */
-    public static SymbolicExecutionState handleNameClashes(Goal thisGoal,
-            SymbolicExecutionState mergePartnerState) {
-        final TermBuilder tb = thisGoal.proof().getServices().getTermBuilder();
+    public static Pair<SymbolicExecutionState, SymbolicExecutionState> handleNameClashes(
+            SymbolicExecutionState mergeState,
+            SymbolicExecutionState mergePartnerState, Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final Proof proof = services.getProof();
 
         // This goal
         final Collection<Operator> thisGoalSymbols = new ArrayList<>();
+        final Goal thisGoal = proof.getGoal(mergeState.getCorrespondingNode());
         final NamespaceSet thisGoalNamespaces = thisGoal.getLocalNamespaces();
         thisGoalSymbols
                 .addAll(thisGoalNamespaces.programVariables().allElements());
@@ -1340,7 +1347,7 @@ public class MergeRuleUtils {
 
         // Partner goal
         final Collection<Operator> partnerGoalSymbols = new ArrayList<>();
-        final Goal partnerGoal = thisGoal.proof()
+        final Goal partnerGoal = proof
                 .getGoal(mergePartnerState.getCorrespondingNode());
         final NamespaceSet partnerGoalNamespaces = partnerGoal
                 .getLocalNamespaces();
@@ -1365,40 +1372,62 @@ public class MergeRuleUtils {
 
             // Loop over all problematic operators and rename them in the
             // partner state.
-            for (Operator op : problematicOps) {
-                Operator newOp;
-                if (op instanceof Function) {
-                    newOp = ((Function) op)
-                            .rename(new Name(tb.newName(op.name().toString(),
+            for (Operator partnerStateOp : problematicOps) {
+                final Operator mergeStateOp = thisGoalSymbols.parallelStream()
+                        .filter(s -> s.name().equals(partnerStateOp.name()))
+                        .collect(Collectors.toList()).get(0);
+                
+                Operator newOp1;
+                Operator newOp2;
+                if (partnerStateOp instanceof Function) {
+                    newOp1 = ((Function) mergeStateOp)
+                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
                                     thisGoal.getLocalNamespaces())));
-                    thisGoal.getLocalNamespaces().functions()
-                            .add((Function) newOp);
-                    
-                    partnerGoalNamespaces.functions().parent().remove(op.name());
-                } else if (op instanceof LocationVariable) {
-                    newOp = ((LocationVariable) op)
-                            .rename(new Name(tb.newName(op.name().toString(),
+                    thisGoalNamespaces.functions().add((Function) newOp1);
+                    thisGoalNamespaces.flushToParent();
+
+                    newOp2 = ((Function) partnerStateOp)
+                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
                                     thisGoal.getLocalNamespaces())));
-                    thisGoal.getLocalNamespaces().programVariables()
-                            .add((LocationVariable) newOp);
-                    
-                    partnerGoalNamespaces.programVariables().parent().remove(op.name());
+                    thisGoalNamespaces.functions().add((Function) newOp2);
+                    thisGoalNamespaces.flushToParent();
+                } else if (partnerStateOp instanceof LocationVariable) {
+                    newOp1 = ((LocationVariable) mergeStateOp)
+                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                                    thisGoal.getLocalNamespaces())));
+                    thisGoalNamespaces.programVariables()
+                            .add((LocationVariable) newOp1);
+                    thisGoalNamespaces.flushToParent();
+
+                    newOp2 = ((LocationVariable) partnerStateOp)
+                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                                    thisGoal.getLocalNamespaces())));
+                    thisGoalNamespaces.programVariables()
+                            .add((LocationVariable) newOp2);
+                    thisGoalNamespaces.flushToParent();
                 } else {
                     throw new RuntimeException(
                             "MergeRule: Unexpected type of Operator involved in name clash: "
-                                    + op.getClass().getSimpleName());
+                                    + partnerStateOp.getClass().getSimpleName());
                 }
+                
+                mergeState = new SymbolicExecutionState(
+                        OpReplacer.replace(mergeStateOp, newOp1,
+                                mergeState.getSymbolicState(), tb.tf()),
+                        OpReplacer.replace(mergeStateOp, newOp1,
+                                mergeState.getPathCondition(), tb.tf()),
+                        mergeState.getCorrespondingNode());
 
                 mergePartnerState = new SymbolicExecutionState(
-                        OpReplacer.replace(op, newOp,
+                        OpReplacer.replace(partnerStateOp, newOp2,
                                 mergePartnerState.getSymbolicState(), tb.tf()),
-                        OpReplacer.replace(op, newOp,
+                        OpReplacer.replace(partnerStateOp, newOp2,
                                 mergePartnerState.getPathCondition(), tb.tf()),
                         mergePartnerState.getCorrespondingNode());
             }
         }
 
-        return mergePartnerState;
+        return new Pair<>(mergeState, mergePartnerState);
     }
 
     /**

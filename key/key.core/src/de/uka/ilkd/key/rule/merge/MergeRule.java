@@ -61,6 +61,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
@@ -189,7 +190,12 @@ public class MergeRule implements BuiltInRule {
         for (SymbolicExecutionState state : mergePartnerStates) {
             mergeRuleApp.fireProgressChange(cnt++);
 
-            state = MergeRuleUtils.handleNameClashes(goal, state);
+            final Pair<SymbolicExecutionState, SymbolicExecutionState> noClash = //
+                    MergeRuleUtils.handleNameClashes(mergedState, state,
+                            services);
+            
+            mergedState = noClash.first;
+            state = noClash.second;
 
             Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> mergeResult = mergeStates(
                     mergeRule, mergedState, state, thisSEState.third,
@@ -530,8 +536,8 @@ public class MergeRule implements BuiltInRule {
                 || !(heap2.op() instanceof Function)) {
             // Covers the case of two different symbolic heaps
             return new ValuesMergeResult(newConstraints,
-                    MergeByIfThenElse.createIfThenElseTerm(state1, state2, heap1,
-                            heap2, distinguishingFormula, services),
+                    MergeByIfThenElse.createIfThenElseTerm(state1, state2,
+                            heap1, heap2, distinguishingFormula, services),
                     newNames, sideConditionsToProve);
         }
 
