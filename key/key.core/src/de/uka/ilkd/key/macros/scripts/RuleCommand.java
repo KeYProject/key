@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
@@ -36,10 +37,10 @@ public class RuleCommand extends AbstractCommand {
 
     private static class Parameters {
         String rulename;
-        Term on;
-        Term formula;
+        String on;
+        String formula;
         int occ = -1;
-        Map<String, Term> instantiations = new HashMap<>();
+        Map<String, String> instantiations = new HashMap<>();
     }
 
     private static class TacletNameFilter extends TacletFilter {
@@ -72,26 +73,32 @@ public class RuleCommand extends AbstractCommand {
             throw new ScriptException("Not a unique \\assumes instantiation");
         }
 
-        theApp = assumesCandidates.head();
+        Goal g = getFirstOpenGoal(proof, state);
 
+        theApp = assumesCandidates.head();
         for (SchemaVariable sv : theApp.uninstantiatedVars()) {
-			if (theApp.isInstantiationRequired(sv)) {
-				Term inst = p.instantiations.get(sv.name().toString());
-				if (inst == null) {
-					throw new ScriptException("missing instantiation for " + sv);
-				}
-				theApp = theApp.addInstantiation(sv, inst, true, proof.getServices());
-			}
-		}
+            if (theApp.isInstantiationRequired(sv)) {
+                String str = p.instantiations.get(sv.name().toString());
+                Term inst;
+                try {
+                    inst = toTerm(g, state, str, null);
+                } catch (ParserException e) {
+                    throw new ScriptException(e);
+                }
+                if (inst == null) {
+                    throw new ScriptException("missing instantiation for " + sv);
+                }
+                theApp = theApp.addInstantiation(sv, inst, true, proof.getServices());
+            }
+        }
 
         // instantiate remaining symbols
-        theApp = theApp.tryToInstantiate(proof.getServices());
+        theApp = theApp.tryToInstantiate(proof.getServices().getOverlay(g.getLocalNamespaces()));
 
         if(theApp == null) {
             throw new ScriptException("Cannot instantiate this rule");
         }
 
-        Goal g = getFirstOpenGoal(proof, state);
         g.apply(theApp);
     }
 
@@ -118,6 +125,10 @@ public class RuleCommand extends AbstractCommand {
 
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(taclet);
 
+        // TODO allow for sv instantiations at this point
+//        SchemaVariable sv = app.uninstantiatedVars().iterator().next();
+        // app = app.addCheckedInstantiation(sv, formula, proof.getServices(), true);
+
         return app;
     }
 
@@ -125,7 +136,8 @@ public class RuleCommand extends AbstractCommand {
             throws ScriptException {
 
         ImmutableList<TacletApp> allApps = findAllTacletApps(proof, p, state);
-        List<TacletApp> matchingApps = filterList(p, allApps);
+        Goal goal = getFirstOpenGoal(proof, state);
+        List<TacletApp> matchingApps = filterList(p, allApps, goal, state);
 
         if(matchingApps.isEmpty()) {
             throw new ScriptException("No matching applications.");
@@ -151,12 +163,20 @@ public class RuleCommand extends AbstractCommand {
         Services services = proof.getServices();
         TacletFilter filter = new TacletNameFilter(p.rulename);
         Goal g = getFirstOpenGoal(proof, state);
+        Term formula = null;
+        try {
+            if(p.formula != null) {
+                formula = toTerm(g, state, p.formula, null);
+            }
+        } catch (ParserException e) {
+            throw new ScriptException(e);
+        }
         RuleAppIndex index = g.ruleAppIndex ();
         index.autoModeStopped ();
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if(p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
+            if(formula != null && !sf.formula().equalsModRenaming(formula)) {
                 continue;
             }
             allApps = allApps.append(
@@ -166,7 +186,7 @@ public class RuleCommand extends AbstractCommand {
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if(p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
+            if(formula != null && !sf.formula().equalsModRenaming(formula)) {
                 continue;
             }
             allApps = allApps.append(
@@ -180,13 +200,23 @@ public class RuleCommand extends AbstractCommand {
     /*
      * Filter those apps from a list that are according to the parameters.
      */
-    private List<TacletApp> filterList(Parameters p, ImmutableList<TacletApp> list) {
+    private List<TacletApp> filterList(Parameters p, ImmutableList<TacletApp> list,
+            Goal goal, Map<String, Object> state) throws ScriptException {
         List<TacletApp> matchingApps = new ArrayList<TacletApp>();
         for (TacletApp tacletApp : list) {
             if(tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;
-                if(p.on == null || pta.posInOccurrence().subTerm().equalsModRenaming(p.on)) {
+                if(p.on == null) {
                     matchingApps.add(pta);
+                } else {
+                    try {
+                        Term on = toTerm(goal, state, p.on, null);
+                        if(pta.posInOccurrence().subTerm().equals(on)) {
+                            matchingApps.add(pta);
+                        }
+                    } catch (ParserException e) {
+                        throw new ScriptException(e);
+                    }
                 }
             }
         }
@@ -199,35 +229,35 @@ public class RuleCommand extends AbstractCommand {
         Parameters result = new Parameters();
 
         try {
-        	for (Entry<String, String> arg : args.entrySet()) {
+            for (Entry<String, String> arg : args.entrySet()) {
                 switch (arg.getKey()) {
-        		    case "#2":
-        		        // rule name
-        		        result.rulename = args.get("#2");
-        		        break;
-        			case "on":
-        			    // on="term to apply to as find"
-        				result.on = toTerm(proof, state, arg.getValue(), null);
-        				break;
-        			case "formula":
-        			    // formula="toplevel formula in which it appears"
-        				result.formula = toTerm(proof, state, arg.getValue(), null);
-        				break;
-        			case "occ":
-        			    // occurrence number;
-        				result.occ = Integer.parseInt(arg.getValue());
-        				break;
-        			default:
-        			    // instantiation
+                case "#2":
+                    // rule name
+                    result.rulename = args.get("#2");
+                    break;
+                case "on":
+                    // on="term to apply to as find"
+                    result.on = arg.getValue();
+                    break;
+                case "formula":
+                    // formula="toplevel formula in which it appears"
+                    result.formula = arg.getValue();
+                    break;
+                case "occ":
+                    // occurrence number;
+                    result.occ = Integer.parseInt(arg.getValue());
+                    break;
+                default:
+                    // instantiation
                     String s = arg.getKey();
-        			    if (!s.startsWith("#")) {
+                    if (!s.startsWith("#")) {
                         if (s.startsWith("inst_")) {
-        			            s = s.substring(5);
-        			        }
-                        result.instantiations.put(s, toTerm(proof, state, arg.getValue(), null));
-        			    }
-         		}
-        	}
+                            s = s.substring(5);
+                        }
+                        result.instantiations.put(s, arg.getValue());
+                    }
+                }
+            }
         } catch(Exception e) {
             throw new ScriptException(e);
         }

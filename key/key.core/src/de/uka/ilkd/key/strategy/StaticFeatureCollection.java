@@ -11,7 +11,7 @@ import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.rule.join.JoinRule;
+import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.feature.ApplyTFFeature;
 import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.CompareCostsFeature;
@@ -22,6 +22,7 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.ImplicitCastNecessary;
 import de.uka.ilkd.key.strategy.feature.InstantiatedSVFeature;
 import de.uka.ilkd.key.strategy.feature.LetFeature;
+import de.uka.ilkd.key.strategy.feature.MergeRuleFeature;
 import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
 import de.uka.ilkd.key.strategy.feature.ShannonFeature;
@@ -100,28 +101,13 @@ public class StaticFeatureCollection {
         TermBuffer sf = new TermBuffer();
         TermBuffer sub = new TermBuffer();
 
-        Feature countOccurrencesInSeq
-                = sum(sf,
-                        SequentFormulasGenerator.sequent(),
-                        sum(sub,
-                                SubtermGenerator
-                                .leftTraverse(sf, any()), // instead
-                                // of
-                                // any
-                                // a
-                                // condition
-                                // which
-                                // stops
-                                // traversal
-                                // when
-                                // depth(cutF)
-                                // >
-                                // depth(sub)
-                                // would
-                                // be
-                                // better
-                                ifZero(applyTF(cutFormula, eq(sub)),
-                                        longConst(1), longConst(0))));
+        Feature countOccurrencesInSeq = sum(sf,
+                SequentFormulasGenerator.sequent(),
+                sum(sub, SubtermGenerator.leftTraverse(sf, any()),
+                        // instead of any a condition which stops traversal when
+                        // depth(cutF) > depth(sub) would be better
+                        ifZero(applyTF(cutFormula, eq(sub)), longConst(1),
+                                longConst(0))));
         return countOccurrencesInSeq;
     }
 

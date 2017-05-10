@@ -53,6 +53,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -435,9 +436,9 @@ public final class WhileInvariantRule extends AbstractLoopInvariantRule {
         return localOuts;
     }
 
-    static void register(ProgramVariable pv, Services services) {
-        final Namespace progVarNames = services.getNamespaces()
-                .programVariables();
+    static void register(ProgramVariable pv,
+                         Services services) {
+        final Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
         }

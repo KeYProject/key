@@ -7,7 +7,7 @@
                <statement name="int result = _value;" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="false">
                   <statement name="return result_1;" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="false">
                      <methodReturn name="&lt;return of zero&gt;" signature="&lt;return of JoinTest.zero(_value)&gt;" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="lt(value,Z(0(#)))">
-                        <termination name="&lt;end&gt;" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="false">
+                        <termination name="&lt;end&gt;" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

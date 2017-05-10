@@ -16,6 +16,7 @@ package de.uka.ilkd.key.logic.op;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -133,18 +134,24 @@ public final class SortDependingFunction extends Function {
 	                	      		      sort));
 	
 	//ugly: multiple generic sorts with the same name may exist over time 
+	Namespace<Function> functions = services.getNamespaces().functions();
 	if(result != null 
 	   && sort instanceof GenericSort
 	   && result.getSortDependingOn() != sort) {
 	    result = new SortDependingFunction(template,
 		    			       sort);
-	    services.getNamespaces().functions().add(result);	    
+	    functions.add(result);
 	}
 
 	if(result == null) {
-	    result = new SortDependingFunction(template,
-		    			       sort);
-	    services.getNamespaces().functions().addSafely(result);
+	    result = new SortDependingFunction(template, sort);
+	    // The namespaces may be wrapped for local symbols
+	    // Sort depending functions are to be added to the "root" namespace, however.
+	    // Therefore, let's rewind to the root (MU, 2017-03)
+	    while(functions.parent() != null) {
+	        functions = functions.parent();
+	    }
+	    functions.addSafely(result);
 	}
 
         assert result.getSortDependingOn() == sort 

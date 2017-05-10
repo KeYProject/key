@@ -98,16 +98,6 @@ public class ProofMacroMenu extends JMenu {
         for (ProofMacro macro : REGISTERED_MACROS) {
                 
             boolean applicable = node != null && macro.canApplyTo(node, posInOcc);
-
-                    // NOTE (DS): At the moment, JoinRule is an experimental
-                    // feature. We therefore only add join-related macros
-                    // if the feature is currently active.
-                    // TODO (DS): Remove below check related to the exp. \\
-            // feature once JoinRule is considered stable.
-            if (!Main.isExperimentalMode()
-                    && macro.getName().contains("join")) {
-                applicable = false;
-                }
                 
             if(applicable) {
                 JMenuItem menuItem = createMenuItem(macro, mediator, posInOcc);

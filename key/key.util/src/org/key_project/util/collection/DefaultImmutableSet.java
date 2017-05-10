@@ -261,7 +261,6 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         }
     }
 
-
     public String toString() {
 	Iterator<T> it=this.iterator();
 	StringBuffer str=new StringBuffer("{");

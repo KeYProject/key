@@ -25,12 +25,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import recoder.CrossReferenceServiceConfiguration;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.Type;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
@@ -165,6 +159,7 @@ import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
@@ -190,7 +185,12 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
-
+import recoder.CrossReferenceServiceConfiguration;
+import recoder.abstraction.ClassType;
+import recoder.abstraction.Type;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.declaration.TypeDeclaration;
+import recoder.list.generic.ASTList;
 
 /**
  * Objects of this class can be used to transform an AST returned by the recoder
@@ -1043,6 +1043,20 @@ public class Recoder2KeYConverter {
         return new MethodBodyStatement(bodySource, resultVar, mr);
     }
 
+    public MergePointStatement convert(
+        de.uka.ilkd.key.java.recoderext.MergePointStatement mps) {
+        final LocationVariable locVar = new LocationVariable(
+                services.getVariableNamer().getTemporaryNameProposal("x"),
+                (Sort) services.getNamespaces().sorts().lookup("boolean"));
+        
+        final Comment[] comments = new Comment[mps.getComments().size()];
+        for (int i = 0; i < mps.getComments().size(); i++) {
+            comments[i] = convert(mps.getComments().get(i));
+        }
+        
+        return new MergePointStatement(locVar, comments);
+    }
+
     public CatchAllStatement convert(
 	    	de.uka.ilkd.key.java.recoderext.CatchAllStatement cas) {
         return new CatchAllStatement
@@ -1091,7 +1105,6 @@ public class Recoder2KeYConverter {
       kjt.setJavaType(keyEnumDecl);
       return keyEnumDecl;
    }
-
 
     public InterfaceDeclaration convert(
             recoder.java.declaration.InterfaceDeclaration td) {
@@ -1705,7 +1718,6 @@ public class Recoder2KeYConverter {
          return new EnhancedFor(convertLoopInitializers(f), convertGuard(f),
                  convertBody(f),collectComments(f),positionInfo(f));
      }
-
 
     /**
      * converts a While.

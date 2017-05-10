@@ -35,5 +35,6 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
  */
 public interface ProgramConstruct extends Expression, Statement, ILoopInit, 
     IForUpdates, IGuard, Label, TerminalProgramElement, ExpressionStatement,
-    TypeReference, IProgramVariable, IProgramMethod, Branch, IExecutionContext, MethodName {  
+    TypeReference, IProgramVariable, IProgramMethod, Branch, IExecutionContext,
+    MethodName {
 }

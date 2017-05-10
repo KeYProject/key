@@ -553,6 +553,7 @@ TOKEN :
 		    | < INT: "int" >
 		    | < INTERFACE: "interface" >
 		    | < ISSTATIC: "#isstatic" >
+		    | < MERGEPOINT : "merge_point" >
 		    | < EVALARGS: "#evaluate-arguments" >
 		    | < REPLACEARGS: "#replace" >
 		    | < LONG: "long" >
@@ -3592,6 +3593,7 @@ Statement Statement() :
      | result = SwitchStatement()
      | result = IfStatement()
      | result = WhileStatement()
+     | result = MergePointStatement()
      | result = LoopScopeStatement()
      | result = KeYMetaConstructStatement()
      | result = DoStatement()
@@ -4462,6 +4464,29 @@ LoopScopeBlock LoopScopeStatement() :
     }
 }
 
+MergePointStatement MergePointStatement() :
+{
+    MergePointStatement result;
+    Expression indexPV = null;
+}
+{
+    "merge_point"
+	{
+	    result = factory.createMergePointStatement();
+	    setPrefixInfo(result);
+	}
+    "(" indexPV = Expression()
+	{
+	    result.setIndexPV(indexPV);
+	}
+	")"
+	";"
+	{
+	    checkConstruction(result);
+	    return result;
+	}
+}
+
 Do DoStatement() :
 {
     Do result;
@@ -4687,7 +4712,7 @@ Continue ContinueStatement() :
 	    result = factory.createContinue();
 	    setPrefixInfo(result);
 	}
-    [ (<IDENTIFIER>
+    [ <IDENTIFIER>
     {
 	id = factory.createIdentifier(token.image);
 	setPrefixInfo(id);

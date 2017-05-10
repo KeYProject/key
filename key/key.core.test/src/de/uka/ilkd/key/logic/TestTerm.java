@@ -208,7 +208,7 @@ public class TestTerm extends TestCase {
     }
 
    /**
-    * Tests {@link TermImpl#isContainsJavaBlockRecursive()}.
+    * Tests {@link TermImpl#containsJavaBlockRecursive()}.
     */
    public void testIsContainsJavaBlockRecursive() {
       Term noJB = tf.createTerm(Junctor.TRUE);
@@ -217,10 +217,10 @@ public class TestTerm extends TestCase {
       Term withJB = tf.createTerm(Modality.DIA, new ImmutableArray<Term>(noJB), null, javaBlock);
       Term withJBChild = tf.createTerm(Junctor.NOT, withJB);
       Term withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
-      assertFalse(noJB.isContainsJavaBlockRecursive());
-      assertFalse(noJBWithChild.isContainsJavaBlockRecursive());
-      assertTrue(withJB.isContainsJavaBlockRecursive());
-      assertTrue(withJBChild.isContainsJavaBlockRecursive());
-      assertTrue(withJBChildChild.isContainsJavaBlockRecursive());
+      assertFalse(noJB.containsJavaBlockRecursive());
+      assertFalse(noJBWithChild.containsJavaBlockRecursive());
+      assertTrue(withJB.containsJavaBlockRecursive());
+      assertTrue(withJBChild.containsJavaBlockRecursive());
+      assertTrue(withJBChildChild.containsJavaBlockRecursive());
    }
 }

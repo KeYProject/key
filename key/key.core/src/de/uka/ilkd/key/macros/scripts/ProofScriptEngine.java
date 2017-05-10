@@ -87,7 +87,8 @@ public class ProofScriptEngine {
             if(commandMonitor != null) {
                 commandMonitor.update(null, cmd);
             }
-            System.out.println("Command: " + cmd);
+
+            // System.out.println("Command: " + cmd);
 
             try {
                 String name = argMap.get(ScriptLineParser.COMMAND_KEY);

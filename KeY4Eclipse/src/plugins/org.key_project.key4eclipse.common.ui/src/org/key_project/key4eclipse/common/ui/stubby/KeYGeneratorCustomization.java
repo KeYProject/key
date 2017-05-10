@@ -48,6 +48,7 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.FileCollection;
@@ -203,7 +204,7 @@ public class KeYGeneratorCustomization implements IGeneratorCustomization {
             }
          }
          // Compute methods of interest
-         ImmutableList<IProgramMethod> methods = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
+         ImmutableList<ProgramMethod> methods = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
          for (IProgramMethod pm : methods) {
             registerProgramMethod(pm);
          }

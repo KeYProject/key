@@ -122,6 +122,10 @@ public class StrategySettingsDefinition {
                                         StrategyProperties.METHOD_CONTRACT);
 
                                 newProps.setProperty(
+                                        StrategyProperties.MPS_OPTIONS_KEY,
+                                        StrategyProperties.MPS_MERGE);
+
+                                newProps.setProperty(
                                         StrategyProperties.DEP_OPTIONS_KEY,
                                         StrategyProperties.DEP_ON);
 
@@ -171,6 +175,10 @@ public class StrategySettingsDefinition {
                                 newProps.setProperty(
                                         StrategyProperties.METHOD_OPTIONS_KEY,
                                         StrategyProperties.METHOD_NONE);
+
+                                newProps.setProperty(
+                                        StrategyProperties.MPS_MERGE,
+                                        StrategyProperties.MPS_NONE);
 
                                 newProps.setProperty(
                                         StrategyProperties.DEP_OPTIONS_KEY,

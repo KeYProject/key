@@ -483,7 +483,7 @@ public final class WhileInvariantTransformer {
                     termLabelState, services, applicationPos, rule, ruleApp,
                     goal, Junctor.IMP, new ImmutableArray<Term>(premiss, inv),
                     applicationSequent);
-            return TB.imp(premiss, inv, labels);
+            return TB.imp(premiss, contFlagTerm == null ? inv : TB.imp(contFlagTerm, inv), labels);
         }
     }
 

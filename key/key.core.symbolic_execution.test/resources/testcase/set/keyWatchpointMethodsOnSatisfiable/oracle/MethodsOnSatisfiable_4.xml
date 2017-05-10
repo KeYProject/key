@@ -12,8 +12,8 @@
          </branchCondition>
          <branchCondition name="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="true" branchCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="main(x_global);" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false">
-               <methodCall name="&lt;call MethodsOnSatisfiable.main(x_3)&gt;" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false">
-                  <branchStatement name="if (x_3&gt;=0)" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false" blockOpened="true">
+               <methodCall name="&lt;call MethodsOnSatisfiable.main(x_2)&gt;" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false">
+                  <branchStatement name="if (x_2&gt;=0)" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false" blockOpened="true">
                   </branchStatement>
                </methodCall>
             </statement>

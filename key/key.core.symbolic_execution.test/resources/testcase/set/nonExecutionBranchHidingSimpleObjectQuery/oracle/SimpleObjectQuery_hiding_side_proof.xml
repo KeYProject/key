@@ -12,15 +12,15 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
             <branchCondition name="equals(exc_0,null)" pathCondition="equals(exc_0,null)" pathConditionChanged="true" branchCondition="equals(exc_0,null)" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <statement name="return magicValue;" pathCondition="equals(exc_0,null)" pathConditionChanged="false">
                   <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleObjectQuery.main(x)&gt;" pathCondition="equals(exc_0,null)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	res_subMagic_0 {equals(x,null)}, 
+	res_subMagic {equals(x,null)}, 
 	Z(2(4(#))) {and(not(equals(x,null)),equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))}, 
 	Z(neglit(1(1(7(4(#)))))) {and(not(equals(x,null)),not(equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x)))}
 as result of main&gt;" signatureIncludingReturnValue="&lt;return 
-	res_subMagic_0 {equals(x,null)}, 
+	res_subMagic {equals(x,null)}, 
 	Z(2(4(#))) {and(not(equals(x,null)),equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))}, 
 	Z(neglit(1(1(7(4(#)))))) {and(not(equals(x,null)),not(equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x)))}
 as result of SimpleObjectQuery.main(x)&gt;" isReturnValueComputed="true" methodReturnCondition="equals(exc_0,null)">
-                     <methodReturnValue name="res_subMagic_0 {equals(x,null)}" returnValueString="res_subMagic_0" hasCondition="true" conditionString="equals(x,null)">
+                     <methodReturnValue name="res_subMagic {equals(x,null)}" returnValueString="res_subMagic" hasCondition="true" conditionString="equals(x,null)">
                      </methodReturnValue>
                      <methodReturnValue name="Z(2(4(#))) {and(not(equals(x,null)),equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="and(not(equals(x,null)),equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))">
                      </methodReturnValue>

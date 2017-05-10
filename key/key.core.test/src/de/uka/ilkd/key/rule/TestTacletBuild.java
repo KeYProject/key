@@ -63,12 +63,12 @@ public class TestTacletBuild extends TestCase {
     }
 
     public void test0() {
-	SchemaVariable u=(SchemaVariable) 
-	    TacletForTests.getVariables().lookup(new Name("u"));
-	SchemaVariable v=(SchemaVariable) 
-	    TacletForTests.getVariables().lookup(new Name("v"));
-	Term b=tf.createTerm((SchemaVariable) 
-	    TacletForTests.getVariables().lookup(new Name("b")), NO_SUBTERMS);
+	SchemaVariable u=
+	    TacletForTests.getSchemaVariables().lookup(new Name("u"));
+	SchemaVariable v=
+	    TacletForTests.getSchemaVariables().lookup(new Name("v"));
+	Term b=tf.createTerm(
+	    TacletForTests.getSchemaVariables().lookup(new Name("b")), NO_SUBTERMS);
 	Term t1=tb.ex((QuantifiableVariable)u, b);
 	Term t2=tb.ex((QuantifiableVariable)v, b);
 	RewriteTacletBuilder<RewriteTaclet> sb=new RewriteTacletBuilder<RewriteTaclet>();
@@ -88,16 +88,16 @@ public class TestTacletBuild extends TestCase {
 	sb.addVarsNotFreeIn(u, (SchemaVariable) b.op());
 	sb.addVarsNotFreeIn(v, (SchemaVariable) b.op());
 	sb.getTaclet();  //no exception is thrown here anymore
-	
+
     }
 
 
     public void testUniquenessOfIfAndFindVarSVsInIfAndFind() {
 	boolean thrown=false;
-	SchemaVariable u=(SchemaVariable) 
-	    TacletForTests.getVariables().lookup(new Name("u"));
+	SchemaVariable u=
+	    TacletForTests.getSchemaVariables().lookup(new Name("u"));
 	Term A=tf.createTerm
-	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
+	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")),
 	     NO_SUBTERMS);
 	Term t1=tb.all((QuantifiableVariable)u, A);
 	Sequent seq = Sequent.createSuccSequent
@@ -119,10 +119,10 @@ public class TestTacletBuild extends TestCase {
 
     public void testUniquenessOfIfAndFindVarSVBothInIf() {
 	boolean thrown=false;
-	SchemaVariable u=(SchemaVariable) 
-	    TacletForTests.getVariables().lookup(new Name("u"));
+	SchemaVariable u=
+	    TacletForTests.getSchemaVariables().lookup(new Name("u"));
 	Term A=tf.createTerm
-	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
+	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")),
 	     NO_SUBTERMS);
 	Term t1=tb.all( (QuantifiableVariable)u, A);
 	Term t2=tb.ex((QuantifiableVariable)u, A);
@@ -146,10 +146,10 @@ public class TestTacletBuild extends TestCase {
 
     public void testUniquenessOfIfAndFindVarSVsInFind() {
 	boolean thrown=false;
-	SchemaVariable u=(SchemaVariable) 
-	    TacletForTests.getVariables().lookup(new Name("u"));
+	SchemaVariable u=
+	    TacletForTests.getSchemaVariables().lookup(new Name("u"));
 	Term A=tf.createTerm
-	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
+	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")),
 	     NO_SUBTERMS);
 	Term t1=tb.all((QuantifiableVariable)u, A);
 	SuccTacletBuilder sb=new SuccTacletBuilder();
@@ -164,10 +164,10 @@ public class TestTacletBuild extends TestCase {
     }
 
     private final HelperClassForTests helper = new HelperClassForTests();
-    
+
     public static final String testRules = HelperClassForTests.TESTCASE_DIRECTORY+File.separator+"tacletprefix";
-    
-    public void testSchemavariablesInAddrulesRespectPrefix() {        
+
+    public void testSchemavariablesInAddrulesRespectPrefix() {
         try {
             helper.parseThrowException
             (new File(testRules+File.separator+
@@ -179,6 +179,6 @@ public class TestTacletBuild extends TestCase {
         }
         fail("Expected an invalid prefix exception as the the addrule contains " +
         		"a schemavariable with wrong prefix.");
-        
+
     }
 }

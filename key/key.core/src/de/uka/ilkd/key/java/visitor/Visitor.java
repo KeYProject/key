@@ -40,17 +40,7 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.expression.literal.CharLiteral;
-import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
-import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
-import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
-import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.literal.LongLiteral;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.literal.StringLiteral;
+import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
 import de.uka.ilkd.key.java.expression.operator.BinaryAndAssignment;
 import de.uka.ilkd.key.java.expression.operator.BinaryNot;
@@ -142,6 +132,7 @@ import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopInit;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -164,6 +155,7 @@ import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.speclang.MergeContract;
 
 /**
  * This class is implemented by visitors/walkers.
@@ -198,6 +190,8 @@ public interface Visitor {
 	    ContextStatementBlock x);
 
     void performActionOnIntLiteral(IntLiteral x); 
+
+    void performActionOnBigintLiteral(BigintLiteral x);
 
     void performActionOnBooleanLiteral(BooleanLiteral x);
     
@@ -415,6 +409,8 @@ public interface Visitor {
     void performActionOnArrayReference(ArrayReference x); 
 
     void performActionOnMetaClassReference(MetaClassReference x); 
+    
+    void performActionOnMergePointStatement(MergePointStatement x);
 
     void performActionOnMethodReference(MethodReference x); 
 
@@ -477,6 +473,8 @@ public interface Visitor {
     void performActionOnLoopInvariant(LoopSpecification x);
     
     void performActionOnBlockContract(BlockContract x);
+    
+    void performActionOnMergeContract(MergeContract x);
 
     void performActionOnSeqLength(SeqLength seqLength);
 

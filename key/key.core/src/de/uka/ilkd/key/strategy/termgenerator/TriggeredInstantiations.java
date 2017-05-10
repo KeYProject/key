@@ -239,7 +239,7 @@ public class TriggeredInstantiations implements TermGenerator {
     private void collectTerms(Term instanceCandidate, Set<Term> terms,
             IntegerLDT intLDT) {
         if (instanceCandidate.freeVars().isEmpty()
-                && !instanceCandidate.isContainsJavaBlockRecursive()) {
+                && !instanceCandidate.containsJavaBlockRecursive()) {
             terms.add(instanceCandidate);
         }
         if (intLDT.getNumberSymbol() != instanceCandidate.op()) {

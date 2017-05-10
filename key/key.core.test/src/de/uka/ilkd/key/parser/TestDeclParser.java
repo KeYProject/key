@@ -26,8 +26,10 @@ import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -41,6 +43,7 @@ public class TestDeclParser extends TestCase {
 
     NamespaceSet nss;
     Services serv;
+    private Namespace<SchemaVariable> parsedSchemaVars;
 
     public TestDeclParser(String name) {
 	super(name);
@@ -72,10 +75,11 @@ public class TestDeclParser extends TestCase {
 		serv, nss);
     }
 
-    public void parseDecls(String s) {
+    private void parseDecls(String s) {
 	try {
 	    KeYParserF p = stringParser(s);
 	    p.decls();
+	    this.parsedSchemaVars = p.schemaVariables();
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);
@@ -270,7 +274,7 @@ public class TestDeclParser extends TestCase {
 		   "\\functions {\n" +
 		   "  aSort[][] f(aSort);\n" +
 		   "}\n");
-	Sort aSort = (Sort)nss.sorts().lookup(new Name("aSort"));
+	Sort aSort = nss.sorts().lookup(new Name("aSort"));
 	Sort objectSort = serv.getJavaInfo().objectSort();
 	Sort cloneableSort = serv.getJavaInfo().cloneableSort();
         Sort serializableSort = serv.getJavaInfo().serializableSort();
@@ -301,8 +305,8 @@ public class TestDeclParser extends TestCase {
 		   "  list cons(elem,list);\n" +
 		   "}\n");
 	
-	Sort elem = (Sort)nss.sorts().lookup(new Name("elem"));
-	Sort list = (Sort)nss.sorts().lookup(new Name("list"));
+	Sort elem = nss.sorts().lookup(new Name("elem"));
+	Sort list = nss.sorts().lookup(new Name("list"));
 
         Sort objectSort = serv.getJavaInfo().objectSort();
         Sort cloneableSort = serv.getJavaInfo().cloneableSort();
@@ -360,8 +364,8 @@ public class TestDeclParser extends TestCase {
 		   "  maybe;\n" +
 		   "}\n");
 	
-	Sort elem = (Sort)nss.sorts().lookup(new Name("elem"));
-	Sort list = (Sort)nss.sorts().lookup(new Name("list"));
+	Sort elem = nss.sorts().lookup(new Name("elem"));
+	Sort list = nss.sorts().lookup(new Name("list"));
 
 
 	assertEquals("find isEmpty predicate", new Name("isEmpty"),
@@ -402,36 +406,38 @@ public class TestDeclParser extends TestCase {
 		   "}\n");
 	
 	
-	Sort elem = (Sort)nss.sorts().lookup(new Name("elem"));
-	Sort list = (Sort)nss.sorts().lookup(new Name("list"));
+	Sort elem = nss.sorts().lookup(new Name("elem"));
+	Sort list = nss.sorts().lookup(new Name("list"));
+
+	Namespace<SchemaVariable> variables = parsedSchemaVars;
 
 	assertEquals("find SV x", new Name("x"),
-		     nss.variables().lookup(new Name("x")).name()); 
+		     variables.lookup(new Name("x")).name());
 	assertTermSV("SV x type", 
-		     nss.variables().lookup(new Name("x"))); 
+		     variables.lookup(new Name("x")));
 	assertEquals("SV x sort", elem,
-		     ((SchemaVariable)nss.variables().lookup(new Name("x"))).sort()); 
+		     ((SchemaVariable)variables.lookup(new Name("x"))).sort());
 
 	assertEquals("find SV ", new Name("y"),
-		     nss.variables().lookup(new Name("y")).name()); 
+		     variables.lookup(new Name("y")).name());
 	assertTermSV("SV y type", 
-		     nss.variables().lookup(new Name("y"))); 
+		     variables.lookup(new Name("y")));
 	assertEquals("SV y sort", elem,
-		     ((SchemaVariable)nss.variables().lookup(new Name("y"))).sort()); 
+		     ((SchemaVariable)variables.lookup(new Name("y"))).sort());
 
 	assertEquals("find SV ", new Name("lv"),
-		     nss.variables().lookup(new Name("lv")).name()); 
+		     variables.lookup(new Name("lv")).name());
 	assertVariableSV("SV lv type", 
-		     nss.variables().lookup(new Name("lv"))); 
+		     variables.lookup(new Name("lv")));
 	assertEquals("SV lv sort", list,
-		     ((SchemaVariable)nss.variables().lookup(new Name("lv"))).sort()); 
+		     ((SchemaVariable)variables.lookup(new Name("lv"))).sort());
 	
 	assertEquals("find SV ", new Name("b"),
-		     nss.variables().lookup(new Name("b")).name()); 
+		     variables.lookup(new Name("b")).name());
 	assertFormulaSV("SV b type", 
-		     nss.variables().lookup(new Name("b"))); 
+		     variables.lookup(new Name("b")));
 	assertEquals("SV b sort", Sort.FORMULA,
-		     ((SchemaVariable)nss.variables().lookup(new Name("b"))).sort()); 
+		     ((SchemaVariable)variables.lookup(new Name("b"))).sort());
     }
     
 

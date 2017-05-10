@@ -5,14 +5,13 @@
          <operationContract name="result_0 = magic(x, y) catch(exc_0)
 pre: QueryInPrecondition.xPre(x) = TRUE &amp; y &lt; 0
 | !(QueryInPrecondition.xPre(x) = TRUE &amp; y &lt; 0)
-post: (       QueryInPrecondition.xPre(x)
-            @heapBefore_magic_0
+post: (       QueryInPrecondition.xPre(x)@heapBefore_magic
         = TRUE
       &amp; y &lt; 0
    -&gt;   result_0 = QueryInPrecondition.subFirst(x, y)
       &amp; exc_0 = null)
 &amp; (   !(    QueryInPrecondition.xPre(x)
-              @heapBefore_magic_0
+              @heapBefore_magic
           = TRUE
         &amp; y &lt; 0)
    -&gt;   result_0 = QueryInPrecondition.subSecond(x, y)

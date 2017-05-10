@@ -13,9 +13,11 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -191,7 +193,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * basename in the passed list of global variables, or -1
      */
     protected int getMaxCounterInGlobals(String basename, 
-					 Globals globals) {
+            Iterable<ProgramElementName> globals) {
         int result = -1;
 
         Iterator<ProgramElementName> it = globals.iterator();
@@ -254,7 +256,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * tells whether a name is unique in the passed list of global variables
      */
-    protected boolean isUniqueInGlobals(String name, Globals globals) {
+    protected boolean isUniqueInGlobals(String name, Iterable<ProgramElementName> globals) {
     	Iterator<ProgramElementName> it = globals.iterator();
     	while(it.hasNext()) {
 	    ProgramElementName n = it.next();
@@ -308,16 +310,24 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * creates a Globals object for use with other internal methods
      */
-    protected Globals wrapGlobals(ImmutableList<Named> globals) {
-	return new GlobalsAsListOfNamed(globals);
+    protected Iterable<ProgramElementName> wrapGlobals(ImmutableList<? extends Named> globals) {
+        List<ProgramElementName> result = new ArrayList<ProgramElementName>(globals.size());
+        for (Named named : globals) {
+            result.add((ProgramElementName) named.name());
+        }
+        return result;
     }
 
 
     /**
      * creates a Globals object for use with other internal methods
      */
-    protected Globals wrapGlobals(ImmutableSet<ProgramVariable> globals) {
-	return new GlobalsAsSetOfProgramVariable(globals);
+    protected Iterable<ProgramElementName> wrapGlobals(ImmutableSet<ProgramVariable> globals) {
+        List<ProgramElementName> result = new ArrayList<ProgramElementName>(globals.size());
+        for (ProgramVariable named : globals) {
+            result.add(named.getProgramElementName());
+        }
+        return result;
     }
 
 
@@ -790,90 +800,6 @@ public abstract class VariableNamer implements InstantiationProposer {
         }
     }
 
-
-    /**
-     * wrapper for global variables coming as a ListOfNamed
-     */
-    private static class GlobalsAsListOfNamed
-    		   implements Globals {
-	private ImmutableList<Named> globals;
-
-	public GlobalsAsListOfNamed(ImmutableList<Named> globals) {
-	    this.globals = globals;
-	}
-
-	public Iterator<ProgramElementName> iterator() {
-	    return new AdapterOfIteratorOfNamed(globals.iterator());
-	}
-    }
-
-
-    /**
-     * wrapper for global variables coming as a SetOfProgramVariable
-     */
-    private static class GlobalsAsSetOfProgramVariable
-    		   implements Globals {
-    	private ImmutableSet<ProgramVariable> globals;
-
-	public GlobalsAsSetOfProgramVariable(ImmutableSet<ProgramVariable> globals) {
-	    this.globals = globals;
-	}
-
-	public Iterator<ProgramElementName> iterator() {
-	    return new AdapterOfIteratorOfProgramVariable(globals.iterator());
-	}
-    }
-
-
-    /**
-     * adapter from IteratorOfNamed to IteratorOfProgramElementName
-     */
-    private static class AdapterOfIteratorOfNamed
-		   implements Iterator<ProgramElementName> {
-	private Iterator<Named> it;
-
-	public AdapterOfIteratorOfNamed(Iterator<Named> it) {
-	    this.it = it;
-	}
-
-	public boolean hasNext() {
-	    return it.hasNext();
-	}
-
-	public ProgramElementName next() {
-	    return (ProgramElementName)(it.next().name());
-	}
-	      
-        public void remove() {
-            it.remove();
-        }
-    }
-
-
-    /**
-     * adapter from IteratorOfProgramVariable to IteratorOfProgramElementName
-     */
-    private static class AdapterOfIteratorOfProgramVariable
-		   implements Iterator<ProgramElementName> {
-	private Iterator<ProgramVariable> it;
-
-	public AdapterOfIteratorOfProgramVariable(Iterator<ProgramVariable> it) {
-	    this.it = it;
-	}
-
-	public boolean hasNext() {
-	    return it.hasNext();
-	}
-
-	public ProgramElementName next() {
-	    return it.next().getProgramElementName();
-	}
-	
-	public void remove() {
-	    it.remove();
-	}
-    }
-
     /**
      * a customized JavaASTWalker
      */
@@ -912,14 +838,6 @@ public abstract class VariableNamer implements InstantiationProposer {
     }
 
     
-    /**
-     * internal representation for global variables
-     */
-    protected static interface Globals {
-    	public Iterator<ProgramElementName> iterator();
-    }
-
-
     /**
      * tuple of a basename and an index
      */

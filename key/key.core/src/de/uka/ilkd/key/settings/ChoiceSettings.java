@@ -31,7 +31,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 
 public class ChoiceSettings implements Settings, Cloneable {
@@ -106,8 +105,8 @@ public class ChoiceSettings implements Settings, Cloneable {
      * in <code>choiceNS</code> or if entries of <code>category2Choices</code>
      * are no longer present in <code>choiceNS</code>
      * @param remove remove entries not present in <code>choiceNS</code> */
-    public void updateChoices(Namespace choiceNS, boolean remove){
-	Iterator<Named> it = choiceNS.allElements().iterator();
+    public void updateChoices(Namespace<Choice> choiceNS, boolean remove){
+	Iterator<Choice> it = choiceNS.allElements().iterator();
 	HashMap<String,Set<String>> c2C = new LinkedHashMap<String, Set<String>>();
 	Choice c;
 	Set<String> soc;

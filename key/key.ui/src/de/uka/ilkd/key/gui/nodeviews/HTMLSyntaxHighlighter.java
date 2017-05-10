@@ -20,12 +20,13 @@ import java.util.regex.Pattern;
 import javax.swing.JEditorPane;
 import javax.swing.text.html.HTMLDocument;
 
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * Performs a simple pattern-based syntax highlighting for KeY sequents by
@@ -135,6 +136,9 @@ public class HTMLSyntaxHighlighter {
     private static final String PROGVAR_REPLACEMENT =
             "$1<span class=\"progvar_highlight\">$2</span>$3";
 
+    private static final Pattern SINGLE_LINE_COMMENT_PATTERN = Pattern.compile("(//.*?)<br>");
+    private static final String SINGLE_LINE_COMMENT_REPLACEMENT = "<span class=\"comment_highlight\">$1</span><br>";
+
     /**
      * Creates a new {@link HTMLSyntaxHighlighter} for this HTMLDocument.
      *
@@ -151,11 +155,14 @@ public class HTMLSyntaxHighlighter {
                 ".java_highlight { color: #7F0055; font-weight: bold; }";
         final String progVarHighlightRule =
                 ".progvar_highlight { color: #6A3E3E; }";
+        final String commentHighlightRule = 
+                ".comment_highlight { color: #3F7F5F; }";
 
         document.getStyleSheet().addRule(propLogicHighlightRule);
         document.getStyleSheet().addRule(progVarHighlightRule);
         document.getStyleSheet().addRule(javaHighlightRule);
         document.getStyleSheet().addRule(foLogicHighlightRule);
+        document.getStyleSheet().addRule(commentHighlightRule);
     }
 
     /**
@@ -191,14 +198,14 @@ public class HTMLSyntaxHighlighter {
             // there are a lot of registered globals AND the number of formulae
             // in the sequent is big.
             
-            Iterable<? extends ProgramVariable> programVariables;
+            Iterable<? extends IProgramVariable> programVariables;
             final InitConfig initConfig = displayedNode.proof().getInitConfig();
             
-            if (displayedNode.getGlobalProgVars().size() < NUM_PROGVAR_THRESHOLD) {
-                programVariables = displayedNode.getGlobalProgVars();
+            if (displayedNode.getLocalProgVars().size() < NUM_PROGVAR_THRESHOLD) {
+                programVariables = displayedNode.getLocalProgVars();
             } else if (initConfig != null
                     && displayedNode.sequent().size() < NUM_FORMULAE_IN_SEQ_THRESHOLD) {
-                programVariables = JoinRuleUtils
+                programVariables = MergeRuleUtils
                         .getLocationVariablesHashSet(displayedNode.sequent(),
                                                      initConfig.getServices());
             } else {
@@ -231,7 +238,7 @@ public class HTMLSyntaxHighlighter {
      * @return The input String augmented by syntax highlighting tags.
      */
     private String addSyntaxHighlighting(String htmlString,
-            Iterable<? extends ProgramVariable> programVariables) {
+            Iterable<? extends IProgramVariable> programVariables) {
 
         htmlString =
                 PROP_LOGIC_KEYWORDS_PATTERN.matcher(htmlString).replaceAll(
@@ -247,6 +254,9 @@ public class HTMLSyntaxHighlighter {
             modality =
                     JAVA_KEYWORDS_PATTERN.matcher(modality).replaceAll(
                             JAVA_KEYWORDS_REPLACEMENT);
+
+            modality = SINGLE_LINE_COMMENT_PATTERN.matcher(modality)
+                    .replaceAll(SINGLE_LINE_COMMENT_REPLACEMENT);
 
             htmlString = htmlString.replace(modalityMatcher.group(), modality);
         }

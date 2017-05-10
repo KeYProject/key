@@ -8,6 +8,7 @@ import java.util.Map;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
@@ -83,20 +84,25 @@ public abstract class AbstractCommand implements ProofScriptCommand {
     }
 
     final protected static Term toTerm(Proof proof, Map<String, Object> state, String string, Sort sort) throws ParserException, ScriptException {
+        return toTerm(proof.getServices().getNamespaces(), state, string, sort, proof.getServices());
+    }
 
+    final protected static Term toTerm(Goal goal, Map<String, Object> state, String string, Sort sort) throws ParserException, ScriptException {
+        return toTerm(goal.getLocalNamespaces(), state, string, sort, goal.proof().getServices());
+    }
+
+    private static Term toTerm(NamespaceSet namespaces, Map<String, Object> state, String string, Sort sort, Services services) throws ParserException, ScriptException {
         AbbrevMap abbrMap = (AbbrevMap)state.get(ABBREV_KEY);
         if(abbrMap == null) {
             abbrMap = EMPTY_MAP;
         }
 
         StringReader reader = new StringReader(string);
-        Services services = proof.getServices();
-        Term formula = PARSER.parse(reader, sort, services, services.getNamespaces(), abbrMap);
+        Term formula = PARSER.parse(reader, sort, services, namespaces, abbrMap);
         return formula;
     }
 
     final protected static Sort toSort(Proof proof, Map<String, Object> state, String string) throws ParserException, ScriptException {
-        StringReader reader = new StringReader(string);
         Services services = proof.getServices();
         Sort sort = (Sort) services.getNamespaces().sorts().lookup(string);
         return sort;

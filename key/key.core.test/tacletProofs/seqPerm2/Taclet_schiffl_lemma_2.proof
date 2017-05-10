@@ -24,7 +24,7 @@
 [Strategy]Timeout=-1
 [Strategy]MaximumNumberOfAutomaticApplications=200
 [SMTSettings]integersMaximum=2147483645
-[Choice]DefaultChoices=assertions-assertions\\:safe , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:ban , JavaCard-JavaCard\\:on , Strings-Strings\\:on , modelFields-modelFields\\:showSatisfiability , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , moreSeqRules-moreSeqRules\\:on , permissions-permissions\\:off , joinGenerateIsWeakeningGoal-joinGenerateIsWeakeningGoal\\:off
+[Choice]DefaultChoices=assertions-assertions\\:safe , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:ban , JavaCard-JavaCard\\:on , Strings-Strings\\:on , modelFields-modelFields\\:showSatisfiability , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , moreSeqRules-moreSeqRules\\:on , permissions-permissions\\:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off
 [SMTSettings]useConstantsForBigOrSmallIntegers=true
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
@@ -191,7 +191,7 @@ tryclose branch;
 rule allRight;
 rule impRight;
 rule andLeft;
-instantiate var=iv with='v_iv_1';
+instantiate var=iv with='v_iv_0';
 rule impLeft;
 tryclose branch;
 rule getOfSwap;
@@ -240,7 +240,7 @@ tryclose branch;
 rule allRight;
 rule impRight;
 rule andLeft;
-instantiate var=iv with='v_iv_2';
+instantiate var=iv with='v_iv_0';
 rule impLeft;
 tryclose branch;
 rule getOfSwap;
@@ -296,7 +296,7 @@ rule impRight;
 rule andLeft;
 # start: providing equation for latter use
 #        in many case distinctions
-instantiate var=iv with='v_iv_3';
+instantiate var=iv with='v_iv_0';
 rule impLeft;
 tryclose branch;
 # end: providing equation for latter use
@@ -398,10 +398,10 @@ rule impRight;
 rule andLeft;
 # start: providing equation for latter use
 #        in many case distinctions 
-instantiate var=iv with='v_iv_4';
+instantiate var=iv with='v_iv_0';
 rule impLeft;
 tryclose branch;
-instantiate var=iv with='v_iv_4';
+instantiate var=iv with='v_iv_0';
 rule impLeft;
 tryclose branch;
 # end: providing equation for latter use
@@ -513,7 +513,7 @@ tryclose branch;
 # established: r5 is permutation
 rule allRight;
 rule impRight;
-instantiate hide var=iv with='v_iv_5';
+instantiate hide var=iv with='v_iv_0';
 rule impLeft;
 tryclose branch;
 rule andLeft;

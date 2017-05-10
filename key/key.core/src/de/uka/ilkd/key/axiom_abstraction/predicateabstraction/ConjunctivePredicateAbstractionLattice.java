@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.NotUniqueException;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * A lattice for all predicates accepting the given sort. This lattice consists
@@ -98,7 +98,7 @@ public class ConjunctivePredicateAbstractionLattice extends
     public int size() {
         // All 2^n combinations (including bottom element) plus additional
         // top element.
-        return JoinRuleUtils.intPow(2, predicates.size()) + 1;
+        return MergeRuleUtils.intPow(2, predicates.size()) + 1;
     }
 
     /*

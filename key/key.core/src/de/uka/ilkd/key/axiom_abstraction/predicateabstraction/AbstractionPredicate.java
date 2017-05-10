@@ -24,17 +24,20 @@ import javax.naming.NameAlreadyBoundException;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * Interface for predicates used for predicate abstraction. An abstraction
@@ -43,8 +46,8 @@ import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
  *
  * @author Dominic Scheurer
  */
-public abstract class AbstractionPredicate implements Function<Term, Term>,
-        Named {
+public abstract class AbstractionPredicate
+        implements Function<Term, Term>, Named {
 
     /**
      * The sort for the argument of this {@link AbstractionPredicate}.
@@ -111,12 +114,10 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
      */
     public static AbstractionPredicate create(final Sort argSort,
             final Function<Term, Term> mapping, Services services) {
-        LocationVariable placeholder =
-                JoinRuleUtils.getFreshLocVariableForPrefix("_ph", argSort,
-                        services);
+        LocationVariable placeholder = MergeRuleUtils
+                .getFreshLocVariableForPrefix("_ph", argSort, services);
 
-        return create(
-                mapping.apply(services.getTermBuilder().var(placeholder)),
+        return create(mapping.apply(services.getTermBuilder().var(placeholder)),
                 placeholder, services);
     }
 
@@ -141,26 +142,24 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
         final Sort fInputSort = placeholder.sort();
 
         AbstractionPredicate result = new AbstractionPredicate(fInputSort) {
-            private final Name name = new Name("abstrPred_"
-                    + predicate.op().toString());
+            private final Name name = new Name(
+                    "abstrPred_" + predicate.op().toString());
             private Function<Term, Term> mapping = null;
 
             @Override
             public Term apply(Term input) {
                 if (mapping == null) {
-                    mapping =
-                            (Term param) -> {
-                                if (param.sort() != fInputSort) {
-                                    throw new IllegalArgumentException(
-                                            "Input must be of sort \""
-                                                    + fInputSort
-                                                    + "\", given: \""
-                                                    + param.sort() + "\".");
-                                }
+                    mapping = (Term param) -> {
+                        if (param.sort() != fInputSort) {
+                            throw new IllegalArgumentException(
+                                    "Input must be of sort \"" + fInputSort
+                                            + "\", given: \"" + param.sort()
+                                            + "\".");
+                        }
 
-                                return OpReplacer.replace(tb.var(placeholder),
-                                        param, predicate, tf);
-                            };
+                        return OpReplacer.replace(tb.var(placeholder), param,
+                                predicate, tf);
+                    };
                 }
 
                 return mapping.apply(input);
@@ -213,20 +212,17 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
      */
     public String toParseableString(final Services services) {
         StringBuilder sb = new StringBuilder();
-        Pair<LocationVariable, Term> predicateFormWithPlaceholder =
-                getPredicateFormWithPlaceholder();
+        Pair<LocationVariable, Term> predicateFormWithPlaceholder = getPredicateFormWithPlaceholder();
 
-        sb.append("(")
-                .append("'")
-                .append(predicateFormWithPlaceholder.first.sort())
-                .append(" ")
-                .append(predicateFormWithPlaceholder.first)
-                .append("', '")
+        sb.append("(").append("'")
+                .append(predicateFormWithPlaceholder.first.sort()).append(" ")
+                .append(predicateFormWithPlaceholder.first).append("', '")
                 .append(OutputStreamProofSaver
                         .escapeCharacters(OutputStreamProofSaver
                                 .printAnything(
                                         predicateFormWithPlaceholder.second,
-                                        services, false).toString().trim()
+                                        services, false)
+                                .toString().trim()
                                 .replaceAll("(\\r|\\n|\\r\\n)+", "")))
                 .append("')");
 
@@ -236,8 +232,12 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
     /**
      * Parses the String representation of an abstraction predicates.
      * 
-     * @param s {@link String} to parse.
-     * @param services The {@link Services} object.
+     * @param s
+     *            {@link String} to parse.
+     * @param services
+     *            The {@link Services} object.
+     * @param localNamespaces
+     *            The local {@link NamespaceSet}.
      * @return The parsed {@link String}.
      * @throws ParserException
      *             If there is a syntax error.
@@ -245,11 +245,11 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
      *             If the given placeholder is already known to the system.
      * @throws SortNotKnownException
      *             If the given sort is not known to the system.
-      */
+     */
     public static List<AbstractionPredicate> fromString(final String s,
-            final Services services) throws ParserException {
-        final ArrayList<AbstractionPredicate> result =
-                new ArrayList<AbstractionPredicate>();
+            final Services services, NamespaceSet localNamespaces)
+            throws ParserException {
+        final ArrayList<AbstractionPredicate> result = new ArrayList<AbstractionPredicate>();
 
         Pattern p = Pattern.compile("\\('(.+?)', '(.+?)'\\)");
         Matcher m = p.matcher(s);
@@ -259,27 +259,30 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
             matched = true;
 
             for (int i = 1; i < m.groupCount(); i += 2) {
-                assert i + 1 <= m.groupCount() : "Wrong format of join abstraction predicates: "
-                        + "There should always be pairs of placeholders and predicate terms.";
+                assert i + 1 <= m
+                        .groupCount() : "Wrong format of join abstraction predicates: "
+                                + "There should always be pairs of placeholders and predicate terms.";
 
                 final String phStr = m.group(i);
                 final String predStr = m.group(i + 1);
 
                 // Parse the placeholder
                 Pair<Sort, Name> ph = null;
-                ph = JoinRuleUtils.parsePlaceholder(phStr, false, services);
+                ph = MergeRuleUtils.parsePlaceholder(phStr, false, services);
 
                 // Add placeholder to namespaces, if necessary
-                if (services.getNamespaces().variables().lookup(ph.second) == null) {
-                    services.getNamespaces()
-                            .variables()
-                            .add(new LocationVariable(new ProgramElementName(
-                                    ph.second.toString()), ph.first));
+                Namespace<IProgramVariable> variables = services.getNamespaces()
+                        .programVariables();
+                if (variables.lookup(ph.second) == null) {
+                    variables.add(new LocationVariable(
+                            new ProgramElementName(ph.second.toString()),
+                            ph.first));
                 }
 
                 // Parse the predicate
-                result.add(JoinRuleUtils.parsePredicate(predStr,
-                        JoinRuleUtils.singletonArrayList(ph), services));
+                result.add(MergeRuleUtils.parsePredicate(predStr,
+                        MergeRuleUtils.singletonArrayList(ph), localNamespaces,
+                        services));
             }
         }
 

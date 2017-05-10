@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -109,6 +110,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -748,7 +750,7 @@ public class KeyConnection extends MemoryConnection {
       MemoryInterface result = new KeyInterface(this, type);
       result.setName(interfaceName);
       // Add methods
-      ImmutableList<IProgramMethod> methods = services.getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
+      ImmutableList<ProgramMethod> methods = services.getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
       fillInterfaceWithMethods(services, result, methods, type);
       // Add attributes
       result.setStatic(ct.isStatic());
@@ -839,12 +841,13 @@ public class KeyConnection extends MemoryConnection {
       MemoryEnum result = new KeyEnum(this, type);
       result.setName(className);
       // Add methods (must be done before constructor adding to collect implicit defined constructors)
-      ImmutableList<IProgramMethod> methods = services.getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
-      List<IProgramMethod> implicitConstructors = new LinkedList<IProgramMethod>(); 
+      ImmutableList<ProgramMethod> methods = services.getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
+      List<ProgramMethod> implicitConstructors = new LinkedList<ProgramMethod>(); 
       fillEnumWithMethodsAndConstructors(services, result, methods, implicitConstructors, type);
       // Add constructors with use of implicit constructor definitions to get the specifications
       ImmutableList<IProgramMethod> constructors = services.getJavaInfo().getConstructors(type);
-      fillEnumWithMethodsAndConstructors(services, result, constructors, implicitConstructors, type);
+      fillEnumWithMethodsAndConstructors(services, result, constructors,
+              implicitConstructors.parallelStream().map(c -> (IProgramMethod) c).collect(Collectors.toList()), type);
       // Add attributes
       result.setStatic(ct.isStatic());
       if (ct.isPrivate()) {
@@ -938,12 +941,12 @@ public class KeyConnection extends MemoryConnection {
     * @param implicitConstructors The implicit constructor definitions to fill and to read from.
     * @throws DSException Occurred Exception
     */
-   protected void fillEnumWithMethodsAndConstructors(Services services,
+   protected <PM extends IProgramMethod> void fillEnumWithMethodsAndConstructors(Services services,
                                                      IDSEnum toFill, 
-                                                     ImmutableList<IProgramMethod> methodsAndConstructors,
-                                                     List<IProgramMethod> implicitConstructors,
+                                                     ImmutableList<PM> methodsAndConstructors,
+                                                     List<PM> implicitConstructors,
                                                      KeYJavaType type) throws DSException {
-      for (IProgramMethod methodOrConstructor : methodsAndConstructors) {
+      for (PM methodOrConstructor : methodsAndConstructors) {
          if (!methodOrConstructor.isImplicit()) {
             if (methodOrConstructor.isConstructor()) {
                IProgramMethod implicitConstructor = getImplicitConstructor(implicitConstructors, methodOrConstructor);
@@ -979,12 +982,13 @@ public class KeyConnection extends MemoryConnection {
       MemoryClass result = new KeyClass(this, type);
       result.setName(className);
       // Add methods (must be done before constructor adding to collect implicit defined constructors)
-      ImmutableList<IProgramMethod> methods = services.getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
-      List<IProgramMethod> implicitConstructors = new LinkedList<IProgramMethod>(); 
+      ImmutableList<ProgramMethod> methods = services.getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
+      List<ProgramMethod> implicitConstructors = new LinkedList<ProgramMethod>(); 
       fillClassWithMethodsAndConstructors(services, result, methods, implicitConstructors, type);
       // Add constructors with use of implicit constructor definitions to get the specifications
       ImmutableList<IProgramMethod> constructors = services.getJavaInfo().getConstructors(type);
-      fillClassWithMethodsAndConstructors(services, result, constructors, implicitConstructors, type);
+      fillClassWithMethodsAndConstructors(services, result, constructors, 
+              implicitConstructors.parallelStream().map(c -> (IProgramMethod) c).collect(Collectors.toList()), type);
       // Add attributes
       result.setAnonymous(isAnonymous(ct));
       result.setAbstract(ct.isAbstract());
@@ -1337,7 +1341,7 @@ public class KeyConnection extends MemoryConnection {
     */
    protected void fillInterfaceWithMethods(Services services,
                                            IDSInterface toFill, 
-                                           ImmutableList<IProgramMethod> methodsAndConstructors,
+                                           ImmutableList<ProgramMethod> methodsAndConstructors,
                                            KeYJavaType type) throws DSException {
       for (IProgramMethod methodOrConstructor : methodsAndConstructors) {
          if (!methodOrConstructor.isImplicit()) {
@@ -1356,12 +1360,12 @@ public class KeyConnection extends MemoryConnection {
     * @param implicitConstructors The implicit constructor definitions to fill and to read from.
     * @throws DSException Occurred Exception
     */
-   protected void fillClassWithMethodsAndConstructors(Services services,
+   protected <PM extends IProgramMethod> void fillClassWithMethodsAndConstructors(Services services,
                                                       IDSClass toFill, 
-                                                      ImmutableList<IProgramMethod> methodsAndConstructors,
-                                                      List<IProgramMethod> implicitConstructors,
+                                                      ImmutableList<PM> methodsAndConstructors,
+                                                      List<PM> implicitConstructors,
                                                       KeYJavaType type) throws DSException {
-      for (IProgramMethod methodOrConstructor : methodsAndConstructors) {
+      for (PM methodOrConstructor : methodsAndConstructors) {
          if (!methodOrConstructor.isImplicit()) {
             if (methodOrConstructor.isConstructor()) {
                IProgramMethod implicitConstructor = getImplicitConstructor(implicitConstructors, methodOrConstructor);
@@ -1389,10 +1393,10 @@ public class KeyConnection extends MemoryConnection {
     * @param toSearch The explicit constructor definition to search.
     * @return The found implicit constructor or {@code null} if it is not available.
     */
-   protected IProgramMethod getImplicitConstructor(List<IProgramMethod> toSearchIn, 
-                                                   IProgramMethod toSearch) {
+   protected <PM extends IProgramMethod> IProgramMethod getImplicitConstructor(List<PM> toSearchIn, 
+                                                   PM toSearch) {
       IProgramMethod result = null;
-      Iterator<IProgramMethod> iter = toSearchIn.iterator();
+      Iterator<PM> iter = toSearchIn.iterator();
       while (result == null && iter.hasNext()) {
          IProgramMethod next = iter.next();
          // Make sure that the method/constructor is in the same container (e.g. class)

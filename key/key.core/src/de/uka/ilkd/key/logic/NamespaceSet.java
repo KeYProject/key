@@ -13,29 +13,30 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.RuleSet;
 
 public class NamespaceSet {
 
-    private Namespace varNS          = new Namespace();
-    private Namespace progVarNS      = new Namespace();
-    private Namespace funcNS         = new Namespace();
-    private Namespace ruleSetNS      = new Namespace();
-    private Namespace sortNS         = new Namespace();
-    private Namespace choiceNS       = new Namespace();
+    private Namespace<QuantifiableVariable> varNS = new Namespace<QuantifiableVariable>();
+    private Namespace<IProgramVariable> progVarNS = new Namespace<IProgramVariable>();
+    private Namespace<Function> funcNS = new Namespace<Function>();
+    private Namespace<RuleSet> ruleSetNS = new Namespace<RuleSet>();
+    private Namespace<Sort> sortNS = new Namespace<Sort>();
+    private Namespace<Choice> choiceNS = new Namespace<Choice>();
 
-    
     public NamespaceSet() {
     }
 
-    public NamespaceSet(Namespace varNS, 
-	    		Namespace funcNS, 
-                        Namespace sortNS, 
-                        Namespace ruleSetNS,
-			Namespace choiceNS, 
-			Namespace programVarNS) {
+    public NamespaceSet(Namespace<QuantifiableVariable> varNS,
+	    		Namespace<Function> funcNS,
+                        Namespace<Sort> sortNS,
+                        Namespace<RuleSet> ruleSetNS,
+			Namespace<Choice> choiceNS,
+			Namespace<IProgramVariable> programVarNS) {
 	this.varNS     = varNS;
 	this.progVarNS = programVarNS;
 	this.funcNS    = funcNS;
@@ -44,54 +45,86 @@ public class NamespaceSet {
 	this.choiceNS  = choiceNS;
     }
 
-    public Namespace variables() {
+    public NamespaceSet copy() {
+        return new NamespaceSet(
+                variables().copy(),
+                functions().copy(),
+                sorts().copy(),
+                ruleSets().copy(),
+                choices().copy(),
+                programVariables().copy());
+    }
+
+    public NamespaceSet shallowCopy() {
+        return new NamespaceSet(
+                variables(),
+                functions(),
+                sorts(),
+                ruleSets(),
+                choices(),
+                programVariables());
+    }
+
+    // TODO MU: Rename into sth with wrap or similar
+    public NamespaceSet copyWithParent() {
+        return new NamespaceSet(
+                new Namespace<QuantifiableVariable>(variables()),
+                new Namespace<Function>(functions()),
+                new Namespace<Sort>(sorts()),
+                new Namespace<RuleSet>(ruleSets()),
+                new Namespace<Choice>(choices()),
+                new Namespace<IProgramVariable>(programVariables())
+                );
+    }
+
+    public Namespace<QuantifiableVariable> variables() {
 	return varNS;
     }
 
-    public void setVariables(Namespace varNS) {
+    public void setVariables(Namespace<QuantifiableVariable> varNS) {
 	this.varNS = varNS;
     }
 
-    public Namespace programVariables() {
+    public Namespace<IProgramVariable> programVariables() {
 	return progVarNS;
     }
 
-    public void setProgramVariables(Namespace progVarNS) {
+    public void setProgramVariables(Namespace<IProgramVariable> progVarNS) {
 	this.progVarNS = progVarNS;
     }
 
-    public Namespace functions() {
+    public Namespace<Function> functions() {
 	return funcNS;
     }
 
-    public void setFunctions(Namespace funcNS) {
+    public void setFunctions(Namespace<Function> funcNS) {
 	this.funcNS = funcNS;
     }
 
-    public Namespace ruleSets() {
+    public Namespace<RuleSet> ruleSets() {
 	return ruleSetNS;
     }
 
-    public void setRuleSets(Namespace ruleSetNS) {
+    public void setRuleSets(Namespace<RuleSet> ruleSetNS) {
 	this.ruleSetNS = ruleSetNS;
     }
 
-    public Namespace sorts() {
+    public Namespace<Sort> sorts() {
 	return sortNS;
     }
 
-    public void setSorts(Namespace sortNS) {
+    public void setSorts(Namespace<Sort> sortNS) {
 	this.sortNS = sortNS;
     }
 
-    public Namespace choices() {
+    public Namespace<Choice> choices() {
 	return choiceNS;
     }
 
-    public void setChoices(Namespace choiceNS) {
+    public void setChoices(Namespace<Choice> choiceNS) {
 	this.choiceNS = choiceNS;
     }
-    
+
     public void add(NamespaceSet ns) {
 	variables().add(ns.variables());
 	programVariables().add(ns.programVariables());
@@ -101,74 +134,37 @@ public class NamespaceSet {
 	choices().add(ns.choices());
     }
 
-    public NamespaceSet copy() {
-	NamespaceSet c = new NamespaceSet();
-	c.setSorts(sorts().copy());
-	c.setRuleSets(ruleSets().copy());
-	c.setFunctions(functions().copy());
-	c.setVariables(variables().copy());
-	c.setProgramVariables(programVariables().copy());
-	c.setChoices(choices().copy());
-	return c;
-    }
-    
     /**
-     * starts the protocol of all contained namespaces
+     * returns all namespaces in an array
      */
-    public void startProtocol() {
-	variables().startProtocol();
-	programVariables().startProtocol();
-	sorts().startProtocol();
-	ruleSets().startProtocol();
-	functions().startProtocol();
-	choices().startProtocol();
-    }
-       
-    /**
-     * returns all namespaces in an array     
-     */
-    private Namespace[] asArray() {
-        return new Namespace[]{variables(), 
-        		       programVariables(), 
-        		       sorts(), 
-        		       ruleSets(), 
+    private Namespace<?>[] asArray() {
+        return new Namespace[]{variables(),
+        		       programVariables(),
+        		       sorts(),
+        		       ruleSets(),
         		       functions(),
         		       choices()
         };
     }
-    
+
     /**
      * returns all namespaces with symbols that may occur
      * in a real sequent (this means all namespaces without
-     * variables, choices and ruleSets)      
+     * variables, choices and ruleSets)
      */
-    private Namespace[] logicAsArray() {
+    private Namespace<?>[] logicAsArray() {
         return new Namespace[]{
            programVariables(), sorts(), functions()
         };
     }
-    
-    /**
-     * adds the protocolled names of the given NamespaceSet to this one    
-     */
-    public void addProtocolled(NamespaceSet nss) {
-      final Namespace[] myNames = asArray();
-      final Namespace[] otherNames = nss.asArray();
-      for (int i = 0; i<myNames.length; i++) {
-          final Iterator<Named> it = otherNames[i].getProtocolled();
-          while (it.hasNext()) {
-              myNames[i].add(it.next());
-          }
-      }       
-    }
 
     /**
      * looks up if the given name is found in one of the namespaces
-     * and returns the named object or null if no object with the same name 
+     * and returns the named object or null if no object with the same name
      * has been found
      */
     public Named lookup(Name name) {
-	final Namespace[] spaces = asArray();
+	final Namespace<?>[] spaces = asArray();
 	return lookup(name, spaces);
     }
 
@@ -178,25 +174,25 @@ public class NamespaceSet {
      * @param name the Name to look up
      * @return the element of the given name or null
      */
-    public Named lookupLogicSymbol(Name name) {        
+    public Named lookupLogicSymbol(Name name) {
         return lookup(name, logicAsArray());
     }
-    
+
     /**
      * @param name
      * @param spaces
-     * @return the element with the given name if found in the 
+     * @return the element with the given name if found in the
      * given namespaces, otherwise <tt>null</tt>
      */
-    private Named lookup(Name name, final Namespace[] spaces) {
-        for (Namespace space : spaces) {
+    private Named lookup(Name name, final Namespace<?>[] spaces) {
+        for (Namespace<?> space : spaces) {
             final Named n = space.lookup(name);
             if (n != null) return n;
-        } 
+        }
         return null;
     }
 
-    
+
     @Override
     public String toString() {
 	return "Sorts: " + sorts() + "\n" +
@@ -206,9 +202,9 @@ public class NamespaceSet {
 	    "Heuristics: " + ruleSets() + "\n" +
 	    "Taclet Options: " + choices() + "\n";
     }
-    
-    
-    public <T extends Name> boolean contains(ImmutableSet<T> names) {
+
+
+    public <T extends Name> boolean containsAll(Iterable<T> names) {
         for (Name name : names) {
             if (lookupLogicSymbol(name) == null) {
                 return false;
@@ -216,4 +212,58 @@ public class NamespaceSet {
         }
         return true;
     }
+
+    public void seal() {
+        varNS.seal();
+        progVarNS.seal();
+        funcNS.seal();
+        ruleSetNS.seal();
+        sortNS.seal();
+        choiceNS.seal();
+    }
+
+    public boolean isEmpty() {
+        return varNS.isEmpty() &&
+                programVariables().isEmpty() &&
+                funcNS.isEmpty() &&
+                ruleSetNS.isEmpty() &&
+                sortNS.isEmpty() &&
+                choiceNS.isEmpty();
+    }
+
+
+    // create a namespace
+    public NamespaceSet simplify() {
+        return new NamespaceSet(varNS.simplify(),
+                funcNS.simplify(),
+                sortNS.simplify(),
+                ruleSetNS.simplify(),
+                choiceNS.simplify(),
+                progVarNS.simplify());
+    }
+
+    public NamespaceSet getCompression() {
+        return new NamespaceSet(varNS.compress(),
+                funcNS.compress(),
+                sortNS.compress(),
+                ruleSetNS.compress(),
+                choiceNS.compress(),
+                progVarNS.compress());
+    }
+
+    public void flushToParent() {
+        for (Namespace<?> ns : asArray()) {
+            ns.flushToParent();
+        }
+    }
+
+    public NamespaceSet getParent() {
+        return new NamespaceSet(varNS.parent(),
+                funcNS.parent(),
+                sortNS.parent(),
+                ruleSetNS.parent(),
+                choiceNS.parent(),
+                progVarNS.parent());
+    }
+
 }

@@ -66,7 +66,7 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.java.visitor.ContainsStatementVisitor;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -127,9 +127,9 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.join.CloseAfterJoin;
-import de.uka.ilkd.key.rule.join.CloseAfterJoinRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
+import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -3885,51 +3885,6 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Utilits class used by {@link SymbolicExecutionUtil#containsStatement(MethodFrame, ProgramElement, Services)}.
-    * @author Martin Hentschel
-    */
-   private static class ContainsStatementVisitor extends JavaASTVisitor {
-      /**
-       * The {@link ProgramElement} to search.
-       */
-      private final SourceElement toSearch;
-      
-      /**
-       * The result.
-       */
-      private boolean contained = false;
-      
-      /**
-       * Constructor.
-       * @param root The {@link ProgramElement} to start search in.
-       * @param toSearch The {@link SourceElement} to search.
-       * @param services The {@link Services} to use.
-       */
-      public ContainsStatementVisitor(ProgramElement root, SourceElement toSearch, Services services) {
-         super(root, services);
-         this.toSearch = toSearch;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      protected void doDefaultAction(SourceElement se) {
-         if (equalsWithPosition(se, toSearch)) { // Comparison by == is not possible since loops are recreated
-            contained = true;
-         }
-      }
-
-      /**
-       * Returns the result.
-       * @return {@code true} contained, {@code false} not contained.
-       */
-      public boolean isContained() {
-         return contained;
-      }
-   }
-   
-   /**
     * Creates recursive a term which can be used to determine the value
     * of {@link #getProgramVariable()}.
     * @param services The {@link Services} to use.
@@ -4185,22 +4140,22 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the {@link JoinRuleBuiltInRuleApp} is applied.
+    * Checks if the {@link MergeRuleBuiltInRuleApp} is applied.
     * @param ruleApp The {@link RuleApp} to check.
-    * @return {@code true} is {@link JoinRuleBuiltInRuleApp}, {@code false} otherwise.
+    * @return {@code true} is {@link MergeRuleBuiltInRuleApp}, {@code false} otherwise.
     */
    public static boolean isJoin(RuleApp ruleApp) {
-      return ruleApp instanceof JoinRuleBuiltInRuleApp &&
-             !((JoinRuleBuiltInRuleApp) ruleApp).getJoinPartners().isEmpty();
+      return ruleApp instanceof MergeRuleBuiltInRuleApp &&
+             !((MergeRuleBuiltInRuleApp) ruleApp).getMergePartners().isEmpty();
    }
 
    /**
-    * Checks if the {@link CloseAfterJoinRuleBuiltInRuleApp} is applied.
+    * Checks if the {@link CloseAfterMergeRuleBuiltInRuleApp} is applied.
     * @param ruleApp The {@link RuleApp} to check.
-    * @return {@code true} is {@link CloseAfterJoinRuleBuiltInRuleApp}, {@code false} otherwise.
+    * @return {@code true} is {@link CloseAfterMergeRuleBuiltInRuleApp}, {@code false} otherwise.
     */
    public static boolean isCloseAfterJoin(RuleApp ruleApp) {
-      return ruleApp instanceof CloseAfterJoinRuleBuiltInRuleApp;
+      return ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp;
    }
 
    /**
@@ -4210,8 +4165,8 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isWeakeningGoalEnabled(Proof proof) {
       if (proof != null && !proof.isDisposed()) {
-         String value = proof.getSettings().getChoiceSettings().getDefaultChoices().get(CloseAfterJoin.JOIN_GENERATE_IS_WEAKENING_GOAL_CFG);
-         return CloseAfterJoin.JOIN_GENERATE_IS_WEAKENING_GOAL_CFG_ON.equals(value);
+         String value = proof.getSettings().getChoiceSettings().getDefaultChoices().get(CloseAfterMerge.MERGE_GENERATE_IS_WEAKENING_GOAL_CFG);
+         return CloseAfterMerge.MERGE_GENERATE_IS_WEAKENING_GOAL_CFG_ON.equals(value);
       }
       else {
          return false;

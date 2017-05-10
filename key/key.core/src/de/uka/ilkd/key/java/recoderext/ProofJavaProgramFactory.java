@@ -402,9 +402,17 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 							 StatementBlock block) {
 	return new MethodCallStatement(resVar, ec, block);
     }
-    
+
     public LoopScopeBlock createLoopScopeBlock() {
         return new LoopScopeBlock();
+    }
+    
+    public MergePointStatement createMergePointStatement() {
+        return new MergePointStatement();
+    }
+    
+    public MergePointStatement createMergePointStatement(Expression expr) {
+        return new MergePointStatement(expr);
     }
 
     /**

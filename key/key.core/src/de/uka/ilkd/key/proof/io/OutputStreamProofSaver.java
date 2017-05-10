@@ -66,11 +66,11 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
-import de.uka.ilkd.key.rule.join.CloseAfterJoinRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithLatticeAbstraction;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
+import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
+import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -388,48 +388,48 @@ public class OutputStreamProofSaver {
                 tree.append("\")");
             }
 
-            if (appliedRuleApp instanceof JoinRuleBuiltInRuleApp) {
-                JoinRuleBuiltInRuleApp joinApp =
-                        (JoinRuleBuiltInRuleApp) appliedRuleApp;
-                JoinProcedure concreteRule = joinApp.getConcreteRule();
+            if (appliedRuleApp instanceof MergeRuleBuiltInRuleApp) {
+                MergeRuleBuiltInRuleApp mergeApp =
+                        (MergeRuleBuiltInRuleApp) appliedRuleApp;
+                MergeProcedure concreteRule = mergeApp.getConcreteRule();
 
                 tree.append(" (")
-                        .append(ProofElementID.JOIN_PROCEDURE.getRawName())
+                        .append(ProofElementID.MERGE_PROCEDURE.getRawName())
                         .append(" \"");
                 tree.append(concreteRule.toString());
                 tree.append("\")");
 
                 tree.append(" (")
-                        .append(ProofElementID.NUMBER_JOIN_PARTNERS
+                        .append(ProofElementID.NUMBER_MERGE_PARTNERS
                                 .getRawName()).append(" \"");
-                tree.append(joinApp.getJoinPartners().size());
+                tree.append(mergeApp.getMergePartners().size());
                 tree.append("\")");
 
-                tree.append(" (").append(ProofElementID.JOIN_ID.getRawName())
+                tree.append(" (").append(ProofElementID.MERGE_ID.getRawName())
                         .append(" \"");
-                tree.append(joinApp.getJoinNode().serialNr());
+                tree.append(mergeApp.getMergeNode().serialNr());
                 tree.append("\")");
 
-                if (joinApp.getDistinguishingFormula() != null) {
+                if (mergeApp.getDistinguishingFormula() != null) {
                     tree.append(" (")
-                            .append(ProofElementID.JOIN_DIST_FORMULA
+                            .append(ProofElementID.MERGE_DIST_FORMULA
                                     .getRawName()).append(" \"");
                     tree.append(escapeCharacters(printAnything(
-                            joinApp.getDistinguishingFormula(),
+                            mergeApp.getDistinguishingFormula(),
                             proof.getServices(), false).toString().trim()
                             .replaceAll("(\\r|\\n|\\r\\n)+", "")));
                     tree.append("\")");
                 }
 
-                // Predicates for joins with predicate abstraction.
-                JoinWithPredicateAbstraction predAbstrRule;
-                if (concreteRule instanceof JoinWithPredicateAbstraction
+                // Predicates for merges with predicate abstraction.
+                MergeWithPredicateAbstraction predAbstrRule;
+                if (concreteRule instanceof MergeWithPredicateAbstraction
                         && (predAbstrRule =
-                                (JoinWithPredicateAbstraction) concreteRule)
+                                (MergeWithPredicateAbstraction) concreteRule)
                                 .getPredicates().size() > 0) {
 
                     tree.append(" (")
-                            .append(ProofElementID.JOIN_ABSTRACTION_PREDICATES
+                            .append(ProofElementID.MERGE_ABSTRACTION_PREDICATES
                                     .getRawName()).append(" \"");
                     for (Map.Entry<Sort, ArrayList<AbstractionPredicate>> predsForSorts : predAbstrRule
                             .getPredicates().entrySet()) {
@@ -446,20 +446,20 @@ public class OutputStreamProofSaver {
                     tree.append("\")");
 
                     tree.append(" (")
-                            .append(ProofElementID.JOIN_PREDICATE_ABSTRACTION_LATTICE_TYPE
+                            .append(ProofElementID.MERGE_PREDICATE_ABSTRACTION_LATTICE_TYPE
                                     .getRawName()).append(" \"");
                     tree.append(predAbstrRule.getLatticeType().getName());
                     tree.append("\")");
 
                 }
 
-                if (concreteRule instanceof JoinWithLatticeAbstraction) {
+                if (concreteRule instanceof MergeWithLatticeAbstraction) {
                     final Map<ProgramVariable, AbstractDomainElement> userChoices =
-                            ((JoinWithLatticeAbstraction) concreteRule)
+                            ((MergeWithLatticeAbstraction) concreteRule)
                                     .getUserChoices();
                     if (!userChoices.isEmpty()) {
                         tree.append(" (")
-                                .append(ProofElementID.JOIN_USER_CHOICES
+                                .append(ProofElementID.MERGE_USER_CHOICES
                                         .getRawName()).append(" \"");
                         for (final ProgramVariable v : userChoices.keySet()) {
                             final AbstractDomainElement elem =
@@ -480,19 +480,22 @@ public class OutputStreamProofSaver {
                 }
             }
 
-            if (appliedRuleApp instanceof CloseAfterJoinRuleBuiltInRuleApp) {
-                CloseAfterJoinRuleBuiltInRuleApp closeApp =
-                        (CloseAfterJoinRuleBuiltInRuleApp) appliedRuleApp;
+            if (appliedRuleApp instanceof CloseAfterMergeRuleBuiltInRuleApp) {
+                CloseAfterMergeRuleBuiltInRuleApp closeApp =
+                        (CloseAfterMergeRuleBuiltInRuleApp) appliedRuleApp;
 
-                // TODO (DS): There may be problems here if the join node is
+                // TODO (DS): There may be problems here if the merge node is
                 // pruned away. Need to test some cases and either check for
                 // null pointers at this place or find a better solution.
-                tree.append(" (").append(ProofElementID.JOIN_NODE.getRawName())
+                tree.append(" (").append(ProofElementID.MERGE_NODE.getRawName())
                         .append(" \"");
-                tree.append(closeApp.getCorrespondingJoinNode().parent()
+                tree.append(closeApp.getCorrespondingMergeNode().parent()
                         .serialNr());
                 tree.append("\")");
             }
+            
+            tree.append("");
+            userInteraction2Proof(node, tree);
 
             tree.append(")\n");
         }

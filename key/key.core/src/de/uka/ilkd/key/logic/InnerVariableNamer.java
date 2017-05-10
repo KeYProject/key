@@ -36,7 +36,7 @@ public class InnerVariableNamer extends VariableNamer {
      * and the passed program
      */
     private int getMaxCounterInGlobalsAndProgram(String basename,
-    				 		 Globals globals,
+            Iterable<ProgramElementName> globals,
 						 ProgramElement program,
 						 PosInProgram posOfDeclaration) {
 	int maxInGlobals = getMaxCounterInGlobals(basename, globals);
@@ -52,13 +52,13 @@ public class InnerVariableNamer extends VariableNamer {
                                   PosInOccurrence posOfFind) {
 	ProgramElementName name = var.getProgramElementName();
 	BasenameAndIndex bai = getBasenameAndIndex(name);
-	Globals globals = wrapGlobals(goal.getGlobalProgVars());
+        Iterable<ProgramElementName> globals = wrapGlobals(goal.node().getLocalProgVars());
 	map.clear();
 
 	//prepare renaming of inner var
 	final NameCreationInfo nci = MethodStackInfo.create(getProgramFromPIO(posOfFind));
 	ProgramElementName newname = null;
-   ProgramElementName branchUniqueName = null;
+	ProgramElementName branchUniqueName = null;
 
 	// Name proposal = services.getProof().getNameRecorder().getProposal();
         Name proposal = services.getNameRecorder().getProposal();

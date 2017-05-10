@@ -105,6 +105,16 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "implementation. Method contracts are strictly deactivated.</html>";
     public static final String TOOL_TIP_METHOD_NONE = "<html>"
             + "Stop when encountering a method" + "</html>";
+    public static final String TOOL_TIP_MPS_MERGE
+            = "<html>Use merge point statements for merging. That is,<br>"
+            + "whenever all branches with a given merge point statement<br>"
+            + "have reached it, the strategies will eventually merge<br>"
+            + "the branches together using the merge point specification.</html>";
+public static final String TOOL_TIP_MPS_SKIP
+            = "<html>Simply removes (skips) the merge point statment;<br>"
+            + "no state merging is applied.</html>";
+public static final String TOOL_TIP_MPS_NONE = "<html>"
+            + "Stop when encountering a merge point statement" + "</html>";
     public static final String TOOL_TIP_CLASSAXIOM_FREE
             = "<html>Expand class axioms (such as invariants) freely.</html>";
     public static final String TOOL_TIP_CLASSAXIOM_DELAYED
@@ -340,6 +350,18 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.METHOD_NONE, "None",
                                 TOOL_TIP_METHOD_NONE));
+        OneOfStrategyPropertyDefinition mergePointStatementTreatment
+                = new OneOfStrategyPropertyDefinition(
+                        StrategyProperties.MPS_OPTIONS_KEY, "Merge point statements",
+                        new StrategyPropertyValueDefinition(
+                                StrategyProperties.MPS_MERGE, "Merge",
+                                TOOL_TIP_MPS_MERGE),
+                        new StrategyPropertyValueDefinition(
+                                StrategyProperties.MPS_SKIP, "Skip",
+                                TOOL_TIP_MPS_SKIP),
+                        new StrategyPropertyValueDefinition(
+                                StrategyProperties.MPS_NONE, "None",
+                                TOOL_TIP_MPS_NONE));
         OneOfStrategyPropertyDefinition dependencyContracts
                 = new OneOfStrategyPropertyDefinition(
                         StrategyProperties.DEP_OPTIONS_KEY,
@@ -471,9 +493,9 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                                 .size()]));
         // Model
         return new StrategySettingsDefinition("Java DL Options", stopAt,
-                proofSplitting, loopTreatment, blockTreatment,
-                methodTreatment, dependencyContracts, queryTreatment,
-                arithmeticTreatment, quantifierTreatment, classAxiom,
-                autoInduction, userOptions);
+                proofSplitting, loopTreatment, blockTreatment, methodTreatment,
+                mergePointStatementTreatment, dependencyContracts,
+                queryTreatment, arithmeticTreatment, quantifierTreatment,
+                classAxiom, autoInduction, userOptions);
     }
 }

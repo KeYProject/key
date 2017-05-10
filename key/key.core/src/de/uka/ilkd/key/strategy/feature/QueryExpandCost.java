@@ -129,8 +129,8 @@ public class QueryExpandCost implements Feature {
 	 * @see <code>literalsToCost</code>
 	 */
 	private static int maxIntliteralInArgumentsTimesTwo(Term t, IntegerLDT iLDT, Services serv){
-		final Namespace sorts = serv.getNamespaces().sorts();
-		final Sort intSort = (Sort) sorts.lookup(IntegerLDT.NAME);
+		final Namespace<Sort> sorts = serv.getNamespaces().sorts();
+		final Sort intSort = sorts.lookup(IntegerLDT.NAME);
 		int cost=0;
 		//The computation is limited to arguments that have an arithmetic type. E.g., don't calculate int literals in the heap parameter. 
 		for(int i=0;i<t.arity();i++){  

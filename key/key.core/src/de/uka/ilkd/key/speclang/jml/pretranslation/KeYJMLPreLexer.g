@@ -79,7 +79,6 @@ lexer grammar KeYJMLPreLexer;
     INSTANCE 			: 'instance';
     INVARIANT 			: 'invariant';
     INVARIANT_RED 		: 'invariant_redundantly';
-    JOIN_PROC           : 'join_proc';
     LOOP_INVARIANT  		: 'loop_invariant';
     LOOP_INVARIANT_RED  	: 'loop_invariant_redundantly';
     LOOP_INVARIANT_FREE	: 'loop_invariant_free';
@@ -89,6 +88,9 @@ lexer grammar KeYJMLPreLexer;
     MAPS_RED			: 'maps_redundantly';
     MEASURED_BY                 : 'measured_by';
     MEASURED_BY_REDUNDANTLY     : 'measured_by_redundantly';
+    MERGE_POINT         : 'merge_point';
+    MERGE_PROC          : 'merge_proc';
+    MERGE_PARAMS        : 'merge_params';
     MODEL 			: 'model';
     MODEL_BEHAVIOR 		: 'model_behavior' ;
     MODEL_BEHAVIOUR 		: 'model_behaviour' ;
@@ -274,6 +276,13 @@ SEMICOLON
     ';'
 ;
 
+
+//TODO (DS): I wanted two enable the usage of "\old" in STRING_LITERALs for merge params specifications.
+//           Therefore, I changed the definition like it can be seen below. Now, however, ANTLR is reporting
+//           issues like:
+//             Decision can match input such as "'\\''r'" using multiple alternatives: 1, 2
+//             As a result, alternative(s) 2 were disabled for that input
+//           This probably should be resolved...
 STRING_LITERAL
     : '"' ( ESC | ~('"'|'\\') )* '"'
     ;

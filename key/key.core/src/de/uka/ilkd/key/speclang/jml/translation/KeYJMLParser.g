@@ -29,6 +29,7 @@ options {
     import de.uka.ilkd.key.util.Pair;
     import de.uka.ilkd.key.util.Triple;
     import de.uka.ilkd.key.util.InfFlowSpec;
+    import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 
     import java.math.BigInteger;
     import java.util.List;
@@ -392,7 +393,6 @@ top returns [Object ret = null] throws  SLTranslationException
     |   representsclause { ret = $representsclause.result; }
     |   axiomsclause { ret = $axiomsclause.ret; }
     |   requiresclause { ret = $requiresclause.ret; }
-    |   joinprocclause { ret = $joinprocclause.ret; }
     |   requiresfreeclause { ret = $requiresfreeclause.ret; }
     |   decreasesclause { ret = $decreasesclause.ret; }
     |   separatesclause { ret = $separatesclause.result; } // old information flow syntax
@@ -403,6 +403,7 @@ top returns [Object ret = null] throws  SLTranslationException
     |   signalsclause { ret = $signalsclause.ret; }
     |   signalsonlyclause { ret = $signalsonlyclause.result; }
     |   termexpression { ret = $termexpression.result; }
+    |   mergeparamsspec { ret = $mergeparamsspec.result; }
     )
     (SEMI)? EOF
     ;
@@ -453,12 +454,6 @@ requiresfreeclause returns [Term ret = null] throws SLTranslationException
 :
     req=REQUIRES_FREE result=predornot
             { ret = translator.translate(req.getText(), Term.class, result, services); }
-    ;
-
-joinprocclause returns [Term ret = null] throws SLTranslationException
-:
-    jpr=JOIN_PROC result=predornot
-            { ret = translator.translate(jpr.getText(), Term.class, result, services); }
     ;
 
 ensuresclause returns [Term ret = null] throws SLTranslationException
@@ -634,6 +629,51 @@ signalsonlyclause returns [Term result = null] throws SLTranslationException
     )
     { result = translator.translate(sigo.getText(), Term.class, typeList, this.excVar, services); }
     ;
+    
+mergeparamsspec returns [MergeParamsSpec result = null] throws SLTranslationException
+@init {
+    ImmutableList<Term> preds = ImmutableSLList.<Term>nil();
+    LocationVariable placeholder = null;
+}
+:
+	MERGE_PARAMS
+	
+	LBRACE
+
+		(latticetype = IDENT)
+		
+		COLON
+	
+	    LPAREN
+	    	(phType = typespec)
+	    	(phName = IDENT)
+	    	{
+	            placeholder = new LocationVariable(new ProgramElementName(phName.getText()), phType);
+	            resolverManager.putIntoTopLocalVariablesNamespace(placeholder);
+	    	}
+	    RPAREN
+	    
+	    RARROW
+	    
+	    LBRACE
+	    	(abstrPred = predicate)
+	    	{
+	    		preds = preds.prepend(abstrPred);
+	    	}
+	    	(
+	    		COMMA
+	    		(abstrPred = predicate)
+		    	{
+		    		preds = preds.prepend(abstrPred);
+		    	}
+	    	)*
+	    RBRACE
+	    
+    RBRACE
+    {
+    	result = new MergeParamsSpec(latticetype.getText(), placeholder, preds);
+    }
+;
 
 
 termexpression returns [Term result = null] throws SLTranslationException
@@ -1000,7 +1040,7 @@ relationalexpr returns [SLExpression ret=null] throws SLTranslationException
 		if (result.getTerm() == null) {
 		    addIgnoreWarning("subtype expression <: only supported for" +
 			" \\typeof() arguments on the left side.", st);
-			final Namespace fns = services.getNamespaces().functions();
+			final Namespace<Function> fns = services.getNamespaces().functions();
 			int x = -1; Name name = null;
 			do name = new Name("subtype_"+ ++x);
 			while (fns.lookup(name)!= null);

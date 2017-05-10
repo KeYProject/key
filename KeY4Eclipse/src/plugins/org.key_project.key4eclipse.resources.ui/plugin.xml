@@ -76,6 +76,27 @@
             </visibleWhen>
          </command>
          <command
+               commandId="org.key_project.key4eclipse.resources.ui.convertToJavaProjectCommand"
+               icon="icons/logo16.gif"
+               label="Convert to Java Project"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <test
+                              forcePluginActivation="true"
+                              property="org.eclipse.core.resources.projectNature"
+                              value="org.key_project.key4eclipse.resources.KeYProjectNature">
+                     </test>                    
+                  </adapt>
+               </iterate>
+            </visibleWhen>
+         </command>
+         <command
                commandId="org.key_project.key4eclipse.resources.ui.buildOutdatedProofsCommand"
                icon="icons/logo16.gif"
                label="Build outdated proofs"
@@ -152,6 +173,11 @@
             </class>
          </state>
       </command>
+      <command
+            categoryId="org.key_project.key4eclipse.resources.ui.category"
+            id="org.key_project.key4eclipse.resources.ui.convertToKeYProjectCommand"
+            name="Convert to Java Project">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
@@ -170,6 +196,10 @@
       <image
             commandId="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPartCommand"
             icon="icons/synced.gif">
+      </image>
+      <image
+            commandId="org.key_project.key4eclipse.resources.ui.convertToJavaProjectCommand"
+            icon="icons/logo16.gif">
       </image>
    </extension>
    <extension
@@ -245,6 +275,24 @@
       <handler
             class="org.key_project.key4eclipse.resources.ui.handler.ClearLogHandler"
             commandId="org.key_project.key4eclipse.resources.ui.clearLog">
+      </handler>
+      <handler
+            class="org.key_project.key4eclipse.resources.ui.handler.ConvertKeYToJavaProjectHandler"
+            commandId="org.key_project.key4eclipse.resources.ui.convertToJavaProjectCommand">
+         <enabledWhen>
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <adapt
+                     type="org.eclipse.core.resources.IResource">
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.core.resources.projectNature"
+                        value="org.key_project.key4eclipse.resources.KeYProjectNature">
+                  </test>
+               </adapt>
+            </iterate>
+         </enabledWhen>
       </handler>
    </extension>
    <extension
