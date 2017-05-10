@@ -4712,7 +4712,7 @@ Continue ContinueStatement() :
 	    result = factory.createContinue();
 	    setPrefixInfo(result);
 	}
-    [ <IDENTIFIER>
+    [ (<IDENTIFIER>
     {
 	id = factory.createIdentifier(token.image);
 	setPrefixInfo(id);

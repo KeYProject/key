@@ -87,10 +87,11 @@ public class StaticFeatureCollection {
         return ConditionalFeature.createConditional(filter, cost);
     }
 
-    protected static Feature setupJoinRule() {
+    protected static Feature mergeRuleFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(JoinRule.INSTANCE);
-        return ConditionalFeature.createConditional(filter, inftyConst());
+        filter.addRuleToSet(MergeRule.INSTANCE);
+        return ConditionalFeature.createConditional(filter,
+                SumFeature.createSum(cost, MergeRuleFeature.INSTANCE));
     }
 
     protected static Feature sequentContainsNoPrograms() {
