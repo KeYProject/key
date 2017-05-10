@@ -22,8 +22,10 @@ import org.key_project.util.collection.DefaultImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -33,6 +35,7 @@ import de.uka.ilkd.key.rule.Taclet;
 public class TestTacletTranslator extends TestCase {
 
     private NamespaceSet nss;
+    private Namespace<SchemaVariable> schemaVariableNS;
     private Services services;
 
 
@@ -56,16 +59,19 @@ public class TestTacletTranslator extends TestCase {
                 "  \\term S x;\n" +
                 "  \\variables S z;\n" +
                 "}\n");
+        System.out.println();
     }
 
     //
     // Utility Methods for test cases.
     //
     private KeYParserF stringTacletParser(String s) {
-	return new KeYParserF(ParserMode.TACLET,
+	KeYParserF p = new KeYParserF(ParserMode.TACLET,
 		new KeYLexerF(s,
 			"No file. parser/TestTacletParser.stringTacletParser(" + s + ")"),
 		services, nss);
+        p.setSchemaVariablesNamespace(schemaVariableNS);
+        return p;
     }
 
     private void parseDecls(String s) {
@@ -75,6 +81,7 @@ public class TestTacletTranslator extends TestCase {
 			    "No file. parser/TestTacletParser.stringDeclParser(" + s + ")"),
 		   services, nss);
             p.decls();
+            schemaVariableNS = p.schemaVariables();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -86,6 +93,7 @@ public class TestTacletTranslator extends TestCase {
     private Term parseTerm(String s) {
         try {
             KeYParserF p = stringTacletParser(s);
+            p.setSchemaVariablesNamespace(schemaVariableNS);
             return p.term();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
@@ -98,6 +106,7 @@ public class TestTacletTranslator extends TestCase {
     private Term parseFma(String s) {
         try {
             KeYParserF p = stringTacletParser(s);
+            p.setSchemaVariablesNamespace(schemaVariableNS);
 
             return p.formula();
         } catch (Exception e) {
@@ -111,6 +120,7 @@ public class TestTacletTranslator extends TestCase {
     private Taclet parseTaclet(String s) {
         try {
             KeYParserF p = stringTacletParser(s);
+            p.setSchemaVariablesNamespace(schemaVariableNS);
 
             return p.taclet(DefaultImmutableSet.<Choice> nil());
         } catch (Exception e) {
