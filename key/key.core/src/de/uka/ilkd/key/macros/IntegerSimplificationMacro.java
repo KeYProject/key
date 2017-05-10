@@ -60,6 +60,7 @@ public class IntegerSimplificationMacro extends AbstractPropositionalExpansionMa
             "castDel2",
             "castDel3",
             //"castedGetAny",
+            "div_literals",
             "double_unary_minus_literal",
             "i_minus_i_is_zero",
             "inChar",
