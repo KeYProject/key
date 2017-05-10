@@ -84,6 +84,7 @@ public class IntegerSimplificationMacro extends AbstractPropositionalExpansionMa
             "moduloShortIsInShort",
             "mul_literals",
             "neg_literal",
+            "polySimp_addLiterals",
             "precOfInt",
             "precOfIntPair",
             "precOfPairInt",
