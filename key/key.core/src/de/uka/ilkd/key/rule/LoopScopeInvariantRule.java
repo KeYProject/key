@@ -61,9 +61,9 @@ import de.uka.ilkd.key.util.Pair;
  * <pre>
  * \Gamma ==> {U}Inv, \Delta
  * \Gamma, {U'}Inv ==> \Delta, {U'}[\pi
- *    boolean x = false;
+ *    boolean x = true;
  *    loop-scope(x){
- *      if(nse) l1: ... ln:  { p continue; }
+ *      if(nse) l1: ... ln:  { p x = false; }
  *    } \omega]
  *    ((x = TRUE -> \phi) & (x = FALSE -> Inv))
  * ------------------------------------------------------------------- loopInvariant
@@ -324,7 +324,12 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         } else {
             stmnt.add(loop.getBody());
         }
-        stmnt.add(KeYJavaASTFactory.continueStatement(null));
+        
+        // If this assignment of "false" to the loop scope index is reached, we
+        // are in the standard "preserved" case and have to show the invariant.
+        
+        stmnt.add(KeYJavaASTFactory.assign(loopScopeIdxVar,
+                KeYJavaASTFactory.falseLiteral()));
 
         Statement ifBody = new StatementBlock(
                 stmnt.toArray(new Statement[stmnt.size()]));
@@ -341,8 +346,17 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final LoopScopeBlock loopScope = new LoopScopeBlock(loopScopeIdxVar,
                 KeYJavaASTFactory.block(newIf));
 
+        // NOTE (important): The assignment of the initial value "true" for the
+        // loop scope index variable is crucial here; otherwise, the handling of
+        // empty loop scopes (show invariant of index is false, show post
+        // condition if index is true) won't work. Note that this behavior
+        // differs from Nathan Wasser's thesis and the paper on loop scope
+        // invariants, where we instead use an artificial "continue" statement.
+        // We wanted to get rid of this.
+        
         final StatementBlock newBlock = KeYJavaASTFactory
-                .block(KeYJavaASTFactory.declare(loopScopeIdxVar), loopScope);
+                .block(KeYJavaASTFactory.declare(loopScopeIdxVar,
+                        KeYJavaASTFactory.trueLiteral()), loopScope);
 
         final ProgramElement result = new ProgramElementReplacer(
                 origProg.program(), services).replace(stmtToReplace, newBlock);
