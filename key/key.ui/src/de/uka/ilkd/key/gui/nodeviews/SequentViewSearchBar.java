@@ -86,6 +86,9 @@ public class SequentViewSearchBar extends SearchBar {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 searchField.requestFocus();
+                if (sequentView.filter instanceof SearchSequentPrintFilter) {
+                    ((SearchSequentPrintFilter) sequentView.filter).setRegex(regExpCheckBox.isSelected());
+                }
                 search();
             }
         });
@@ -99,11 +102,11 @@ public class SequentViewSearchBar extends SearchBar {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     switch ((SearchMode) searchModeBox.getSelectedItem()) {
                     case HIDE:
-                        sequentView.setFilter(new HideSequentPrintFilter(sequentView.getLogicPrinter()));
+                        sequentView.setFilter(new HideSequentPrintFilter(sequentView.getLogicPrinter(), regExpCheckBox.isSelected()));
                         search();
                         break;
                     case REGROUP:
-                        sequentView.setFilter(new RegroupSequentPrintFilter(sequentView.getLogicPrinter()));
+                        sequentView.setFilter(new RegroupSequentPrintFilter(sequentView.getLogicPrinter(), regExpCheckBox.isSelected()));
                         search();
                         break;
                     case HIGHLIGHT:
@@ -180,28 +183,8 @@ public class SequentViewSearchBar extends SearchBar {
         }
 
         resultIteratorPos = 0;
-        int searchFlag = 0;
-        if (search.toLowerCase().equals(search)) {
-            // no capital letters used --> case insensitive matching
-            searchFlag = searchFlag | Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
-        }
-        if (!regExpCheckBox.isSelected()) {
-            // search for literal string instead of regExp
-            searchFlag = searchFlag | Pattern.LITERAL;
-        }
-
-        // (DS) We replace non-breaking space ("&nbsp;") by ordinary space.
-        // This became necessary due to the change to HTML Documents
-        // in the course of the introduction of syntax highlighting.
-
-        Pattern p;
-        try {
-            p = Pattern.compile(search.replace("\u00A0", "\u0020"), searchFlag);
-        } catch (PatternSyntaxException pse) {
-            return false;
-        } catch (IllegalArgumentException iae) {
-            return false;
-        }
+        
+        Pattern p = SearchSequentPrintFilter.createPattern(search, regExpCheckBox.isSelected());
 
         Matcher m = p.matcher(sequentView.getText().replace("\u00A0", "\u0020"));
 

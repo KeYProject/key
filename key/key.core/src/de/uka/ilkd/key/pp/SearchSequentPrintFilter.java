@@ -17,21 +17,30 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
     public void setLogicPrinter(SequentViewLogicPrinter logicPrinter) {
         this.lp = logicPrinter;
     }
-
-    protected Pattern createPattern() {
+    
+    public static Pattern createPattern(String search, boolean regex) {
         int searchFlag = 0;
-        if (searchString.toLowerCase().equals(searchString)) {
+        if (search.toLowerCase().equals(search)) {
             searchFlag = searchFlag | Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
         }
 
+        // (DS) We replace non-breaking space ("&nbsp;", \\u00a0) 
+        // by ordinary space (\\u0020).
+        // This became necessary due to the change to HTML Documents
+        // in the course of the introduction of syntax highlighting.
+        
+        // (JS) Replace special characters with escaped special 
+        // characters and contract several whitespaces into a 
+        // single one so that line breaks are treated correctly.
+        
         if (!regex) {
-            // search for literal string instead of regExp
-            searchFlag = searchFlag | Pattern.LITERAL;
+            search = search.replaceAll("[^\\s\\u00a0\\w]", "\\\\$0");
         }
 
         Pattern p = null;
         try {
-            p = Pattern.compile(searchString.replace("\u00A0", "\u0020"), searchFlag);
+            String s = search.replaceAll("[\\s\\u00a0]+", "\\\\s+");
+            p = Pattern.compile(s, searchFlag);
         } catch (PatternSyntaxException pse) {
             pse.printStackTrace();
         } catch (IllegalArgumentException iae) {
@@ -39,5 +48,12 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
         }
         return p;
     }
+    
+    protected Pattern createPattern() {
+        return createPattern(this.searchString, this.regex);
+    }
 
+    public void setRegex(boolean selected) {
+        this.regex = selected;
+    }
 }

@@ -106,8 +106,10 @@ public class InitialPositionTable extends PositionTable{
 	ImmutableList<Integer> p = ImmutableSLList.<Integer>nil();
 
 	p = prependPathInFormula(p,pio);
-	p = p.prepend(Integer.valueOf(indexOfCfma(pio.sequentFormula(),
-					      filter)));
+	int index = indexOfCfma(pio.sequentFormula(), filter);
+	if(index == -1) 
+	    return null;
+    p = p.prepend(Integer.valueOf(index));
 	p = p.prepend(Integer.valueOf(0));
 	return p;
     }

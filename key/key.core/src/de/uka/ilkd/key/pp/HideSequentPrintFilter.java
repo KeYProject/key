@@ -28,8 +28,9 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
  */
 public class HideSequentPrintFilter extends SearchSequentPrintFilter {
 
-    public HideSequentPrintFilter(SequentViewLogicPrinter lp) {
+    public HideSequentPrintFilter(SequentViewLogicPrinter lp, boolean regex) {
         this.lp = lp;
+        this.regex = regex;
     }
 
     @Override
@@ -40,7 +41,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
             filterIdentity();
             return;
         }
-
+        
         Pattern p = createPattern();
         if (p == null)
             return;

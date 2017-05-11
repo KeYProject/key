@@ -30,8 +30,9 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
 
-    public RegroupSequentPrintFilter(SequentViewLogicPrinter lp) {
+    public RegroupSequentPrintFilter(SequentViewLogicPrinter lp, boolean regex) {
         this.lp = lp;
+        this.regex = regex;
     }
 
     @Override
