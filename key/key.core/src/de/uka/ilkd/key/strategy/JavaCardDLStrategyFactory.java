@@ -28,6 +28,16 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
     public static final String TOOL_TIP_STOP_AT_UNCLOSABLE
             = "<html>Stop as soon as the first not automatically<br>"
             + "closable goal is encountered.</html>";
+    public static final String TOOL_TIP_OSS_ON = "<html>"
+            + "Turns on One Step Simplification. This will result in<br>"
+            + "(sometimes significantly) shorter proofs which,<br>"
+            + "however, are less transparent since simplification<br>"
+            + "steps (rule applications) are combined in one OSS step." + "</html>";
+    public static final String TOOL_TIP_OSS_OFF = "<html>"
+            + "Turns off One Step Simplification. This will result in<br>"
+            + "larger, but more transparent proof trees, since each<br>"
+            + "simplification step is realized in one single rule<br>"
+            + "application, with all instantiations clearly visible." + "</html>";
     public static final String TOOL_TIP_PROOF_SPLITTING_FREE = "<html>"
             + "Split formulas (if-then-else expressions,<br>"
             + "disjunctions in the antecedent, conjunctions in<br>"
@@ -297,6 +307,15 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.STOPMODE_NONCLOSE,
                                 "Unclosable", TOOL_TIP_STOP_AT_UNCLOSABLE));
+        OneOfStrategyPropertyDefinition ossUsage
+            = new OneOfStrategyPropertyDefinition(
+                    StrategyProperties.OSS_OPTIONS_KEY, "One Step Simplification",
+                    new StrategyPropertyValueDefinition(
+                            StrategyProperties.OSS_ON, "Enabled",
+                            TOOL_TIP_OSS_ON),
+                    new StrategyPropertyValueDefinition(
+                            StrategyProperties.OSS_OFF, "Disabled",
+                            TOOL_TIP_OSS_OFF));
         OneOfStrategyPropertyDefinition proofSplitting
                 = new OneOfStrategyPropertyDefinition(
                         StrategyProperties.SPLITTING_OPTIONS_KEY,
@@ -492,7 +511,7 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
                         props.toArray(new AbstractStrategyPropertyDefinition[props
                                 .size()]));
         // Model
-        return new StrategySettingsDefinition("Java DL Options", stopAt,
+        return new StrategySettingsDefinition("Java DL Options", stopAt, ossUsage,
                 proofSplitting, loopTreatment, blockTreatment, methodTreatment,
                 mergePointStatementTreatment, dependencyContracts,
                 queryTreatment, arithmeticTreatment, quantifierTreatment,

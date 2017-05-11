@@ -49,7 +49,8 @@ import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -553,12 +554,15 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
 
     private synchronized void refresh(Proof proof) {
-        ProofIndependentSettings settings = proof.getProofIndependentSettings();
+        ProofSettings settings = proof.getSettings();
         if (settings == null) {
-            settings = ProofIndependentSettings.DEFAULT_INSTANCE;
+            settings = ProofSettings.DEFAULT_SETTINGS;
         }
 
-        boolean newActive = settings.getGeneralSettings().oneStepSimplification();
+        final boolean newActive = settings.getStrategySettings()
+                .getActiveStrategyProperties()
+                .get(StrategyProperties.OSS_OPTIONS_KEY)
+                .equals(StrategyProperties.OSS_ON);
 
         if (active != newActive || lastProof != proof) {
             active = newActive;
@@ -574,6 +578,16 @@ public final class OneStepSimplifier implements BuiltInRule {
     //public interface
     //-------------------------------------------------------------------------
 
+    /**
+     * Enables or disables the one step simplification, depending on the
+     * strategy setting made. <strong>IMPORTANT:</strong> This won't do any good
+     * if called <i>before</i> the strategy has been set / changed for the
+     * current proof. So make sure that everything is done in proper order.
+     * 
+     * @param proof
+     *            The {@link Proof} for which to refresh the
+     *            {@link OneStepSimplifier} instance.
+     */
     public static void refreshOSS(Proof proof) {
         OneStepSimplifier simplifierInstance = MiscTools.findOneStepSimplifier(proof);
         if (simplifierInstance != null) {

@@ -5,9 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.List;
-import java.util.Properties;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -20,8 +18,6 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
-import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
 
@@ -163,29 +159,6 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
       ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
       String lks = settings.getLocalKeYSettings();
       ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(lks);
-      
-      // (DS) The following is rather a hack; before, the OSS settings in a
-      // .key file were ignored, which caused nondeterministic usage of OSS in
-      // proofs. A better way would be to render OSS a proof-dependent setting
-      // which would be turned on and off in the strategy settings.
-      {
-          final Properties globalProps = new Properties();
-          globalProps.load(new StringReader(gks));
-          
-          final Properties localProps = new Properties(globalProps);
-          if (lks != null) {
-              localProps.load(new StringReader(lks));
-          }
-          
-          final String ossActivated =
-              localProps.getProperty(GeneralSettings.ONE_STEP_SIMPLIFICATION_KEY);
-          
-          if (ossActivated != null) {
-                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
-                        .setOneStepSimplification(
-                                Boolean.valueOf(ossActivated));
-          }
-      }
 
       // Name resolution for the available KeY file.
       File keyFile = getKeYFile();

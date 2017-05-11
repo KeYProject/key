@@ -45,9 +45,11 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -537,8 +539,10 @@ public abstract class AbstractProblemLoader {
         IntermediatePresentationProofFileParser.Result parserResult = null;
         IntermediateProofReplayer.Result replayResult = null;
 
-        final boolean isOSSActivated =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+        final String ossStatus =
+                (String) proof.getSettings().getStrategySettings()
+                        .getActiveStrategyProperties()
+                        .get(StrategyProperties.OSS_OPTIONS_KEY);
         ReplayResult result;
         try {
         	assert envInput instanceof KeYUserProblemFile;
@@ -553,7 +557,11 @@ public abstract class AbstractProblemLoader {
                 // For loading, we generally turn on one step simplification to be
                 // able to load proofs that used it even if the user has currently
                 // turned OSS off.
-                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
+                StrategyProperties newProps = proof.getSettings()
+                        .getStrategySettings().getActiveStrategyProperties();
+                newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
+                        StrategyProperties.OSS_ON);
+                updateStrategySettings(proof.getActiveStrategy(), newProps);
                 OneStepSimplifier.refreshOSS(proof);
                 
                 replayer = new IntermediateProofReplayer(this, proof, parserResult);
@@ -577,13 +585,33 @@ public abstract class AbstractProblemLoader {
                 errors.addAll(replayResult.getErrors());
             }
             
-            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(isOSSActivated);
+            StrategyProperties newProps = 
+                proof.getSettings().getStrategySettings()
+                        .getActiveStrategyProperties();
+            newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
+                            ossStatus);
+            updateStrategySettings(proof.getActiveStrategy(), newProps);
             OneStepSimplifier.refreshOSS(proof);
+            
             result = new ReplayResult(status, errors, lastTouchedNode);
         }
         	
         
         return result;
+    }
+    
+    private void updateStrategySettings(Strategy strategy,
+            StrategyProperties p) {
+        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(
+                strategy.name());
+        ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
+                .setActiveStrategyProperties(p);
+
+        proof.getSettings().getStrategySettings().setStrategy(strategy.name());
+        proof.getSettings().getStrategySettings()
+                .setActiveStrategyProperties(p);
+
+        proof.setActiveStrategy(strategy);
     }
 
     /**
