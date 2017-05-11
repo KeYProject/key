@@ -163,20 +163,35 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
       ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
       String lks = settings.getLocalKeYSettings();
       ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(lks);
-      
-        // (DS) The following is rather a hack; before, the OSS settings in a
-        // .key file were ignored, which caused nondeterministic usage of OSS in
-        // proofs. A better way would be to render OSS a proof-dependent setting
-        // which would be turned on and off in the strategy settings.
-      {
+      if (lks != null) {
+          System.out.println("Have local KeY settings.");
+          System.out.print("OSS: ");
           final Properties props = new Properties();
           props.load(new StringReader(gks));
           final String ossLocallyActivated = props.getProperty(GeneralSettings.ONE_STEP_SIMPLIFICATION_KEY);
+          System.out.println(ossLocallyActivated);
+      }
+      
+      // (DS) The following is rather a hack; before, the OSS settings in a
+      // .key file were ignored, which caused nondeterministic usage of OSS in
+      // proofs. A better way would be to render OSS a proof-dependent setting
+      // which would be turned on and off in the strategy settings.
+      {
+          final Properties globalProps = new Properties();
+          globalProps.load(new StringReader(gks));
           
-          if (ossLocallyActivated != null) {
+          final Properties localProps = new Properties(globalProps);
+          if (lks != null) {
+              localProps.load(new StringReader(lks));
+          }
+          
+          final String ossActivated =
+              localProps.getProperty(GeneralSettings.ONE_STEP_SIMPLIFICATION_KEY);
+          
+          if (ossActivated != null) {
                 ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
                         .setOneStepSimplification(
-                                Boolean.valueOf(ossLocallyActivated));
+                                Boolean.valueOf(ossActivated));
           }
       }
 
