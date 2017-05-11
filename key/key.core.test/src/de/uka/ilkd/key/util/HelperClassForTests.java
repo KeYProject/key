@@ -54,6 +54,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 public class HelperClassForTests {
@@ -149,17 +150,36 @@ public class HelperClassForTests {
     }
 
     /**
-     * Defines if one step simplification is enabled in general and within the {@link Proof}.
-     * @param proof The optional {@link Proof}.
-     * @param enabled {@code true} use one step simplification, {@code false} do not use one step simplification.
+     * Defines if one step simplification is enabled in general and within the
+     * {@link Proof}.
+     * 
+     * @param proof
+     *            The optional {@link Proof}.
+     * @param enabled
+     *            {@code true} use one step simplification, {@code false} do not
+     *            use one step simplification.
      */
-    public static void setOneStepSimplificationEnabled(Proof proof, boolean enabled) {
-       final String newVal = enabled ? StrategyProperties.OSS_ON : StrategyProperties.OSS_OFF;
-       ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties().put(StrategyProperties.OSS_OPTIONS_KEY, newVal);
-       if (proof != null && !proof.isDisposed()) {
-          proof.getSettings().getStrategySettings().getActiveStrategyProperties().put(StrategyProperties.OSS_OPTIONS_KEY, newVal);
-          OneStepSimplifier.refreshOSS(proof);
-       }
+    public static void setOneStepSimplificationEnabled(Proof proof,
+            boolean enabled) {
+        final String newVal = enabled ? StrategyProperties.OSS_ON
+                : StrategyProperties.OSS_OFF;
+
+        {
+            final StrategyProperties newProps = ProofSettings.DEFAULT_SETTINGS
+                    .getStrategySettings().getActiveStrategyProperties();
+            newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, newVal);
+            ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
+                    .setActiveStrategyProperties(newProps);
+        }
+
+        if (proof != null && !proof.isDisposed()) {
+            final StrategyProperties newProps = proof.getSettings()
+                    .getStrategySettings().getActiveStrategyProperties();
+            newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, newVal);
+
+            Strategy.updateStrategySettings(proof, newProps);
+            OneStepSimplifier.refreshOSS(proof);
+        }
     }
     
     /**

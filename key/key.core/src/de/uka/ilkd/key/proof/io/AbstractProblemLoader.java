@@ -45,7 +45,6 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -561,7 +560,7 @@ public abstract class AbstractProblemLoader {
                         .getStrategySettings().getActiveStrategyProperties();
                 newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
                         StrategyProperties.OSS_ON);
-                updateStrategySettings(proof.getActiveStrategy(), newProps);
+                Strategy.updateStrategySettings(proof, newProps);
                 OneStepSimplifier.refreshOSS(proof);
                 
                 replayer = new IntermediateProofReplayer(this, proof, parserResult);
@@ -590,7 +589,7 @@ public abstract class AbstractProblemLoader {
                         .getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
                             ossStatus);
-            updateStrategySettings(proof.getActiveStrategy(), newProps);
+            Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
             
             result = new ReplayResult(status, errors, lastTouchedNode);
@@ -598,20 +597,6 @@ public abstract class AbstractProblemLoader {
         	
         
         return result;
-    }
-    
-    private void updateStrategySettings(Strategy strategy,
-            StrategyProperties p) {
-        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(
-                strategy.name());
-        ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
-                .setActiveStrategyProperties(p);
-
-        proof.getSettings().getStrategySettings().setStrategy(strategy.name());
-        proof.getSettings().getStrategySettings()
-                .setActiveStrategyProperties(p);
-
-        proof.setActiveStrategy(strategy);
     }
 
     /**
