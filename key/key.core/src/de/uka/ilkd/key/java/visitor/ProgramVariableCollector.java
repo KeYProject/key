@@ -43,7 +43,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     private final LinkedHashSet<LocationVariable> result = new LinkedHashSet<LocationVariable>();
 
     /**
-     * collects all program variables occuring in the AST <tt>root</tt> using
+     * collects all program variables occurring in the AST <tt>root</tt> using
      * this constructor is equivalent to
      * <tt>ProggramVariableCollector(root, false)</tt>
      * 
@@ -126,6 +126,14 @@ public class ProgramVariableCollector extends JavaASTVisitor {
                 .getAllHeaps()) {
             Term inv = x.getInvariant(heap, selfTerm, atPres, services);
             if (inv != null) {
+                inv.execPostOrder(tpvc);
+            }
+        }
+
+        // free invariants
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            Term inv = x.getFreeInvariant(heap, selfTerm, atPres, services);
+            if(inv != null) {
                 inv.execPostOrder(tpvc);
             }
         }
