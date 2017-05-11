@@ -1,7 +1,10 @@
 package de.uka.ilkd.key.rule.merge;
 
+import java.util.Set;
+
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -20,20 +23,22 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private Node partnerNode, correspondingMergeNode;
 
-    private SymbolicExecutionState mergeNodeState = null;
-    private SymbolicExecutionState partnerState = null;
-    private Term pc = null;
+    private SymbolicExecutionState mergeNodeState;
+    private SymbolicExecutionState partnerState;
+    private Term pc;
+    private Set<Name> newNames;
 
     public CloseAfterMergeRuleBuiltInRuleApp(BuiltInRule builtInRule,
             PosInOccurrence pio, Node thePartnerNode,
             Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
-            SymbolicExecutionState partnerState, Term pc) {
+            SymbolicExecutionState partnerState, Term pc, Set<Name> newNames) {
         this(builtInRule, pio);
         setThePartnerNode(thePartnerNode);
         setCorrespondingMergeNode(correspondingMergeNode);
         setMergeNodeState(mergeNodeState);
         setPartnerState(partnerState);
         setPc(pc);
+        setNewNames(newNames);
     }
 
     public CloseAfterMergeRuleBuiltInRuleApp(BuiltInRule builtInRule,
@@ -103,6 +108,14 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     public void setPc(Term pc) {
         this.pc = pc;
+    }
+
+    public Set<Name> getNewNames() {
+        return newNames;
+    }
+
+    public void setNewNames(Set<Name> newNames) {
+        this.newNames = newNames;
     }
 
 }

@@ -13,12 +13,7 @@
 
 package org.key_project.keyide.ui.providers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
@@ -37,16 +32,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.GoalListener;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.NodeInfo;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * The {@link LabelProvider} used to label a proof tree consiting of 
@@ -279,7 +267,8 @@ public class ProofTreeLabelProvider extends LabelProvider {
                if (SymbolicExecutionUtil.isBlockContractValidityBranch(node.getAppliedRuleApp())) {
                   Term modalityTerm = TermBuilder.goBelowUpdates(node.getAppliedRuleApp().posInOccurrence().subTerm());
                   BlockContractValidityTermLabel bcLabel = (BlockContractValidityTermLabel) modalityTerm.getLabel(BlockContractValidityTermLabel.NAME);
-                  if (SymbolicExecutionUtil.lazyComputeIsExceptionalTermination(node, (IProgramVariable) proof.getServices().getNamespaces().programVariables().lookup(bcLabel.getExceptionVariableName()))) {
+                  if (SymbolicExecutionUtil.lazyComputeIsExceptionalTermination(node, 
+                          (IProgramVariable) MiscTools.findActualVariable(bcLabel.getExceptionVariable(), node))) {
                      if (SymbolicExecutionUtil.lazyComputeIsAdditionalBranchVerified(node)) {
                         return KeYImages.getImage(KeYImages.BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION);
                      }

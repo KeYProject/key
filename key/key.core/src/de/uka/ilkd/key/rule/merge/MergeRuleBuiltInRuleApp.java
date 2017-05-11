@@ -5,16 +5,21 @@ import java.util.ArrayList;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergeRule.MergeRuleProgressListener;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
+import de.uka.ilkd.key.speclang.MergeContract;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
@@ -28,6 +33,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
  */
 public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
+    // TODO: Make fields final and remove setters (create new app instead)
     private Node mergeNode = null;
     private ImmutableList<MergePartner> mergePartners = null;
     private MergeProcedure concreteRule = null;
@@ -48,6 +54,24 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         super(rule, pio, ifInsts);
     }
 
+    public MergeRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
+            ImmutableList<PosInOccurrence> ifInsts, Node mergeNode,
+            ImmutableList<MergePartner> mergePartners,
+            MergeProcedure concreteRule,
+            SymbolicExecutionStateWithProgCnt thisSEState,
+            ImmutableList<SymbolicExecutionState> mergePartnerStates,
+            Term distForm,
+            ArrayList<MergeRuleProgressListener> progressListeners) {
+        super(rule, pio, ifInsts);
+        this.mergeNode = mergeNode;
+        this.mergePartners = mergePartners;
+        this.concreteRule = concreteRule;
+        this.thisSEState = thisSEState;
+        this.mergePartnerStates = mergePartnerStates;
+        this.distForm = distForm;
+        this.progressListeners = progressListeners;
+    }
+
     @Override
     public AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos) {
         return null;
@@ -61,7 +85,34 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
-        return this;
+        // We assume that this method is *only* called for situations where the
+        // current active statement is a MergePointStatement. Manual state
+        // merging is still possible, but then this method shouldn't be called
+        // (completion task is done by the corresponding visual dialogs).
+
+        final ImmutableList<MergePartner> mergePartners = MergeRule
+                .findPotentialMergePartners(goal, pio);
+
+        if (mergePartners.isEmpty()) {
+            return this;
+        }
+
+        final MergePointStatement mps = (MergePointStatement) JavaTools
+                .getActiveStatement(
+                        TermBuilder.goBelowUpdates(pio.subTerm()).javaBlock());
+
+        final Services services = goal.proof().getServices();
+        final MergeContract mc = services.getSpecificationRepository()
+                .getMergeContracts(mps).iterator().next();
+
+        final Node node = goal.node();
+
+        return new MergeRuleBuiltInRuleApp(super.builtInRule, super.pio,
+                super.ifInsts, node, mergePartners,
+                mc.getInstantiatedMergeProcedure(services),
+                MergeRuleUtils.sequentToSETriple(node, pio, services),
+                MergeRuleUtils.sequentsToSEPairs(mergePartners), null,
+                new ArrayList<>());
     }
 
     @Override

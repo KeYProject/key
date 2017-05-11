@@ -32,6 +32,8 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.JavaModel;
@@ -166,7 +168,7 @@ public abstract class AbstractPO implements IPersistablePO {
 
 
     protected final void register(ProgramVariable pv, Services services) {
-         Namespace progVarNames = services.getNamespaces().programVariables();
+         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
          if (pv != null && progVarNames.lookup(pv.name()) == null) {
              progVarNames.addSafely(pv);
          }
@@ -181,7 +183,7 @@ public abstract class AbstractPO implements IPersistablePO {
  
 
     protected final void register(Function f, Services services) {
-         Namespace functionNames = services.getNamespaces().functions();
+         Namespace<Function> functionNames = services.getNamespaces().functions();
          if (f != null && functionNames.lookup(f.name()) == null) {
              assert f.sort() != Sort.UPDATE;
              if (f.sort() == Sort.FORMULA) {

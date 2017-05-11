@@ -50,6 +50,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -260,7 +261,7 @@ public class QueryExpand implements BuiltInRule {
     private ImmutableArray<ProgramVariable> getRegisteredArgumentVariables(
             ImmutableArray<ParameterDeclaration> paramDecls, TermServices services) {
 
-        final Namespace progvarsNS = services.getNamespaces().programVariables();
+        final Namespace<IProgramVariable> progvarsNS = services.getNamespaces().programVariables();
         final ProgramVariable[] args = new ProgramVariable[paramDecls.size()];
         int i = 0;
         for (final ParameterDeclaration pdecl : paramDecls) {

@@ -39,11 +39,11 @@ import de.uka.ilkd.key.rule.TacletApp;
 public class InstantiateCommand extends AbstractCommand {
 
     private static class Parameters {
-        Term formula;
-        String var;
-        int occ = 1;
-        boolean hide;
-        public Term with;
+        private Term formula;
+        private String var;
+        private int occ = 1;
+        private boolean hide;
+        private String with;
     }
 
     @Override
@@ -71,7 +71,14 @@ public class InstantiateCommand extends AbstractCommand {
 
         SchemaVariable sv = theApp.uninstantiatedVars().iterator().next();
 
-        theApp = theApp.addInstantiation(sv, params.with, true /*???*/, proof.getServices());
+        Term with;
+        try {
+            with = toTerm(goal, state, params.with, null);
+        } catch (ParserException e) {
+            throw new ScriptException("Term specified for instantiation cannot be parsed");
+        }
+
+        theApp = theApp.addInstantiation(sv, with, true /*???*/, proof.getServices());
 
         theApp = theApp.tryToInstantiate(proof.getServices());
 
@@ -244,11 +251,7 @@ public class InstantiateCommand extends AbstractCommand {
         // instantiation
         String withStr = args.get("with");
         if(withStr != null) {
-            try {
-                params.with = toTerm(proof, state, withStr, null);
-            } catch (ParserException e) {
-                throw new ScriptException(e);
-            }
+            params.with = withStr;
         } else {
             throw new ScriptException("'with' must be specified");
         }

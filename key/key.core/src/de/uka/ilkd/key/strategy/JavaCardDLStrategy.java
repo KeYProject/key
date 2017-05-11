@@ -14,7 +14,12 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.*;
+import de.uka.ilkd.key.ldt.BooleanLDT;
+import de.uka.ilkd.key.ldt.CharListLDT;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -36,6 +41,7 @@ import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
 import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
 import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
 import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
+import de.uka.ilkd.key.strategy.feature.DeleteMergePointRuleFeature;
 import de.uka.ilkd.key.strategy.feature.DependencyContractFeature;
 import de.uka.ilkd.key.strategy.feature.DiffFindAndIfFeature;
 import de.uka.ilkd.key.strategy.feature.DiffFindAndReplacewithFeature;
@@ -237,7 +243,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature oneStepSimplificationF =
                 oneStepSimplificationFeature(longConst(-11000));
 
-        final Feature mergeRuleF = setupMergeRule();
+        final Feature mergeRuleF;
+        final String mpsProperty =
+                strategyProperties
+                        .getProperty(StrategyProperties.MPS_OPTIONS_KEY);
+        if (mpsProperty.equals(StrategyProperties.MPS_MERGE)) {
+            mergeRuleF = mergeRuleFeature(longConst(-4000));
+        }
+        else {
+            mergeRuleF = mergeRuleFeature(inftyConst());
+        }
 
         // final Feature smtF = smtFeature(inftyConst());
 
@@ -274,7 +289,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 getServices().getTypeConverter().getLocSetLDT();
 
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-
+        
         bindRuleSet(d, "semantics_blasting", inftyConst());
         bindRuleSet(d, "simplify_heap_high_costs", inftyConst());
 
@@ -487,6 +502,30 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             throw new RuntimeException("Unexpected strategy property "
                     + methProp);
         }
+
+        final String mpsProp =
+                strategyProperties
+                        .getProperty(StrategyProperties.MPS_OPTIONS_KEY);
+
+        switch (mpsProp) {
+        case StrategyProperties.MPS_MERGE:
+            /*
+             * For this case, we use a special feature, since deleting merge
+             * points should only be done after a merge rule application.
+             */
+            bindRuleSet(d, "merge_point", DeleteMergePointRuleFeature.INSTANCE);
+            break;
+        case StrategyProperties.MPS_SKIP:
+            bindRuleSet(d, "merge_point", longConst(-5000));
+            break;
+        case StrategyProperties.MPS_NONE:
+            bindRuleSet(d, "merge_point", inftyConst());
+            break;
+        default:
+            throw new RuntimeException("Unexpected strategy property "
+                    + methProp);
+        }
+
 
         final String queryAxProp =
                 strategyProperties

@@ -576,14 +576,14 @@ class TermImpl implements Term {
      * {@inheritDoc}
      */
     @Override
-    public boolean isContainsJavaBlockRecursive() {
+    public boolean containsJavaBlockRecursive() {
         if ( containsJavaBlockRecursive == ThreeValuedTruth.UNKNOWN ) {
             ThreeValuedTruth result = ThreeValuedTruth.FALSE;
             if (javaBlock != null && !javaBlock.isEmpty() ) {
                 result = ThreeValuedTruth.TRUE;
             } else {                
                 for (int i = 0, arity = subs.size(); i<arity; i++) {
-                    if (subs.get(i).isContainsJavaBlockRecursive()) {
+                    if (subs.get(i).containsJavaBlockRecursive()) {
                         result = ThreeValuedTruth.TRUE;
                         break;
                     }

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
@@ -123,7 +124,7 @@ public class ModelGenerator implements SolverLauncherListener{
 		//System.out.println("Model to term");
 
 		TermBuilder tb = services.getTermBuilder();
-		Namespace variables = services.getNamespaces().programVariables();
+		Namespace<IProgramVariable> variables = services.getNamespaces().programVariables();
 		Term tmodel=tb.tt();
 		for(String c : m.getConstants().keySet()){
 

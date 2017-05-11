@@ -53,6 +53,11 @@ public final class StrategyProperties extends Properties {
     public final static String METHOD_CONTRACT = "METHOD_CONTRACT";
     public final static String METHOD_NONE = "METHOD_NONE";
     
+    public final static String MPS_OPTIONS_KEY = "MPS_OPTIONS_KEY";
+    public final static String MPS_SKIP = "MPS_SKIP";
+    public final static String MPS_MERGE= "MPS_MERGE";
+    public final static String MPS_NONE = "MPS_NONE";
+    
     public final static String DEP_OPTIONS_KEY = "DEP_OPTIONS_KEY";
     public final static String DEP_ON = "DEP_ON";
     public final static String DEP_OFF = "DEP_OFF";
@@ -143,6 +148,7 @@ public final class StrategyProperties extends Properties {
     	LOOP_OPTIONS_KEY, LOOP_EXPAND, LOOP_EXPAND_BOUNDED, LOOP_INVARIANT, LOOP_NONE,
     	BLOCK_OPTIONS_KEY, BLOCK_CONTRACT, BLOCK_EXPAND, BLOCK_NONE,
     	METHOD_OPTIONS_KEY, METHOD_EXPAND, METHOD_CONTRACT, METHOD_NONE,
+    	MPS_OPTIONS_KEY, MPS_MERGE, MPS_SKIP, MPS_NONE,
     	DEP_OPTIONS_KEY, DEP_ON, DEP_OFF,
     	QUERY_OPTIONS_KEY, QUERY_ON, QUERY_RESTRICTED, QUERY_OFF,
     	QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON, QUERYAXIOM_OFF,
@@ -164,6 +170,7 @@ public final class StrategyProperties extends Properties {
         defaultMap.setProperty(LOOP_OPTIONS_KEY, LOOP_INVARIANT);
         defaultMap.setProperty(BLOCK_OPTIONS_KEY, BLOCK_CONTRACT);
         defaultMap.setProperty(METHOD_OPTIONS_KEY, METHOD_CONTRACT);
+        defaultMap.setProperty(MPS_OPTIONS_KEY, MPS_MERGE);
         defaultMap.setProperty(DEP_OPTIONS_KEY, DEP_ON);
         defaultMap.setProperty(QUERY_OPTIONS_KEY, QUERY_OFF);
         defaultMap.setProperty(QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON);
@@ -185,6 +192,7 @@ public final class StrategyProperties extends Properties {
         put(LOOP_OPTIONS_KEY, defaultMap.get(LOOP_OPTIONS_KEY));
         put(BLOCK_OPTIONS_KEY, defaultMap.get(BLOCK_OPTIONS_KEY));
         put(METHOD_OPTIONS_KEY, defaultMap.get(METHOD_OPTIONS_KEY));
+        put(MPS_OPTIONS_KEY, defaultMap.get(MPS_OPTIONS_KEY));
         put(DEP_OPTIONS_KEY, defaultMap.get(DEP_OPTIONS_KEY));
         put(QUERY_OPTIONS_KEY, defaultMap.get(QUERY_OPTIONS_KEY));
         put(QUERYAXIOM_OPTIONS_KEY, defaultMap.get(QUERYAXIOM_OPTIONS_KEY));
@@ -216,6 +224,7 @@ public final class StrategyProperties extends Properties {
         sp.put(LOOP_OPTIONS_KEY, readSingleOption(p, LOOP_OPTIONS_KEY));
         sp.put(BLOCK_OPTIONS_KEY, readSingleOption(p, BLOCK_OPTIONS_KEY)); 
         sp.put(METHOD_OPTIONS_KEY, readSingleOption(p, METHOD_OPTIONS_KEY));
+        sp.put(MPS_OPTIONS_KEY, readSingleOption(p, MPS_OPTIONS_KEY));
         sp.put(DEP_OPTIONS_KEY, readSingleOption(p,DEP_OPTIONS_KEY));
         sp.put(QUERY_OPTIONS_KEY, readSingleOption(p,QUERY_OPTIONS_KEY));
         sp.put(QUERYAXIOM_OPTIONS_KEY, readSingleOption(p,QUERYAXIOM_OPTIONS_KEY));
@@ -247,6 +256,7 @@ public final class StrategyProperties extends Properties {
         p.put(STRATEGY_PROPERTY+LOOP_OPTIONS_KEY, get(LOOP_OPTIONS_KEY));
         p.put(STRATEGY_PROPERTY+BLOCK_OPTIONS_KEY, get(BLOCK_OPTIONS_KEY));
         p.put(STRATEGY_PROPERTY+METHOD_OPTIONS_KEY, get(METHOD_OPTIONS_KEY));
+        p.put(STRATEGY_PROPERTY+MPS_OPTIONS_KEY, get(MPS_OPTIONS_KEY));
         p.put(STRATEGY_PROPERTY+DEP_OPTIONS_KEY, get(DEP_OPTIONS_KEY));              
         p.put(STRATEGY_PROPERTY+QUERY_OPTIONS_KEY, get(QUERY_OPTIONS_KEY));              
         p.put(STRATEGY_PROPERTY+QUERYAXIOM_OPTIONS_KEY, get(QUERYAXIOM_OPTIONS_KEY));              
@@ -324,6 +334,7 @@ public final class StrategyProperties extends Properties {
        sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT : StrategyProperties.LOOP_EXPAND);
        sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, blockTreatmentContract ? StrategyProperties.BLOCK_CONTRACT : StrategyProperties.BLOCK_EXPAND);
        sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatmentContract ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
+       sp.setProperty(StrategyProperties.MPS_OPTIONS_KEY, StrategyProperties.MPS_MERGE);
        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_RESTRICTED);
        sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
        sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_OFF);

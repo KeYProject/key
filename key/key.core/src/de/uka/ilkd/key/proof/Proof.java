@@ -221,7 +221,8 @@ public class Proof implements Named {
 
         Goal firstGoal = new Goal(rootNode,
                         new RuleAppIndex(new TacletAppIndex(rules, getServices()),
-                                        new BuiltInRuleAppIndex(builtInRules), getServices()));
+                                        new BuiltInRuleAppIndex(builtInRules), getServices())
+                        );
         openGoals = openGoals.prepend(firstGoal);
 
         if (closed())
@@ -344,9 +345,12 @@ public class Proof implements Named {
     /** sets the variable, function, sort, heuristics namespaces */
     public void setNamespaces(NamespaceSet ns) {
         getServices().setNamespaces(ns);
-        if (openGoals().size() > 1)
+        if (!root.leaf()) {
             throw new IllegalStateException("Proof: ProgVars set too late");
-        openGoals().head().setProgramVariables(ns.programVariables());
+        }
+
+        Goal fstGoal = openGoals().head();
+        fstGoal.makeLocalNamespacesFrom(ns);
     }
 
     public ProofEnvironment getEnv() {
@@ -705,7 +709,6 @@ public class Proof implements Named {
         }
 
         private void refreshGoal(Goal goal, Node node) {
-            goal.setGlobalProgVars(node.getGlobalProgVars());
             goal.getRuleAppManager().clearCache();
             goal.ruleAppIndex().clearIndexes();
             goal.node().setAppliedRuleApp(null);

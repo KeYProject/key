@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -308,8 +309,8 @@ public class InfFlowProofSymbols {
     }
 
     public static ProgramVariable searchPV(String s, Services services) {
-        Namespace ns = services.getNamespaces().programVariables();
-        Named n = ns.lookup(s);
+        Namespace<IProgramVariable> ns = services.getNamespaces().programVariables();
+        IProgramVariable n = ns.lookup(s);
         int i = 0;
         while (n == null && i < 1000) {
             n = ns.lookup(s + "_" + i);

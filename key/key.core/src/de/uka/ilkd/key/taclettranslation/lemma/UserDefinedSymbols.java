@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -50,17 +51,17 @@ public class UserDefinedSymbols {
                 public int compare(Named o1, Named o2) {
                         return o1.name().compareTo(o2.name());
                 }
-
         }
+
         final UserDefinedSymbols parent;
-        final Set<Named> usedExtraFunctions = new TreeSet<Named>(
+        final Set<Function> usedExtraFunctions = new TreeSet<Function>(
                         NamedComparator.INSTANCE);
-        final Set<Named> usedExtraPredicates = new TreeSet<Named>(
+        final Set<Function> usedExtraPredicates = new TreeSet<Function>(
                         NamedComparator.INSTANCE);
-        final Set<Named> usedExtraSorts = new TreeSet<Named>(
+        final Set<Sort> usedExtraSorts = new TreeSet<Sort>(
                         NamedComparator.INSTANCE);
-        final Set<Named> usedExtraVariables = new TreeSet<Named>(
-                        NamedComparator.INSTANCE);
+        final Set<QuantifiableVariable> usedExtraVariables =
+                new TreeSet<QuantifiableVariable>(NamedComparator.INSTANCE);
         final Set<Named> usedSchemaVariables = new TreeSet<Named>(
                         NamedComparator.INSTANCE);
         final ImmutableSet<Taclet> axioms;
@@ -83,19 +84,18 @@ public class UserDefinedSymbols {
                 this.referenceNamespaces = parent.referenceNamespaces;
         }
 
-        private void addUserDefiniedSymbol(Named symbol, Set<Named> set,
-                        Namespace excludeNamespace) {
+        private <T extends Named> void addUserDefiniedSymbol(T symbol, Set<T> set,
+                        Namespace<T> excludeNamespace) {
                 if (!contains(symbol, set)){
-                        if(symbol instanceof SchemaVariable||excludeNamespace.lookup(symbol.name()) == null){
-                                
+                        if(symbol instanceof SchemaVariable ||
+                                excludeNamespace.lookup(symbol.name()) == null) {
                                 set.add(symbol);
-                
                         }
                 }
                 
         }
 
-        private boolean contains(Named symbol, Set<Named> set) {
+        private <T extends Named>boolean contains(T symbol, Set<T> set) {
                 if (parent != null && parent.contains(symbol, set)) {
                         return true;
                 }
@@ -103,12 +103,12 @@ public class UserDefinedSymbols {
                 return set.contains(symbol);
         }
 
-        public void addFunction(Named symbol) {
+        public void addFunction(Function symbol) {
                 addUserDefiniedSymbol(symbol, usedExtraFunctions,
                                 referenceNamespaces.functions());
         }
 
-        public void addPredicate(Named symbol) {
+        public void addPredicate(Function symbol) {
                 addUserDefiniedSymbol(symbol, usedExtraPredicates,
                                 referenceNamespaces.functions());
         }
@@ -123,19 +123,20 @@ public class UserDefinedSymbols {
                                         addSort(parentSort);
                                 }
                        }
-                        addUserDefiniedSymbol(symbol, usedExtraSorts,
+                        addUserDefiniedSymbol(sort, usedExtraSorts,
                                         referenceNamespaces.sorts());
                 }
         }
 
-        public void addVariable(Named symbol) {
+        public void addVariable(QuantifiableVariable symbol) {
                 addUserDefiniedSymbol(symbol, usedExtraVariables,
                                 referenceNamespaces.variables());
         }
 
-        public void addSchemaVariable(Named symbol) {
+        public void addSchemaVariable(SchemaVariable symbol) {
+            // FIXME: This breaks the generics of namespace
                 addUserDefiniedSymbol(symbol, usedSchemaVariables,
-                                referenceNamespaces.variables());
+                                (Namespace)referenceNamespaces.variables());
         }
 
         public void addSymbolsToNamespaces(NamespaceSet namespaces) {
@@ -148,9 +149,9 @@ public class UserDefinedSymbols {
                                 usedExtraVariables);
         }
 
-        private void addSymbolsToNamespace(Namespace namespace,
-                        Collection<Named> symbols) {
-                for (Named symbol : symbols) {
+        private <T extends Named> void addSymbolsToNamespace(Namespace<T> namespace,
+                        Collection<T> symbols) {
+                for (T symbol : symbols) {
                         namespace.addSafely(symbol);
                 }
         }
@@ -192,8 +193,8 @@ public class UserDefinedSymbols {
 
 
         public void replaceGenericByProxySorts() {
-            Set<Named> result = new HashSet<Named>();
-            for (Named sort : usedExtraSorts) {
+            Set<Sort> result = new HashSet<Sort>();
+            for (Sort sort : usedExtraSorts) {
                 if (sort instanceof GenericSort) {
                     GenericSort genSort = (GenericSort) sort;
                     ProxySort proxySort = new ProxySort(genSort.name(), genSort.extendsSorts());

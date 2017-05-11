@@ -14,8 +14,7 @@
 package de.uka.ilkd.key.rule.merge;
 
 import java.io.File;
-
-import junit.framework.TestCase;
+import java.util.Iterator;
 
 import org.junit.Test;
 
@@ -26,18 +25,15 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionUntilMergePointMacro;
-import de.uka.ilkd.key.macros.FullAutoPilotWithJMLSpecMergesProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.rule.merge.MergeProcedure;
-import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.util.ProofStarter;
+import junit.framework.TestCase;
 
 /**
  * Test suite for the {@link MergeRule}.
@@ -46,13 +42,12 @@ import de.uka.ilkd.key.util.ProofStarter;
  */
 public class MergeRuleTests extends TestCase {
 
-    private static final String TEST_RESOURCES_DIR_PREFIX =
-            "resources/testcase/merge/";
+    private static final String TEST_RESOURCES_DIR_PREFIX = "resources/testcase/merge/";
 
     /**
      * Simple regression test case loading an existing closed proof (standard
-     * Gcd example) including two merges with ITE antecedent merges and trying to
-     * replay it.
+     * Gcd example) including two merges with ITE antecedent merges and trying
+     * to replay it.
      *
      * @throws ProblemLoaderException
      *             If the proof could not be loaded.
@@ -65,8 +60,8 @@ public class MergeRuleTests extends TestCase {
 
     /**
      * Simple regression test case loading an existing closed proof (standard
-     * Gcd example) including two merges with predicate abstraction and trying to
-     * replay it.
+     * Gcd example) including two merges with predicate abstraction and trying
+     * to replay it.
      *
      * @throws ProblemLoaderException
      *             If the proof could not be loaded.
@@ -79,33 +74,100 @@ public class MergeRuleTests extends TestCase {
 
     /**
      * Simple regression test case loading an existing closed proof (standard
-     * Gcd example) including two merges with predicate abstraction (with lattice
-     * elements manually chosen by the user) and trying to replay it.
+     * Gcd example) including two merges with predicate abstraction (with
+     * lattice elements manually chosen by the user) and trying to replay it.
      *
      * @throws ProblemLoaderException
      *             If the proof could not be loaded.
      */
     @Test
     public void testLoadGcdProofWithPredAbstrAndUserChoices() {
-        Proof proof = loadProof("gcd.closed.predicateAbstractionWithUserChoices.proof");
+        Proof proof = loadProof(
+                "gcd.closed.predicateAbstractionWithUserChoices.proof");
         assertTrue(proof.closed());
     }
 
     /**
-     * Runs the FullAutoPilotWithJMLSpecMergesProofMacro on the problem with merge
-     * blocks specified in JML, following by an automatic strategy finish. At
-     * the end, there should be two merge applications, and the proof should be
-     * closed.
+     * Automatic proof of the Gcd problem with two merges triggered by merge
+     * point statements.
      */
     @Test
-    public void testDoAutomaticGcdProofWithMerges() {
-        final Proof proof = loadProof("gcd.joinBlocks.key");
-        runMacro(new FullAutoPilotWithJMLSpecMergesProofMacro(), proof.root());
+    public void testDoAutomaticGcdProofWithMergePointStatements() {
+        final Proof proof = loadProof("gcd.mergePointStatements.key");
         startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());
-        assertEquals("There should be two merge rule applications in the proof.", 2,
-                proof.getStatistics().mergeRuleApps);
+
+        Iterator<Node> it = proof.root().subtreeIterator();
+        int mergeAppsCnt = 0;
+        while (it.hasNext()) {
+            if (it.next()
+                    .getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
+                mergeAppsCnt++;
+            }
+        }
+
+        assertEquals("There should be two merge apps.", 2, mergeAppsCnt);
+    }
+
+    /**
+     * Replays a closed proof of the Gcd problem with two merges triggered by
+     * merge point statements.
+     */
+    @Test
+    public void testLoadClosedGcdProofWithMergePointStatements() {
+        final Proof proof = loadProof("gcd.mergePointStatements.closed.proof");
+
+        assertTrue(proof.closed());
+
+        Iterator<Node> it = proof.root().subtreeIterator();
+        int mergeAppsCnt = 0;
+        while (it.hasNext()) {
+            if (it.next()
+                    .getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
+                mergeAppsCnt++;
+            }
+        }
+
+        assertEquals("There should be two merge apps.", 2, mergeAppsCnt);
+    }
+
+    /**
+     * Automatic proof of the Gcd problem with two merges triggered by merge
+     * point statements.
+     */
+    @Test
+    public void testDoAutomaticGcdProofWithMergePointStatementAndBlockContract() {
+        final Proof proof = loadProof("gcd.MPSAndBlockContract.key");
+        startAutomaticStrategy(proof);
+
+        assertTrue(proof.closed());
+
+        Iterator<Node> it = proof.root().subtreeIterator();
+        int mergeAppsCnt = 0;
+        while (it.hasNext()) {
+            if (it.next()
+                    .getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
+                mergeAppsCnt++;
+            }
+        }
+
+        assertEquals("There should be one merge app.", 1, mergeAppsCnt);
+    }
+
+    /**
+     * Regression test for a case where a merge with MPS is done after two
+     * branches with a variable "result_0", which is not the same (one time an
+     * integer and one time an Object). This clash has to result in a renaming.
+     * An interactive cut in the proof should make sure that the renaming works
+     * and resolves the clashes. The test case includes a "is weakening" goal.
+     * Underlying Java file: "A.java".
+     */
+    @Test
+    public void testLoadProofWithDiffVarsWithSameNameAndMPS() {
+        Proof proof = loadProof(
+                "A.differentVarsWithSameName.MPS.cut.closed.proof");
+        assertTrue(proof.closed());
     }
 
     /**
@@ -133,8 +195,8 @@ public class MergeRuleTests extends TestCase {
         final Proof proof = loadProof("gcd.key");
 
         for (int i = 0; i < 2; i++) {
-            runMacro(new FinishSymbolicExecutionUntilMergePointMacro(), proof
-                    .openGoals().head().node());
+            runMacro(new FinishSymbolicExecutionUntilMergePointMacro(),
+                    proof.openGoals().head().node());
             mergeFirstGoal(proof, MergeIfThenElseAntecedent.instance());
         }
 
@@ -146,8 +208,8 @@ public class MergeRuleTests extends TestCase {
      * Merges for SE states with different symbolic states are only allowed if
      * the path conditions are distinguishable -- for the case that if-then-else
      * conditions are employed. This test case tries to merge two states with
-     * equal path condition but different symbolic states -- therefore, the merge
-     * should fail due to an incomplete rule application.
+     * equal path condition but different symbolic states -- therefore, the
+     * merge should fail due to an incomplete rule application.
      */
     @Test
     public void testMergeIndistinguishablePathConditionsWithITE() {
@@ -156,8 +218,7 @@ public class MergeRuleTests extends TestCase {
         try {
             mergeFirstGoal(proof, MergeIfThenElseAntecedent.instance());
             fail("The merge operation should not be applicable.");
-        }
-        catch (IncompleteRuleAppException e) {
+        } catch (IncompleteRuleAppException e) {
         }
     }
 
@@ -167,14 +228,13 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testMergeThreeIndistinguishablePathConditionsWithITE() {
-        final Proof proof =
-                loadProof("IndistinguishablePathConditions.twoJoins.proof");
+        final Proof proof = loadProof(
+                "IndistinguishablePathConditions.twoJoins.proof");
 
         try {
             mergeFirstGoal(proof, MergeIfThenElseAntecedent.instance());
             fail("The merge operation should not be applicable.");
-        }
-        catch (IncompleteRuleAppException e) {
+        } catch (IncompleteRuleAppException e) {
         }
     }
 
@@ -220,13 +280,14 @@ public class MergeRuleTests extends TestCase {
 
         final Goal mergeGoal = proof.openGoals().head();
         final Node mergeNode = mergeGoal.node();
-        final PosInOccurrence mergePio = getPioFirstFormula(mergeNode.sequent());
-        final MergeRuleBuiltInRuleApp mergeApp =
-                (MergeRuleBuiltInRuleApp) mergeRule.createApp(mergePio, services);
+        final PosInOccurrence mergePio = getPioFirstFormula(
+                mergeNode.sequent());
+        final MergeRuleBuiltInRuleApp mergeApp = (MergeRuleBuiltInRuleApp) mergeRule
+                .createApp(mergePio, services);
 
         {
-            mergeApp.setMergePartners(MergeRule.findPotentialMergePartners(proof
-                    .openGoals().head(), mergePio));
+            mergeApp.setMergePartners(MergeRule.findPotentialMergePartners(
+                    proof.openGoals().head(), mergePio));
             mergeApp.setConcreteRule(mergeProc);
             mergeApp.setMergeNode(mergeNode);
         }
@@ -259,8 +320,7 @@ public class MergeRuleTests extends TestCase {
     private void runMacro(AbstractProofMacro macro, Node node) {
         try {
             macro.applyTo(null, node, null, null);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             fail("Could not apply macro.");
         }
     }
@@ -278,15 +338,15 @@ public class MergeRuleTests extends TestCase {
         assertTrue(proofFile.exists());
 
         try {
-            KeYEnvironment<?> environment =
-                    KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-                            proofFile, null, null, null, true);
+            KeYEnvironment<?> environment = KeYEnvironment.load(
+                    JavaProfile.getDefaultInstance(), proofFile, null, null,
+                    null, true);
             Proof proof = environment.getLoadedProof();
             assertNotNull(proof);
 
             return proof;
-        }
-        catch (ProblemLoaderException e) {
+        } catch (ProblemLoaderException e) {
+            e.printStackTrace();
             fail("Proof could not be loaded:\n" + e.getMessage());
             return null;
         }

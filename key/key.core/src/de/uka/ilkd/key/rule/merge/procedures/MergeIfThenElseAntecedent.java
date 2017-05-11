@@ -33,15 +33,15 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
  * Rule that merges two sequents based on the if-then-else construction: If two
  * locations are assigned different values in the states, the value in the
  * merged state is chosen based on the path condition. This rule retains total
- * precision. In contrast to the {@link MergeIfThenElse} rule, the distinction is
+ * precision. In contrast to the {@link MergeByIfThenElse} rule, the distinction is
  * not realized in the update / symbolic state, but in the antecedent / path
  * condition. This can be much more efficient.
  * 
  * @author Dominic Scheurer
- * @see MergeIfThenElse
+ * @see MergeByIfThenElse
  * @see MergeRule
  */
-public class MergeIfThenElseAntecedent extends MergeProcedure {
+public class MergeIfThenElseAntecedent extends MergeProcedure implements UnparametricMergeProcedure {
 
     private static MergeIfThenElseAntecedent INSTANCE = null;
 
@@ -126,7 +126,7 @@ public class MergeIfThenElseAntecedent extends MergeProcedure {
 
         if (distinguishingFormula == null) {
             final Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
-                    MergeIfThenElse.createDistFormAndRightSidesForITEUpd(state1,
+                    MergeByIfThenElse.createDistFormAndRightSidesForITEUpd(state1,
                             state2, ifTerm, elseTerm, services);
 
             final Term cond = distFormAndRightSidesForITEUpd.first;

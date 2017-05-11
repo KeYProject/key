@@ -20,7 +20,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -149,7 +151,7 @@ abstract class ReplaceAndRegisterMethod {
 
     final void register(ProgramVariable pv,
                         Services services) {
-        Namespace progVarNames = services.getNamespaces().programVariables();
+        Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
         }
@@ -166,7 +168,7 @@ abstract class ReplaceAndRegisterMethod {
 
     final void register(Function f,
                         Services services) {
-        Namespace functionNames = services.getNamespaces().functions();
+        Namespace<Function> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != Sort.UPDATE;
             functionNames.addSafely(f);

@@ -163,10 +163,11 @@ public class VariableNameProposer implements InstantiationProposer {
 	final NamespaceSet nss = services.getNamespaces();
 	Name l_name;
 	final String basename = name + SKOLEMTERM_VARIABLE_NAME_POSTFIX;
+	int cnt = 0;
 	do {
-	    name = basename + services.getCounter(SKOLEMTERMVARCOUNTER_PREFIX + name)
-		.getCountPlusPlus();	    
+	    name = basename + cnt;
 	    l_name = new Name(name);
+	    cnt++;
 	} while (nss.lookup(l_name) != null &&
                 !previousProposals.contains(name));
         

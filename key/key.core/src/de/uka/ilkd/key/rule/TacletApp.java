@@ -40,6 +40,7 @@ import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenameTable;
@@ -54,6 +55,7 @@ import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
@@ -447,7 +449,7 @@ public abstract class TacletApp implements RuleApp {
 	if (!isExecutable(services)) {
         throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " + this);
 	}
-    registerSkolemConstants(services);
+    registerSkolemConstants(goal.getLocalNamespaces());
 	goal.addAppliedRuleApp(this);
 	return taclet().apply(goal, services, this);
     }
@@ -783,20 +785,19 @@ public abstract class TacletApp implements RuleApp {
     }
     
     
-    public void registerSkolemConstants(TermServices services) {
+    public void registerSkolemConstants(NamespaceSet nss) {
 	final SVInstantiations insts = instantiations();
 	final Iterator<SchemaVariable> svIt = insts.svIterator();
 	while(svIt.hasNext()) {
 	    final SchemaVariable sv = svIt.next();
 	    if(sv instanceof SkolemTermSV) {
 		final Term inst = (Term) insts.getInstantiation(sv);
-		final Namespace functions =
-                        services.getNamespaces().functions();
+                final Namespace<Function> functions = nss.functions();
 
                 // skolem constant might already be registered in
                 // case it is used in the \addrules() section of a rule
                 if (functions.lookup(inst.op().name()) == null) {
-                    functions.addSafely(inst.op());
+                    functions.addSafely((Function) inst.op());
                 }
 	    }
 	}
@@ -1163,8 +1164,8 @@ public abstract class TacletApp implements RuleApp {
      *            the old variable namespace
      * @return the new created variable namespace
      */
-    public Namespace extendVarNamespaceForSV(Namespace var_ns, SchemaVariable sv) {
-	Namespace ns = new Namespace(var_ns);
+    public Namespace<QuantifiableVariable> extendVarNamespaceForSV(Namespace<QuantifiableVariable> var_ns, SchemaVariable sv) {
+	Namespace<QuantifiableVariable> ns = new Namespace<QuantifiableVariable>(var_ns);
 	Iterator<SchemaVariable> it = taclet().getPrefix(sv).prefix()
 		.iterator();
 	while (it.hasNext()) {
@@ -1187,17 +1188,21 @@ public abstract class TacletApp implements RuleApp {
      * 
      * @author mulbrich
      * @param func_ns
-     *            the original function namespace
+     *            the original function namespace, not <code>null</code>
      * @return the new function namespace that bases on the original one
      */
-    public Namespace extendedFunctionNameSpace(Namespace func_ns) {
-	Namespace ns = new Namespace(func_ns);
+    public Namespace<Function> extendedFunctionNameSpace(Namespace<Function> func_ns) {
+	Namespace<Function> ns = new Namespace<Function>(func_ns);
 	Iterator<SchemaVariable> it = instantiations.svIterator();
 	while (it.hasNext()) {
 	    SchemaVariable sv = it.next();
 	    if (sv instanceof SkolemTermSV) {
 		Term inst = (Term) instantiations.getInstantiation(sv);
-		ns.addSafely(inst.op());
+		Operator op = inst.op();
+		assert op instanceof Function :
+		    "At this point the skolem instantiation is expected to "
+		    + "be a function symbol, not " + inst;
+        ns.addSafely((Function) op);
 	    }
 	}
 	return ns;

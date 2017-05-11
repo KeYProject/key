@@ -38,7 +38,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
  * A job for running KeY Project Builds.
- * @author Stefan Käsdorf
+ * @author Stefan Kaesdorf
  */
 @SuppressWarnings("restriction")
 public class KeYProjectBuildJob extends Job{
@@ -129,7 +129,9 @@ public class KeYProjectBuildJob extends Job{
             proofManager.dispose();
          }
          try {
-            LogManager.getInstance().log(project, new LogRecord(LogRecordKind.CLEAN, start, System.currentTimeMillis() - start, properties.isBuildRequiredProofsOnly(), properties.isEnableMultiThreading(), properties.getNumberOfThreads()));
+            LogManager.getInstance().log(project, new LogRecord(LogRecordKind.CLEAN, start,
+                    System.currentTimeMillis() - start, properties.isBuildRequiredProofsOnly(),
+                    properties.isEnableMultiThreading(), properties.getNumberOfThreads()));
          }
          catch (CoreException e) {
             LogUtil.getLogger().logError(e);

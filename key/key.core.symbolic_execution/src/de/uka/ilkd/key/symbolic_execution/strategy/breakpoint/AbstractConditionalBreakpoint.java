@@ -43,6 +43,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -167,7 +168,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * @param inScope
     */
    private void putValuesFromGlobalVars(ProgramVariable varForCondition, Node node, boolean inScope) {
-      for(ProgramVariable progVar : node.getGlobalProgVars()){
+      for(IProgramVariable progVar : node.getLocalProgVars()){
          if(inScope&&varForCondition.name().equals(progVar.name())&&(getVariableNamingMap().get(varForCondition)==null||getVariableNamingMap().get(varForCondition).equals(varForCondition))){
             toKeep.add((LocationVariable) progVar);
             getVariableNamingMap().put(varForCondition, progVar);

@@ -553,6 +553,7 @@ TOKEN :
 		    | < INT: "int" >
 		    | < INTERFACE: "interface" >
 		    | < ISSTATIC: "#isstatic" >
+		    | < MERGEPOINT : "merge_point" >
 		    | < EVALARGS: "#evaluate-arguments" >
 		    | < REPLACEARGS: "#replace" >
 		    | < LONG: "long" >
@@ -3591,6 +3592,7 @@ Statement Statement() :
      | result = SwitchStatement()
      | result = IfStatement()
      | result = WhileStatement()
+     | result = MergePointStatement()
      | result = KeYMetaConstructStatement()
      | result = DoStatement()
      | result = ForStatement()
@@ -4437,6 +4439,29 @@ Statement stat;
 	checkConstruction(result);
 	return result;
     }
+}
+
+MergePointStatement MergePointStatement() :
+{
+    MergePointStatement result;
+    Expression indexPV = null;
+}
+{
+    "merge_point"
+	{
+	    result = factory.createMergePointStatement();
+	    setPrefixInfo(result);
+	}
+    "(" indexPV = Expression()
+	{
+	    result.setIndexPV(indexPV);
+	}
+	")"
+	";"
+	{
+	    checkConstruction(result);
+	    return result;
+	}
 }
 
 Do DoStatement() :

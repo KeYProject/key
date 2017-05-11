@@ -21,10 +21,10 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateLeftSideLoc
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateRightSideFor;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitting;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isUpdateNormalForm;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSEPair;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
@@ -56,11 +56,12 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeProcedure.ValuesMergeResult;
-import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElse;
+import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
@@ -82,7 +83,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
  * 
  * @see MergeRuleUtils
  * @see MergeTotalWeakening
- * @see MergeIfThenElse
+ * @see MergeByIfThenElse
  * @see MergeIfThenElseAntecedent
  * @see MergeWithLatticeAbstraction
  * @see MergeWithPredicateAbstraction
@@ -184,10 +185,20 @@ public class MergeRule implements BuiltInRule {
                 thisSEState.first, thisSEState.second, newGoal.node());
         LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
         LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<Term>();
+        HashMap<Node, SymbolicExecutionState> mergePartnerNodesToStates = new HashMap<>();
 
         int cnt = 0;
         for (SymbolicExecutionState state : mergePartnerStates) {
             mergeRuleApp.fireProgressChange(cnt++);
+
+            final Pair<SymbolicExecutionState, SymbolicExecutionState> noClash = //
+                    MergeRuleUtils.handleNameClashes(mergedState, state,
+                            services);
+
+            mergedState = noClash.first;
+            state = noClash.second;
+
+            mergePartnerNodesToStates.put(state.getCorrespondingNode(), state);
 
             Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> mergeResult = mergeStates(
                     mergeRule, mergedState, state, thisSEState.third,
@@ -213,9 +224,9 @@ public class MergeRule implements BuiltInRule {
         for (MergePartner mergePartner : mergePartners) {
             closeMergePartnerGoal(newGoal.node(), mergePartner.getGoal(),
                     mergePartner.getPio(), mergedState,
-                    sequentToSEPair(mergePartner.getGoal().node(),
-                            mergePartner.getPio(), services),
-                    thisSEState.third);
+                    mergePartnerNodesToStates
+                            .get(mergePartner.getGoal().node()),
+                    thisSEState.third, newNames);
         }
 
         // Delete previous sequents
@@ -528,8 +539,8 @@ public class MergeRule implements BuiltInRule {
                 || !(heap2.op() instanceof Function)) {
             // Covers the case of two different symbolic heaps
             return new ValuesMergeResult(newConstraints,
-                    MergeIfThenElse.createIfThenElseTerm(state1, state2, heap1,
-                            heap2, distinguishingFormula, services),
+                    MergeByIfThenElse.createIfThenElseTerm(state1, state2,
+                            heap1, heap2, distinguishingFormula, services),
                     newNames, sideConditionsToProve);
         }
 
@@ -632,7 +643,7 @@ public class MergeRule implements BuiltInRule {
           // ((Function) heap2.op()).equals(createFunc))
 
         return new ValuesMergeResult(newConstraints,
-                MergeIfThenElse.createIfThenElseTerm(state1, state2, heap1,
+                MergeByIfThenElse.createIfThenElseTerm(state1, state2, heap1,
                         heap2, distinguishingFormula, services),
                 newNames, sideConditionsToProve);
 
@@ -651,14 +662,7 @@ public class MergeRule implements BuiltInRule {
      */
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        // Note: We do not check for merge partner existence
-        // to save time during automatic execution.
-        // As a result, the rule is applicable for any
-        // formula of suitable form, but then with empty
-        // list of candidates.
-
-        return isOfAdmissibleForm(goal, pio, false); // Don't do the check for
-                                                     // partner existence
+        return isOfAdmissibleForm(goal, pio, true);
     }
 
     /**
@@ -772,13 +776,13 @@ public class MergeRule implements BuiltInRule {
         final ImmutableList<Goal> allGoals = services.getProof()
                 .getSubtreeGoals(start);
 
-        final Triple<Term, Term, Term> ownSEState = sequentToSETriple(goal.node(),
-                pio, services);
+        final Triple<Term, Term, Term> ownSEState = sequentToSETriple(
+                goal.node(), pio, services);
 
         // Find potential partners -- for which isApplicable is true and
         // they have the same program counter (and post condition).
         ImmutableList<MergePartner> potentialPartners = ImmutableSLList.nil();
-        
+
         for (final Goal g : allGoals) {
             if (!g.equals(goal) && !g.isLinked()) {
                 Semisequent succedent = g.sequent().succedent();
@@ -787,7 +791,8 @@ public class MergeRule implements BuiltInRule {
 
                     final PosInTerm pit = PosInTerm.getTopLevel();
 
-                    final PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
+                    final PosInOccurrence gPio = new PosInOccurrence(f, pit,
+                            false);
                     if (isOfAdmissibleForm(g, gPio, false)) {
                         final Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
                                 g.node(), gPio, services);

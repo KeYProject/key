@@ -198,8 +198,8 @@
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="a_5" isArrayIndex="false">
-                        <value name="a_5 {true}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_8" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <variable name="a_1" isArrayIndex="false">
+                        <value name="a_1 {true}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            <variable name="message" isArrayIndex="false">
                               <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
@@ -224,7 +224,7 @@
                            </value>
                         </variable>
                         <variable name="exc" isArrayIndex="false">
-                           <value name="exc {true}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_8" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="exc {true}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               <variable name="message" isArrayIndex="false">
                                  <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>

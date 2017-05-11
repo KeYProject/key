@@ -98,7 +98,7 @@ public class TestClashFreeSubst extends TestCase {
 	f = lookup_func("f"); g = lookup_func("g");
 	p = lookup_func("p"); q = lookup_func("q");
 	pv0 = new LocationVariable (new ProgramElementName ( "pv0" ), srt);
-	nss.variables().add ( pv0 );
+	nss.programVariables().add ( pv0 );
 
 	// The declaration parser cannot parse LogicVariables; these
 	// are normally declared in quantifiers, so we introduce them
@@ -303,7 +303,9 @@ public class TestClashFreeSubst extends TestCase {
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 =
 	    res.varsBoundHere(0).get(0);
-	nss.setVariables(new Namespace(nss.variables(), x1));
+	Namespace<QuantifiableVariable> ns = new Namespace<>(nss.variables());
+	ns.add(x1);
+	nss.setVariables(ns);
 	assertEquals("clash resolution",
 		     parseTerm("\\exists x1; q(x1,f(x))"),
 		     res);
@@ -326,7 +328,9 @@ public class TestClashFreeSubst extends TestCase {
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 =
 	    res.varsBoundHere(1).get(0);
-	nss.setVariables(new Namespace(nss.variables(), x1));
+	Namespace<QuantifiableVariable> ns = new Namespace<>(nss.variables());
+        ns.add(x1);
+        nss.setVariables(ns);
 	assertEquals("clash resolution in substitution term",
 		     parseTerm("{\\subst x1; f(f(x))}g(x1,f(x))"),
 		     res);
@@ -360,7 +364,9 @@ public class TestClashFreeSubst extends TestCase {
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 =
 	    res.varsBoundHere(0).get(1);
-	nss.setVariables(new Namespace(nss.variables(), x1));
+	Namespace<QuantifiableVariable> ns = new Namespace<>(nss.variables());
+        ns.add(x1);
+        nss.setVariables(ns);
 	assertEquals("clash resolution in multi term",
 		     toMulti(parseTerm(
 			       "\\forall y; \\forall x1; \\forall z; q(g(x1,y),g(f(x),z))")),
@@ -377,7 +383,9 @@ public class TestClashFreeSubst extends TestCase {
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 =
 	    res.varsBoundHere(0).get(2);
-	nss.setVariables(new Namespace(nss.variables(), x1));
+	Namespace<QuantifiableVariable> ns = new Namespace<>(nss.variables());
+        ns.add(x1);
+        nss.setVariables(ns);
 	assertEquals("clash resolution in multi term",
 		     toMulti(parseTerm(
 			       "q(g(x1,y),g(f(x),z))")),
@@ -411,7 +419,9 @@ public class TestClashFreeSubst extends TestCase {
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 =
 	    res.varsBoundHere(1).get(0);
-	nss.setVariables(new Namespace(nss.variables(), x1));
+	Namespace<QuantifiableVariable> ns = new Namespace<>(nss.variables());
+        ns.add(x1);
+        nss.setVariables(ns);
 	assertEquals("substitution",
 		     parseTerm("{\\subst " + x1.name () +
 			       "; f(pv0)} ( q(f(pv0),x) & {pv0:=f(pv0)}q(x," +

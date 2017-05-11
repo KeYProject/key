@@ -13,7 +13,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
                      <operationContract name="self.withdraw(_amount) catch(exc_1)
 pre: _amount &gt;  0 &amp; self.&lt;inv&gt;
 post: self.balance
-  = javaSubInt(self.balance@heapBefore_withdraw_0,
+  = javaSubInt(self.balance@heapBefore_withdraw,
                _amount)
 &amp; self.&lt;inv&gt;
 &amp; exc_1 = null

@@ -333,7 +333,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         }
 
         if (!app.complete()) {
-            return app.tryToInstantiate(services);
+            return app.tryToInstantiate(services.getOverlay(p_goal.getLocalNamespaces()));
         } else if (!app.isExecutable(services)) {
             return null;
         } else {

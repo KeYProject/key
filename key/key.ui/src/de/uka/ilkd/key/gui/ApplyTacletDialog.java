@@ -27,6 +27,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Collection;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -36,11 +37,9 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
@@ -110,7 +109,7 @@ public abstract class ApplyTacletDialog extends JDialog {
     }
     
     protected JPanel createInfoPanel() {
-	ImmutableList<Named> vars=model[0].programVariables().elements();
+	Collection<IProgramVariable> vars = model[0].programVariables().elements();
 	JPanel panel = new JPanel(new GridLayout(1,1));
 	panel.setBorder(new TitledBorder("Sequent program variables"));       
 	JScrollPane scroll = new JScrollPane();

@@ -32,9 +32,15 @@ import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
@@ -56,6 +62,7 @@ import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
@@ -126,7 +133,7 @@ public class KeYMediator {
     /** returns the variable namespace
      * @return the variable namespace
      */
-    public Namespace var_ns() {
+    public Namespace<QuantifiableVariable> var_ns() {
        NamespaceSet namespaces = namespaces();
        return namespaces != null ? namespaces.variables() : null;
     }
@@ -134,7 +141,7 @@ public class KeYMediator {
     /** returns the program variable namespace
      * @return the program variable namespace
      */
-    public Namespace progVar_ns() {
+    public Namespace<IProgramVariable> progVar_ns() {
        NamespaceSet namespaces = namespaces();
        return namespaces != null ? namespaces.programVariables() : null;
     }
@@ -142,7 +149,7 @@ public class KeYMediator {
     /** returns the function namespace
      * @return the function namespace
      */
-    public Namespace func_ns() {
+    public Namespace<Function> func_ns() {
        NamespaceSet namespaces = namespaces();
        return namespaces != null ? namespaces.functions() : null;
     }
@@ -150,7 +157,7 @@ public class KeYMediator {
     /** returns the sort namespace
      * @return the sort namespace
      */
-    public Namespace sort_ns() {
+    public Namespace<Sort> sort_ns() {
        NamespaceSet namespaces = namespaces();
        return namespaces != null ? namespaces.sorts() : null;
     }
@@ -158,7 +165,7 @@ public class KeYMediator {
     /** returns the heuristics namespace
      * @return the heuristics namespace
      */
-    public Namespace heur_ns() {
+    public Namespace<RuleSet> heur_ns() {
        NamespaceSet namespaces = namespaces();
        return namespaces != null ? namespaces.ruleSets() : null;
     }
@@ -166,17 +173,9 @@ public class KeYMediator {
     /** returns the choice namespace
      * @return the choice namespace
      */
-    public Namespace choice_ns() {
+    public Namespace<Choice> choice_ns() {
        NamespaceSet namespaces = namespaces();
        return namespaces != null ? namespaces.choices() : null;
-    }
-
-    /** returns the prog var namespace
-     * @return the prog var namespace
-     */
-    public Namespace pv_ns() {
-       NamespaceSet namespaces = namespaces();
-       return namespaces != null ? namespaces.programVariables() : null;
     }
 
     /** returns the namespace set

@@ -142,4 +142,16 @@ public final class Immutables {
         return result;
     }
 
+    public static <T> ImmutableSet<T> createSetFrom(Iterable<T> iterable) {
+        return DefaultImmutableSet.fromImmutableList(createListFrom(iterable));
+    }
+
+    public static <T> ImmutableList<T> createListFrom(Iterable<T> iterable) {
+        ImmutableList<T> result = ImmutableSLList.<T>nil();
+        for (T t : iterable) {
+            result = result.prepend(t);
+        }
+        return result.reverse();
+    }
+
 }

@@ -752,7 +752,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	
 	Services services = TacletForTests.services();
 	Sort nullSort = new NullSort(services.getJavaInfo().objectSort());
-	services.getNamespaces().sorts().add(ImmutableSLList.<Named>nil().prepend(A1OBJ)
+	services.getNamespaces().sorts().add(ImmutableSLList.<Sort>nil().prepend(A1OBJ)
 		                                                     .prepend(A2OBJ)
 		                                                     .prepend(A3OBJ)
 		                                                     .prepend(A4OBJ)

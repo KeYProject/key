@@ -17,6 +17,8 @@ import java.io.IOException;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
@@ -48,217 +50,214 @@ import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.util.Debug;
 
 /**
- * The program method represents a (pure) method in the logic.
- * In case of a non-static method the first argument represents the 
- * object on which the method is invoked. 
+ * The program method represents a (pure) method in the logic. In case of a
+ * non-static method the first argument represents the object on which the
+ * method is invoked.
  */
-public final class ProgramMethod extends ObserverFunction 
-    			  	 implements ProgramInLogic, IProgramMethod {
+public final class ProgramMethod extends ObserverFunction
+        implements ProgramInLogic, IProgramMethod {
 
     private final MethodDeclaration method;
-    /** Return type of the method. Must not be null. Use KeYJavaType.VOID_TYPE for void methods. */
+    /**
+     * Return type of the method. Must not be null. Use KeYJavaType.VOID_TYPE
+     * for void methods.
+     */
     private final KeYJavaType returnType;
     private final PositionInfo pi;
-    
-    
 
-    //-------------------------------------------------------------------------
-    //constructors
-    //-------------------------------------------------------------------------     
-    public ProgramMethod(MethodDeclaration method,
-        KeYJavaType container,
-    	KeYJavaType kjt,
-    	PositionInfo pi,
-    	final Sort heapSort) {
-    	this(method, container, kjt, pi, heapSort, 1);
+    // -------------------------------------------------------------------------
+    // constructors
+    // -------------------------------------------------------------------------
+    public ProgramMethod(MethodDeclaration method, KeYJavaType container,
+            KeYJavaType kjt, PositionInfo pi, final Sort heapSort) {
+        this(method, container, kjt, pi, heapSort, 1);
     }
-  
-    public ProgramMethod(MethodDeclaration method, 
-			 KeYJavaType container, 
-			 KeYJavaType kjt,
-                         PositionInfo pi,
-                         Sort heapSort,
-                         int heapCount) {
-        super(method.getProgramElementName().toString(), 
-              kjt.getSort(),
-              kjt,
-              heapSort,
-              container,
-              method.isStatic(),
-              getParamTypes(method),
-              heapCount,
-              method.getStateCount());
-        this.method  = method;
-        this.returnType     = kjt;
-        this.pi      = pi;
+
+    public ProgramMethod(MethodDeclaration method, KeYJavaType container,
+            KeYJavaType kjt, PositionInfo pi, Sort heapSort, int heapCount) {
+        super(method.getProgramElementName().toString(), kjt.getSort(), kjt,
+                heapSort, container, method.isStatic(), getParamTypes(method),
+                heapCount, method.getStateCount());
+        this.method = method;
+        this.returnType = kjt;
+        this.pi = pi;
     }
-    
-    
 
-    //-------------------------------------------------------------------------
-    //internal methods
-    //-------------------------------------------------------------------------     
-
+    // -------------------------------------------------------------------------
+    // internal methods
+    // -------------------------------------------------------------------------
 
     private static ImmutableArray<KeYJavaType> getParamTypes(
-	    					MethodDeclaration md) {
-	KeYJavaType[] result 
-		= new KeYJavaType[md.getParameterDeclarationCount()];
-	for(int i = 0; i < result.length; i++) {
-	    result[i] = md.getParameterDeclarationAt(i)
-	    		  .getVariableSpecification()
-	    		  .getProgramVariable()
-	                  .getKeYJavaType();
-	}
-	return new ImmutableArray<KeYJavaType>(result);
+            MethodDeclaration md) {
+        KeYJavaType[] result = new KeYJavaType[md
+                .getParameterDeclarationCount()];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = md.getParameterDeclarationAt(i)
+                    .getVariableSpecification().getProgramVariable()
+                    .getKeYJavaType();
+        }
+        return new ImmutableArray<KeYJavaType>(result);
     }
-    
-    
 
-    //-------------------------------------------------------------------------
-    //public interface
-    //-------------------------------------------------------------------------     
+    // -------------------------------------------------------------------------
+    // public interface
+    // -------------------------------------------------------------------------
 
-    // convenience methods to access methods of the corresponding MethodDeclaration
+    // convenience methods to access methods of the corresponding
+    // MethodDeclaration
     // in a direct way
-   
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getMethodDeclaration()
-    */
-   @Override
-   public MethodDeclaration getMethodDeclaration() {
-	return method;
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getMethodDeclaration()
+     */
+    @Override
+    public MethodDeclaration getMethodDeclaration() {
+        return method;
     }
 
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getParameterType(int)
-    */
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getParameterType(int)
+     */
     @Override
-   public KeYJavaType getParameterType(int i) {
-       return method.getParameterDeclarationAt(i).getVariableSpecification().getProgramVariable().getKeYJavaType(); 
+    public KeYJavaType getParameterType(int i) {
+        return method.getParameterDeclarationAt(i).getVariableSpecification()
+                .getProgramVariable().getKeYJavaType();
     }
-    
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getBody()
-    */
-   @Override
-   public StatementBlock getBody() {
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getBody()
+     */
+    @Override
+    public StatementBlock getBody() {
         return getMethodDeclaration().getBody();
     }
 
     @Override
-    public SourceElement getFirstElement(){
-	return this;
+    public SourceElement getFirstElement() {
+        return this;
     }
 
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
-       return getFirstElement();
+        return getFirstElement();
     }
 
     @Override
-    public SourceElement getLastElement(){
-	return this;
+    public SourceElement getLastElement() {
+        return this;
     }
 
     @Override
     public Comment[] getComments() {
-	return method.getComments();
+        return method.getComments();
     }
 
     @Override
     public void prettyPrint(PrettyPrinter w) throws IOException {
-	method.prettyPrint(w);
+        method.prettyPrint(w);
     }
 
-    /** 
-     * calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
-     * @param v the Visitor
+    /**
+     * calls the corresponding method of a visitor in order to perform some
+     * action/transformation on this element
+     * 
+     * @param v
+     *            the Visitor
      */
     @Override
     public void visit(Visitor v) {
-	v.performActionOnProgramMethod(this);
+        v.performActionOnProgramMethod(this);
     }
 
     /**
-     *        Returns the start position of the primary token of this element.
-     *        To get the start position of the syntactical first token,
-     *        call the corresponding method of <CODE>getFirstElement()</CODE>.
-     *        @return the start position of the primary token.
-    */
-    @Override    
-    public Position getStartPosition(){
-	return pi.getStartPosition();
-    }
-
-    /**
-     *        Returns the end position of the primary token of this element.
-     *        To get the end position of the syntactical first token,
-     *        call the corresponding method of <CODE>getLastElement()</CODE>.
-     *        @return the end position of the primary token.
+     * Returns the start position of the primary token of this element. To get
+     * the start position of the syntactical first token, call the corresponding
+     * method of <CODE>getFirstElement()</CODE>.
+     * 
+     * @return the start position of the primary token.
      */
     @Override
-    public Position getEndPosition(){
-	return pi.getEndPosition();
+    public Position getStartPosition() {
+        return pi.getStartPosition();
     }
 
     /**
-     *        Returns the relative position (number of blank heading lines and 
-     *        columns) of the primary token of this element.
-     *        To get the relative position of the syntactical first token,
-     *        call the corresponding method of <CODE>getFirstElement()</CODE>.
-     *        @return the relative position of the primary token.
+     * Returns the end position of the primary token of this element. To get the
+     * end position of the syntactical first token, call the corresponding
+     * method of <CODE>getLastElement()</CODE>.
+     * 
+     * @return the end position of the primary token.
      */
     @Override
-    public Position getRelativePosition(){
-	return  pi.getRelativePosition();
+    public Position getEndPosition() {
+        return pi.getEndPosition();
     }
 
+    /**
+     * Returns the relative position (number of blank heading lines and columns)
+     * of the primary token of this element. To get the relative position of the
+     * syntactical first token, call the corresponding method of
+     * <CODE>getFirstElement()</CODE>.
+     * 
+     * @return the relative position of the primary token.
+     */
+    @Override
+    public Position getRelativePosition() {
+        return pi.getRelativePosition();
+    }
 
     @Override
-    public PositionInfo getPositionInfo(){
-	return  pi;
+    public PositionInfo getPositionInfo() {
+        return pi;
     }
-
 
     /**
      * Test whether the declaration is private.
      */
     @Override
-    public boolean isPrivate(){
-	return method.isPrivate();
+    public boolean isPrivate() {
+        return method.isPrivate();
     }
 
     /**
      * Test whether the declaration is protected.
      */
     @Override
-    public boolean isProtected(){
-	return method.isProtected();
+    public boolean isProtected() {
+        return method.isProtected();
     }
 
     /**
      * Test whether the declaration is public.
      */
     @Override
-    public boolean isPublic(){
-	return method.isPublic();
+    public boolean isPublic() {
+        return method.isPublic();
     }
 
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#isConstructor()
-    */
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#isConstructor()
+     */
     @Override
-   public boolean isConstructor(){
-	return method instanceof Constructor;
+    public boolean isConstructor() {
+        return method instanceof Constructor;
     }
 
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#isModel()
-    */
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#isModel()
+     */
     @Override
-   public boolean isModel() {
+    public boolean isModel() {
         return method.isModel();
     }
 
@@ -266,187 +265,221 @@ public final class ProgramMethod extends ObserverFunction
      * Test whether the declaration is strictfp.
      */
     @Override
-    public boolean isStrictFp(){
-	return method.isStrictFp();
+    public boolean isStrictFp() {
+        return method.isStrictFp();
     }
-    
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#isVoid()
-    */
-   @Override
-   public boolean isVoid(){
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#isVoid()
+     */
+    @Override
+    public boolean isVoid() {
         return returnType == KeYJavaType.VOID_TYPE && !isConstructor();
     }
-    
+
     @Override
-    public ImmutableArray<Modifier> getModifiers(){
-	return method.getModifiers();
+    public ImmutableArray<Modifier> getModifiers() {
+        return method.getModifiers();
     }
 
     @Override
     public int getChildCount() {
-	return 0;
+        return 0;
     }
 
     @Override
-    public ProgramElement getChildAt(int i){
-       return null;
+    public ProgramElement getChildAt(int i) {
+        return null;
     }
-  
-    /** equals modulo renaming is described in class
-     * SourceElement.
+
+    /**
+     * equals modulo renaming is described in class SourceElement.
      */
     @Override
-    public boolean equalsModRenaming(SourceElement se, 
-	    NameAbstractionTable nat) {
-	if (se == null || !(se instanceof IProgramMethod)) {
-	    return false;
-	}
+    public boolean equalsModRenaming(SourceElement se,
+            NameAbstractionTable nat) {
+        if (se == null || !(se instanceof IProgramMethod)) {
+            return false;
+        }
 
-	return method==((IProgramMethod)se).getMethodDeclaration();
+        return method == ((IProgramMethod) se).getMethodDeclaration();
     }
-    
+
     @Deprecated
-    public KeYJavaType getKJT(){
+    public KeYJavaType getKJT() {
         return returnType;
     }
 
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getReturnType()
-    */
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getReturnType()
+     */
     @Override
-   public KeYJavaType getReturnType() {
+    public KeYJavaType getReturnType() {
         return returnType;
     }
 
     @Override
     public Expression convertToProgram(Term t, ExtList l) {
-	ProgramElement called;
-	if (isStatic()) {
-	    called = new TypeRef(getContainerType());
-	} else {
-	    called=(ProgramElement)l.get(0);
-	    l.remove(0);
-	}
-	return new MethodReference(l, getProgramElementName(), 
-				   (ReferencePrefix) called);
-    }   
-    
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getProgramElementName()
-    */
-   @Override
-   public ProgramElementName getProgramElementName() {
-	return getMethodDeclaration().getProgramElementName();
+        ProgramElement called;
+        if (isStatic()) {
+            called = new TypeRef(getContainerType());
+        } else {
+            called = (ProgramElement) l.get(0);
+            l.remove(0);
+        }
+        return new MethodReference(l, getProgramElementName(),
+                (ReferencePrefix) called);
     }
 
-   /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getUniqueName()
-    */
-   @Override
-   public String getUniqueName() {
-       return getName() + "_" +
-              Math.abs(ContractFactory.generateContractTypeName("",
-                                                                getContainerType(),
-                                                                this,
-                                                                getContainerType()
-                                                                ).hashCode());
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getProgramElementName()
+     */
+    @Override
+    public ProgramElementName getProgramElementName() {
+        return getMethodDeclaration().getProgramElementName();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getUniqueName()
+     */
+    @Override
+    public String getUniqueName() {
+        return getName() + "_"
+                + Math.abs(ContractFactory.generateContractTypeName("",
+                        getContainerType(), this, getContainerType())
+                        .hashCode());
     } // Included HashCode to make IF-Predicates unique and still reproducible
 
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getFullName()
-    */
-   @Override
-   public String getFullName() {
-       return getMethodDeclaration().getFullName();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getFullName()
+     */
+    @Override
+    public String getFullName() {
+        return getMethodDeclaration().getFullName();
     }
 
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getName()
-    */
-   @Override
-   public String getName() {
-    	return getMethodDeclaration().getName();
-    }
-    
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#isAbstract()
-    */
-   @Override
-   public boolean isAbstract() {
-    	return getMethodDeclaration().isAbstract();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getName()
+     */
+    @Override
+    public String getName() {
+        return getMethodDeclaration().getName();
     }
 
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#isImplicit()
-    */
-   @Override
-   public boolean isImplicit(){
-	return getName().startsWith("<");
-    }
-    
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#isNative()
-    */
-   @Override
-   public boolean isNative() {
-    	return getMethodDeclaration().isNative();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#isAbstract()
+     */
+    @Override
+    public boolean isAbstract() {
+        return getMethodDeclaration().isAbstract();
     }
 
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#isFinal()
-    */
-   @Override
-   public boolean isFinal() {
-    	return getMethodDeclaration().isFinal();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#isImplicit()
+     */
+    @Override
+    public boolean isImplicit() {
+        return getName().startsWith("<");
     }
 
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#isSynchronized()
-    */
-   @Override
-   public boolean isSynchronized() {
-    	return getMethodDeclaration().isSynchronized();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#isNative()
+     */
+    @Override
+    public boolean isNative() {
+        return getMethodDeclaration().isNative();
     }
-    
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getThrown()
-    */
-   @Override
-   public Throws getThrown() {
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#isFinal()
+     */
+    @Override
+    public boolean isFinal() {
+        return getMethodDeclaration().isFinal();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#isSynchronized()
+     */
+    @Override
+    public boolean isSynchronized() {
+        return getMethodDeclaration().isSynchronized();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getThrown()
+     */
+    @Override
+    public Throws getThrown() {
         return getMethodDeclaration().getThrown();
     }
-    
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getParameterDeclarationAt(int)
-    */
-   @Override
-   public ParameterDeclaration getParameterDeclarationAt(int index) {
-    	return getMethodDeclaration().getParameterDeclarationAt(index);
-    }
-    
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getVariableSpecification(int)
-    */
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.uka.ilkd.key.logic.op.IProgramMethod#getParameterDeclarationAt(int)
+     */
     @Override
-   public VariableSpecification getVariableSpecification(int index) {
-        return method.getParameterDeclarationAt(index).getVariableSpecification();
+    public ParameterDeclaration getParameterDeclarationAt(int index) {
+        return getMethodDeclaration().getParameterDeclarationAt(index);
     }
-     
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getParameterDeclarationCount()
-    */
-   @Override
-   public int getParameterDeclarationCount() {
-    	return getMethodDeclaration().getParameterDeclarationCount();
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.uka.ilkd.key.logic.op.IProgramMethod#getVariableSpecification(int)
+     */
+    @Override
+    public VariableSpecification getVariableSpecification(int index) {
+        return method.getParameterDeclarationAt(index)
+                .getVariableSpecification();
     }
-    
-    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getParameters()
-    */
-   @Override
-   public ImmutableArray<ParameterDeclaration> getParameters() {
-    	return getMethodDeclaration().getParameters();
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.uka.ilkd.key.logic.op.IProgramMethod#getParameterDeclarationCount()
+     */
+    @Override
+    public int getParameterDeclarationCount() {
+        return getMethodDeclaration().getParameterDeclarationCount();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getParameters()
+     */
+    @Override
+    public ImmutableArray<ParameterDeclaration> getParameters() {
+        return getMethodDeclaration().getParameters();
     }
 
     @Override
@@ -458,6 +491,22 @@ public final class ProgramMethod extends ObserverFunction
         } else {
             Debug.out("Program match failed (pattern, source)", this, src);
             return null;
-        }        
+        }
+    }
+
+    @Override
+    public ImmutableList<LocationVariable> collectParameters() {
+        ImmutableList<LocationVariable> paramVars = ImmutableSLList
+                .<LocationVariable> nil();
+        int numParams = getParameterDeclarationCount();
+        for (int i = numParams - 1; i >= 0; i--) {
+            ParameterDeclaration pd = getParameterDeclarationAt(i);
+            IProgramVariable paramProgVar = pd.getVariableSpecification()
+                    .getProgramVariable();
+            assert paramProgVar instanceof LocationVariable : "Parameter declaration expected to be location var!";
+            LocationVariable paramLocVar = (LocationVariable) paramProgVar;
+            paramVars = paramVars.prepend(paramLocVar);
+        }
+        return paramVars;
     }
 }

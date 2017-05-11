@@ -24,15 +24,10 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
@@ -148,9 +143,8 @@ public class ExecutionBlockContract extends AbstractExecutionNode<SourceElement>
     */
    protected Term declaredVariableAsTerm(StatementBlock sb, int statementIndex) {
       Statement resultInitStatement = sb.getStatementAt(statementIndex);
-      assert resultInitStatement instanceof LocalVariableDeclaration : "Block Contract Rule has changed.";
-      String name = ((LocalVariableDeclaration) resultInitStatement).getVariables().get(0).getName();
-      Named var = getServices().getNamespaces().lookup(new Name(name));
+      assert resultInitStatement instanceof LocalVariableDeclaration : "Block Contract Rule has changed.";      
+      Named var =  ((LocalVariableDeclaration) resultInitStatement).getVariables().get(0).getProgramVariable();
       assert var != null : "Block Contract Rule has changed.";
       return getServices().getTermBuilder().var((ProgramVariable) var);
    }

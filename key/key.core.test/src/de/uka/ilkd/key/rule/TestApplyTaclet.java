@@ -47,7 +47,7 @@ import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 
 
-/** 
+/**
  * class tests the apply methods in Taclet
  */
 public class TestApplyTaclet extends TestCase{
@@ -60,48 +60,48 @@ public class TestApplyTaclet extends TestCase{
 		   "(A -> B) -> (!(!(A -> B)))",
 		   "(A -> B) -> (!(!(A -> B)))",
 		   "(A -> B) -> (!(!(A -> B)))",
-		   "",		   
+		   "",
 		   "","\\<{try{while (1==1) {if (1==2) {break;}} return 1==3; int i=17; } catch (Exception e) { return null;}}\\>A",
-                   "A & B", 
+                   "A & B",
                    "",
 		   "",//"s{}::isEmpty(sset)",
 		   "",//"s{}::size(sset)=0",
 		   "A & (A & B)", "",
-		   "f(const)=const", 
+		   "f(const)=const",
 		   "const=f(f(const))",
-		   "f(const)=const", 
+		   "f(const)=const",
 		   "const=f(const)",
-		   "f(const)=const", 
+		   "f(const)=const",
 		   "A & {i:=0}(const=f(const))",
-		   "f(const)=const", 
+		   "f(const)=const",
 		   "A & {i:=0}(const=f(f(const)))",
-		   "{i:=0}(f(const)=const)", 
+		   "{i:=0}(f(const)=const)",
 		   "{i:=1}(const=f(const)) & \\<{i=2;}\\>(const=f(const)) " + "& {i:=0}(const=f(const))",
-		   "{i:=0}(f(const)=const)", 
+		   "{i:=0}(f(const)=const)",
 		   "{i:=1}(const=f(const)) & \\<{i=2;}\\>(const=f(const)) " + "& {i:=0}(const=const)",
-                   "", 
+                   "",
                    "\\<{ {} {break;} }\\> true",
-		   "", 
+		   "",
 		   "\\<{ {{}} {{break;}} }\\> true",
-		   "", 
+		   "",
 		   "\\<{ try {} catch ( Exception e ) {} catch ( Throwable e ) {} }\\> true",
-		   "", 
+		   "",
 		   "\\<{ try {} catch ( Exception e ) {} try {} catch ( Throwable e ) {} }\\> true",
-		   "", 
+		   "",
 		   "\\<{ try {} catch ( Exception e ) {break;} catch ( Throwable e ) {continue;} }\\> true",
-		   "", 
+		   "",
 		   "\\<{ try {} catch ( Exception e ) {break;} try {} catch ( Throwable e ) {continue;} }\\> true",
-		   "", 
+		   "",
 		   "\\<{ try {} catch ( Exception e ) {} catch ( Throwable e ) {} finally {} }\\> true",
-		   "", 
+		   "",
 		   "\\<{ try {} catch ( Exception e ) {} finally {} try {} catch ( Throwable e ) {} }\\> true",
-                   "", 
+                   "",
                    "\\<{try{while (1==1) {if (1==2) {break;}} return 1==3; int i=17; } catch (Exception e) { return null;}}\\>\\forall int i; i>0",
-                   "", 
+                   "",
                    "\\<{try{ {} while (1==1) {if (1==2) {break;}} return 1==3; int i=17; } catch (Exception e) { return null;}}\\>\\forall int i; i>0"
     };
     Proof[] proof;
-    
+
 
     public TestApplyTaclet(String name) {
 	super(name);
@@ -111,7 +111,7 @@ public class TestApplyTaclet extends TestCase{
 
 
     private static Semisequent parseTermForSemisequent(String t) {
-	if ("".equals(t)) { 
+	if ("".equals(t)) {
 	    return Semisequent.EMPTY_SEMISEQUENT;
 	}
 	SequentFormula cf0
@@ -120,18 +120,18 @@ public class TestApplyTaclet extends TestCase{
     }
 
     public void setUp() {
-	
+
 
 	TacletForTests.setStandardFile(TacletForTests.testRules);
 	TacletForTests.parse();
 	assert TacletForTests.services().getNamespaces().programVariables().lookup(new Name("i")) != null;
-	
+
 	proof = new Proof[strs.length/2];
-                        
+
         for (int i=0; i<proof.length; i++) {
 	    Semisequent antec = parseTermForSemisequent(strs[2*i]);
 	    Semisequent succ = parseTermForSemisequent(strs[2*i+1]);
-	    Sequent s = Sequent.createSequent(antec, succ);	    
+	    Sequent s = Sequent.createSequent(antec, succ);
 	    proof[i]=new Proof("TestApplyTaclet", TacletForTests.initConfig());
 	    proof[i].setRoot(new Node(proof[i], s));
 	}
@@ -140,47 +140,47 @@ public class TestApplyTaclet extends TestCase{
     public void tearDown() {
         proof = null;
     }
-    
-    
+
+
     public void testSuccTacletWithoutIf() {
 	Term fma = proof[0].root().sequent().succedent().getFirst().formula();
 	NoPosTacletApp impright=TacletForTests.getRules().lookup("imp_right");
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( impright );
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
-	PosInOccurrence applyPos= new 
+	PosInOccurrence applyPos= new
 			PosInOccurrence(goal.sequent().succedent().getFirst(),
 					PosInTerm.getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
+		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
 	ImmutableList<Goal> goals=rApp.execute(goal, TacletForTests.services());
-	assertTrue("Too many or zero goals for imp-right.",goals.size()==1);	
+	assertTrue("Too many or zero goals for imp-right.",goals.size()==1);
 	Sequent seq=goals.head().sequent();
 	assertEquals("Wrong antecedent after imp-right",
-		     seq.antecedent().getFirst().formula(), fma.sub(0));  
+		     seq.antecedent().getFirst().formula(), fma.sub(0));
        	assertEquals("Wrong succedent after imp-right",
-		     seq.succedent().getFirst().formula(), fma.sub(1));  	
+		     seq.succedent().getFirst().formula(), fma.sub(1));
     }
-    
+
 
     public void testAddingRule() {
 	Term fma=proof[0].root().sequent().succedent().getFirst().formula();
-	NoPosTacletApp imprightadd 
+	NoPosTacletApp imprightadd
 	    = TacletForTests.getRules().lookup("TestApplyTaclet_imp_right_add");
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( imprightadd );
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
-	PosInOccurrence applyPos= new 
-	    PosInOccurrence(goal.sequent().succedent().getFirst(), 
+	PosInOccurrence applyPos= new
+	    PosInOccurrence(goal.sequent().succedent().getFirst(),
 			    PosInTerm.getTopLevel(),
 			    false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 	    getTacletAppAt(TacletFilter.TRUE, applyPos,
-			   null);	
+			   null);
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
@@ -189,18 +189,18 @@ public class TestApplyTaclet extends TestCase{
 	Sequent seq=goals.head().sequent();
 	assertEquals("Wrong antecedent after imp_right_add",
 		     seq.antecedent().getFirst().formula(),
-		     fma.sub(0));  
+		     fma.sub(0));
        	assertEquals("Wrong succedent after imp_right_add",
 		     seq.succedent().getFirst().formula(),
-		     fma.sub(1));  
+		     fma.sub(1));
 	ImmutableList<NoPosTacletApp> nfapp=goals.head().indexOfTaclets().getNoFindTaclet
-	    (new IHTacletFilter ( true, ImmutableSLList.<RuleSet>nil() ), 
+	    (new IHTacletFilter ( true, ImmutableSLList.<RuleSet>nil() ),
 	     null);
 	Term aimpb=TacletForTests.parseTerm("A -> B");
 	assertTrue("Cut Rule should be inserted to TacletIndex.", nfapp.size()==1);
 	assertTrue("Inserted cut rule's b should be instantiated to A -> B.",
 		   nfapp.head().instantiations().getInstantiation
-		   ((SchemaVariable)TacletForTests.getVariables().lookup(new Name("b")))
+		   ((SchemaVariable)TacletForTests.getSchemaVariables().lookup(new Name("b")))
 		   .equals(aimpb));
 	assertTrue("Rule App should be complete", rApp.complete());
 	goals=nfapp.head().execute(goals.head(), TacletForTests.services());
@@ -209,24 +209,24 @@ public class TestApplyTaclet extends TestCase{
 	assertTrue("Preinstantiated cut-rule should be executed", goals.size()==2);
 	assertTrue("A->B should be in the succedent of one of the new goals now, "
 		   +"it's in the antecedent, anyway.",
-		   seq1.succedent().getFirst().formula().equals(aimpb) || 
+		   seq1.succedent().getFirst().formula().equals(aimpb) ||
 		   seq2.succedent().getFirst().formula().equals(aimpb) ||
-		   (seq1.succedent().get(1)!=null 
+		   (seq1.succedent().get(1)!=null
 		    && seq1.succedent().get(1).formula().equals(aimpb)) ||
-		   (seq2.succedent().get(1)!=null 
+		   (seq2.succedent().get(1)!=null
 		    && seq2.succedent().get(1).formula().equals(aimpb)));
     }
 
-    
+
     public void testSuccTacletAllRight() {
 	NoPosTacletApp allright = TacletForTests.getRules().lookup("all_right");
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( allright );
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
 	PosInOccurrence applyPos
-	    = new PosInOccurrence(goal.sequent().succedent().getFirst(), 
+	    = new PosInOccurrence(goal.sequent().succedent().getFirst(),
 				  PosInTerm.getTopLevel(),
-				  false);	
+				  false);
 	ImmutableList<TacletApp> rApplist = goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);
 	assertTrue("Too many or zero rule applications.", rApplist.size()==1);
@@ -234,22 +234,22 @@ public class TestApplyTaclet extends TestCase{
 	rApp = ((TacletApp)rApp).tryToInstantiate ( TacletForTests.services() );
 	assertTrue("Rule App should be complete", rApp.complete());
 	ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
-	assertTrue("Too many or zero goals for all-right.",goals.size()==1);	
+	assertTrue("Too many or zero goals for all-right.",goals.size()==1);
 	Sequent seq=goals.head().sequent();
 	assertEquals("Wrong antecedent after all-right",seq.antecedent(),
-		     Semisequent.EMPTY_SEMISEQUENT);  
+		     Semisequent.EMPTY_SEMISEQUENT);
        	assertEquals("Wrong succedent after all-right (op mismatch)",
 		     seq.succedent().getFirst().formula().op(),
-		     TacletForTests.getFunctions().lookup(new Name("p")));  	
+		     TacletForTests.getFunctions().lookup(new Name("p")));
     }
-    
+
     public void testTacletWithIf() {
         NoPosTacletApp close = TacletForTests.getRules().lookup("close_goal");
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( close );
 	Goal goal = createGoal ( proof[2].root(), tacletIndex );
 	PosInOccurrence applyPos=new PosInOccurrence
-	    (goal.sequent().succedent().getFirst(), 
+	    (goal.sequent().succedent().getFirst(),
 	     PosInTerm.getTopLevel(),
 	     false);
  	ImmutableList<TacletApp> rApplist
@@ -258,17 +258,17 @@ public class TestApplyTaclet extends TestCase{
  	assertTrue("Too many or zero rule applications.\napp list:"+rApplist,rApplist.size()==1);
 
  	TacletApp rApp=rApplist.head();
-	ImmutableList<TacletApp> appList = 
-	    rApp.findIfFormulaInstantiations ( goal.sequent (), 
+	ImmutableList<TacletApp> appList =
+	    rApp.findIfFormulaInstantiations ( goal.sequent (),
 	                                       TacletForTests.services() );
 	assertTrue("Match Failed.", !appList.isEmpty());
 	assertTrue("Too many matches.", appList.size()==1);
 	assertTrue("Wrong match found.", appList.head().instantiations()==rApp.instantiations());
 	assertTrue("Rule App should be complete", appList.head().complete());
  	ImmutableList<Goal> goals=appList.head ().execute(goal, TacletForTests.services());
-	assertTrue("Wrong number of goals for close.", goals.size()==1);		
+	assertTrue("Wrong number of goals for close.", goals.size()==1);
 	proof[2].closeGoal ( goals.head ());
-	assertTrue("Proof should be closed.", proof[2].closed ());		
+	assertTrue("Proof should be closed.", proof[2].closed ());
 	/*
  	IList<SVInstantiations> svilist=rApp.taclet().matchIf(goal.sequent(),
 					   rApp.instantiations(), null);
@@ -277,11 +277,11 @@ public class TestApplyTaclet extends TestCase{
 	assertTrue("Wrong match found.", svilist.head()==rApp.instantiations());
 	assertTrue("Rule App should be complete", rApp.complete());
  	IList<Goal> goals=rApp.execute(goal, TacletForTests.services());
-	assertTrue("Too many goals for close.", goals.size()==0);		
+	assertTrue("Too many goals for close.", goals.size()==0);
 	*/
     }
 
-    
+
     public void testAntecTacletWithoutIf() {
 	Term fma=proof[3].root().sequent().antecedent().getFirst().formula();
 	NoPosTacletApp impleft = TacletForTests.getRules().lookup("imp_left");
@@ -289,7 +289,7 @@ public class TestApplyTaclet extends TestCase{
  	tacletIndex.add ( impleft );
  	Goal goal = createGoal ( proof[3].root(), tacletIndex );
 	PosInOccurrence applyPos= new PosInOccurrence
-	    (goal.sequent().antecedent().getFirst(), 
+	    (goal.sequent().antecedent().getFirst(),
 	     PosInTerm.getTopLevel(),
 	     true);
  	ImmutableList<TacletApp> rApplist
@@ -299,32 +299,32 @@ public class TestApplyTaclet extends TestCase{
  	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
  	ImmutableList<Goal> goals=rApp.execute(goal, TacletForTests.services());
- 	assertTrue("Too many or zero goals for imp-left.",goals.size()==2);	
+ 	assertTrue("Too many or zero goals for imp-left.",goals.size()==2);
 	Sequent seq=goals.head().sequent();
 	if (!seq.succedent().isEmpty()) {
 	    assertEquals("Wrong succedent after imp-left",
 			 seq.succedent().getFirst().formula(),
-			 fma.sub(0));  
+			 fma.sub(0));
 	    goals=goals.tail();
 	    seq=goals.head().node().sequent();
 	    assertEquals("Wrong antecedent after imp-left",
 			 seq.antecedent().getFirst().formula(),
-			 fma.sub(1));  
+			 fma.sub(1));
 	} else {
 	    assertEquals("Wrong antecedent after imp-left",
 			 seq.antecedent().getFirst().formula(),
-			 fma.sub(1));  
+			 fma.sub(1));
 	    goals=goals.tail();
 	    seq=goals.head().node().sequent();
 
 	    assertEquals("Wrong succedent after imp-left",
 			 seq.succedent().getFirst().formula(),
-			 fma.sub(0));  
+			 fma.sub(0));
 	}
     }
 
 
-    
+
     public void testRewriteTacletWithoutIf() {
 	NoPosTacletApp contradiction = TacletForTests.getRules().lookup
 	    ("TestApplyTaclet_contradiction");
@@ -332,17 +332,17 @@ public class TestApplyTaclet extends TestCase{
  	tacletIndex.add ( contradiction );
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
 	PosInOccurrence pos
-	    = new PosInOccurrence(goal.sequent().succedent().getFirst(), 
+	    = new PosInOccurrence(goal.sequent().succedent().getFirst(),
 				  PosInTerm.getTopLevel().down(1).down(0).down(0),
 				  false);
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-	    getTacletAppAt(TacletFilter.TRUE, pos, null);	
+	    getTacletAppAt(TacletFilter.TRUE, pos, null);
 
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
 	ImmutableList<Goal> goals=rApp.execute(goal, TacletForTests.services());
-	assertTrue("Too many or zero goals for contradiction.",goals.size()==1);	
+	assertTrue("Too many or zero goals for contradiction.",goals.size()==1);
 	Sequent seq=goals.head().sequent();
 	Term term=seq.succedent().getFirst().formula().sub(1).sub(0).sub(0);
 	assertTrue(term.equals(TacletForTests.parseTerm("!B -> !A")));
@@ -356,24 +356,24 @@ public class TestApplyTaclet extends TestCase{
  	tacletIndex.add ( cut );
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
 	PosInOccurrence pos
-	    = new PosInOccurrence(goal.sequent().succedent().getFirst(), 
+	    = new PosInOccurrence(goal.sequent().succedent().getFirst(),
 				  PosInTerm.getTopLevel(),
 				  false);
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
- 		    getTacletAppAt(TacletFilter.TRUE, pos, null);	
+ 		    getTacletAppAt(TacletFilter.TRUE, pos, null);
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	TacletApp rApp=rApplist.head().addInstantiation
-	    ((SchemaVariable)TacletForTests.getVariables().lookup(new Name("b")), 
-             t_c, 
+	    (TacletForTests.getSchemaVariables().lookup(new Name("b")),
+             t_c,
              false,
              proof[0].getServices());
 	assertTrue("Rule App should be complete", rApp.complete());
  	ImmutableList<Goal> goals=rApp.execute(goal, TacletForTests.services());
- 	assertTrue("Too many or too few goals.",goals.size()==2);	
+ 	assertTrue("Too many or too few goals.",goals.size()==2);
  	Sequent seq1=goals.head().sequent();
  	goals=goals.tail();
  	Sequent seq2=goals.head().sequent();
-	if (!seq1.antecedent().isEmpty() 
+	if (!seq1.antecedent().isEmpty()
 	    && seq1.antecedent().getFirst().formula().equals(t_c)) {
 	    assertTrue("D is in antecedent of 1st goal but not in succedent of 2nd",
 		       seq2.succedent().getFirst().formula().equals(t_c)
@@ -382,7 +382,7 @@ public class TestApplyTaclet extends TestCase{
 	    assertTrue("D is not in antecedent and not in succedent "
 		       +"of first new goal",
 		       seq1.succedent().getFirst().formula().equals(t_c)
-		       || seq1.succedent().get(1).formula().equals(t_c));	    
+		       || seq1.succedent().get(1).formula().equals(t_c));
 	    assertTrue("D is in succedent of first new goal, but not in antecedent "
 		       +"of second new goal",
 		       seq2.antecedent().getFirst().formula().equals(t_c));
@@ -392,7 +392,7 @@ public class TestApplyTaclet extends TestCase{
 
 
 
-    /*    
+    /*
     public String automaticProof(Sequent initSeq, TacletIndex index){
 	String out="";
 	Proof proof=new Proof();
@@ -402,7 +402,7 @@ public class TestApplyTaclet extends TestCase{
 	goals=goals.prepend(goal);
 	while (goals.size()!=0) {
 	    SequentFormula cfma=null;
-	    SequentFormula userCfma=null;   // in the real system the 
+	    SequentFormula userCfma=null;   // in the real system the
 		                              //user would select this
 	    IList<TacletApp> rapplist=ImmSLList.<TacletApp>nil();
 	    out="\n"+out+("Goals: "+goals+"\n");
@@ -412,16 +412,16 @@ public class TestApplyTaclet extends TestCase{
 	    while (it.hasNext()) {
 		userCfma=it.next();
 		rapplist=rapplist.prepend(goal.ruleAppIndex().
-		    getTacletAppAtAndBelow(TacletFilter.TRUE, new 
+		    getTacletAppAtAndBelow(TacletFilter.TRUE, new
 			PosInOccurrence(userCfma, PosInTerm.TOP_LEVEL,
 					goal.node().sequent())));
 	    }
        	    if (rapplist.isEmpty()) {
 		it=goal.node().sequent().succedent().iterator();
-		while (it.hasNext()) {		
-		    userCfma=it.next();	
+		while (it.hasNext()) {
+		    userCfma=it.next();
 		    rapplist=rapplist.prepend(goal.ruleAppIndex()
-			.getTacletAppAtAndBelow(TacletFilter.TRUE, new 
+			.getTacletAppAtAndBelow(TacletFilter.TRUE, new
 			    PosInOccurrence(userCfma, PosInTerm.TOP_LEVEL,
 					    goal.node().sequent()))) ;
 		}
@@ -433,12 +433,12 @@ public class TestApplyTaclet extends TestCase{
 	    boolean executed=false;
 	    while (!executed && !rapplist.isEmpty()) {
 		IList<ImmMap<SchemaVariable,Term>>
-		    mrlist=((Taclet)(rapplist.head().rule())).matchIf(goal.node().sequent(), 
+		    mrlist=((Taclet)(rapplist.head().rule())).matchIf(goal.node().sequent(),
 								    rapplist.head().instantiations());
 		out="\n"+out+("List of if-seq matches:"+mrlist);
-		if (!mrlist.isEmpty()) {		
+		if (!mrlist.isEmpty()) {
 		    out+="Execute: "+rapplist.head()+"\n";
-		    goals=goals.prepend(rapplist.head().execute(goal));	
+		    goals=goals.prepend(rapplist.head().execute(goal));
 		    executed=true;
 		}
 		rapplist=rapplist.tail();
@@ -479,8 +479,8 @@ public class TestApplyTaclet extends TestCase{
 	NoPosTacletApp cut = TacletForTests.getRules().lookup("TestApplyTaclet_cut");
 	assertTrue("TacletApp should not be complete, as b is not instantiated",
 		   !cut.complete());
-	SchemaVariable b=(SchemaVariable)
-	    TacletForTests.getVariables().lookup(new Name("b"));
+	SchemaVariable b=
+	    TacletForTests.getSchemaVariables().lookup(new Name("b"));
 	assertTrue("b should be in the set of not instantiated SVs",
 		   cut.uninstantiatedVars().contains(b));
     }
@@ -491,10 +491,10 @@ public class TestApplyTaclet extends TestCase{
 		   !orright.complete());
 
 	Services services = TacletForTests.services();
-	SchemaVariable b=(SchemaVariable)
-	    TacletForTests.getVariables().lookup(new Name("b"));
-	SchemaVariable c=(SchemaVariable)
-	    TacletForTests.getVariables().lookup(new Name("c"));
+	SchemaVariable b=
+	    TacletForTests.getSchemaVariables().lookup(new Name("b"));
+	SchemaVariable c=
+	    TacletForTests.getSchemaVariables().lookup(new Name("c"));
 	assertTrue("b and c should be in the set of not instantiated SVs",
 		   orright.uninstantiatedVars()
 		   .equals(DefaultImmutableSet.<SchemaVariable>nil().add(b).add(c)));
@@ -514,16 +514,16 @@ public class TestApplyTaclet extends TestCase{
 		   +"instantiated",
 		   orright.complete());
     }
-    
-    
 
-    
+
+
+
     public void testPrgTacletApp() {
 	NoPosTacletApp wh0 = TacletForTests.getRules().lookup("TestApplyTaclet_while0");
-	SchemaVariable e2=(SchemaVariable)
-	    TacletForTests.getVariables().lookup(new Name("#e2"));
-	SchemaVariable p1=(SchemaVariable)
-	    TacletForTests.getVariables().lookup(new Name("#p1"));
+	SchemaVariable e2=
+	    TacletForTests.getSchemaVariables().lookup(new Name("#e2"));
+	SchemaVariable p1=
+	    TacletForTests.getSchemaVariables().lookup(new Name("#p1"));
 	//	wh0=wh0.addInstantiation(e2,TacletForTests.parseExpr("boolean", "false"));
 	//	wh0=wh0.addInstantiation(p1,TacletForTests.parsePrg("{if (false){}}"));
 	Sequent seq=proof[4].root().sequent();
@@ -541,19 +541,19 @@ public class TestApplyTaclet extends TestCase{
         assertTrue("#p1 not instantiated", app.instantiations().isInstantiated(p1));
 
         ImmutableList<Goal> goals = app.execute(goal, TacletForTests.services);
-        
+
         assertTrue("Unexpected number of goals", goals.size() == 1);
     }
 
-    
+
     public void testBugBrokenApply() {
 	// several times the following bug got broken
-	// The application of 
+	// The application of
 	//    'find (b==>) replacewith(b==>); add (==>b);'
-	// resulted in 
+	// resulted in
 	// ==>  ,   b==>b instead of
-	// b==>  ,   b==>b 
-	NoPosTacletApp cdr = 
+	// b==>  ,   b==>b
+	NoPosTacletApp cdr =
 	    TacletForTests.getRules().lookup("TestApplyTaclet_cut_direct_r");
 
 	Sequent seq = proof[1].root().sequent();
@@ -569,7 +569,7 @@ public class TestApplyTaclet extends TestCase{
 
 	assertTrue("Expected two goals", goals.size()==2);
 	assertTrue("First goal should be 'b==>b', but is "+
-		   goals.head().sequent(), 
+		   goals.head().sequent(),
 		   goals.head().sequent().antecedent().size()  == 1 &&
 		   goals.head().sequent().antecedent().iterator().
 		   next().formula().op()==Quantifier.ALL &&
@@ -578,19 +578,19 @@ public class TestApplyTaclet extends TestCase{
 		   next().formula().op()==Quantifier.ALL);
 	goals = goals.tail();
 	assertTrue("Second goal should be '==>b', but is "+
-		   goals.head().sequent(), 
+		   goals.head().sequent(),
 		   goals.head().sequent().antecedent().size() == 0 &&
 		   goals.head().sequent().succedent().size()  == 1 &&
 		   goals.head().sequent().succedent().iterator().
 		   next().formula().op()==Quantifier.ALL);
-	
+
     }
 
     public void testBugID176() {
 	// the last time the bug above had been fixed, the hidden
 	// taclets got broken (did not hide anymore)
 	// also known as bug #176
-	NoPosTacletApp hide_r = 
+	NoPosTacletApp hide_r =
 	    TacletForTests.getRules().lookup("TestApplyTaclet_hide_r");
 
 	Sequent seq = proof[1].root().sequent();
@@ -602,21 +602,21 @@ public class TestApplyTaclet extends TestCase{
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
 
 	ImmutableList<TacletApp> rApplist = goal.ruleAppIndex().
-	    getTacletAppAt(TacletFilter.TRUE, 
+	    getTacletAppAt(TacletFilter.TRUE,
 			   pio, null);
 	ImmutableList<Goal> goals = rApplist.head().
 	    execute(goal, TacletForTests.services());
 
 	assertTrue("Expected one goal", goals.size()==1);
 	assertTrue("Expected '==>', but is "+
-		   goals.head().sequent(), 
+		   goals.head().sequent(),
 		   goals.head().sequent().isEmpty());
 
     }
 
     public void testBugID177() {
 	// bug #177
-	NoPosTacletApp al = 
+	NoPosTacletApp al =
 	    TacletForTests.getRules().lookup("and_left");
 
 	Sequent seq = proof[5].root().sequent();
@@ -628,7 +628,7 @@ public class TestApplyTaclet extends TestCase{
 	Goal goal = createGoal ( proof[5].root(), tacletIndex );
 
 	ImmutableList<TacletApp> rApplist = goal.ruleAppIndex().
-	    getTacletAppAt(TacletFilter.TRUE, 
+	    getTacletAppAt(TacletFilter.TRUE,
 			   pio, null);
 	ImmutableList<Goal> goals = rApplist.head().
 	    execute(goal, TacletForTests.services());
@@ -638,15 +638,15 @@ public class TestApplyTaclet extends TestCase{
 	Iterator<SequentFormula> it = goals.head().sequent().
 	    antecedent().iterator();
 	assertTrue("Expected 'A, B ==>', but is "+
-		   goals.head().sequent(), 
+		   goals.head().sequent(),
 		   goals.head().sequent().antecedent().size() == 2 &&
 		   it.next().formula().equals(TacletForTests.parseTerm("A")) &&
 		   it.next().formula().equals(TacletForTests.parseTerm("B")));
     }
 
-    public void testBugID188() {	
+    public void testBugID188() {
 	//bug #188
-	
+
 	NoPosTacletApp al = TacletForTests.getRules().lookup("and_left");
 	Sequent seq = proof[7].root().sequent();
 	PosInOccurrence pio = new PosInOccurrence ( seq.antecedent().get(0),
@@ -659,11 +659,11 @@ public class TestApplyTaclet extends TestCase{
 	Goal goal = createGoal ( proof[7].root(), tacletIndex );
 
 	ImmutableList<TacletApp> rApplist = goal.ruleAppIndex().
-	    getTacletAppAt(TacletFilter.TRUE, 
+	    getTacletAppAt(TacletFilter.TRUE,
 			   pio, null);
 	ImmutableList<Goal> goals = rApplist.head().
 	    execute(goal, TacletForTests.services());
-	
+
 
        	seq = goals.head ().sequent ();
 	pio = new PosInOccurrence ( seq.antecedent().get(1),
@@ -675,7 +675,7 @@ public class TestApplyTaclet extends TestCase{
 	goal = createGoal ( goals.head().node(), tacletIndex );
 
 	rApplist = goal.ruleAppIndex().
-	    getTacletAppAt(TacletFilter.TRUE, 
+	    getTacletAppAt(TacletFilter.TRUE,
 			   pio, null);
 
 	goals = rApplist.head().
@@ -683,11 +683,11 @@ public class TestApplyTaclet extends TestCase{
 
 	assertTrue("Expected one goal", goals.size()==1);
 
-	Iterator<SequentFormula> it = 
+	Iterator<SequentFormula> it =
 	    goals.head().sequent().antecedent().iterator();
 
 	assertTrue("Expected 'A, B ==>', but is "+
-		   goals.head().sequent(), 
+		   goals.head().sequent(),
 		   goals.head().sequent().antecedent().size() == 2 &&
 		   goals.head().sequent().succedent().size() == 0 &&
 		   it.next().formula().equals(TacletForTests.parseTerm("A")) &&
@@ -703,11 +703,11 @@ public class TestApplyTaclet extends TestCase{
  	tacletIndex.add ( apply_eq_nonrigid );
 	Goal goal = createGoal ( proof[8].root(), tacletIndex );
 	PosInOccurrence pos
-	    = new PosInOccurrence(goal.sequent().succedent().getFirst(), 
+	    = new PosInOccurrence(goal.sequent().succedent().getFirst(),
 				  PosInTerm.getTopLevel(),
 				  false);
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, services);	
+	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, services);
 
 	assertTrue("Expected four rule applications.",rApplist.size()==4);
 
@@ -721,7 +721,7 @@ public class TestApplyTaclet extends TestCase{
 	assertTrue("Rule App should be complete", appList.head().complete());
 
  	ImmutableList<Goal> goals=appList.head ().execute(goal, TacletForTests.services());
-	assertTrue("Too many or zero goals.",goals.size()==1);	
+	assertTrue("Too many or zero goals.",goals.size()==1);
 	Sequent seq=goals.head().sequent();
 	Sequent correctSeq=proof[9].root().sequent();
 	assertEquals("Wrong result", seq, correctSeq);
@@ -730,26 +730,26 @@ public class TestApplyTaclet extends TestCase{
 
     public void testModalityLevel1 () {
         Services services = TacletForTests.services();
-	NoPosTacletApp apply_eq_nonrigid = TacletForTests.getRules().lookup    
+	NoPosTacletApp apply_eq_nonrigid = TacletForTests.getRules().lookup
 	    ("apply_eq_nonrigid");
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
  	tacletIndex.add ( apply_eq_nonrigid );
 	Goal goal = createGoal ( proof[10].root(), tacletIndex );
 	PosInOccurrence pos
-	    = new PosInOccurrence(goal.sequent().succedent().getFirst(), 
+	    = new PosInOccurrence(goal.sequent().succedent().getFirst(),
 				  PosInTerm.getTopLevel(),
 				  false);
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, 
-                services);	
+	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos,
+                services);
 
 	assertTrue("Expected three rule applications.",rApplist.size()==3);
 
-	ImmutableList<TacletApp> appList = ImmutableSLList.<TacletApp>nil();	
+	ImmutableList<TacletApp> appList = ImmutableSLList.<TacletApp>nil();
 	Iterator<TacletApp> appIt = rApplist.iterator ();
 	while ( appIt.hasNext () )
 	    appList = appList.prepend
-		( appIt.next ().findIfFormulaInstantiations ( goal.sequent (), 
+		( appIt.next ().findIfFormulaInstantiations ( goal.sequent (),
 		        services ) );
 
 	assertTrue("Did not expect a match.", appList.size()==0);
@@ -803,11 +803,11 @@ public class TestApplyTaclet extends TestCase{
  	tacletIndex.add ( make_insert_eq_nonrigid );
 	Goal goal = createGoal ( proof[12].root(), tacletIndex );
 	PosInOccurrence pos
-	    = new PosInOccurrence(goal.sequent().antecedent().getFirst(), 
+	    = new PosInOccurrence(goal.sequent().antecedent().getFirst(),
 				  PosInTerm.getTopLevel(),
 				 true);
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, services);	
+	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, services);
 
 	assertTrue("Expected one rule application.",rApplist.size()==1);
 	assertTrue("Rule App should be complete", rApplist.head().complete());
@@ -817,16 +817,16 @@ public class TestApplyTaclet extends TestCase{
 
 	goal = goals.head ();
 
-	pos = new PosInOccurrence(goal.sequent().succedent().getFirst(), 
+	pos = new PosInOccurrence(goal.sequent().succedent().getFirst(),
 				  PosInTerm.getTopLevel(),
 				  false);
  	rApplist=goal.ruleAppIndex().
-	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, 
-                services);	
+	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos,
+                services);
 
 	assertTrue("Expected one rule application.",rApplist.size()==1);
 	assertTrue("Rule App should be complete", rApplist.head().complete());
-	
+
  	goals=rApplist.head ().execute(goal, TacletForTests.services());
 	assertTrue("Expected one goal.",goals.size()==1);
 
@@ -843,12 +843,12 @@ public class TestApplyTaclet extends TestCase{
  	tacletIndex.add ( testApplyTaclet_wrap_blocks_two_empty_lists );
 	Goal goal = createGoal ( proof[14].root(), tacletIndex );
 	PosInOccurrence pos
-	    = new PosInOccurrence(goal.sequent().succedent().getFirst(), 
+	    = new PosInOccurrence(goal.sequent().succedent().getFirst(),
 				  PosInTerm.getTopLevel(),
 				  false);
 
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);	
+	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
 
 	assertTrue("Expected one rule application.",rApplist.size()==1);
 	assertTrue("Rule App should be complete", rApplist.head().complete());
@@ -858,8 +858,8 @@ public class TestApplyTaclet extends TestCase{
  	ImmutableList<Goal> goals=rApplist.head ().execute(goal, TacletForTests.services());
 
 	assertTrue("Expected one goal.",goals.size()==1);
-	
-	Sequent correctSeq = proof[15].root ().sequent ();	
+
+	Sequent correctSeq = proof[15].root ().sequent ();
 	assertEquals("Wrong result", correctSeq, goals.head().sequent());
     }
 
@@ -880,12 +880,12 @@ public class TestApplyTaclet extends TestCase{
  	tacletIndex.add ( test_catch_list1 );
 	Goal goal = createGoal ( proof[p_proof].root(), tacletIndex );
 	PosInOccurrence pos
-	    = new PosInOccurrence(goal.sequent().succedent().getFirst(), 
+	    = new PosInOccurrence(goal.sequent().succedent().getFirst(),
 				  PosInTerm.getTopLevel(),
 				  false);
 
  	ImmutableList<TacletApp> rApplist = goal.ruleAppIndex().
-	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);	
+	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
 
 	assertTrue("Expected one rule application.", rApplist.size()==1);
 	assertTrue("Rule App should be complete.", rApplist.head().complete());
@@ -893,15 +893,15 @@ public class TestApplyTaclet extends TestCase{
  	ImmutableList<Goal> goals=rApplist.head ().execute(goal, TacletForTests.services());
 
 	assertTrue("Expected one goal.", goals.size()==1);
-	
+
 	Sequent correctSeq = proof[p_proof+1].root ().sequent ();
 
 	Term resultFormula  = goals.head().sequent().getFormulabyNr ( 1 ).formula ();
 	Term correctFormula = correctSeq.getFormulabyNr ( 1 ).formula ();
 
-	assertTrue("Wrong result. Expected:" + ProofSaver.printAnything(correctFormula, TacletForTests.services()) + 
-	        " But was:"+ 
-	        ProofSaver.printAnything(resultFormula,TacletForTests.services()), 
+	assertTrue("Wrong result. Expected:" + ProofSaver.printAnything(correctFormula, TacletForTests.services()) +
+	        " But was:"+
+	        ProofSaver.printAnything(resultFormula,TacletForTests.services()),
 	            resultFormula.equalsModRenaming ( correctFormula ) );
     }
 
@@ -915,8 +915,8 @@ public class TestApplyTaclet extends TestCase{
     }
 
     /**
-     * tests if the variable sv collector pays attention to schema variables 
-     * occuring as part of attributes and/or updates (there was a bug where 
+     * tests if the variable sv collector pays attention to schema variables
+     * occuring as part of attributes and/or updates (there was a bug where
      * this has been forgotten, and as a result after applying a method contract
      * schemavariables have been introduces into a goal sequent)
      */
@@ -930,27 +930,27 @@ public class TestApplyTaclet extends TestCase{
             SchemaVariable sv = it.next();
             collSet = collSet.add(sv);
         }
-        
+
         assertTrue("Expected four uninstantiated variables in taclet " +
-                   t +", but found " + collSet.size(), collSet.size()==4);              
+                   t +", but found " + collSet.size(), collSet.size()==4);
     }
-    
+
     /**
-     * tests a bug, which caused the first statement in a context block to be discarded  
-     * in cases where the complete program has been matched by the prefix and suffix of the context 
+     * tests a bug, which caused the first statement in a context block to be discarded
+     * in cases where the complete program has been matched by the prefix and suffix of the context
      * block i.e.
      * a rule like
      * <code>
      * \find ( <.. ...>\forall u; post )
-     * \replacewith (\forall u;<.. ..>post)      
+     * \replacewith (\forall u;<.. ..>post)
      * </code>
-     * applied on 
+     * applied on
      * <code> < method-frame():{ while (...) {...} } >\forall int i; i>0</code>
      * created the goal
      * <code> \forall int i;< method-frame():{ } >i>0 </code>
      * which is of course incorrect.
      */
-    
+
     public void testCompleteContextAddBug() {
         NoPosTacletApp app = TacletForTests.getRules ().lookup ( "TestApplyTaclet_allPullOutBehindDiamond" );
 
@@ -958,29 +958,29 @@ public class TestApplyTaclet extends TestCase{
         tacletIndex.add ( app );
         Goal goal = createGoal ( proof[22].root(), tacletIndex );
         PosInOccurrence pos
-            = new PosInOccurrence(goal.sequent().succedent().getFirst(), 
+            = new PosInOccurrence(goal.sequent().succedent().getFirst(),
                                   PosInTerm.getTopLevel(),
                                   false);
 
         ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-            getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);    
+            getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
 
         assertTrue("Expected one rule application.",rApplist.size()==1);
         assertTrue("Rule App should be complete", rApplist.head().complete());
-      
+
         ImmutableList<Goal> goals=rApplist.head ().execute(goal, TacletForTests.services());
-        
+
         assertTrue("Expected one goal.",goals.size()==1);
-        
-        // the content of the diamond must not have changed 
+
+        // the content of the diamond must not have changed
         ProgramElement expected = proof[22].root().sequent().getFormulabyNr(1).formula().javaBlock().program();
         ProgramElement is = goals.head().sequent().getFormulabyNr(1).formula().sub(0).javaBlock().program();
         assertEquals("Context has been thrown away.",expected, is);
-       
+
     }
-    
+
     /**
-     *  
+     *
      */
     public void testContextAdding() {
         NoPosTacletApp app = TacletForTests.getRules ().lookup ( "TestApplyTaclet_addEmptyStatement" );
@@ -989,28 +989,28 @@ public class TestApplyTaclet extends TestCase{
         tacletIndex.add ( app );
         Goal goal = createGoal ( proof[22].root(), tacletIndex );
         PosInOccurrence pos
-            = new PosInOccurrence(goal.sequent().succedent().getFirst(), 
+            = new PosInOccurrence(goal.sequent().succedent().getFirst(),
                                   PosInTerm.getTopLevel(),
                                   false);
 
         ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-            getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);    
+            getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
 
         assertTrue("Expected one rule application.",rApplist.size()==1);
         assertTrue("Rule App should be complete", rApplist.head().complete());
-      
+
         ImmutableList<Goal> goals=rApplist.head ().execute(goal, TacletForTests.services());
-        
+
         assertTrue("Expected one goal.",goals.size()==1);
-        
-        // the content of the diamond must not have changed 
+
+        // the content of the diamond must not have changed
         ProgramElement expected = TacletForTests.parsePrg("{try{ ; while (1==1) {if (1==2) {break;}} return 1==3; " +
                         "int i=17; } catch (Exception e) { return null;}}");
-                        
+
         ProgramElement is = goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();
-        assertTrue("Expected:"+expected+"\n but was:"+is, expected.equalsModRenaming(is, new NameAbstractionTable()));      
+        assertTrue("Expected:"+expected+"\n but was:"+is, expected.equalsModRenaming(is, new NameAbstractionTable()));
     }
-    
+
     /**
      *  this test is different from the other empty block removal test
      */
@@ -1021,26 +1021,26 @@ public class TestApplyTaclet extends TestCase{
         tacletIndex.add ( app );
         Goal goal = createGoal ( proof[23].root(), tacletIndex );
         PosInOccurrence pos
-            = new PosInOccurrence(goal.sequent().succedent().getFirst(), 
+            = new PosInOccurrence(goal.sequent().succedent().getFirst(),
                                   PosInTerm.getTopLevel(),
                                   false);
 
         ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-            getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);    
+            getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
 
         assertTrue("Expected one rule application.",rApplist.size()==1);
         assertTrue("Rule App should be complete", rApplist.head().complete());
-      
+
         ImmutableList<Goal> goals=rApplist.head ().execute(goal, TacletForTests.services());
-        
+
         assertTrue("Expected one goal.",goals.size()==1);
-        
-        // the content of the diamond must not have changed 
+
+        // the content of the diamond must not have changed
         ProgramElement expected = TacletForTests.parsePrg("{try{while (1==1) {if (1==2) {break;}} return 1==3; " +
                         "int i=17; } catch (Exception e) { return null;}}");
-        
+
         ProgramElement is = goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();
         assertTrue("Expected:"+expected+"\n but was:"+is, expected.equalsModRenaming(is, new NameAbstractionTable()));
     }
-    
+
 }

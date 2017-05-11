@@ -3,7 +3,10 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 
 public class LetCommand extends AbstractCommand {
@@ -40,7 +43,17 @@ public class LetCommand extends AbstractCommand {
                 throw new ScriptException(key + " is already fixed in this script");
             }
             try {
-                abbrMap.put(toTerm(proof, stateMap, entry.getValue(), null), key, true);
+                Term term;
+                try {
+                    term = toTerm(proof, stateMap, entry.getValue(), null);
+                } catch (ParserException e) {
+                    // The term might contain symbols locally introduced
+                    // This is not the cleanest of all solutions, but
+                    // scripts will be done differently soon, anyway.
+                    Goal g = getFirstOpenGoal(proof, stateMap);
+                    term = toTerm(g, stateMap, entry.getValue(), null);
+                }
+                abbrMap.put(term, key, true);
             } catch (Exception e) {
                 throw new ScriptException(e);
             }

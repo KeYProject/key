@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -24,11 +25,13 @@ import java.util.ListIterator;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
@@ -61,7 +64,19 @@ public class Node  {
 
     private NameRecorder         nameRecorder;
 
-    private ImmutableSet<ProgramVariable> globalProgVars      = DefaultImmutableSet.<ProgramVariable>nil();
+    /**
+     * a linked list of the locally generated program variables.
+     * It extends the list of the parent node.
+     */
+    private ImmutableList<IProgramVariable> localProgVars
+        = ImmutableSLList.<IProgramVariable>nil();
+
+    /**
+     * a linked list of the locally generated function symbols.
+     * It extends the list of the parent node.
+     */
+    private ImmutableList<Function> localFunctions
+        = ImmutableSLList.<Function>nil();
 
     private boolean              closed              = false;
 
@@ -114,7 +129,9 @@ public class Node  {
      */
     public Node(Proof proof, Sequent seq, Node parent) {
         this(proof, seq);
-        this.parent=parent;
+        this.parent = parent;
+        this.localFunctions = parent.localFunctions;
+        this.localProgVars = parent.localProgVars;
     }
 
     /** sets the sequent at this node
@@ -182,12 +199,38 @@ public class Node  {
 	return localIntroducedRules;
     }
 
-    public ImmutableSet<ProgramVariable> getGlobalProgVars() {
-	return globalProgVars;
+    /**
+     * Returns the set of created program variables known in this node.
+     *
+     * In the resulting list, the newest additions come first.
+     *
+     * @returns a non-null immutable list of program variables.
+     */
+    public ImmutableList<IProgramVariable> getLocalProgVars() {
+        return localProgVars;
     }
 
-    public void setGlobalProgVars(ImmutableSet<ProgramVariable> progVars) {
-	globalProgVars=progVars;
+    public void addLocalProgVars(Iterable<? extends IProgramVariable> elements) {
+        for (IProgramVariable pv : elements) {
+            localProgVars = localProgVars.prepend(pv);
+        }
+    }
+
+    /**
+     * Returns the set of freshly created function symbols known to this node.
+     *
+     * In the resulting list, the newest additions come first.
+     *
+     * @return a non-null immutable list of function symbols.
+     */
+    public Iterable<Function> getLocalFunctions() {
+        return localFunctions;
+    }
+
+    public void addLocalFunctions(Collection<? extends Function> elements) {
+        for (Function op : elements) {
+            localFunctions = localFunctions.prepend(op);
+        }
     }
 
      /**

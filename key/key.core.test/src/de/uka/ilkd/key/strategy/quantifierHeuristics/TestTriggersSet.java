@@ -13,13 +13,16 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import junit.framework.TestCase;
+import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
@@ -30,7 +33,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.TacletAppIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletForTests;
+import junit.framework.TestCase;
 
 
 //most Code are copyed from Logic.TestUpdateFactory
@@ -39,11 +44,11 @@ public class TestTriggersSet extends TestCase {
 
 	private Proof proof;
     
-	private Namespace variables = new Namespace();
+	private Namespace<QuantifiableVariable> variables = new Namespace<>();
 
-	private Namespace functions = new Namespace();
+	private Namespace<Function> functions = new Namespace<>();
 
-	private Namespace sorts = new Namespace();
+	private Namespace<Sort> sorts = new Namespace<>();
 
 	//sort 
 	private Sort r;
@@ -207,14 +212,15 @@ public class TestTriggersSet extends TestCase {
 		proof.add(g);
 
 		proof.setNamespaces(new NamespaceSet(variables, functions, sorts,
-				new Namespace(), new Namespace(),new Namespace() ));
+				new Namespace<RuleSet>(), new Namespace<Choice>(),
+				new Namespace<IProgramVariable>() ));
 
 	}
 
 	private Term parseTerm(String termstr) {
 		return TacletForTests.parseTerm(termstr, new NamespaceSet(
-				variables, functions, sorts, new Namespace(),
-				new Namespace(), new Namespace()));
+				variables, functions, sorts, new Namespace<RuleSet>(),
+				new Namespace<Choice>(), new Namespace<IProgramVariable>()));
 	}
 
 	public void testTrigger1(){

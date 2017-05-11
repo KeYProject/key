@@ -32,20 +32,12 @@ public class SelectCommand extends AbstractCommand {
         	succOnly = true;
         } else if (args.values().contains("antecedent")) anteOnly = true;
 
-        try {
-            Term t = toTerm(proof, stateMap, formulaString, Sort.FORMULA);
+        Goal g = findGoalWith(formulaString, stateMap, proof);
 
-            Goal g = findGoalWith(t, proof, anteOnly, succOnly);
-
-            stateMap.put(GOAL_KEY, g);
-
-        } catch (ParserException e) {
-            throw new ScriptException("illegal formula: " + formulaString, e);
-        }
-
+        stateMap.put(GOAL_KEY, g);
     }
 
-    private Goal findGoalWith(Term formula, Proof proof, boolean anteOnly, boolean succOnly) throws ScriptException {
+    private Goal findGoalWith(String formulaString, Map<String, Object> stateMap, Proof proof) throws ScriptException {
 
         Goal g;
         Deque<Node> choices = new LinkedList<Node>();
@@ -57,37 +49,21 @@ public class SelectCommand extends AbstractCommand {
             Sequent seq;
             switch (childCount) {
             case 0:
-            	if (!succOnly && !anteOnly) {
-	                seq = node.sequent();
-	                if(contains(seq, formula)) {
-	                    g = getGoal(proof.openGoals(), node);
-	                    if(g.isAutomatic()) {
-	                        return g;
-	                    }
-	                }
-	                node = choices.pollLast();
-	                break;
-            	} else if (anteOnly) {
-            		Semisequent s = node.sequent().antecedent();
-	                if(contains(s, formula)) {
-	                    g = getGoal(proof.openGoals(), node);
-	                    if(g.isAutomatic()) {
-	                        return g;
-	                    }
-	                }
-	                node = choices.pollLast();
-	                break;
-            	} else {
-            		Semisequent s = node.sequent().succedent();
-	                if(contains(s, formula)) {
-	                    g = getGoal(proof.openGoals(), node);
-	                    if(g.isAutomatic()) {
-	                        return g;
-	                    }
-	                }
-	                node = choices.pollLast();
-	                break;
-            	}
+                seq = node.sequent();
+                Term formula;
+                try {
+                    g = getGoal(proof.openGoals(), node);
+                    formula = toTerm(g, stateMap, formulaString, Sort.FORMULA);
+                    if(contains(seq, formula)) {
+                        if(g.isAutomatic()) {
+                            return g;
+                        }
+                    }
+                } catch (ParserException e) {
+                    // Perhaps grep for ... (program) variable or constant #name not declared
+                }
+                node = choices.pollLast();
+                break;
 
             case 1:
                 node = node.child(0);
@@ -111,7 +87,7 @@ public class SelectCommand extends AbstractCommand {
             }
         }
 
-        throw new ScriptException("There is no such goal");
+        throw new ScriptException("There is no goal which contains the formula " + formulaString);
     }
 
     private boolean contains(Sequent seq, Term formula) {

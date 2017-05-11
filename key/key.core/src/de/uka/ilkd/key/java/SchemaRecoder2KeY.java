@@ -20,21 +20,22 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import recoder.java.declaration.TypeDeclaration;
-import recoder.list.generic.ASTArrayList;
-import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaJavaProgramFactory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import recoder.java.declaration.TypeDeclaration;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 
 public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
 
     /** the namespace containing the program schema variables allowed here */
-    protected Namespace svns;
+    protected Namespace<SchemaVariable> svns;
 
     /** caches access to methods for reflection */
     private final static HashMap<?, ?> schemaCt2meth = new LinkedHashMap<Object, Object>(400);
@@ -69,7 +70,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
         return schemaCt2meth;
     }
 
-    public void setSVNamespace(Namespace svns) {
+    public void setSVNamespace(Namespace<SchemaVariable> svns) {
         this.svns = svns;
     }
 

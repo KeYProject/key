@@ -20,7 +20,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
-import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -71,18 +70,18 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
                             ImmutableArray<QuantifiableVariable> newTermBoundVars,
                             JavaBlock newTermJavaBlock,
                             Set<TermLabel> labels) {
-      if (rule instanceof BlockContractRule &&
-          StringUtil.startsWith(hint, "ValidityModality: exceptionVar=") &&
-          SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
-         if (CollectionUtil.search(labels, new IFilter<TermLabel>() {
-                                              @Override
-                                              public boolean select(TermLabel element) {
-                                                 return element instanceof BlockContractValidityTermLabel;
-                                              }
-                                   }) == null) {
-            String exceptionVarName = ((String) hint).substring("ValidityModality: exceptionVar=".length());
-            labels.add(new BlockContractValidityTermLabel(exceptionVarName));
-         }
+       if (rule instanceof BlockContractRule &&
+               ((BlockContractRule.BlockContractHint)hint).getExcecptionalVariable() != null 
+               && 
+               SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
+           if (CollectionUtil.search(labels, new IFilter<TermLabel>() {
+               @Override
+               public boolean select(TermLabel element) {
+                   return element instanceof BlockContractValidityTermLabel;
+               }
+           }) == null) {
+               labels.add(new BlockContractValidityTermLabel(((BlockContractRule.BlockContractHint)hint).getExcecptionalVariable()));
+           }
       }
    }
 }

@@ -30,6 +30,8 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.KeYLexerF;
@@ -63,17 +65,18 @@ public class TacletForTests {
     public static InitConfig initConfig;
     public static File lastFile=null;
 
-    public static Namespace variables = null;
+    private static Namespace<QuantifiableVariable> variables = null;
+    private static Namespace<SchemaVariable> schemaVariables;
 
     public static Profile profile = new JavaProfile() {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
             public RuleCollection getStandardRules() {
                 return new RuleCollection(
-                                RuleSourceFactory.fromDefaultLocation(ldtFile), 
+                                RuleSourceFactory.fromDefaultLocation(ldtFile),
                                 ImmutableSLList.<BuiltInRule>nil());
             }
         };
-        
+
     public static void clear() {
         lastFile = null;
         services = null;
@@ -81,20 +84,21 @@ public class TacletForTests {
         rules = null;
         variables = null;
         scm = new AbbrevMap();
-        nss = new NamespaceSet();        
+        nss = new NamespaceSet();
     }
-        
+
     public static void parse(File file) {
-	try {	    
+	try {
 	    if (!file.equals(lastFile)) {
-		KeYFileForTests envInput = new KeYFileForTests("Test", file, profile);	
-		ProblemInitializer pi = new ProblemInitializer(envInput.getProfile()); 
+		KeYFileForTests envInput = new KeYFileForTests("Test", file, profile);
+		ProblemInitializer pi = new ProblemInitializer(envInput.getProfile());
 		initConfig = pi.prepare(envInput);
-              	nss      = initConfig.namespaces(); 
+              	nss      = initConfig.namespaces();
                 rules    = initConfig.createTacletIndex();
                 services = initConfig.getServices();
 		lastFile = file;
 		variables = envInput.variables();
+		schemaVariables = envInput.schemaVariables();
 	    }
 	} catch (Exception e) {
 	    System.err.println("Exception occurred while parsing "+file+"\n");
@@ -113,7 +117,7 @@ public class TacletForTests {
    return services;
     }
 
-    
+
     public static JavaInfo javaInfo() {
 	return services ().getJavaInfo ();
     }
@@ -141,12 +145,12 @@ public class TacletForTests {
     public static NoPosTacletApp getTaclet(String name) {
 	return rules.lookup(new Name(name));
     }
-    
+
     public static AbbrevMap getAbbrevs(){
         return scm;
     }
 
-    public static Namespace getSorts() {
+    public static Namespace<Sort> getSorts() {
 	return nss.sorts();
     }
 
@@ -155,20 +159,24 @@ public class TacletForTests {
     }
 
 
-    public static Namespace getHeuristics() {
+    public static Namespace<RuleSet> getHeuristics() {
 	return nss.ruleSets();
     }
 
-    public static Namespace getFunctions() {
+    public static Namespace<Function> getFunctions() {
 	return nss.functions();
     }
 
 
-    public static Namespace getVariables() {
+    public static Namespace<QuantifiableVariable> getVariables() {
 	return variables;
     }
 
-    public static Namespace getProgramVariables() {
+    public static Namespace<SchemaVariable> getSchemaVariables() {
+        return schemaVariables;
+    }
+
+    public static Namespace<IProgramVariable> getProgramVariables() {
 	return nss.programVariables();
     }
 
@@ -177,22 +185,22 @@ public class TacletForTests {
     }
 
     public static Function funcLookup(String name) {
-	return (Function)getFunctions().lookup(new Name(name));
+	return getFunctions().lookup(new Name(name));
     }
 
     public static SchemaVariable svLookup(String name) {
-	return (SchemaVariable)getVariables().lookup(new Name(name));
+	return getSchemaVariables().lookup(new Name(name));
     }
 
     public static Sort sortLookup(String name) {
-	return (Sort)getSorts().lookup(new Name(name));
+	return getSorts().lookup(new Name(name));
     }
 
     public static Term parseTerm(String termstr, Services services) {
 	if (termstr.equals("")) return null;
-	
+
 	StringReader br = null;
-	try {	    
+	try {
 	    br   = new StringReader(termstr);
 	    KeYParserF parser = new KeYParserF(ParserMode.TERM,
 		    new KeYLexerF(br,
@@ -210,13 +218,13 @@ public class TacletForTests {
 	} finally {
 	    if (br != null) br.close();
 	}
-	
+
     }
 
     public static Term parseTerm(String termstr, NamespaceSet set) {
 	if (termstr.equals("")) return null;
 	StringReader br = null;
-	try {	    
+	try {
 	    br = new StringReader(termstr);
 	    KeYParserF parser = new KeYParserF(ParserMode.TERM,
 		    new KeYLexerF(br,
@@ -233,7 +241,7 @@ public class TacletForTests {
 	} finally {
 	    if (br != null) br.close();
 	}
-	
+
     }
 
     public static Term parseTerm(String termstr) {

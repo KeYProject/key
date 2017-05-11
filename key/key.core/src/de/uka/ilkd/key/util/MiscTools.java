@@ -40,6 +40,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -574,6 +575,31 @@ public final class MiscTools {
        else {
           return null;
        }
+    }
+
+    /**
+     * Returns the actual variable for a given one (this means it returns the renamed variable).
+     * @param node the Node where to look up the actual variable (result from renaming)
+     * @return The renamed variable
+     */
+    public static ProgramVariable findActualVariable(ProgramVariable originalVar, Node node) {
+        ProgramVariable actualVar = originalVar;
+        if (node != null) {          
+            outer:
+                do {
+                    if (node.getRenamingTable() != null) {
+                        for (RenamingTable rt : node.getRenamingTable()) {
+                            ProgramVariable renamedVar = (ProgramVariable) rt.getRenaming(actualVar);
+                            if (renamedVar != null || !node.getLocalProgVars().contains(actualVar)) {
+                                actualVar = renamedVar;
+                                break outer;
+                            }
+                        }
+                    }
+                    node = node.parent();
+                } while (node != null);
+        }
+        return actualVar;
     }
 
     //-------------------------------------------------------------------------

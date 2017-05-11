@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -167,7 +168,7 @@ public class ProofObligationVars {
 
     static void register(ProgramVariable pv,
                          Services services) {
-        Namespace progVarNames = services.getNamespaces().programVariables();
+        Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
         }

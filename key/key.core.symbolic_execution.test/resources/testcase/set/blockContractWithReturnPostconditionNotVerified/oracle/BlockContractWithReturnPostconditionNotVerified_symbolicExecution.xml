@@ -11,8 +11,8 @@ post returned = TRUE
 mod {}termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false">
                <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Validity">
                   <branchStatement name="if (x_3==2)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
-                     <statement name="returned=true;" pathCondition="true" pathConditionChanged="false">
-                        <statement name="result_0=-4711;" pathCondition="true" pathConditionChanged="false">
+                     <statement name="returned_1=true;" pathCondition="true" pathConditionChanged="false">
+                        <statement name="result_0_1=-4711;" pathCondition="true" pathConditionChanged="false">
                            <termination name="&lt;block contract end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="BLOCK_CONTRACT_NORMAL" branchVerified="false">
                            </termination>
                            <completedBlockEntry path="/0/0/0/0/0/0" conditionString="true"/>

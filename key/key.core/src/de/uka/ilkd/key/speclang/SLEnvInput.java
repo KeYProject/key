@@ -35,8 +35,10 @@ import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractEnvInput;
@@ -214,7 +216,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             }
 
             //contracts, loop invariants
-            final ImmutableList<IProgramMethod> pms 
+            final ImmutableList<ProgramMethod> pms
                 = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
             for(IProgramMethod pm : pms) {
                 //contracts
@@ -245,6 +247,21 @@ public final class SLEnvInput extends AbstractEnvInput {
                     for (BlockContract specification : blockContracts) {
                     	specRepos.addBlockContract(specification);
                     }
+                }
+
+                //merge point statements
+                final JavaASTCollector mpsCollector =
+                        new JavaASTCollector(pm.getBody(), MergePointStatement.class);
+                mpsCollector.start();
+                for (ProgramElement mps : mpsCollector.getNodes()) {
+                    final ImmutableSet<MergeContract> mergeContracts = //
+                            specExtractor.extractMergeContracts(pm,
+                                    (MergePointStatement) mps,
+                                    ((Contract) methodSpecs.iterator().next())
+                                            .getOrigVars().params);
+
+                    mergeContracts
+                            .forEach(mc -> specRepos.addMergeContract(mc));
                 }
 
                 final JavaASTCollector labeledCollector =

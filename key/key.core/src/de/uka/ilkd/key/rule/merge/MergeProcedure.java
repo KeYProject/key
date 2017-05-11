@@ -23,7 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElse;
+import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
@@ -44,7 +44,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
  * 
  * @author Dominic Scheurer
  * 
- * @see MergeIfThenElse
+ * @see MergeByIfThenElse
  * @see MergeIfThenElseAntecedent
  * @see MergeTotalWeakening
  * @see MergeWithSignLattice
@@ -61,7 +61,7 @@ public abstract class MergeProcedure {
                         .prepend(MergeTotalWeakening.instance())
                         .prepend(MergeWithPredicateAbstractionFactory.instance())
                         .prepend(MergeIfThenElseAntecedent.instance())
-                        .prepend(MergeIfThenElse.instance());
+                        .prepend(MergeByIfThenElse.instance());
     }
 
     /**

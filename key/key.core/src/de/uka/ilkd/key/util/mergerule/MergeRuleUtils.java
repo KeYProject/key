@@ -40,9 +40,10 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -54,9 +55,11 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -70,6 +73,7 @@ import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -77,6 +81,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.rule.merge.MergePartner;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
@@ -534,9 +539,11 @@ public class MergeRuleUtils {
 
         do {
             newName = services.getTermBuilder().newName(prefix);
-            result = new LocationVariable(new ProgramElementName(newName),
-                    sort);
-            services.getNamespaces().variables().add(result);
+            result = new LocationVariable(//
+                    new ProgramElementName(newName), sort);
+            Namespace<IProgramVariable> variables = //
+                    services.getNamespaces().programVariables();
+            variables.add(result);
         } while (newName.equals(prefix));
 
         return result;
@@ -601,8 +608,8 @@ public class MergeRuleUtils {
 
             LinkedList<Term> transfSubs = new LinkedList<Term>();
             for (Term sub : term.subs()) {
-                transfSubs
-                        .add(substConstantsByFreshVars(sub, replMap, services));
+                transfSubs.add(substConstantsByFreshVars(sub, restrictTo,
+                        replMap, services));
             }
 
             return services.getTermFactory().createTerm(term.op(),
@@ -717,8 +724,8 @@ public class MergeRuleUtils {
 
         int newCounter = 0;
         String branchUniqueName = base;
-        while (!isUniqueInGlobals(branchUniqueName.toString(),
-                intrNode.getGlobalProgVars())
+        Iterable<IProgramVariable> progVars = intrNode.getLocalProgVars();
+        while (!isUniqueInGlobals(branchUniqueName.toString(), progVars)
                 || (lookupVarInNS(branchUniqueName, services) != null
                         && !lookupVarInNS(branchUniqueName, services).sort()
                                 .equals(var.sort()))) {
@@ -745,7 +752,7 @@ public class MergeRuleUtils {
     public static Node getIntroducingNodeforLocVar(LocationVariable var,
             Node node) {
 
-        while (!node.root() && node.getGlobalProgVars().contains(var)) {
+        while (!node.root() && node.getLocalProgVars().contains(var)) {
             node = node.parent();
         }
 
@@ -764,7 +771,7 @@ public class MergeRuleUtils {
      *         there is no non-empty Java block.
      */
     public static JavaBlock getJavaBlockRecursive(Term term) {
-        if (!term.isContainsJavaBlockRecursive()) {
+        if (!term.containsJavaBlockRecursive()) {
             return JavaBlock.EMPTY_JAVABLOCK;
         }
 
@@ -1125,7 +1132,7 @@ public class MergeRuleUtils {
             if (!distCandidates.isEmpty()) {
                 // Just take the first, any one should be good enough, at least
                 // with the present knowledge
-                theOneDistinguishingTerm = distCandidates.get(0);
+                theOneDistinguishingTerm = t;
             }
         }
 
@@ -1168,17 +1175,21 @@ public class MergeRuleUtils {
      *            Parent of remaining join node.
      * @param mergePartner
      *            Partner goal to close.
+     * @param newNames
+     *            The set of new names (of Skolem constants) introduced in the
+     *            merge.
      */
     public static void closeMergePartnerGoal(Node mergeNodeParent,
             Goal mergePartner, PosInOccurrence pio,
             SymbolicExecutionState mergeState,
-            SymbolicExecutionState mergePartnerState, Term pc) {
+            SymbolicExecutionState mergePartnerState, Term pc,
+            Set<Name> newNames) {
 
         InitConfig initConfig = mergeNodeParent.proof().getInitConfig();
 
         CloseAfterMerge closeRule = CloseAfterMerge.INSTANCE;
         RuleApp app = closeRule.createApp(pio, mergePartner.node(),
-                mergeNodeParent, mergeState, mergePartnerState, pc);
+                mergeNodeParent, mergeState, mergePartnerState, pc, newNames);
 
         // Register rule if not done yet.
         // This avoids error messages of the form
@@ -1286,17 +1297,137 @@ public class MergeRuleUtils {
         ImmutableList<SymbolicExecutionState> result = ImmutableSLList.nil();
         for (MergePartner sequentInfo : sequentInfos) {
             final Node node = sequentInfo.getGoal().node();
-            final Services services = sequentInfo.getGoal().proof().getServices();
+            final Services services = sequentInfo.getGoal().proof()
+                    .getServices();
 
-            Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
-                    node, sequentInfo.getPio(), services);
+            Triple<Term, Term, Term> partnerSEState = sequentToSETriple(node,
+                    sequentInfo.getPio(), services);
 
-            result = result
-                    .prepend(new SymbolicExecutionState(partnerSEState.first,
-                            partnerSEState.second, node));
+            result = result.prepend(new SymbolicExecutionState(
+                    partnerSEState.first, partnerSEState.second, node));
         }
 
         return result;
+    }
+
+    /**
+     * Due to the introduction of local namespaces, we run into trouble when
+     * applying state merging in the presence of locally introduced symbols.
+     * These include program variables as well as Skolem constants. This method
+     * finds all name clashes and renames the corresponding entities in the
+     * {@link SymbolicExecutionState} state.
+     * 
+     * @param mergeState
+     *            The {@link SymbolicExecutionState} in which the partners
+     *            should be merged.
+     * @param mergePartnerState
+     *            The {@link SymbolicExecutionState} of the second merge
+     *            partner.
+     * @param services
+     *            The {@link Services} object.
+     * 
+     * @return The renamed {@link SymbolicExecutionState} of the second merge
+     *         partner.
+     */
+    public static Pair<SymbolicExecutionState, SymbolicExecutionState> handleNameClashes(
+            SymbolicExecutionState mergeState,
+            SymbolicExecutionState mergePartnerState, Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final Proof proof = services.getProof();
+
+        // This goal
+        final Collection<Operator> thisGoalSymbols = new ArrayList<>();
+        final Goal thisGoal = proof.getGoal(mergeState.getCorrespondingNode());
+        final NamespaceSet thisGoalNamespaces = thisGoal.getLocalNamespaces();
+        thisGoalSymbols
+                .addAll(thisGoalNamespaces.programVariables().allElements());
+        thisGoalSymbols.addAll(thisGoalNamespaces.functions().allElements());
+        final List<Name> thisGoalNames = thisGoalSymbols.parallelStream()
+                .map(pv -> pv.name()).collect(Collectors.toList());
+
+        // Partner goal
+        final Collection<Operator> partnerGoalSymbols = new ArrayList<>();
+        final Goal partnerGoal = proof
+                .getGoal(mergePartnerState.getCorrespondingNode());
+        final NamespaceSet partnerGoalNamespaces = partnerGoal
+                .getLocalNamespaces();
+        partnerGoalSymbols
+                .addAll(partnerGoalNamespaces.programVariables().allElements());
+        partnerGoalSymbols
+                .addAll(partnerGoalNamespaces.functions().allElements());
+        final List<Name> partnerGoalNames = partnerGoalSymbols.parallelStream()
+                .map(pv -> pv.name()).collect(Collectors.toList());
+
+        // Construct intersection: Common names
+        thisGoalNames.retainAll(partnerGoalNames);
+
+        if (!thisGoalNames.isEmpty()) {
+            // There are conflicts... So let's do something
+
+            final List<Operator> problematicOps = partnerGoalSymbols
+                    .parallelStream()
+                    .filter(pv -> thisGoalNames.contains(pv.name()))
+                    .filter(pv -> !thisGoalSymbols.contains(pv))
+                    .collect(Collectors.toList());
+
+            // Loop over all problematic operators and rename them in the
+            // partner state.
+            for (Operator partnerStateOp : problematicOps) {
+                final Operator mergeStateOp = thisGoalSymbols.parallelStream()
+                        .filter(s -> s.name().equals(partnerStateOp.name()))
+                        .collect(Collectors.toList()).get(0);
+                
+                Operator newOp1;
+                Operator newOp2;
+                if (partnerStateOp instanceof Function) {
+                    newOp1 = ((Function) mergeStateOp)
+                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                                    thisGoal.getLocalNamespaces())));
+                    thisGoalNamespaces.functions().add((Function) newOp1);
+                    thisGoalNamespaces.flushToParent();
+
+                    newOp2 = ((Function) partnerStateOp)
+                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                                    thisGoal.getLocalNamespaces())));
+                    thisGoalNamespaces.functions().add((Function) newOp2);
+                    thisGoalNamespaces.flushToParent();
+                } else if (partnerStateOp instanceof LocationVariable) {
+                    newOp1 = ((LocationVariable) mergeStateOp)
+                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                                    thisGoal.getLocalNamespaces())));
+                    thisGoalNamespaces.programVariables()
+                            .add((LocationVariable) newOp1);
+                    thisGoalNamespaces.flushToParent();
+
+                    newOp2 = ((LocationVariable) partnerStateOp)
+                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                                    thisGoal.getLocalNamespaces())));
+                    thisGoalNamespaces.programVariables()
+                            .add((LocationVariable) newOp2);
+                    thisGoalNamespaces.flushToParent();
+                } else {
+                    throw new RuntimeException(
+                            "MergeRule: Unexpected type of Operator involved in name clash: "
+                                    + partnerStateOp.getClass().getSimpleName());
+                }
+                
+                mergeState = new SymbolicExecutionState(
+                        OpReplacer.replace(mergeStateOp, newOp1,
+                                mergeState.getSymbolicState(), tb.tf()),
+                        OpReplacer.replace(mergeStateOp, newOp1,
+                                mergeState.getPathCondition(), tb.tf()),
+                        mergeState.getCorrespondingNode());
+
+                mergePartnerState = new SymbolicExecutionState(
+                        OpReplacer.replace(partnerStateOp, newOp2,
+                                mergePartnerState.getSymbolicState(), tb.tf()),
+                        OpReplacer.replace(partnerStateOp, newOp2,
+                                mergePartnerState.getPathCondition(), tb.tf()),
+                        mergePartnerState.getCorrespondingNode());
+            }
+        }
+
+        return new Pair<>(mergeState, mergePartnerState);
     }
 
     /**
@@ -1379,17 +1510,19 @@ public class MergeRuleUtils {
      *
      * @param input
      *            The predicate to parse (contains exactly one placeholder).
+     * @param localNamespaces
+     *            The local {@link NamespaceSet}.
      * @return The parsed {@link AbstractionPredicate}.
      * @throws ParserException
      *             If there is a syntax error.
      */
     public static AbstractionPredicate parsePredicate(String input,
             ArrayList<Pair<Sort, Name>> registeredPlaceholders,
-            Services services) throws ParserException {
+            NamespaceSet localNamespaces, Services services)
+            throws ParserException {
         DefaultTermParser parser = new DefaultTermParser();
         Term formula = parser.parse(new StringReader(input), Sort.FORMULA,
-                services, services.getNamespaces(),
-                services.getProof().abbreviations());
+                services, localNamespaces, services.getProof().abbreviations());
 
         ImmutableSet<LocationVariable> containedLocVars = MergeRuleUtils
                 .getLocationVariables(formula, services);
@@ -1397,8 +1530,9 @@ public class MergeRuleUtils {
         int nrContainedPlaceholders = 0;
         LocationVariable usedPlaceholder = null;
         for (Pair<Sort, Name> placeholder : registeredPlaceholders) {
-            LocationVariable placeholderVariable = (LocationVariable) services
-                    .getNamespaces().variables().lookup(placeholder.second);
+            LocationVariable placeholderVariable = (LocationVariable) (services
+                    .getNamespaces().programVariables()
+                    .lookup(placeholder.second));
 
             if (containedLocVars.contains(placeholderVariable)) {
                 nrContainedPlaceholders++;
@@ -1595,7 +1729,8 @@ public class MergeRuleUtils {
      * @param sideProofName
      *            name for the generated side proof.
      * @param timeout
-     *            A timeout for the proof in milliseconds.
+     *            A timeout for the proof in milliseconds. Set to -1 for no
+     *            timeout.
      * @return The proof result.
      */
     private static ApplyStrategyInfo tryToProve(Sequent toProve,
@@ -1603,8 +1738,7 @@ public class MergeRuleUtils {
             int timeout) {
         final ProofEnvironment sideProofEnv = SideProofUtil
                 .cloneProofEnvironmentWithOwnOneStepSimplifier(
-                        services.getProof(), // Parent Proof
-                        new Choice[] {}); // useSimplifyTermProfile
+                        services.getProof());
 
         ApplyStrategyInfo proofResult = null;
         try {
@@ -1613,13 +1747,42 @@ public class MergeRuleUtils {
                                   // environment
                     toProve, sideProofName); // Proof name
 
-            proofStarter.setTimeout(timeout * 1000000);
+            proofStarter.setTimeout(timeout);
+            proofStarter.setStrategyProperties(setupStrategy());
 
             proofResult = proofStarter.start();
         } catch (ProofInputException e) {
         }
 
         return proofResult;
+    }
+
+    /**
+     * creates the strategy configuration to be used for the side proof
+     * 
+     * @return the StrategyProperties
+     */
+    private static StrategyProperties setupStrategy() {
+        final StrategyProperties sp = new StrategyProperties();
+        sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY,
+                StrategyProperties.AUTO_INDUCTION_OFF);
+        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
+                StrategyProperties.QUERY_OFF);
+        sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
+                StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+        sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
+                StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+        sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
+                StrategyProperties.SPLITTING_NORMAL);
+        sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
+                StrategyProperties.DEP_OFF);
+        sp.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
+                StrategyProperties.CLASS_AXIOM_OFF);
+        sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
+                StrategyProperties.METHOD_NONE);
+        sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
+                StrategyProperties.LOOP_NONE);
+        return sp;
     }
 
     /**
@@ -1639,9 +1802,10 @@ public class MergeRuleUtils {
     private static boolean isProvable(Term toProve, Services services,
             boolean doSplit, int timeout) {
 
-        ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit,
-                "Provability check", timeout);
-        boolean result = proofResult.getProof().closed();
+        final ApplyStrategyInfo proofResult = tryToProve(toProve, services,
+                doSplit, "Provability check", timeout);
+        final Proof proof = proofResult.getProof();
+        boolean result = proof.closed();
 
         return result;
 
@@ -1755,8 +1919,8 @@ public class MergeRuleUtils {
      * @see VariableNamer#isUniqueInGlobals(String, Globals)
      */
     private static boolean isUniqueInGlobals(String name,
-            ImmutableSet<ProgramVariable> globals) {
-        for (final ProgramVariable n : globals) {
+            Iterable<IProgramVariable> globals) {
+        for (final IProgramVariable n : globals) {
             if (n.toString().equals(name)) {
                 return false;
             }

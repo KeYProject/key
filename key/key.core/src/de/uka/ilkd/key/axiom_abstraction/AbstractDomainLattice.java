@@ -28,7 +28,7 @@ public abstract class AbstractDomainLattice implements
      * Time in milliseconds after which a proof attempt of a defining axiom
      * times out.
      */
-    private static final int AXIOM_PROVE_TIMEOUT_MS = 1000;
+    private static final int AXIOM_PROVE_TIMEOUT_MS = 10000;
 
     /**
      * Abstracts from a given element of the concrete domain by returning a

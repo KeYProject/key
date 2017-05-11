@@ -50,8 +50,8 @@ public abstract class SLResolverManager {
     private final boolean useLocalVarsAsImplicitReceivers;
     private final TermBuilder tb;    
     
-    private ImmutableList<Namespace> /*ParsableVariable*/
-        localVariablesNamespaces = ImmutableSLList.<Namespace>nil();
+    private ImmutableList<Namespace<?>> /*ParsableVariable*/
+        localVariablesNamespaces = ImmutableSLList.<Namespace<?>>nil();
 
     private Map<ParsableVariable,KeYJavaType> kjts 
 	= new LinkedHashMap<ParsableVariable,KeYJavaType>();
@@ -100,7 +100,7 @@ public abstract class SLResolverManager {
      */
     private SLExpression resolveLocal(String name) {
         Name n = new Name(name);
-        for(Namespace ns : localVariablesNamespaces) {
+        for(Namespace<?> ns : localVariablesNamespaces) {
             ParsableVariable localVar = (ParsableVariable) ns.lookup(n);
             if(localVar != null) {
                 Term varTerm = tb.var(localVar);
@@ -119,7 +119,7 @@ public abstract class SLResolverManager {
     private SLExpression resolveImplicit(String name, SLParameters parameters) 
             throws SLTranslationException {
         if(useLocalVarsAsImplicitReceivers) {
-            for(Namespace ns : localVariablesNamespaces) {
+            for(Namespace<?> ns : localVariablesNamespaces) {
                 for(Named n : ns.elements()) {
                     ParsableVariable localVar = (ParsableVariable) n;
                     SLExpression receiver 
@@ -242,6 +242,7 @@ public abstract class SLResolverManager {
      * Pushes a new, empty namespace onto the stack.
      */
     public void pushLocalVariablesNamespace() {
+        // FIXME: This breaks the generics of namespaces.
         Namespace ns = new Namespace();
         localVariablesNamespaces = localVariablesNamespaces.prepend(ns);
     }
@@ -252,7 +253,8 @@ public abstract class SLResolverManager {
      */
     public void putIntoTopLocalVariablesNamespace(ParsableVariable pv,
 	    					  KeYJavaType kjt) {
-        localVariablesNamespaces.head().addSafely(pv);
+        // FIXME: This breaks the generics of Namespaces.
+        ((Namespace)localVariablesNamespaces.head()).addSafely(pv);
         kjts.put(pv, kjt);
     }
     

@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -51,13 +52,13 @@ import de.uka.ilkd.key.rule.inst.TermInstantiation;
  * Replaces program variables.
  */
 public final class ProgVarReplacer {
-    
+
     /**
      * map specifying the replacements to be done
      */
     private final Map<ProgramVariable, ProgramVariable> map;
-    
-    
+
+
     /**
      * The services object
      */
@@ -105,18 +106,18 @@ public final class ProgVarReplacer {
     /**
      * replaces in a set
      */
-    public ImmutableSet<ProgramVariable> replace(ImmutableSet<ProgramVariable> vars) {
-    	ImmutableSet<ProgramVariable> result = vars;
+    public ImmutableSet<IProgramVariable> replace(ImmutableSet<IProgramVariable> vars) {
+        ImmutableSet<IProgramVariable> result = vars;
 
-    	for (final ProgramVariable var : vars) {
-	    ProgramVariable newVar = map.get(var);
-	    if(newVar != null) {
-	    	result = result.remove(var);
-	    	result = result.add(newVar);
-	    }
-	}
+        for (final IProgramVariable var : vars) {
+            IProgramVariable newVar = map.get(var);
+            if(newVar != null) {
+                result = result.remove(var);
+                result = result.add(newVar);
+            }
+        }
 
-	return result;
+        return result;
     }
 
 
@@ -248,8 +249,8 @@ public final class ProgVarReplacer {
         result.setFormulaList(s.asList());
 
         final Iterator<SequentFormula> it = s.iterator();
-        
-        for (int formulaNumber = 0; it.hasNext(); formulaNumber++) {            
+
+        for (int formulaNumber = 0; it.hasNext(); formulaNumber++) {
             final SequentFormula oldcf = it.next();
             final SequentFormula newcf = replace(oldcf);
 
@@ -275,8 +276,8 @@ public final class ProgVarReplacer {
 	}
         return result;
     }
-    
-    
+
+
     private Term replaceProgramVariable(Term t) {
         final ProgramVariable pv = (ProgramVariable) t.op();
         Object o = map.get(pv);
@@ -287,15 +288,15 @@ public final class ProgVarReplacer {
         }
         return t;
     }
-    
-    
+
+
     private Term standardReplace(Term t) {
         Term result = t;
-        
+
         final Term newSubTerms[] = new Term[t.arity()];
 
         boolean changedSubTerm = false;
-        
+
         for(int i = 0, ar = t.arity(); i < ar; i++) {
             final Term subTerm = t.sub(i);
             newSubTerms[i] = replace(subTerm);
@@ -314,26 +315,26 @@ public final class ProgVarReplacer {
             }
         }
 
-        if(changedSubTerm || newJb != jb) {                               
+        if (changedSubTerm || newJb != jb) {
             result = services.getTermFactory().createTerm(t.op(),
                     newSubTerms,
                     t.boundVars(),
                     newJb, t.getLabels());
         }
         return result;
-    }    
-    
-    
+    }
+
+
     /**
      * replaces in a term
      */
     public Term replace(Term t) {
         final Operator op = t.op();
         if (op instanceof ProgramVariable) {
-            return replaceProgramVariable(t);       
+            return replaceProgramVariable(t);
         } else {
             return standardReplace(t);
-        }    
+        }
     }
 
 
@@ -341,9 +342,9 @@ public final class ProgVarReplacer {
      * replaces in a statement
      */
     public ProgramElement replace(ProgramElement pe) {
-        ProgVarReplaceVisitor pvrv = new ProgVarReplaceVisitor(pe, 
-                                                               map, 
-                                                               false, 
+        ProgVarReplaceVisitor pvrv = new ProgVarReplaceVisitor(pe,
+                                                               map,
+                                                               false,
                                                                services);
 	pvrv.start();
 	return pvrv.result();
