@@ -163,14 +163,6 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
       ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
       String lks = settings.getLocalKeYSettings();
       ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(lks);
-      if (lks != null) {
-          System.out.println("Have local KeY settings.");
-          System.out.print("OSS: ");
-          final Properties props = new Properties();
-          props.load(new StringReader(gks));
-          final String ossLocallyActivated = props.getProperty(GeneralSettings.ONE_STEP_SIMPLIFICATION_KEY);
-          System.out.println(ossLocallyActivated);
-      }
       
       // (DS) The following is rather a hack; before, the OSS settings in a
       // .key file were ignored, which caused nondeterministic usage of OSS in
