@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.RuleSet;
 
@@ -105,5 +106,29 @@ public final class DefaultTermParser {
             throw new ParserException(tse.getMessage(), null);
         }
     }
+    
+     /**
+     * The method reads the input and parses a sequent with the
+     * specified namespaces.
+     * @return the paresed String as Sequent Object
+     * @throws ParserException The method throws a ParserException, if
+     * the input could not be parsed correctly
+     */
+    public Sequent parseSeq(Reader in, Services services, NamespaceSet nss, AbbrevMap scm) 
+            throws ParserException {
+        KeYParserF p = null;
+        try {
+            p = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""), new Recoder2KeY(services, nss), services, nss, scm);
+            final Sequent seq = p.seq();
+                return seq;
+        } catch (RecognitionException re) {
+            // problemParser cannot be null since exception is thrown during parsing.
+            String message = p.getErrorMessage(re);
+            throw new ParserException(message, new Location(re));
+        } catch (IOException tse) {
+            throw new ParserException(tse.getMessage(), null);
+        }
+    }
+
     
 }

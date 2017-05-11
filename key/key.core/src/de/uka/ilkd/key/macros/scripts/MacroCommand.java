@@ -7,48 +7,64 @@ import java.util.ServiceLoader;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
 
-public class MacroCommand extends AbstractCommand {
+public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
+
+    public MacroCommand() {
+        super(Parameters.class);
+    }
+
+    static class Parameters {
+        @Option("#2") public String macroName;
+    }
 
     private static Map<String, ProofMacro> macroMap = loadMacroMap();
 
-    @Override
-    public String getName() {
+    @Override public Parameters evaluateArguments(EngineState state,
+            Map<String, String> arguments) throws Exception {
+        return state.getValueInjector().inject(new Parameters(), arguments);
+    }
+
+    @Override public String getName() {
         return "macro";
     }
 
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
-
-        String macroName = args.get("#2");
-
+    @Override public void execute(AbstractUserInterfaceControl uiControl,
+            Parameters args, EngineState state)
+            throws ScriptException, InterruptedException {
         //
         // look up macro name
-        ProofMacro macro = macroMap.get(macroName);
-        if(macro == null) {
-            throw new ScriptException("Macro '" + macroName + "' not found");
+        ProofMacro macro = macroMap.get(args.macroName);
+        if (macro == null) {
+            throw new ScriptException(
+                    "Macro '" + args.macroName + "' not found");
         }
 
-        Goal g = getFirstOpenGoal(proof, state);
-        ProofMacroFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
+        Goal g = state.getFirstOpenGoal();
+        ProofMacroFinishedInfo info = ProofMacroFinishedInfo
+                .getDefaultInfo(macro, state.getProof());
         try {
-            uiControl.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
+            uiControl.taskStarted(
+                    new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro,
+                            macro.getName(), 0));
             synchronized (macro) {
                 info = macro.applyTo(uiControl, g.node(), null, uiControl);
             }
-        } catch (Exception e) {
-            throw new ScriptException("Macro '" + macroName + "' raised an exception: " + e.getMessage(), e);
-        } finally {
+        }
+        catch (Exception e) {
+            throw new ScriptException(
+                    "Macro '" + args.macroName + "' raised an exception: " + e
+                            .getMessage(), e);
+        }
+        finally {
             uiControl.taskFinished(info);
         }
 
     }
-
 
     private static Map<String, ProofMacro> loadMacroMap() {
         ServiceLoader<ProofMacro> loader = ServiceLoader.load(ProofMacro.class);
@@ -56,7 +72,7 @@ public class MacroCommand extends AbstractCommand {
 
         for (ProofMacro proofMacro : loader) {
             String commandName = proofMacro.getScriptCommandName();
-            if(commandName != null) {
+            if (commandName != null) {
                 result.put(commandName, proofMacro);
             }
         }

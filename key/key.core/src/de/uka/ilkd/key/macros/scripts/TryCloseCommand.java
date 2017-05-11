@@ -2,50 +2,54 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.TryCloseMacro;
+import de.uka.ilkd.key.macros.scripts.meta.Option;
+import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
 
-public class TryCloseCommand extends AbstractCommand {
+public class TryCloseCommand
+        extends AbstractCommand<TryCloseCommand.TryCloseArguments> {
+    static class TryCloseArguments {
+        @Option("steps") public Integer steps;
+        @Option("#2") public String branch;
+    }
 
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
+    public TryCloseCommand() {
+        super(TryCloseArguments.class);
+    }
 
-        String stepsStr = args.get("steps");
-        TryCloseMacro macro;
-        if(stepsStr != null) {
-            try {
-                int steps = Integer.parseInt(stepsStr);
-                macro = new TryCloseMacro(steps);
-            } catch (NumberFormatException e) {
-                throw new ScriptException("Not a number: " + stepsStr, e);
-            }
-        } else {
-            macro = new TryCloseMacro();
-        }
+    @Override public TryCloseArguments evaluateArguments(EngineState state,
+            Map<String, String> arguments) throws Exception {
+        return ValueInjector.injection(new TryCloseArguments(), arguments);
+    }
 
-        boolean branch = "branch".equals(args.get("#2"));
+    @Override public void execute(TryCloseArguments args)
+            throws ScriptException, InterruptedException {
 
+        TryCloseMacro macro = args.steps == null ?
+                new TryCloseMacro() :
+                new TryCloseMacro(args.steps);
+
+        boolean branch = "branch".equals(args.branch);
         Node target;
-        if(branch) {
-            target = getFirstOpenGoal(proof, state).node();
-        } else {
-            target = proof.root();
+        if (branch) {
+            target = state.getFirstOpenGoal().node();
+        }
+        else {
+            target = state.getProof().root();
         }
 
         try {
-            macro.applyTo(uiControl, target, null, (ProverTaskListener)uiControl);
-        } catch (Exception e) {
-            throw new ScriptException("tryclose caused an exception: " + e.getMessage(), e);
+            macro.applyTo(uiControl, target, null, uiControl);
         }
+        catch (Exception e) {
+            throw new ScriptException(
+                    "tryclose caused an exception: " + e.getMessage(), e);
+        }
+
     }
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return "tryclose";
     }
-
 }
