@@ -37,15 +37,20 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
             search = search.replaceAll("[^\\s\\u00a0\\w]", "\\\\$0");
         }
 
+        
+        
         Pattern p = null;
         try {
             String s = search.replaceAll("[\\s\\u00a0]+", "\\\\s+");
             p = Pattern.compile(s, searchFlag);
-        } catch (PatternSyntaxException pse) {
-            pse.printStackTrace();
+        } 
+        // This means the search String is not a valid regex (yet!). 
+        // Probably because the user is still typing.
+        catch (PatternSyntaxException pse) {
+            return null;
         } catch (IllegalArgumentException iae) {
             iae.printStackTrace();
-        }
+        } 
         return p;
     }
     

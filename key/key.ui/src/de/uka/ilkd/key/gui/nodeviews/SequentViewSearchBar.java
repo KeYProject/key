@@ -183,8 +183,11 @@ public class SequentViewSearchBar extends SearchBar {
         }
 
         resultIteratorPos = 0;
+        Pattern p;
         
-        Pattern p = SearchSequentPrintFilter.createPattern(search, regExpCheckBox.isSelected());
+        p = SearchSequentPrintFilter.createPattern(search, regExpCheckBox.isSelected());
+
+        if (p == null) return false;
 
         Matcher m = p.matcher(sequentView.getText().replace("\u00A0", "\u0020"));
 
