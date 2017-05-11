@@ -62,6 +62,7 @@ public class IntegerSimplificationMacro extends AbstractPropositionalExpansionMa
             //"castedGetAny",
             "div_literals",
             "double_unary_minus_literal",
+            "equal_literals",
             "i_minus_i_is_zero",
             "inChar",
             "inByte",
