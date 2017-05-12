@@ -26,3 +26,6 @@ smt-solvers
 
 *.serialized
 **/testresults/**
+
+# *.orig files are created by git during merges
+*.orig
