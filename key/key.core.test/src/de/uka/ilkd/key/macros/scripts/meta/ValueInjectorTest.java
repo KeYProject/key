@@ -14,12 +14,6 @@ import static org.junit.Assert.assertEquals;
  * @version 1 (02.05.17)
  */
 public class ValueInjectorTest {
-    public static class PP {
-        @Option("b") boolean b;
-        @Option(value = "i", required = true) int i;
-        @Option(value = "s", required = false) String s;
-    }
-
     @Test public void testInjectionSimple() throws Exception {
         PP pp = new PP();
         Map<String, String> args = new HashMap<>();
@@ -27,7 +21,7 @@ public class ValueInjectorTest {
         args.put("i", "42");
         args.put("s", "blubb");
 
-        ValueInjector.injection(pp, args);
+        ValueInjector.injection(null, pp, args);
 
         Assert.assertEquals(true, pp.b);
         Assert.assertEquals(42, pp.i);
@@ -43,11 +37,11 @@ public class ValueInjectorTest {
         args.put("b", "true");
         args.put("s", "blubb");
 
-        ValueInjector.injection(pp, args);
+        ValueInjector.injection(null, pp, args);
     }
 
     @Test public void testInferScriptArguments() throws NoSuchFieldException {
-        List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(PP.class);
+        List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(PP.class, null);
         assertEquals(3, meta.size());
 
         {
@@ -74,5 +68,14 @@ public class ValueInjectorTest {
             assertEquals(false, i.isRequired());
         }
 
+    }
+
+    public static class PP {
+        @Option("b")
+        boolean b;
+        @Option(value = "i", required = true)
+        int i;
+        @Option(value = "s", required = false)
+        String s;
     }
 }

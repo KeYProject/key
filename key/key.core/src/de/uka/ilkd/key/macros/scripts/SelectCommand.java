@@ -1,9 +1,5 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Map;
-
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -13,18 +9,18 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
-public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
-    public class Parameters {
-        @Option("formula") public Term formula;
-    }
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Map;
 
+public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public SelectCommand() {
         super(Parameters.class);
     }
 
     @Override public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
-        return state.getValueInjector().inject(new Parameters(), arguments);
+        return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override public void execute(Parameters args)
@@ -98,6 +94,11 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     @Override public String getName() {
         return "select";
+    }
+
+    public class Parameters {
+        @Option("formula")
+        public Term formula;
     }
 
 }

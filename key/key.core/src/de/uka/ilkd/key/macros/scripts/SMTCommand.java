@@ -13,19 +13,25 @@ import java.util.*;
 
 public class SMTCommand
         extends AbstractCommand<SMTCommand.SMTCommandArguments> {
-    static class SMTCommandArguments {
-        @Option("solver") public  String solver = "Z3";
-    }
+    private static final Map<String, SolverType> SOLVER_MAP = computeSolverMap();
 
     public SMTCommand() {
         super(SMTCommandArguments.class);
     }
 
-    private static final Map<String, SolverType> SOLVER_MAP = computeSolverMap();
+    private static Map<String, SolverType> computeSolverMap() {
+        Map<String, SolverType> result = new HashMap<String, SolverType>();
+
+        for (SolverType type : SolverType.ALL_SOLVERS) {
+            result.put(type.getName(), type);
+        }
+
+        return Collections.unmodifiableMap(result);
+    }
 
     @Override public SMTCommandArguments evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
-        return ValueInjector.injection(new SMTCommandArguments(), arguments);
+        return ValueInjector.injection(this, new SMTCommandArguments(), arguments);
     }
 
     @Override public String getName() {
@@ -56,16 +62,6 @@ public class SMTCommand
         }
     }
 
-    private static Map<String, SolverType> computeSolverMap() {
-        Map<String, SolverType> result = new HashMap<String, SolverType>();
-
-        for (SolverType type : SolverType.ALL_SOLVERS) {
-            result.put(type.getName(), type);
-        }
-
-        return Collections.unmodifiableMap(result);
-    }
-
     private SolverTypeCollection computeSolvers(String value) {
         String[] parts = value.split(" *, *");
         List<SolverType> types = new ArrayList<SolverType>();
@@ -76,6 +72,11 @@ public class SMTCommand
             }
         }
         return new SolverTypeCollection(value, 1, types);
+    }
+
+    static class SMTCommandArguments {
+        @Option("solver")
+        public String solver = "Z3";
     }
 
 }

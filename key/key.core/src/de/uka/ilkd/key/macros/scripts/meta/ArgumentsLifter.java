@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.macros.scripts.meta;
 
+import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Alexander Weigl
@@ -16,7 +16,7 @@ public final class ArgumentsLifter {
     private ArgumentsLifter() {
     }
 
-    public static List<ProofScriptArgument> inferScriptArguments(Class clazz) {
+    public static List<ProofScriptArgument> inferScriptArguments(Class clazz, ProofScriptCommand command) {
         List<ProofScriptArgument> args = new ArrayList<>();
         for (Field field : clazz.getDeclaredFields()) {
             Option option = field.getDeclaredAnnotation(Option.class);
@@ -37,6 +37,7 @@ public final class ArgumentsLifter {
             }
         }
         //
+        args.forEach(a -> a.setCommand(command));
         return args;
     }
 

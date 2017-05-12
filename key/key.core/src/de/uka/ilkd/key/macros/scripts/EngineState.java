@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -24,10 +23,10 @@ import java.util.*;
  * @version 1 (28.03.17)
  */
 public class EngineState {
+    private final static DefaultTermParser PARSER = new DefaultTermParser();
     private final Map<String, Object> arbitraryVariables = new HashMap<>();
     private final Proof proof;
     private AbbrevMap abbrevMap = new AbbrevMap();
-    private final static DefaultTermParser PARSER = new DefaultTermParser();
     /**
      * nullable
      */
@@ -40,6 +39,15 @@ public class EngineState {
         this.proof = proof;
         valueInjector.addConverter(Term.class, (String s) -> toTerm(s, null));
         valueInjector.addConverter(Sort.class, this::toSort);
+    }
+
+    protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
+        for (Goal goal : openGoals) {
+            if (goal.node() == node) {
+                return goal;
+            }
+        }
+        return null;
     }
 
     public void setGoal(Goal g) {
@@ -62,41 +70,40 @@ public class EngineState {
         }
 
         Goal g;
-        Deque<Node> choices = new LinkedList<>();
+        Deque<Node> choices = new LinkedList<Node>();
 
         while (node != null) {
             assert !node.isClosed();
             int childCount = node.childrenCount();
 
             switch (childCount) {
-            case 0:
-                g = getGoal(proof.openGoals(), node);
-                if (g.isAutomatic()) {
-                    return g;
-                }
-                node = choices.pollLast();
-                break;
+                case 0:
+                    g = getGoal(proof.openGoals(), node);
+                    if (g.isAutomatic()) {
+                        return g;
+                    }
+                    node = choices.pollLast();
+                    break;
 
-            case 1:
-                node = node.child(0);
-                break;
+                case 1:
+                    node = node.child(0);
+                    break;
 
-            default:
-                Node next = null;
-                for (int i = 0; i < childCount; i++) {
-                    Node child = node.child(i);
-                    if (!child.isClosed()) {
-                        if (next == null) {
-                            next = child;
-                        }
-                        else {
-                            choices.add(child);
+                default:
+                    Node next = null;
+                    for (int i = 0; i < childCount; i++) {
+                        Node child = node.child(i);
+                        if (!child.isClosed()) {
+                            if (next == null) {
+                                next = child;
+                            } else {
+                                choices.add(child);
+                            }
                         }
                     }
-                }
-                assert next != null;
-                node = next;
-                break;
+                    assert next != null;
+                    node = next;
+                    break;
             }
         }
         assert false : "There must be an open goal at this point";
@@ -108,16 +115,17 @@ public class EngineState {
         StringReader reader = new StringReader(string);
         Services services = proof.getServices();
         Term formula = PARSER
-                .parse(reader, sort, services, services.getNamespaces(),
+                .parse(reader, sort, services, getFirstOpenGoal().getLocalNamespaces(),
                         abbrevMap);
         return formula;
     }
 
     public Sort toSort(String sortName)
             throws ParserException, ScriptException {
-        Services services = proof.getServices();
-        Sort sort = (Sort) services.getNamespaces().sorts().lookup(sortName);
-        return sort;
+        return (getFirstOpenGoal() == null
+                ? getProof().getServices().getNamespaces()
+                : getFirstOpenGoal().getLocalNamespaces())
+                .sorts().lookup(sortName);
     }
 
     public Sequent toSequent(String sequent)
@@ -125,32 +133,15 @@ public class EngineState {
         StringReader reader = new StringReader(sequent);
         Services services = proof.getServices();
 
-        NamespaceSet nss = getFirstOpenGoal() == null ?
-                services.getNamespaces() :
-                getFirstOpenGoal().getLocalNamespaces();
-
-        Sequent seq = PARSER
-                .parseSeq(reader, services, nss, getAbbreviations());
-        //Sequent seq = null;
+        Sequent seq = PARSER.parseSeq(reader, services,
+                getFirstOpenGoal().getLocalNamespaces(), getAbbreviations());
         return seq;
-        //Term formula = PARSER.parse(reader, sort, services, nss, abbrMap);
-        //return formula;
-    }
-
-    protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
-        for (Goal goal : openGoals) {
-            if (goal.node() == node) {
-                return goal;
-            }
-        }
-        return null;
     }
 
     public int getMaxAutomaticSteps() {
         if (proof != null) {
             return proof.getSettings().getStrategySettings().getMaxSteps();
-        }
-        else {
+        } else {
             return ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
                     .getMaxSteps();
         }
@@ -163,20 +154,20 @@ public class EngineState {
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(steps);
     }
 
-    public void setObserver(Observer observer) {
-        this.observer = observer;
-    }
-
     public Observer getObserver() {
         return observer;
     }
 
-    public void setBaseFileName(File baseFileName) {
-        this.baseFileName = baseFileName;
+    public void setObserver(Observer observer) {
+        this.observer = observer;
     }
 
     public File getBaseFileName() {
         return baseFileName;
+    }
+
+    public void setBaseFileName(File baseFileName) {
+        this.baseFileName = baseFileName;
     }
 
     public ValueInjector getValueInjector() {
@@ -190,4 +181,5 @@ public class EngineState {
     public void setGoal(Node node) {
         setGoal(getGoal(proof.openGoals(), node));
     }
+
 }

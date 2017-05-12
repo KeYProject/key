@@ -1,26 +1,21 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.util.Map;
-
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Node;
 
+import java.util.Map;
+
 public class TryCloseCommand
         extends AbstractCommand<TryCloseCommand.TryCloseArguments> {
-    static class TryCloseArguments {
-        @Option("steps") public Integer steps;
-        @Option("#2") public String branch;
-    }
-
     public TryCloseCommand() {
         super(TryCloseArguments.class);
     }
 
     @Override public TryCloseArguments evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
-        return ValueInjector.injection(new TryCloseArguments(), arguments);
+        return ValueInjector.injection(this, new TryCloseArguments(), arguments);
     }
 
     @Override public void execute(TryCloseArguments args)
@@ -51,5 +46,12 @@ public class TryCloseCommand
 
     @Override public String getName() {
         return "tryclose";
+    }
+
+    public static class TryCloseArguments {
+        @Option(value = "steps", required = false)
+        public Integer steps;
+        @Option(value = "#2", required = false)
+        public String branch;
     }
 }

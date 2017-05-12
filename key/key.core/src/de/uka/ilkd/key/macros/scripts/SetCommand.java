@@ -7,24 +7,13 @@ import java.util.Properties;
 
 public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
 
-    static class Parameters {
-        @Option("key") public String key;
-        @Option("value") public String value;
-
-        public Properties getProperties() {
-            Properties p = new Properties();
-            p.setProperty(key, value);
-            return p;
-        }
-    }
-
     public SetCommand() {
         super(Parameters.class);
     }
 
     @Override public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
-        return state.getValueInjector().inject(new Parameters(), arguments);
+        return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override public void execute(Parameters args)
@@ -34,5 +23,18 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
 
     @Override public String getName() {
         return "set";
+    }
+
+    static class Parameters {
+        @Option("key")
+        public String key;
+        @Option("value")
+        public String value;
+
+        public Properties getProperties() {
+            Properties p = new Properties();
+            p.setProperty(key, value);
+            return p;
+        }
     }
 }

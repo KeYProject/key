@@ -33,19 +33,9 @@ import java.util.Map;
  */
 public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
-    public static class Parameters {
-        @Option(value="#2") public  String rulename;
-        @Option(value="on", required = false) public Term on;
-        @Option(value="formula", required = false) public Term formula;
-        @Option(value="occ", required = false) public  int occ = -1;
-        @Varargs(as=Term.class, prefix="inst_")
-        public Map<String, Term> instantiations = new HashMap<>();
-    }
-
     public RuleCommand() {
         super(Parameters.class);
     }
-
 
     @Override public String getName() {
         return "rule";
@@ -54,7 +44,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     @Override public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
         Parameters p = state.getValueInjector()
-                .inject(new Parameters(), arguments);
+                .inject(this, new Parameters(), arguments);
 
         // instantiation
         /*
@@ -113,16 +103,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         Goal g = state.getFirstOpenGoal();
         g.apply(theApp);
-    }
-
-    private static class TacletNameFilter extends TacletFilter {
-        private final Name rulename;
-        public TacletNameFilter(String rulename) {
-            this.rulename = new Name(rulename);
-        }
-        @Override protected boolean filter(Taclet taclet) {
-            return taclet.name().equals(rulename);
-        }
+        state.setGoal((Goal) null);
     }
 
     private TacletApp makeTacletApp(Parameters p, EngineState state)
@@ -226,6 +207,32 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             }
         }
         return matchingApps;
+    }
+
+    public static class Parameters {
+        @Option(value = "#2")
+        public String rulename;
+        @Option(value = "on", required = false)
+        public Term on;
+        @Option(value = "formula", required = false)
+        public Term formula;
+        @Option(value = "occ", required = false)
+        public int occ = -1;
+        @Varargs(as = Term.class, prefix = "inst_")
+        public Map<String, Term> instantiations = new HashMap<>();
+    }
+
+    private static class TacletNameFilter extends TacletFilter {
+        private final Name rulename;
+
+        public TacletNameFilter(String rulename) {
+            this.rulename = new Name(rulename);
+        }
+
+        @Override
+        protected boolean filter(Taclet taclet) {
+            return taclet.name().equals(rulename);
+        }
     }
 
     /*

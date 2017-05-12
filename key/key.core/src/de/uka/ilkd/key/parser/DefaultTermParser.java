@@ -14,24 +14,19 @@
 package de.uka.ilkd.key.parser;
 
 
-import java.io.IOException;
-import java.io.Reader;
-
-import org.antlr.runtime.RecognitionException;
-
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.RuleSet;
+import org.antlr.runtime.RecognitionException;
+
+import java.io.IOException;
+import java.io.Reader;
 
 
 /** This class wraps the default KeY-Term-Parser.
@@ -94,8 +89,8 @@ public final class DefaultTermParser {
                                 nss, 
                                 scm);
 
-	    final Term result = parser.term();
-	    if (sort != null &&  ! result.sort().extendsTrans(sort))
+            final Term result = parser.termEOF();
+            if (sort != null &&  ! result.sort().extendsTrans(sort))
 	        throw new ParserException("Expected sort "+sort+", but parser returns sort "+result.sort()+".", null);
         return result;
         } catch (RecognitionException re) {
@@ -119,7 +114,7 @@ public final class DefaultTermParser {
         KeYParserF p = null;
         try {
             p = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""), new Recoder2KeY(services, nss), services, nss, scm);
-            final Sequent seq = p.seq();
+            final Sequent seq = p.seqEOF();
                 return seq;
         } catch (RecognitionException re) {
             // problemParser cannot be null since exception is thrown during parsing.

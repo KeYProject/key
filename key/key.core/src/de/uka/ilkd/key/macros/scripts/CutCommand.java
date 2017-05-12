@@ -23,17 +23,13 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
         super(Parameters.class);
     }
 
-    static class Parameters {
-        @Option("#2") public Term formula;
-    }
-
     @Override public String getName() {
         return "cut";
     }
 
     @Override public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
-        return state.getValueInjector().inject(new Parameters(), arguments);
+        return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     /**
@@ -56,6 +52,11 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
         app = app.addCheckedInstantiation(sv, args.formula,
                 state.getProof().getServices(), true);
         state.getFirstOpenGoal().apply(app);
+    }
+
+    static class Parameters {
+        @Option("#2")
+        public Term formula;
     }
 
 }

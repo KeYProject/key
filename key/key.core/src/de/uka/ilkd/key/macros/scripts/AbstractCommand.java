@@ -18,13 +18,12 @@ import java.util.logging.Logger;
  * @author Alexander Weigl
  */
 public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
+    protected static Logger log = Logger.getLogger(ProofScriptCommand.class.getName());
     private final Class<T> parameterClazz;
     protected Proof proof;
     protected Services service;
     protected EngineState state;
     protected AbstractUserInterfaceControl uiControl;
-
-    protected static Logger log = Logger.getLogger(ProofScriptCommand.class.getName());
 
     public AbstractCommand(Class<T> clazz) {
         this.parameterClazz = clazz;
@@ -33,14 +32,14 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
     public List<ProofScriptArgument> getArguments() {
         if (parameterClazz == null)
             return new ArrayList<>();
-        return ArgumentsLifter.inferScriptArguments(parameterClazz);
+        return ArgumentsLifter.inferScriptArguments(parameterClazz, this);
     }
 
 
     @Override public T evaluateArguments(EngineState state, Map<String, String> arguments) throws Exception {
         if (parameterClazz != null) {
             T obj = parameterClazz.newInstance();
-            return state.getValueInjector().inject(obj, arguments);
+            return state.getValueInjector().inject(this, obj, arguments);
         }
         return null;
     }

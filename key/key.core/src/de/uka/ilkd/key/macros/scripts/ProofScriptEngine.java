@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.Proof;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -8,10 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Observer;
 import java.util.ServiceLoader;
-
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.Proof;
 
 /**
  * @author Mattias Ulbrich
@@ -48,7 +48,8 @@ public class ProofScriptEngine {
         return result;
     }
 
-    @SuppressWarnings("unchecked") public void execute(
+    @SuppressWarnings("unchecked")
+    public void execute(
             AbstractUserInterfaceControl uiControl, Proof proof)
             throws IOException, InterruptedException, ScriptException {
 
@@ -102,11 +103,16 @@ public class ProofScriptEngine {
 
                 Object o = command.evaluateArguments(stateMap, argMap);
                 command.execute(uiControl, o, stateMap);
-            }
-            catch (InterruptedException ie) {
+            } catch (InterruptedException ie) {
                 throw ie;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
+                stateMap.getProof().getSubtreeGoals(stateMap.getProof().root()).forEach(g -> {
+                            System.out.println("====");
+                            System.out.println(g);
+                            System.out.println("====");
+                        }
+                );
+
                 throw new ScriptException(
                         "Error while executing script: " + e.getMessage()
                                 + "\n\nCommand:" + argMap

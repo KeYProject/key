@@ -18,19 +18,15 @@ import java.util.Map;
  */
 public class AssumeCommand
         extends AbstractCommand<AssumeCommand.FormulaParameter> {
+    private static final Name TACLET_NAME = new Name("UNSOUND_ASSUME");
+
     public AssumeCommand() {
         super(FormulaParameter.class);
     }
 
-    public static class FormulaParameter {
-        @Option("#2") public Term formula;
-    }
-
-    private static final Name TACLET_NAME = new Name("UNSOUND_ASSUME");
-
     @Override public FormulaParameter evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
-        return ValueInjector.injection(new FormulaParameter(), arguments);
+        return ValueInjector.injection(this, new FormulaParameter(), arguments);
     }
 
     @Override public String getName() {
@@ -48,5 +44,10 @@ public class AssumeCommand
         app = app.addCheckedInstantiation(sv, parameter.formula,
                 proof.getServices(), true);
         goal.apply(app);
+    }
+
+    public static class FormulaParameter {
+        @Option("#2")
+        public Term formula;
     }
 }

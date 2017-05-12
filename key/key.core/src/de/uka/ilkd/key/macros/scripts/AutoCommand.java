@@ -5,7 +5,6 @@ import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -33,7 +32,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             Map<String, String> arguments) {
         Parameters args = new Parameters();
         try {
-            ValueInjector.getInstance().inject(args, arguments);
+            ValueInjector.getInstance().inject(this, args, arguments);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -71,7 +70,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
 
         //
         // Give some feedback
-        applyStrategy.addProverTaskObserver((ProverTaskListener) uiControl);
+        applyStrategy.addProverTaskObserver(uiControl);
         // TODO get rid of that cast.
 
         //

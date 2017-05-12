@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.util.Map;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -10,25 +8,21 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
+import java.util.Map;
+
 /**
  *
  */
 public class SchemaVarCommand
         extends AbstractCommand<SchemaVarCommand.Parameters> {
 
-    public static class Parameters {
-        @Option("#2") public String type;
-        @Option("#3") public String var;
-    }
-
     public SchemaVarCommand() {
         super(Parameters.class);
     }
 
-
     @Override public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
-        return state.getValueInjector().inject(new Parameters(), arguments);
+        return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override public void execute(Parameters args)
@@ -69,6 +63,13 @@ public class SchemaVarCommand
 
     @Override public String getName() {
         return "schemaVar";
+    }
+
+    public static class Parameters {
+        @Option("#2")
+        public String type;
+        @Option("#3")
+        public String var;
     }
 
 }
