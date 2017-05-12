@@ -339,7 +339,7 @@ public final class StrategyProperties extends Properties {
                                                     boolean nonExecutionBranchHidingSideProofs,
                                                     boolean aliasChecks) {
        // TODO (DS, 2017-05-11): Would be great to also use the loop scope invariant for the SED. For this, one would however have to change the SED's implementation and to update the tests. 
-       sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_INVARIANT); //loopTreatmentInvariant ? StrategyProperties.LOOP_SCOPE_INVARIANT : StrategyProperties.LOOP_EXPAND);
+       sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT : StrategyProperties.LOOP_EXPAND);
        sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, blockTreatmentContract ? StrategyProperties.BLOCK_CONTRACT : StrategyProperties.BLOCK_EXPAND);
        sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatmentContract ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
        sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_ON);
