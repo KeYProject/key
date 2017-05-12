@@ -40,10 +40,12 @@ import de.uka.ilkd.key.proof.Proof;
  */
 public class PredicateAbstractionLatticeTests extends TestCase {
 
+    private static final String TEST_RESOURCES_DIR_PREFIX = "resources/testcase/merge/";
+
     @Test
     public void testCreateSignLatticeWithPredicates() {
         // Dummy proof to get a term builder.
-        final Proof p = MergeRuleTests.loadProof("dummy.key");
+        final Proof p = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX, "dummy.key");
         final Services services = p.getServices();
 
         final Sort intSort =
@@ -186,7 +188,7 @@ public class PredicateAbstractionLatticeTests extends TestCase {
 
     public void testToAndFromString() {
         // Dummy proof to get services etc.
-        final Proof p = MergeRuleTests.loadProof("dummy.key");
+        final Proof p = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX, "dummy.key");
         final Services services = p.getServices();
         final TermBuilder tb = services.getTermBuilder();
 
