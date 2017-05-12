@@ -16,11 +16,16 @@ package de.uka.ilkd.key.rule.loop;
 import org.junit.Test;
 
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleTests;
 import junit.framework.TestCase;
 
 /**
- * TODO
+ * Test cases for the {@link LoopScopeInvariantRule}. Should shine a light on
+ * more subtle and exotic cases, like nested loops with multiple labeled breaks
+ * and continues, combination with exceptional behavior / try-catch, etc.
+ * 
+ * TODO: Add more test cases for the scenarios sketched above.
  *
  * @author Dominic Scheurer
  */
