@@ -95,7 +95,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         }
 
         // instantiate remaining symbols
-        theApp = theApp.tryToInstantiate(proof.getServices());
+        theApp = theApp.tryToInstantiate(proof.getServices().getOverlay(state.getFirstOpenGoal().getLocalNamespaces()));
 
         if (theApp == null) {
             throw new ScriptException("Cannot instantiate this rule");

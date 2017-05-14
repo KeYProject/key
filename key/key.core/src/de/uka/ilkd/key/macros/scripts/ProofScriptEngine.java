@@ -5,6 +5,7 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
@@ -69,6 +70,7 @@ public class ProofScriptEngine {
             stateMap.setObserver(commandMonitor);
         }
 
+        int cnt = 0;
         while (true) {
             if (Thread.interrupted()) {
                 throw new InterruptedException();
@@ -88,7 +90,6 @@ public class ProofScriptEngine {
             if (commandMonitor != null) {
                 commandMonitor.update(null, cmd);
             }
-            System.out.println("Command: " + cmd);
 
             try {
                 String name = argMap.get(ScriptLineParser.COMMAND_KEY);
@@ -101,14 +102,18 @@ public class ProofScriptEngine {
                     throw new ScriptException("Unknown command " + name);
                 }
 
+                System.out.format("%5d: %s%n", ++cnt, cmd);
+                //write("/tmp/weiglProofScripts_%d.txt", cnt, proof);
+
                 Object o = command.evaluateArguments(stateMap, argMap);
                 command.execute(uiControl, o, stateMap);
             } catch (InterruptedException ie) {
                 throw ie;
             } catch (Exception e) {
-                stateMap.getProof().getSubtreeGoals(stateMap.getProof().root()).forEach(g -> {
+                System.out.println("GOALS:" + proof.getSubtreeGoals(proof.root()).size());
+                proof.getSubtreeGoals(stateMap.getProof().root()).forEach(g -> {
                             System.out.println("====");
-                            System.out.println(g);
+                            System.out.println(g.sequent());
                             System.out.println("====");
                         }
                 );
@@ -120,6 +125,14 @@ public class ProofScriptEngine {
                         initialLocation.getFilename(), mlp.getLine(),
                         mlp.getColumn(), e);
             }
+        }
+    }
+
+    private void write(String s, int cnt, Proof proof) {
+        try (FileWriter fw = new FileWriter(String.format(s, cnt))) {
+            fw.write(proof.toString());
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
         }
     }
 

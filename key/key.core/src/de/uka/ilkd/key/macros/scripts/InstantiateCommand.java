@@ -86,13 +86,15 @@ public class InstantiateCommand
 
     private ImmutableList<TacletApp> findAllTacletApps(Parameters p,
             EngineState state) throws ScriptException {
+        boolean hide = p.hide.equals("hide");
+
 
         String rulename;
         if (p.formula.op() == Quantifier.ALL) {
-            rulename = "allLeft" + (p.hide ? "Hide" : "");
+            rulename = "allLeft" + (hide ? "Hide" : "");
         }
         else {
-            rulename = "exRight" + (p.hide ? "Hide" : "");
+            rulename = "exRight" + (hide ? "Hide" : "");
         }
 
         Proof proof = state.getProof();
@@ -253,8 +255,10 @@ public class InstantiateCommand
         public String var;
         @Option(value = "occ", required = false)
         public int occ = 1;
+
         @Option(value = "#2", required = false)
-        public boolean hide;
+        public String hide = "";
+
         @Option(value = "with", required = false)
         public Term with;
     }
