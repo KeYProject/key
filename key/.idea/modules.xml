@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/key.core/key.core.iml" filepath="$PROJECT_DIR$/key.core/key.core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key.core.example/key.core.example.iml" filepath="$PROJECT_DIR$/key.core.example/key.core.example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key.core.proof_references/key.core.proof_references.iml" filepath="$PROJECT_DIR$/key.core.proof_references/key.core.proof_references.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key.core.proof_references.test/key.core.proof_references.test.iml" filepath="$PROJECT_DIR$/key.core.proof_references.test/key.core.proof_references.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key.core.symbolic_execution/key.core.symbolic_execution.iml" filepath="$PROJECT_DIR$/key.core.symbolic_execution/key.core.symbolic_execution.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key.core.symbolic_execution.example/key.core.symbolic_execution.example.iml" filepath="$PROJECT_DIR$/key.core.symbolic_execution.example/key.core.symbolic_execution.example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key.core.symbolic_execution.test/key.core.symbolic_execution.test.iml" filepath="$PROJECT_DIR$/key.core.symbolic_execution.test/key.core.symbolic_execution.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key.core.test/key.core.test.iml" filepath="$PROJECT_DIR$/key.core.test/key.core.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key.core.testgen/key.core.testgen.iml" filepath="$PROJECT_DIR$/key.core.testgen/key.core.testgen.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key.core.testgen.test/key.core.testgen.test.iml" filepath="$PROJECT_DIR$/key.core.testgen.test/key.core.testgen.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key.removegenerics/key.removegenerics.iml" filepath="$PROJECT_DIR$/key.removegenerics/key.removegenerics.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key.removegenerics.test/key.removegenerics.test.iml" filepath="$PROJECT_DIR$/key.removegenerics.test/key.removegenerics.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key.ui/key.ui.iml" filepath="$PROJECT_DIR$/key.ui/key.ui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key.util/key.util.iml" filepath="$PROJECT_DIR$/key.util/key.util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key.util.test/key.util.test.iml" filepath="$PROJECT_DIR$/key.util.test/key.util.test.iml" />
+    </modules>
+  </component>
+</project>

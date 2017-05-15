@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/bin" />
+    <output-test url="file://$MODULE_DIR$/../bin/test/key.removegenerics.test" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/.settings" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="module" module-name="key.core" />
+    <orderEntry type="module" module-name="key.core.test" />
+    <orderEntry type="module" module-name="key.util" />
+    <orderEntry type="module" module-name="key.util.test" />
+    <orderEntry type="module" module-name="key.removegenerics" />
+  </component>
+</module>
