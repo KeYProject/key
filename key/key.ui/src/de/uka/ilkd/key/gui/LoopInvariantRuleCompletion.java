@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -98,10 +99,11 @@ public class LoopInvariantRuleCompletion implements
     }
 
     /**
-     * Checks if the app is supported. 
-     * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
+     * Checks if the app is supported. This functionality is also used by the
+     * Eclipse plug-ins like the KeYIDE.
      */
     public static boolean checkCanComplete(final IBuiltInRuleApp app) {
-        return app.rule() instanceof WhileInvariantRule;
-   }
+        return app.rule() instanceof WhileInvariantRule
+                || app.rule() instanceof LoopScopeInvariantRule;
+    }
 }

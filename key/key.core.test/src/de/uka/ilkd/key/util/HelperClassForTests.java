@@ -52,9 +52,10 @@ import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.ChoiceSettings;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 
 public class HelperClassForTests {
    public static final String TESTCASE_DIRECTORY;
@@ -137,25 +138,48 @@ public class HelperClassForTests {
      * @return {@code true} one step simplification is enabled, {@code false} if disabled.
      */
     public static boolean isOneStepSimplificationEnabled(Proof proof) {
+       StrategyProperties props;
        if (proof != null && !proof.isDisposed()) {
-          return proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification();
+           props = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
        }
        else {
-          return ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+           props = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties(); 
        }
+       
+       return props.get(StrategyProperties.OSS_OPTIONS_KEY).equals(StrategyProperties.OSS_ON);
     }
 
     /**
-     * Defines if one step simplification is enabled in general and within the {@link Proof}.
-     * @param proof The optional {@link Proof}.
-     * @param enabled {@code true} use one step simplification, {@code false} do not use one step simplification.
+     * Defines if one step simplification is enabled in general and within the
+     * {@link Proof}.
+     * 
+     * @param proof
+     *            The optional {@link Proof}.
+     * @param enabled
+     *            {@code true} use one step simplification, {@code false} do not
+     *            use one step simplification.
      */
-    public static void setOneStepSimplificationEnabled(Proof proof, boolean enabled) {
-       ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(enabled);
-       if (proof != null && !proof.isDisposed()) {
-          proof.getProofIndependentSettings().getGeneralSettings().setOneStepSimplification(enabled);
-          OneStepSimplifier.refreshOSS(proof);
-       }
+    public static void setOneStepSimplificationEnabled(Proof proof,
+            boolean enabled) {
+        final String newVal = enabled ? StrategyProperties.OSS_ON
+                : StrategyProperties.OSS_OFF;
+
+        {
+            final StrategyProperties newProps = ProofSettings.DEFAULT_SETTINGS
+                    .getStrategySettings().getActiveStrategyProperties();
+            newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, newVal);
+            ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
+                    .setActiveStrategyProperties(newProps);
+        }
+
+        if (proof != null && !proof.isDisposed()) {
+            final StrategyProperties newProps = proof.getSettings()
+                    .getStrategySettings().getActiveStrategyProperties();
+            newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, newVal);
+
+            Strategy.updateStrategySettings(proof, newProps);
+            OneStepSimplifier.refreshOSS(proof);
+        }
     }
     
     /**

@@ -3832,7 +3832,7 @@ varexp[TacletBuilder b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
-    | varcond_differentFields[b]  
+    | varcond_differentFields[b]
   ) 
   | 
   ( (NOT_ {negated = true;} )? 

@@ -99,7 +99,6 @@ public final class KeyStrokeManager {
         // default mappings
         mapping.put(de.uka.ilkd.key.gui.actions.OpenExampleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_E,MULTI_KEY_MASK));
         mapping.put(de.uka.ilkd.key.gui.actions.EditMostRecentFileAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_E,SHORTCUT_KEY_MASK));
-        mapping.put(de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_T,MULTI_KEY_MASK));
         mapping.put(de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_P,MULTI_KEY_MASK));
         mapping.put(de.uka.ilkd.key.gui.actions.UnicodeToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_U,MULTI_KEY_MASK));
     }

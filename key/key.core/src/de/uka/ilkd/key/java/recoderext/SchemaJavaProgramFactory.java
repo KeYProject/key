@@ -14,7 +14,6 @@
 // This file is partially taken from the RECODER library, which is protected by 
 // the LGPL, and modified.
 
-
 package de.uka.ilkd.key.java.recoderext;
 
 import java.io.IOException;
@@ -98,6 +97,11 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 							   Statement st) {
 	return new RMethodCallStatement(resVar, esvw, st);
     }
+    
+    public LoopScopeBlock createLoopScopeBlock() {
+        return new LoopScopeBlock();
+    }
+
     
     public RMethodBodyStatement createRMethodBodyStatement
             (TypeReference typeRef,
@@ -258,9 +262,6 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 	}
 	return new CatchSVWrapper(sv);
     }
-
-
-
 
     /** 
      For internal reuse and synchronization.
@@ -568,7 +569,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
 
 
-    public void setSVNamespace(Namespace<SchemaVariable> ns) {
+    public void setSVNamespace(Namespace ns) {
 	svns=ns;
     }
 }

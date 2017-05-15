@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 
 /**
  * The Class {@link ParameterlessTermLabel} can be used to define labels without parameters.
@@ -104,6 +105,17 @@ public final class ParameterlessTermLabel implements TermLabel {
 
    public static final TermLabel POST_CONDITION_LABEL =
            new ParameterlessTermLabel(POST_CONDITION_LABEL_NAME);
+   
+   /**
+    * Name of {@link #LOOP_SCOPE_INDEX_LABEL}.
+    */
+   public static final Name LOOP_SCOPE_INDEX_LABEL_NAME = new Name("loopScopeIndex");
+
+   /**
+    * Label attached to loop scope index variables in {@link LoopScopeInvariantRule}.
+    */
+   public static final TermLabel LOOP_SCOPE_INDEX_LABEL =
+           new ParameterlessTermLabel(LOOP_SCOPE_INDEX_LABEL_NAME);
 
     /**
      * The unique name of this label.

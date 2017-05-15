@@ -111,7 +111,7 @@ public class StrategySettingsDefinition {
 
                                 newProps.setProperty(
                                         StrategyProperties.LOOP_OPTIONS_KEY,
-                                        StrategyProperties.LOOP_INVARIANT);
+                                        StrategyProperties.LOOP_SCOPE_INVARIANT);
 
                                 newProps.setProperty(
                                         StrategyProperties.BLOCK_OPTIONS_KEY,
@@ -136,6 +136,10 @@ public class StrategySettingsDefinition {
                                 newProps.setProperty(
                                         StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
                                         StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+
+                                newProps.setProperty(
+                                        StrategyProperties.OSS_OPTIONS_KEY,
+                                        StrategyProperties.OSS_ON);
 
                                 newProps.setProperty(
                                         StrategyProperties.QUANTIFIERS_OPTIONS_KEY,

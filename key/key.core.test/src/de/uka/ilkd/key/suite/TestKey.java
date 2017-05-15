@@ -133,14 +133,14 @@ public class TestKey extends TestSuite {
 	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
 
         TestSuite suite = new TestSuite();
-//        suite.addTest(createSuite(utilityTests, "Testing KeY specific Utilities"));
-//        suite.addTest(createSuite(logicModelTests, "Testing Logic Engine"));
-//        suite.addTest(createSuite(parserTests, "Testing Parsers"));
-//        suite.addTest(createSuite(ruleTests, "Testing Rule Engine"));
-//        suite.addTest(createSuite(proofConstructionTests, "Testing Proof Construction"));
-//        suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
-//        suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
-//        suite.addTest(createSuite(smtTests, "Testing SMT backend"));
+        suite.addTest(createSuite(utilityTests, "Testing KeY specific Utilities"));
+        suite.addTest(createSuite(logicModelTests, "Testing Logic Engine"));
+        suite.addTest(createSuite(parserTests, "Testing Parsers"));
+        suite.addTest(createSuite(ruleTests, "Testing Rule Engine"));
+        suite.addTest(createSuite(proofConstructionTests, "Testing Proof Construction"));
+        suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
+        suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
+        suite.addTest(createSuite(smtTests, "Testing SMT backend"));
         suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));
 
         return suite;
