@@ -18,7 +18,7 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
         this.lp = logicPrinter;
     }
     
-    public static Pattern createPattern(String search, boolean regex) {
+    public static Pattern createPattern(String search, boolean regex) throws IllegalRegexException {
         int searchFlag = 0;
         if (search.toLowerCase().equals(search)) {
             searchFlag = searchFlag | Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
@@ -47,7 +47,7 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
         // This means the search String is not a valid regex (yet!). 
         // Probably because the user is still typing.
         catch (PatternSyntaxException pse) {
-            return null;
+            throw new IllegalRegexException(pse);
         } catch (IllegalArgumentException iae) {
             iae.printStackTrace();
         } 
@@ -55,7 +55,11 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
     }
     
     protected Pattern createPattern() {
-        return createPattern(this.searchString, this.regex);
+        try {
+            return createPattern(this.searchString, this.regex);
+        } catch (IllegalRegexException e) {
+            return null;
+        }
     }
 
     public void setRegex(boolean selected) {

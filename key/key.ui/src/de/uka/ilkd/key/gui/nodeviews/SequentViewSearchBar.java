@@ -27,6 +27,7 @@ import javax.swing.JComboBox;
 import de.uka.ilkd.key.gui.SearchBar;
 import de.uka.ilkd.key.pp.HideSequentPrintFilter;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
+import de.uka.ilkd.key.pp.IllegalRegexException;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.RegroupSequentPrintFilter;
 import de.uka.ilkd.key.pp.SearchSequentPrintFilter;
@@ -185,7 +186,13 @@ public class SequentViewSearchBar extends SearchBar {
         resultIteratorPos = 0;
         Pattern p;
         
-        p = SearchSequentPrintFilter.createPattern(search, regExpCheckBox.isSelected());
+        try {
+            p = SearchSequentPrintFilter.createPattern(search, regExpCheckBox.isSelected());
+            searchField.setToolTipText("");
+        } catch (IllegalRegexException pse) {
+            searchField.setToolTipText("Not a valid regular expression!");
+            return false;
+        }
 
         if (p == null) return false;
 
