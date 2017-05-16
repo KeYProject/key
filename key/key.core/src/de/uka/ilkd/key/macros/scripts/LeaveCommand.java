@@ -1,12 +1,15 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 
-public class LeaveCommand extends AbstractCommand {
+public class LeaveCommand extends NoArgumentCommand {
+    private static Logger log = Logger.getLogger(ProofScriptCommand.class.getName());
+
 
     @Override
     public String getName() {
@@ -14,10 +17,10 @@ public class LeaveCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
-        Goal goal = getFirstOpenGoal(proof, state);
-        System.err.println("Deactivating " + goal.node().serialNr());
+    public void execute(AbstractUserInterfaceControl uiControl,
+            Void args, EngineState state) throws ScriptException, InterruptedException {
+        Goal goal = state.getFirstOpenGoal();
+        log.info("Deactivating " + goal.node().serialNr());
         goal.setEnabled(false);
     }
 

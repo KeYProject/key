@@ -1,47 +1,62 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.util.Map;
-
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
-public class CutCommand extends AbstractCommand {
+import java.util.Map;
 
+/**
+ * The command object CutCommand has as scriptcommand name "cut"
+ * As parameters:
+ * a formula with the id "#2"
+ */
+public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
     private static final Name CUT_TACLET_NAME = new Name("cut");
 
-    @Override
-    public String getName() {
+    public CutCommand() {
+        super(Parameters.class);
+    }
+
+    @Override public String getName() {
         return "cut";
     }
 
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
+    @Override public Parameters evaluateArguments(EngineState state,
+            Map<String, String> arguments) throws Exception {
+        return state.getValueInjector().inject(this, new Parameters(), arguments);
+    }
 
-        Goal goal = getFirstOpenGoal(proof, state);
-        Term formula;
-        try {
-            String formString = args.get("#2");
-            formula = toTerm(goal, state, formString, Sort.FORMULA);
-        } catch (ParserException e) {
-            throw new ScriptException(e);
-        }
+    /**
+     *
+     * @param uiControl
+     * @param args
+     * @param state
+     * @throws ScriptException
+     * @throws InterruptedException
+     */
+    @Override public void execute(AbstractUserInterfaceControl uiControl,
+            Parameters args, EngineState state)
+            throws ScriptException, InterruptedException {
 
-        Taclet cut = proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(CUT_TACLET_NAME);
+        Taclet cut = state.getProof().getEnv().getInitConfigForEnvironment()
+                .lookupActiveTaclet(CUT_TACLET_NAME);
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
-        app = app.addCheckedInstantiation(sv, formula, proof.getServices(), true);
-        goal.apply(app);
+        app = app.addCheckedInstantiation(sv, args.formula,
+                state.getProof().getServices(), true);
+        state.getFirstOpenGoal().apply(app);
+    }
+
+    public static class Parameters {
+        @Option("#2")
+        public Term formula;
     }
 
 }

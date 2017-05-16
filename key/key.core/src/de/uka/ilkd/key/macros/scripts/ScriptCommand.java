@@ -1,48 +1,49 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import de.uka.ilkd.key.macros.scripts.meta.Option;
+import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
+
 import java.io.File;
 import java.nio.file.NoSuchFileException;
 import java.util.Map;
-import java.util.Observer;
+import java.util.logging.Logger;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.proof.Proof;
+public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
+    public ScriptCommand() {
+        super(Parameters.class);
+    }
 
-public class ScriptCommand extends AbstractCommand {
+    public static class Parameters {
+        @Option("#2") public  String filename;
+    }
 
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args, Map<String, Object> stateMap)
+    @Override public void execute(Parameters args)
             throws ScriptException, InterruptedException {
+        File root = state.getBaseFileName();
+        if (!root.isDirectory())
+            root = root.getParentFile();
+        File file = new File(root, args.filename);
 
-        String filename = args.get("#2");
-        File file;
-        Object baseFileObject = stateMap.get(ProofScriptEngine.BASE_FILE_NAME_KEY);
-        if(baseFileObject != null) {
-            File baseFile = new File(baseFileObject.toString());
-            file = new File(baseFile.getParent(), filename);
-        } else {
-            file = new File(filename);
-        }
-
-        System.err.println("Included script " + file);
+        log.info("Included script " + file);
 
         try {
             ProofScriptEngine pse = new ProofScriptEngine(file);
-            pse.setCommandMonitor((Observer) stateMap.get(ProofScriptEngine.OBSERVER_KEY));
+            pse.setCommandMonitor(state.getObserver());
             pse.execute(uiControl, proof);
-        } catch(NoSuchFileException e) {
+        }
+        catch (NoSuchFileException e) {
             // The message is very cryptic otherwise.
-            throw new ScriptException("Script file '" + filename + "' not found", e);
-        } catch (Exception e) {
-            throw new ScriptException("Error while running script'" + filename
-                    + "': " + e.getMessage(), e);
+            throw new ScriptException("Script file '" + file + "' not found",
+                    e);
+        }
+        catch (Exception e) {
+            throw new ScriptException(
+                    "Error while running script'" + file + "': " + e
+                            .getMessage(), e);
         }
     }
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return "script";
     }
-
 }

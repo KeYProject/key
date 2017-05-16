@@ -1,18 +1,19 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.proof.Proof;
 
-public class ExitCommand extends NoArgumentCommand {
+public class SkipCommand extends NoArgumentCommand {
     @Override public void execute(AbstractUserInterfaceControl uiControl,
             Void args, EngineState stateMap)
             throws ScriptException, InterruptedException {
-        throw new InterruptedException(
-                "Interruption requested from within script");
 
     }
 
     @Override public String getName() {
-        return "exit";
+        return "skip";
     }
+
 }
