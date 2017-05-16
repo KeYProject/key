@@ -3754,19 +3754,6 @@ modifiers[TacletBuilder b]
         ) *
     ;
 
-
-seqEOF returns [Sequent s] :
-         ss=seq EOF
-         {s = ss;}
-     ;
-
-
-termEOF returns [Term _term = null]
-@after { _term = result; }
-    :
-        result = term EOF
-    ;
-
 seq returns [Sequent s] : 
         ant=semisequent SEQARROW suc=semisequent
         { s = Sequent.createSequent(ant, suc); }
