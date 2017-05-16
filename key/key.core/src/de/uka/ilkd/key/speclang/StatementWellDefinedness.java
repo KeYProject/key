@@ -163,7 +163,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param leadingUpdate the context update
      * @param localAnonUpdate anonymization update of local variables
      * @param services
-     * @return The proof seuqne t for the well-definedness check
+     * @return The proof sequent for the well-definedness check
      */
     public SequentFormula generateSequent(ProgramVariable self, LocationVariable heap,
                                           Term anonHeap, ImmutableSet<ProgramVariable> ps,

@@ -239,6 +239,24 @@ public class BlockContractRule implements BuiltInRule {
         }
     }
 
+    private static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
+                                              Services services) {
+        Term anonUpdate = null;
+        final TermBuilder tb = services.getTermBuilder();
+        for(ProgramVariable pv : localOuts) {
+            final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
+            final Function anonFunc = new Function(anonFuncName, pv.sort(), true);
+            services.getNamespaces().functions().addSafely(anonFunc);
+            final Term elemUpd = tb.elementary((LocationVariable)pv, tb.func(anonFunc));
+            if(anonUpdate == null) {
+                anonUpdate = elemUpd;
+            } else {
+                anonUpdate = tb.parallel(anonUpdate, elemUpd);
+            }
+        }
+        return anonUpdate;
+    }
+
     private BlockContractRule() {
     }
 
@@ -483,6 +501,10 @@ public class BlockContractRule implements BuiltInRule {
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
+        final Term wdUpdate = services.getTermBuilder().parallel(contextUpdate, remembranceUpdate);
+        Term anonUpdate = createLocalAnonUpdate(localOutVariables, services); // can still be null
+        final Term localAnonUpdate =
+                anonUpdate != null ? anonUpdate : services.getTermBuilder().skip();
         final Term anonymisationUpdate =
                 updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps,
                                                         /*anonymisationLocalVariables, */
@@ -498,11 +520,10 @@ public class BlockContractRule implements BuiltInRule {
                                                                      this);
         if (WellDefinednessCheck.isOn()) {
             result = goal.split(4);
-            //final Term remUpd = updatesBuilder.buildRemembranceUpdate(heaps);
 
             configurator.setUpWdGoal(result.tail().tail().tail().head(),
-                                     contract, contextUpdate,
-                                     remembranceUpdate, heaps.get(0),
+                                     contract, wdUpdate,
+                                     localAnonUpdate, heaps.get(0),
                                      anonymisationHeaps.get(heaps.get(0)),
                                      localInVariables);
         } else {
@@ -1126,6 +1147,8 @@ public class BlockContractRule implements BuiltInRule {
             if (goal == null) {
                 return;
             }
+            // FIXME: Handling of \old-references needs to be investigated,
+            //        however only completeness is lost, soundness is guaranteed
             goal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
             final BlockWellDefinedness bwd = new BlockWellDefinedness(contract, localIns, services);
             services.getSpecificationRepository().addWdStatement(bwd);
