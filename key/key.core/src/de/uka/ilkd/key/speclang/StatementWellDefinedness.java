@@ -101,15 +101,20 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param po the proof obligation terms of the statement
      * @param vars the new (current) variables
      * @param leadingUpdate the context update of the program before the statement
+     * @param localAnon anonymize local variables
      * @param services
      * @return the actual terms used in the well-definedness sequent
      */
     final SequentTerms createSeqTerms(POTerms po, Variables vars,
-                                      Term leadingUpdate, Services services) {
+                                      Term leadingUpdate, Term localAnon,
+                                      Services services) {
         final Term pre = getPre(po.pre, vars.self, vars.heap, vars.params, false, services).term;
         final Term post = getPost(po.post, vars.result, services);
         final ImmutableList<Term> wdRest = TB.wd(po.rest);
-        final Term updates = getUpdates(po.mod, vars.heap, vars.heap, vars.anonHeap, services);
+        final Term updates =
+                TB.parallel(localAnon,
+                            getUpdates(po.mod, vars.heap, vars.heap,
+                                       vars.anonHeap, services));
         final Term uPost = TB.apply(updates, TB.and(TB.wd(post), TB.and(wdRest)));
         return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.mod, po.rest, uPost, services);
     }
@@ -124,6 +129,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param anonHeap The anonymized heap
      * @param ps The current parameter variables
      * @param leadingUpdate The context update
+     * @param localAnonUpdate anonymization update of local variables
      * @param services The current services reference
      * @return The proof sequent for the well-definedness check
      */
@@ -131,7 +137,8 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
                                           ProgramVariable result, LocationVariable heap,
                                           ProgramVariable heapAtPre, Term anonHeap,
                                           ImmutableSet<ProgramVariable> ps,
-                                          Term leadingUpdate, Services services) {
+                                          Term leadingUpdate, Term localAnonUpdate,
+                                          Services services) {
         final ImmutableList<ProgramVariable> params = convertParams(ps);
         final Map<LocationVariable, ProgramVariable> atPres =
                 new LinkedHashMap<LocationVariable, ProgramVariable>();
@@ -140,7 +147,8 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
                 new Variables(self, result, exception, atPres, params, heap, anonHeap);
         final POTerms po = replace(this.createPOTerms(), vars);
         final Term update = replace(leadingUpdate, vars);
-        final SequentTerms seqTerms = createSeqTerms(po, vars, update, services);
+        final Term localAnon = replace(localAnonUpdate, vars);
+        final SequentTerms seqTerms = createSeqTerms(po, vars, update, localAnon, services);
         return generateSequent(seqTerms, services);
     }
 
@@ -153,13 +161,16 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param anonHeap anonymised heap
      * @param ps set of parameter variables
      * @param leadingUpdate the context update
+     * @param localAnonUpdate anonymization update of local variables
      * @param services
      * @return The proof seuqne t for the well-definedness check
      */
     public SequentFormula generateSequent(ProgramVariable self, LocationVariable heap,
                                           Term anonHeap, ImmutableSet<ProgramVariable> ps,
-                                          Term leadingUpdate, Services services) {
-        return generateSequent(self, null, null, heap, null, anonHeap, ps, leadingUpdate, services);
+                                          Term leadingUpdate, Term localAnonUpdate,
+                                          Services services) {
+        return generateSequent(self, null, null, heap, null, anonHeap, ps, leadingUpdate,
+                               localAnonUpdate, services);
     }
 
     @Override

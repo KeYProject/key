@@ -775,6 +775,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     private void setupWdGoal(final Goal goal, final LoopSpecification inv,
                              final Term update, final Term selfTerm,
                              final LocationVariable heap, final Term anonHeap,
+                             final Term localAnonUpdate,
                              final ImmutableSet<ProgramVariable> localIns,
                              PosInOccurrence pio, Services services) {
         if (goal == null) {
@@ -790,7 +791,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
         services.getSpecificationRepository().addWdStatement(lwd);
         final SequentFormula wdInv = lwd.generateSequent(self, heap, anonHeap, localIns,
-                                                         update, services);
+                                                         update, localAnonUpdate, services);
         goal.changeFormula(wdInv, pio);
     }
 
@@ -894,6 +895,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         //prepare anon update, frame condition, etc.
         Term anonUpdate = createLocalAnonUpdate(localOuts, services); // can still be null
+        final Term localAnonUpdate = anonUpdate != null ? anonUpdate : tb.skip();
         //Term anonAssumption = null;
         Term wellFormedAnon = null;
         Term frameCondition = null;
@@ -969,7 +971,8 @@ public final class WhileInvariantRule implements BuiltInRule {
         
 
         setupWdGoal(wdGoal, inst.inv, inst.u, inst.selfTerm, heapContext.get(0),
-                    anonHeap, localIns, ruleApp.posInOccurrence(), services);
+                    anonHeap, localAnonUpdate, localIns, ruleApp.posInOccurrence(),
+                    services);
 
         //"Body Preserves Invariant":
         // \replacewith (==>  #atPreEqs(anon1) 
@@ -1004,7 +1007,8 @@ public final class WhileInvariantRule implements BuiltInRule {
         prepareInvInitiallyValidBranch(termLabelState, services, ruleApp, inst, invTerm, reachableState, initGoal);
 
         setupWdGoal(wdGoal, inst.inv, inst.u, inst.selfTerm, heapContext.get(0),
-                    anonHeap, localIns, ruleApp.posInOccurrence(), services);
+                    anonHeap, localAnonUpdate, localIns, ruleApp.posInOccurrence(),
+                    services);
 
         // "Use Case":
         // \replacewith (==> #introNewAnonUpdate(#modifies, inv ->

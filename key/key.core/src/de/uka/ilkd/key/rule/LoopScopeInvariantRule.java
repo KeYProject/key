@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -126,6 +127,9 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final Modality modality = (Modality) progPost.op();
 
         return !InfFlowCheckInfo.isInfFlow(goal)
+                && !WellDefinednessCheck.isOn() // TODO: Remove when wd goal is integrated,
+                                                //  otherwise loop invariant rule would be unsound
+                                                //  w.r.t. well-definedness
                 && !(modality == Modality.BOX_TRANSACTION
                         || modality == Modality.DIA_TRANSACTION);
     }

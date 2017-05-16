@@ -498,8 +498,11 @@ public class BlockContractRule implements BuiltInRule {
                                                                      this);
         if (WellDefinednessCheck.isOn()) {
             result = goal.split(4);
+            //final Term remUpd = updatesBuilder.buildRemembranceUpdate(heaps);
+
             configurator.setUpWdGoal(result.tail().tail().tail().head(),
-                                     contract, contextUpdate, heaps.get(0),
+                                     contract, contextUpdate,
+                                     remembranceUpdate, heaps.get(0),
                                      anonymisationHeaps.get(heaps.get(0)),
                                      localInVariables);
         } else {
@@ -1117,8 +1120,8 @@ public class BlockContractRule implements BuiltInRule {
         }
 
         public void setUpWdGoal(final Goal goal, final BlockContract contract,
-                                final Term update, final LocationVariable heap,
-                                final Function anonHeap,
+                                final Term update, final Term anonUpdate,
+                                final LocationVariable heap, final Function anonHeap,
                                 final ImmutableSet<ProgramVariable> localIns) {
             if (goal == null) {
                 return;
@@ -1128,9 +1131,11 @@ public class BlockContractRule implements BuiltInRule {
             services.getSpecificationRepository().addWdStatement(bwd);
             final LocationVariable heapAtPre = variables.remembranceHeaps.get(heap);
             final Term anon = anonHeap != null ? services.getTermBuilder().func(anonHeap) : null;
-            final SequentFormula wdBlock = bwd.generateSequent(variables.self, variables.exception,
-                    variables.result, heap, heapAtPre,
-                    anon, localIns, update, services);
+            final SequentFormula wdBlock =
+                    bwd.generateSequent(variables.self, variables.exception,
+                                        variables.result, heap, heapAtPre,
+                                        anon, localIns, update, anonUpdate,
+                                        services);
             goal.changeFormula(wdBlock, occurrence);
         }
 
