@@ -40,6 +40,8 @@ class ScriptLineParser {
      */
     private int line = 1;
 
+    private int pos = 0;
+
     /**
      * the filename from which the script is taken.
      */
@@ -103,6 +105,7 @@ class ScriptLineParser {
             } else {
                 col ++;
             }
+            pos ++;
 
             switch(c) {
             case -1:
@@ -245,6 +248,10 @@ class ScriptLineParser {
 
     public int getColumn() {
         return col;
+    }
+
+    public int getPosition() {
+        return pos;
     }
 
     public void setLocation(Location location) {
