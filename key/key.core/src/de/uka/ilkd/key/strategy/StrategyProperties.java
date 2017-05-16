@@ -170,7 +170,7 @@ public final class StrategyProperties extends Properties {
     
     static {
         defaultMap.setProperty(SPLITTING_OPTIONS_KEY, SPLITTING_DELAYED);
-        defaultMap.setProperty(LOOP_OPTIONS_KEY, LOOP_SCOPE_INVARIANT);
+        defaultMap.setProperty(LOOP_OPTIONS_KEY, LOOP_INVARIANT);
         defaultMap.setProperty(BLOCK_OPTIONS_KEY, BLOCK_CONTRACT);
         defaultMap.setProperty(METHOD_OPTIONS_KEY, METHOD_CONTRACT);
         defaultMap.setProperty(MPS_OPTIONS_KEY, MPS_MERGE);
