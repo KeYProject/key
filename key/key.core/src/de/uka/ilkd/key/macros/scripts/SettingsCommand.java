@@ -27,15 +27,13 @@ public class SettingsCommand
 
     @Override protected void execute(Parameters args)
             throws ScriptException, InterruptedException {
-
-        /*TODO: invalid SymbolReference (changed methods)
-          if (args.oneStepSimplification != null) {
+        if (args.oneStepSimplification != null) {
             proof.getProofIndependentSettings().getGeneralSettings()
                     .setOneStepSimplification(args.oneStepSimplification);
 
             log.info(String.format("Set oneStepSimplification to %s",
                     args.oneStepSimplification));
-                    }*/
+        }
 
     }
 
