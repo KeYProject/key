@@ -44,7 +44,7 @@ public class PositionTable {
     protected int[] endPos;
 
     // the PositionTables for the direct subterms (or parts of sequent, etc.)
-    protected PositionTable[] child;    
+    protected PositionTable[] children;    
 
     // the current active entry number.
     // When a new "in-order" element is started, the counter is increased.
@@ -68,11 +68,11 @@ public class PositionTable {
 	this.rows=rows;
 	startPos=new int[rows];
 	endPos=new int[rows];
-	child=new PositionTable[rows];
+	children=new PositionTable[rows];
 	for (int i=0; i<rows; i++) {
 	    startPos[i]=-1;
 	    endPos[i]=-1;
-	    child[i]=null;
+	    children[i]=null;
 	}
     }
 
@@ -106,7 +106,7 @@ public class PositionTable {
 	if (sub == -1) {
 	    return ImmutableSLList.<Integer>nil();
 	} else {
-	    return child[sub].pathForIndex(index-startPos[sub])
+	    return children[sub].pathForIndex(index-startPos[sub])
 		.prepend(Integer.valueOf(sub));
 	}
     }
@@ -127,7 +127,7 @@ public class PositionTable {
 	if (sub==-1) {
 	    return new Range(0,length);
 	} else {
-	    Range r = child[sub].rangeForIndex(index-startPos[sub],
+	    Range r = children[sub].rangeForIndex(index-startPos[sub],
 					       endPos[sub]-startPos[sub]);
 	    r.start += startPos[sub];
 	    r.end   += startPos[sub];
@@ -146,7 +146,7 @@ public class PositionTable {
 	if (sub==-1) {
 	    return getFirstStatementRange();
 	} else {
-	    Range r = child[sub].
+	    Range r = children[sub].
 		firstStatementRangeForIndex(index-startPos[sub]);
 	    if (r!=null) {
 		r.start += startPos[sub];
@@ -175,7 +175,7 @@ public class PositionTable {
 	    return new Range(0,length);
 	} else {
 	    int sub = path.head().intValue();
-	    Range r = child[sub].rangeForPath(path.tail(),
+	    Range r = children[sub].rangeForPath(path.tail(),
 					      endPos[sub]-startPos[sub]);
 	    r.start += startPos[sub];
 	    r.end   += startPos[sub];
@@ -196,7 +196,7 @@ public class PositionTable {
      */
     public void setEnd(int end, PositionTable child) {
         endPos[currentEntry] = end;
-        this.child[currentEntry] = child;
+        this.children[currentEntry] = child;
     }
 
     /**
@@ -230,7 +230,15 @@ public class PositionTable {
      */
     public PositionTable getChild(int i) {
 	
-	return child[i];
+	return children[i];
+    }
+    
+    /**
+     * 
+     * @return the number of children of this PT
+     */
+    public int getChildCount() {
+        return children.length;
     }
 
     /**
@@ -239,7 +247,7 @@ public class PositionTable {
     public String toString() {
 	String result="[";
 	for (int i=0; i<rows; i++) {
-	    result=result+"<"+startPos[i]+","+endPos[i]+","+child[i]+">";
+	    result=result+"<"+startPos[i]+","+endPos[i]+","+children[i]+">";
             if (rows - 1 != i)
                 result = result + ",";
 	}
@@ -275,7 +283,7 @@ public class PositionTable {
 	    new PosInOccurrence ( cfma, PosInTerm.getTopLevel(),
 				  filter.getOriginalSequent ().antecedent().contains(cfma) );
 	
-	return child[cfmaNo].getTermPIS(filterEntry,tail,
+	return children[cfmaNo].getTermPIS(filterEntry,tail,
 					currentPos);
     }
     
@@ -302,7 +310,7 @@ public class PositionTable {
 	    int subNo  =  posList.head().intValue();
 	    PosInOccurrence subpio = pio.down ( subNo );	   
 
-	    return child[subNo].getTermPIS(filterEntry,
+	    return children[subNo].getTermPIS(filterEntry,
 					   posList.tail(),
 					   subpio);
 	}

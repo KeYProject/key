@@ -454,4 +454,7 @@ public class Sequent implements Iterable<SequentFormula> {
         }
         return result;
     }
+    public boolean contains(SequentFormula form) {
+        return antecedent.contains(form) || succedent.contains(form);
+    }
 }

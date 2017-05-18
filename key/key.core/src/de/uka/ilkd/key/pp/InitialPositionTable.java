@@ -24,7 +24,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
  * An InitialPositionTable is a PositionTable that describes the
  * beginning of the element/subelement relationship. Thus, an
  * InitialPositionTable describes the information on where the
- * semisequents of a sequent are located. It is the root of the tree of
+ * {@link SequentFormula}e of a sequent are located. It is the root of the tree of
  * PositionTables and may be asked for a PosInSequent for a given index
  * position and a given Sequent.
  *
@@ -91,7 +91,7 @@ public class InitialPositionTable extends PositionTable{
 	if (posList.isEmpty() || posList.tail().isEmpty()) {
 	    return PosInSequent.createSequentPos();	
 	} else {
-	    return child[0].getSequentPIS(posList.tail(),filter);
+	    return children[0].getSequentPIS(posList.tail(),filter);
 	}
     }
 

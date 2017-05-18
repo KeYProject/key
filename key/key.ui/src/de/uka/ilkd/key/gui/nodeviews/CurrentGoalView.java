@@ -26,16 +26,23 @@ import java.util.LinkedList;
 
 import javax.swing.SwingUtilities;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ApplyTacletDialog;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentPrintFilterEntry;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
@@ -59,6 +66,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     private static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
 
     public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
+    public static final int MAX_AGE = 50;
 
     // the mediator
     private final KeYMediator mediator;
@@ -71,6 +79,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
     private static final Insets autoScrollSensitiveRegion = new Insets(20, 20, 20, 20);
     private final LinkedList<Object> updateHighlights;
+    private final LinkedList<Object> heatMapHighlights;
 
     /**
      * creates a viewer for a sequent
@@ -145,6 +154,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         getMediator().addGUIListener(guiListener);
 
         updateHighlights = new LinkedList<Object>();
+        heatMapHighlights   = new LinkedList<Object>();
 
     }
 
@@ -160,9 +170,42 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         for (Object updateHighlight : updateHighlights) {
             removeHighlight(updateHighlight);
         }
-
+        
         updateHighlights.clear();
-        Range[] ranges = getLogicPrinter().getInitialPositionTable().getUpdateRanges();
+        heatMapHighlights.clear();
+        InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
+        Range[] ranges = ipt.getUpdateRanges();
+        int i = 0;
+
+        for(SequentPrintFilterEntry entry : filter.getFilteredAntec()) {
+            SequentFormula form = entry.getFilteredFormula();
+            int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form);
+            if(age < MAX_AGE) {
+                Color color = computeColorForAge(age);
+                ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil().prepend(0).append(i); 
+                Range r = ipt.rangeForPath(list);
+                Range newR = new Range(r.start()+1, r.end()+1); // Off-by-one: siehe unten bzw in InnerNodeView. rangeForPath ist schuld
+                Object tag = getColorHighlight(color);
+                heatMapHighlights.add(tag);
+                paintHighlight(newR, tag);
+            }
+            ++i;
+        }
+        
+        for(SequentPrintFilterEntry entry : filter.getFilteredSucc()) {
+            SequentFormula form = entry.getFilteredFormula();
+            int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form);
+            if (age < MAX_AGE) {
+                Color color = computeColorForAge(age);
+                ImmutableList<Integer> list =  ImmutableSLList.<Integer>nil().prepend(0).append(i); 
+                Range r = ipt.rangeForPath(list);
+                Range newR = new Range(r.start()+1, r.end()+1);
+                Object tag = getColorHighlight(color);
+                heatMapHighlights.add(tag);
+                paintHighlight(newR, tag);
+            }
+            ++i;
+        }
 
         if (ranges != null) {
             for (Range range : ranges) {
@@ -178,6 +221,20 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 paintHighlight(range, tag);
             }
         }
+    }
+
+    private Color computeColorForAge(int age) {
+        float col = (.5f)*(float)age / MAX_AGE;
+        return new Color(.5f+col, 0.f, 0.F);
+    }
+
+    private int computeSeqFormulaAge(Node node, SequentFormula form) {
+        int age = 0;
+        while (age < MAX_AGE && node != null && node.sequent().contains(form)) {
+            age++;
+            node = node.parent();
+        }
+        return age;
     }
 
     protected DragSource getDragSource() {
