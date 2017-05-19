@@ -68,6 +68,8 @@ public class ViewSettings implements Settings, Cloneable {
     private boolean confirmExit = true;
     /**Show Taclet uninstantiated in tooltip -- for learning  */
     private boolean showUninstantiatedTaclet = false;
+    /** Show heatmap of most recently used sequent formulae*/
+    private boolean heatmapEnabled = false;
     
     private LinkedList<SettingsListener> listenerList =
         new LinkedList<SettingsListener>();
@@ -406,8 +408,18 @@ public void setUseUnicode(boolean useUnicode) {
         this.confirmExit = confirmExit;
         fireSettingsChanged();
     }
+    public boolean isHeatmapEnabled() {
+        return heatmapEnabled;
+    }
+    public void enableHeatmap(boolean enableHeatmap) {
+        this.heatmapEnabled = enableHeatmap;
+        fireSettingsChanged();
+    }
     public boolean getShowUninstantiatedTaclet(){
 	    return showUninstantiatedTaclet;
+    }
+    public boolean heatmapEnabled(){
+        return heatmapEnabled;
     }
     public void setShowUninstantiatedTaclet(boolean b){
 	this.showUninstantiatedTaclet = b;

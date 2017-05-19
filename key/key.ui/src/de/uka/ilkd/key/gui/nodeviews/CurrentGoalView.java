@@ -44,6 +44,7 @@ import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -66,7 +67,10 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     private static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
 
     public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
-    public static final int MAX_AGE = 50;
+    // default starting color for heatmaps
+    private static final Color HEATMAP_DEFAULT_COLOR = new Color(.7f, .5f, .5f);
+    // maximum age of a sequent formula for heatmap
+    public static final int MAX_AGE = 10;
 
     // the mediator
     private final KeYMediator mediator;
@@ -78,6 +82,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     private DragSource dragSource = null;
 
     private static final Insets autoScrollSensitiveRegion = new Insets(20, 20, 20, 20);
+
     private final LinkedList<Object> updateHighlights;
     private final LinkedList<Object> heatMapHighlights;
 
@@ -172,11 +177,35 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
         
         updateHighlights.clear();
-        heatMapHighlights.clear();
         InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
         Range[] ranges = ipt.getUpdateRanges();
-        int i = 0;
+        
+        if (ranges != null) {
+            for (Range range : ranges) {
+                // NOTE (DS): The below addition of 1 to the beginning is a quick-and-dirty
+                // fix for a shift of highlighted areas to the left that occurred after the
+                // change to HTML documents in the JEditorPane (previous JTextArea). If
+                // something concerning highlighting does not work in the future, here could
+                // be a starting place to find the mistake.
+                range = new Range(range.start() + 1, range.end() + 1);
+                
+                Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR);
+                updateHighlights.add(tag);
+                paintHighlight(range, tag);
+            }
+        }
+    }
+    
+    private void updateHeatmapHighlights() {
+        if (getLogicPrinter() == null) {
+            return;
+        }
+        
+        heatMapHighlights.clear();
 
+        InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
+        
+        int i = 0;
         for(SequentPrintFilterEntry entry : filter.getFilteredAntec()) {
             SequentFormula form = entry.getFilteredFormula();
             int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form);
@@ -206,26 +235,19 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             }
             ++i;
         }
-
-        if (ranges != null) {
-            for (Range range : ranges) {
-                // NOTE (DS): The below addition of 1 to the beginning is a quick-and-dirty
-                // fix for a shift of highlighted areas to the left that occurred after the
-                // change to HTML documents in the JEditorPane (previous JTextArea). If
-                // something concerning highlighting does not work in the future, here could
-                // be a starting place to find the mistake.
-                range = new Range(range.start() + 1, range.end() + 1);
-                
-                Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR);
-                updateHighlights.add(tag);
-                paintHighlight(range, tag);
-            }
-        }
     }
 
     private Color computeColorForAge(int age) {
-        float col = (.5f)*(float)age / MAX_AGE;
-        return new Color(.5f+col, 0.f, 0.F);
+        float[] color = HEATMAP_DEFAULT_COLOR.getRGBColorComponents(null);
+        float redDiff = (1.f - color[0]) / MAX_AGE;
+        float greenDiff = (1.f - color[1]) / MAX_AGE;
+        float blueDiff = (1.f - color[2]) / MAX_AGE;
+        
+        float red = color[0] + redDiff * age;
+        float green = color[1] + greenDiff * age;
+        float blue = color[2] + blueDiff * age;
+        
+        return new Color(red, green, blue);
     }
 
     private int computeSeqFormulaAge(Node node, SequentFormula form) {
@@ -285,6 +307,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
 
         updateUpdateHighlights();
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().heatmapEnabled()) {
+            updateHeatmapHighlights();
+        }
         restorePosition();
         addMouseListener(listener);
         repaint();

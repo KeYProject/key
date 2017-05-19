@@ -720,6 +720,8 @@ public final class MainWindow extends JFrame  {
         view.add(new ToolTipOptionsAction(this));
 
         view.add(new ProofDiffFrame.Action(this));
+        
+        view.add(new JCheckBoxMenuItem(new ToggleHeatmapAction(this)));
                 
         return view;
     }
