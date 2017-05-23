@@ -70,7 +70,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     // default starting color for heatmaps
     private static final Color HEATMAP_DEFAULT_COLOR = new Color(.7f, .5f, .5f);
     // maximum age of a sequent formula for heatmap
-    public static final int MAX_AGE = 10;
+    public static final int MAX_AGE = 6;
 
     // the mediator
     private final KeYMediator mediator;
@@ -206,29 +206,17 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
         
         int i = 0;
-        for(SequentPrintFilterEntry entry : filter.getFilteredAntec()) {
+        
+        ImmutableList<SequentPrintFilterEntry> entryList = filter.getFilteredAntec().append(filter.getFilteredSucc());
+        
+        for(SequentPrintFilterEntry entry : entryList) {
             SequentFormula form = entry.getFilteredFormula();
             int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form);
             if(age < MAX_AGE) {
                 Color color = computeColorForAge(age);
                 ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil().prepend(0).append(i); 
                 Range r = ipt.rangeForPath(list);
-                Range newR = new Range(r.start()+1, r.end()+1); // Off-by-one: siehe unten bzw in InnerNodeView. rangeForPath ist schuld
-                Object tag = getColorHighlight(color);
-                heatMapHighlights.add(tag);
-                paintHighlight(newR, tag);
-            }
-            ++i;
-        }
-        
-        for(SequentPrintFilterEntry entry : filter.getFilteredSucc()) {
-            SequentFormula form = entry.getFilteredFormula();
-            int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form);
-            if (age < MAX_AGE) {
-                Color color = computeColorForAge(age);
-                ImmutableList<Integer> list =  ImmutableSLList.<Integer>nil().prepend(0).append(i); 
-                Range r = ipt.rangeForPath(list);
-                Range newR = new Range(r.start()+1, r.end()+1);
+                Range newR = new Range(r.start()+1, r.end()+1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
                 Object tag = getColorHighlight(color);
                 heatMapHighlights.add(tag);
                 paintHighlight(newR, tag);
@@ -239,14 +227,17 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
     private Color computeColorForAge(int age) {
         float[] color = HEATMAP_DEFAULT_COLOR.getRGBColorComponents(null);
-        float redDiff = (1.f - color[0]) / MAX_AGE;
-        float greenDiff = (1.f - color[1]) / MAX_AGE;
-        float blueDiff = (1.f - color[2]) / MAX_AGE;
+        float redDiff = (1.f - color[0]);
+        float greenDiff = (1.f - color[1]);
+        float blueDiff = (1.f - color[2]);
+        // exponentieller abfall - unterschiede zwischen ersten zwei, drei formeln deutlicher, danach kaum noch unterschied
+        // float diff = interpolateCol(age); 
         
-        float red = color[0] + redDiff * age;
-        float green = color[1] + greenDiff * age;
-        float blue = color[2] + blueDiff * age;
-        
+        // linearer abfall
+        float diff = (float) age / MAX_AGE;
+        float red = color[0] + redDiff * diff;
+        float green = color[1] + greenDiff * diff;
+        float blue = color[2] + blueDiff * diff;
         return new Color(red, green, blue);
     }
 
@@ -257,6 +248,10 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             node = node.parent();
         }
         return age;
+    }
+    
+    private float interpolateCol(int age) {
+        return (float) (1.f - Math.pow(.5f, age-1));
     }
 
     protected DragSource getDragSource() {
@@ -280,7 +275,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             SwingUtilities.invokeLater(sequentUpdater);
         }
     }
-
     /**
      * sets the text being printed
      */
