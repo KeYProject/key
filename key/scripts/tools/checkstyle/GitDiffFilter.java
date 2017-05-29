@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,6 +13,31 @@ import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
 import com.puppycrawl.tools.checkstyle.api.Filter;
 
+/**
+ * This class implements a checkstyle filter which filters all messages
+ * which correspond to lines which have been recently changed according
+ * to a git-diff file provided to the filter.
+ *
+ * <h2>Diff file</h2>
+ * The git-diff file must be provided and is not produced by the filter.
+ * You may create it using
+ *
+ * <pre>git diff -U0 $MERGE_BASE &gt; diffFile</pre>
+ *
+ * For <code>MERGE_BASE</code> the assignment
+ *
+ * <pre>MERGE_BASE=`git merge-base HEAD origin/master`</pre>
+ *
+ * proved sensible if merging against the master branch.
+ * The <code>diffFile</code> can then be provided to the filter as
+ * <pre> &lt;module name="GitDiffFilter"&gt;
+ *   &lt;property name="diffFilename" value="diffFile" /&gt;
+ * &lt;/module&gt;</pre>
+ *
+ * @author Mattias Ulbrich
+ * @version 1
+ * @since Mar 2017
+ */
 public final class GitDiffFilter extends AutomaticBean implements Filter {
 
     private static class Interval {
@@ -35,21 +59,26 @@ public final class GitDiffFilter extends AutomaticBean implements Filter {
             }
         }
 
-        @Override public String toString() {
+        @Override
+        public String toString() {
             return "[" + from + ", " + to + "]";
         }
     }
 
     private final Pattern FILENAME_PATTERN = Pattern.compile("\\+\\+\\+ b/(.*)");
-    private final Pattern CHANGE_PATTERN = Pattern.compile("@@ -[^ ]+ \\+(\\d+)(?:,(\\d)+)? @@.*");
+    private final Pattern CHANGE_PATTERN = Pattern.compile("@@ -[^ ]+ \\+(\\d+)(?:,(\\d+))? @@.*");
 
     private String diffFilename = null;
+    private String filenamePrefix = null;
     private Map<String, List<Interval>> changedLines = null;
 
 
-    public void setFilename(String filename) {
+    public void setDiffFilename(String filename) {
         this.diffFilename = filename;
-        this.changedLines = null;
+    }
+
+    public void setFilenamePrefix(String prefix) {
+        this.filenamePrefix = prefix;
     }
 
     @Override
@@ -59,11 +88,12 @@ public final class GitDiffFilter extends AutomaticBean implements Filter {
         }
 
         String filename;
-        try {
-            filename = new File(event.getFileName()).getAbsoluteFile().getCanonicalPath();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+	filename = event.getFileName();
+        // try {
+        //     filename = new File(event.getFileName()).getAbsoluteFile().getCanonicalPath();
+        // } catch (IOException e) {
+        //     throw new RuntimeException(e);
+        // }
         List<Interval> intervals = changedLines.get(filename);
 
         if(intervals == null) {
@@ -87,8 +117,9 @@ public final class GitDiffFilter extends AutomaticBean implements Filter {
                 Matcher m = FILENAME_PATTERN.matcher(line);
                 if(m.matches()) {
                     filename = m.group(1);
-                    filename = System.getProperty("prefix") + filename;
-                    filename = new File(filename).getAbsoluteFile().getCanonicalPath();
+		    if(filenamePrefix != null)
+			filename = filenamePrefix + File.separator + filename;
+                    // filename = new File(filename).getAbsoluteFile().getCanonicalPath();
                     result.put(filename, new ArrayList<Interval>());
                     continue;
                 }
