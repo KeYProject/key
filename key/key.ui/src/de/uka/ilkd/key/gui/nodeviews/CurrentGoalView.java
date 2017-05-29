@@ -231,7 +231,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         float greenDiff = (1.f - color[1]);
         float blueDiff = (1.f - color[2]);
         // exponentieller abfall - unterschiede zwischen ersten zwei, drei formeln deutlicher, danach kaum noch unterschied
-        // float diff = interpolateCol(age); 
+        // float diff = (float) (1.f - Math.pow(.5f, age-1)); 
         
         // linearer abfall
         float diff = (float) age / MAX_AGE;
@@ -248,10 +248,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             node = node.parent();
         }
         return age;
-    }
-    
-    private float interpolateCol(int age) {
-        return (float) (1.f - Math.pow(.5f, age-1));
     }
 
     protected DragSource getDragSource() {
