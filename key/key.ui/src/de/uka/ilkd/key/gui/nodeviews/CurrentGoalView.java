@@ -21,6 +21,9 @@ import java.awt.dnd.Autoscroll;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DropTarget;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.EventObject;
 import java.util.LinkedList;
 
@@ -68,9 +71,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
     public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
     // default starting color for heatmaps
-    private static final Color HEATMAP_DEFAULT_COLOR = new Color(.7f, .5f, .5f);
+    private static final Color HEATMAP_DEFAULT_START_COLOR = new Color(.7f, .5f, .5f);
     // maximum age of a sequent formula for heatmap
-    public static final int MAX_AGE = 6;
+    public static final int MAX_AGE_FOR_HEATMAP = 6;
 
     // the mediator
     private final KeYMediator mediator;
@@ -207,26 +210,52 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         
         int i = 0;
         
+        // 5 "youngest" sequent formulas are highlighted. below is highlighting only by age.
         ImmutableList<SequentPrintFilterEntry> entryList = filter.getFilteredAntec().append(filter.getFilteredSucc());
+        SequentPrintFilterEntry[] sortedArray = new SequentPrintFilterEntry[entryList.size()];
+        entryList.toArray(sortedArray);
+        Arrays.sort(sortedArray, new Comparator<SequentPrintFilterEntry>() {
+            @Override
+            public int compare(SequentPrintFilterEntry o1, SequentPrintFilterEntry o2) {
+                return computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), o1.getFilteredFormula(), 1000)
+                        >= computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), o2.getFilteredFormula(), 1000) ? 1 : -1;
+            }
+        });
         
         for(SequentPrintFilterEntry entry : entryList) {
-            SequentFormula form = entry.getFilteredFormula();
-            int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form);
-            if(age < MAX_AGE) {
-                Color color = computeColorForAge(age);
-                ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil().prepend(0).append(i); 
-                Range r = ipt.rangeForPath(list);
-                Range newR = new Range(r.start()+1, r.end()+1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
-                Object tag = getColorHighlight(color);
-                heatMapHighlights.add(tag);
-                paintHighlight(newR, tag);
+            for (int j = 0; j < 5; ++j) {
+                if (sortedArray[j].equals(entry)) {
+                    Color color = computeColorForAge(j);
+                    ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil().prepend(0).append(i); 
+                    Range r = ipt.rangeForPath(list);
+                    Range newR = new Range(r.start()+1, r.end()+1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
+                    Object tag = getColorHighlight(color);
+                    heatMapHighlights.add(tag);
+                    paintHighlight(newR, tag);
+                }
             }
             ++i;
         }
+        
+        
+//        for(SequentPrintFilterEntry entry : entryList) {
+//            SequentFormula form = entry.getFilteredFormula();
+//            int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form, MAX_AGE_FOR_HEATMAP);
+//            if(age < MAX_AGE_FOR_HEATMAP) {
+//                Color color = computeColorForAge(age);
+//                ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil().prepend(0).append(i); 
+//                Range r = ipt.rangeForPath(list);
+//                Range newR = new Range(r.start()+1, r.end()+1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
+//                Object tag = getColorHighlight(color);
+//                heatMapHighlights.add(tag);
+//                paintHighlight(newR, tag);
+//            }
+//            ++i;
+//        }
     }
 
     private Color computeColorForAge(int age) {
-        float[] color = HEATMAP_DEFAULT_COLOR.getRGBColorComponents(null);
+        float[] color = HEATMAP_DEFAULT_START_COLOR.getRGBColorComponents(null);
         float redDiff = (1.f - color[0]);
         float greenDiff = (1.f - color[1]);
         float blueDiff = (1.f - color[2]);
@@ -234,21 +263,34 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         // float diff = (float) (1.f - Math.pow(.5f, age-1)); 
         
         // linearer abfall
-        float diff = (float) age / MAX_AGE;
+        float diff = (float) age / MAX_AGE_FOR_HEATMAP;
         float red = color[0] + redDiff * diff;
         float green = color[1] + greenDiff * diff;
         float blue = color[2] + blueDiff * diff;
         return new Color(red, green, blue);
     }
 
-    private int computeSeqFormulaAge(Node node, SequentFormula form) {
+    private int computeSeqFormulaAge(Node node, SequentFormula form, int max_age) {
         int age = 0;
-        while (age < MAX_AGE && node != null && node.sequent().contains(form)) {
+        while (age < max_age && node != null && node.sequent().contains(form)) {
             age++;
             node = node.parent();
         }
         return age;
     }
+    
+    /**
+     * given a node and a sequent formula, returns the first node 
+     * that did contain the sequent formula @form.
+     */
+    public Node jumpToIntroduction(Node node, SequentFormula form) {
+        while (node.parent() != null && node.sequent().contains(form)) {
+            node = node.parent();
+        }
+        return node;
+    }
+    
+    
 
     protected DragSource getDragSource() {
         return dragSource;
