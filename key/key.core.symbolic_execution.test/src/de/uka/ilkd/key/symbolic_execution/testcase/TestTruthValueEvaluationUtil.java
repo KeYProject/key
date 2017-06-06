@@ -189,7 +189,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * Tests example: /set/truthValueBlockContractMagic42
     */
 	@Ignore
-	public void testBlockContractMagic42() throws Exception {
+	public void IGNORE_testBlockContractMagic42() throws Exception {
       // Create expected results
       ExpectedBranchResult goal66 = new ExpectedBranchResult(new ExpectedTruthValueResult("9.0", TruthValue.TRUE),
                                                              new ExpectedTruthValueResult("11.0", TruthValue.TRUE),
@@ -292,7 +292,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * Tests example: /set/truthValueAssignableAndLoop
     */
 	@Ignore
-	public void testAssignableAndLoop() throws Exception {
+    public void IGNORE_testAssignableAndLoop() throws Exception {
       // Create expected results
       ExpectedBranchResult goal430 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.FALSE),
                                                               new ExpectedTruthValueResult("4.0", TruthValue.FALSE),
@@ -808,7 +808,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * Tests example: /set/truthValueArrayUtil
     */
 	@Ignore
-	public void testArrayUtil_NoOneStepSimplification() throws Exception {
+	public void IGNORE_testArrayUtil_NoOneStepSimplification() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult goal97 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult goal826 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("17.0", TruthValue.TRUE), new ExpectedTruthValueResult("18.0", TruthValue.TRUE), new ExpectedTruthValueResult("20.0", TruthValue.TRUE)));
@@ -834,7 +834,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * Tests example: /set/truthValueArrayUtil
     */
 	@Ignore
-	public void testArrayUtil() throws Exception {
+	public void IGNORE_testArrayUtil() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult goal97 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult goal826 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("17.0", TruthValue.TRUE), new ExpectedTruthValueResult("18.0", TruthValue.TRUE), new ExpectedTruthValueResult("20.0", TruthValue.TRUE)));
