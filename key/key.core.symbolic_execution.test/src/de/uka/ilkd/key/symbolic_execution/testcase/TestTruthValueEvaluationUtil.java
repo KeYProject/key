@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.runners.MethodSorters;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -36,7 +37,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueWeakeningTest
     */
-   public void testJoinTestAfterBranchConditionWithWeakeningGoal() throws Exception {
+	public void testJoinTestAfterBranchConditionWithWeakeningGoal() throws Exception {
       // Create expected results
       ExpectedBranchResult seGoal = new ExpectedBranchResult();
       ExpectedBranchResult weakeningGoal = new ExpectedBranchResult(new ExpectedTruthValueResult("13.0", TruthValue.FALSE),
@@ -187,7 +188,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueBlockContractMagic42
     */
-   public void testBlockContractMagic42() throws Exception {
+	@Ignore
+	public void testBlockContractMagic42() throws Exception {
       // Create expected results
       ExpectedBranchResult goal66 = new ExpectedBranchResult(new ExpectedTruthValueResult("9.0", TruthValue.TRUE),
                                                              new ExpectedTruthValueResult("11.0", TruthValue.TRUE),
@@ -289,7 +291,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueAssignableAndLoop
     */
-   public void testAssignableAndLoop() throws Exception {
+	@Ignore
+	public void testAssignableAndLoop() throws Exception {
       // Create expected results
       ExpectedBranchResult goal430 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.FALSE),
                                                               new ExpectedTruthValueResult("4.0", TruthValue.FALSE),
@@ -804,7 +807,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueArrayUtil
     */
-   public void testArrayUtil_NoOneStepSimplification() throws Exception {
+	@Ignore
+	public void testArrayUtil_NoOneStepSimplification() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult goal97 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult goal826 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("17.0", TruthValue.TRUE), new ExpectedTruthValueResult("18.0", TruthValue.TRUE), new ExpectedTruthValueResult("20.0", TruthValue.TRUE)));
@@ -829,7 +833,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueArrayUtil
     */
-   public void testArrayUtil() throws Exception {
+	@Ignore
+	public void testArrayUtil() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult goal97 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult goal826 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("17.0", TruthValue.TRUE), new ExpectedTruthValueResult("18.0", TruthValue.TRUE), new ExpectedTruthValueResult("20.0", TruthValue.TRUE)));
