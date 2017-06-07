@@ -253,6 +253,14 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 //            ++i;
 //        }
     }
+    
+    private void updateTermHighlights() {
+        List<pio, alter(?)> list;
+        Node node = getMainWindow().getMediator().getSelectedNode();
+        node = 20. parentNode; node.getNodeInfo().get
+        list.add node.getAppliedRuleApp().posInOccurrence();
+        node.// nur find-Teil. TODO: Auch add
+    }
 
     private Color computeColorForAge(int age) {
         float[] color = HEATMAP_DEFAULT_START_COLOR.getRGBColorComponents(null);
@@ -281,7 +289,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     
     /**
      * given a node and a sequent formula, returns the first node 
-     * that did contain the sequent formula @form.
+     * among the node's parents that contains the sequent formula @form.
      */
     public Node jumpToIntroduction(Node node, SequentFormula form) {
         while (node.parent() != null && node.sequent().contains(form)) {

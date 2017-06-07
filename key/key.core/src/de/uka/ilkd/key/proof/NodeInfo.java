@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -69,6 +70,8 @@ public class NodeInfo {
 
     /** User-provided plain-text annotations to the node. */
     private String notes;
+
+    private SequentChangeInfo sequentChangeInfo;
 
 
     public NodeInfo(Node node) {
@@ -351,5 +354,13 @@ public class NodeInfo {
     /** Get user-provided plain-text annotations. */
     public String getNotes() {
         return notes;
+    }
+
+    public SequentChangeInfo getSequentChangeInfo() {
+        return sequentChangeInfo;
+    }
+
+    public void setSequentChangeInfo(SequentChangeInfo sequentChangeInfo) {
+        this.sequentChangeInfo = sequentChangeInfo;
     }
 }
