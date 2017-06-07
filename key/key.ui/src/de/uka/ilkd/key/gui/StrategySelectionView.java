@@ -666,7 +666,7 @@ public final class StrategySelectionView extends JPanel {
                 .setActiveStrategyProperties(p);
 
         proof.setActiveStrategy(strategy);
-
+        
         refresh(proof);
     }
 

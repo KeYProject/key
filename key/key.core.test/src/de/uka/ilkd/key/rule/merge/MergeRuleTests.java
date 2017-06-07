@@ -54,7 +54,7 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testLoadGcdProof() {
-        Proof proof = loadProof("gcd.closed.proof");
+        Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX, "gcd.closed.proof");
         assertTrue(proof.closed());
     }
 
@@ -68,7 +68,7 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testLoadGcdProofWithPredAbstr() {
-        Proof proof = loadProof("gcd.closed.predicateabstraction.proof");
+        Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX, "gcd.closed.predicateabstraction.proof");
         assertTrue(proof.closed());
     }
 
@@ -83,7 +83,7 @@ public class MergeRuleTests extends TestCase {
     @Test
     public void testLoadGcdProofWithPredAbstrAndUserChoices() {
         Proof proof = loadProof(
-                "gcd.closed.predicateAbstractionWithUserChoices.proof");
+                TEST_RESOURCES_DIR_PREFIX, "gcd.closed.predicateAbstractionWithUserChoices.proof");
         assertTrue(proof.closed());
     }
 
@@ -93,7 +93,7 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testDoAutomaticGcdProofWithMergePointStatements() {
-        final Proof proof = loadProof("gcd.mergePointStatements.key");
+        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX, "gcd.mergePointStatements.key");
         startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());
@@ -116,7 +116,7 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testLoadClosedGcdProofWithMergePointStatements() {
-        final Proof proof = loadProof("gcd.mergePointStatements.closed.proof");
+        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX, "gcd.mergePointStatements.closed.proof");
 
         assertTrue(proof.closed());
 
@@ -138,7 +138,7 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testDoAutomaticGcdProofWithMergePointStatementAndBlockContract() {
-        final Proof proof = loadProof("gcd.MPSAndBlockContract.key");
+        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX, "gcd.MPSAndBlockContract.key");
         startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());
@@ -166,7 +166,7 @@ public class MergeRuleTests extends TestCase {
     @Test
     public void testLoadProofWithDiffVarsWithSameNameAndMPS() {
         Proof proof = loadProof(
-                "A.differentVarsWithSameName.MPS.cut.closed.proof");
+                TEST_RESOURCES_DIR_PREFIX, "A.differentVarsWithSameName.MPS.cut.closed.proof");
         assertTrue(proof.closed());
     }
 
@@ -192,7 +192,7 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testDoManualGcdProof() throws Exception {
-        final Proof proof = loadProof("gcd.key");
+        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX, "gcd.key");
 
         for (int i = 0; i < 2; i++) {
             runMacro(new FinishSymbolicExecutionUntilMergePointMacro(),
@@ -213,7 +213,7 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testMergeIndistinguishablePathConditionsWithITE() {
-        final Proof proof = loadProof("IndistinguishablePathConditions.proof");
+        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX, "IndistinguishablePathConditions.proof");
 
         try {
             mergeFirstGoal(proof, MergeIfThenElseAntecedent.instance());
@@ -229,7 +229,7 @@ public class MergeRuleTests extends TestCase {
     @Test
     public void testMergeThreeIndistinguishablePathConditionsWithITE() {
         final Proof proof = loadProof(
-                "IndistinguishablePathConditions.twoJoins.proof");
+                TEST_RESOURCES_DIR_PREFIX, "IndistinguishablePathConditions.twoJoins.proof");
 
         try {
             mergeFirstGoal(proof, MergeIfThenElseAntecedent.instance());
@@ -245,7 +245,7 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testMergeIndistinguishablePathConditionsWithFullAnonymization() {
-        final Proof proof = loadProof("IndistinguishablePathConditions.proof");
+        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX, "IndistinguishablePathConditions.proof");
 
         mergeFirstGoal(proof, MergeTotalWeakening.instance());
         startAutomaticStrategy(proof);
@@ -260,7 +260,7 @@ public class MergeRuleTests extends TestCase {
      * @param proof
      *            Proof to prove automatically.
      */
-    private void startAutomaticStrategy(final Proof proof) {
+    public static void startAutomaticStrategy(final Proof proof) {
         ProofStarter starter = new ProofStarter(false);
         starter.init(proof);
         starter.start();
@@ -328,13 +328,14 @@ public class MergeRuleTests extends TestCase {
     /**
      * Loads the given proof file. Checks if the proof file exists and the proof
      * is not null, and fails if the proof could not be loaded.
-     *
+     * @param directory TODO
      * @param proofFileName
      *            The file name of the proof file to load.
+     *
      * @return The loaded proof.
      */
-    static Proof loadProof(String proofFileName) {
-        File proofFile = new File(TEST_RESOURCES_DIR_PREFIX + proofFileName);
+    public static Proof loadProof(Object directory, String proofFileName) {
+        File proofFile = new File(directory + proofFileName);
         assertTrue(proofFile.exists());
 
         try {

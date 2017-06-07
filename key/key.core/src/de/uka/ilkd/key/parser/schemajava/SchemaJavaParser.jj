@@ -557,6 +557,7 @@ TOKEN :
 		    | < EVALARGS: "#evaluate-arguments" >
 		    | < REPLACEARGS: "#replace" >
 		    | < LONG: "long" >
+		    | < LOOPSCOPE: "loop-scope" >
 		    | < NATIVE: "native" >
 		    | < NEW: "new" >
 		    | < NULL: "null" >
@@ -3593,6 +3594,7 @@ Statement Statement() :
      | result = IfStatement()
      | result = WhileStatement()
      | result = MergePointStatement()
+     | result = LoopScopeStatement()
      | result = KeYMetaConstructStatement()
      | result = DoStatement()
      | result = ForStatement()
@@ -4441,6 +4443,27 @@ Statement stat;
     }
 }
 
+LoopScopeBlock LoopScopeStatement() :
+{
+    LoopScopeBlock result;
+    Expression indexPV = null;
+	Statement stat;
+}
+{
+    "loop-scope"
+	{
+	    result = factory.createLoopScopeBlock();
+	    setPrefixInfo(result);
+	}
+    "(" indexPV = Expression() ")" stat = Statement()
+    {
+	result.setIndexPV(indexPV);
+	result.setBody(stat);
+	checkConstruction(result);
+	return result;
+    }
+}
+
 MergePointStatement MergePointStatement() :
 {
     MergePointStatement result;
@@ -4689,12 +4712,21 @@ Continue ContinueStatement() :
 	    result = factory.createContinue();
 	    setPrefixInfo(result);
 	}
-    [ <IDENTIFIER>
+    [ (<IDENTIFIER>
     {
 	id = factory.createIdentifier(token.image);
 	setPrefixInfo(id);
 	result.setIdentifier(id);
     }
+     ) | (
+	   <SVIDENTIFIER>
+    {
+	id = factory.getLabelSV(token.image);
+	setPrefixInfo(id);
+	result.setIdentifier(id);
+    }
+
+	   )
     ] ";"
 	{
 	    checkConstruction(result);

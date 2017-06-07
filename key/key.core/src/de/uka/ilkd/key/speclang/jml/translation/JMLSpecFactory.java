@@ -347,11 +347,11 @@ public class JMLSpecFactory {
                         .<PositionedString> nil()
                         .append(new PositionedString("assignable \\nothing;"));
                 clauses.assignables.put(heap,
-                        translateAssignable(pm, progVars.selfVar,
-                                progVars.paramVars, assignableNothing));
+                        translateAssignable(pm, progVars.selfVar, progVars.paramVars,
+                                            progVars.atPres, assignableNothing));
             } else {
                 clauses.assignables.put(heap, translateAssignable(pm,
-                        progVars.selfVar, progVars.paramVars,
+                        progVars.selfVar, progVars.paramVars, progVars.atPres,
                         textualSpecCase.getAssignable(heap.name().toString())));
             }
 
@@ -413,11 +413,11 @@ public class JMLSpecFactory {
                 clauses.accessibles.put(heapAtPre, null);
             } else {
                 clauses.accessibles.put(heap, translateAssignable(pm,
-                        progVars.selfVar, progVars.paramVars,
+                        progVars.selfVar, progVars.paramVars, progVars.atPres,
                         textualSpecCase.getAccessible(heap.name().toString())));
                 clauses.accessibles.put(heapAtPre,
                         translateAssignable(pm, progVars.selfVar,
-                                progVars.paramVars,
+                                progVars.paramVars, progVars.atPres,
                                 textualSpecCase.getAccessible(
                                         heap.name().toString() + "AtPre")));
             }
@@ -542,12 +542,13 @@ public class JMLSpecFactory {
 
     private Term translateUnionClauses(IProgramMethod pm,
             ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, Term> atPres,
             ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
         Term result = TB.empty();
         for (PositionedString expr : originalClauses) {
             Term translated = JMLTranslator.translate(expr,
-                    pm.getContainerType(), selfVar, paramVars, null, null, null,
+                    pm.getContainerType(), selfVar, paramVars, null, null, atPres,
                     Term.class, services);
 
             // less than nothing is marked by some special term;
@@ -661,18 +662,20 @@ public class JMLSpecFactory {
     @SuppressWarnings("unused")
     private Term translateAccessible(IProgramMethod pm, ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, Term> atPres,
             ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
         if (originalClauses.isEmpty()) {
             return TB.allLocs();
         } else {
             return translateUnionClauses(pm, selfVar, paramVars,
-                    originalClauses);
+                                         atPres, originalClauses);
         }
     }
 
     private Term translateAssignable(IProgramMethod pm, ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, Term> atPres,
             ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
 
@@ -680,7 +683,7 @@ public class JMLSpecFactory {
             return TB.allLocs();
         } else {
             return translateUnionClauses(pm, selfVar, paramVars,
-                    originalClauses);
+                                         atPres, originalClauses);
         }
     }
 
@@ -1454,7 +1457,7 @@ public class JMLSpecFactory {
                 for (PositionedString expr : as) {
                     Term translated = JMLTranslator.translate(expr,
                             pm.getContainerType(), selfVar, allVars, null, null,
-                            null, Term.class, services);
+                            atPres, Term.class, services);
                     a = TB.union(a, translated);
                 }
             }
@@ -1463,7 +1466,8 @@ public class JMLSpecFactory {
         }
 
         // translateToTerm infFlowSpecs
-        Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs = new LinkedHashMap<LocationVariable, ImmutableList<InfFlowSpec>>();
+        Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs =
+                new LinkedHashMap<LocationVariable, ImmutableList<InfFlowSpec>>();
         ImmutableList<InfFlowSpec> infFlowSpecTermList;
         final LocationVariable baseHeap = services.getTypeConverter()
                 .getHeapLDT().getHeap();

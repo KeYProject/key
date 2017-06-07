@@ -7,7 +7,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.7.100",
  org.key_project.util;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .,
  key.lib/antlr.jar,
  key.lib/recoderKey.jar
@@ -61,6 +61,7 @@ Export-Package: .,
  de.uka.ilkd.key.logic.util,
  de.uka.ilkd.key.macros,
  de.uka.ilkd.key.macros.scripts,
+ de.uka.ilkd.key.macros.scripts.meta,
  de.uka.ilkd.key.parser,
  de.uka.ilkd.key.parser.proofjava,
  de.uka.ilkd.key.parser.schemajava,

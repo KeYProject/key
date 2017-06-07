@@ -31,6 +31,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.SynchronizedBlock;
 import de.uka.ilkd.key.java.statement.Try;
@@ -618,7 +619,9 @@ public abstract class TacletIndex  {
 	    LabeledStatement.class,
 	    Try.class,	    
 	    MethodFrame.class,
-	    SynchronizedBlock.class};
+	    SynchronizedBlock.class,
+	    LoopScopeBlock.class
+	    };
 
 	/**
 	 * number of prefix types
@@ -634,7 +637,7 @@ public abstract class TacletIndex  {
 	 * fields to indicate the position of the next relevant child (the next
 	 * possible prefix element or real statement
 	 */
-	static final int[] nextChild = new int[]{0,1,0,1,1};
+	static final int[] nextChild = new int[]{0,1,0,1,1,1};
 
 	PrefixOccurrences() {
 	    reset();
@@ -655,20 +658,20 @@ public abstract class TacletIndex  {
 	 * @param pe the occurred program element
 	 * @return the number of the next possible prefix element
 	 */
-	public int occurred(ProgramElement pe) {
-	    for (int i=0; i<PREFIXTYPES; i++) {
-		if (prefixClasses[i].isInstance(pe)) {
-		    occurred[i]=true;
-		    if (pe instanceof MethodFrame) {
-			return (((MethodFrame)pe).getProgramVariable()
-				==null) ?  1 : 2;
-		    } else {
-			return nextChild[i];
-		    }
-		}
-	    }
-	    return -1;
-	}
+    public int occurred(ProgramElement pe) {
+        for (int i = 0; i < PREFIXTYPES; i++) {
+            if (prefixClasses[i].isInstance(pe)) {
+                occurred[i] = true;
+                if (pe instanceof MethodFrame) {
+                    return (((MethodFrame) pe).getProgramVariable() == null)
+                            ? 1 : 2;
+                } else {
+                    return nextChild[i];
+                }
+            }
+        }
+        return -1;
+    }
 
 	/**
 	 * creates a selection of the given NoPosTacletApp map that comply with the

@@ -140,6 +140,7 @@ import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
@@ -2333,6 +2334,24 @@ public class PrettyPrinter {
         if (x.getBody() != null) {
             writeElement(1, x.getBody());
         }
+        printFooter(x);
+    }
+
+
+    public void printLoopScopeBlock(LoopScopeBlock x) 
+    throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+//        write("\u21BB"); // UTF-8 loop scope sign
+        write("loop-scope(");
+        if (x.getIndexPV() != null) {
+            writeElement(x.getIndexPV());
+        }
+        write(")");
+        if (x.getBody() != null) {
+            writeElement(1, x.getBody());
+        }
+//        write("\u21BA"); // UTF-8 loop scope end sign
         printFooter(x);
     }
 

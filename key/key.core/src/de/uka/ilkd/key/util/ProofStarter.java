@@ -233,11 +233,11 @@ public class ProofStarter {
               strategy = factory.create(proof, sp);
            }
 
-           if (proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification()) {
-               OneStepSimplifier.refreshOSS(proof);
-           }
-
            proof.setActiveStrategy(strategy);
+           
+            // It is important that OSS is refreshed AFTER the strategy has been
+            // set!
+           OneStepSimplifier.refreshOSS(proof);
 
            IGoalChooser goalChooser = profile.getSelectedGoalChooserBuilder().create();
            ApplyStrategy prover = new ApplyStrategy(goalChooser);

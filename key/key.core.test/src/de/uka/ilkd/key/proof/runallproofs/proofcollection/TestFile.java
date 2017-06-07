@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -18,8 +20,6 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
-
-import static org.junit.Assert.*;
 
 /**
  * Data structure for .key-files that will be tested during

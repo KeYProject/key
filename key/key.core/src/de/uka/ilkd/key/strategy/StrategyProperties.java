@@ -19,9 +19,6 @@ import java.util.Set;
 
 public final class StrategyProperties extends Properties {
     
-    /**
-     * 
-     */
     private static final long serialVersionUID = -4647245742912258421L;
     public final static String INF_FLOW_CHECK_PROPERTY = "INF_FLOW_CHECK_PROPERTY";
     public final static String INF_FLOW_CHECK_TRUE = "INF_FLOW_CHECK_TRUE";
@@ -36,11 +33,12 @@ public final class StrategyProperties extends Properties {
     public final static String SPLITTING_NORMAL = "SPLITTING_NORMAL";
     public final static String SPLITTING_OFF = "SPLITTING_OFF";
     public final static String SPLITTING_DELAYED = "SPLITTING_DELAYED";
-
+    
     public final static String LOOP_OPTIONS_KEY = "LOOP_OPTIONS_KEY";
     public final static String LOOP_EXPAND = "LOOP_EXPAND";
     public final static String LOOP_EXPAND_BOUNDED = "LOOP_EXPAND_BOUNDED"; //Used for test generation chrisg
     public final static String LOOP_INVARIANT = "LOOP_INVARIANT";
+    public final static String LOOP_SCOPE_INVARIANT = "LOOP_SCOPE_INVARIANT";
     public final static String LOOP_NONE = "LOOP_NONE";
     
     public final static String BLOCK_OPTIONS_KEY = "BLOCK_OPTIONS_KEY";
@@ -75,6 +73,10 @@ public final class StrategyProperties extends Properties {
     public final static String NON_LIN_ARITH_NONE = "NON_LIN_ARITH_NONE";
     public final static String NON_LIN_ARITH_DEF_OPS = "NON_LIN_ARITH_DEF_OPS";
     public final static String NON_LIN_ARITH_COMPLETION = "NON_LIN_ARITH_COMPLETION";
+
+    public final static String OSS_OPTIONS_KEY = "OSS_OPTIONS_KEY";
+    public final static String OSS_ON = "OSS_ON";
+    public final static String OSS_OFF= "OSS_OFF";
 
     public final static String QUANTIFIERS_OPTIONS_KEY = "QUANTIFIERS_OPTIONS_KEY";
     public final static String QUANTIFIERS_NONE = "QUANTIFIERS_NONE";
@@ -145,7 +147,7 @@ public final class StrategyProperties extends Properties {
         INF_FLOW_CHECK_PROPERTY, INF_FLOW_CHECK_TRUE, INF_FLOW_CHECK_FALSE,
         STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT, STOPMODE_NONCLOSE,
     	SPLITTING_OPTIONS_KEY, SPLITTING_NORMAL, SPLITTING_OFF, SPLITTING_DELAYED,
-    	LOOP_OPTIONS_KEY, LOOP_EXPAND, LOOP_EXPAND_BOUNDED, LOOP_INVARIANT, LOOP_NONE,
+    	LOOP_OPTIONS_KEY, LOOP_EXPAND, LOOP_EXPAND_BOUNDED, LOOP_INVARIANT, LOOP_SCOPE_INVARIANT, LOOP_NONE,
     	BLOCK_OPTIONS_KEY, BLOCK_CONTRACT, BLOCK_EXPAND, BLOCK_NONE,
     	METHOD_OPTIONS_KEY, METHOD_EXPAND, METHOD_CONTRACT, METHOD_NONE,
     	MPS_OPTIONS_KEY, MPS_MERGE, MPS_SKIP, MPS_NONE,
@@ -153,6 +155,7 @@ public final class StrategyProperties extends Properties {
     	QUERY_OPTIONS_KEY, QUERY_ON, QUERY_RESTRICTED, QUERY_OFF,
     	QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON, QUERYAXIOM_OFF,
     	NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE, NON_LIN_ARITH_DEF_OPS, NON_LIN_ARITH_COMPLETION,
+    	OSS_OPTIONS_KEY, OSS_ON, OSS_OFF,
     	QUANTIFIERS_OPTIONS_KEY, QUANTIFIERS_NONE, QUANTIFIERS_NON_SPLITTING, QUANTIFIERS_NON_SPLITTING_WITH_PROGS, QUANTIFIERS_INSTANTIATE,
     	VBT_PHASE, VBT_SYM_EX, VBT_QUAN_INST, VBT_MODEL_GEN,
     	CLASS_AXIOM_OFF, CLASS_AXIOM_DELAYED, CLASS_AXIOM_FREE,
@@ -171,6 +174,7 @@ public final class StrategyProperties extends Properties {
         defaultMap.setProperty(BLOCK_OPTIONS_KEY, BLOCK_CONTRACT);
         defaultMap.setProperty(METHOD_OPTIONS_KEY, METHOD_CONTRACT);
         defaultMap.setProperty(MPS_OPTIONS_KEY, MPS_MERGE);
+        defaultMap.setProperty(OSS_OPTIONS_KEY, OSS_ON);
         defaultMap.setProperty(DEP_OPTIONS_KEY, DEP_ON);
         defaultMap.setProperty(QUERY_OPTIONS_KEY, QUERY_OFF);
         defaultMap.setProperty(QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON);
@@ -197,6 +201,7 @@ public final class StrategyProperties extends Properties {
         put(QUERY_OPTIONS_KEY, defaultMap.get(QUERY_OPTIONS_KEY));
         put(QUERYAXIOM_OPTIONS_KEY, defaultMap.get(QUERYAXIOM_OPTIONS_KEY));
         put(NON_LIN_ARITH_OPTIONS_KEY, defaultMap.get(NON_LIN_ARITH_OPTIONS_KEY));
+        put(OSS_OPTIONS_KEY, defaultMap.get(OSS_OPTIONS_KEY));
         put(QUANTIFIERS_OPTIONS_KEY, defaultMap.get(QUANTIFIERS_OPTIONS_KEY));
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
             put(USER_TACLETS_OPTIONS_KEY(i), defaultMap.get(USER_TACLETS_OPTIONS_KEY(i)));
@@ -229,6 +234,7 @@ public final class StrategyProperties extends Properties {
         sp.put(QUERY_OPTIONS_KEY, readSingleOption(p,QUERY_OPTIONS_KEY));
         sp.put(QUERYAXIOM_OPTIONS_KEY, readSingleOption(p,QUERYAXIOM_OPTIONS_KEY));
         sp.put(NON_LIN_ARITH_OPTIONS_KEY, readSingleOption(p,NON_LIN_ARITH_OPTIONS_KEY));
+        sp.put(OSS_OPTIONS_KEY, readSingleOption(p, OSS_OPTIONS_KEY));
         sp.put(QUANTIFIERS_OPTIONS_KEY, readSingleOption(p,QUANTIFIERS_OPTIONS_KEY));
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
             sp.put(USER_TACLETS_OPTIONS_KEY(i), readSingleOption(p,USER_TACLETS_OPTIONS_KEY(i)));
@@ -260,8 +266,9 @@ public final class StrategyProperties extends Properties {
         p.put(STRATEGY_PROPERTY+DEP_OPTIONS_KEY, get(DEP_OPTIONS_KEY));              
         p.put(STRATEGY_PROPERTY+QUERY_OPTIONS_KEY, get(QUERY_OPTIONS_KEY));              
         p.put(STRATEGY_PROPERTY+QUERYAXIOM_OPTIONS_KEY, get(QUERYAXIOM_OPTIONS_KEY));              
-        p.put(STRATEGY_PROPERTY+NON_LIN_ARITH_OPTIONS_KEY, get(NON_LIN_ARITH_OPTIONS_KEY));              
-        p.put(STRATEGY_PROPERTY+QUANTIFIERS_OPTIONS_KEY, get(QUANTIFIERS_OPTIONS_KEY));              
+        p.put(STRATEGY_PROPERTY+NON_LIN_ARITH_OPTIONS_KEY, get(NON_LIN_ARITH_OPTIONS_KEY)); 
+        p.put(STRATEGY_PROPERTY+OSS_OPTIONS_KEY, get(OSS_OPTIONS_KEY));             
+        p.put(STRATEGY_PROPERTY+QUANTIFIERS_OPTIONS_KEY, get(QUANTIFIERS_OPTIONS_KEY));               
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
             p.put(STRATEGY_PROPERTY+USER_TACLETS_OPTIONS_KEY(i), get(USER_TACLETS_OPTIONS_KEY(i)));
         p.put(STRATEGY_PROPERTY+INF_FLOW_CHECK_PROPERTY, get(INF_FLOW_CHECK_PROPERTY));
@@ -331,9 +338,11 @@ public final class StrategyProperties extends Properties {
                                                     boolean blockTreatmentContract,
                                                     boolean nonExecutionBranchHidingSideProofs,
                                                     boolean aliasChecks) {
+       // TODO (DS, 2017-05-11): Would be great to also use the loop scope invariant for the SED. For this, one would however have to change the SED's implementation and to update the tests. 
        sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT : StrategyProperties.LOOP_EXPAND);
        sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, blockTreatmentContract ? StrategyProperties.BLOCK_CONTRACT : StrategyProperties.BLOCK_EXPAND);
        sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatmentContract ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
+       sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_ON);
        sp.setProperty(StrategyProperties.MPS_OPTIONS_KEY, StrategyProperties.MPS_MERGE);
        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_RESTRICTED);
        sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);

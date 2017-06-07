@@ -1,36 +1,22 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.macros.scripts.meta.Option;
+import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
-import de.uka.ilkd.key.smt.RuleAppSMT;
-import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverType;
-import de.uka.ilkd.key.smt.SolverTypeCollection;
 
-public class SMTCommand extends AbstractCommand {
+import java.util.*;
 
-    private static final String DEFAULT_SOLVER = "Z3";
-    private static final String SOLVER_KEY = "solver";
-
+public class SMTCommand
+        extends AbstractCommand<SMTCommand.SMTCommandArguments> {
     private static final Map<String, SolverType> SOLVER_MAP = computeSolverMap();
 
-    @Override
-    public String getName() {
-        return "smt";
+    public SMTCommand() {
+        super(SMTCommandArguments.class);
     }
 
     private static Map<String, SolverType> computeSolverMap() {
@@ -43,22 +29,25 @@ public class SMTCommand extends AbstractCommand {
         return Collections.unmodifiableMap(result);
     }
 
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
+    @Override public SMTCommandArguments evaluateArguments(EngineState state,
+            Map<String, String> arguments) throws Exception {
+        return ValueInjector.injection(this, new SMTCommandArguments(), arguments);
+    }
 
+    @Override public String getName() {
+        return "smt";
+    }
 
-        String value = args.get(SOLVER_KEY);
-        if(value == null ) {
-            value = DEFAULT_SOLVER;
-        }
+    @Override public void execute(SMTCommandArguments args)
+            throws ScriptException, InterruptedException {
+        SolverTypeCollection su = computeSolvers(args.solver);
 
-        SolverTypeCollection su = computeSolvers(value);
+        Goal goal = state.getFirstOpenGoal();
 
-        Goal goal = getFirstOpenGoal(proof, state);
-
-        SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
-                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),goal.proof());
+        SMTSettings settings = new SMTSettings(
+                goal.proof().getSettings().getSMTSettings(),
+                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                goal.proof());
         SolverLauncher launcher = new SolverLauncher(settings);
         Collection<SMTProblem> probList = new LinkedList<SMTProblem>();
         probList.add(new SMTProblem(goal));
@@ -66,7 +55,8 @@ public class SMTCommand extends AbstractCommand {
 
         for (SMTProblem problem : probList) {
             if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-                IBuiltInRuleApp app = RuleAppSMT.rule.createApp(null).setTitle(value);
+                IBuiltInRuleApp app = RuleAppSMT.rule.createApp(null)
+                        .setTitle(args.solver);
                 problem.getGoal().apply(app);
             }
         }
@@ -77,11 +67,16 @@ public class SMTCommand extends AbstractCommand {
         List<SolverType> types = new ArrayList<SolverType>();
         for (String name : parts) {
             SolverType type = SOLVER_MAP.get(name);
-            if(type != null) {
+            if (type != null) {
                 types.add(type);
             }
         }
         return new SolverTypeCollection(value, 1, types);
+    }
+
+    static class SMTCommandArguments {
+        @Option("solver")
+        public String solver = "Z3";
     }
 
 }

@@ -1,28 +1,41 @@
 #!/bin/bash
 
-HOME_DIR=../../../../
-DIFF_FILE=$HOME_DIR/checkstyle-diff.txt
-
 cd `dirname $0`
+
+HOME_DIR=`readlink -f ../../../..`
+DIFF_FILE=$HOME_DIR/checkstyle-diff.txt
 
 MERGE_BASE=`git merge-base HEAD origin/master`
 OPTIONS=""
+
+javac -cp checkstyle-7.6-all.jar -d . -sourcepath $HOME_DIR \
+      GitDiffFilter.java \
+      NoEmbeddedPlusPlusCheck.java
 
 for arg in "$@"
 do
   case $arg in
     --xml)
-      OPTIONS="-f xml -o HOME_DIR/checkstyle-results.xml"
+      OPTIONS="-f xml "
       ;;
 
     --base=*)
       MERGE_BASE=${arg#*=}
       ;;
+
+    --out=*)
+      OPTIONS="-o ${arg#*=}"
   esac
 done
 
 git diff -U0 $MERGE_BASE > $DIFF_FILE
 
-#java -ea -Dprefix=../../../ -cp .:checkstyle-7.6-all.jar -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1234  com.puppycrawl.tools.checkstyle.Main -c key_checks.xml -f xml ../../key.core/src
+# Uncomment the incremental check in the checkstyle configuration
+sed -e 's/<!--KeY\(.*\)-->/\1/' key_checks.xml > key_checks_incremental.xml
 
-java -ea -Dprefix=$HOME_DIR -cp .:checkstyle-7.6-all.jar com.puppycrawl.tools.checkstyle.Main -c key_checks.xml $OPTIONS $HOME_DIR/key/key.core/src
+java -ea -cp .:checkstyle-7.6-all.jar \
+    -Dhome.dir=$HOME_DIR/ \
+    -Ddiff.file=$DIFF_FILE \
+    com.puppycrawl.tools.checkstyle.Main \
+    -c key_checks_incremental.xml \
+    $OPTIONS $HOME_DIR/key/key.core/src

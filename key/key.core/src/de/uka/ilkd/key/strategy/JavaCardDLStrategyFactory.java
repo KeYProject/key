@@ -28,6 +28,16 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
     public static final String TOOL_TIP_STOP_AT_UNCLOSABLE
             = "<html>Stop as soon as the first not automatically<br>"
             + "closable goal is encountered.</html>";
+    public static final String TOOL_TIP_OSS_ON = "<html>"
+            + "Turns on One Step Simplification. This will result in<br>"
+            + "(sometimes significantly) shorter proofs which,<br>"
+            + "however, are less transparent since simplification<br>"
+            + "steps (rule applications) are combined in one OSS step." + "</html>";
+    public static final String TOOL_TIP_OSS_OFF = "<html>"
+            + "Turns off One Step Simplification. This will result in<br>"
+            + "larger, but more transparent proof trees, since each<br>"
+            + "simplification step is realized in one single rule<br>"
+            + "application, with all instantiations clearly visible." + "</html>";
     public static final String TOOL_TIP_PROOF_SPLITTING_FREE = "<html>"
             + "Split formulas (if-then-else expressions,<br>"
             + "disjunctions in the antecedent, conjunctions in<br>"
@@ -63,6 +73,22 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "after arbitrarily many loop iterations (body preserves invariant).</li>"
             + "<li>Invariant holds after the loop terminates (use case).</li>"
             + "</ul></html>";
+    public static final String TOOL_TIP_LOOP_SCOPE_INVARIANT
+            = "<html>"
+            + "Use loop (scope) invariants for loops.<br>"
+            + "Three properties have to be shown:<br>"
+            + "<ul><li>Validity of invariant of a loop is preserved by the<br>"
+            + "loop guard and loop body (initially valid).</li>"
+            + "<li>If the invariant was valid at the start of the loop, it holds <br>"
+            + "after arbitrarily many loop iterations (body preserves invariant).</li>"
+            + "<li>Invariant holds after the loop terminates (use case).</li>"
+            + "</ul>"
+            + "<p>In the loop scope invariant rule, the last two are combined "
+            + "into a single goal.<br/>"
+            + "This rule is easier to comprehend than the traditional rule in "
+            + "the presence of<br/>"
+            + "potentially exceptional program behavior.</p>"
+            + "</html>";
     public static final String TOOL_TIP_LOOP_EXPAND = "<html>"
             + "Unroll loop body." + "</html>";
     public static final String TOOL_TIP_LOOP_NONE = "<html>"
@@ -281,6 +307,15 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.STOPMODE_NONCLOSE,
                                 "Unclosable", TOOL_TIP_STOP_AT_UNCLOSABLE));
+        OneOfStrategyPropertyDefinition ossUsage
+            = new OneOfStrategyPropertyDefinition(
+                    StrategyProperties.OSS_OPTIONS_KEY, "One Step Simplification",
+                    new StrategyPropertyValueDefinition(
+                            StrategyProperties.OSS_ON, "Enabled",
+                            TOOL_TIP_OSS_ON),
+                    new StrategyPropertyValueDefinition(
+                            StrategyProperties.OSS_OFF, "Disabled",
+                            TOOL_TIP_OSS_OFF));
         OneOfStrategyPropertyDefinition proofSplitting
                 = new OneOfStrategyPropertyDefinition(
                         StrategyProperties.SPLITTING_OPTIONS_KEY,
@@ -298,6 +333,10 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
                 = new OneOfStrategyPropertyDefinition(
                         StrategyProperties.LOOP_OPTIONS_KEY,
                         "Loop treatment",
+                        2,
+                        new StrategyPropertyValueDefinition(
+                                StrategyProperties.LOOP_SCOPE_INVARIANT,
+                                "Loop Scope Invariant", TOOL_TIP_LOOP_SCOPE_INVARIANT),
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.LOOP_INVARIANT,
                                 "Invariant", TOOL_TIP_LOOP_INVARIANT),
@@ -472,7 +511,7 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
                         props.toArray(new AbstractStrategyPropertyDefinition[props
                                 .size()]));
         // Model
-        return new StrategySettingsDefinition("Java DL Options", stopAt,
+        return new StrategySettingsDefinition("Java DL Options", stopAt, ossUsage,
                 proofSplitting, loopTreatment, blockTreatment, methodTreatment,
                 mergePointStatementTreatment, dependencyContracts,
                 queryTreatment, arithmeticTreatment, quantifierTreatment,

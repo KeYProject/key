@@ -2527,8 +2527,13 @@ term returns [Term _term = null]
               raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
-        
-        
+
+termEOF returns [Term _term = null]
+@after { _term = result; }
+    :
+        result = term EOF
+    ;
+
 elementary_update_term returns[Term _elementary_update_term=null]
 @after { _elementary_update_term = result; }
 :
@@ -3757,6 +3762,11 @@ seq returns [Sequent s] :
          raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
      }
+
+seqEOF returns [Sequent s] :
+         ss=seq EOF
+         {s = ss;}
+     ;
      
 termorseq returns [Object o]
     :
@@ -3822,7 +3832,7 @@ varexp[TacletBuilder b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
-    | varcond_differentFields[b]  
+    | varcond_differentFields[b]
   ) 
   | 
   ( (NOT_ {negated = true;} )? 

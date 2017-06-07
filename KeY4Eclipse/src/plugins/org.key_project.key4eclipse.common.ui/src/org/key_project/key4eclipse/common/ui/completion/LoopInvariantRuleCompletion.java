@@ -607,10 +607,10 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          //FIXME: InfFlowSpecs are currently not implemented, thus there's little point in writing a UI for them.
          //The InfFlowSpecs code here does not actually do anything.
          Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs = new LinkedHashMap<LocationVariable, ImmutableList<InfFlowSpec>>();
-         Map<LocationVariable,Term> freeSpecs = new LinkedHashMap<LocationVariable, Term>();
-
+         Map<LocationVariable, Term> freeSpec = new LinkedHashMap<LocationVariable, Term>();
+         
          //return the new Invariant
-         LoopSpecification newInvariant = loopApp.getSpec().configurate(invMap, modMap, freeSpecs, infFlowSpecs, variantTerm);
+         LoopSpecification newInvariant = loopApp.getSpec().configurate(invMap, freeSpec, modMap, infFlowSpecs, variantTerm);
          return loopApp.setLoopInvariant(newInvariant);
       }
 
