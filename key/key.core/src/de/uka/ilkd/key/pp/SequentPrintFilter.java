@@ -29,10 +29,10 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
  */
 public abstract class SequentPrintFilter {
 
-    private Sequent originalSequent;
+    Sequent originalSequent;
 
-    private ImmutableList<SequentPrintFilterEntry> antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
-    private ImmutableList<SequentPrintFilterEntry> succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
+    ImmutableList<SequentPrintFilterEntry> antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
+    ImmutableList<SequentPrintFilterEntry> succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
 
     /**
      * @return the original sequent

@@ -3,22 +3,28 @@ package de.uka.ilkd.key.pp;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+/**
+ * This is an interface for filters that are used to
+ * modify the sequent view, improving the search function.
+ *
+ * @author jschiffl
+ */
 public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
 
     /**
      * the String that is to be matched in the sequent view
      */
-    private String searchString;
+    String searchString;
 
     /**
      * the logic printer in use
      */
-    private LogicPrinter lp;
+    LogicPrinter lp;
 
     /**
      * indicating whether the user input should be treated as regular expression
      */
-    private boolean regex;
+    boolean regex;
 
     public void setSearchString(String searchString) {
         this.searchString = searchString;

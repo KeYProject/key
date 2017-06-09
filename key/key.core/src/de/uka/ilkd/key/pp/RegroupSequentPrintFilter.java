@@ -32,6 +32,11 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
 
+    /**
+     *
+     * @param lp the logic printer in use
+     * @param regex should the search be treated as a regular expression?
+     */
     public RegroupSequentPrintFilter(SequentViewLogicPrinter lp, boolean regex) {
         this.lp = lp;
         this.regex = regex;
