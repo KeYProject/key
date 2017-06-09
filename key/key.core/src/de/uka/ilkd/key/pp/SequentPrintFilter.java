@@ -28,29 +28,29 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
  * by adjusting constraints, deleting formulas, etc.
  */
 public abstract class SequentPrintFilter {
-	
-	protected Sequent originalSequent;
 
-    protected ImmutableList<SequentPrintFilterEntry> antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
-    protected ImmutableList<SequentPrintFilterEntry> succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
-    
+    private Sequent originalSequent;
+
+    private ImmutableList<SequentPrintFilterEntry> antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
+    private ImmutableList<SequentPrintFilterEntry> succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
+
     /**
      * @return the original sequent
      */
     public Sequent getOriginalSequent() {
-    	return originalSequent;
+        return originalSequent;
     }
-    
+
     protected abstract void filterSequent();
-    
+
     /**
      * sets the (original) sequent of this filter
      */
     public void setSequent(Sequent s) {
-    	originalSequent = s;
-    	antec = null;
-    	succ = null;
-    	filterSequent();
+        originalSequent = s;
+        antec = null;
+        succ = null;
+        filterSequent();
     }
 
     /**
@@ -58,26 +58,28 @@ public abstract class SequentPrintFilter {
      * use for instantiating metavariables when printing
      */
     public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
-    	return antec;
+        return antec;
     }
+
     public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
-    	return succ;
+        return succ;
     }
-    
+
     /**
-     * converts the complete original sequent into antecedent/succendent lists of print filter entries.
+     * converts the complete original sequent into
+     * antecedent/succendent lists of print filter entries.
      */
     protected void filterIdentity() {
-    	antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
-    	Iterator<SequentFormula> it = originalSequent.antecedent().iterator();
-		while (it.hasNext()) {
-			antec = antec.append(new IdentityFilterEntry(it.next()));
-		}
-		
-		succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
-		it = originalSequent.succedent().iterator();
-		while (it.hasNext()) {
-			succ = succ.append(new IdentityFilterEntry(it.next()));
-		}
+        antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
+        Iterator<SequentFormula> it = originalSequent.antecedent().iterator();
+        while (it.hasNext()) {
+            antec = antec.append(new IdentityFilterEntry(it.next()));
+        }
+
+        succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
+        it = originalSequent.succedent().iterator();
+        while (it.hasNext()) {
+            succ = succ.append(new IdentityFilterEntry(it.next()));
+        }
     }
 }

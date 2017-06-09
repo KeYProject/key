@@ -17,13 +17,15 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 /**
- * @author jschiffl This filter takes a search string and regroups the sequent
+ * @author jschiffl
+ *         This filter takes a search string and regroups the sequent
  *         so that the sequent formulas matching the search are grouped around
  *         the sequent arrow, so that they can be viewed together.
  */

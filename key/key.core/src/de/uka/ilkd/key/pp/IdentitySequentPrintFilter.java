@@ -22,8 +22,9 @@ import de.uka.ilkd.key.logic.SequentFormula;
 public class IdentitySequentPrintFilter extends SequentPrintFilter {
 
     protected void filterSequent() {
-        if (antec != null)
+        if (antec != null) {
             return;
+        }
         filterIdentity();
     }
 
@@ -48,8 +49,8 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
     public static class IdentityFilterEntry implements SequentPrintFilterEntry {
         final SequentFormula originalFormula;
 
-        public IdentityFilterEntry(SequentFormula p_originalFormula) {
-            originalFormula = p_originalFormula;
+        public IdentityFilterEntry(SequentFormula originalFormula) {
+            this.originalFormula = originalFormula;
         }
 
         /**

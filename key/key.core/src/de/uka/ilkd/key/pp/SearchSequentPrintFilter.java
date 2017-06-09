@@ -5,9 +5,20 @@ import java.util.regex.PatternSyntaxException;
 
 public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
 
-    protected String searchString;
-    protected boolean regex;
-    protected LogicPrinter lp;
+    /**
+     * the String that is to be matched in the sequent view
+     */
+    private String searchString;
+
+    /**
+     * the logic printer in use
+     */
+    private LogicPrinter lp;
+
+    /**
+     * indicating whether the user input should be treated as regular expression
+     */
+    private boolean regex;
 
     public void setSearchString(String searchString) {
         this.searchString = searchString;
@@ -17,7 +28,13 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
     public void setLogicPrinter(SequentViewLogicPrinter logicPrinter) {
         this.lp = logicPrinter;
     }
-    
+
+    /**
+     * @param search the String we are looking for
+     * @param regex  indicating whether search string should be treated as regex
+     * @return A pattern matching the input String
+     * @throws IllegalRegexException
+     */
     public static Pattern createPattern(String search, boolean regex) throws IllegalRegexException {
         int searchFlag = 0;
         if (search.toLowerCase().equals(search)) {
@@ -28,32 +45,30 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
         // by ordinary space (\\u0020).
         // This became necessary due to the change to HTML Documents
         // in the course of the introduction of syntax highlighting.
-        
+
         // (JS) Replace special characters with escaped special 
         // characters and contract several whitespaces into a 
         // single one so that line breaks are treated correctly.
-        
+
         if (!regex) {
             search = search.replaceAll("[^\\s\\u00a0\\w]", "\\\\$0");
         }
 
-        
-        
         Pattern p = null;
         try {
             String s = search.replaceAll("[\\s\\u00a0]+", "\\\\s+");
             p = Pattern.compile(s, searchFlag);
-        } 
+        }
         // This means the search String is not a valid regex (yet!). 
         // Probably because the user is still typing.
         catch (PatternSyntaxException pse) {
             throw new IllegalRegexException(pse);
         } catch (IllegalArgumentException iae) {
             iae.printStackTrace();
-        } 
+        }
         return p;
     }
-    
+
     protected Pattern createPattern() {
         try {
             return createPattern(this.searchString, this.regex);

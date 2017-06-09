@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -41,10 +42,11 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
             filterIdentity();
             return;
         }
-        
+
         Pattern p = createPattern();
-        if (p == null)
+        if (p == null) {
             return;
+        }
 
         antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
         it = originalSequent.antecedent().iterator();
