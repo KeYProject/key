@@ -98,7 +98,7 @@ public class TacletMenu extends JMenu {
      *
      */
     private static final long serialVersionUID = -4659105575090816693L;
-    public static final int TOO_MUCH_TACLETS = 15; //reduce for debugging.
+    public static final int TOO_MANY_TACLETS = 15; //reduce for debugging.
     private PosInSequent pos;
     private CurrentGoalView sequentView;
     private KeYMediator mediator;
@@ -514,7 +514,7 @@ public class TacletMenu extends JMenu {
             target.add(createMenuItem(app, control));
             currentSize++;
 
-            if (currentSize >= TOO_MUCH_TACLETS && i + 1 < rest.size()) {
+            if (currentSize >= TOO_MANY_TACLETS && i + 1 < rest.size()) {
                 JMenu newMenu = new JMenu(MORE_RULES);
                 target.add(newMenu);
                 target = newMenu;
