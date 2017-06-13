@@ -45,6 +45,7 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.pp.SearchSequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Node;
@@ -71,7 +72,8 @@ public class InnerNodeView extends SequentView {
     public InnerNodeView(Node node, MainWindow mainWindow) {
         super(mainWindow);
         this.node = node;
-        filter = new IdentitySequentPrintFilter(node.sequent());
+        filter = new IdentitySequentPrintFilter();
+        filter.setSequent(node.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
                         mainWindow.getMediator().getNotationInfo(),
                         mainWindow.getMediator().getServices(),
@@ -306,23 +308,27 @@ public class InnerNodeView extends SequentView {
     /**
      * @param pos the PosInOccurrence that should be highlighted.
      * @param light the painter for the highlight.
-     * @return the range of characters that was highlighted.
+     * @return the range of characters that was highlighted. returns null if nothing has been highlighted.
      * @throws BadLocationException
      */
     private Range highlightPos(PosInOccurrence pos,
             HighlightPainter light)
             throws BadLocationException {
         ImmutableList<Integer> path = posTable.pathForPosition(pos, filter);
-        Range r = posTable.rangeForPath(path);
+        if(path != null) {
+            Range r = posTable.rangeForPath(path);
+
+            // NOTE (DS): The below addition of 1 to the beginning is a quick-and-dirty
+            // fix for a shift of highlighted areas to the left that occurred after the
+            // change to HTML documents in the JEditorPane (previous JTextArea). If
+            // something concerning highlighting does not work in the future, here could
+            // be a starting place to find the mistake.
+            getHighlighter().addHighlight(r.start() + 1, r.end() + 1, light);
+            return r;
+        } else {
+            return null;
+        }
         
-        // NOTE (DS): The below addition of 1 to the beginning is a quick-and-dirty
-        // fix for a shift of highlighted areas to the left that occurred after the
-        // change to HTML documents in the JEditorPane (previous JTextArea). If
-        // something concerning highlighting does not work in the future, here could
-        // be a starting place to find the mistake.
-        getHighlighter().addHighlight(r.start() + 1, r.end() + 1, light);
-        
-        return r;
     }
 
     @Override
@@ -336,8 +342,8 @@ public class InnerNodeView extends SequentView {
         getLogicPrinter().update(filter, getLineWidth());
         setText(getSyntaxHighlighter().process(getLogicPrinter().toString(), node));
         posTable = getLogicPrinter().getInitialPositionTable();
-
         RuleApp app = node.getAppliedRuleApp();
+        
         if (app != null) {
             highlightRuleAppPosition(app);
         }

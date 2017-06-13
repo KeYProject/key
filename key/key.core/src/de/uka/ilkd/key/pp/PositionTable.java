@@ -259,24 +259,17 @@ public class PositionTable {
      * @param filter
      *            the sequent print filter from that was used to print the
      *            sequent
-     */    
-    
+     * @return the positionInSequent for the given position list
+     */
+
     protected PosInSequent getSequentPIS(ImmutableList<Integer> posList,
-				       SequentPrintFilter filter) {
-	int cfmaNo = posList.head().intValue();
-	ImmutableList<Integer> tail = posList.tail();
-
-	SequentPrintFilterEntry filterEntry = 
-	    getFilterEntry(cfmaNo, filter);
-
-	SequentFormula cfma = filterEntry.getOriginalFormula();
-
-	PosInOccurrence currentPos = 
-	    new PosInOccurrence ( cfma, PosInTerm.getTopLevel(),
-				  filter.getSequent ().antecedent().contains(cfma) );
-	
-	return child[cfmaNo].getTermPIS(filterEntry,tail,
-					currentPos);
+                                         SequentPrintFilter filter) {
+        int cfmaNo = posList.head().intValue();
+        ImmutableList<Integer> tail = posList.tail();
+        SequentPrintFilterEntry filterEntry = getFilterEntry(cfmaNo, filter);
+        SequentFormula cfma = filterEntry.getOriginalFormula();
+        PosInOccurrence currentPos = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), filter.getOriginalSequent().antecedent().contains(cfma));
+        return child[cfmaNo].getTermPIS(filterEntry, tail, currentPos);
     }
     
     /**
@@ -307,15 +300,14 @@ public class PositionTable {
 					   subpio);
 	}
     }
-    
-    private static SequentPrintFilterEntry 
-	getFilterEntry(int cfmaNo, 
-		       SequentPrintFilter filter) {
-	int i = cfmaNo;
-	ImmutableList<SequentPrintFilterEntry> list =
-	    filter.getAntec().append(filter.getSucc());
+
+    private static SequentPrintFilterEntry
+        getFilterEntry(int cfmaNo, SequentPrintFilter filter) {
+        int i = cfmaNo;
+        ImmutableList<SequentPrintFilterEntry> list =
+                filter.getFilteredAntec().append(filter.getFilteredSucc());
         while (i-- != 0)
             list = list.tail();
-	return list.head ();
+        return list.head();
     }
 }

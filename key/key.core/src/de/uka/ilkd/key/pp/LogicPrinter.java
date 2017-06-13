@@ -723,8 +723,8 @@ public class LogicPrinter {
     public void printSequent(SequentPrintFilter filter,
                              boolean finalbreak) {
         try {
-            ImmutableList<SequentPrintFilterEntry> antec = filter.getAntec();
-            ImmutableList<SequentPrintFilterEntry> succ  = filter.getSucc();
+            ImmutableList<SequentPrintFilterEntry> antec = filter.getFilteredAntec();
+            ImmutableList<SequentPrintFilterEntry> succ  = filter.getFilteredSucc();
             markStartSub();
             startTerm(antec.size()+succ.size());
             layouter.beginC(1).ind();
@@ -1603,13 +1603,15 @@ public class LogicPrinter {
 
 	layouter.brk(1).print(separator + " ");
 
-	if(t.sub(1).op() == UpdateJunctor.PARALLEL_UPDATE) {
-	    markStartSub();
-	    printParallelUpdateHelper(separator, t.sub(1), ass);
-	    markEndSub();
-	} else {
-	    maybeParens(t.sub(1), ass);
-	}
+        if (t.sub(1).op() == UpdateJunctor.PARALLEL_UPDATE) {
+            markStartSub();
+            layouter.print("(");
+            printParallelUpdateHelper(separator, t.sub(1), ass);
+            layouter.print(")");
+            markEndSub();
+        } else {
+            maybeParens(t.sub(1), ass);
+        }
     }
 
 

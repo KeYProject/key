@@ -30,7 +30,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ApplyTacletDialog;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
@@ -220,9 +219,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                     setText(getSyntaxHighlighter().process(
                             getLogicPrinter().toString(),
                             getMainWindow().getMediator().getSelectedNode()));
-                    MainWindow.getInstance().sequentViewSearchBar.search();
                 } catch (Error e) {
                     System.err.println("Error occurred while printing Sequent!");
+                    e.printStackTrace();
                     errorocc = true;
                 }
             } while (errorocc);
@@ -255,7 +254,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      * sets the LogicPrinter to use
      */
     public void setPrinter(Goal goal) {
-        filter = new IdentitySequentPrintFilter(goal.sequent());
+        filter.setSequent(goal.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(null),
                                                     getMediator().getNotationInfo(),
                                                     mediator.getServices(),

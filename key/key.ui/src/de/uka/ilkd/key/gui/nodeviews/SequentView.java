@@ -34,6 +34,7 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
@@ -77,7 +78,7 @@ public abstract class SequentView extends JEditorPane {
     }
 
     private final ConfigChangeListener configChangeListener;
-    SequentPrintFilter filter;
+    protected SequentPrintFilter filter;
     private SequentViewLogicPrinter printer;
     private HTMLSyntaxHighlighter syntaxHighlighter;
     public boolean refreshHighlightning = true;
@@ -131,6 +132,8 @@ public abstract class SequentView extends JEditorPane {
         addComponentListener(changeListener);
         addPropertyChangeListener("font", changeListener);
         addHierarchyBoundsListener(changeListener);
+        
+        filter = new IdentitySequentPrintFilter();
     }
 
     public final void setFont() {
@@ -470,5 +473,11 @@ public abstract class SequentView extends JEditorPane {
     }
 
     public abstract void printSequent();
+
+	public void setFilter(SequentPrintFilter sequentPrintFilter) {
+		this.filter = sequentPrintFilter;
+		this.filter.setSequent(getMainWindow().getMediator().getSelectedNode().sequent());
+		printSequent();
+	}
 
 }

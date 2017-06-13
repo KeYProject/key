@@ -13,95 +13,85 @@
 
 package de.uka.ilkd.key.pp;
 
-import java.util.Iterator;
-
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 
-
 /**
- * Identity Filter not doing anything 
+ * Identity Filter not doing anything
  */
-public class IdentitySequentPrintFilter implements SequentPrintFilter {
-
-    protected Sequent              originalSequent;
-
-    protected ImmutableList<SequentPrintFilterEntry> antec = null;
-    protected ImmutableList<SequentPrintFilterEntry> succ  = null;
-
-    public IdentitySequentPrintFilter ( Sequent    p_s ) {
-	originalSequent = p_s;	
-    }
-
-    protected void filterSequent () {
-	if ( antec != null )
-	    return;
-
-	Iterator<SequentFormula> it;
-
-	antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
-	it    = originalSequent.antecedent ().iterator ();
-	while ( it.hasNext () )
-	    antec = antec.append ( filterFormula ( it.next () ) );
-	
-	succ  = ImmutableSLList.<SequentPrintFilterEntry>nil();
-	it    = originalSequent.succedent ().iterator ();
-	while ( it.hasNext () )
-	    succ  = succ .append ( filterFormula ( it.next () ) );
-    }
-
-    protected SequentPrintFilterEntry filterFormula ( SequentFormula p_cfma ) {
-	return new IdentityFilterEntry ( p_cfma );
-    }
-
+public class IdentitySequentPrintFilter extends SequentPrintFilter {
 
     /**
-     * @return the original sequent
+     * filters the sequent, creating SequentPrintFilterEntries from the sequent formulae.
      */
-    public Sequent      getSequent         () {
-	return originalSequent;
+    protected void filterSequent() {
+        if (antec != null) {
+            return;
+        }
+        filterIdentity();
     }
 
     /**
-     * Get the formulas of the filtered sequent and the constraints to
-     * use for instantiating metavariables when printing
+     *
+     * @param sequentFormula the formula to filter
+     * @return the FilterEntry from the formula
      */
-    public ImmutableList<SequentPrintFilterEntry> getAntec       () {
-	filterSequent ();
-	return antec;
+    protected SequentPrintFilterEntry filterFormula(SequentFormula sequentFormula) {
+        return new IdentityFilterEntry(sequentFormula);
     }
 
-    public ImmutableList<SequentPrintFilterEntry> getSucc        () {
-	filterSequent ();
-	return succ;
+    /**
+     * Get the formulas of the filtered antecedent and the constraints to use for
+     * instantiating metavariables when printing
+     * @return the filtered antecedent
+     */
+    public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
+        filterSequent();
+        return antec;
     }
 
-
-    private static class IdentityFilterEntry implements SequentPrintFilterEntry {
-	final SequentFormula originalFormula;
-
-
-	public IdentityFilterEntry ( SequentFormula p_originalFormula) {
-	    originalFormula   = p_originalFormula;
-	}
-
-	/**
-	 * Formula to display
-	 */
-	public SequentFormula getFilteredFormula   () {
-	    return originalFormula;
-	}
-
-	/**
-	 * Original formula from sequent
-	 */
-	public SequentFormula getOriginalFormula   () {
-	    return originalFormula;
-	}
-
+    /**
+     * Get the formulas of the filtered succcedent and the constraints to use for
+     * instantiating metavariables when printing
+     * @return the filtered succcedent
+     */
+    public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
+        filterSequent();
+        return succ;
     }
 
+    /**
+     * A filter entry, representing one sequent formula.
+     */
+    public static class IdentityFilterEntry implements SequentPrintFilterEntry {
+        /**
+         * the original Formula being filtered
+         */
+        final SequentFormula originalFormula;
+
+        /**
+         * constructor
+         * @param originalFormula the original formula to be filtered
+         */
+        IdentityFilterEntry(SequentFormula originalFormula) {
+            this.originalFormula = originalFormula;
+        }
+
+        /**
+         * Formula to display
+         * @return the original formula
+         */
+        public SequentFormula getFilteredFormula() {
+            return originalFormula;
+        }
+
+        /**
+         * Original formula from sequent
+         * @return the original formula
+         */
+        public SequentFormula getOriginalFormula() {
+            return originalFormula;
+        }
+
+    }
 }
