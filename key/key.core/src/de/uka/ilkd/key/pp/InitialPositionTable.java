@@ -96,22 +96,27 @@ public class InitialPositionTable extends PositionTable{
     }
 
 
-    /** Returns the path for a given PosInOccurrence.  This is 
-     * built up from the initial 0, the number of the 
-     * SequentFormula in the sequent, the position in the 
+    /**
+     * Returns the path for a given PosInOccurrence.  This is
+     * built up from the initial 0, the number of the
+     * SequentFormula in the sequent, the position in the
      * constrained formula, and possibly inside a Metavariable
-     * instantiation. */
+     * instantiation.
+     * @param pio the given PosInOccurrence
+     * @param filter the current filter
+     * @return the path for the given pio
+     */
     public ImmutableList<Integer> pathForPosition(PosInOccurrence pio,
-					 SequentPrintFilter filter) {
-	ImmutableList<Integer> p = ImmutableSLList.<Integer>nil();
-
-	p = prependPathInFormula(p,pio);
-	int index = indexOfCfma(pio.sequentFormula(), filter);
-	if(index == -1) 
-	    return null;
-    p = p.prepend(Integer.valueOf(index));
-	p = p.prepend(Integer.valueOf(0));
-	return p;
+                                                  SequentPrintFilter filter) {
+        ImmutableList<Integer> p = ImmutableSLList.<Integer>nil();
+        p = prependPathInFormula(p, pio);
+        int index = indexOfCfma(pio.sequentFormula(), filter);
+        if (index == -1) {
+            return null;
+        }
+        p = p.prepend(Integer.valueOf(index));
+        p = p.prepend(Integer.valueOf(0));
+        return p;
     }
 
     private ImmutableList<Integer> prependPathInFormula(ImmutableList<Integer> p,
@@ -122,21 +127,26 @@ public class InitialPositionTable extends PositionTable{
 	}
 	return p;
     }
-    
 
-    /** Returns the index of the constrained formula in the sequent
-     * as printed. */
+
+    /**
+     * Returns the index of the constrained formula in the sequent
+     * as printed.
+     * @param cfma   the sequent formula
+     * @param filter the current filter
+     * @return the index of the given formula in the sequent as printed
+     */
     private int indexOfCfma(SequentFormula cfma,
-			    SequentPrintFilter filter) {
-	ImmutableList<SequentPrintFilterEntry> list =
-        filter.getFilteredAntec().append(filter.getFilteredSucc());
-	int k;
-	for ( k=0 ; !list.isEmpty(); k++,list = list.tail() ) {
-	    if (list.head().getOriginalFormula()==cfma) {
-		return k;
-	    }
-	}
-	return -1;
+                            SequentPrintFilter filter) {
+        ImmutableList<SequentPrintFilterEntry> list =
+                filter.getFilteredAntec().append(filter.getFilteredSucc());
+        int k;
+        for (k = 0; !list.isEmpty(); k++, list = list.tail()) {
+            if (list.head().getOriginalFormula() == cfma) {
+                return k;
+            }
+        }
+        return -1;
     }
 
     /**

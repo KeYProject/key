@@ -67,13 +67,19 @@ public abstract class SequentPrintFilter {
     }
 
     /**
-     * Get the formulas of the filtered sequent and the constraints to
-     * use for instantiating metavariables when printing
+     * Get the formulas of the filtered antecedent and the constraints to use for
+     * instantiating metavariables when printing
+     * @return the filtered antecedent
      */
     public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
         return antec;
     }
 
+    /**
+     * Get the formulas of the filtered succcedent and the constraints to use for
+     * instantiating metavariables when printing
+     * @return the filtered succcedent
+     */
     public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
         return succ;
     }

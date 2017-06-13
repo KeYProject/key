@@ -1603,15 +1603,15 @@ public class LogicPrinter {
 
 	layouter.brk(1).print(separator + " ");
 
-	if(t.sub(1).op() == UpdateJunctor.PARALLEL_UPDATE) {
-	    markStartSub();
-	    layouter.print("(");
-	    printParallelUpdateHelper(separator, t.sub(1), ass);
-	    layouter.print(")");
-	    markEndSub();
-	} else {
-	    maybeParens(t.sub(1), ass);
-	}
+        if (t.sub(1).op() == UpdateJunctor.PARALLEL_UPDATE) {
+            markStartSub();
+            layouter.print("(");
+            printParallelUpdateHelper(separator, t.sub(1), ass);
+            layouter.print(")");
+            markEndSub();
+        } else {
+            maybeParens(t.sub(1), ass);
+        }
     }
 
 

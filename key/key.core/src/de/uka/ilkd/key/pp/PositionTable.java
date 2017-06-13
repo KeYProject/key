@@ -259,6 +259,7 @@ public class PositionTable {
      * @param filter
      *            the sequent print filter from that was used to print the
      *            sequent
+     * @return the positionInSequent for the given position list
      */
 
     protected PosInSequent getSequentPIS(ImmutableList<Integer> posList,
@@ -301,7 +302,7 @@ public class PositionTable {
     }
 
     private static SequentPrintFilterEntry
-    getFilterEntry(int cfmaNo, SequentPrintFilter filter) {
+        getFilterEntry(int cfmaNo, SequentPrintFilter filter) {
         int i = cfmaNo;
         ImmutableList<SequentPrintFilterEntry> list =
                 filter.getFilteredAntec().append(filter.getFilteredSucc());
