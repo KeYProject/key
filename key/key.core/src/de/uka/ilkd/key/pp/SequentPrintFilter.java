@@ -28,10 +28,19 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
  * by adjusting constraints, deleting formulas, etc.
  */
 public abstract class SequentPrintFilter {
-
+    /**
+     * the original sequent
+     */
     Sequent originalSequent;
 
+    /**
+     * the antecedent of the filtered formula
+     */
     ImmutableList<SequentPrintFilterEntry> antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
+
+     /**
+     * the antecedent of the filtered formula
+     */
     ImmutableList<SequentPrintFilterEntry> succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
 
     /**
@@ -41,10 +50,14 @@ public abstract class SequentPrintFilter {
         return originalSequent;
     }
 
+    /**
+     * filters the sequent according to filter type
+     */
     protected abstract void filterSequent();
 
     /**
      * sets the (original) sequent of this filter
+     * @param s the sequent s is set to
      */
     public void setSequent(Sequent s) {
         originalSequent = s;

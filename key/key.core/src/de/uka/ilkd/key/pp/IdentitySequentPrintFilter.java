@@ -21,6 +21,9 @@ import de.uka.ilkd.key.logic.SequentFormula;
  */
 public class IdentitySequentPrintFilter extends SequentPrintFilter {
 
+    /**
+     * filters the sequent, creating SequentPrintFilterEntries from the sequent formulae.
+     */
     protected void filterSequent() {
         if (antec != null) {
             return;
@@ -28,33 +31,55 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
         filterIdentity();
     }
 
-    protected SequentPrintFilterEntry filterFormula(SequentFormula p_cfma) {
-        return new IdentityFilterEntry(p_cfma);
+    /**
+     *
+     * @param sequentFormula the formula to filter
+     * @return the FilterEntry from the formula
+     */
+    protected SequentPrintFilterEntry filterFormula(SequentFormula sequentFormula) {
+        return new IdentityFilterEntry(sequentFormula);
     }
 
     /**
-     * Get the formulas of the filtered sequent and the constraints to use for
+     * Get the formulas of the filtered antecedent and the constraints to use for
      * instantiating metavariables when printing
+     * @return the filtered antecedent
      */
     public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
         filterSequent();
         return antec;
     }
 
+    /**
+     * Get the formulas of the filtered succcedent and the constraints to use for
+     * instantiating metavariables when printing
+     * @return the filtered succcedent
+     */
     public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
         filterSequent();
         return succ;
     }
 
+    /**
+     * A filter entry, representing one sequent formula.
+     */
     public static class IdentityFilterEntry implements SequentPrintFilterEntry {
+        /**
+         * the original Formula being filtered
+         */
         final SequentFormula originalFormula;
 
-        public IdentityFilterEntry(SequentFormula originalFormula) {
+        /**
+         * constructor
+         * @param originalFormula the original formula to be filtered
+         */
+        IdentityFilterEntry(SequentFormula originalFormula) {
             this.originalFormula = originalFormula;
         }
 
         /**
          * Formula to display
+         * @return the original formula
          */
         public SequentFormula getFilteredFormula() {
             return originalFormula;
@@ -62,6 +87,7 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
 
         /**
          * Original formula from sequent
+         * @return the original formula
          */
         public SequentFormula getOriginalFormula() {
             return originalFormula;

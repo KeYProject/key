@@ -1606,7 +1606,7 @@ public class LogicPrinter {
 	if(t.sub(1).op() == UpdateJunctor.PARALLEL_UPDATE) {
 	    markStartSub();
 	    layouter.print("(");
- 	    printParallelUpdateHelper(separator, t.sub(1), ass);
+	    printParallelUpdateHelper(separator, t.sub(1), ass);
 	    layouter.print(")");
 	    markEndSub();
 	} else {

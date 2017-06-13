@@ -26,6 +26,11 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
      */
     boolean regex;
 
+    /**
+     * sets the filter's search string
+     *
+     * @param searchString the new search string
+     */
     public void setSearchString(String searchString) {
         this.searchString = searchString;
         filterSequent();
@@ -39,7 +44,7 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
      * @param search the String we are looking for
      * @param regex  indicating whether search string should be treated as regex
      * @return A pattern matching the input String
-     * @throws IllegalRegexException
+     * @throws IllegalRegexException if the given pattern is not a valid regex
      */
     public static Pattern createPattern(String search, boolean regex) throws IllegalRegexException {
         int searchFlag = 0;
@@ -47,13 +52,13 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
             searchFlag = searchFlag | Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
         }
 
-        // (DS) We replace non-breaking space ("&nbsp;", \\u00a0) 
+        // (DS) We replace non-breaking space ("&nbsp;", \\u00a0)
         // by ordinary space (\\u0020).
         // This became necessary due to the change to HTML Documents
         // in the course of the introduction of syntax highlighting.
 
-        // (JS) Replace special characters with escaped special 
-        // characters and contract several whitespaces into a 
+        // (JS) Replace special characters with escaped special
+        // characters and contract several whitespaces into a
         // single one so that line breaks are treated correctly.
 
         if (!regex) {
@@ -64,17 +69,18 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
         try {
             String s = search.replaceAll("[\\s\\u00a0]+", "\\\\s+");
             p = Pattern.compile(s, searchFlag);
-        }
-        // This means the search String is not a valid regex (yet!). 
-        // Probably because the user is still typing.
-        catch (PatternSyntaxException pse) {
-            throw new IllegalRegexException(pse);
+        } catch (PatternSyntaxException pse) {
+            throw new IllegalRegexException(pse); // not a valid regex (yet?)
         } catch (IllegalArgumentException iae) {
             iae.printStackTrace();
         }
         return p;
     }
 
+    /**
+     * creates a pattern with the current search string and regex option
+     * @return a brand new shiny pattern
+     */
     protected Pattern createPattern() {
         try {
             return createPattern(this.searchString, this.regex);

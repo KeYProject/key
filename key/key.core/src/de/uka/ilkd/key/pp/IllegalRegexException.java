@@ -10,6 +10,10 @@ public class IllegalRegexException extends Exception {
 
     private static final long serialVersionUID = 1113541L;
 
+    /**
+     * constructor
+     * @param cause the cause of the exception
+     */
     public IllegalRegexException(Throwable cause) {
         super(cause);
     }
