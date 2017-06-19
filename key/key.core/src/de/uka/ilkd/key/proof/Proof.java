@@ -723,7 +723,7 @@ public class Proof implements Named {
             // delete NodeInfo, but preserve potentially existing branch label
             String branchLabel = node.getNodeInfo().getBranchLabel();
             node.clearNodeInfo();
-            if (branchLabel != null && branchLabel != "") {
+            if (branchLabel != null) {
                 node.getNodeInfo().setBranchLabel(branchLabel);
             }
         }
