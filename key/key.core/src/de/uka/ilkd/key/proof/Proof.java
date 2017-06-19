@@ -719,7 +719,13 @@ public class Proof implements Named {
             goal.ruleAppIndex().clearIndexes();
             goal.node().setAppliedRuleApp(null);
             node.clearNameCache();
+
+            // delete NodeInfo, but preserve potentially existing branch label
+            String branchLabel = node.getNodeInfo().getBranchLabel();
             node.clearNodeInfo();
+            if (branchLabel != null) {
+                node.getNodeInfo().setBranchLabel(branchLabel);
+            }
         }
 
         private void removeOpenGoals(Collection<Node> toBeRemoved) {
