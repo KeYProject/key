@@ -1517,13 +1517,13 @@ hexintegerliteral returns [SLExpression result=null] throws SLTranslationExcepti
       String text = n.getText();
       try {
         if(text.endsWith("l") || text.endsWith("L")) {
-          Long val = Long.valueOf(Long.parseLong(text.substring(2, text.length()-1), 16));
+          Long val = Long.decode(text.substring(0, text.length()-1));
           result = new SLExpression(tb.zTerm(val.toString()),
                                     javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LONG));
         } else {
-          Integer val = Integer.valueOf(Integer.parseInt(text.substring(2), 16));
+          Integer val = Integer.decode(text);
           result = new SLExpression(tb.zTerm(val.toString()),
-  	                          javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
+  	                                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
 	    }
 	  } catch(NumberFormatException ex) {
 	    raiseError("Number constant out of bounds", n);
@@ -1549,7 +1549,7 @@ decimalnumeral returns [SLExpression result=null] throws SLTranslationException
         } else {
           Integer val = Integer.decode(text);
           result = new SLExpression(tb.zTerm(val.toString()), 
-  	                          javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
+  	                                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
 	    }
 	  } catch(NumberFormatException ex) {
 	    raiseError("Number constant out of bounds", n);
