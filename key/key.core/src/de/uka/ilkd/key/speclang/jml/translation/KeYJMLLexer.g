@@ -272,12 +272,17 @@ BACKSLASH_PREFIXED:
 HEXLITERAL
     :
         '0' ('x'|'X') (HEXDIGIT)+ ( 'l'|'L' )?
-;
+    ;
 
-DECOCTLITERAL
+OCTLITERAL
     :
-        (DIGIT)+ ( 'l'|'L' )?
-;
+        '0' (DIGIT)+ ( 'l'|'L' )?
+    ;
+
+DECLITERAL
+    :
+        (('1'..'9') (DIGIT)* | '0') ( 'l'|'L' )?
+    ;
 
 CHAR_LITERAL:
         '\''

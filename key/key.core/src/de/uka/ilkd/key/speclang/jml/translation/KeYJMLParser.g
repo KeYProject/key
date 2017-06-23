@@ -40,6 +40,9 @@ options {
 
 @members {
 
+    private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
+    private static final BigInteger MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
+
     private TermBuilder tb;
 
     private Services services;
@@ -63,6 +66,8 @@ options {
     // Helper objects
     private JMLResolverManager resolverManager;
     private JavaIntegerSemanticsHelper intHelper;
+
+    private int lastObservedUnaryMinus = -1;
 
 
     private KeYJMLParser(KeYJMLLexer lexer,
@@ -1212,7 +1217,8 @@ unaryexpr returns [SLExpression ret=null] throws SLTranslationException
 	    result = intHelper.buildPromotedUnaryPlusExpression(result);
 	}
     |
-	MINUS result=unaryexpr
+	minus=MINUS { lastObservedUnaryMinus = minus.getTokenIndex(); }
+	  result=unaryexpr
 	{
 	    if (result.isType()) {
 		raiseError("Cannot build  -" + result.getType().getName() + ".");
@@ -1502,32 +1508,56 @@ javaliteral returns [SLExpression ret=null] throws SLTranslationException
 	}
     ;
 
-integerliteral returns [SLExpression ret=null] throws SLTranslationException
+/*integerliteral returns [SLExpression ret=null] throws SLTranslationException
 @after {ret = result;}
 :
 	result=decimalintegerliteral
     |
 	result=hexintegerliteral
-;
+;*/
 
-hexintegerliteral returns [SLExpression result=null] throws SLTranslationException
+integerliteral returns [SLExpression result=null] throws SLTranslationException
+@init { int radix=10; }
 :
-    n=HEXLITERAL
+    n = ( HEXLITERAL {radix=16;}
+        | DECLITERAL
+        | OCTLITERAL {radix=8;}
+        )
     {
-      String text = n.getText();
-      try {
+        String text = n.getText();
+        boolean isLong = false;
+
+        BigInteger isMinus = BigInteger.ONE;
+        for(int i = lastObservedUnaryMinus+1; i < n.getTokenIndex(); i++) {
+            if(input.get(i).getChannel() == 0) {
+                isMinus = BigInteger.ZERO;
+                break;
+            }
+        }
+
         if(text.endsWith("l") || text.endsWith("L")) {
-          Long val = Long.decode(text.substring(0, text.length()-1));
+          isLong = true;
+          text = text.substring(0, text.length() - 1);
+        }
+
+        if(radix == 16) {
+          text = text.substring(2);
+        }
+        
+        BigInteger val = new BigInteger(text, radix);
+        
+        if(isLong ? (val.compareTo(MAX_LONG.add(isMinus)) > 0)
+                  : (val.compareTo(MAX_INT.add(isMinus)) > 0)) {
+           raiseError("Number constant out of bounds", n);
+        }
+      
+        if(isLong) {
           result = new SLExpression(tb.zTerm(val.toString()),
                                     javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LONG));
         } else {
-          Integer val = Integer.decode(text);
           result = new SLExpression(tb.zTerm(val.toString()),
   	                                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
 	    }
-	  } catch(NumberFormatException ex) {
-	    raiseError("Number constant out of bounds", n);
-	  }
     }
 ;
 
