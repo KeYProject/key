@@ -352,6 +352,7 @@ group simpleTests {
    provable ./heap/simple/selection_sort.key
    provable ./heap/simple/seq.key
    provable ./heap/simple/oldForParams.key
+   provable ./heap/simple/parse_lmtd.key
    provable ./heap/strictly_pure/strictlyPureMethod.key
    provable ./heap/strictly_pure/useStrictlyPureMethod.key
    provable ./heap/Wellfounded/ackermann.key
