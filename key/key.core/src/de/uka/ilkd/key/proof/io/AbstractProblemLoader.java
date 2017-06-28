@@ -353,10 +353,9 @@ public abstract class AbstractProblemLoader {
                                 classPath, bootClassPath, profileOfNewProofs, includes);
             }
         }
-        else if (filename.endsWith(".key") || filename.endsWith(".proof")) {
+        else if (filename.endsWith(".key") || filename.endsWith(".proof") || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof
-            return new KeYUserProblemFile(filename, file, control, profileOfNewProofs);
-
+            return new KeYUserProblemFile(filename, file, control, profileOfNewProofs, filename.endsWith(".proof.gz"));
         }
         else if (file.isDirectory()) {
             // directory containing java sources, probably enriched

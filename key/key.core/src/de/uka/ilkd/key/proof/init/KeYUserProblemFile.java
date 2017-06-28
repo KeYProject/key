@@ -65,10 +65,16 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
                               File file, 
                               ProgressMonitor monitor,
                               Profile profile) {
-        super(name, file, monitor, profile);
+        this(name, file, monitor, profile, false);
     }
-    
-    
+
+    public KeYUserProblemFile(String name,
+                              File file,
+                              ProgressMonitor monitor,
+                              Profile profile,
+                              boolean compressed) {
+        super(name, file, monitor, profile, compressed);
+    }
     
     //-------------------------------------------------------------------------
     //public interface

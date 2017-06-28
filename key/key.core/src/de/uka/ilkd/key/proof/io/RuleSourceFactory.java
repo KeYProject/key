@@ -38,6 +38,14 @@ public class RuleSourceFactory {
     }
 
     public static RuleSource initRuleFile(final File file) {
-        return new FileRuleSource(file);
+        return initRuleFile(file, false);
+    }
+
+    public static RuleSource initRuleFile(final File file, boolean compressed) {
+        if (compressed) {
+            return new GZipFileRuleSource(file);
+        } else {
+            return new FileRuleSource(file);
+        }
     }
 }

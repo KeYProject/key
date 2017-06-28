@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -32,7 +33,6 @@ import de.uka.ilkd.key.util.KeYConstants;
 public class ProofSaver extends OutputStreamProofSaver {
 
    private final File file;
-   LogicPrinter printer;
 
    /**
     * <p>
@@ -58,10 +58,14 @@ public class ProofSaver extends OutputStreamProofSaver {
       this.file = file;
    }
 
+   protected void save(File file) throws IOException {
+       save(new FileOutputStream(file));
+   }
+
    public String save() throws IOException {
       String errorMsg = null;
       try {
-         save(new FileOutputStream(file));
+         save(file);
       }
       catch (IOException ioe) {
          errorMsg = "Could not save \n" + filename() + ".\n";
