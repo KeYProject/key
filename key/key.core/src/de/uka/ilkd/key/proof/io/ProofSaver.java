@@ -58,14 +58,26 @@ public class ProofSaver extends OutputStreamProofSaver {
       this.file = file;
    }
 
-   protected void save(File file) throws IOException {
-       save(new FileOutputStream(file));
-   }
+    /**
+     * Save the proof to file referenced by {@code file}.
+     *
+     * The format in which the proof is stored depends on the class. Thr base
+     * class creates a plain output file. Subclasses may choose to use other
+     * formats.
+     *
+     * @param file
+     *            the file to write to
+     * @throws IOException
+     *             if I/O fails
+     */
+    protected void save(File file) throws IOException {
+        save(new FileOutputStream(file));
+    }
 
    public String save() throws IOException {
       String errorMsg = null;
       try {
-         save(file);
+            save(file);
       }
       catch (IOException ioe) {
          errorMsg = "Could not save \n" + filename() + ".\n";

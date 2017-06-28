@@ -41,6 +41,15 @@ public class RuleSourceFactory {
         return initRuleFile(file, false);
     }
 
+    /**
+     * Initialise this object from a file
+     *
+     * @param file
+     *            the non-<code>null</code> file reference
+     * @param compressed
+     *            <code>true</code> iff the file is gzip-compressed
+     * @return the rule source read from the file.
+     */
     public static RuleSource initRuleFile(final File file, boolean compressed) {
         if (compressed) {
             return new GZipFileRuleSource(file);
