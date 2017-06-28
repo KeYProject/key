@@ -21,10 +21,13 @@ import java.awt.dnd.Autoscroll;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DropTarget;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EventObject;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.swing.SwingUtilities;
@@ -32,6 +35,7 @@ import javax.swing.SwingUtilities;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.axiom_abstraction.signanalysis.Pos;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ApplyTacletDialog;
 import de.uka.ilkd.key.gui.GUIListener;
@@ -39,6 +43,9 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.logic.FormulaChangeInfo;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
@@ -49,6 +56,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * This sequent view displays the sequent of an open goal and allows selection
@@ -254,12 +262,78 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 //        }
     }
     
+    class PIO_age {
+        PosInOccurrence pio;
+        int age;
+        public PIO_age(PosInOccurrence pio, int age) {
+            this.pio = pio;
+            this.age = age;
+        }
+        public PosInOccurrence get_pio() {
+            return pio;
+        }
+        public int get_age() {
+            return age;
+        }
+        public void set_pio(PosInOccurrence pio) {
+            this.pio = pio;
+            
+        }
+    }
+    
     private void updateTermHighlights() {
-        List<pio, alter(?)> list;
+        LinkedList<Node> nodeList = new LinkedList<>();
         Node node = getMainWindow().getMediator().getSelectedNode();
-        node = 20. parentNode; node.getNodeInfo().get
-        list.add node.getAppliedRuleApp().posInOccurrence();
-        node.// nur find-Teil. TODO: Auch add
+        nodeList.add(node);
+        int i = 0;
+        while (i < MAX_AGE_FOR_HEATMAP-1 && node.parent() != null) {
+            node = node.parent(); 
+            nodeList.addFirst(node);
+            ++i;
+        }
+        LinkedList<PIO_age> pio_age_list = new LinkedList<>();
+        Iterator<Node> it = nodeList.iterator();
+        int age = nodeList.size();
+        while (it.hasNext()) {
+            node = it.next();
+            if (node.getNodeInfo().getSequentChangeInfo() != null) {
+                ImmutableList<SequentFormula> added_ante = node.getNodeInfo().getSequentChangeInfo().addedFormulas(true);
+                ImmutableList<SequentFormula> added_succ = node.getNodeInfo().getSequentChangeInfo().addedFormulas(false);
+                for (SequentFormula sf : added_ante) {
+                    pio_age_list.add(new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), age));
+                    System.out.println("added_ante: " + sf.toString());
+                }
+                for (SequentFormula sf : added_succ) {
+                    pio_age_list.add(new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), age));
+                    System.out.println("added_succ: " + sf.toString());
+                }
+                ImmutableList<FormulaChangeInfo> modified = node.getNodeInfo().getSequentChangeInfo().modifiedFormulas();
+                for (FormulaChangeInfo fci : modified) {
+                    for (PIO_age pair : pio_age_list) {
+                        if (pair.get_pio().sequentFormula().equals(fci.getOriginalFormula())) {
+                            pair.set_pio(new PosInOccurrence(fci.getNewFormula(), pair.get_pio().posInTerm(), pair.get_pio().isInAntec()));
+                        }
+                    }
+                    pio_age_list.add(new PIO_age(fci.getPositionOfModification(), age));
+                    System.out.println("modified: " + fci.getOriginalFormula().toString());
+                }
+            }
+            --age; 
+        }
+        InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
+
+        for (PIO_age pair : pio_age_list) {
+            PosInOccurrence pio = pair.get_pio();
+            Color color = computeColorForAge(pair.get_age());
+            ImmutableList<Integer> pfp = ipt.pathForPosition(pio, filter);
+            if (pfp != null) {
+                Range r = ipt.rangeForPath(pfp);
+                Range newR = new Range(r.start()+1, r.end()+1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
+                Object tag = getColorHighlight(color);
+                heatMapHighlights.add(tag);
+                paintHighlight(newR, tag);
+            }
+        }
     }
 
     private Color computeColorForAge(int age) {
@@ -348,7 +422,8 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
         updateUpdateHighlights();
         if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().heatmapEnabled()) {
-            updateHeatmapHighlights();
+//            updateHeatmapHighlights();
+            updateTermHighlights();
         }
         restorePosition();
         addMouseListener(listener);
