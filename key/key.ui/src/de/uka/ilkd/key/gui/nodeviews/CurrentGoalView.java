@@ -265,6 +265,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     class PIO_age {
         PosInOccurrence pio;
         int age;
+        boolean active = true;
         public PIO_age(PosInOccurrence pio, int age) {
             this.pio = pio;
             this.age = age;
@@ -279,6 +280,11 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             this.pio = pio;
             
         }
+        @Override
+        public String toString() {
+            return "PIO_age [pio=" + pio + ", age=" + age + ", active=" + active + "]";
+        }
+
     }
     
     private void updateTermHighlights() {
@@ -309,20 +315,45 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 }
                 ImmutableList<FormulaChangeInfo> modified = node.getNodeInfo().getSequentChangeInfo().modifiedFormulas();
                 for (FormulaChangeInfo fci : modified) {
+                    PosInOccurrence positionOfMod = fci.getPositionOfModification();
+                    pio_age_list.add(new PIO_age(positionOfMod, age));
                     for (PIO_age pair : pio_age_list) {
                         if (pair.get_pio().sequentFormula().equals(fci.getOriginalFormula())) {
+                            if(positionOfMod.posInTerm().isPrefixOf(pair.get_pio().posInTerm())) {
+                                pair.active = false;
+                            } else {
                             pair.set_pio(new PosInOccurrence(fci.getNewFormula(), pair.get_pio().posInTerm(), pair.get_pio().isInAntec()));
                         }
                     }
-                    pio_age_list.add(new PIO_age(fci.getPositionOfModification(), age));
+                    }
                     System.out.println("modified: " + fci.getOriginalFormula().toString());
                 }
+                for (SequentFormula sf : node.getNodeInfo().getSequentChangeInfo().removedFormulas(true)) {
+                    for (PIO_age pair : pio_age_list) {
+                        if (pair.get_pio().sequentFormula().equals(sf) && pair.get_pio().isInAntec()) {
+                            pair.active = false;
+                            System.out.println("removed antec: " + sf);
+                        }
+                    }
+                }
+                for (SequentFormula sf : node.getNodeInfo().getSequentChangeInfo().removedFormulas(false)) {
+                    for (PIO_age pair : pio_age_list) {
+                        if (pair.get_pio().sequentFormula().equals(sf) && !pair.get_pio().isInAntec()) {
+                            pair.active = false;
+                            System.out.println("removed antec: " + sf);
+                        }
+                    }
+                }
+
             }
             --age; 
         }
         InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
 
         for (PIO_age pair : pio_age_list) {
+            System.out.println(pair);
+            if(!pair.active)
+                continue;
             PosInOccurrence pio = pair.get_pio();
             Color color = computeColorForAge(pair.get_age());
             ImmutableList<Integer> pfp = ipt.pathForPosition(pio, filter);

@@ -330,5 +330,17 @@ public final class PosInTerm {
         }
     }
 
+    public boolean isPrefixOf(PosInTerm pit) {
+        if(size >= pit.size)
+            return false;
+
+        for(int i = 0; i < size; i++) {
+            if (positions[i] != pit.positions[i])
+                return false;
+        }
+
+        return true;
+    }
+
 
 }
