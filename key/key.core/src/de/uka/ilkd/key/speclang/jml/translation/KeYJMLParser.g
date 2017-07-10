@@ -1523,7 +1523,7 @@ integerliteral returns [SLExpression result=null] throws SLTranslationException
         | DECLITERAL
         | OCTLITERAL {radix=8;}
         )
-    {
+    {    
         String text = n.getText();
         boolean isLong = false;
 
@@ -1535,20 +1535,51 @@ integerliteral returns [SLExpression result=null] throws SLTranslationException
             }
         }
 
+        // int or long?
         if(text.endsWith("l") || text.endsWith("L")) {
           isLong = true;
           text = text.substring(0, text.length() - 1);
         }
 
-        if(radix == 16) {
-          text = text.substring(2);
+        // remove underscores
+        text = text.replace('_', '');
+
+        switch (radix) {
+          case 2:
+          case 16:
+              text = text.substring(2);     // cut of '0x' resp. '0b'
+              break;
+          case 8:
+              text = text.substring(1);     // cut of leading '0'
+              break;
+          case 10:
+              break;
         }
-        
+       
         BigInteger val = new BigInteger(text, radix);
         
-        if(isLong ? (val.compareTo(MAX_LONG.add(isMinus)) > 0)
+        if (radix == 10) {
+            // check if the value is inside the valid range for int/long
+            if(isLong ? (val.compareTo(MAX_LONG.add(isMinus)) > 0)
                   : (val.compareTo(MAX_INT.add(isMinus)) > 0)) {
-           raiseError("Number constant out of bounds", n);
+        	    raiseError("Number constant out of bounds", n);
+            }
+            
+            if (isLong) {
+        	    long i = val.longValue();
+        	    if (i<0) {
+        		   minusFlag = true;
+        		   i=-i;
+        	    }
+            } else {
+                int i = val.intValue();
+                if (i<0) {
+        	        minusFlag = true;
+                    i=-i;
+                }
+            }
+        } else {
+            // TODO: interpret non-decimal literals as bitvectors (two's complement)
         }
       
         if(isLong) {

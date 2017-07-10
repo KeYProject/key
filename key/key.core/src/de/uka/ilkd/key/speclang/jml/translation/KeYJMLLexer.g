@@ -230,6 +230,26 @@ LETTER
         '$'
 ;
 
+
+fragment
+BINDIGIT
+    :
+        '0'..'1'
+;
+
+fragment
+OCTDIGIT
+    :
+        '0'..'7'
+;
+
+
+fragment
+DECDIGIT
+    :
+        '0'..'9'
+;
+
 fragment
 DIGIT
 	:
@@ -242,6 +262,49 @@ HEXDIGIT
         DIGIT | 'a' .. 'f'
               | 'A' .. 'F'
 ;
+
+fragment
+BINPREFIX
+    :
+        '0' ('b'|'B')
+;
+
+fragment
+OCTPREFIX
+    :
+        '0'
+;
+
+fragment
+HEXPREFIX
+    :
+        '0' ('x'|'X')
+;
+
+fragment
+LONGSUFFIX
+    :
+        'l' | 'L'
+;
+
+BINLITEAL
+    :
+        BINPREFIX BINDIGIT ((BINDIGIT | '_')* BINDIGIT)? LONGSUFFIX?
+;
+
+OCTLITERAL
+    :
+        OCTPREFIX OCTDIGIT ((OCTDIGIT | '_')* OCTDIGIT)? LONGSUFFIX?
+;
+
+DECLITERAL
+    :
+        DECDIGIT ((DECDIGIT | '_')* DECDIGIT)? LONGSUFFIX?
+;
+
+HEXLITERAL
+    :
+        HEXPREFIX ((HEXDIGIT | '_')* HEXDIGIT)? LONGSUFFIX?
 
 fragment
 LETTERORDIGIT

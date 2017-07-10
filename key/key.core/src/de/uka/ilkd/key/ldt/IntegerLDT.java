@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.ldt;
 
+import java.math.BigInteger;
+
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -602,7 +604,25 @@ public final class IntegerLDT extends LDT {
             // need to cut that off (fixes bug #1523)
             assert Character.toLowerCase(literalString.charAt(literalString.length()-1)) == 'l';
             try {
-                final long l = Long.decode(literalString.substring(0, literalString.length()-1));
+        	String digits = literalString.substring(0, literalString.length()-1);	// cut of L suffix
+        	BigInteger b;
+        	if (digits.startsWith("0x")) {					// hexadecimal
+        	    b = new BigInteger(digits.substring(2), 16);
+        	} else if (digits.startsWith("0") && digits.length() > 1) { 	// octal
+        	    b = new BigInteger(digits.substring(1), 8);
+        	} else {	 						// decimal
+        	    b = new BigInteger(digits, 10);
+        	}
+        	
+        	if (b.compareTo(new BigInteger("9223372036854775808")) > 0) throw new
+                	NumberFormatException("This won't fit into a long");
+        	long l = b.longValue();
+        	if (l<0) {
+        	    minusFlag = true;
+        	    l=-l;
+        	}
+        	
+                // final long l = Long.decode(literalString.substring(0, literalString.length()-1));
                 int_ch=(""+l).toCharArray();
             } catch (NumberFormatException nfe) {
                 Debug.fail("Cannot convert long constant! "+literalString);
