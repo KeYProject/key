@@ -1517,21 +1517,28 @@ javaliteral returns [SLExpression ret=null] throws SLTranslationException
 ;*/
 
 integerliteral returns [SLExpression result=null] throws SLTranslationException
-@init { int radix=10; }
+@init { int radix=10; } //System.out.println(input.LA(1));}
 :
     n = ( HEXLITERAL {radix=16;}
         | DECLITERAL
         | OCTLITERAL {radix=8;}
+        | BINLITERAL {radix=2;}
         )
     {    
         String text = n.getText();
         boolean isLong = false;
 
-        BigInteger isMinus = BigInteger.ONE;
-        for(int i = lastObservedUnaryMinus+1; i < n.getTokenIndex(); i++) {
-            if(input.get(i).getChannel() == 0) {
-                isMinus = BigInteger.ZERO;
-                break;
+        BigInteger isMinus = BigInteger.ZERO;
+        
+        // check if the last observed unary minus sign is adjacent to the literal
+        if (lastObservedUnaryMinus != -1) {    // at least one unary minus has been observed
+            isMinus = BigInteger.ONE;
+            for (int i = lastObservedUnaryMinus+1; i < n.getTokenIndex(); i++) {
+                // ignore whitespace and comments (TODO: check)
+                if(input.get(i).getChannel() == 0) {
+                    isMinus = BigInteger.ZERO;
+                    break;
+                }
             }
         }
 
@@ -1542,7 +1549,7 @@ integerliteral returns [SLExpression result=null] throws SLTranslationException
         }
 
         // remove underscores
-        text = text.replace('_', '');
+        text = text.replace("_", "");
 
         switch (radix) {
           case 2:
@@ -1559,36 +1566,50 @@ integerliteral returns [SLExpression result=null] throws SLTranslationException
         BigInteger val = new BigInteger(text, radix);
         
         if (radix == 10) {
+            
             // check if the value is inside the valid range for int/long
-            if(isLong ? (val.compareTo(MAX_LONG.add(isMinus)) > 0)
+            if (isLong ? (val.compareTo(MAX_LONG.add(isMinus)) > 0)
                   : (val.compareTo(MAX_INT.add(isMinus)) > 0)) {
         	    raiseError("Number constant out of bounds", n);
             }
-            
             if (isLong) {
-        	    long i = val.longValue();
-        	    if (i<0) {
-        		   minusFlag = true;
-        		   i=-i;
-        	    }
+	            // use a BigInteger here to be sure the (absolute) value fits into it
+                result = new SLExpression(tb.zTerm(val.toString()),
+                                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LONG));
             } else {
-                int i = val.intValue();
-                if (i<0) {
-        	        minusFlag = true;
-                    i=-i;
-                }
+        	    // use a long to be sure the (absolute) value fits into it
+                long i = val.longValue();
+                result = new SLExpression(tb.zTerm(Long.toString(i)),
+                                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
             }
         } else {
             // TODO: interpret non-decimal literals as bitvectors (two's complement)
+            
+            // the converted int/long may be between 0 and 2^64-1/2^32-1
+            if (isLong ? (val.compareTo(new BigInteger("18446744073709551615")) > 0)
+        	    : (val.compareTo(new BigInteger("4294967295")) > 0)) {
+        	    raiseError("Number constant out of bounds", n);
+            }
+            if (isLong) {
+        	    // convert to long using two's complement
+                long i = val.longValue();
+                result = new SLExpression(tb.zTerm(Long.valueOf(i)),
+                        javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LONG));
+            } else {
+        	    // convert to int using two's complement
+                int i = val.intValue();
+                result = new SLExpression(tb.zTerm(Integer.valueOf(i)),
+                        javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
+            }            
         }
-      
-        if(isLong) {
-          result = new SLExpression(tb.zTerm(val.toString()),
+
+        /* if(isLong) {
+          result = new SLExpression(tb.zTerm(Integer.valueOf(i)),     //val.toString()),
                                     javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LONG));
         } else {
           result = new SLExpression(tb.zTerm(val.toString()),
   	                                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
-	    }
+	    }*/
     }
 ;
 

@@ -243,6 +243,11 @@ OCTDIGIT
         '0'..'7'
 ;
 
+fragment
+NONZERODECDIGIT
+    :
+        '1'..'9'
+;
 
 fragment
 DECDIGIT
@@ -287,7 +292,7 @@ LONGSUFFIX
         'l' | 'L'
 ;
 
-BINLITEAL
+BINLITERAL
     :
         BINPREFIX BINDIGIT ((BINDIGIT | '_')* BINDIGIT)? LONGSUFFIX?
 ;
@@ -299,12 +304,13 @@ OCTLITERAL
 
 DECLITERAL
     :
-        DECDIGIT ((DECDIGIT | '_')* DECDIGIT)? LONGSUFFIX?
+        '0' | NONZERODECDIGIT ((DECDIGIT | '_')* DECDIGIT)? LONGSUFFIX?
 ;
 
 HEXLITERAL
     :
         HEXPREFIX ((HEXDIGIT | '_')* HEXDIGIT)? LONGSUFFIX?
+;
 
 fragment
 LETTERORDIGIT
@@ -332,6 +338,7 @@ BACKSLASH_PREFIXED:
  | JML_IDENT
  ;
 
+/* 
 HEXLITERAL
     :
         '0' ('x'|'X') (HEXDIGIT)+ ( 'l'|'L' )?
@@ -346,6 +353,7 @@ DECLITERAL
     :
         (('1'..'9') (DIGIT)* | '0') ( 'l'|'L' )?
     ;
+*/ 
 
 CHAR_LITERAL:
         '\''
