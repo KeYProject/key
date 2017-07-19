@@ -1,14 +1,12 @@
 package de.uka.ilkd.key.parser;
 
-import org.junit.Test;
+import org.antlr.runtime.RecognitionException;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
-import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 public class TestIntLiteralParsing extends AbstractTestTermParser {
@@ -18,7 +16,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
     }
     
     @Override
-    public Term parseTerm(String s) throws Exception {
+    public Term parseTerm(String s) throws RecognitionException {
         PositionedString p = new PositionedString(s);
         /*
          containerType and self variable are not relevant for the tests
@@ -31,20 +29,10 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
         return parser.termexpression();
     }
     
-    public SLExpression parseNumLiteral(String s) throws Exception {
-        PositionedString p = new PositionedString(s);
-        /*
-         containerType and self variable are not relevant for the tests
-         currently and can be changed if needed.
-         */
-        KeYJavaType containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
-        ProgramVariable self = services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
-        KeYJMLParser parser = new KeYJMLParser(p, getServices(), containerType, self,
-                null, null, null, null);
-        return parser.integerliteral();
-    }
-    
-    static final String[] STRINGS = {
+    /**
+     * Some Strings representing valid int values and the expected terms created by parsing them.
+     */
+    static final String[] INTSTRINGS = {
 	//  	input					, 	expected output
 	    "0xffff_ffff"				,	"Z(neglit(1(#)))",
 	    "0x000"					,	"Z(0(#))",
@@ -64,33 +52,38 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
 	    "0b0100100100011101"			,	"Z(7(1(7(8(1(#))))))"
     };
     
-    public void testIntLiteralParsing() throws Exception {
+    /**
+     * Tests if the Strings in INTSTRINGS are parsed and converted correctly.
+     * @throws RecognitionException
+     */
+    public void testIntLiteralParsing() throws RecognitionException {
 	Term t;
-	String input, actual, expected, pretty;
+	String input, actual, expected;
 	
-	for (int i = 0; i < STRINGS.length / 2; i++) {
-	    input = STRINGS[i*2];
-	    expected = STRINGS[i*2 + 1];
+	for (int i = 0; i < INTSTRINGS.length / 2; i++) {
+	    input = INTSTRINGS[i*2];
+	    expected = INTSTRINGS[i*2 + 1];
 	    
 	    t = parseTerm(input);
 	    actual = t.toString();
-	    pretty = LogicPrinter.quickPrintTerm(t, services);
 	    
-	    //System.out.println("input: " + input + " term: " + actual + " expected: " + expected + " pretty: " + pretty);
 	    assertEquals(expected, actual);
 	    }
     }
     
-    static final String[] LSTRINGS = {
+    /**
+     * Some Strings representing valid long values and the expected terms created by parsing them.
+     */
+    static final String[] LONGSTRINGS = {
 	//  	input					, 	expected output
-	    "0xffff_ffff_ffff_ffffL"			,	"Z(neglit(1(#)))",
+	// long versions of the Strings in INTSTRINGS should still be parseable:
 	    "0x000l"					,	"Z(0(#))",
 	    "0x8000_0000l"				,	"Z(8(4(6(3(8(4(7(4(1(2(#)))))))))))",
 	    "0x7fffffffL"				,	"Z(7(4(6(3(8(4(7(4(1(2(#)))))))))))",
 	    "2147483647L"				,	"Z(7(4(6(3(8(4(7(4(1(2(#)))))))))))",
 	    "-2147483648l"				,	"javaUnaryMinusLong(Z(8(4(6(3(8(4(7(4(1(2(#))))))))))))",
 	    "0l"						,	"Z(0(#))",
-	    "-0L"					,	"javaUnaryMinusInt(Z(0(#)))",
+	    "-0L"					,	"javaUnaryMinusLong(Z(0(#)))",
 	    "00L"					,	"Z(0(#))",
 	    "017777777777l"				,	"Z(7(4(6(3(8(4(7(4(1(2(#)))))))))))",
 	    "020000000000l"				,	"Z(8(4(6(3(8(4(7(4(1(2(#)))))))))))",
@@ -98,62 +91,91 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
 	    "0b0L"					,	"Z(0(#))",
 	    "0b01111111111111111111111111111111L"	,	"Z(7(4(6(3(8(4(7(4(1(2(#)))))))))))",
 	    "0b1000_0000_0000_0000_0000_0000_0000_0000l",	"Z(8(4(6(3(8(4(7(4(1(2(#)))))))))))",
-	    "0b0100100100011101L"			,	"Z(7(1(7(8(1(#))))))"
+	    "0b0100100100011101L"			,	"Z(7(1(7(8(1(#))))))",
+	// "real" longs:
+	    "0xffff_ffff_ffff_ffffL"			,	"Z(neglit(1(#)))",
+	    "9223372036854775807L"			,	"Z(7(0(8(5(7(7(4(5(8(6(3(0(2(7(3(3(2(2(9(#))))))))))))))))))))",
+	    "-9223372036854775808L"			,	"javaUnaryMinusLong(Z(8(0(8(5(7(7(4(5(8(6(3(0(2(7(3(3(2(2(9(#)))))))))))))))))))))",
+	    "0b1111111111_1111111111_1111111111_"
+	    + "1111111111_1111111111_1111111111_1111L"	, "Z(neglit(1(#)))",
+	    "0b1000000000_0000000000_0000000000_"
+	    + "0000000000_0000000000_0000000000_0000L"	,	"Z(neglit(8(0(8(5(7(7(4(5(8(6(3(0(2(7(3(3(2(2(9(#)))))))))))))))))))))",
+	    "0b0111111111_1111111111_1111111111_"
+	    + "1111111111_1111111111_1111111111_1111L"	,	"Z(7(0(8(5(7(7(4(5(8(6(3(0(2(7(3(3(2(2(9(#))))))))))))))))))))"
+	    
     };
     
-    public void testLongLiteralParsing() throws Exception {
+    /**
+     * Tests if the Strings in LONGSTRINGS are parsed and converted correctly.
+     * @throws RecognitionException
+     */
+    public void testLongLiteralParsing() throws RecognitionException {
 	Term t;
-	String input, actual, expected, pretty;
+	String input, actual, expected;
 	
-	for (int i = 0; i < LSTRINGS.length / 2; i++) {
-	    input = LSTRINGS[i*2];
-	    expected = LSTRINGS[i*2 + 1];
+	for (int i = 0; i < LONGSTRINGS.length / 2; i++) {
+	    input = LONGSTRINGS[i*2];
+	    expected = LONGSTRINGS[i*2 + 1];
 	    
 	    t = parseTerm(input);
 	    actual = t.toString();
-	    pretty = LogicPrinter.quickPrintTerm(t, services);
 	    
-	    //System.out.println("input: " + input + " term: " + actual + " expected: " + expected + " pretty: " + pretty);
 	    assertEquals(expected, actual);		    
 	}
     }
     
+    /**
+     * These Strings represent numbers that are out of range of the int type.
+     */
     private static final String[] INTRANGESTRINGS = {
-	    "-2147483649",
-	    "2147483648",
-	    "0x100000000",
-	    "0b100000000000000000000000000000000",
-	    "040000000000"
+	    "-2147483649",					// -2^31 - 1
+	    "2147483648",					// 2^31
+	    "0x1_0000_0000",					// 2^32
+	    "0b1_0000_0000_0000_0000_0000_0000_0000_0000",	// 2^32
+	    "0400_0000_0000"					// 2^32
     };
     
-    public void testIntRange() throws Exception {
+    /**
+     * This method tests if meaningful ("out of bounds") error messages get printed for int literals
+     * which are just outside the range of int.
+     * @throws RecognitionException
+     */
+    public void testIntRange() throws RecognitionException {
 	for (String s : INTRANGESTRINGS) {
     	    try {
     	        parseTerm(s);
     	        fail();
     	    }
     	    catch (SLTranslationException e) {
-    	        assertEquals("Number constant out of bounds", e.getMessage());
+    	        assertTrue(e.getMessage().startsWith("Number constant out of bounds"));
     	    }
 	}
     }
     
+    /**
+     * These Strings represent numbers that are out of range of the long type.
+     */
     private static final String[] LONGRANGESTRINGS = {
-	    "-9_223_372_036_854_775_809L",
-	    "9223372036854775808L",
-	    "0x10000000000000000l",
-	    "0b10000000000000000000000000000000000000000000000000000000000000000l",
-	    "020_0000_0000_0000_0000_0000L"
+	    "-9_223_372_036_854_775_809L",							// -2^63 - 1
+	    "9223372036854775808L",								// 2^63
+	    "0x1_0000_0000_0000_0000L",								// 2^64
+	    "0b10000_0000000000_0000000000_0000000000_0000000000_0000000000_0000000000L",	// 2^64
+	    "020_0000_0000_0000_0000_0000L"							// 2^64
     };
     
-    public void testLongRange() throws Exception {
+    /**
+     * This method tests if meaningful ("out of bounds") error messages get printed for long literals
+     * which are just outside the range of long.
+     * @throws RecognitionException
+     */
+    public void testLongRange() throws RecognitionException {
 	for (String s : LONGRANGESTRINGS) {
     	    try {
     	        parseTerm(s);
     	        fail();
     	    }
     	    catch (SLTranslationException e) {
-    	        assertEquals("Number constant out of bounds", e.getMessage());
+    	        assertTrue(e.getMessage().startsWith("Number constant out of bounds"));
     	    }
 	}
     }

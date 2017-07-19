@@ -40,8 +40,25 @@ options {
 
 @members {
 
+    /**
+     * maximum valid value of a signed int
+     */
     private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
+    
+    /**
+     * maximum valid value of a signed long
+     */
     private static final BigInteger MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
+
+    /**
+     * maximum valid value if an int was interpreted unsigned
+     */
+    private static final BigInteger MAX_UINT = new BigInteger("4294967295");
+    
+    /**
+     * maximum valid value if a long was interpreted unsigned
+     */
+    private static final BigInteger MAX_ULONG = new BigInteger("18446744073709551615");
 
     private TermBuilder tb;
 
@@ -1517,7 +1534,7 @@ javaliteral returns [SLExpression ret=null] throws SLTranslationException
 ;*/
 
 integerliteral returns [SLExpression result=null] throws SLTranslationException
-@init { int radix=10; } //System.out.println(input.LA(1));}
+@init { int radix=10; }
 :
     n = ( HEXLITERAL {radix=16;}
         | DECLITERAL
@@ -1527,7 +1544,36 @@ integerliteral returns [SLExpression result=null] throws SLTranslationException
     {    
         String text = n.getText();
         boolean isLong = false;
-
+        
+        ///////////////////////////////////////////////////////////////////////////
+        /* preprocessing of the input string: */
+        
+        // int or long?
+        if(text.endsWith("l") || text.endsWith("L")) {
+          isLong = true;
+          text = text.substring(0, text.length() - 1);
+        }
+        
+        // remove underscores
+        text = text.replace("_", "");
+        
+        switch (radix) {
+          case 2:
+          case 16:
+              text = text.substring(2);     // cut of '0x' resp. '0b'
+              break;
+          case 8:
+              text = text.substring(1);     // cut of leading '0'
+              break;
+          case 10:
+              break;
+          default:
+              break;
+        }
+        
+        ///////////////////////////////////////////////////////////////////////////
+        /* preprocessing of the context (literal surrounded by an unary minus?): */
+        
         BigInteger isMinus = BigInteger.ZERO;
         
         // check if the last observed unary minus sign is adjacent to the literal
@@ -1541,75 +1587,43 @@ integerliteral returns [SLExpression result=null] throws SLTranslationException
                 }
             }
         }
-
-        // int or long?
-        if(text.endsWith("l") || text.endsWith("L")) {
-          isLong = true;
-          text = text.substring(0, text.length() - 1);
-        }
-
-        // remove underscores
-        text = text.replace("_", "");
-
-        switch (radix) {
-          case 2:
-          case 16:
-              text = text.substring(2);     // cut of '0x' resp. '0b'
-              break;
-          case 8:
-              text = text.substring(1);     // cut of leading '0'
-              break;
-          case 10:
-              break;
-        }
-       
+        
+        ///////////////////////////////////////////////////////////////////////////
+        /* range check and actual conversion: */
+        
+        /* the raw BigInteger converted from the input String without considering
+         * allowed value range or two's complement
+         */
         BigInteger val = new BigInteger(text, radix);
         
+        // calculate maximum valid value for the literal (depending on sign, long/int and radix)
+        BigInteger MAX;
         if (radix == 10) {
-            
-            // check if the value is inside the valid range for int/long
-            if (isLong ? (val.compareTo(MAX_LONG.add(isMinus)) > 0)
-                  : (val.compareTo(MAX_INT.add(isMinus)) > 0)) {
-        	    raiseError("Number constant out of bounds", n);
-            }
-            if (isLong) {
-	            // use a BigInteger here to be sure the (absolute) value fits into it
-                result = new SLExpression(tb.zTerm(val.toString()),
-                                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LONG));
-            } else {
-        	    // use a long to be sure the (absolute) value fits into it
-                long i = val.longValue();
-                result = new SLExpression(tb.zTerm(Long.toString(i)),
-                                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
-            }
+            MAX = isLong ? MAX_LONG : MAX_INT;
         } else {
-            // TODO: interpret non-decimal literals as bitvectors (two's complement)
-            
-            // the converted int/long may be between 0 and 2^64-1/2^32-1
-            if (isLong ? (val.compareTo(new BigInteger("18446744073709551615")) > 0)
-        	    : (val.compareTo(new BigInteger("4294967295")) > 0)) {
-        	    raiseError("Number constant out of bounds", n);
-            }
-            if (isLong) {
-        	    // convert to long using two's complement
-                long i = val.longValue();
-                result = new SLExpression(tb.zTerm(Long.valueOf(i)),
-                        javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LONG));
-            } else {
-        	    // convert to int using two's complement
-                int i = val.intValue();
-                result = new SLExpression(tb.zTerm(Integer.valueOf(i)),
-                        javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
-            }            
+            MAX = isLong ? MAX_ULONG : MAX_UINT;
         }
+        MAX = MAX.add(isMinus);
 
-        /* if(isLong) {
-          result = new SLExpression(tb.zTerm(Integer.valueOf(i)),     //val.toString()),
-                                    javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LONG));
-        } else {
-          result = new SLExpression(tb.zTerm(val.toString()),
-  	                                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
-	    }*/
+        // check if literal is in valid range
+        if (val.compareTo(MAX) > 0) {
+            raiseError("Number constant out of bounds: " + n.getText(), n);
+        }
+        
+        /* perform the actual conversion (two's complement for bin, oct and hex!) of the
+         * BigInteger to a String containing the real (checked valid) value of the literal
+         */
+        String strVal;
+        if (radix == 10) {
+            strVal = isLong ? val.toString() : Long.toString(val.longValue());
+        }
+        else {
+            strVal = isLong ? Long.toString(val.longValue()) : Integer.toString(val.intValue());
+        }
+        
+        // encapsulate the literal into a SLExpression
+	    PrimitiveType literalType = isLong ? PrimitiveType.JAVA_LONG : PrimitiveType.JAVA_INT;
+        result = new SLExpression(tb.zTerm(strVal), javaInfo.getPrimitiveKeYJavaType(literalType));
     }
 ;
 
