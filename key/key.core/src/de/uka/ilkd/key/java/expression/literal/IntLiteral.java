@@ -21,7 +21,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -31,7 +30,7 @@ import de.uka.ilkd.key.logic.Name;
  *  @author <TT>AutoDoc</TT>
  */
 
-public class IntLiteral extends Literal {
+public class IntLiteral extends AbstractNumeralLiteral {
 
     /**
      *      Textual representation of the value.
@@ -59,6 +58,11 @@ public class IntLiteral extends Literal {
      */
     public IntLiteral(String value) {
         this.value=value.intern();
+    }
+
+    public IntLiteral(String value, boolean surroundedByUnaryMinus) {
+	this.value = value.intern();
+	this.surroundedByUnaryMinus = surroundedByUnaryMinus;
     }
 
     /**

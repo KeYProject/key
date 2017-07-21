@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.literal.AbstractNumeralLiteral;
 import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
@@ -50,6 +51,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -68,6 +70,27 @@ public final class IntegerLDT extends LDT {
     public static final String NEGATIVE_LITERAL_STRING = "neglit";
     public static final Name NUMBERS_NAME = new Name("Z");
     public static final Name CHAR_ID_NAME = new Name("C"); 
+    
+    // constants for int and long conversion
+    /**
+     * maximum valid value of a signed int
+     */
+    private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
+    
+    /**
+     * maximum valid value of a signed long
+     */
+    private static final BigInteger MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
+
+    /**
+     * maximum valid value if an int was interpreted unsigned
+     */
+    private static final BigInteger MAX_UINT = new BigInteger("4294967295");
+    
+    /**
+     * maximum valid value if a long was interpreted unsigned
+     */
+    private static final BigInteger MAX_ULONG = new BigInteger("18446744073709551615");
     
     //the following fields cache the symbols from integerHeader.key. 
     //(explanations see there)
@@ -550,6 +573,10 @@ public final class IntegerLDT extends LDT {
         char[] int_ch=null;
         assert sharp != null;
         Term result = services.getTermBuilder().func(sharp);
+        
+        if (lit instanceof IntLiteral || lit instanceof LongLiteral) {
+            System.out.println();
+        }
 
         Function identifier=numbers;
         if (lit instanceof CharLiteral) {
@@ -577,66 +604,162 @@ public final class IntegerLDT extends LDT {
         // the logic. The former can have prefixes ("0" for octal,
         // "0x" for hex) and suffixes ("L" for long literal). The latter
         // do not have any of these but can have arbitrary length.
-        if (lit instanceof IntLiteral) {
-            if (literalString.startsWith("0") && !literalString.equals("0")) { // hex or octal literal
-                try {
-                    long l = Long.decode(literalString);
-                    //the following contortion is necessary to deal with
-                    //valid java programs like int i = 0xffffffff;
-                    //http://stackoverflow.com/questions/4355619/converting-string-to-intger-hex-value-strange-behaviour
-                    if (l>4294967295L) throw new
-                        NumberFormatException("This won't fit into an int");
-                    int i = (int) l;
-                    if (i<0) {
-                        minusFlag = true;
-                        i=-i;
+//        if (lit instanceof IntLiteral) {
+//            if (literalString.startsWith("0") && !literalString.equals("0")) { // hex or octal literal
+//                try {
+//                    long l = Long.decode(literalString);
+//                    //the following contortion is necessary to deal with
+//                    //valid java programs like int i = 0xffffffff;
+//                    //http://stackoverflow.com/questions/4355619/converting-string-to-intger-hex-value-strange-behaviour
+//                    if (l>4294967295L) throw new
+//                        NumberFormatException("This won't fit into an int");
+//                    int i = (int) l;
+//                    if (i<0) {
+//                        minusFlag = true;
+//                        i=-i;
+//                    }
+//                    int_ch=(""+i).toCharArray();
+//                } catch(NumberFormatException nfe) {
+//                    Debug.fail("Cannot convert int constant! "+literalString);
+//                }
+//            } else {
+//                int_ch=literalString.toCharArray();
+//            }
+//            length = int_ch.length;
+//        } else if (lit instanceof LongLiteral) {
+//            // long constants have the letter 'l' as final character
+//            // need to cut that off (fixes bug #1523)
+//            assert Character.toLowerCase(literalString.charAt(literalString.length()-1)) == 'l';
+//            try {
+//                final long l = Long.decode(literalString.substring(0, literalString.length()-1));
+//                int_ch=(""+l).toCharArray();
+//            } catch (NumberFormatException nfe) {
+//                Debug.fail("Cannot convert long constant! "+literalString);
+//            }
+//            length = int_ch.length;
+//        }
+        
+        if (lit instanceof AbstractNumeralLiteral) {	// Int.. or Long... 
+            AbstractNumeralLiteral nl = (AbstractNumeralLiteral)lit;
+            
+            String text = literalString;
+            boolean isLong = false;
+            int radix = 10;
+            
+            ///////////////////////////////////////////////////////////////////////////
+            /* preprocessing of the input string: */
+            
+            // int or long?
+            if(text.endsWith("l") || text.endsWith("L")) {
+              isLong = true;
+              text = text.substring(0, text.length() - 1);
+            }
+            
+            // remove underscores
+            text = text.replace("_", "");
+            
+            if (text.startsWith("0x") || text.startsWith("0X")) {		// hex
+        	radix = 16;
+            }
+            else if (text.startsWith("0b") || text.startsWith("0B")) {		// bin
+        	radix = 2;
+            }
+            else if (text.startsWith("0") && text.length() > 1) {		// oct
+        	radix = 8;
+            }
+            
+            switch (radix) {
+              case 2:
+              case 16:
+                  text = text.substring(2);     // cut of '0x' resp. '0b'
+                  break;
+              case 8:
+                  text = text.substring(1);     // cut of leading '0'
+                  break;
+              case 10:
+                  break;
+              default:
+                  break;
+            }
+            
+            ///////////////////////////////////////////////////////////////////////////
+            /* preprocessing of the context (literal surrounded by an unary minus?): */
+            
+            boolean parsedMinus = false;
+            parsedMinus = nl.isSurroundedByUnaryMinus();
+            
+            BigInteger isMinus = parsedMinus ? BigInteger.ONE : BigInteger.ZERO;
+            
+            // TODO: how to get this information?
+            /*
+            // check if the last observed unary minus sign is adjacent to the literal
+            if (lastObservedUnaryMinus != -1) {    // at least one unary minus has been observed
+                isMinus = BigInteger.ONE;
+                for (int i = lastObservedUnaryMinus+1; i < n.getTokenIndex(); i++) {
+                    // ignore whitespace and comments (TODO: check)
+                    if(input.get(i).getChannel() == 0) {
+                        isMinus = BigInteger.ZERO;
+                        break;
                     }
-                    int_ch=(""+i).toCharArray();
-                } catch(NumberFormatException nfe) {
-                    Debug.fail("Cannot convert int constant! "+literalString);
                 }
+            }*/
+            
+            ///////////////////////////////////////////////////////////////////////////
+            /* range check and actual conversion: */
+            
+            /* the raw BigInteger converted from the input String without considering
+             * allowed value range or two's complement
+             */
+            BigInteger val = new BigInteger(text, radix);
+            
+            // calculate maximum valid value for the literal (depending on sign, long/int and radix)
+            BigInteger MAX;
+            if (radix == 10) {
+                MAX = isLong ? MAX_LONG : MAX_INT;
             } else {
-                int_ch=literalString.toCharArray();
+                MAX = isLong ? MAX_ULONG : MAX_UINT;
             }
-            length = int_ch.length;
-        } else if (lit instanceof LongLiteral) {
-            // long constants have the letter 'l' as final character
-            // need to cut that off (fixes bug #1523)
-            assert Character.toLowerCase(literalString.charAt(literalString.length()-1)) == 'l';
-            try {
-        	String digits = literalString.substring(0, literalString.length()-1);	// cut of L suffix
-        	BigInteger b;
-        	if (digits.startsWith("0x")) {					// hexadecimal
-        	    b = new BigInteger(digits.substring(2), 16);
-        	} else if (digits.startsWith("0") && digits.length() > 1) { 	// octal
-        	    b = new BigInteger(digits.substring(1), 8);
-        	} else {	 						// decimal
-        	    b = new BigInteger(digits, 10);
-        	}
-        	
-        	if (b.compareTo(new BigInteger("9223372036854775808")) > 0) throw new
-                	NumberFormatException("This won't fit into a long");
-        	long l = b.longValue();
-        	if (l<0) {
-        	    minusFlag = true;
-        	    l=-l;
-        	}
-        	
-                // final long l = Long.decode(literalString.substring(0, literalString.length()-1));
-                int_ch=(""+l).toCharArray();
-            } catch (NumberFormatException nfe) {
-                Debug.fail("Cannot convert long constant! "+literalString);
+            MAX = MAX.add(isMinus);
+
+            // check if literal is in valid range
+            if (val.compareTo(MAX) > 0) {
+                //raiseError("Number constant out of bounds: " + literalString, n);
+        	throw new NumberFormatException("Number constant out of bounds: " + literalString);
             }
+            
+            /* perform the actual conversion (two's complement for bin, oct and hex!) of the
+             * BigInteger to a String containing the real (checked valid) value of the literal
+             */
+            String strVal;
+            if (radix == 10) {
+                strVal = isLong ? val.toString() : Long.toString(val.longValue());
+            }
+            else {
+                strVal = isLong ? Long.toString(val.longValue()) : Integer.toString(val.intValue());
+            }
+            
+            // after converting a number using two's complement, it may be negative
+            if (strVal.charAt(0) == '-') {
+                minusFlag = true;       
+                strVal = strVal.substring(1);
+            }
+            
+            int_ch = strVal.toCharArray();
             length = int_ch.length;
         }
         
+        try {
         for (int i = 0; i < length; i++) {
             result = services.getTermBuilder().func(numberSymbol[int_ch[i]-'0'], result);
+        }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println(lit + " " + literalString);
         }
         if (minusFlag) {
             result = services.getTermBuilder().func(neglit, result);
         }
         result = services.getTermBuilder().func(identifier, result);
+	
 
         Debug.out("integerldt: result of translating literal (lit, result):", 
                   lit, result);

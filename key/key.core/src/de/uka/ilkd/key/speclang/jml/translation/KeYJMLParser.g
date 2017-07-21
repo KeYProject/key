@@ -17,6 +17,10 @@ options {
     import de.uka.ilkd.key.java.abstraction.*;
     import de.uka.ilkd.key.java.expression.literal.StringLiteral;
     import de.uka.ilkd.key.java.expression.literal.CharLiteral;
+    import de.uka.ilkd.key.java.expression.Literal;
+    import de.uka.ilkd.key.java.expression.literal.CharLiteral;
+    import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+    import de.uka.ilkd.key.java.expression.literal.LongLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.ldt.*;
     import de.uka.ilkd.key.logic.*;
@@ -1543,87 +1547,113 @@ integerliteral returns [SLExpression result=null] throws SLTranslationException
         )
     {    
         String text = n.getText();
-        boolean isLong = false;
         
-        ///////////////////////////////////////////////////////////////////////////
-        /* preprocessing of the input string: */
-        
-        // int or long?
-        if(text.endsWith("l") || text.endsWith("L")) {
-          isLong = true;
-          text = text.substring(0, text.length() - 1);
-        }
-        
-        // remove underscores
-        text = text.replace("_", "");
-        
-        switch (radix) {
-          case 2:
-          case 16:
-              text = text.substring(2);     // cut of '0x' resp. '0b'
-              break;
-          case 8:
-              text = text.substring(1);     // cut of leading '0'
-              break;
-          case 10:
-              break;
-          default:
-              break;
-        }
-        
-        ///////////////////////////////////////////////////////////////////////////
-        /* preprocessing of the context (literal surrounded by an unary minus?): */
-        
-        BigInteger isMinus = BigInteger.ZERO;
-        
-        // check if the last observed unary minus sign is adjacent to the literal
+        // an unary minus affects the valid range of a decimal literal
+        boolean isMinus = false;
         if (lastObservedUnaryMinus != -1) {    // at least one unary minus has been observed
-            isMinus = BigInteger.ONE;
+            isMinus = true;
             for (int i = lastObservedUnaryMinus+1; i < n.getTokenIndex(); i++) {
                 // ignore whitespace and comments (TODO: check)
-                if(input.get(i).getChannel() == 0) {
-                    isMinus = BigInteger.ZERO;
+                if(input.get(i).getChannel() == Token.DEFAULT_CHANNEL) {
+                    isMinus = false;
                     break;
                 }
             }
         }
         
+        boolean isLong = text.endsWith("l") || text.endsWith("L");
+        Literal literal = isLong ? new LongLiteral(text, isMinus) : new IntLiteral(text, isMinus);
+        
+        Term intLit = 
+	         services.getTypeConverter().getIntegerLDT().translateLiteral(literal, services);
+    
+        PrimitiveType literalType = isLong ? PrimitiveType.JAVA_LONG : PrimitiveType.JAVA_INT;
+        result = new SLExpression(intLit, javaInfo.getPrimitiveKeYJavaType(literalType));
+        
         ///////////////////////////////////////////////////////////////////////////
-        /* range check and actual conversion: */
-        
-        /* the raw BigInteger converted from the input String without considering
-         * allowed value range or two's complement
-         */
-        BigInteger val = new BigInteger(text, radix);
-        
-        // calculate maximum valid value for the literal (depending on sign, long/int and radix)
-        BigInteger MAX;
-        if (radix == 10) {
-            MAX = isLong ? MAX_LONG : MAX_INT;
-        } else {
-            MAX = isLong ? MAX_ULONG : MAX_UINT;
-        }
-        MAX = MAX.add(isMinus);
-
-        // check if literal is in valid range
-        if (val.compareTo(MAX) > 0) {
-            raiseError("Number constant out of bounds: " + n.getText(), n);
-        }
-        
-        /* perform the actual conversion (two's complement for bin, oct and hex!) of the
-         * BigInteger to a String containing the real (checked valid) value of the literal
-         */
-        String strVal;
-        if (radix == 10) {
-            strVal = isLong ? val.toString() : Long.toString(val.longValue());
-        }
-        else {
-            strVal = isLong ? Long.toString(val.longValue()) : Integer.toString(val.intValue());
-        }
-        
-        // encapsulate the literal into a SLExpression
-	    PrimitiveType literalType = isLong ? PrimitiveType.JAVA_LONG : PrimitiveType.JAVA_INT;
-        result = new SLExpression(tb.zTerm(strVal), javaInfo.getPrimitiveKeYJavaType(literalType));
+//        
+//        String text = n.getText();
+//        boolean isLong = false;
+//        
+//        ///////////////////////////////////////////////////////////////////////////
+//        /* preprocessing of the input string: */
+//        
+//        // int or long?
+//        if(text.endsWith("l") || text.endsWith("L")) {
+//          isLong = true;
+//          text = text.substring(0, text.length() - 1);
+//        }
+//        
+//        // remove underscores
+//        text = text.replace("_", "");
+//        
+//        switch (radix) {
+//          case 2:
+//          case 16:
+//              text = text.substring(2);     // cut of '0x' resp. '0b'
+//              break;
+//          case 8:
+//              text = text.substring(1);     // cut of leading '0'
+//              break;
+//          case 10:
+//              break;
+//          default:
+//              break;
+//        }
+//        
+//        ///////////////////////////////////////////////////////////////////////////
+//        /* preprocessing of the context (literal surrounded by an unary minus?): */
+//        
+//        BigInteger isMinus = BigInteger.ZERO;
+//        
+//        // check if the last observed unary minus sign is adjacent to the literal
+//        if (lastObservedUnaryMinus != -1) {    // at least one unary minus has been observed
+//            isMinus = BigInteger.ONE;
+//            for (int i = lastObservedUnaryMinus+1; i < n.getTokenIndex(); i++) {
+//                // ignore whitespace and comments (TODO: check)
+//                if(input.get(i).getChannel() == 0) {
+//                    isMinus = BigInteger.ZERO;
+//                    break;
+//                }
+//            }
+//        }
+//        
+//        ///////////////////////////////////////////////////////////////////////////
+//        /* range check and actual conversion: */
+//        
+//        /* the raw BigInteger converted from the input String without considering
+//         * allowed value range or two's complement
+//         */
+//        BigInteger val = new BigInteger(text, radix);
+//        
+//        // calculate maximum valid value for the literal (depending on sign, long/int and radix)
+//        BigInteger MAX;
+//        if (radix == 10) {
+//            MAX = isLong ? MAX_LONG : MAX_INT;
+//        } else {
+//            MAX = isLong ? MAX_ULONG : MAX_UINT;
+//        }
+//        MAX = MAX.add(isMinus);
+//
+//        // check if literal is in valid range
+//        if (val.compareTo(MAX) > 0) {
+//            raiseError("Number constant out of bounds: " + n.getText(), n);
+//        }
+//        
+//        /* perform the actual conversion (two's complement for bin, oct and hex!) of the
+//         * BigInteger to a String containing the real (checked valid) value of the literal
+//         */
+//        String strVal;
+//        if (radix == 10) {
+//            strVal = isLong ? val.toString() : Long.toString(val.longValue());
+//        }
+//        else {
+//            strVal = isLong ? Long.toString(val.longValue()) : Integer.toString(val.intValue());
+//        }
+//        
+//        // encapsulate the literal into a SLExpression
+//	    PrimitiveType literalType = isLong ? PrimitiveType.JAVA_LONG : PrimitiveType.JAVA_INT;
+//        //result = new SLExpression(tb.zTerm(strVal), javaInfo.getPrimitiveKeYJavaType(literalType));
     }
 ;
 

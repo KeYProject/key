@@ -21,7 +21,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -31,14 +30,13 @@ import de.uka.ilkd.key.logic.Name;
  *  @author <TT>AutoDoc</TT>
  */
 
-public class LongLiteral extends Literal {
+public class LongLiteral extends AbstractNumeralLiteral {
 
     /**
  *      Textual representation of the value.
      */
 
     protected final String value;
-
 
     /**
  *      Long literal.
@@ -69,6 +67,11 @@ public class LongLiteral extends Literal {
         this.value=(value.endsWith("L") || value.endsWith("l")) ? value : (value + 'L');
     }
 
+    public LongLiteral(String value, boolean surroundedByUnaryMinus) {
+        this.value=(value.endsWith("L") || value.endsWith("l")) ? value : (value + 'L');
+        this.surroundedByUnaryMinus = surroundedByUnaryMinus;
+    }
+    
     /** tests if equals
      */
     public boolean equalsModRenaming(	SourceElement o, 
@@ -96,6 +99,10 @@ public class LongLiteral extends Literal {
 
     public String getValue() {
         return value;
+    }
+    
+    public boolean isSurroundedByUnaryMinus() {
+	return surroundedByUnaryMinus;
     }
 
     /** calls the corresponding method of a visitor in order to
