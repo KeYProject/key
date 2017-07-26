@@ -812,7 +812,11 @@ public class Recoder2KeYConverter {
 
     /** convert a recoder IntLiteral to a KeY IntLiteral */
     public IntLiteral convert(recoder.java.expression.literal.IntLiteral intLit) {
-        return new IntLiteral(collectComments(intLit), intLit.getValue());
+        if (intLit.getASTParent() instanceof recoder.java.expression.operator.Negative) {
+            return new IntLiteral(collectComments(intLit), intLit.getValue(), true);
+        } else {
+            return new IntLiteral(collectComments(intLit), intLit.getValue(), false);
+        }
     }
 
     /** convert a recoder BooleanLiteral to a KeY BooleanLiteral */
@@ -946,16 +950,16 @@ public class Recoder2KeYConverter {
     }
 
     /** convert a recoder LongLiteral to a KeY LongLiteral */
-    public LongLiteral convert(
-            recoder.java.expression.literal.LongLiteral longLit) {
-
-        return new LongLiteral(collectComments(longLit), longLit.getValue());
+    public LongLiteral convert(recoder.java.expression.literal.LongLiteral longLit) {
+        if (longLit.getASTParent() instanceof recoder.java.expression.operator.Negative) {
+            return new LongLiteral(collectComments(longLit), longLit.getValue(), true);
+        } else {
+            return new LongLiteral(collectComments(longLit), longLit.getValue(), false);
+        }
     }
 
     /** convert a recoder CharLiteral to a KeY CharLiteral */
-    public CharLiteral convert(
-            recoder.java.expression.literal.CharLiteral charLit) {
-
+    public CharLiteral convert(recoder.java.expression.literal.CharLiteral charLit) {
         return new CharLiteral(collectComments(charLit), charLit.getValue());
     }
 

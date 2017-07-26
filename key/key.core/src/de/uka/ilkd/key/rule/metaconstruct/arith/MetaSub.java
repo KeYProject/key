@@ -16,7 +16,7 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -43,7 +43,7 @@ public class MetaSub extends AbstractTermTransformer {
 
 	BigInteger bigIntResult = bigIntArg1.subtract(bigIntArg2);
 	
-	IntLiteral lit = new IntLiteral(bigIntResult.toString());
+	BigintLiteral lit = new BigintLiteral(bigIntResult);
 	return services.getTypeConverter().convertToLogicElement(lit);
     }
 }

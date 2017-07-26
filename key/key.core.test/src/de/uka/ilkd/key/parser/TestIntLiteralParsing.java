@@ -7,7 +7,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 public class TestIntLiteralParsing extends AbstractTestTermParser {
 

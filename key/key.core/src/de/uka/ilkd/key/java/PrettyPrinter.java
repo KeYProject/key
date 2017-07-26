@@ -1074,7 +1074,7 @@ public class PrettyPrinter {
     public void printIntLiteral(IntLiteral x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        write(x.getValue());
+        write(x.getValueString());
         printFooter(x);
     }
     
@@ -1083,7 +1083,7 @@ public class PrettyPrinter {
     public void printBigintLiteral(BigintLiteral x) throws IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        write(x.getValue());
+        write(x.getValueString());
         printFooter(x);
     }
 
@@ -1288,7 +1288,7 @@ public class PrettyPrinter {
     public void printCharLiteral(CharLiteral x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        write(encodeUnicodeChars(x.getValue()));
+        write(encodeUnicodeChars(x.toString()));
         printFooter(x);
     }
 
@@ -1319,7 +1319,7 @@ public class PrettyPrinter {
     public void printLongLiteral(LongLiteral x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        write(x.getValue());
+        write(x.getValueString());
         printFooter(x);
     }
 

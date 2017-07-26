@@ -13,118 +13,225 @@
 
 package de.uka.ilkd.key.java.expression.literal;
 
+import java.math.BigInteger;
+
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Name;
 
 /**
  *  Long literal.
  *  @author <TT>AutoDoc</TT>
  */
 
-public class LongLiteral extends AbstractNumeralLiteral {
+public class LongLiteral extends AbstractIntegerLiteral {
+
+    // constants for range check at String to long conversion
+    /**
+     * A constant holding the maximum valid value of a signed long: 2<sup>63</sup>-1
+     */
+    private static final BigInteger MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
 
     /**
- *      Textual representation of the value.
+     * A constant holding the maximum valid value as if a long was interpreted unsigned:
+     * : 2<sup>64</sup>-1
      */
-
-    protected final String value;
+    private static final BigInteger MAX_ULONG = new BigInteger("ffffffffffffffff", 16);
 
     /**
- *      Long literal.
- *      @param value a long value.
+     * Textual representation of the value as a decimal number.
      */
+    private final String valueStr;
 
+    /**
+     * The actual value of the literal. A <code>BigInteger</code> is used to be able to represent
+     * the absolute value of <code>Long.MIN_VALUE</code>: 2<sup>63</sup>.
+     */
+    private final BigInteger value;
+
+    /**
+     * Creates a new LongLiteral representing the given long.
+     * @param value the long value represented by the literal
+     */
     public LongLiteral(long value) {
-        this.value="" + value + 'L';
+        this.value = BigInteger.valueOf(value);
+        //this.valueStr = "" + value + 'L';
+        this.valueStr = this.value.toString();
     }
 
     /**
-     *      Long literal.
-     *      @param children a list with children(comments)
-     *      @param value a string.
+     * Creates a new LongLiteral from the given String. The String is parsed and checked for range.
+     * The input may be any String containing a literal as described by the Java 8 Language
+     * Specification. This includes hexadecimal, decimal, octal, and binary literals as well as
+     * literals containing underscores as separators. In addition, a preceding '-' sign is allowed.
+     *
+     * @param valStr the String that contains the literal
+     * @throws NumberFormatException if the given String does not represent a syntactically valid
+     *          literal or represents a value out of long range
+     * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1">
+     *               http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
      */
-
-    public LongLiteral(ExtList children, String value) {
-	super(children);
-        this.value=(value.endsWith("L") || value.endsWith("l")) ? value : (value + 'L');
+    public LongLiteral(String valStr) {
+        //this.valueStr = (valStr.endsWith("L") || valStr.endsWith("l")) ? valStr : (valStr + 'L');
+        this.value = parseFromString(valStr);
+        this.valueStr = value.toString().intern();
     }
 
     /**
- *      Long literal.
- *      @param value a string.
+     * Creates a new LongLiteral from the given String. The String is parsed and checked for range.
+     * The input may be any String containing a literal as described by the Java 8 Language
+     * Specification. This includes hexadecimal, decimal, octal, and binary literals as well as
+     * literals containing underscores as separators. In addition, a preceding '-' sign is allowed.
+     * If the literal is surrounded by an unary minus, the corresponding flag can be set.
+     * This allows to perform a correct range check.
+     *
+     * @param valStr the String that contains the literal
+     * @param surroundedByUnaryMinus used in range check
+     * @throws NumberFormatException if the given String does not represent a syntactically valid
+     *          literal or represents a value out of long range
+     * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1">
+     *               http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
      */
-
-    public LongLiteral(String value) {
-        this.value=(value.endsWith("L") || value.endsWith("l")) ? value : (value + 'L');
-    }
-
-    public LongLiteral(String value, boolean surroundedByUnaryMinus) {
-        this.value=(value.endsWith("L") || value.endsWith("l")) ? value : (value + 'L');
-        this.surroundedByUnaryMinus = surroundedByUnaryMinus;
-    }
-    
-    /** tests if equals
-     */
-    public boolean equalsModRenaming(	SourceElement o, 
-										NameAbstractionTable nat){
-		if (!(o instanceof LongLiteral)) {
-		    return false;
-		}
-		return ((LongLiteral)o).getValue().equals(getValue()); 
-    }
-    
-    public int hashCode(){
-    	int result = 17;
-    	result = 37 * result + getValue().hashCode();
-    	return result;
-    }
-    
-    public boolean equals(Object o){
-    	return super.equals(o);
+    public LongLiteral(String valStr, boolean surroundedByUnaryMinus) {
+        super(surroundedByUnaryMinus);
+        //this.valueStr=(valStr.endsWith("L") || valStr.endsWith("l")) ? valStr : (valStr + 'L');
+        this.value = parseFromString(valStr);
+        this.valueStr = value.toString().intern();
     }
 
     /**
- *      Get value.
- *      @return the string.
+     * Constructor for Recoder2KeY transformation.
+     *
+     * @param children the children of this AST element as KeY classes, may contain: Comments
+     * @param valStr the value of the literal
+     * @param surroundedByUnaryMinus indicates whether the literal is directly surrounded
+     *          by an unary minus (used for correct range check)
+     * @throws NumberFormatException if the given String does not represent a syntactically valid
+     *          literal or represents a value out of long range
      */
-
-    public String getValue() {
-        return value;
-    }
-    
-    public boolean isSurroundedByUnaryMinus() {
-	return surroundedByUnaryMinus;
+    public LongLiteral(ExtList children, String valStr, boolean surroundedByUnaryMinus) {
+        super(children, false);
+        //this.valueStr = (valStr.endsWith("L") || valStr.endsWith("l")) ? valStr : (valStr + 'L');
+        this.value = parseFromString(valStr);
+        this.valueStr = value.toString().intern();
     }
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
-     * @param v the Visitor
-     */
+//    @Override
+//    public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
+//        if (!(o instanceof LongLiteral)) {
+//            return false;
+//        }
+//        return ((LongLiteral)o).getValue().equals(getValue());
+//    }
+
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnLongLiteral(this);
+        v.performActionOnLongLiteral(this);
     }
 
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printLongLiteral(this);
     }
 
-
+    @Override
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
     }
 
     @Override
-    public Name getLDTName() {
-        return IntegerLDT.NAME;
+    public BigInteger getValue() {
+        return value;
     }
 
+    @Override
+    public String getValueString() {
+        return valueStr;
+    }
+
+    /**
+     * Parses the String and extracts the actual value of the literal.
+     * This method is able to parse literals as described in the Java 8 Language Specification:
+     * hexadecimal (beginning with '0x'), decimal, octal (beginning with '0'), and binary
+     * (beginning with '0b') literals. In addition, underscores are allowed as separators inside
+     * the literal. All values parsed by this method are checked for range correctly, particularly
+     * considering the asymmetric range of long.
+     * Hexadecimal, octal and binary literals are converted using two's complement.
+     *
+     * @param sourceStr the String containing the value
+     * @return the parsed value as a BigInteger
+     * @throws NumberFormatException if the given String does not represent a syntactically valid
+     *          literal or represents a value out of long range
+     * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1">
+     *               http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
+     */
+    protected BigInteger parseFromString(final String sourceStr) {
+
+        String valStr = sourceStr;
+        int radix = 10;
+
+        ///////////////////////////////////////////////////////////////////////////
+        /* preprocessing of the input string: */
+
+        System.out.println("parse: " + sourceStr);
+
+        // remove underscores
+        valStr = valStr.replace("_", "");
+
+        // remove long suffix
+        if (valStr.endsWith("L") || valStr.endsWith("l")) {
+            valStr = valStr.substring(0, valStr.length() - 1);
+        }
+
+        if (valStr.startsWith("0x") || valStr.startsWith("0X")) {        // hex
+            radix = 16;
+            valStr = valStr.substring(2);     // cut of '0x'
+        } else if (valStr.startsWith("0b") || valStr.startsWith("0B")) { // bin
+            radix = 2;
+            valStr = valStr.substring(2);     // cut of '0b'
+        } else if (valStr.startsWith("0") && valStr.length() > 1) {      // oct
+            radix = 8;
+            valStr = valStr.substring(1);     // cut of leading '0'
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+        /* preprocessing of the context (literal surrounded by an unary minus?): */
+
+        BigInteger isMinus = surroundedByUnaryMinus ? BigInteger.ONE : BigInteger.ZERO;
+
+        ///////////////////////////////////////////////////////////////////////////
+        /* range check and actual conversion: */
+
+        /* the raw BigInteger converted from the input String without considering
+         * allowed value range or two's complement
+         */
+        BigInteger val = new BigInteger(valStr, radix);
+
+        // calculate maximum valid magnitude for the literal (depending on sign and radix)
+        BigInteger maxValue;
+        if (radix == 10) {
+            maxValue = MAX_LONG.add(isMinus);   // asymmetric range depending on sign!
+        } else {
+            maxValue = MAX_ULONG;
+        }
+
+        // check if literal is in valid range
+        if (val.compareTo(maxValue) > 0) {
+            //raiseError("Number constant out of bounds: " + literalString, n);
+            throw new NumberFormatException("Number constant out of bounds: " + sourceStr);
+        }
+
+        /* perform the actual conversion (two's complement for bin, oct and hex!) of the
+         * BigInteger to a String containing the real (checked valid) value of the literal
+         */
+        if (radix == 10) {
+            return val;
+        } else {
+            return BigInteger.valueOf(val.longValue()); // two's complement conversion
+        }
+    }
 }

@@ -13,117 +13,122 @@
 
 package de.uka.ilkd.key.java.expression.literal;
 
+import java.math.BigInteger;
+
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Name;
-
 
 /**
  *  Char literal.
  *  @author <TT>AutoDoc</TT>
  */
-
-public class CharLiteral extends Literal {
-
-    protected final String value;
-    private char charVal;
+public class CharLiteral extends AbstractIntegerLiteral {
 
     /**
- *      Char literal.
- *      @param value a char value.
+     * A decimal String representation of the 16 bit char value represented by this CharLiteral.
      */
-
-    public CharLiteral(char value) {
-	this.value="'" + value + "'";
-	this.charVal=value;
-    }
+    private final String valueStr;
 
     /**
-     *      Char literal.
-     *      @param children an ExtList with all children(comments)
-     *        May contain: Comments
-     *      @param value a string.
+     * The actual char this CharLiteral represents.
      */
+    private final char charVal;
 
-    public CharLiteral(ExtList children, String value) {
-	super(children);
-        this.value=value;
-	this.charVal=value.charAt(1);
+    /**
+     * Creates a new CharLiteral from the given char.
+     * @param charVal a char value.
+     */
+    public CharLiteral(char charVal) {
+        //this.valueStr = "'" + charVal + "'";
+        this.charVal = charVal;
+        this.valueStr = "" + (int)charVal;
     }
 
     /**
- *      Char literal.
- *      @param value a string.
+     * Creates a new CharLiteral from the given String. The String must be of the form
+     * <code>'c'</code> (with c being an arbitrary char).
+     * @param children an ExtList with all children(comments). May contain: Comments
+     * @param valueStr a string.
      */
-
-    public CharLiteral(String value) {
-        this.value=value;
-	this.charVal=value.charAt(1);
+    public CharLiteral(ExtList children, String valueStr) {
+        super(children, false);
+//        this.valueStr = valueStr;
+//        this.charVal = valueStr.charAt(1);
+        this.charVal = valueStr.charAt(1);
+        this.valueStr = "" + (int)charVal;
     }
-
-    /** tests if equals
-     */
-    public boolean equalsModRenaming(SourceElement o, 
-            NameAbstractionTable nat) {
-        if (!(o instanceof CharLiteral)) {
-            return false;
-        }
-        return ((CharLiteral)o).getValue().equals(getValue()); 
-    }
-    
-    public int hashCode(){
-    	int result = 17;
-    	result = 37 * result + getValue().hashCode();
-    	return result;
-    }
-    
-    public boolean equals(Object o){
-    	return super.equals(o);
-    }
-
 
     /**
- *      Get value.
- *      @return the string.
+     * Creates a new CharLiteral from the given String. The String must be of the form
+     * <code>'c'</code> (with c being an arbitrary char).
+     * @param valueStr a string.
      */
-
-    public String getValue() {
-        return value;
+    public CharLiteral(String valueStr) {
+//        this.valueStr=valueStr;
+//        this.charVal=valueStr.charAt(1);
+        this.charVal = valueStr.charAt(1);
+        this.valueStr = "" + (int)charVal;
     }
 
-    public char getCharValue() {
-        return charVal;
+//    /** tests if equals
+//     */
+//    public boolean equalsModRenaming(SourceElement o,
+//            NameAbstractionTable nat) {
+//        if (!(o instanceof CharLiteral)) {
+//            return false;
+//        }
+//        return ((CharLiteral)o).getValue().equals(getValue());
+//    }
+//
+//    public int hashCode(){
+//      int result = 17;
+//      result = 37 * result + getValue().hashCode();
+//      return result;
+//    }
+//
+//    public boolean equals(Object o){
+//      return super.equals(o);
+//    }
+
+    /**
+     * Returns the decimal value of the char.
+     * @return the decimal value of the char as a BigInteger
+     */
+    public BigInteger getValue() {
+        return BigInteger.valueOf(charVal);
     }
 
+//    public char getCharValue() {
+//        return charVal;
+//    }
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
-     * @param v the Visitor
-     */
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnCharLiteral(this);
+        v.performActionOnCharLiteral(this);
     }
 
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printCharLiteral(this);
     }
 
+    @Override
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_CHAR);
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_CHAR);
     }
 
     @Override
-    public Name getLDTName() {
-        return IntegerLDT.NAME;
+    public String toString() {
+        return "'" + charVal + "'";
     }
 
+    @Override
+    public String getValueString() {
+        return valueStr;
+    }
 }

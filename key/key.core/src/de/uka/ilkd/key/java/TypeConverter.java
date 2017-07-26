@@ -401,7 +401,7 @@ public final class TypeConverter {
 	    return convertLiteralExpression((Literal)pe);
 	} else if (pe instanceof Negative
 	        && ((Negative)pe).getChildAt(0) instanceof IntLiteral) {
-	    String val = ((IntLiteral)((Negative)pe).getChildAt(0)).getValue();
+	    String val = ((IntLiteral)((Negative)pe).getChildAt(0)).getValueString();
 	    if (val.charAt(0)=='-') {
 		return integerLDT.translateLiteral
 		    (new IntLiteral(val.substring(1)), services);
@@ -412,7 +412,7 @@ public final class TypeConverter {
 	} else if (pe instanceof Negative
 		   && ((Negative)pe).getChildAt(0) instanceof LongLiteral ) {
 	    String val = ((LongLiteral)
-			  ((Negative)pe).getChildAt(0)).getValue();
+			  ((Negative)pe).getChildAt(0)).getValueString();
 	    if (val.charAt(0)=='-') {
 		return integerLDT.translateLiteral
 		    (new LongLiteral(val.substring(1)), services);
