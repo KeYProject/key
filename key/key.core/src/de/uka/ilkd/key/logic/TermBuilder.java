@@ -1180,7 +1180,7 @@ public class TermBuilder {
 
     /**
      * @param numberString
-     *            String representing an integer
+     *            String representing an integer with radix 10, may be negative
      * @return Term in Z-Notation representing the given number
      * @throws NumberFormatException
      *             if <code>numberString</code> is not a number

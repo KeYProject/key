@@ -48,6 +48,7 @@ import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -277,8 +278,8 @@ public final class IntegerLDT extends LDT {
         index               = addFunction(services, "index");
 
         //cache often used constants       
-        zero = translateLiteral(new IntLiteral(0), services);
-        one = translateLiteral(new IntLiteral(1), services);        
+        zero = makeDigit(0, services.getTermBuilder());
+        one = makeDigit(1, services.getTermBuilder());
     }
     
     
@@ -293,6 +294,10 @@ public final class IntegerLDT extends LDT {
         return (c-'0'>=0) && (c-'0'<=9);
     }
 
+    private Term makeDigit(int digit, TermBuilder tb) {
+        return tb.func(getNumberSymbol(), tb.func(getNumberLiteralFor(0),
+                tb.func(getNumberTerminator())));
+    }
     
     
     //-------------------------------------------------------------------------
@@ -619,26 +624,29 @@ public final class IntegerLDT extends LDT {
 //        }
 //        literalString = ((AbstractIntegerLiteral)lit).getValueString();
         
-        if (literalString.charAt(0) == '-') {
-            minusFlag = true;
-            literalString = literalString.substring(1);
-        }
-        
-        int_ch = literalString.toCharArray();
-        length = int_ch.length;
-        
-        for (int i = 0; i < length; i++) {
-            result = services.getTermBuilder().func(numberSymbol[int_ch[i] - '0'], result);
-        }
-
-        if (minusFlag) {
-            result = services.getTermBuilder().func(neglit, result);
-        }
-        result = services.getTermBuilder().func(identifier, result);
-
-        Debug.out("integerldt: result of translating literal (lit, result):", lit, result);
-
-        return result;
+        // --> TermBuilder.zTerm
+        return services.getTermBuilder().zTerm(literalString);
+//
+//        if (literalString.charAt(0) == '-') {
+//            minusFlag = true;
+//            literalString = literalString.substring(1);
+//        }
+//
+//        int_ch = literalString.toCharArray();
+//        length = int_ch.length;
+//
+//        for (int i = 0; i < length; i++) {
+//            result = services.getTermBuilder().func(numberSymbol[int_ch[i] - '0'], result);
+//        }
+//
+//        if (minusFlag) {
+//            result = services.getTermBuilder().func(neglit, result);
+//        }
+//        result = services.getTermBuilder().func(identifier, result);
+//
+//        Debug.out("integerldt: result of translating literal (lit, result):", lit, result);
+//
+//        return result;
     }
 
     @Override
