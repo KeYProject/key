@@ -459,11 +459,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
-    public void performActionOnBigintLiteral(BigintLiteral x) {
-        doDefaultAction(x);
-    }
-
-    @Override
     public void performActionOnLabeledStatement(LabeledStatement x) {
 	doDefaultAction(x);
     }

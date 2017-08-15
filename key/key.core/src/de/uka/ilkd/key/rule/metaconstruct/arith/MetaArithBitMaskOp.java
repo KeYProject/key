@@ -3,7 +3,6 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -30,7 +29,6 @@ public abstract class MetaArithBitMaskOp extends AbstractTermTransformer {
 	
 		BigInteger result = bitmaskOp(left, right);
 	
-		BigintLiteral lit = new BigintLiteral(result);
-		return services.getTypeConverter().convertToLogicElement(lit);
+                return services.getTermBuilder().zTerm(result.toString());
 	}
 }

@@ -177,8 +177,6 @@ public class LongLiteral extends AbstractIntegerLiteral {
         ///////////////////////////////////////////////////////////////////////////
         /* preprocessing of the input string: */
 
-        System.out.println("parse: " + sourceStr);
-
         // remove underscores
         valStr = valStr.replace("_", "");
 

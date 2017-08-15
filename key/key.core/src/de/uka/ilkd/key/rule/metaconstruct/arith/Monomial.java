@@ -21,7 +21,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.LexPathOrdering;
 import de.uka.ilkd.key.logic.Term;
@@ -221,8 +220,7 @@ public class Monomial {
                                                                it.next () );
         }
         
-        final BigintLiteral lit = new BigintLiteral(coefficient);
-        final Term cTerm = services.getTypeConverter ().convertToLogicElement ( lit );
+        final Term cTerm = services.getTermBuilder().zTerm(coefficient.toString());
 
         if ( res == null )
             res = cTerm;

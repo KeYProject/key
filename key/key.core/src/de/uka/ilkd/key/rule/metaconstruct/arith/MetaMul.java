@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -42,7 +41,6 @@ public class MetaMul extends AbstractTermTransformer {
 	    BigInteger(convertToDecimalString(arg2, services));
 	BigInteger bigIntResult = bigIntArg1.multiply(bigIntArg2);
 	
-	BigintLiteral lit = new BigintLiteral(bigIntResult);
-	return services.getTypeConverter().convertToLogicElement(lit);
+        return services.getTermBuilder().zTerm(bigIntResult.toString());
     }
 }

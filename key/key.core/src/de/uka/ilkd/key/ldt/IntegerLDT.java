@@ -23,7 +23,6 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
-import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.LongLiteral;
@@ -546,19 +545,12 @@ public final class IntegerLDT extends LDT {
     public Term translateLiteral(Literal lit, Services services) {
         int length = 0;
         boolean minusFlag = false;
-        Debug.assertTrue(lit instanceof IntLiteral ||
-                         lit instanceof LongLiteral ||
-                         lit instanceof BigintLiteral ||
-                         lit instanceof CharLiteral,
+        Debug.assertTrue(lit instanceof AbstractIntegerLiteral,
                          "Literal '"+lit+"' is not an integer literal.");
 
         char[] int_ch=null;
         assert sharp != null;
         Term result = services.getTermBuilder().func(sharp);
-
-        if (!(lit instanceof CharLiteral)) {
-            System.out.println(lit);
-        }
 
         Function identifier = numbers;
         if (lit instanceof CharLiteral) {

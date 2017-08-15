@@ -191,8 +191,6 @@ public interface Visitor {
 
     void performActionOnIntLiteral(IntLiteral x); 
 
-    void performActionOnBigintLiteral(BigintLiteral x);
-
     void performActionOnBooleanLiteral(BooleanLiteral x);
     
     void performActionOnEmptySetLiteral(EmptySetLiteral x);

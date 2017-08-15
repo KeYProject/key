@@ -49,7 +49,6 @@ import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
-import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
@@ -1072,15 +1071,6 @@ public class PrettyPrinter {
     }
 
     public void printIntLiteral(IntLiteral x) throws java.io.IOException {
-        printHeader(x);
-        writeInternalIndentation(x);
-        write(x.getValueString());
-        printFooter(x);
-    }
-    
-
-
-    public void printBigintLiteral(BigintLiteral x) throws IOException {
         printHeader(x);
         writeInternalIndentation(x);
         write(x.getValueString());

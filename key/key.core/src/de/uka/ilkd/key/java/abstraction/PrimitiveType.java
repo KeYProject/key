@@ -17,7 +17,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
@@ -66,7 +65,8 @@ public final class PrimitiveType implements Type {
     public static final PrimitiveType JAVA_LONG  =
 	new PrimitiveType("long", new LongLiteral(0L), IntegerLDT.NAME);
     public static final PrimitiveType JAVA_BIGINT =
-            new PrimitiveType("\\bigint", new BigintLiteral(0), IntegerLDT.NAME);
+            new PrimitiveType("\\bigint", new IntLiteral(0), IntegerLDT.NAME); //TODO: originally the default value was a BigintLiteral
+                                                                               //       -> why use a Literal here instead of just BigInteger?
     public static final PrimitiveType JAVA_FLOAT =
 	new PrimitiveType("float", new FloatLiteral(0.0f), FloatLDT.NAME);
     public static final PrimitiveType JAVA_DOUBLE  =

@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -85,11 +84,9 @@ public final class MetaDiv extends AbstractTermTransformer {
 		else
 		    bigIntResult = bigIntResult.add(BigInteger.ONE);
 	}
-	BigintLiteral lit = new BigintLiteral(bigIntResult);
 	Debug.assertTrue(checkResult(bigIntArg1, bigIntArg2, bigIntResult), 
 			 bigIntArg1+"/"+bigIntArg2+"="+bigIntResult+
 			 " is inconsistent with the taclet div_axiom");
-	return services.getTypeConverter().convertToLogicElement(lit);
-
+        return services.getTermBuilder().zTerm(bigIntResult.toString());
     }
 }
