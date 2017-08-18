@@ -13,10 +13,10 @@ import java.util.Map;
  */
 public class ValueInjector {
     private static ValueInjector INSTANCE;
-    private Map<Class, Converter> converters = new HashMap<>();
+    private Map<Class, StringConverter> converters = new HashMap<>();
 
     public static <T> T injection(ProofScriptCommand command, T obj, Map<String, String> arguments)
-            throws ArgumentRequiredException, InjectionReflectionException, NoSpecifiedConverter, ConversionException,
+            throws ArgumentRequiredException, InjectionReflectionException, NoSpecifiedConverterException, ConversionException,
             IllegalAccessException {
         return getInstance().inject(command, obj, arguments);
     }
@@ -46,7 +46,7 @@ public class ValueInjector {
     }
 
     public <T> T inject(ProofScriptCommand command, T obj, Map<String, String> arguments)
-            throws IllegalAccessException, ConversionException, InjectionReflectionException, NoSpecifiedConverter,
+            throws IllegalAccessException, ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
             ArgumentRequiredException {
         List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(obj.getClass(), command);
         List<ProofScriptArgument> varArgs = new ArrayList<>(meta.size());
@@ -88,7 +88,7 @@ public class ValueInjector {
     }
 
     private void injectIntoField(ProofScriptArgument meta, Map<String, String> args, Object obj)
-            throws InjectionReflectionException, ArgumentRequiredException, ConversionException, NoSpecifiedConverter {
+            throws InjectionReflectionException, ArgumentRequiredException, ConversionException, NoSpecifiedConverterException {
         final String val = args.get(meta.getName());
         if (val == null) {
             if (meta.isRequired())
@@ -112,10 +112,10 @@ public class ValueInjector {
 
     @SuppressWarnings("unchecked")
     private Object convert(ProofScriptArgument meta, String val)
-            throws NoSpecifiedConverter, ConversionException {
-        Converter converter = getConverter(meta.getType());
+            throws NoSpecifiedConverterException, ConversionException {
+        StringConverter converter = getConverter(meta.getType());
         if (converter == null)
-            throw new NoSpecifiedConverter("No converter registered for class: " + meta.getField().getType(), meta);
+            throw new NoSpecifiedConverterException("No converter registered for class: " + meta.getField().getType(), meta);
 
         try {
             return converter.convert(val);
@@ -125,12 +125,12 @@ public class ValueInjector {
         }
     }
 
-    public <T> void addConverter(Class<T> clazz, Converter<T> conv) {
+    public <T> void addConverter(Class<T> clazz, StringConverter<T> conv) {
         converters.put(clazz, conv);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Converter<T> getConverter(Class<T> clazz) {
-        return (Converter<T>) converters.get(clazz);
+    public <T> StringConverter<T> getConverter(Class<T> clazz) {
+        return (StringConverter<T>) converters.get(clazz);
     }
 }

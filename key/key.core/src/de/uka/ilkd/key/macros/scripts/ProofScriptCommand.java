@@ -54,4 +54,9 @@ public interface ProofScriptCommand<T> {
      * @see ProofScriptEngine
      */
     String getName();
+
+    /**
+     *
+     */
+    String getDocumentation();
 }

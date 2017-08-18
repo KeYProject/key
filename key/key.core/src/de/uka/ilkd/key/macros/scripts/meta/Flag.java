@@ -6,6 +6,6 @@ package de.uka.ilkd.key.macros.scripts.meta;
  */
 public @interface Flag {
     String arg();
-
     String value();
+    String help() default "";
 }

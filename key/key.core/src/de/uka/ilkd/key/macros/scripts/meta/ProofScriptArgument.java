@@ -15,7 +15,9 @@ public class ProofScriptArgument<T> {
     private boolean required;
     private boolean flag;
     private Field field;
-    private boolean hasVariableArguments;
+    private boolean variableArguments;
+
+    private String documentation;
 
     public ProofScriptCommand<T> getCommand() {
         return command;
@@ -62,7 +64,8 @@ public class ProofScriptArgument<T> {
         return this;
     }
 
-    @Override public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -83,7 +86,8 @@ public class ProofScriptArgument<T> {
         return type == that.type;
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         int result = command != null ? command.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
@@ -100,12 +104,22 @@ public class ProofScriptArgument<T> {
         return field;
     }
 
+
+    public String getDocumentation() {
+        return documentation;
+    }
+
+    public ProofScriptArgument setDocumentation(String documentation) {
+        this.documentation = documentation;
+        return this;
+    }
+
     public ProofScriptArgument setVariableArguments(boolean hasVariableArguments) {
-        this.hasVariableArguments = hasVariableArguments;
+        this.variableArguments = hasVariableArguments;
         return this;
     }
 
     public boolean hasVariableArguments() {
-        return hasVariableArguments;
+        return variableArguments;
     }
 }

@@ -12,4 +12,5 @@ import java.lang.annotation.Target;
 public @interface Option {
     String value();
     boolean required() default true;
+    String help() default "";
 }
