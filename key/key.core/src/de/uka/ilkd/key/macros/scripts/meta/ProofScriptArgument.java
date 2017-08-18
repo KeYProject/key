@@ -16,7 +16,6 @@ public class ProofScriptArgument<T> {
     private boolean flag;
     private Field field;
     private boolean variableArguments;
-
     private String documentation;
 
     public ProofScriptCommand<T> getCommand() {

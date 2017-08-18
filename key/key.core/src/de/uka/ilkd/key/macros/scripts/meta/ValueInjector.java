@@ -15,18 +15,39 @@ public class ValueInjector {
     private static ValueInjector INSTANCE;
     private Map<Class, StringConverter> converters = new HashMap<>();
 
+    /**
+     *
+     * @param command
+     * @param obj
+     * @param arguments
+     * @param <T>
+     * @return
+     * @throws ArgumentRequiredException
+     * @throws InjectionReflectionException
+     * @throws NoSpecifiedConverterException
+     * @throws ConversionException
+     * @throws IllegalAccessException
+     */
     public static <T> T injection(ProofScriptCommand command, T obj, Map<String, String> arguments)
             throws ArgumentRequiredException, InjectionReflectionException, NoSpecifiedConverterException, ConversionException,
             IllegalAccessException {
         return getInstance().inject(command, obj, arguments);
     }
 
+    /**
+     *
+     * @return
+     */
     public static ValueInjector getInstance() {
         if (INSTANCE == null)
             INSTANCE = createDefault();
         return INSTANCE;
     }
 
+    /**
+     *
+     * @return
+     */
     public static ValueInjector createDefault() {
         ValueInjector vi = new ValueInjector();
         vi.addConverter(Integer.class, Integer::parseInt);
@@ -45,6 +66,19 @@ public class ValueInjector {
         return vi;
     }
 
+    /**
+     *
+     * @param command
+     * @param obj
+     * @param arguments
+     * @param <T>
+     * @return
+     * @throws IllegalAccessException
+     * @throws ConversionException
+     * @throws InjectionReflectionException
+     * @throws NoSpecifiedConverterException
+     * @throws ArgumentRequiredException
+     */
     public <T> T inject(ProofScriptCommand command, T obj, Map<String, String> arguments)
             throws IllegalAccessException, ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
             ArgumentRequiredException {
@@ -125,10 +159,22 @@ public class ValueInjector {
         }
     }
 
+    /**
+     *
+     * @param clazz
+     * @param conv
+     * @param <T>
+     */
     public <T> void addConverter(Class<T> clazz, StringConverter<T> conv) {
         converters.put(clazz, conv);
     }
 
+    /**
+     *
+     * @param clazz
+     * @param <T>
+     * @return
+     */
     @SuppressWarnings("unchecked")
     public <T> StringConverter<T> getConverter(Class<T> clazz) {
         return (StringConverter<T>) converters.get(clazz);

@@ -76,6 +76,7 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
 
     /**
      *
+     * @return
      */
     @Override
     public String getDocumentation() {

@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.macros.scripts.meta;
 
 /**
+ *
+ *
  * @author Alexander Weigl
  * @version 1 (02.05.17)
  */
@@ -17,6 +19,10 @@ public class InjectionException extends Exception{
         this.argument = argument;
     }
 
+    /**
+     *
+     * @return
+     */
     public ProofScriptArgument getArgument() {
         return argument;
     }
