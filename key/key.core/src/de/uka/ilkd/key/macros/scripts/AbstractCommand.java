@@ -25,6 +25,10 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
     protected Services service;
     protected EngineState state;
     protected AbstractUserInterfaceControl uiControl;
+
+    /**
+     * Documentation of this command.
+     */
     protected String documentation = null;
 
     public AbstractCommand(Class<T> clazz) {
@@ -75,8 +79,7 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
     }
 
     /**
-     *
-     * @return
+     * {@inheritDoc}
      */
     @Override
     public String getDocumentation() {

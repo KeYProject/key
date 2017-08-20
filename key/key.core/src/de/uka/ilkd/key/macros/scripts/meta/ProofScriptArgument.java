@@ -16,6 +16,9 @@ public class ProofScriptArgument<T> {
     private boolean flag;
     private Field field;
     private boolean variableArguments;
+    /**
+     * Holds the documentation of this argument.
+     */
     private String documentation;
 
     public ProofScriptCommand<T> getCommand() {
@@ -65,23 +68,29 @@ public class ProofScriptArgument<T> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         ProofScriptArgument<?> that = (ProofScriptArgument<?>) o;
 
-        if (required != that.required)
+        if (required != that.required) {
             return false;
-        if (flag != that.flag)
+        }
+        if (flag != that.flag) {
             return false;
+        }
         if (command != null ?
                 !command.equals(that.command) :
-                that.command != null)
+                that.command != null) {
             return false;
-        if (name != null ? !name.equals(that.name) : that.name != null)
+        }
+        if (name != null ? !name.equals(that.name) : that.name != null) {
             return false;
+        }
         return type == that.type;
     }
 
@@ -95,19 +104,29 @@ public class ProofScriptArgument<T> {
         return result;
     }
 
-    public void setField(Field field) {
-        this.field = field;
-    }
-
     public Field getField() {
         return field;
     }
 
+    public void setField(Field field) {
+        this.field = field;
+    }
 
+    /**
+     * Documentation for this argument.
+     *
+     * @return a non null string
+     */
     public String getDocumentation() {
         return documentation;
     }
 
+    /**
+     * Documentation for this argument.
+     *
+     * @param documentation a string
+     * @return this
+     */
     public ProofScriptArgument setDocumentation(String documentation) {
         this.documentation = documentation;
         return this;

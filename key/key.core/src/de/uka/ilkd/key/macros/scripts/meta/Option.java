@@ -10,23 +10,29 @@ import java.lang.annotation.Target;
  *
  * @author Alexander Weigl
  * @version 1
+ * @see Flag
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Option {
     /**
      * Name of the command line argument.
+     *
+     * @return a non-null string
      */
     String value();
 
     /**
      * Marks if this option has to be given on call of corresponding script command.
+     *
+     * @return true iff this field is required (not null)
      */
     boolean required() default true;
 
     /**
      * A help message for this argument.
-     * @return
+     *
+     * @return a non-null string
      */
     String help() default "";
 }

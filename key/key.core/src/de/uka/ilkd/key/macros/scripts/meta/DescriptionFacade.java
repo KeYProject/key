@@ -14,8 +14,17 @@ import java.util.Properties;
  * @author Alexander Weigl
  * @version 1 (18.08.17)
  */
-public class DescriptionFacade {
+public final class DescriptionFacade {
+    /**
+     * The filename of the XML properties containing the documentation of proof script commands.
+     */
     private static final String COMMANDS_DESCRIPTION = "commands_description.xml";
+
+    /**
+     * Lazy-loaded properties
+     *
+     * @see #getProperties
+     */
     private static Properties properties = null;
 
     private DescriptionFacade() {
@@ -23,6 +32,7 @@ public class DescriptionFacade {
 
     /**
      * Lazy loading of the properties.
+     *
      * @return a properties
      */
     public static Properties getProperties() {
@@ -39,26 +49,41 @@ public class DescriptionFacade {
     }
 
     /**
-     * @param cmd
-     * @return
+     * Looks up the documentation for the given command in the properties file.
+     * If no documentation is available an empty string is returned.
+     *
+     * @param cmd non-null proof script command
+     * @return a non-null string
+     * @see ProofScriptCommand#getDocumentation()
      */
     public static String getDocumentation(ProofScriptCommand cmd) {
         return getString(cmd.getName());
     }
 
     /**
-     * @param arg
-     * @return
+     * Looks up the documentation for the given proof script argument.
+     * If no documentation is available an empty string is returned.
+     *
+     * @param arg non-null proof script argument
+     * @return a non-null string
+     * @see ProofScriptArgument#getDocumentation()
      */
     public static String getDocumentation(ProofScriptArgument arg) {
         String key = arg.getCommand().getName() + "." + arg.getName();
         return getString(key);
     }
 
+    /**
+     * Helper function for look ups in the property file.
+     *
+     * @param key look up key
+     * @return a non-null string
+     */
     private static String getString(String key) {
         String property = getProperties().getProperty(key);
         if (null == property) {
-            System.err.println("No documentation entry found for " + key + " in " + COMMANDS_DESCRIPTION);
+            System.err.format("No documentation entry found for %s in %s%n",
+                    key, COMMANDS_DESCRIPTION);
             return "";
         }
         return property;
