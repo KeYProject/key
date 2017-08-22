@@ -38,8 +38,8 @@ public interface ProofScriptCommand<T> {
      * @param uiControl the current ui controller
      * @param args      the script arguments
      * @param stateMap  the current state
-     * @throws ScriptException
-     * @throws InterruptedException
+     * @throws ScriptException      if something bad happens
+     * @throws InterruptedException if something bad happens
      */
     //TODO downgrade AbstractUserInterfaceControl to UserInterfaceControl
     void execute(AbstractUserInterfaceControl uiControl, T args,
