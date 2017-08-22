@@ -20,7 +20,6 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
     protected static Logger log = Logger.getLogger(ProofScriptCommand.class.getName());
-    private final Class<T> parameterClazz;
     protected Proof proof;
     protected Services service;
     protected EngineState state;
@@ -30,6 +29,11 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
      * Documentation of this command.
      */
     protected String documentation = null;
+
+    /**
+     * ...
+     */
+    private final Class<T> parameterClazz;
 
     public AbstractCommand(Class<T> clazz) {
         this.parameterClazz = clazz;

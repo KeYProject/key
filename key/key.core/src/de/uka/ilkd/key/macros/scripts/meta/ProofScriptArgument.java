@@ -15,6 +15,9 @@ public class ProofScriptArgument<T> {
     private boolean required;
     private boolean flag;
     private Field field;
+    /**
+     * is an argument ellipsis
+     */
     private boolean variableArguments;
     /**
      * Holds the documentation of this argument.

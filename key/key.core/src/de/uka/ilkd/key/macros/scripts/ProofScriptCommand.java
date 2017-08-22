@@ -35,9 +35,9 @@ public interface ProofScriptCommand<T> {
             throws Exception;
 
     /**
-     * @param uiControl
-     * @param args
-     * @param stateMap
+     * @param uiControl the current ui controller
+     * @param args      the script arguments
+     * @param stateMap  the current state
      * @throws ScriptException
      * @throws InterruptedException
      */
