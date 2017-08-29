@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.java.expression.literal;
 
-import java.math.BigInteger;
-
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -30,12 +28,6 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 public class IntLiteral extends AbstractIntegerLiteral {
 
-    // constants for range check at String to int conversion
-    /**
-     * A constant holding the maximum valid value of a signed int: 2<sup>31</sup>-1
-     */
-    private static final long MAX_INT = Integer.MAX_VALUE;
-
     /**
      * A constant holding the maximum valid value as if an int was interpreted unsigned:
      * 2<sup>32</sup>-1
@@ -48,10 +40,9 @@ public class IntLiteral extends AbstractIntegerLiteral {
     private final String valueStr;
 
     /**
-     * The actual value of the literal. A <code>long</code> is used to be able to represent
-     * the absolute value of <code>Integer.MIN_VALUE</code>: 2<sup>31</sup>.
+     * The actual value of the literal.
      */
-    private final long value;
+    private final int value;
 
     /**
      * Creates a new IntLiteral representing the given int.
@@ -75,7 +66,8 @@ public class IntLiteral extends AbstractIntegerLiteral {
      *               http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
      */
     public IntLiteral(String valStr) {
-        this(valStr, false);
+        this.value = parseFromString(valStr);
+        this.valueStr = Integer.toString(value).intern();
     }
 
     /**
@@ -94,7 +86,6 @@ public class IntLiteral extends AbstractIntegerLiteral {
      *               http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
      */
     public IntLiteral(String valStr, boolean surroundedByUnaryMinus) {
-        super(surroundedByUnaryMinus);
         this.value = parseFromString(valStr);
         this.valueStr = Long.toString(value).intern();
     }
@@ -104,13 +95,11 @@ public class IntLiteral extends AbstractIntegerLiteral {
      *
      * @param children the children of this AST element as KeY classes, may contain: Comments
      * @param valStr the value of the literal
-     * @param surroundedByUnaryMinus indicates whether the literal is directly surrounded
-     *          by an unary minus (used for correct range check)
      * @throws NumberFormatException if the given String does not represent a syntactically valid
      *          literal or represents a value out of int range
      */
-    public IntLiteral(ExtList children, String valStr, boolean surroundedByUnaryMinus) {
-        super(children, surroundedByUnaryMinus);
+    public IntLiteral(ExtList children, String valStr) {
+        super(children);
         this.value = parseFromString(valStr);
         this.valueStr = Long.toString(value).intern();
     }
@@ -139,8 +128,8 @@ public class IntLiteral extends AbstractIntegerLiteral {
     }
 
     @Override
-    public BigInteger getValue() {
-        return BigInteger.valueOf(value);
+    public long getValue() {
+        return value;
     }
 
     @Override
@@ -164,17 +153,25 @@ public class IntLiteral extends AbstractIntegerLiteral {
      * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1">
      *               http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
      */
-    protected long parseFromString(final String sourceStr) throws NumberFormatException {
+    protected int parseFromString(final String sourceStr) throws NumberFormatException {
 
         String valStr = sourceStr;
         int radix = 10;
+        boolean neg = false;
 
         ///////////////////////////////////////////////////////////////////////////
         /* preprocessing of the input string: */
 
+        // remove minus sign for easier removal of prefix
+        if (valStr.startsWith("-")) {
+            neg = true;
+            valStr = valStr.substring(1);
+        }
+
         // remove underscores
         valStr = valStr.replace("_", "");
 
+        // remove prefix indicating the radix
         if (valStr.startsWith("0x") || valStr.startsWith("0X")) {        // hex
             radix = 16;
             valStr = valStr.substring(2);     // cut of '0x'
@@ -186,10 +183,10 @@ public class IntLiteral extends AbstractIntegerLiteral {
             valStr = valStr.substring(1);     // cut of leading '0'
         }
 
-        ///////////////////////////////////////////////////////////////////////////
-        /* preprocessing of the context (literal surrounded by an unary minus?): */
-
-        int isMinus = surroundedByUnaryMinus ? 1 : 0;
+        // add minus sign again
+        if (neg) {
+            valStr = "-" + valStr;
+        }
 
         ///////////////////////////////////////////////////////////////////////////
         /* range check and actual conversion: */
@@ -199,29 +196,25 @@ public class IntLiteral extends AbstractIntegerLiteral {
          */
         long val = Long.parseLong(valStr, radix);
 
-        // calculate maximum valid magnitude for the literal (depending on sign and radix)
+        // calculate maximum valid range for the literal (depending on sign and radix)
         long maxValue;
+        long minValue;
         if (radix == 10) {
-            maxValue = MAX_INT + isMinus;       // asymmetric range depending on sign!
+            minValue = Integer.MIN_VALUE;
+            maxValue = Integer.MAX_VALUE;
         } else {
             maxValue = MAX_UINT;
+            minValue = 0;
         }
 
         // check if literal is in valid range
-        if (val > maxValue) {
+        if (val > maxValue || val < minValue) {
             //raiseError("Number constant out of bounds: " + literalString, n);
             throw new NumberFormatException("Number constant out of bounds: " + valStr);
         }
 
         /* perform the actual conversion (two's complement for bin, oct and hex!) of the
-         * BigInteger to a String containing the real (checked valid) value of the literal
-         */
-        if (radix == 10) {
-            //valueStr = Long.toString(val);
-            return val;
-        } else {
-            //valueStr = Integer.toString((int)val);
-            return (int)val;    // the cast does the two's complement conversion
-        }
+         * BigInteger to a String containing the real (checked valid) value of the literal */
+        return (int)val;    // the cast does the two's complement conversion
     }
 }

@@ -59,6 +59,7 @@ import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
+import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
@@ -812,11 +813,7 @@ public class Recoder2KeYConverter {
 
     /** convert a recoder IntLiteral to a KeY IntLiteral */
     public IntLiteral convert(recoder.java.expression.literal.IntLiteral intLit) {
-        if (intLit.getASTParent() instanceof recoder.java.expression.operator.Negative) {
-            return new IntLiteral(collectComments(intLit), intLit.getValue(), true);
-        } else {
-            return new IntLiteral(collectComments(intLit), intLit.getValue(), false);
-        }
+        return new IntLiteral(collectComments(intLit), intLit.getValue());
     }
 
     /** convert a recoder BooleanLiteral to a KeY BooleanLiteral */
@@ -951,11 +948,7 @@ public class Recoder2KeYConverter {
 
     /** convert a recoder LongLiteral to a KeY LongLiteral */
     public LongLiteral convert(recoder.java.expression.literal.LongLiteral longLit) {
-        if (longLit.getASTParent() instanceof recoder.java.expression.operator.Negative) {
-            return new LongLiteral(collectComments(longLit), longLit.getValue(), true);
-        } else {
-            return new LongLiteral(collectComments(longLit), longLit.getValue(), false);
-        }
+        return new LongLiteral(collectComments(longLit), longLit.getValue());
     }
 
     /** convert a recoder CharLiteral to a KeY CharLiteral */
@@ -2193,7 +2186,28 @@ public class Recoder2KeYConverter {
         return new UnsignedShiftRightAssignment(collectChildrenAndComments(arg));
     }
 
-    public Negative convert(recoder.java.expression.operator.Negative arg) {
+//    public Negative convert(recoder.java.expression.operator.Negative arg) {
+//        return new Negative(collectChildrenAndComments(arg));
+//    }
+
+    public JavaProgramElement convert(recoder.java.expression.operator.Negative arg) {
+        /* if the minus surrounds a decimal Int-/LongLiteral
+         * -> minus belongs to the literal, no separate javaUnaryMinus(...) */
+        if (arg.getChildCount() > 0) {
+            if (arg.getChildAt(0) instanceof recoder.java.expression.literal.IntLiteral) {
+                recoder.java.expression.literal.IntLiteral lit = (recoder.java.expression.literal.IntLiteral)arg.getChildAt(0);
+                if (AbstractIntegerLiteral.representsDecLiteral(lit.getValue())) { // decimal: unary minus belongs to the literal
+                    // encode the minus into the literal
+                    return new IntLiteral(collectComments(lit), "-" + lit.getValue());
+                }
+            } else if (arg.getChildAt(0) instanceof recoder.java.expression.literal.LongLiteral) {
+                recoder.java.expression.literal.LongLiteral lit = (recoder.java.expression.literal.LongLiteral)arg.getChildAt(0);
+                if (AbstractIntegerLiteral.representsDecLiteral(lit.getValue())) { // decimal: unary minus belongs to the literal
+                    // encode the minus into the literal
+                    return new LongLiteral(collectComments(lit), "-" + lit.getValue());
+                }
+            }
+        }
         return new Negative(collectChildrenAndComments(arg));
     }
 

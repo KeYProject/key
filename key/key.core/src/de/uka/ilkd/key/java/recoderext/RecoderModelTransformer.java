@@ -122,7 +122,8 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
             } else if ("long".equals(type.getName())) {
                 return new LongLiteral(0);
             } else if ("\\bigint".equals(type.getName())) {
-                return new BigintLiteral(0);
+                //return new BigintLiteral(0);
+                return new IntLiteral(0);
             } else if ("\\real".equals(type.getName())) {
                 return new RealLiteral();
             } else if ("char".equals(type.getName())) {

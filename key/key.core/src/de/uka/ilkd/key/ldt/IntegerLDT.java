@@ -560,63 +560,7 @@ public final class IntegerLDT extends LDT {
 
         String literalString = ((AbstractIntegerLiteral)lit).getValueString();
 
-//        String literalString = null;
-//        if (lit instanceof IntLiteral) {
-//            literalString = ((IntLiteral)lit).getValueString();
-//        } else if (lit instanceof LongLiteral) {
-//            literalString = ((LongLiteral)lit).getValueString();
-//        } else if (lit instanceof BigintLiteral) {
-//            literalString = ((BigintLiteral)lit).getValueString();
-//        } else {
-//            assert false;
-//        }
-
-//        if (literalString.charAt(0) == '-') {
-//            minusFlag = true;
-//            literalString = literalString.substring(1);
-//        }
-        /* We have to deal with literals coming both from programs and
-         * the logic. The former can have prefixes ("0" for octal,
-         * "0x" for hex) and suffixes ("L" for long literal). The latter
-         * do not have any of these but can have arbitrary length.
-         */
-//        if (lit instanceof IntLiteral) {
-//            if (literalString.startsWith("0") && !literalString.equals("0")) { // hex or octal literal
-//                try {
-//                    long l = Long.decode(literalString);
-//                    //the following contortion is necessary to deal with
-//                    //valid java programs like int i = 0xffffffff;
-//                    //http://stackoverflow.com/questions/4355619/converting-string-to-intger-hex-value-strange-behaviour
-//                    if (l>4294967295L) throw new
-//                        NumberFormatException("This won't fit into an int");
-//                    int i = (int) l;
-//                    if (i<0) {
-//                        minusFlag = true;
-//                        i=-i;
-//                    }
-//                    int_ch=(""+i).toCharArray();
-//                } catch(NumberFormatException nfe) {
-//                    Debug.fail("Cannot convert int constant! "+literalString);
-//                }
-//            } else {
-//                int_ch=literalString.toCharArray();
-//            }
-//            length = int_ch.length;
-//        } else if (lit instanceof LongLiteral) {
-//            // long constants have the letter 'l' as final character
-//            // need to cut that off (fixes bug #1523)
-//            assert Character.toLowerCase(literalString.charAt(literalString.length()-1)) == 'l';
-//            try {
-//                final long l = Long.decode(literalString.substring(0, literalString.length()-1));
-//                int_ch=(""+l).toCharArray();
-//            } catch (NumberFormatException nfe) {
-//                Debug.fail("Cannot convert long constant! "+literalString);
-//            }
-//            length = int_ch.length;
-//        }
-//        literalString = ((AbstractIntegerLiteral)lit).getValueString();
-        
-        // --> TermBuilder.zTerm
+        Debug.out("integerldt: result of translating literal (lit, result):", lit, result);
         return services.getTermBuilder().zTerm(literalString);
 //
 //        if (literalString.charAt(0) == '-') {
@@ -636,7 +580,7 @@ public final class IntegerLDT extends LDT {
 //        }
 //        result = services.getTermBuilder().func(identifier, result);
 //
-//        Debug.out("integerldt: result of translating literal (lit, result):", lit, result);
+//        
 //
 //        return result;
     }

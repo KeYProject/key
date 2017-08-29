@@ -399,15 +399,15 @@ public final class TypeConverter {
 	    return convertArrayReference((ArrayReference)pe, ec);
 	} else if (pe instanceof Literal) {
 	    return convertLiteralExpression((Literal)pe);
-	} else if (pe instanceof Negative
+	} 
+	// removed: at this point, all minus signs should be integrated into literals if necessary
+	/*else if (pe instanceof Negative
 	        && ((Negative)pe).getChildAt(0) instanceof IntLiteral) {
 	    String val = ((IntLiteral)((Negative)pe).getChildAt(0)).getValueString();
 	    if (val.charAt(0)=='-') {
-		return integerLDT.translateLiteral
-		    (new IntLiteral(val.substring(1)), services);
+		return integerLDT.translateLiteral(new IntLiteral(val.substring(1)), services);
 	    } else {
-		return integerLDT.translateLiteral
-		    (new IntLiteral("-"+val), services);
+		return integerLDT.translateLiteral(new IntLiteral("-"+val), services);
 	    }
 	} else if (pe instanceof Negative
 		   && ((Negative)pe).getChildAt(0) instanceof LongLiteral ) {
@@ -420,7 +420,7 @@ public final class TypeConverter {
 		return integerLDT.translateLiteral
 		    (new LongLiteral("-"+val), services);
 	    }
-	} else if (pe instanceof ThisReference) {
+	}*/ else if (pe instanceof ThisReference) {
 	    return convertReferencePrefix((ThisReference)pe, ec);
 	} else if (pe instanceof ParenthesizedExpression) {
             return convertToLogicElement

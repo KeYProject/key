@@ -56,7 +56,7 @@ public class CharLiteral extends AbstractIntegerLiteral {
      * @param valueStr a string.
      */
     public CharLiteral(ExtList children, String valueStr) {
-        super(children, false);
+        super(children);
 //        this.valueStr = valueStr;
 //        this.charVal = valueStr.charAt(1);
         this.charVal = valueStr.charAt(1);
@@ -99,8 +99,8 @@ public class CharLiteral extends AbstractIntegerLiteral {
      * Returns the decimal value of the char.
      * @return the decimal value of the char as a BigInteger
      */
-    public BigInteger getValue() {
-        return BigInteger.valueOf(charVal);
+    public long getValue() {
+        return charVal;
     }
 
 //    public char getCharValue() {
