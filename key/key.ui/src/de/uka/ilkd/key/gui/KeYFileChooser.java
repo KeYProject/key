@@ -36,24 +36,35 @@ public class KeYFileChooser {
                             || "java".equals(IOUtil.getFileExtension(f))
                             || "key".equals(IOUtil.getFileExtension(f))
                             || "proof".equals(IOUtil.getFileExtension(f))
-                            || "gz".equals(IOUtil.getFileExtension(f));
+                            || f.getName().endsWith(".proof.gz");
         }
 
         public String getDescription() {
-            return "Java files, KeY files and Source Directories";
+            return "Java files, (compressed) KeY files and source directories";
         }
     };
+
+    private static final FileFilter COMPRESSED_FILTER = new FileFilter() {
+        public boolean accept(File f) {
+            return f.getName().endsWith(".proof.gz") || f.isDirectory();
+        }
+
+        public String getDescription() {
+            return "compressed KeY proof files (.proof.gz)";
+        }
+    };
+
+
     private static KeYFileChooser INSTANCE;
 
     private final JFileChooser fileChooser;
-    private final JCheckBox compressionCheckBox = new JCheckBox("Compress");
 
     private boolean saveDialog;
 
     private File resetFile = null;
 
     public boolean useCompression() {
-        return compressionCheckBox.isSelected();
+        return getSelectedFile().getName().endsWith(".proof.gz");
     }
 
     private KeYFileChooser(File initDir) {
@@ -69,6 +80,7 @@ public class KeYFileChooser {
                 super.approveSelection();
             }
         };
+        fileChooser.addChoosableFileFilter(COMPRESSED_FILTER);
         fileChooser.setFileFilter(FILTER);
     }
 
@@ -97,7 +109,6 @@ public class KeYFileChooser {
 
     private void setSaveDialog(boolean b) {
         saveDialog = b;
-        fileChooser.setAccessory(b ? compressionCheckBox : null);
         fileChooser.setFileSelectionMode(b
                         ? JFileChooser.FILES_ONLY
                                         : JFileChooser.FILES_AND_DIRECTORIES);
