@@ -35,7 +35,10 @@ public class LongLiteral extends AbstractIntegerLiteral {
      * A constant holding the maximum valid value of a signed long: 2<sup>63</sup>-1
      */
     private static final BigInteger MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
-    
+
+    /**
+     * A constant holding the minimum valid value of a signed long: -2<sup>63</sup>
+     */
     private static final BigInteger MIN_LONG = BigInteger.valueOf(Long.MIN_VALUE);
 
     /**
@@ -45,7 +48,7 @@ public class LongLiteral extends AbstractIntegerLiteral {
     private static final BigInteger MAX_ULONG = new BigInteger("ffffffffffffffff", 16);
 
     /**
-     * Textual representation of the value as a decimal number.
+     * Textual representation of the value as a decimal number (always ends with 'L').
      */
     private final String valueStr;
 
@@ -60,8 +63,7 @@ public class LongLiteral extends AbstractIntegerLiteral {
      */
     public LongLiteral(long value) {
         this.value = value;
-        //this.valueStr = "" + value + 'L';
-        this.valueStr = Long.toString(value).intern();
+        this.valueStr = (Long.toString(value) + 'L').intern();
     }
 
     /**
@@ -77,9 +79,8 @@ public class LongLiteral extends AbstractIntegerLiteral {
      *               http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
      */
     public LongLiteral(String valStr) {
-        //this.valueStr = (valStr.endsWith("L") || valStr.endsWith("l")) ? valStr : (valStr + 'L');
         this.value = parseFromString(valStr);
-        this.valueStr = Long.toString(value).intern();
+        this.valueStr = (Long.toString(value) + 'L').intern();
     }
 
     /**
@@ -92,18 +93,9 @@ public class LongLiteral extends AbstractIntegerLiteral {
      */
     public LongLiteral(ExtList children, String valStr) {
         super(children);
-        //this.valueStr = (valStr.endsWith("L") || valStr.endsWith("l")) ? valStr : (valStr + 'L');
         this.value = parseFromString(valStr);
-        this.valueStr = Long.toString(value).intern();
+        this.valueStr = (Long.toString(value) + 'L').intern();
     }
-
-//    @Override
-//    public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-//        if (!(o instanceof LongLiteral)) {
-//            return false;
-//        }
-//        return ((LongLiteral)o).getValue().equals(getValue());
-//    }
 
     @Override
     public void visit(Visitor v) {
@@ -125,6 +117,12 @@ public class LongLiteral extends AbstractIntegerLiteral {
         return value;
     }
 
+    /**
+     *
+     * @return the actual value of the literal converted to a decimal String. If the literal
+     *         represents a negative value, the first character is a '-' sign.
+     *         The returned String always ends with 'L' to indicate a long.
+     */
     @Override
     public String getValueString() {
         return valueStr;
@@ -154,7 +152,7 @@ public class LongLiteral extends AbstractIntegerLiteral {
 
         ///////////////////////////////////////////////////////////////////////////
         /* preprocessing of the input string: */
-        
+
         // remove minus sign for easier removal of prefix
         if (valStr.startsWith("-")) {
             neg = true;
@@ -178,7 +176,7 @@ public class LongLiteral extends AbstractIntegerLiteral {
             radix = 8;
             valStr = valStr.substring(1);     // cut of leading '0'
         }
-        
+
         // add minus sign again
         if (neg) {
             valStr = "-" + valStr;

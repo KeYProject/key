@@ -543,46 +543,15 @@ public final class IntegerLDT extends LDT {
 
     @Override
     public Term translateLiteral(Literal lit, Services services) {
-        int length = 0;
-        boolean minusFlag = false;
         Debug.assertTrue(lit instanceof AbstractIntegerLiteral,
-                         "Literal '"+lit+"' is not an integer literal.");
+                         "Literal '" + lit + "' is not an integer literal.");
 
-        char[] int_ch=null;
-        assert sharp != null;
-        Term result = services.getTermBuilder().func(sharp);
+        // TODO: set correct identifier: Function identifier = numbers/charID;
 
-        Function identifier = numbers;
-        if (lit instanceof CharLiteral) {
-            //lit = new IntLiteral("" + (int)(((CharLiteral)lit).getValue()));
-            identifier = charID;
-        }
-
-        String literalString = ((AbstractIntegerLiteral)lit).getValueString();
-
+        long literalValue = ((AbstractIntegerLiteral)lit).getValue();
+        Term result = services.getTermBuilder().zTerm(literalValue);
         Debug.out("integerldt: result of translating literal (lit, result):", lit, result);
-        return services.getTermBuilder().zTerm(literalString);
-//
-//        if (literalString.charAt(0) == '-') {
-//            minusFlag = true;
-//            literalString = literalString.substring(1);
-//        }
-//
-//        int_ch = literalString.toCharArray();
-//        length = int_ch.length;
-//
-//        for (int i = 0; i < length; i++) {
-//            result = services.getTermBuilder().func(numberSymbol[int_ch[i] - '0'], result);
-//        }
-//
-//        if (minusFlag) {
-//            result = services.getTermBuilder().func(neglit, result);
-//        }
-//        result = services.getTermBuilder().func(identifier, result);
-//
-//        
-//
-//        return result;
+        return result;
     }
 
     @Override

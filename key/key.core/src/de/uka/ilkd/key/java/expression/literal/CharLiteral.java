@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.java.expression.literal;
 
-import java.math.BigInteger;
-
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -57,8 +55,6 @@ public class CharLiteral extends AbstractIntegerLiteral {
      */
     public CharLiteral(ExtList children, String valueStr) {
         super(children);
-//        this.valueStr = valueStr;
-//        this.charVal = valueStr.charAt(1);
         this.charVal = valueStr.charAt(1);
         this.valueStr = "" + (int)charVal;
     }
@@ -69,31 +65,9 @@ public class CharLiteral extends AbstractIntegerLiteral {
      * @param valueStr a string.
      */
     public CharLiteral(String valueStr) {
-//        this.valueStr=valueStr;
-//        this.charVal=valueStr.charAt(1);
         this.charVal = valueStr.charAt(1);
         this.valueStr = "" + (int)charVal;
     }
-
-//    /** tests if equals
-//     */
-//    public boolean equalsModRenaming(SourceElement o,
-//            NameAbstractionTable nat) {
-//        if (!(o instanceof CharLiteral)) {
-//            return false;
-//        }
-//        return ((CharLiteral)o).getValue().equals(getValue());
-//    }
-//
-//    public int hashCode(){
-//      int result = 17;
-//      result = 37 * result + getValue().hashCode();
-//      return result;
-//    }
-//
-//    public boolean equals(Object o){
-//      return super.equals(o);
-//    }
 
     /**
      * Returns the decimal value of the char.
@@ -102,10 +76,6 @@ public class CharLiteral extends AbstractIntegerLiteral {
     public long getValue() {
         return charVal;
     }
-
-//    public char getCharValue() {
-//        return charVal;
-//    }
 
     @Override
     public void visit(Visitor v) {

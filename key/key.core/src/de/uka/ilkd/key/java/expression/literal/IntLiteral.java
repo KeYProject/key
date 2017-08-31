@@ -104,14 +104,6 @@ public class IntLiteral extends AbstractIntegerLiteral {
         this.valueStr = Long.toString(value).intern();
     }
 
-//    @Override
-//    public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-//        if (!(o instanceof IntLiteral)) {
-//            return false;
-//        }
-//        return ((IntLiteral)o).getValueString().equals(getValueString());
-//    }
-
     @Override
     public void visit(Visitor v) {
         v.performActionOnIntLiteral(this);

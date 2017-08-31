@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.java.expression.literal;
 
 import org.key_project.util.ExtList;
@@ -9,13 +22,17 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 
 /**
- * This class is a superclass for integer literals (Bigint, Int, Long, Char).
+ * This class is a superclass for integer literals (Int, Long, Char).
  * It provides a getValue() method to receive the actual value of the literal as well as
- * getValueString() to get a String representation.
+ * getValueString() to get a String representation. Subclasses of this class perform range checks at
+ * creation time. This means once a literal is created it is certainly valid.
  * @author Wolfram Pfeifer
  */
 public abstract class AbstractIntegerLiteral extends Literal {
 
+    /**
+     * Empty default constructor.
+     */
     protected AbstractIntegerLiteral() {
     }
 
@@ -41,7 +58,11 @@ public abstract class AbstractIntegerLiteral extends Literal {
      */
     public abstract String getValueString();
 
-    // TODO: equals
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
     @Override
     public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
         if (!(o.getClass() == this.getClass())) {
@@ -58,7 +79,7 @@ public abstract class AbstractIntegerLiteral extends Literal {
     @Override
     public int hashCode() {
         int result = 17;
-        result = (int) (37 * result + getValue()); //XXX
+        result = (int) (37 * result + getValueString().hashCode());
         return result;
     }
 
