@@ -112,6 +112,8 @@ options {
     private static final int NORMAL_NONRIGID = 0;
     private static final int LOCATION_MODIFIER = 1;
 
+    private static final String LIMIT_SUFFIX = "\$lmtd";
+
     static HashMap<String, IProofFileParser.ProofElementID> prooflabel2tag = new LinkedHashMap<>(15);
     static {
          prooflabel2tag.put("branch", ProofElementID.BRANCH);
@@ -3523,7 +3525,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
         ((MINUS)? NUM_LITERAL) => (MINUS {neg = "-";})? number=NUM_LITERAL
         { a = toZNotation(neg+number.getText(), functions());}    
     | AT a = abbreviation
-    | varfuncid = funcpred_name (LIMITED {limited = true;})?
+    | varfuncid = funcpred_name
         ( (~LBRACE | LBRACE bound_variables) =>
             (
                LBRACE 
@@ -3543,16 +3545,20 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
 	    } else if(varfuncid.equals("skip") && args == null) {
 	        a = getTermFactory().createTerm(UpdateJunctor.SKIP);
 	    } else {
-	            Operator op = lookupVarfuncId(varfuncid, args);  
-	            if(limited) {
-	                if(op.getClass() == ObserverFunction.class) {
+	            Operator op;
+	            if(varfuncid.endsWith(LIMIT_SUFFIX)) {
+	                varfuncid = varfuncid.substring(0, varfuncid.length()-5);
+	                op = lookupVarfuncId(varfuncid, args);
+	                if(ObserverFunction.class.isAssignableFrom(op.getClass())) {
 	                    op = getServices().getSpecificationRepository()
 	                                      .limitObs((ObserverFunction)op).first;
 	                } else {
 	                    semanticError("Cannot can be limited: " + op);
 	                }
-	            }   
-	                   
+	            } else {
+	                op = lookupVarfuncId(varfuncid, args);
+	            }
+
 	            if (op instanceof ParsableVariable) {
 	                a = termForParsedVariable((ParsableVariable)op);
 	            } else {
