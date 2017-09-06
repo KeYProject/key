@@ -1239,13 +1239,16 @@ unaryexpr returns [SLExpression ret=null] throws SLTranslationException
 	    String text = "-" + declit.getText();
         
         boolean isLong = text.endsWith("l") || text.endsWith("L");
-        Literal literal = isLong ? new LongLiteral(text) : new IntLiteral(text);
-        
-        Term intLit = 
+        try {
+            Literal literal = isLong ? new LongLiteral(text) : new IntLiteral(text);
+            Term intLit = 
              services.getTypeConverter().getIntegerLDT().translateLiteral(literal, services);
     
-        PrimitiveType literalType = isLong ? PrimitiveType.JAVA_LONG : PrimitiveType.JAVA_INT;
-        result = new SLExpression(intLit, javaInfo.getPrimitiveKeYJavaType(literalType));
+            PrimitiveType literalType = isLong ? PrimitiveType.JAVA_LONG : PrimitiveType.JAVA_INT;
+            result = new SLExpression(intLit, javaInfo.getPrimitiveKeYJavaType(literalType));
+        } catch (NumberFormatException e) {
+            throw getExceptionManager().createException(e.getMessage(), e);
+        }
 	}	
     |
 	minus=MINUS result=unaryexpr
@@ -1550,13 +1553,17 @@ integerliteral returns [SLExpression result=null] throws SLTranslationException
         String text = n.getText();
         
         boolean isLong = text.endsWith("l") || text.endsWith("L");
-        Literal literal = isLong ? new LongLiteral(text) : new IntLiteral(text);
+        try {
+            Literal literal = isLong ? new LongLiteral(text) : new IntLiteral(text);
         
-        Term intLit = 
-	         services.getTypeConverter().getIntegerLDT().translateLiteral(literal, services);
+            Term intLit = 
+	             services.getTypeConverter().getIntegerLDT().translateLiteral(literal, services);
     
-        PrimitiveType literalType = isLong ? PrimitiveType.JAVA_LONG : PrimitiveType.JAVA_INT;
-        result = new SLExpression(intLit, javaInfo.getPrimitiveKeYJavaType(literalType));
+            PrimitiveType literalType = isLong ? PrimitiveType.JAVA_LONG : PrimitiveType.JAVA_INT;
+            result = new SLExpression(intLit, javaInfo.getPrimitiveKeYJavaType(literalType));
+        } catch (NumberFormatException e) {
+            throw getExceptionManager().createException(e.getMessage(), e);
+        }
     }
 ;
 

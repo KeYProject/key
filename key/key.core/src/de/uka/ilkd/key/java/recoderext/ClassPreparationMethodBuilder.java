@@ -36,6 +36,8 @@ import recoder.java.reference.FieldReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.java.PosConvertException;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -96,6 +98,9 @@ public class ClassPreparationMethodBuilder
     	    result = ce.isCompileTimeConstant(spec.getInitializer()); 
     	} catch (java.lang.ArithmeticException t) {
     	    result = false;
+    	} catch (NumberFormatException e) {
+    	    throw new PosConvertException(e.getMessage(), spec.getStartPosition().getLine(), spec.getStartPosition().getColumn());
+    	    // SLTranslationException(e.getMessage(), "", spec.getStartPosition().getLine(), spec.getStartPosition().getColumn());
     	}
     	
     	return result;

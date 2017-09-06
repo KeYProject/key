@@ -579,7 +579,7 @@ public final class IntegerLDT extends LDT {
             }
             // numbers must end with a sharp
             if (f == sharp) {
-                return new IntLiteral(sb.toString());
+                return new IntLiteral(sb.toString());     // TODO: what if number too large for int?
             }
         }
         throw new RuntimeException("IntegerLDT: Cannot convert term to program: "

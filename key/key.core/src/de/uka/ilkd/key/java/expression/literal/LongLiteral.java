@@ -188,7 +188,13 @@ public class LongLiteral extends AbstractIntegerLiteral {
         /* the raw BigInteger converted from the input String without considering
          * allowed value range or two's complement
          */
-        BigInteger val = new BigInteger(valStr, radix);
+        BigInteger val;
+        try {
+            val = new BigInteger(valStr, radix);
+        } catch (NumberFormatException e) {
+            // refer to long here to give a meaningful error message to the user
+            throw new NumberFormatException("Not a parsable long: " + valStr);
+        }
 
         // calculate maximum valid magnitude for the literal (depending on sign and radix)
         BigInteger maxValue;

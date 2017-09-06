@@ -71,26 +71,6 @@ public class IntLiteral extends AbstractIntegerLiteral {
     }
 
     /**
-     * Creates a new IntLiteral from the given String. The String is parsed and checked for range.
-     * The input may be any String containing a literal as described by the Java 8 Language
-     * Specification. This includes hexadecimal, decimal, octal, and binary literals as well as
-     * literals containing underscores as separators. In addition, a preceding '-' sign is allowed.
-     * If the literal is surrounded by an unary minus, the corresponding flag can be set.
-     * This allows to perform a correct range check.
-     *
-     * @param valStr the String that contains the literal
-     * @param surroundedByUnaryMinus used in range check
-     * @throws NumberFormatException if the given String does not represent a syntactically valid
-     *          literal or represents a value out of int range
-     * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1">
-     *               http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
-     */
-    public IntLiteral(String valStr, boolean surroundedByUnaryMinus) {
-        this.value = parseFromString(valStr);
-        this.valueStr = Long.toString(value).intern();
-    }
-
-    /**
      * Constructor for Recoder2KeY transformation.
      *
      * @param children the children of this AST element as KeY classes, may contain: Comments
@@ -186,7 +166,13 @@ public class IntLiteral extends AbstractIntegerLiteral {
         /* the raw long converted from the input String without considering
          * allowed value range or two's complement
          */
-        long val = Long.parseLong(valStr, radix);
+        long val = 0;
+        try {
+            Long.parseLong(valStr, radix);
+        } catch (NumberFormatException e) {
+            // refer to int here to give a meaningful error message to the user
+            throw new NumberFormatException("Not a parsable int: " + valStr);
+        }
 
         // calculate maximum valid range for the literal (depending on sign and radix)
         long maxValue;
