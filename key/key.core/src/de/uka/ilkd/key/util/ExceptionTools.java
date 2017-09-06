@@ -12,6 +12,10 @@ import de.uka.ilkd.key.parser.proofjava.ParseException;
 import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import recoder.java.CompilationUnit;
+import recoder.java.ProgramElement;
+import recoder.kit.UnitKit;
+import recoder.service.UnresolvedReferenceException;
 
 /**
  * Various utility methods related to exceptions.
@@ -79,7 +83,15 @@ public final class ExceptionTools {
             // may still be null ...
             location = ((ScriptException)exc).getLocation();
         } else if (exc instanceof PosConvertException) {
-            location = new Location("", ((PosConvertException) exc).getLine(),
+            Throwable cause = exc.getCause();
+            String file = "";
+            if (cause instanceof UnresolvedReferenceException) {
+                UnresolvedReferenceException ure = (UnresolvedReferenceException) cause;
+                CompilationUnit cu = UnitKit.getCompilationUnit(ure.getUnresolvedReference());
+                String dataloc = cu.getDataLocation().toString();
+                file = dataloc.substring(dataloc.indexOf(':') + 1);
+            }
+            location = new Location(file, ((PosConvertException) exc).getLine(),
                                         ((PosConvertException) exc).getColumn());
         } 
     
