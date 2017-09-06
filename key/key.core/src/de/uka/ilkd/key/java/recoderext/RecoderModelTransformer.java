@@ -57,7 +57,6 @@ import recoder.service.DefaultCrossReferenceSourceInfo;
 import de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
-import de.uka.ilkd.key.java.recoderext.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.java.recoderext.expression.literal.RealLiteral;
 import de.uka.ilkd.key.util.Debug;
 
