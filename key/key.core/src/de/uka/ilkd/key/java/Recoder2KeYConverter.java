@@ -561,7 +561,6 @@ public class Recoder2KeYConverter {
     private Literal getLiteralFor(
             recoder.service.ConstantEvaluator.EvaluationResult p_er) {
         switch (p_er.getTypeCode()) {
-        // XXX need to add one for \bigint, too?
         case recoder.service.ConstantEvaluator.BOOLEAN_TYPE:
             return BooleanLiteral.getBooleanLiteral(p_er.getBoolean());
         case recoder.service.ConstantEvaluator.CHAR_TYPE:
@@ -813,7 +812,13 @@ public class Recoder2KeYConverter {
 
     /** convert a recoder IntLiteral to a KeY IntLiteral */
     public IntLiteral convert(recoder.java.expression.literal.IntLiteral intLit) {
+        try {
         return new IntLiteral(collectComments(intLit), intLit.getValue());
+        } catch (NumberFormatException e) {
+            throw new PosConvertException(e,
+                    intLit.getStartPosition().getLine(),
+                    intLit.getStartPosition().getColumn());
+        }
     }
 
     /** convert a recoder BooleanLiteral to a KeY BooleanLiteral */
@@ -1463,6 +1468,7 @@ public class Recoder2KeYConverter {
             try {
         	if (ce.isCompileTimeConstant(init, er))
         	    return getLiteralFor(er);
+            } catch (NumberFormatException t) {
             } catch (java.lang.ArithmeticException t) {
             }
         }

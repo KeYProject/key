@@ -99,8 +99,9 @@ public class ClassPreparationMethodBuilder
     	} catch (java.lang.ArithmeticException t) {
     	    result = false;
     	} catch (NumberFormatException e) {
-    	    throw new PosConvertException(e.getMessage(), spec.getStartPosition().getLine(), spec.getStartPosition().getColumn());
+            // throw new PosConvertException(e.getMessage(), spec.getStartPosition().getLine(), spec.getStartPosition().getColumn());
     	    // SLTranslationException(e.getMessage(), "", spec.getStartPosition().getLine(), spec.getStartPosition().getColumn());
+            result = false;
     	}
     	
     	return result;

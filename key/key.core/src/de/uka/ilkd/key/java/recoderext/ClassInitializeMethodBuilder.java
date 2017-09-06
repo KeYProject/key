@@ -117,6 +117,8 @@ public class ClassInitializeMethodBuilder
 	
 	try {
 	    result = ce.isCompileTimeConstant(spec.getInitializer()); 
+	} catch (NumberFormatException e) {
+	    result = false;
 	} catch (java.lang.ArithmeticException t) {
 	    result = false;
 	}

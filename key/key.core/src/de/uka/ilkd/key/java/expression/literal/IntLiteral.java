@@ -168,7 +168,7 @@ public class IntLiteral extends AbstractIntegerLiteral {
          */
         long val = 0;
         try {
-            Long.parseLong(valStr, radix);
+            val = Long.parseLong(valStr, radix);
         } catch (NumberFormatException e) {
             // refer to int here to give a meaningful error message to the user
             throw new NumberFormatException("Not a parsable int: " + valStr);
