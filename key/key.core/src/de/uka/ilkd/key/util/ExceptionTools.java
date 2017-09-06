@@ -3,6 +3,7 @@ package de.uka.ilkd.key.util;
 import org.antlr.runtime.RecognitionException;
 
 import de.uka.ilkd.key.java.ParseExceptionInFile;
+import de.uka.ilkd.key.java.PosConvertException;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.KeYSemanticException;
 import de.uka.ilkd.key.parser.Location;
@@ -77,6 +78,9 @@ public final class ExceptionTools {
         } else if (exc instanceof ScriptException) {
             // may still be null ...
             location = ((ScriptException)exc).getLocation();
+        } else if (exc instanceof PosConvertException) {
+            location = new Location("", ((PosConvertException) exc).getLine(),
+                                        ((PosConvertException) exc).getColumn());
         } 
     
         if (location == null && exc.getCause() != null) {

@@ -348,14 +348,23 @@ public class Recoder2KeY implements JavaReader {
      *            read. not null.
      * @return a new list containing the recoder compilation units corresponding
      *         to the given files.
+     * @throws ParseExceptionInFile
+     *             any exception occurring while treating the file is wrapped
+     *             into a parse exception that contains the filename.
      */
 
-    public de.uka.ilkd.key.java.CompilationUnit[] readCompilationUnitsAsFiles(String[] cUnitStrings) {
+    public de.uka.ilkd.key.java.CompilationUnit[]
+            readCompilationUnitsAsFiles(String[] cUnitStrings) throws ParseExceptionInFile {
+
         List<recoder.java.CompilationUnit> cUnits = recoderCompilationUnitsAsFiles(cUnitStrings);
         de.uka.ilkd.key.java.CompilationUnit[] result = new de.uka.ilkd.key.java.CompilationUnit[cUnits.size()];
         for (int i = 0, sz = cUnits.size(); i < sz; i++) {
             Debug.out("converting now " + cUnitStrings[i]);
-            result[i] = getConverter().processCompilationUnit(cUnits.get(i), cUnitStrings[i]);
+            try {
+                result[i] = getConverter().processCompilationUnit(cUnits.get(i), cUnitStrings[i]);
+            } catch (Exception e) {
+                throw new ParseExceptionInFile(cUnitStrings[i], e);
+            }
         }
         return result;
     }
@@ -1298,6 +1307,11 @@ public class Recoder2KeY implements JavaReader {
 		cause = t.getCause();
 	    } 
 	}
+
+	if(cause instanceof PosConvertException) {
+	    throw (PosConvertException)cause;
+	}
+
 	int[] pos = extractPositionInfo(cause.toString());
         final RuntimeException rte;
         if (pos.length > 0) {
