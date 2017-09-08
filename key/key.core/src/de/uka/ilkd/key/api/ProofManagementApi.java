@@ -26,11 +26,11 @@ public class ProofManagementApi {
     private final List<Contract> proofContracts = new ArrayList<>();
     private HashSet<String> ruleNames;
 
-    ProofManagementApi(KeYEnvironment env) {
+    public ProofManagementApi(KeYEnvironment env) {
         currentEnv = env;
     }
 
-    Services getServices() {
+    public Services getServices() {
         return currentEnv.getServices();
     }
 

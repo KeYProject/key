@@ -44,11 +44,11 @@ public class ProofApi {
         //TODO
     }
 
-    KeYEnvironment getEnv() {
+    public KeYEnvironment getEnv() {
         return env;
     }
 
-    Proof getProof() {
+    public Proof getProof() {
         return proof;
     }
 
