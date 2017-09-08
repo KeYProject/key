@@ -51,7 +51,7 @@ public class Matcher {
 
         Services copyServices = api.getEnv().getServices().copy(false);
         //services.copy(false);
-        //Aufbau der Deklarationen für den NameSpace
+        //Aufbau der Deklarationen fuer den NameSpace
         buildNameSpace(assignments ,copyServices);
         //Zusammenbau des Pseudotaclets
         //Parsen des Taclets
@@ -80,7 +80,7 @@ public class Matcher {
         if(size > 0) {
             Iterator<SequentFormula> patternIterator = patternSeq.iterator();
 
-            //Init mit leeren Matchconditions, die gefüllt werden
+            //Init mit leeren Matchconditions, die gefuellt werden
             MatchConditions matchCond = MatchConditions.EMPTY_MATCHCONDITIONS;
 
             //Iteratoren durch die Sequent
