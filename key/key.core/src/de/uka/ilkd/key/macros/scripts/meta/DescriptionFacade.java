@@ -65,10 +65,13 @@ public final class DescriptionFacade {
      * If no documentation is available an empty string is returned.
      *
      * @param arg non-null proof script argument
-     * @return a non-null string
+     * @return a string or null, if {@code arg} is null or {@code arg.getCommand} returns null
      * @see ProofScriptArgument#getDocumentation()
      */
     public static String getDocumentation(ProofScriptArgument arg) {
+        if(arg==null || arg.getCommand() == null) {
+            return null;
+        }
         String key = arg.getCommand().getName() + "." + arg.getName();
         return getString(key);
     }
