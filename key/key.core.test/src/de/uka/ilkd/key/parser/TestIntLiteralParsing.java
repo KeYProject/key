@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 public class TestIntLiteralParsing extends AbstractTestTermParser {
 
@@ -145,7 +146,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
     	        parseTerm(s);
     	        fail();
     	    }
-    	    catch (NumberFormatException e) {
+    	    catch (SLTranslationException e) {
     	        assertTrue(e.getMessage().startsWith("Number constant out of bounds"));
     	    }
 	}
@@ -173,7 +174,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
     	        parseTerm(s);
     	        fail();
     	    }
-    	    catch (NumberFormatException e) {
+    	    catch (SLTranslationException e) {
     	        assertTrue(e.getMessage().startsWith("Number constant out of bounds"));
     	    }
 	}
