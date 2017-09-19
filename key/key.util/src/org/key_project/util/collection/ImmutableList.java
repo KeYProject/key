@@ -14,87 +14,63 @@
 package org.key_project.util.collection;
 
 import java.util.Iterator;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * List interface to be implemented by non-destructive lists
  */
 public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
 
-    /**
-     * prepends element to the list (non-destructive)
-     *
+    /** prepends element to the list (non-destructive)
      * @param element the head of the created list
      * @return IList<T> with the new element as head and this list as tail
      */
     ImmutableList<T> prepend(T element);
 
-    /**
-     * prepends a whole list (non-destructive)
-     *
+    /** prepends a whole list (non-destructive)
      * @param list the list to be prepended
      * @return IList<T> list++this
      */
 
     ImmutableList<T> prepend(ImmutableList<T> list);
-
-    /**
-     * prepends an iterable collection
-     */
+    
+    /** prepends an iterable collection */
     ImmutableList<T> prepend(Iterable<T> collection);
 
-    /**
-     * prepends array (O(n))
-     *
+    /** prepends array (O(n))
      * @param array the array of the elements to be prepended
      * @return IList<T> the new list
      */
     ImmutableList<T> prepend(@SuppressWarnings("unchecked") T... array);
 
-    /**
-     * appends element to the list (non-destructive)
-     *
+    /** appends element to the list (non-destructive)
      * @param element to be added at the end
      * @return IList<T> with the new element at the end
      */
     ImmutableList<T> append(T element);
 
-    /**
-     * appends a whole list (non-destructive)
-     *
+    /** appends a whole list (non-destructive)
      * @param list the list to be appended
      * @return IList<T> this++list
      */
     ImmutableList<T> append(ImmutableList<T> list);
-
-    /**
-     * appends an iterable collection
-     */
+    
+    /** appends an iterable collection */
     ImmutableList<T> append(Iterable<T> collection);
 
-    /**
-     * appends element at end (non-destructive) (O(n))
-     *
+    /** appends element at end (non-destructive) (O(n))
      * @param array the array to be appended
      * @return IList<T> the new list
      */
     ImmutableList<T> append(@SuppressWarnings("unchecked") T... array);
 
-    /**
-     * @return <T> the first element in list
-     */
+    /** @return <T> the first element in list */
     T head();
 
-    /**
-     * @return IList<T> tail of list
-     */
+    /** @return IList<T> tail of list */
 
     ImmutableList<T> tail();
 
-    /**
-     * @return IList<T> this list without the first <code>n</code> elements
-     */
+    /** @return IList<T> this list without the first <code>n</code> elements  */
     ImmutableList<T> take(int n);
 
     /**
@@ -102,38 +78,26 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      */
     ImmutableList<T> reverse();
 
-    /**
-     * @return Iterator<T> of this list
-     */
+    /** @return Iterator<T> of this list */
     @Override
     Iterator<T> iterator();
 
-    /**
-     * @return boolean is true iff. obj is in List
-     */
+    /** @return boolean is true iff. obj is in List */
     boolean contains(T obj);
 
-    /**
-     * @return int representing number of elements in list
-     */
+    /** @return int representing number of elements in list  */
 
     int size();
 
-    /**
-     * @return true iff the list is empty
-     */
+    /** @return true iff the list is empty */
     boolean isEmpty();
 
-    /**
-     * removes first occurrence of obj
-     *
+    /** removes first occurrence of obj
      * @return new list
      */
     ImmutableList<T> removeFirst(T obj);
 
-    /**
-     * removes all occurrences of obj
-     *
+    /** removes all occurrences of obj
      * @return new list
      */
     ImmutableList<T> removeAll(T obj);
@@ -147,14 +111,4 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * Convert the list to a Java array (O(n))
      */
     <S> S[] toArray(Class<S> type);
-
-
-    /**
-     * A stream object for this collection.
-     *
-     * @return a non-null stream object
-     */
-    default Stream<T> stream() {
-        return StreamSupport.stream(this.spliterator(), false);
-    }
 }

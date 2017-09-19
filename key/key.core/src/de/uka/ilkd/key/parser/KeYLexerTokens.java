@@ -188,6 +188,7 @@ public class KeYLexerTokens {
         names[KeYParser.IN_TYPE] = "'\\inType'";
         names[KeYParser.IS_ABSTRACT_OR_INTERFACE] = "'\\isAbstractOrInterface'";
         names[KeYParser.CONTAINERTYPE] = "'\\containerType'";
+        names[KeYParser.LIMITED] = "'$lmtd'";
         names[KeYParser.LOCSET] = "'\\locset'";
         names[KeYParser.SEQ] = "'\\seq'";
         names[KeYParser.BIGINT] = "'\\bigint'";

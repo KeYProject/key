@@ -37,7 +37,6 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
-import de.uka.ilkd.key.proof.io.*;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -66,7 +65,11 @@ import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
@@ -369,12 +372,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
        if (saved) {
            file = jFC.getSelectedFile();
            final String filename = file.getAbsolutePath();
-           ProofSaver saver;
-           if (jFC.useCompression()) {
-               saver = new GZipProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
-           } else {
-               saver = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
-           }
+           ProofSaver saver =
+                   new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
            String errorMsg;
            try {
                errorMsg = saver.save();

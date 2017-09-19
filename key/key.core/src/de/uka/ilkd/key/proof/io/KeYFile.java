@@ -107,31 +107,7 @@ public class KeYFile implements EnvInput {
                    File file, 
                    ProgressMonitor monitor,
                    Profile profile) {
-        this(name, file, monitor, profile, false);
-    }
-
-    /**
-     * Creates a new representation for a given file by indicating a name and a
-     * file representing the physical source of the .key file.
-     *
-     * @param name
-     *            the name of the resource
-     * @param file
-     *            the file to find it
-     * @param monitor
-     *            a possibly null reference to a monitor for the loading
-     *            progress
-     * @param profile
-     *            the KeY profile under which the file is to be load
-     * @param compressed
-     *            <code>true</code> iff the file has compressed content
-     */
-    public KeYFile(String name,
-                   File file,
-                   ProgressMonitor monitor,
-                   Profile profile,
-                   boolean compressed) {
-        this(name, RuleSourceFactory.initRuleFile(file, compressed), monitor, profile);
+	this(name, RuleSourceFactory.initRuleFile(file), monitor, profile);
     }
     
 
