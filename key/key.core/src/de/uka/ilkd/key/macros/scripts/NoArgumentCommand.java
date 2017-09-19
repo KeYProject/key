@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import de.uka.ilkd.key.macros.scripts.meta.DescriptionFacade;
 import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
 
 import java.util.ArrayList;
@@ -18,5 +19,10 @@ public abstract class NoArgumentCommand implements ProofScriptCommand<Void> {
     @Override public Void evaluateArguments(EngineState state,
             Map<String, String> arguments) {
         return null;
+    }
+
+    @Override
+    public String getDocumentation() {
+        return DescriptionFacade.getDocumentation(this);
     }
 }

@@ -1,0 +1,55 @@
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <comment>This is a comment</comment>
+    <entry key="assume">
+        The assume command is an unsound taclet rule and takes one argument:
+
+        The command adds the formula passed as argument to the antecedent
+        a formula #2 to which the command is applied
+    </entry>
+    <entry key="auto">
+        The AutoCommand invokes the automatic strategy "Auto"
+    </entry>
+    <entry key="cut">
+        * The command object CutCommand has as scriptcommand name "cut"
+        * As parameters:
+        * a formula with the id "#2"
+    </entry>
+
+    <entry key="exit">
+
+    </entry>
+
+    <entry key="leave">
+
+    </entry>
+
+    <entry key="let">
+
+    </entry>
+
+    <entry key="rule"><![CDATA[
+        * Command that applies a calculus rule
+        * All parameters are passed as strings and converted by the command.
+        * The parameters are:
+        * <ol>
+        *     <li>#2 = <String>rule name</String></li>
+        *     <li>on= key.core.logic.Term on which the rule should be applied to as String (find part of the rule) </li>
+        *     <li>formula= toplevel formula in which term appears in</li>
+        *     <li>occ = occurrence number</li>
+        *     <li>inst_= instantiation</li>
+        * </ol>
+            ]]>
+    </entry>
+
+    <entry key="smt"></entry>
+    <entry key="set"></entry>
+    <entry key="skip"></entry>
+    <entry key="tryclose"/>
+    <entry key="instantiate"><![CDATA[
+  instantiate var=a occ=2 with="a_8" hide
+  <p>
+  instantiate formula="\forall int a; phi(a)" with="a_8"
+    ]]>
+    </entry>
+</properties>
