@@ -294,7 +294,7 @@ public final class IntegerLDT extends LDT {
     }
 
     private Term makeDigit(int digit, TermBuilder tb) {
-        return tb.func(getNumberSymbol(), tb.func(getNumberLiteralFor(0),
+        return tb.func(getNumberSymbol(), tb.func(getNumberLiteralFor(digit),
                 tb.func(getNumberTerminator())));
     }
     
