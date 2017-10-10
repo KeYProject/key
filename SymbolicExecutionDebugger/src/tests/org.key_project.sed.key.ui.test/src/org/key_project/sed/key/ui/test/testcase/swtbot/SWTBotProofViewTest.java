@@ -364,7 +364,8 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
             assertTrue(proofView.bot().tree().getTreeItem("10:OPEN GOAL").isSelected());
             //get the node that is selected
             Node goal = view.getCurrentProof().openGoals().head().node();
-            IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter(goal.sequent());
+            IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter();
+            filter.setSequent(goal.sequent());
             LogicPrinter printer = new SequentViewLogicPrinter(new ProgramPrinter(null), 
                                                                SymbolicExecutionUtil.createNotationInfo(view.getCurrentProof()), 
                                                                goal.proof().getServices(),

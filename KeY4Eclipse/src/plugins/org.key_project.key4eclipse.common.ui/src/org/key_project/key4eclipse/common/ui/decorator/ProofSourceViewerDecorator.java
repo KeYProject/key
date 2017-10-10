@@ -57,7 +57,7 @@ import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 /**
  * The Decorator for the KeYEditor.
  * 
- * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
+ * @author Christoph Schneider, Niklas Bunzel, Stefan Kï¿½sdorf, Marco Drebing
  */
 public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    /**
@@ -203,7 +203,8 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    public void showNode(Node node, NotationInfo notationInfo, VisibleTermLabels visibleLabels) {
       this.node = node;
       if (node != null) {
-         filter = new IdentitySequentPrintFilter(node.sequent());
+         filter = new IdentitySequentPrintFilter();
+         filter.setSequent(node.sequent());
          printer = new SequentViewLogicPrinter(new ProgramPrinter(null), 
                                                notationInfo, 
                                                node.proof().getServices(),
