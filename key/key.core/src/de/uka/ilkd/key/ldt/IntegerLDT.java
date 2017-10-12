@@ -546,10 +546,13 @@ public final class IntegerLDT extends LDT {
         Debug.assertTrue(lit instanceof AbstractIntegerLiteral,
                          "Literal '" + lit + "' is not an integer literal.");
 
-        // TODO: set correct identifier: Function identifier = numbers/charID;
+        Term result;
+        if (lit instanceof CharLiteral) {
+            result = services.getTermBuilder().cTerm(((CharLiteral) lit).getValueString());
+        } else {
+            result = services.getTermBuilder().zTerm(((AbstractIntegerLiteral) lit).getValue());
+        }
 
-        long literalValue = ((AbstractIntegerLiteral)lit).getValue();
-        Term result = services.getTermBuilder().zTerm(literalValue);
         Debug.out("integerldt: result of translating literal (lit, result):", lit, result);
         return result;
     }
