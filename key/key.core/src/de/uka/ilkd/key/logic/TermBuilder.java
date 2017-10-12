@@ -1179,14 +1179,13 @@ public class TermBuilder {
     }
 
     /**
-     * @param numberString
-     *            String representing an integer with radix 10, may be negative
-     * @return Term in Z-Notation representing the given number
-     * @throws NumberFormatException
-     *             if <code>numberString</code> is not a number
+     * Creates Z-/C-terms for ints/chars.
+     * @param numberString a string containing the number in a decimal representation
+     * @param containsChar true iff the number represents a char
+     * @return Term in Z-/C-Notation representing the given number
+     * @throws NumberFormatException if <code>numberString</code> is not a number
      */
-    public Term zTerm(String numberString) {
-
+    private Term numberTerm(String numberString, boolean containsChar) {
         if (numberString == null || numberString.isEmpty()) {
             throw new NumberFormatException(numberString + " is not a number.");
         }
@@ -1237,19 +1236,28 @@ public class TermBuilder {
                 digit = 9;
                 break;
             default:
-                throw new NumberFormatException(
-                        numberString + " is not a number.");
+                throw new NumberFormatException(numberString + " is not a number.");
             }
-
-            numberLiteralTerm = func(intLDT.getNumberLiteralFor(digit),
-                    numberLiteralTerm);
+            numberLiteralTerm = func(intLDT.getNumberLiteralFor(digit), numberLiteralTerm);
         }
         if (negate) {
-            numberLiteralTerm = func(intLDT.getNegativeNumberSign(),
-                    numberLiteralTerm);
+            numberLiteralTerm = func(intLDT.getNegativeNumberSign(), numberLiteralTerm);
         }
-        numberLiteralTerm = func(intLDT.getNumberSymbol(), numberLiteralTerm);
+        // chars get a surrounding C, ints a surrounding Z
+        numberLiteralTerm = func(containsChar ? intLDT.getCharSymbol() : intLDT.getNumberSymbol(),
+                numberLiteralTerm);
         return numberLiteralTerm;
+    }
+
+    /**
+     * @param numberString
+     *            String representing an integer with radix 10, may be negative
+     * @return Term in Z-Notation representing the given number
+     * @throws NumberFormatException
+     *             if <code>numberString</code> is not a number
+     */
+    public Term zTerm(String numberString) {
+        return numberTerm(numberString, false);
     }
 
     /**
@@ -1259,6 +1267,16 @@ public class TermBuilder {
      */
     public Term zTerm(long number) {
         return zTerm("" + number);
+    }
+
+    /**
+     * @param numberString String containing the value of the char as a decimal number
+     * @return Term in C-Notation representing the given char
+     * @throws NumberFormatException
+     *             if <code>numberString</code> is not a number
+     */
+    public Term cTerm(String numberString) {
+        return numberTerm(numberString, true);
     }
 
     public Term add(Term t1, Term t2) {

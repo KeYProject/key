@@ -138,7 +138,7 @@ public class LongLiteral extends AbstractIntegerLiteral {
      * Hexadecimal, octal and binary literals are converted using two's complement.
      *
      * @param sourceStr the String containing the value
-     * @return the parsed value as a BigInteger
+     * @return the parsed value as a long
      * @throws NumberFormatException if the given String does not represent a syntactically valid
      *          literal or represents a value out of long range
      * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1">
