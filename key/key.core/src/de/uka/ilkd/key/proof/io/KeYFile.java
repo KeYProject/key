@@ -107,7 +107,7 @@ public class KeYFile implements EnvInput {
                    File file, 
                    ProgressMonitor monitor,
                    Profile profile) {
-	this(name, RuleSourceFactory.initRuleFile(file), monitor, profile);
+        this(name, RuleSourceFactory.initRuleFile(file), monitor, profile);
     }
     
 

@@ -29,6 +29,6 @@ public abstract class MetaArithBitMaskOp extends AbstractTermTransformer {
 	
 		BigInteger result = bitmaskOp(left, right);
 	
-                return services.getTermBuilder().zTerm(result.toString());
+        return services.getTermBuilder().zTerm(result.toString());
 	}
 }

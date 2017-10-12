@@ -40,8 +40,8 @@ public final class MetaPow extends AbstractTermTransformer {
     	BigInteger bigIntArg1;
     	BigInteger bigIntArg2;
 
-    	bigIntArg1 = new BigInteger(convertToDecimalString(arg1, services));
-    	bigIntArg2 = new BigInteger(convertToDecimalString(arg2, services));
+        bigIntArg1 = new BigInteger(convertToDecimalString(arg1, services));
+        bigIntArg2 = new BigInteger(convertToDecimalString(arg2, services));
     	
     	if (bigIntArg2.compareTo(BigInteger.ZERO) <= -1 || bigIntArg2.compareTo(MetaShift.INT_MAX_VALUE) > 1) {
     		return term;

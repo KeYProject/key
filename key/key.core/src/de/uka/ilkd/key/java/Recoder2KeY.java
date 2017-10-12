@@ -1291,7 +1291,7 @@ public class Recoder2KeY implements JavaReader {
     /**
      * report an error in form of a ConvertException. The cause is always
      * attached to the resulting exception.
-     * 
+     *
      * @param message
      *            message to be used.
      * @param t
@@ -1301,18 +1301,18 @@ public class Recoder2KeY implements JavaReader {
      */
     public static void reportError(String message, Throwable t) {
         // Attention: this highly depends on Recoders exception messages!
-	Throwable cause = t;
-	if  (t instanceof ExceptionHandlerException) {
-	    if (t.getCause() != null) {
-		cause = t.getCause();
-	    } 
-	}
+        Throwable cause = t;
+        if  (t instanceof ExceptionHandlerException) {
+            if (t.getCause() != null) {
+                cause = t.getCause();
+            }
+        }
 
-	if(cause instanceof PosConvertException) {
-	    throw (PosConvertException)cause;
-	}
+        if(cause instanceof PosConvertException) {
+            throw (PosConvertException)cause;
+        }
 
-	int[] pos = extractPositionInfo(cause.toString());
+        int[] pos = extractPositionInfo(cause.toString());
         final RuntimeException rte;
         if (pos.length > 0) {
             rte = new PosConvertException(message, pos[0], pos[1]);
