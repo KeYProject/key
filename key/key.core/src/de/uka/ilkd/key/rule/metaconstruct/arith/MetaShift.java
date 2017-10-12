@@ -65,7 +65,7 @@ public abstract class MetaShift extends AbstractTermTransformer {
 				&& !result.equals(BigInteger.ZERO) // if the result is zero nothing changes anymore, so we can exit the loop 
 				);
 
-                return services.getTermBuilder().zTerm(result.toString());
+        return services.getTermBuilder().zTerm(result.toString());
 	}
 
 

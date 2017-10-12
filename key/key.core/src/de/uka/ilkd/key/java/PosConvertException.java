@@ -38,8 +38,8 @@ public class PosConvertException extends ConvertException {
      */
     public PosConvertException(String message, int line, int column) {
         super(message);
-        this.line=line;
-        this.column=column;
+        this.line = line;
+        this.column = column;
     }
 
     /**
@@ -51,8 +51,8 @@ public class PosConvertException extends ConvertException {
      */
     public PosConvertException(Throwable cause, int line, int column) {
         super(cause);
-        this.line=line;
-        this.column=column;
+        this.line = line;
+        this.column = column;
     }
 
 

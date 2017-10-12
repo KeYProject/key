@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
+ * @author <TT>Unknown</TT>
  */
 @Target(ElementType.FIELD) @Retention(RetentionPolicy.RUNTIME)
 public @interface Option {
