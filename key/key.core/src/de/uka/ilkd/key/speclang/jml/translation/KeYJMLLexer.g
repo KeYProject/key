@@ -357,13 +357,15 @@ DECLITERAL
 
 CHAR_LITERAL:
         '\''
-                ((' '..'&') |
-                 ('('..'[') |
-                 (']'..'~') |
-                 ('\\' ('\'' | '\\' | 'n' | 'r' | 't' | 'b' | 'f' | '"' | 'u' HEXDIGIT+ ))
+                (~('\''|'\\') |
+                 ('\\' ('\'' | '\\' | 'n' | 'r' | 't' | 'b' | 'f' | '"' | OCT_CHAR))
+                 // note: unicode escapes are processed earlier
                 )
       '\''
     ;
+
+fragment OCT_CHAR:
+        (('0'|'1'|'2'|'3') OCTDIGIT OCTDIGIT) | (OCTDIGIT OCTDIGIT) | OCTDIGIT;
 
 STRING_LITERAL
     : '"' ( ESC | ~('"'|'\\') )* '"'

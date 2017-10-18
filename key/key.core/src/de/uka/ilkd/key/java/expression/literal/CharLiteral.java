@@ -44,7 +44,8 @@ public class CharLiteral extends AbstractIntegerLiteral {
      * Creates a new CharLiteral from the given String.
      * Char literals can be given as described in the Java 8 Language Specification:
      * chars written directly (like 'a', '0', 'Z'), Java escape chars (like '\n', '\r'), and
-     * Unicode escapes (oct: '\040', hex: '\u0020').
+     * octal Unicode escapes (like '\040'). Note that unicode escapes in hexadecimal form are
+     * processed earlier and don't have to be handled here.
      *
      * Note that the char must be enclosed in single-quotes.
      *
@@ -104,7 +105,8 @@ public class CharLiteral extends AbstractIntegerLiteral {
      * Parses the String and extracts the actual value of the literal.
      * This method is able to parse char literals as described in the Java 8 Language Specification:
      * chars written directly (like 'a', '0', 'Z'), Java escape chars (like '\n', '\r'), and
-     * Unicode escapes (oct: '\040', hex: '\u0020').
+     * octal Unicode escapes (like '\040'). Note that unicode escapes in hexadecimal form are
+     * processed earlier and don't have to be handled by this method.
      *
      * This method does not check the length of the literal for validity.
      *
@@ -126,7 +128,7 @@ public class CharLiteral extends AbstractIntegerLiteral {
          * There are three possible cases:
          *   1. the char is written directly
          *   2. Java escape like '\n'
-         *   3. Unicode escape like '\u0020' (hex) or '\040' (oct)
+         *   3. octal Unicode escape like '\040'
          */
         if (valStr.charAt(0) == '\\') {
             switch (valStr.charAt(1)) {
@@ -146,8 +148,6 @@ public class CharLiteral extends AbstractIntegerLiteral {
                 return '\'';
             case '\\':
                 return '\\';
-            case 'u':
-                return (char) Integer.parseInt(valStr.substring(2, valStr.length()), 16);
             case '0':
             case '1':
             case '2':
