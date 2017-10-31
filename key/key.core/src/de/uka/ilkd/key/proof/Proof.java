@@ -99,6 +99,9 @@ public class Proof implements Named {
     /** list with the open goals of the proof */
     private ImmutableList<Goal> openGoals = ImmutableSLList.<Goal>nil();
 
+    // TODO: WP: naming conflicts (see class JavaDoc)
+    private ImmutableList<Goal> closedGoals = ImmutableSLList.<Goal>nil();
+
     /** declarations &c, read from a problem file or otherwise */
     private String problemHeader = "";
 
@@ -447,6 +450,9 @@ public class Proof implements Named {
         return openGoals;
     }
 
+    public ImmutableList<Goal> closedGoals() {  // TODO: WP: doc
+        return closedGoals;
+    }
 
     /**
      * return the list of open and enabled goals
@@ -511,6 +517,7 @@ public class Proof implements Named {
             goal = getGoal ( it.next () );
             if ( goal != null ) {
                 b = true;
+                closedGoals = closedGoals.prepend(goal);
                 remove ( goal );
             }
         }
@@ -535,6 +542,9 @@ public class Proof implements Named {
      */
     public void reOpenGoal(Goal p_goal) {
         p_goal.node().reopen();
+        closedGoals = closedGoals.removeAll(p_goal);
+        fireProofStructureChanged();
+        //fireProofClosed();
     }
 
     /** removes the given goal from the list of open goals. Take care
@@ -621,14 +631,13 @@ public class Proof implements Named {
             breadthFirstSearch(cuttingPoint, new ProofVisitor() {
                 @Override
                 public void visit(Proof proof, Node visitedNode) {
-                    if (visitedNode.leaf() && !visitedNode.isClosed()) {
+                    if (visitedNode.leaf()) { // && !visitedNode.isClosed()) { // TODO: WP:
                         if (firstLeaf == null) {
                             firstLeaf = visitedNode;
                         }
                         else {
                             residualLeaves.add(visitedNode);
                         }
-
                     }
 
                     if (initConfig != null && visitedNode.parent() != null) {
@@ -666,13 +675,18 @@ public class Proof implements Named {
                             });
                         }
                     }
-
                 }
             });
 
-            final Goal firstGoal = getGoal(firstLeaf);
+            // first leaf is closed -> add as goal and reopen
+            final Goal firstGoal = firstLeaf.isClosed() ? getClosedGoal(firstLeaf) : getGoal(firstLeaf);
             assert firstGoal != null;
-            
+            if (firstLeaf.isClosed()) {
+                add(firstGoal);
+                reOpenGoal(firstGoal);
+            }
+
+            // TODO: WP: test interplay with merge rules
             // Cutting a linked goal (linked by a "defocusing" merge
             // operation, see {@link MergeRule}) unlinks this goal again.
             if (firstGoal.isLinked()) {
@@ -710,6 +724,9 @@ public class Proof implements Named {
 
             //remove the goals of the residual leaves.
             removeOpenGoals(residualLeaves);
+
+            removeClosedGoals(residualLeaves);      // TODO: WP:
+
             return subtrees;
 
         }
@@ -738,6 +755,15 @@ public class Proof implements Named {
             openGoals = newGoalList;
         }
 
+        private void removeClosedGoals(Collection<Node> toBeRemoved) {  // TODO: WP:
+            ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
+            for(Goal closedGoal : closedGoals){
+                if(!toBeRemoved.contains(closedGoal.node())){
+                    newGoalList = newGoalList.append(closedGoal);
+                }
+            }
+            closedGoals = newGoalList;
+        }
 
         private ImmutableList<Node> cut(Node node) {
             ImmutableList<Node> children = ImmutableSLList.nil();
@@ -774,7 +800,7 @@ public class Proof implements Named {
 
     public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint, boolean fireChanges) {
         assert cuttingPoint.proof() == this;
-        if(getGoal(cuttingPoint) != null || cuttingPoint.isClosed()){
+        if(getGoal(cuttingPoint) != null) { //|| cuttingPoint.isClosed()){  // TODO: WP:
             return null;
         }
 
@@ -913,7 +939,6 @@ public class Proof implements Named {
         }
     }
 
-
     /**
      * Fires the event {@link ProofTreeListener#notesChanged(ProofTreeEvent)} to all listener.
      * @param node The changed {@link Node}.
@@ -983,6 +1008,18 @@ public class Proof implements Named {
         return null;
     }
 
+    public boolean isClosedGoal(Node node) {   //TODO: WP: doc
+        return getClosedGoal(node) != null;
+    }
+
+    public Goal getClosedGoal(Node node) {   //TODO: WP: doc
+        for (final Goal result : closedGoals) {
+            if (result.node() == node) {
+                return result;
+            }
+        }
+        return null;
+    }
 
     /** returns the list of goals of the subtree starting with node.
      *
@@ -997,6 +1034,17 @@ public class Proof implements Named {
         	if (leaves.remove(goal.node())) { //if list contains node, remove it to make the list faster later
         		result = result.prepend(goal);
         	}
+        }
+        return result;
+    }
+
+    public ImmutableList<Goal> getClosedSubtreeGoals(Node node) {   //TODO: WP: doc
+        ImmutableList<Goal> result = ImmutableSLList.<Goal>nil();
+        List<Node> leaves = node.getLeaves();
+        for (final Goal goal : closedGoals) {
+            if (leaves.remove(goal.node())) { //if list contains node, remove it to make the list faster later
+                result = result.prepend(goal);
+            }
         }
         return result;
     }

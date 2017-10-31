@@ -310,5 +310,9 @@ public final class ProofCorrectnessMgt {
 	public void proofClosed(ProofTreeEvent e) {	    
 	    updateProofStatus();
 	}
+
+	public void proofStructureChanged(ProofTreeEvent e) {  // TODO: WP:
+	    updateProofStatus();
+	}
     }
 }

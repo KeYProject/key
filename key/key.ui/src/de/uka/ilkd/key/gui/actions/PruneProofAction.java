@@ -78,7 +78,7 @@ public final class PruneProofAction extends MainWindowAction {
                     	// pruning a tree only if the selected node has children
                         // and sub tree is not closed
 
-                        setEnabled(!(selNode.leaf() || selNode.isClosed()));
+                        setEnabled(!(selNode.leaf() || selNode.isClosed()));   //TODO: WP: is this ignored?
                     } 
                 }
             }

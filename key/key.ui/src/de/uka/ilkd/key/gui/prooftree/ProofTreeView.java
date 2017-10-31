@@ -895,8 +895,10 @@ public class ProofTreeView extends JPanel {
 		prune.setIcon(IconFactory.pruneLogo(ICON_SIZE));
 		prune.setEnabled(false);
 		if (proof != null) {
-		    if (proof.isGoal(invokedNode) ||
-		        proof.getSubtreeGoals(invokedNode).size()>0) {
+		    if (proof.isGoal(invokedNode) ||              // TODO: WP: why allow pruning of the goal itself?
+		        proof.isClosedGoal(invokedNode) ||
+		        proof.getSubtreeGoals(invokedNode).size()>0 ||
+		        proof.getClosedSubtreeGoals(invokedNode).size()>0) {
 		        prune.setEnabled(true);
 		    }
 		}
