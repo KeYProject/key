@@ -35,7 +35,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
  *
  * The action is enabled if a goal is selected. 
  */
-public final class UndoLastStepAction extends MainWindowAction {
+public final class UndoLastStepAction extends MainWindowAction {    // TODO: WP: delete class
 
     /**
      * 

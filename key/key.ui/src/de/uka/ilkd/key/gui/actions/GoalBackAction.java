@@ -67,6 +67,7 @@ public final class GoalBackAction extends MainWindowAction {
     public void init() {
         final KeYSelectionListener selListener = new KeYSelectionListener() {
 
+            @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
                 final Proof proof = getMediator().getSelectedProof();
                 if (proof == null) {
@@ -77,10 +78,12 @@ public final class GoalBackAction extends MainWindowAction {
                     final Node selNode = getMediator().getSelectedNode();
                     /* we undo the last rule application, if
                      * the goal refers not to the proof's root and the node is not a closed goal node */
-                    setEnabled(selNode != proof.root() && !selNode.isClosed());
+                    setEnabled(selNode != null && selNode != proof.root()); // && !selNode.isClosed());
                 }
+                setBackMode();      // TODO: WP: for updating text with taclet name -> TODO: correct taclet name
             }
             
+            @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
                 selectedNodeChanged(e);
             }                
@@ -125,19 +128,28 @@ public final class GoalBackAction extends MainWindowAction {
     	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
     
-    public void actionPerformed(ActionEvent e) {            
+    public void actionPerformed(ActionEvent e) {
+        final Node selNode = getMediator().getSelectedNode();
         Goal selGoal = getMediator().getSelectedGoal();
         
-        if (selGoal == null) { // determine one goal from the subtree below
-            final Node selNode = getMediator().getSelectedNode();
+        if (selNode == null) {  // something went wrong -> do nothing
+            return;
+        }
+        
+        if (selGoal == null) { // determine one goal (open or closed) from the subtree below
+            final Proof proof = getMediator().getSelectedProof();
             
-            if(selNode != null && !selNode.isClosed()){
-       		    selGoal = getMediator().getSelectedProof().getSubtreeGoals(selNode).reverse().head();
-       	    }        
+            selGoal = proof.getSubtreeGoals(selNode).reverse().head();
+       		if (selGoal == null) { // still no goal found -> search closed goals
+       		    selGoal = proof.getClosedSubtreeGoals(selNode).reverse().head();
+       		}
         }
 
         if (selGoal != null) {
-            getMediator().setBack(selGoal);            
+            getMediator().setBack(selGoal);
+
+            // set the selection to give the user a visual feedback
+            getMediator().getSelectionModel().setSelectedNode(selGoal.node());
         }
-    }   	
+    }
 }

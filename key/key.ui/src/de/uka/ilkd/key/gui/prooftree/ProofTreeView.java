@@ -73,6 +73,7 @@ import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
+import de.uka.ilkd.key.gui.actions.PruneProofAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
@@ -889,20 +890,20 @@ public class ProofTreeView extends JPanel {
             this.add(macroMenu);
         }
 
-	    this.add(prune);
-	    if (branch != path) {
-		prune.addActionListener(this);
-		prune.setIcon(IconFactory.pruneLogo(ICON_SIZE));
-		prune.setEnabled(false);
-		if (proof != null) {
-		    if (proof.isGoal(invokedNode) ||              // TODO: WP: why allow pruning of the goal itself?
-		        proof.isClosedGoal(invokedNode) ||
-		        proof.getSubtreeGoals(invokedNode).size()>0 ||
-		        proof.getClosedSubtreeGoals(invokedNode).size()>0) {
-		        prune.setEnabled(true);
-		    }
-		}
-	    }
+        this.add(prune);
+        prune.setIcon(IconFactory.pruneLogo(ICON_SIZE));
+        prune.setEnabled(false);
+        if (branch != path) {       // if not a GUIBranchNode is selected -> enable pruning
+            if (proof != null) {
+                if (//proof.isGoal(invokedNode) ||              // TODO: WP: why allow pruning of the goal itself?
+                    //proof.isClosedGoal(invokedNode) ||
+                    proof.getSubtreeGoals(invokedNode).size()>0 ||
+                        proof.getClosedSubtreeGoals(invokedNode).size()>0) {
+                    prune.addActionListener(this);
+                    prune.setEnabled(true);
+                }
+            }
+        }
 
 	    if(branch != path){
 	        delayedCut.addActionListener(this);

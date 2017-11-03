@@ -110,7 +110,6 @@ import de.uka.ilkd.key.gui.actions.TermLabelMenu;
 import de.uka.ilkd.key.gui.actions.TestGenerationAction;
 import de.uka.ilkd.key.gui.actions.ToggleConfirmExitAction;
 import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
-import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
 import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
@@ -720,7 +719,8 @@ public final class MainWindow extends JFrame  {
         proof.setMnemonic(KeyEvent.VK_P);
 
         proof.add(autoModeAction);
-        proof.add(new UndoLastStepAction(this, true));
+        proof.add(new GoalBackAction(this, true)); //new UndoLastStepAction(this, true)); // TODO: WP: old!
+        proof.add(new PruneProofAction(this,false));
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
         proof.add(new SearchInProofTreeAction(this));

@@ -72,13 +72,22 @@ public final class PruneProofAction extends MainWindowAction {
                     final Goal selGoal = getMediator().getSelectedGoal();
                     final Node selNode = getMediator().getSelectedNode();
                     
-                    if (selGoal != null || selNode == null) {
+                    //if (selGoal != null || selNode == null) {
+                    //    setEnabled(false);
+                    if (selNode == null) {
                         setEnabled(false);
                     } else {
+                        if (//proof.isGoal(invokedNode) ||              // TODO: WP: why allow pruning of the goal itself?
+                            //proof.isClosedGoal(invokedNode) ||
+                            proof.getSubtreeGoals(selNode).size()>0 ||
+                            proof.getClosedSubtreeGoals(selNode).size()>0) {
+                                setEnabled(true);
+                        }
+                        
                     	// pruning a tree only if the selected node has children
                         // and sub tree is not closed
 
-                        setEnabled(!(selNode.leaf() || selNode.isClosed()));   //TODO: WP: is this ignored?
+                        //setEnabled(!(selNode.leaf() || selNode.isClosed()));   //TODO: WP: is this ignored?
                     } 
                 }
             }
@@ -111,8 +120,8 @@ public final class PruneProofAction extends MainWindowAction {
         putValue(SMALL_ICON, IconFactory.pruneLogo(MainWindow.TOOLBAR_ICON_SIZE));
         putValue(SHORT_DESCRIPTION, 
                 "Prune the tree below the selected node.");
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z,
-    	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_X, // TODO: WP: what shortcut?
+    	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));     // TODO: WP: make focus independent
 
     }
     
