@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.io.File;
 import java.io.IOException;
@@ -177,6 +178,16 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
          env = pair.first;
          Pair<String, Location> script = pair.second;
          loadedProof = env.getLoadedProof();
+
+         ReplayResult replayResult = env.getReplayResult();
+         if(replayResult.hasErrors() && verbose) {
+             System.err.println("... error(s) while loading");
+             for (Throwable error : replayResult.getErrorList()) {
+                 error.printStackTrace();
+             }
+         }
+
+         assertFalse("Loading problem file failed", replayResult.hasErrors());
 
          // For a reload test we are done at this point. Loading was successful.
          if (testProperty == TestProperty.LOADABLE) {
