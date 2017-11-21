@@ -13,8 +13,9 @@
 
 package org.key_project.util.collection;
 
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 
 /**
@@ -160,6 +161,11 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     /** @return Iterator<T> of the set */
     public Iterator<T> iterator() {
 	return elementList.iterator();
+    }
+    
+    @Override
+    public Stream<T> stream() {
+        return StreamSupport.stream(spliterator(), false);
     }
 
     /** @return true iff obj in set */

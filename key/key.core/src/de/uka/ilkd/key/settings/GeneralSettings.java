@@ -26,8 +26,6 @@ public class GeneralSettings implements Settings, Cloneable {
     private static final String TACLET_FILTER = "[General]StupidMode";
     private static final String DND_DIRECTION_SENSITIVE_KEY
         = "[General]DnDDirectionSensitive";
-    private static final String ONE_STEP_SIMPLIFICATION_KEY
-        = "[General]OneStepSimplification";
     private static final String USE_JML_KEY = "[General]UseJML";
     private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
     private static final String AUTO_SAVE = "[General]AutoSavePeriod";
@@ -42,9 +40,6 @@ public class GeneralSettings implements Settings, Cloneable {
 
     /** is drag and drop instantiation direction sensitive */
     private boolean dndDirectionSensitive = true;
-
-    /** is one-step simplification enabled */
-    private boolean oneStepSimplification = true;
 
     /** launches the rightclick the macro menu. on by default. */
     private boolean rightClickMacros = true;
@@ -71,11 +66,6 @@ public class GeneralSettings implements Settings, Cloneable {
 
     public boolean isDndDirectionSensitive() {        
         return dndDirectionSensitive;
-    }
-    
-    
-    public boolean oneStepSimplification() {
-	return oneStepSimplification;
     }
     
     public boolean isRightClickMacro() {
@@ -105,14 +95,6 @@ public class GeneralSettings implements Settings, Cloneable {
           dndDirectionSensitive = b;
           fireSettingsChanged();
         }
-    }
-    
-    
-    public void setOneStepSimplification(boolean b) {
-	if (oneStepSimplification != b) {
-	    oneStepSimplification = b;
-	    fireSettingsChanged();
-	}
     }
 
 
@@ -153,11 +135,6 @@ public class GeneralSettings implements Settings, Cloneable {
             dndDirectionSensitive = Boolean.valueOf(val).booleanValue();
         }
 
-        val = props.getProperty(ONE_STEP_SIMPLIFICATION_KEY);
-        if (val != null) {
-            oneStepSimplification = Boolean.valueOf(val).booleanValue();
-        }
-
         val = props.getProperty(RIGHT_CLICK_MACROS_KEY);
         if (val != null) {
             rightClickMacros = Boolean.valueOf(val).booleanValue();
@@ -188,7 +165,6 @@ public class GeneralSettings implements Settings, Cloneable {
     public void writeSettings(Object sender, Properties props) {
 	props.setProperty(TACLET_FILTER, "" + tacletFilter);
         props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
-        props.setProperty(ONE_STEP_SIMPLIFICATION_KEY, "" + oneStepSimplification);
         props.setProperty(RIGHT_CLICK_MACROS_KEY, "" + rightClickMacros);
         props.setProperty(USE_JML_KEY, "" + useJML);
         props.setProperty(AUTO_SAVE, ""+ autoSave);

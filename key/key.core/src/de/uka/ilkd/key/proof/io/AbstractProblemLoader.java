@@ -45,9 +45,10 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -352,10 +353,11 @@ public abstract class AbstractProblemLoader {
                                 classPath, bootClassPath, profileOfNewProofs, includes);
             }
         }
-        else if (filename.endsWith(".key") || filename.endsWith(".proof")) {
+        else if (filename.endsWith(".key") || filename.endsWith(".proof")
+              || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof
-            return new KeYUserProblemFile(filename, file, control, profileOfNewProofs);
-
+            return new KeYUserProblemFile(filename, file, control,
+                        profileOfNewProofs, filename.endsWith(".proof.gz"));
         }
         else if (file.isDirectory()) {
             // directory containing java sources, probably enriched
@@ -537,8 +539,10 @@ public abstract class AbstractProblemLoader {
         IntermediatePresentationProofFileParser.Result parserResult = null;
         IntermediateProofReplayer.Result replayResult = null;
 
-        final boolean isOSSActivated =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+        final String ossStatus =
+                (String) proof.getSettings().getStrategySettings()
+                        .getActiveStrategyProperties()
+                        .get(StrategyProperties.OSS_OPTIONS_KEY);
         ReplayResult result;
         try {
         	assert envInput instanceof KeYUserProblemFile;
@@ -553,7 +557,11 @@ public abstract class AbstractProblemLoader {
                 // For loading, we generally turn on one step simplification to be
                 // able to load proofs that used it even if the user has currently
                 // turned OSS off.
-                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
+                StrategyProperties newProps = proof.getSettings()
+                        .getStrategySettings().getActiveStrategyProperties();
+                newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
+                        StrategyProperties.OSS_ON);
+                Strategy.updateStrategySettings(proof, newProps);
                 OneStepSimplifier.refreshOSS(proof);
                 
                 replayer = new IntermediateProofReplayer(this, proof, parserResult);
@@ -577,8 +585,14 @@ public abstract class AbstractProblemLoader {
                 errors.addAll(replayResult.getErrors());
             }
             
-            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(isOSSActivated);
+            StrategyProperties newProps = 
+                proof.getSettings().getStrategySettings()
+                        .getActiveStrategyProperties();
+            newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
+                            ossStatus);
+            Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
+            
             result = new ReplayResult(status, errors, lastTouchedNode);
         }
         	

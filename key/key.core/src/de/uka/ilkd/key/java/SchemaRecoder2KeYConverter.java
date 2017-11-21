@@ -43,6 +43,7 @@ import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.IGuard;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
@@ -239,6 +240,13 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
                 : null), (IExecutionContext) callConvert(l
                         .getExecutionContext()), (StatementBlock) callConvert(l
                                 .getBody()));
+    }
+
+    public LoopScopeBlock convert(
+            de.uka.ilkd.key.java.recoderext.LoopScopeBlock l) {
+        return new LoopScopeBlock(
+                (de.uka.ilkd.key.logic.op.IProgramVariable) callConvert(l.getIndexPV()),
+                (StatementBlock) callConvert(l.getBody()));
     }
 
     /**

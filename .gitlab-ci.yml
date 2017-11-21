@@ -1,0 +1,18 @@
+#
+# This files describes the workflow of the continous integration
+# checker for KeY run within gitlab.
+#
+# Jenkins runs are triggered from somewhere else.
+#
+
+image: key-ant-openjdk-8:latest
+
+compile:
+  script:
+    - ant -f key/scripts/build.xml compileAll
+    
+checkstyle:
+  script:
+    - echo "**** Check the commit's gitlab page for a readable checkstyle report ****"
+    - (key/scripts/tools/checkstyle/runIncrementalCheckstyle.sh | tee report.txt) || true
+    - key/scripts/tools/checkstyle/publishAudit.pl report.txt

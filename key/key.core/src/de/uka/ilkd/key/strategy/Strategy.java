@@ -16,7 +16,9 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.feature.Feature;
 
 /**
@@ -53,4 +55,28 @@ public interface Strategy extends Named, Feature {
                           PosInOccurrence      pio,
                           Goal                 goal,
                           RuleAppCostCollector collector );
+    
+    /**
+     * Updates the {@link Strategy} for the given {@link Proof} by setting the
+     * {@link Strategy}'s {@link StrategyProperties} to the given ones.
+     * 
+     * @param proof
+     *            The {@link Proof} the strategy of which should be updated.
+     * @param p
+     *            The new {@link StrategyProperties}
+     */
+    static void updateStrategySettings(Proof proof,
+            StrategyProperties p) {
+        final Strategy strategy = proof.getActiveStrategy();
+        ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
+                .setStrategy(strategy.name());
+        ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
+                .setActiveStrategyProperties(p);
+
+        proof.getSettings().getStrategySettings().setStrategy(strategy.name());
+        proof.getSettings().getStrategySettings()
+                .setActiveStrategyProperties(p);
+
+        proof.setActiveStrategy(strategy);
+    }
 }

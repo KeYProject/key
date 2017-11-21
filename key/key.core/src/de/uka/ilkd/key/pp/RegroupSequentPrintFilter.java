@@ -17,19 +17,26 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 /**
- * @author jschiffl This filter takes a search string and regroups the sequent
+ * @author jschiffl
+ *         This filter takes a search string and regroups the sequent
  *         so that the sequent formulas matching the search are grouped around
  *         the sequent arrow, so that they can be viewed together.
  */
 
 public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
 
+    /**
+     *
+     * @param lp the logic printer in use
+     * @param regex should the search be treated as a regular expression?
+     */
     public RegroupSequentPrintFilter(SequentViewLogicPrinter lp, boolean regex) {
         this.lp = lp;
         this.regex = regex;
@@ -46,8 +53,9 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
         }
 
         Pattern p = createPattern();
-        if (p == null)
+        if (p == null) {
             return;
+        }
 
         antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
         it = originalSequent.antecedent().iterator();

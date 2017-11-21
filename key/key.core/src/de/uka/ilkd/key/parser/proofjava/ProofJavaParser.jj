@@ -3677,6 +3677,7 @@ Statement Statement() :
 | result = ThrowStatement()
 | result = SynchronizedStatement()
 | result = MergePointStatement()
+| result = LoopScope()
 | result = TryStatement()
 | result = AssertStatement()
 | result = KeYCatchAllStatement()
@@ -4486,6 +4487,29 @@ SynchronizedBlock SynchronizedStatement() :
   block = Block()
   {
       result.setExpression(expr);
+      result.setBody(block);
+      checkConstruction(result);
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+LoopScopeBlock LoopScope() :
+{
+    LoopScopeBlock result;
+    Expression indexPV;
+    StatementBlock block;
+}
+{
+  "loop-scope"
+  {
+      result = factory.createLoopScopeBlock();
+      setPrefixInfo(result);
+  }
+  "(" indexPV = Expression() ")"
+  block = Block()
+  {
+      result.setIndexPV(indexPV);
       result.setBody(block);
       checkConstruction(result);
       setPostfixInfo(result);

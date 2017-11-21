@@ -139,8 +139,8 @@ public abstract class AbstractSWTBotKeYEditorPropertiesTest extends AbstractSWTB
     * @return The shown {@link SWTBotTabbedPropertyList}.
     */
    protected SWTBotTabbedPropertyList getPropertiesTabs(SWTBotView propertiesView) {
-      SWTBotTabbedPropertyList tabs = SWTBotTabbedPropertyList.tabbedPropertyList(propertiesView.bot());
-      assertNotNull(tabs);
+	  SWTBotTabbedPropertyList tabs = SWTBotTabbedPropertyList.tabbedPropertyList(propertiesView.bot());
+	  assertNotNull(tabs);
       return tabs;
    }
 }

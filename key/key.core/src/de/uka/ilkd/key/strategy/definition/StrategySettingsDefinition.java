@@ -138,6 +138,10 @@ public class StrategySettingsDefinition {
                                         StrategyProperties.NON_LIN_ARITH_DEF_OPS);
 
                                 newProps.setProperty(
+                                        StrategyProperties.OSS_OPTIONS_KEY,
+                                        StrategyProperties.OSS_ON);
+
+                                newProps.setProperty(
                                         StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
                                         StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
 

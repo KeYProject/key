@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -28,6 +29,11 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
  */
 public class HideSequentPrintFilter extends SearchSequentPrintFilter {
 
+    /**
+     *
+     * @param lp the logic printer in use
+     * @param regex should the search be treated as regex?
+     */
     public HideSequentPrintFilter(SequentViewLogicPrinter lp, boolean regex) {
         this.lp = lp;
         this.regex = regex;
@@ -41,10 +47,11 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
             filterIdentity();
             return;
         }
-        
+
         Pattern p = createPattern();
-        if (p == null)
+        if (p == null) {
             return;
+        }
 
         antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
         it = originalSequent.antecedent().iterator();

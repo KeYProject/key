@@ -367,10 +367,16 @@ public class ClassTree extends JTree {
            node = fullQualifiedNode;
         }
         else {
-           String[] segments = rootType.getFullName().split("\\.");
-           for (String segment : segments) {
-              node = searchNode(node, segment);
-              pathVector.add(node);
+           final String[] segments = rootType.getFullName().split("\\.");
+           String accumulatedSegment = null;
+           for (final String segment : segments) {
+        	   accumulatedSegment = accumulatedSegment == null ? segment : accumulatedSegment + "." + segment;
+        	   final DefaultMutableTreeNode resNode = searchNode(node, accumulatedSegment);
+        	   if (resNode != null) {
+        		   node = resNode;
+        		   pathVector.add(node);
+        		   accumulatedSegment = null;
+        	   }
            }
         }
         // extend tree path to inner classes
@@ -405,9 +411,10 @@ public class ClassTree extends JTree {
      * @return The first found {@link DefaultMutableTreeNode} with the given text or {@code null} if no {@link DefaultMutableTreeNode} was found.
      */
     protected DefaultMutableTreeNode searchNode(DefaultMutableTreeNode parent, String text) {
-       for (int i = 0; i < parent.getChildCount(); i++) {
+    	for (int i = 0; i < parent.getChildCount(); i++) {
           DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) parent.getChildAt(i);
           Entry e = (Entry) childNode.getUserObject();
+
           if (ObjectUtil.equals(text, e.string)) {
              return childNode;
           }

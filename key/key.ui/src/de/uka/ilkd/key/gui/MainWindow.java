@@ -54,7 +54,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
@@ -87,7 +86,6 @@ import de.uka.ilkd.key.gui.actions.MacroKeyBinding;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.MenuSendFeedackAction;
 import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
-import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
 import de.uka.ilkd.key.gui.actions.OpenExampleAction;
 import de.uka.ilkd.key.gui.actions.OpenFileAction;
 import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
@@ -230,9 +228,6 @@ public final class MainWindow extends JFrame  {
     private LemmaGenerationAction loadUserDefinedTacletsForProvingAction;
     private LemmaGenerationAction loadKeYTaclets;
     private LemmaGenerationBatchModeAction lemmaGenerationBatchModeAction;
-
-    private final OneStepSimplificationToggleAction oneStepSimplAction =
-        new OneStepSimplificationToggleAction(this);
 
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
@@ -501,10 +496,6 @@ public final class MainWindow extends JFrame  {
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this, false));
-        JToggleButton oneStep = new JToggleButton(oneStepSimplAction);
-        oneStep.setHideActionText(true);
-        toolBar.addSeparator();
-        toolBar.add(oneStep);
         return toolBar;
     }
 
@@ -761,7 +752,6 @@ public final class MainWindow extends JFrame  {
 	    options.add(new JCheckBoxMenuItem(new AutoSave(this)));
         options.add(new MinimizeInteraction(this));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
-        options.add(new JCheckBoxMenuItem(oneStepSimplAction));
 
         return options;
 

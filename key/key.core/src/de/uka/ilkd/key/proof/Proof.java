@@ -51,6 +51,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeRule;
@@ -379,6 +380,11 @@ public class Proof implements Named {
         getSettings().getStrategySettings().
         setStrategy(activeStrategy.name());
         updateStrategyOnGoals();
+        
+        // This could be seen as a hack; it's however important that OSS is
+        // refreshed after strategy has been set, otherwise nothing's gonna
+        // happen.
+        OneStepSimplifier.refreshOSS(root.proof());
     }
 
 
@@ -713,7 +719,13 @@ public class Proof implements Named {
             goal.ruleAppIndex().clearIndexes();
             goal.node().setAppliedRuleApp(null);
             node.clearNameCache();
+
+            // delete NodeInfo, but preserve potentially existing branch label
+            String branchLabel = node.getNodeInfo().getBranchLabel();
             node.clearNodeInfo();
+            if (branchLabel != null) {
+                node.getNodeInfo().setBranchLabel(branchLabel);
+            }
         }
 
         private void removeOpenGoals(Collection<Node> toBeRemoved) {

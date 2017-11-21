@@ -112,6 +112,8 @@ options {
     private static final int NORMAL_NONRIGID = 0;
     private static final int LOCATION_MODIFIER = 1;
 
+    private static final String LIMIT_SUFFIX = "\$lmtd";
+
     static HashMap<String, IProofFileParser.ProofElementID> prooflabel2tag = new LinkedHashMap<>(15);
     static {
          prooflabel2tag.put("branch", ProofElementID.BRANCH);
@@ -2527,8 +2529,13 @@ term returns [Term _term = null]
               raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
-        
-        
+
+termEOF returns [Term _term = null]
+@after { _term = result; }
+    :
+        result = term EOF
+    ;
+
 elementary_update_term returns[Term _elementary_update_term=null]
 @after { _elementary_update_term = result; }
 :
@@ -3518,7 +3525,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
         ((MINUS)? NUM_LITERAL) => (MINUS {neg = "-";})? number=NUM_LITERAL
         { a = toZNotation(neg+number.getText(), functions());}    
     | AT a = abbreviation
-    | varfuncid = funcpred_name (LIMITED {limited = true;})?
+    | varfuncid = funcpred_name
         ( (~LBRACE | LBRACE bound_variables) =>
             (
                LBRACE 
@@ -3538,16 +3545,20 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
 	    } else if(varfuncid.equals("skip") && args == null) {
 	        a = getTermFactory().createTerm(UpdateJunctor.SKIP);
 	    } else {
-	            Operator op = lookupVarfuncId(varfuncid, args);  
-	            if(limited) {
-	                if(op.getClass() == ObserverFunction.class) {
+	            Operator op;
+	            if(varfuncid.endsWith(LIMIT_SUFFIX)) {
+	                varfuncid = varfuncid.substring(0, varfuncid.length()-5);
+	                op = lookupVarfuncId(varfuncid, args);
+	                if(ObserverFunction.class.isAssignableFrom(op.getClass())) {
 	                    op = getServices().getSpecificationRepository()
 	                                      .limitObs((ObserverFunction)op).first;
 	                } else {
 	                    semanticError("Cannot can be limited: " + op);
 	                }
-	            }   
-	                   
+	            } else {
+	                op = lookupVarfuncId(varfuncid, args);
+	            }
+
 	            if (op instanceof ParsableVariable) {
 	                a = termForParsedVariable((ParsableVariable)op);
 	            } else {
@@ -3757,6 +3768,11 @@ seq returns [Sequent s] :
          raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
      }
+
+seqEOF returns [Sequent s] :
+         ss=seq EOF
+         {s = ss;}
+     ;
      
 termorseq returns [Object o]
     :
@@ -3822,7 +3838,7 @@ varexp[TacletBuilder b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
-    | varcond_differentFields[b]  
+    | varcond_differentFields[b]
   ) 
   | 
   ( (NOT_ {negated = true;} )? 
