@@ -54,7 +54,7 @@ import de.uka.ilkd.key.util.ProofStarter;
 /**
  * Runnable to perform the actual proof execution.
  * 
- * @author Stefan Käsdorf
+ * @author Stefan Kï¿½sdorf
  */
 public class ProofRunnable implements Runnable {
 
@@ -341,6 +341,8 @@ public class ProofRunnable implements Runnable {
         sb.append("Nodes: " + proof.countNodes());
         sb.append(StringUtil.NEW_LINE);
         sb.append("Branches: " + proof.countBranches());
+        sb.append(StringUtil.NEW_LINE);
+        sb.append("SymEx Rule Applications: " + proof.getStatistics().symbExApps);
         sb.append(StringUtil.NEW_LINE);
 
         return sb.toString();

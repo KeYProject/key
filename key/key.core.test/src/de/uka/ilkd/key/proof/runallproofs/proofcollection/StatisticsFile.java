@@ -250,7 +250,13 @@ public class StatisticsFile implements Serializable {
                 */
                int sumNodes = Integer.parseInt(sums.get(1));
                int sumAutomodeTime = Integer.parseInt(sums.get(4));
-               avgs.add(sumAutomodeTime / sumNodes + "");
+               // In case sumNodes equals zero return the sum w/o dividing
+               if(sumNodes == 0) {
+                   // It may be 0 if all files are "loadable".
+                   avgs.add(Integer.toString(sumAutomodeTime));
+               } else {
+                   avgs.add(Integer.toString(sumAutomodeTime / sumNodes));
+               }
             }
          }
          // Append lines of sums and averages to statistics file.
