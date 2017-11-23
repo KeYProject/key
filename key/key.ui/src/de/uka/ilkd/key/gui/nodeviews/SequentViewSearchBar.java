@@ -89,8 +89,8 @@ public class SequentViewSearchBar extends SearchBar {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 searchField.requestFocus();
-                if (sequentView.filter instanceof SearchSequentPrintFilter) {
-                    ((SearchSequentPrintFilter) sequentView.filter).setRegex(regExpCheckBox.isSelected());
+                if (sequentView.getFilter() instanceof SearchSequentPrintFilter) {
+                    ((SearchSequentPrintFilter) sequentView.getFilter()).setRegex(regExpCheckBox.isSelected());
                 }
                 search();
             }
@@ -170,8 +170,8 @@ public class SequentViewSearchBar extends SearchBar {
     public boolean search(String search) {
         clearSearchResults();
 
-        if (sequentView.filter instanceof SearchSequentPrintFilter) {
-            SearchSequentPrintFilter searchSequentPrintFilter = (SearchSequentPrintFilter) sequentView.filter;
+        if (sequentView.getFilter() instanceof SearchSequentPrintFilter) {
+            SearchSequentPrintFilter searchSequentPrintFilter = (SearchSequentPrintFilter) sequentView.getFilter();
             searchSequentPrintFilter.setLogicPrinter(sequentView.getLogicPrinter());
             searchSequentPrintFilter.setSearchString(searchField.getText());
         }

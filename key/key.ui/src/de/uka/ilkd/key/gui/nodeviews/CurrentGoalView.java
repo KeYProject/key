@@ -211,7 +211,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         setLineWidth(computeLineWidth());
 
         if (getLogicPrinter() != null) {
-            getLogicPrinter().update(filter, getLineWidth());
+            getLogicPrinter().update(getFilter(), getLineWidth());
             boolean errorocc;
             do {
                 errorocc = false;
@@ -254,7 +254,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      * sets the LogicPrinter to use
      */
     public void setPrinter(Goal goal) {
-        filter.setSequent(goal.sequent());
+        getFilter().setSequent(goal.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(null),
                                                     getMediator().getNotationInfo(),
                                                     mediator.getServices(),
@@ -262,7 +262,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     }
 
     protected SequentPrintFilter getSequentPrintFilter() {
-        return filter;
+        return getFilter();
     }
 
     /**
