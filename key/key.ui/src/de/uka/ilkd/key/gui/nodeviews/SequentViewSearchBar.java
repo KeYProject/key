@@ -69,8 +69,10 @@ public class SequentViewSearchBar extends SearchBar {
     }
 
     public void setSequentView(SequentView sequentView) {
+        if(this.sequentView != sequentView) {
+            sequentView.setFilter(this.sequentView.getFilter()); 
+        }
         this.sequentView = sequentView;
-        searchModeBox.setSelectedIndex(0);
         search();
     }
 
@@ -156,10 +158,7 @@ public class SequentViewSearchBar extends SearchBar {
                 search();
             } else {
                 clearSearchResults();
-                if (sequentView.filter instanceof SearchSequentPrintFilter) {
-                    ((SearchSequentPrintFilter) sequentView.filter).setSearchString("");
-                    sequentView.printSequent();
-                }
+                searchModeBox.setSelectedIndex(0);
             }
         }
     }
