@@ -72,8 +72,8 @@ public class InnerNodeView extends SequentView {
     public InnerNodeView(Node node, MainWindow mainWindow) {
         super(mainWindow);
         this.node = node;
-        setFilter(new IdentitySequentPrintFilter());
-        getFilter().setSequent(node.sequent());
+        filter = new IdentitySequentPrintFilter();
+        filter.setSequent(node.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
                         mainWindow.getMediator().getNotationInfo(),
                         mainWindow.getMediator().getServices(),
@@ -81,7 +81,7 @@ public class InnerNodeView extends SequentView {
         setSelectionColor(new Color(10, 180, 50));
         setBackground(INACTIVE_BACKGROUND_COLOR);
 
-        tacletInfo = new JTextArea(getTacletDescription(mainWindow.getMediator(), node, getFilter()));
+        tacletInfo = new JTextArea(getTacletDescription(mainWindow.getMediator(), node, filter));
         tacletInfo.setBackground(getBackground());
         tacletInfo.setBorder(new CompoundBorder(
                 new MatteBorder(3, 0, 0, 0, Color.black),
@@ -314,7 +314,7 @@ public class InnerNodeView extends SequentView {
     private Range highlightPos(PosInOccurrence pos,
             HighlightPainter light)
             throws BadLocationException {
-        ImmutableList<Integer> path = posTable.pathForPosition(pos, getFilter());
+        ImmutableList<Integer> path = posTable.pathForPosition(pos, filter);
         if(path != null) {
             Range r = posTable.rangeForPath(path);
 
@@ -339,7 +339,7 @@ public class InnerNodeView extends SequentView {
     @Override
     public final synchronized void printSequent() {
         setLineWidth(computeLineWidth());
-        getLogicPrinter().update(getFilter(), getLineWidth());
+        getLogicPrinter().update(filter, getLineWidth());
         setText(getSyntaxHighlighter().process(getLogicPrinter().toString(), node));
         posTable = getLogicPrinter().getInitialPositionTable();
         RuleApp app = node.getAppliedRuleApp();

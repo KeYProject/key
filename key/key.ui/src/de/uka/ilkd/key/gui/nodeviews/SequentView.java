@@ -78,7 +78,7 @@ public abstract class SequentView extends JEditorPane {
     }
 
     private final ConfigChangeListener configChangeListener;
-    private SequentPrintFilter filter;
+    protected SequentPrintFilter filter;
     private SequentViewLogicPrinter printer;
     private HTMLSyntaxHighlighter syntaxHighlighter;
     public boolean refreshHighlightning = true;
@@ -133,7 +133,7 @@ public abstract class SequentView extends JEditorPane {
         addPropertyChangeListener("font", changeListener);
         addHierarchyBoundsListener(changeListener);
         
-        setFilter(new IdentitySequentPrintFilter());
+        filter = new IdentitySequentPrintFilter();
     }
 
     public final void setFont() {
@@ -265,7 +265,7 @@ public abstract class SequentView extends JEditorPane {
         if (seqText.length() > 0 && p != null) {
             int characterIndex = correctedViewToModel(p);
             return printer.getInitialPositionTable().
-                    getPosInSequent(characterIndex, getFilter());
+                    getPosInSequent(characterIndex, filter);
         } else {
             return null;
         }
@@ -479,9 +479,5 @@ public abstract class SequentView extends JEditorPane {
 		this.filter.setSequent(getMainWindow().getMediator().getSelectedNode().sequent());
 		printSequent();
 	}
-
-    public SequentPrintFilter getFilter() {
-        return filter;
-    }
 
 }
