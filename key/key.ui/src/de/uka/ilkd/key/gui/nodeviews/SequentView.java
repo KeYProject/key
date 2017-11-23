@@ -265,7 +265,7 @@ public abstract class SequentView extends JEditorPane {
         if (seqText.length() > 0 && p != null) {
             int characterIndex = correctedViewToModel(p);
             return printer.getInitialPositionTable().
-                    getPosInSequent(characterIndex, filter);
+                    getPosInSequent(characterIndex, getFilter());
         } else {
             return null;
         }
@@ -479,5 +479,9 @@ public abstract class SequentView extends JEditorPane {
 		this.filter.setSequent(getMainWindow().getMediator().getSelectedNode().sequent());
 		printSequent();
 	}
+
+    protected SequentPrintFilter getFilter() {
+        return filter;
+    }
 
 }
