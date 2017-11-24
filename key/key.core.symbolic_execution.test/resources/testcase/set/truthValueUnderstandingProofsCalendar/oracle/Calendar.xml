@@ -22,10 +22,8 @@
                         <exceptionalMethodReturn name="&lt;throw java.lang.ArrayStoreException&gt;" signature="&lt;exceptional return of &lt;call self.addEntry(_entry)&gt;&gt;" pathCondition="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))" pathConditionChanged="false" methodReturnCondition="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))">
                            <branchCondition name="true" pathCondition="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
                               <branchCondition name="true" pathCondition="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                 <branchCondition name="true" pathCondition="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                    <termination name="&lt;uncaught java.lang.ArrayStoreException&gt;" pathCondition="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="false">
-                                    </termination>
-                                 </branchCondition>
+                                 <termination name="&lt;uncaught java.lang.ArrayStoreException&gt;" pathCondition="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="false">
+                                 </termination>
                               </branchCondition>
                            </branchCondition>
                         </exceptionalMethodReturn>
@@ -39,5 +37,5 @@
       <methodReturnEntry path="/0/0/0/0/0/1/0/0"/>
    </methodCall>
    <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
-   <terminationEntry path="/0/0/0/0/0/1/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/1/0/0/0/0/0"/>
 </start>
