@@ -21,7 +21,7 @@ public class ReverseArray {
     /*@ public normal_behavior
       @ requires a != null && a.length >= 0;
       @ ensures (\forall int j; j >= 0 && j < a.length; a[j] == \old(a[a.length - (j+1)]));
-      @ diverges true;
+      @ assignable a[*];
       @*/
     public void reverse() {
         int i = 0;
@@ -33,7 +33,8 @@ public class ReverseArray {
           @   && (\forall int j; j >= i && j < length; \old(a[a.length - (j+1)]) == a[a.length - (j+1)] && \old(a[j]) == a[j])
           @   && (a.length % 2 != 0 ==> \old(a[a.length / 2]) == a[length])
           @   && i >= 0 && i <= length;
-          @ modifies a[*];
+          @ assignable a[*];
+          @ decreases a.length - i;
           @*/
         while (i < length) {
             int tmp = a[i];
@@ -67,11 +68,11 @@ public class ReverseArray {
         ReverseArray ra = new ReverseArray();
         ra.a = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         for (int i = 0; i < ra.a.length; i++) {
-            // System.out.println(ra.a[i]);
+            System.out.println(ra.a[i]);
         }
         ra.reverse2(ra.a);
         for (int i = 0; i < ra.a.length; i++) {
-            // System.out.println(ra.a[i]);
+            System.out.println(ra.a[i]);
         }
     }
 
