@@ -850,6 +850,7 @@ group reload_examples {
    provable ./firstTouch/05-ReverseArray/reverseArray.key
 
    loadable ./heap/permutedSum/perm.proof
+   loadable ./firstTouch/05-ReverseArray/reverseArray.proof
    loadable ./heap/verifyThis15_1_RelaxedPrefix/relax.proof
    loadable ./heap/verifyThis15_3_DLL/doUndo.proof
    loadable ./heap/verifyThis15_2_ParallelGcd/parallelGcd.proof
