@@ -11,8 +11,8 @@ firstTouch/02-Subset/README.txt
 heap/vstte10_01_SumAndMax/FIRSTTOUCH.txt
 # moved to competitions below
 # firstTouch/04-LinkedList/README.txt
-# 05 seems to be broken ... deactivated
-# firstTouch/05-ReverseArray/README.txt
+# 05 seems to be broken ... deactivated ... revived
+firstTouch/05-ReverseArray/README.txt
 firstTouch/06-BinarySearch/README.txt
 firstTouch/07-Cell/README.txt
 firstTouch/08-Java5/README.txt
