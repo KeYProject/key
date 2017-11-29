@@ -69,12 +69,26 @@ public class ViewSettings implements Settings, Cloneable {
     /**Show Taclet uninstantiated in tooltip -- for learning  */
     private boolean showUninstantiatedTaclet = false;
     /** Show heatmap of most recently used sequent formulae*/
-    private boolean heatmapEnabled = false;
     
     private LinkedList<SettingsListener> listenerList =
         new LinkedList<SettingsListener>();
 
+    public static enum HeatmapMode {
+        NONE("None"), ALL("All"), NEWEST("Newest"), TERMS("Terms");
+        private String displayName;
 
+        private HeatmapMode(String name) {
+            this.displayName = name;
+        }
+        
+        @Override
+        public String toString() {
+            return this.displayName;
+        }
+    }
+    
+    private HeatmapMode heatmapMode;
+    
     /**
      * @return the current maxTooltipLines
      */
@@ -408,22 +422,22 @@ public void setUseUnicode(boolean useUnicode) {
         this.confirmExit = confirmExit;
         fireSettingsChanged();
     }
-    public boolean isHeatmapEnabled() {
-        return heatmapEnabled;
-    }
-    public void enableHeatmap(boolean enableHeatmap) {
-        this.heatmapEnabled = enableHeatmap;
-        fireSettingsChanged();
-    }
+
     public boolean getShowUninstantiatedTaclet(){
 	    return showUninstantiatedTaclet;
-    }
-    public boolean heatmapEnabled(){
-        return heatmapEnabled;
     }
     public void setShowUninstantiatedTaclet(boolean b){
 	this.showUninstantiatedTaclet = b;
 		    fireSettingsChanged();
+    }
+
+    public HeatmapMode getHeatmapMode() {
+        return heatmapMode;
+    }
+
+    public void setHeatmapMode(HeatmapMode heatmapMode) {
+        this.heatmapMode = heatmapMode;
+        fireSettingsChanged();
     }
 
 }

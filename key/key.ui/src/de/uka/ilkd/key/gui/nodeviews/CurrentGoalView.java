@@ -55,6 +55,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings.HeatmapMode;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 
@@ -207,33 +208,50 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
     }
     
-    private void updateHeatmapHighlights() {
+    private void updateHeatmapHighlights(boolean newest) {
         if (getLogicPrinter() == null) {
             return;
         }
         
-        heatMapHighlights.clear();
-
         InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
         
         int i = 0;
         
-        // 5 "youngest" sequent formulas are highlighted. below is highlighting only by age.
+        // 5 "youngest" sequent formulas are highlighted.
         ImmutableList<SequentPrintFilterEntry> entryList = filter.getFilteredAntec().append(filter.getFilteredSucc());
-        SequentPrintFilterEntry[] sortedArray = new SequentPrintFilterEntry[entryList.size()];
-        entryList.toArray(sortedArray);
-        Arrays.sort(sortedArray, new Comparator<SequentPrintFilterEntry>() {
-            @Override
-            public int compare(SequentPrintFilterEntry o1, SequentPrintFilterEntry o2) {
-                return computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), o1.getFilteredFormula(), 1000)
-                        >= computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), o2.getFilteredFormula(), 1000) ? 1 : -1;
-            }
-        });
-        
-        for(SequentPrintFilterEntry entry : entryList) {
-            for (int j = 0; j < 5; ++j) {
-                if (sortedArray[j].equals(entry)) {
-                    Color color = computeColorForAge(j);
+        if (newest) {
+            SequentPrintFilterEntry[] sortedArray = new SequentPrintFilterEntry[entryList.size()];
+            entryList.toArray(sortedArray);
+            Arrays.sort(sortedArray, new Comparator<SequentPrintFilterEntry>() {
+                @Override
+                public int compare(SequentPrintFilterEntry o1, SequentPrintFilterEntry o2) {
+                    return computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
+                            o1.getFilteredFormula(), 1000) >= computeSeqFormulaAge(
+                                    getMainWindow().getMediator().getSelectedNode(), o2.getFilteredFormula(), 1000) ? 1
+                                            : -1;
+                }
+            });
+            for (SequentPrintFilterEntry entry : entryList) {
+                for (int j = 0; j < 5; ++j) {
+                    if (sortedArray[j].equals(entry)) {
+                        Color color = computeColorForAge(j);
+                        ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil()
+                                .prepend(0).append(i);
+                        Range r = ipt.rangeForPath(list);
+                        Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
+                        Object tag = getColorHighlight(color);
+                        heatMapHighlights.add(tag);
+                        paintHighlight(newR, tag);
+                    }
+                }
+                ++i;
+            } 
+        } else {    // all formulas below MAX_AGE_FOR_HEATMAP are highlighted.
+            for(SequentPrintFilterEntry entry : entryList) {
+                SequentFormula form = entry.getFilteredFormula();
+                int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form, MAX_AGE_FOR_HEATMAP);
+                if(age < MAX_AGE_FOR_HEATMAP) {
+                    Color color = computeColorForAge(age);
                     ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil().prepend(0).append(i); 
                     Range r = ipt.rangeForPath(list);
                     Range newR = new Range(r.start()+1, r.end()+1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
@@ -241,25 +259,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                     heatMapHighlights.add(tag);
                     paintHighlight(newR, tag);
                 }
+                ++i;
             }
-            ++i;
         }
-        
-        
-//        for(SequentPrintFilterEntry entry : entryList) {
-//            SequentFormula form = entry.getFilteredFormula();
-//            int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form, MAX_AGE_FOR_HEATMAP);
-//            if(age < MAX_AGE_FOR_HEATMAP) {
-//                Color color = computeColorForAge(age);
-//                ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil().prepend(0).append(i); 
-//                Range r = ipt.rangeForPath(list);
-//                Range newR = new Range(r.start()+1, r.end()+1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
-//                Object tag = getColorHighlight(color);
-//                heatMapHighlights.add(tag);
-//                paintHighlight(newR, tag);
-//            }
-//            ++i;
-//        }
     }
     
     class PIO_age {
@@ -452,8 +454,14 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
 
         updateUpdateHighlights();
-        if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().heatmapEnabled()) {
-//            updateHeatmapHighlights();
+        heatMapHighlights.clear();
+        HeatmapMode hm = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHeatmapMode();
+        if (hm == HeatmapMode.NONE) {
+        } else if (hm == HeatmapMode.ALL) {
+            updateHeatmapHighlights(false);
+        } else if (hm == HeatmapMode.NEWEST) {
+            updateHeatmapHighlights(true);
+        } else if (hm == HeatmapMode.TERMS) {
             updateTermHighlights();
         }
         restorePosition();

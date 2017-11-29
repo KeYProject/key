@@ -135,6 +135,7 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
+import de.uka.ilkd.key.settings.ViewSettings.HeatmapMode;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
@@ -712,8 +713,41 @@ public final class MainWindow extends JFrame  {
 
         view.add(new ProofDiffFrame.Action(this));
         
-        view.add(new JCheckBoxMenuItem(new ToggleHeatmapAction(this)));
-                
+        view.addSeparator();
+        ButtonGroup group = new ButtonGroup();
+        JRadioButtonMenuItem nope = new JRadioButtonMenuItem("No Heatmap");
+        group.add(nope);
+        nope.setSelected(true);
+        JRadioButtonMenuItem heatmap = new JRadioButtonMenuItem("All");
+        group.add(heatmap);
+        JRadioButtonMenuItem newestHeatmap = new JRadioButtonMenuItem("Newest");
+        group.add(newestHeatmap);
+        JRadioButtonMenuItem terms = new JRadioButtonMenuItem("Terms");
+        group.add(terms);
+        class HeatmapActionListener implements ActionListener {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JRadioButtonMenuItem item = (JRadioButtonMenuItem) e.getSource();
+                if (item == nope) {
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.NONE);
+                } else if (item == heatmap) {
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.ALL);
+                } else if (item == newestHeatmap) {
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.NEWEST);
+                } else if (item == terms) {
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.TERMS);
+                }
+            }
+        }
+        HeatmapActionListener hal = new HeatmapActionListener();
+        nope.addActionListener(hal);
+        heatmap.addActionListener(hal);
+        newestHeatmap.addActionListener(hal);
+        terms.addActionListener(hal);
+        view.add(nope);    
+        view.add(heatmap);    
+        view.add(newestHeatmap);    
+        view.add(terms);
         return view;
     }
 
