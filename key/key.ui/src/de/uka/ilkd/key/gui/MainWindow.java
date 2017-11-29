@@ -718,9 +718,9 @@ public final class MainWindow extends JFrame  {
         JRadioButtonMenuItem nope = new JRadioButtonMenuItem("No Heatmap");
         group.add(nope);
         nope.setSelected(true);
-        JRadioButtonMenuItem heatmap = new JRadioButtonMenuItem("All");
+        JRadioButtonMenuItem heatmap = new JRadioButtonMenuItem("All up to age " + currentGoalView.MAX_AGE_FOR_HEATMAP);
         group.add(heatmap);
-        JRadioButtonMenuItem newestHeatmap = new JRadioButtonMenuItem("Newest");
+        JRadioButtonMenuItem newestHeatmap = new JRadioButtonMenuItem("Newest 5");
         group.add(newestHeatmap);
         JRadioButtonMenuItem terms = new JRadioButtonMenuItem("Terms");
         group.add(terms);

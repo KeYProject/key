@@ -391,7 +391,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             age++;
             node = node.parent();
         }
-        return age;
+        return age - 1;
     }
     
     /**
