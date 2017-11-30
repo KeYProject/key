@@ -67,6 +67,11 @@ public final class Main {
     private static final String AUTO_LOADONLY = "--auto-loadonly";
     private static final String AUTOSAVE = "--autosave";
     private static final String EXPERIMENTAL = "--experimental";
+    /**
+     * This parameter disables the possibility to prune in closed branches. It is meant as a
+     * fallback solution if storing all closed goals needs too much memory.
+     */
+    private static final String NO_PRUNING_CLOSED = "--no-pruning-closed";
     private static final String DEBUG = "--debug";
     private static final String MACRO = "--macro";
     private static final String NO_JMLSPECS = "--no-jmlspecs";
@@ -87,7 +92,6 @@ public final class Main {
     public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
     public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX + "signature";
     private static final String VERBOSITY = "--verbose";
-
     /**
      * The {@link KeYDesktop} used by KeY. The default implementation is
      * replaced in Eclipse. For this reason the {@link Desktop} should never
@@ -246,6 +250,8 @@ public final class Main {
         cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
         cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
+        cl.addOption(NO_PRUNING_CLOSED, null,
+                "disables pruning and goal back in closed branches (saves memory)");
         cl.addSection("Batchmode options:");
         cl.addOption(TACLET_DIR, "<dir>", "load base taclets from a directory, not from internal structures");
         cl.addOption(DEBUG, null, "start KeY in debug mode");
@@ -439,6 +445,9 @@ public final class Main {
                     cl.getString(TACLET_DIR, ""));
         }
 
+        if (cl.isSet(NO_PRUNING_CLOSED)) {
+            GeneralSettings.noPruningClosed = true;
+        }
     }
 
     /**

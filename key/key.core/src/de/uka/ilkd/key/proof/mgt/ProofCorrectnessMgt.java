@@ -307,12 +307,14 @@ public final class ProofCorrectnessMgt {
 
     
     private class DefaultMgtProofTreeListener extends ProofTreeAdapter {
-	public void proofClosed(ProofTreeEvent e) {	    
-	    updateProofStatus();
-	}
+        @Override
+        public void proofClosed(ProofTreeEvent e) {
+            updateProofStatus();
+        }
 
-	public void proofStructureChanged(ProofTreeEvent e) {  // TODO: WP:
-	    updateProofStatus();
-	}
+        @Override
+        public void proofStructureChanged(ProofTreeEvent e) {
+            updateProofStatus();
+        }
     }
 }

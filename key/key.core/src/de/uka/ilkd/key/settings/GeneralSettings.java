@@ -22,6 +22,11 @@ import de.uka.ilkd.key.proof.io.AutoSaver;
 
 public class GeneralSettings implements Settings, Cloneable {
 
+    /**
+     * This parameter disables the possibility to prune in closed branches. It is meant as a
+     * fallback solution if storing all closed goals needs too much memory.
+     */
+    public static boolean noPruningClosed = false;
 
     private static final String TACLET_FILTER = "[General]StupidMode";
     private static final String DND_DIRECTION_SENSITIVE_KEY

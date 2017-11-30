@@ -494,7 +494,7 @@ public final class MainWindow extends JFrame  {
         toolBar.add(new TestGenerationAction(this));
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
-        toolBar.add(new PruneProofAction(this, false));
+        toolBar.add(new PruneProofAction(this));
         return toolBar;
     }
 
@@ -719,8 +719,8 @@ public final class MainWindow extends JFrame  {
         proof.setMnemonic(KeyEvent.VK_P);
 
         proof.add(autoModeAction);
-        proof.add(new GoalBackAction(this, true)); //new UndoLastStepAction(this, true)); // TODO: WP: old!
-        proof.add(new PruneProofAction(this,false));
+        proof.add(new GoalBackAction(this, true));
+        proof.add(new PruneProofAction(this));
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
         proof.add(new SearchInProofTreeAction(this));
