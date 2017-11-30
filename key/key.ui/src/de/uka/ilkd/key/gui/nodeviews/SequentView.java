@@ -478,6 +478,7 @@ public abstract class SequentView extends JEditorPane {
 		this.filter = sequentPrintFilter;
 		this.filter.setSequent(getMainWindow().getMediator().getSelectedNode().sequent());
 		printSequent();
+        getParent().revalidate();
 	}
 
     protected SequentPrintFilter getFilter() {
