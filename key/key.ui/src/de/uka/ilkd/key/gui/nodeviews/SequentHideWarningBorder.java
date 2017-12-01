@@ -27,7 +27,7 @@ public class SequentHideWarningBorder implements Border {
     @Override
     public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
 
-        System.out.println("SequentHideWarningBorder.paintBorder()");
+        //System.out.println("SequentHideWarningBorder.paintBorder()");
 
         SequentPrintFilter filter = sequentView.getFilter();
         if(filter == null) {
@@ -41,21 +41,26 @@ public class SequentHideWarningBorder implements Border {
 
         int orgSize = originalSequent.size();
         int newSize = filter.getFilteredAntec().size() + filter.getFilteredSucc().size();
-        System.out.println(orgSize + " -> " + newSize);
+        //System.out.println(orgSize + " -> " + newSize);
         if(orgSize == newSize) {
             return;
         }
 
+        Graphics g2 = g.create();
+        g2.setClip(0, 0, width, height);
+
         // XXX Make decent
-        g.setFont(new Font("sans-serif", Font.PLAIN, 12));
-        int strWidth = SwingUtilities.computeStringWidth(g.getFontMetrics(), WARNING);
+        g2.setFont(new Font("sans-serif", Font.PLAIN, 12));
+        int strWidth = SwingUtilities.computeStringWidth(g2.getFontMetrics(), WARNING);
 
         int lx = (width-strWidth)/2;
-        g.setColor(ALERT_COLOR);
+        g2.setColor(ALERT_COLOR);
         // XXX Make numbers decent
-        g.fillRect(lx, 0, strWidth+10, 20);
-        g.setColor(Color.BLACK);
-        g.drawString(WARNING, lx+5, 12);
+        g2.fillRect(lx, 0, strWidth+10, 20);
+        g2.setColor(Color.BLACK);
+        g2.drawString(WARNING, lx+5, 12);
+
+        //System.out.println(g2.getClipBounds());
 
     }
 
