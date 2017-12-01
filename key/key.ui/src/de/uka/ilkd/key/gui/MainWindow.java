@@ -61,6 +61,8 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import javax.swing.event.MouseInputAdapter;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -719,7 +721,26 @@ public final class MainWindow extends JFrame  {
         proof.setMnemonic(KeyEvent.VK_P);
 
         proof.add(autoModeAction);
-        proof.add(new GoalBackAction(this, true));
+        GoalBackAction goalBack = new GoalBackAction(this, true);
+        proof.addMenuListener(new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent e) {
+                /* we use this MenuListener to update the name only if the menu is shown since it
+                 * would be slower to update the name (which means scanning all open and closed
+                 * goals) at every selection change (via the KeYSelectionListener in GoalBackAction)
+                 */
+                goalBack.updateName();
+            }
+
+            @Override
+            public void menuDeselected(MenuEvent e) {
+            }
+
+            @Override
+            public void menuCanceled(MenuEvent e) {
+            }
+        });
+        proof.add(goalBack);
         proof.add(new PruneProofAction(this));
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
