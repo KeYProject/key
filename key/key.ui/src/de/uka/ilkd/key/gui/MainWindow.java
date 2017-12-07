@@ -742,6 +742,7 @@ public final class MainWindow extends JFrame  {
         formatter.setCommitsOnValidEdit(true);
         
         JFormattedTextField max_age = new JFormattedTextField(formatter);
+        max_age.setVisible(false);
         
         class HeatmapActionListener implements ActionListener {
             @Override
@@ -750,12 +751,16 @@ public final class MainWindow extends JFrame  {
                 if (item == nope) {
                     ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.NONE);
                     max_age.setValue(5);
+                    max_age.setVisible(false);
                 } else if (item == heatmap) {
                     ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.ALL);
+                    max_age.setVisible(true);
                 } else if (item == newestHeatmap) {
                     ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.NEWEST);
+                    max_age.setVisible(true);
                 } else if (item == terms) {
                     ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.TERMS);
+                    max_age.setVisible(true);
                 }
             }
         }
@@ -775,7 +780,7 @@ public final class MainWindow extends JFrame  {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if (max_age.getValue() != null) {
-                    currentGoalView.setMax_age_for_heatmap((int) max_age.getValue()); 
+                    currentGoalView.setMax_age_for_heatmap((int) max_age.getValue());
                 }
             }
         });
