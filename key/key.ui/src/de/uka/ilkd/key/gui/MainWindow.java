@@ -27,10 +27,15 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.EventObject;
 import java.util.LinkedHashSet;
@@ -45,6 +50,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -54,6 +60,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
@@ -62,6 +69,7 @@ import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
+import javax.swing.text.NumberFormatter;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
@@ -718,18 +726,30 @@ public final class MainWindow extends JFrame  {
         JRadioButtonMenuItem nope = new JRadioButtonMenuItem("No Heatmap");
         group.add(nope);
         nope.setSelected(true);
-        JRadioButtonMenuItem heatmap = new JRadioButtonMenuItem("All up to age " + currentGoalView.MAX_AGE_FOR_HEATMAP);
+        JRadioButtonMenuItem heatmap = new JRadioButtonMenuItem("Seq formulas up to age ");
         group.add(heatmap);
-        JRadioButtonMenuItem newestHeatmap = new JRadioButtonMenuItem("Newest 5");
+        JRadioButtonMenuItem newestHeatmap = new JRadioButtonMenuItem("Newest");
         group.add(newestHeatmap);
-        JRadioButtonMenuItem terms = new JRadioButtonMenuItem("Terms");
+        JRadioButtonMenuItem terms = new JRadioButtonMenuItem("Terms up to age");
         group.add(terms);
+        
+        NumberFormat format = NumberFormat.getInstance();
+        NumberFormatter formatter = new NumberFormatter(format);
+        formatter.setValueClass(Integer.class);
+        formatter.setMinimum(0);
+        formatter.setMaximum(1000);
+        formatter.setAllowsInvalid(false);
+        formatter.setCommitsOnValidEdit(true);
+        
+        JFormattedTextField max_age = new JFormattedTextField(formatter);
+        
         class HeatmapActionListener implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JRadioButtonMenuItem item = (JRadioButtonMenuItem) e.getSource();
                 if (item == nope) {
                     ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.NONE);
+                    max_age.setValue(5);
                 } else if (item == heatmap) {
                     ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.ALL);
                 } else if (item == newestHeatmap) {
@@ -748,6 +768,19 @@ public final class MainWindow extends JFrame  {
         view.add(heatmap);    
         view.add(newestHeatmap);    
         view.add(terms);
+        
+        
+        max_age.addPropertyChangeListener(new PropertyChangeListener() {
+            
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (max_age.getValue() != null) {
+                    currentGoalView.setMax_age_for_heatmap((int) max_age.getValue()); 
+                }
+            }
+        });
+        view.add(max_age);
+        
         return view;
     }
 
