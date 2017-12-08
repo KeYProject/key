@@ -103,6 +103,7 @@ import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
 import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
 import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
+import de.uka.ilkd.key.gui.actions.ShowSymbExLinesAction;
 import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
 import de.uka.ilkd.key.gui.actions.SyntaxHighlightingToggleAction;
 import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
@@ -734,6 +735,8 @@ public final class MainWindow extends JFrame  {
         proof.addSeparator();
         proof.add(new CounterExampleAction(this));
         proof.add(new TestGenerationAction(this));
+        proof.addSeparator();
+        proof.add(new ShowSymbExLinesAction(this));
 
         return proof;
     }
