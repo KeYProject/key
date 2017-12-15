@@ -1,29 +1,28 @@
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dialog;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.swing.JDialog;
-import javax.swing.JScrollPane;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map.Entry;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
 
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Node;
 
@@ -32,128 +31,120 @@ public class ShowSymbExLinesAction extends MainWindowAction {
     public ShowSymbExLinesAction(MainWindow mainWindow) {
         super(mainWindow);
         this.setName("Show Symbolic Execution Path");
+
+        // add a listener for changes in the proof tree
+        final KeYSelectionListener selListener = new KeYSelectionListener() {
+
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+                actionPerformed(null);  // TODO: null
+            }
+
+            public void selectedProofChanged(KeYSelectionEvent e) {
+                selectedNodeChanged(e);
+            }
+        };
+        getMediator().addKeYSelectionListener(selListener);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Node node = getMediator().getSelectedNode();
+        Node symbExNode = getMediator().getSelectedNode();
 
-        if (node == null) {
+        if (symbExNode == null) {
             return;
         }
-        
-        SourceElement activeStatement = node.getNodeInfo().getActiveStatement();
-        if (activeStatement == null) {
+
+        // get PositionInfo of all symbEx nodes
+        LinkedList<PositionInfo> lines = constructLinesSet(symbExNode);
+        if (lines == null) {
             return;
         }
-        String sourceFileStr = activeStatement.getPositionInfo().getParentClass();
-        //String sourceFileStr = node.getNodeInfo().getExecStatementParentClass();
-        
-        if (!sourceFileStr.equals("<NONE>")) {
-            
-            System.out.println(sourceFileStr);
 
-            final File sourceFile = new File(sourceFileStr);
+        // get Files from PositionInfos
+        HashMap<String, File> m = new HashMap<String, File>();
+
+        boolean firstHighlighted = false;
+        for (PositionInfo l : lines) {
+            if (!firstHighlighted) {
+                System.out.println("first: " + l);
+                firstHighlighted = true;
+            } else {
+                System.out.println(l);
+            }
+            m.putIfAbsent(l.getFileName(), new File(l.getFileName()));
+        }
+
+        final JTabbedPane tabs = mainWindow.getSourceTabs();
+        tabs.removeAll();
+
+        for (Entry<String, File> l : m.entrySet()) {
+            final JTextPane textPane = new JTextPane();
+
             try {
-                String source = IOUtil.readFrom(sourceFile);
-                LineInformation[] li = IOUtil.computeLineInformation(sourceFile);
-
-                final JDialog dialog = new JDialog(mainWindow, "Symbolic Execution Path of current Goal ",
-                        Dialog.ModalityType.DOCUMENT_MODAL);
-                dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-
-                dialog.addKeyListener(new KeyAdapter() {
-                    @Override
-                    public void keyPressed(KeyEvent e) {
-                        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                            dialog.dispose();
-                        }
-                    }
-                });
-                final JTextPane textPane = new JTextPane() {
-                    @Override
-                    public void addNotify() {
-                        super.addNotify();
-                        requestFocus();
-                        //textAreaGoto(this, location.getLine(), location.getColumn());
-                    }
-                };
-                
-                textPane.addKeyListener(new KeyAdapter() {
-                    @Override
-                    public void keyPressed(KeyEvent e) {
-                        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                            dialog.dispose();
-                        }
-                    }
-                });
-                
+                String source = IOUtil.readFrom(l.getValue());
                 textPane.setText(source);
+                LineInformation[] li = IOUtil.computeLineInformation(l.getValue());
+
                 textPane.setFont(ExceptionDialog.MESSAGE_FONT);
                 textPane.setEditable(false);
-                
+
                 StyledDocument doc = textPane.getStyledDocument();
                 Style highlighted = textPane.addStyle("highlighted", null);
                 StyleConstants.setBackground(highlighted, Color.YELLOW);
-                
-                Set<Integer> lines = constructLinesSet();
-                for (Integer l : lines) {
-                    // convert line numbers to offsets/lengths in the String 
-                    int offset = li[l-1].getOffset();
-                    int length = source.indexOf('\n', offset) - offset;
-                    doc.setCharacterAttributes(offset, length, highlighted, true);
-                    
-                }                
-                
-                JScrollPane textPaneScrollPane = new JScrollPane(textPane);
-                textPaneScrollPane 
-                .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-                textPaneScrollPane
-                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                int styles = lines.size();
+                int curr = styles;
 
-                Container container = dialog.getContentPane();
-                container.add(textPane, BorderLayout.CENTER);
+                // for each PositionInfo, highlight the corresponding lines in the corresponding file
+                for (PositionInfo pos : lines) {
+                    if (pos.getFileName().equals(l.getKey())) { // TODO: overhead!
+                        // convert line numbers to offsets/lengths in the String
+                        Position start = pos.getStartPosition();
+                        Position end = pos.getEndPosition();
+                        // TODO: Position doc: first line is line 1, first column is column 1
+                        int startIndex = li[start.getLine()-1].getOffset() + start.getColumn()-1;    // TODO: shifting necessary?
+                        int endIndex = li[end.getLine()-1].getOffset() + end.getColumn()-1;
+                        int length = endIndex - startIndex + 1;
+                        System.out.println("start: " + startIndex + " end: " + endIndex + " length: " + length);
 
-                dialog.pack();
-                dialog.setVisible(true);
+                        // more recent lines have a more saturated color
+                        Style i = textPane.addStyle(Integer.toString(curr), null);
+                        StyleConstants.setBackground(i, new Color(255, 255, 255 - 255 / styles * curr--));
 
-            }
-            catch (IOException e1) {
-                // TODO Auto-generated catch block
+                        doc.setCharacterAttributes(startIndex, length, i, true);
+                    }
+                }
+
+                // for each File, create a Tab in TabbedPane
+                tabs.addTab(l.getKey(), textPane);
+            } catch (IOException e1) {
                 e1.printStackTrace();
-                return;
             }
+        }
+        if (tabs.getTabCount() > 0) {
+            tabs.setBorder(new EmptyBorder(0, 0, 0, 0));
+        } else {
+            tabs.setBorder(new TitledBorder("No source loaded"));
         }
     }
 
-    public Set<Integer> constructLinesSet() {
-        Set<Integer> set = new HashSet<>();
+    public LinkedList<PositionInfo> constructLinesSet(Node cur) {
+        LinkedList<PositionInfo> list = new LinkedList<PositionInfo>();
 
-        Node cur = getMediator().getSelectedNode();
-        
         if (cur == null) {
             return null;
         }
-        
+
         do {
             SourceElement activeStatement = cur.getNodeInfo().getActiveStatement();
             if (activeStatement != null) {
-                int startPos = activeStatement.getPositionInfo().getStartPosition().getLine();
-                int endPos = activeStatement.getPositionInfo().getEndPosition().getLine();
-                if (startPos != -1) {
-                    if (startPos == endPos) {
-                        set.add(startPos);
-                        System.out.println("from/to " + startPos);
-                    } else {
-                        set.add(startPos);
-                        set.add(endPos);
-                        System.out.println("from " + startPos + " to " + endPos);
-                    }
+                PositionInfo pos = activeStatement.getPositionInfo();
+                if (pos != null && !pos.equals(PositionInfo.UNDEFINED)) {
+                    list.addLast(pos);
                 }
             }
             cur = cur.parent();
 
         } while (cur != null);
-        return set;
+        return list;
     }
 }

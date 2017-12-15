@@ -54,11 +54,13 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
@@ -170,6 +172,8 @@ public final class MainWindow extends JFrame  {
     /** JScrollPane for displaying SequentViews*/
     private final MainFrame mainFrame;
 
+    private final JTabbedPane sourceTabs;
+
     /** SequentView for the current goal */
     public final CurrentGoalView currentGoalView;
     
@@ -274,6 +278,7 @@ public final class MainWindow extends JFrame  {
         autoModeAction = new AutoModeAction(this);
         mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
+        sourceTabs = new JTabbedPane();
         proofList = new TaskTree(mediator);
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(mediator);
@@ -440,13 +445,20 @@ public final class MainWindow extends JFrame  {
         leftPane.setName("leftPane");
         leftPane.setOneTouchExpandable(true);
 
+        sourceTabs.setBorder(new TitledBorder("No source loaded"));
+
         JPanel rightPane = new JPanel();
         rightPane.setLayout(new BorderLayout());
 	rightPane.add(mainFrame, BorderLayout.CENTER);
 	rightPane.add(sequentViewSearchBar,
                 BorderLayout.SOUTH);
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, rightPane);
+        JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourceTabs);
+        pane.setResizeWeight(0.5);
+        pane.setOneTouchExpandable(true);
+        pane.setName("split2");
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, pane);
         splitPane.setResizeWeight(0); // the right pane is more important
         splitPane.setOneTouchExpandable(true);
         splitPane.setName("splitPane");
@@ -873,7 +885,11 @@ public final class MainWindow extends JFrame  {
     public ProofTreeView getProofTreeView() {
         return mainWindowTabbedPane.getProofTreeView();
     }
-    
+
+    public JTabbedPane getSourceTabs() {
+        return sourceTabs;
+    }
+
     /**
      * Returns the current goal view.
      */
