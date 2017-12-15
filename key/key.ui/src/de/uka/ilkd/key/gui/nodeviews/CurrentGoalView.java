@@ -249,6 +249,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             for(SequentPrintFilterEntry entry : entryList) {
                 SequentFormula form = entry.getFilteredFormula();
                 int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form, getMax_age_for_heatmap() + 2);
+                System.out.println(age);
                 if(age <= getMax_age_for_heatmap()) {
                     Color color = computeColorForAge(age);
                     ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil().prepend(0).append(i); 
@@ -424,7 +425,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     }
 
     private int computeSeqFormulaAge(Node node, SequentFormula form, int max_age) {
-        int age = 0;
+        int age = -1;
         while (age < max_age && node != null && node.sequent().contains(form)) {
             age++;
             node = node.parent();
