@@ -57,7 +57,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings.HeatmapMode;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * This sequent view displays the sequent of an open goal and allows selection
@@ -82,7 +81,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     // default starting color for heatmaps
     private static final Color HEATMAP_DEFAULT_START_COLOR = new Color(.7f, .5f, .5f);
     // maximum age of a sequent formula for heatmap
-    private int max_age_for_heatmap = 6;
+    private int max_age_for_heatmap;
 
     // the mediator
     private final KeYMediator mediator;
@@ -249,8 +248,8 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         } else {    // all formulas below MAX_AGE_FOR_HEATMAP are highlighted.
             for(SequentPrintFilterEntry entry : entryList) {
                 SequentFormula form = entry.getFilteredFormula();
-                int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form, getMax_age_for_heatmap());
-                if(age < getMax_age_for_heatmap()) {
+                int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form, getMax_age_for_heatmap() + 2);
+                if(age <= getMax_age_for_heatmap()) {
                     Color color = computeColorForAge(age);
                     ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil().prepend(0).append(i); 
                     Range r = ipt.rangeForPath(list);
@@ -286,10 +285,20 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         public String toString() {
             return "PIO_age [pio=" + pio + ", age=" + age + ", active=" + active + "]";
         }
-
+        
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof PIO_age) {
+                PIO_age c = (PIO_age) o;
+                if (this.age == c.age && this.pio == c.pio) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
     
-    private void updateTermHighlights() {
+    private void updateTermHighlights(boolean newest) {
         LinkedList<Node> nodeList = new LinkedList<>();
         Node node = getMainWindow().getMediator().getSelectedNode();
         nodeList.add(node);
@@ -301,7 +310,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
         LinkedList<PIO_age> pio_age_list = new LinkedList<>();
         Iterator<Node> it = nodeList.iterator();
-        int age = nodeList.size();
+        int age = nodeList.size() - 1;
         while (it.hasNext()) {
             node = it.next();
             if (node.getNodeInfo().getSequentChangeInfo() != null) {
@@ -309,11 +318,11 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 ImmutableList<SequentFormula> added_succ = node.getNodeInfo().getSequentChangeInfo().addedFormulas(false);
                 for (SequentFormula sf : added_ante) {
                     pio_age_list.add(new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), age));
-                    System.out.println("added_ante: " + sf.toString());
+//                    System.out.println("added_ante: " + sf.toString());
                 }
                 for (SequentFormula sf : added_succ) {
                     pio_age_list.add(new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), age));
-                    System.out.println("added_succ: " + sf.toString());
+//                    System.out.println("added_succ: " + sf.toString());
                 }
                 ImmutableList<FormulaChangeInfo> modified = node.getNodeInfo().getSequentChangeInfo().modifiedFormulas();
                 for (FormulaChangeInfo fci : modified) {
@@ -328,13 +337,13 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                         }
                     }
                     }
-                    System.out.println("modified: " + fci.getOriginalFormula().toString());
+//                    System.out.println("modified: " + fci.getOriginalFormula().toString());
                 }
                 for (SequentFormula sf : node.getNodeInfo().getSequentChangeInfo().removedFormulas(true)) {
                     for (PIO_age pair : pio_age_list) {
                         if (pair.get_pio().sequentFormula().equals(sf) && pair.get_pio().isInAntec()) {
                             pair.active = false;
-                            System.out.println("removed antec: " + sf);
+//                            System.out.println("removed antec: " + sf);
                         }
                     }
                 }
@@ -342,7 +351,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                     for (PIO_age pair : pio_age_list) {
                         if (pair.get_pio().sequentFormula().equals(sf) && !pair.get_pio().isInAntec()) {
                             pair.active = false;
-                            System.out.println("removed antec: " + sf);
+//                            System.out.println("removed antec: " + sf);
                         }
                     }
                 }
@@ -359,19 +368,41 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 }
         });
         
-        for (PIO_age pair : pio_age_list) {
-            System.out.println(pair);
-            if(!pair.active)
-                continue;
-            PosInOccurrence pio = pair.get_pio();
-            Color color = computeColorForAge(pair.get_age());
-            ImmutableList<Integer> pfp = ipt.pathForPosition(pio, filter);
-            if (pfp != null) {
-                Range r = ipt.rangeForPath(pfp);
-                Range newR = new Range(r.start()+1, r.end()+1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
-                Object tag = getColorHighlight(color);
-                heatMapHighlights.add(tag);
-                paintHighlight(newR, tag);
+        if (newest) {
+            int j = 0;
+            PIO_age[] pairs = (PIO_age[]) pio_age_list.toArray();
+            while (j <= max_age_for_heatmap && j < pairs.length) {
+                PIO_age pair = pairs[j];
+                if (!pair.active) {
+                    j--;
+                    continue;
+                }
+                Color color = computeColorForAge(j);
+                ImmutableList<Integer> pfp = ipt.pathForPosition(pair.get_pio(), filter);
+                if (pfp != null) {
+                    Range r = ipt.rangeForPath(pfp);
+                    Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
+                    Object tag = getColorHighlight(color);
+                    heatMapHighlights.add(tag);
+                    paintHighlight(newR, tag);
+                }
+                j++;
+            }
+        } else {
+            for (PIO_age pair : pio_age_list) {
+                if (!pair.active) {
+                    continue;
+                }
+                PosInOccurrence pio = pair.get_pio();
+                Color color = computeColorForAge(pair.get_age());
+                ImmutableList<Integer> pfp = ipt.pathForPosition(pio, filter);
+                if (pfp != null) {
+                    Range r = ipt.rangeForPath(pfp);
+                    Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
+                    Object tag = getColorHighlight(color);
+                    heatMapHighlights.add(tag);
+                    paintHighlight(newR, tag);
+                }
             }
         }
     }
@@ -464,12 +495,14 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         heatMapHighlights.clear();
         HeatmapMode hm = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHeatmapMode();
         if (hm == HeatmapMode.NONE) {
-        } else if (hm == HeatmapMode.ALL) {
+        } else if (hm == HeatmapMode.AGE_SF) {
             updateHeatmapHighlights(false);
-        } else if (hm == HeatmapMode.NEWEST) {
+        } else if (hm == HeatmapMode.NEWEST_SF) {
             updateHeatmapHighlights(true);
-        } else if (hm == HeatmapMode.TERMS) {
-            updateTermHighlights();
+        } else if (hm == HeatmapMode.AGE_TERMS) {
+            updateTermHighlights(false);
+        } else if (hm == HeatmapMode.NEWEST_TERMS) {
+            updateTermHighlights(true);
         }
         restorePosition();
         addMouseListener(listener);

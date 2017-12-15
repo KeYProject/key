@@ -74,7 +74,7 @@ public class ViewSettings implements Settings, Cloneable {
         new LinkedList<SettingsListener>();
 
     public static enum HeatmapMode {
-        NONE("None"), ALL("All"), NEWEST("Newest"), TERMS("Terms");
+        NONE("None"), AGE_SF("All"), NEWEST_SF("Newest"), AGE_TERMS("Terms_age"), NEWEST_TERMS("Terms_newest");
         private String displayName;
 
         private HeatmapMode(String name) {

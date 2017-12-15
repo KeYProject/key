@@ -722,69 +722,8 @@ public final class MainWindow extends JFrame  {
         view.add(new ProofDiffFrame.Action(this));
         
         view.addSeparator();
-        ButtonGroup group = new ButtonGroup();
-        JRadioButtonMenuItem nope = new JRadioButtonMenuItem("No Heatmap");
-        group.add(nope);
-        nope.setSelected(true);
-        JRadioButtonMenuItem heatmap = new JRadioButtonMenuItem("Seq formulas up to age ");
-        group.add(heatmap);
-        JRadioButtonMenuItem newestHeatmap = new JRadioButtonMenuItem("Newest");
-        group.add(newestHeatmap);
-        JRadioButtonMenuItem terms = new JRadioButtonMenuItem("Terms up to age");
-        group.add(terms);
         
-        NumberFormat format = NumberFormat.getInstance();
-        NumberFormatter formatter = new NumberFormatter(format);
-        formatter.setValueClass(Integer.class);
-        formatter.setMinimum(0);
-        formatter.setMaximum(1000);
-        formatter.setAllowsInvalid(false);
-        formatter.setCommitsOnValidEdit(true);
-        
-        JFormattedTextField max_age = new JFormattedTextField(formatter);
-        max_age.setVisible(false);
-        
-        class HeatmapActionListener implements ActionListener {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JRadioButtonMenuItem item = (JRadioButtonMenuItem) e.getSource();
-                if (item == nope) {
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.NONE);
-                    max_age.setValue(5);
-                    max_age.setVisible(false);
-                } else if (item == heatmap) {
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.ALL);
-                    max_age.setVisible(true);
-                } else if (item == newestHeatmap) {
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.NEWEST);
-                    max_age.setVisible(true);
-                } else if (item == terms) {
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.TERMS);
-                    max_age.setVisible(true);
-                }
-            }
-        }
-        HeatmapActionListener hal = new HeatmapActionListener();
-        nope.addActionListener(hal);
-        heatmap.addActionListener(hal);
-        newestHeatmap.addActionListener(hal);
-        terms.addActionListener(hal);
-        view.add(nope);    
-        view.add(heatmap);    
-        view.add(newestHeatmap);    
-        view.add(terms);
-        
-        
-        max_age.addPropertyChangeListener(new PropertyChangeListener() {
-            
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (max_age.getValue() != null) {
-                    currentGoalView.setMax_age_for_heatmap((int) max_age.getValue());
-                }
-            }
-        });
-        view.add(max_age);
+        HeatmapUtil.setupHeatmapMenu(view, currentGoalView);
         
         return view;
     }
