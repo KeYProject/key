@@ -40,6 +40,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ApplyTacletDialog;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.PIO_age;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -81,7 +82,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     // default starting color for heatmaps
     private static final Color HEATMAP_DEFAULT_START_COLOR = new Color(.7f, .5f, .5f);
     // maximum age of a sequent formula for heatmap
-    private int max_age_for_heatmap;
+    private int max_age_for_heatmap = 5;
 
     // the mediator
     private final KeYMediator mediator;
@@ -369,17 +370,21 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 }
         });
         
-        if (newest) {
+        if (newest) { // ist das überhaupt wohldefiniert? Was ist mit Termen, die sich an derselben Stelle ändern?
             int j = 0;
-            PIO_age[] pairs = (PIO_age[]) pio_age_list.toArray();
-            while (j <= max_age_for_heatmap && j < pairs.length) {
-                PIO_age pair = pairs[j];
+            Iterator<PIO_age> it_pa = pio_age_list.iterator();
+            PIO_age tmp = it_pa.next();
+            while (j <= max_age_for_heatmap && it_pa.hasNext()) {
+                PIO_age pair = it_pa.next();
+                while (it_pa.hasNext() && pair.get_pio().equals(it_pa.next().get_pio())) {
+//                    pair = it_pa.next();
+                }
                 if (!pair.active) {
-                    j--;
                     continue;
                 }
                 Color color = computeColorForAge(j);
                 ImmutableList<Integer> pfp = ipt.pathForPosition(pair.get_pio(), filter);
+                System.out.println("age: " + j + " color: " + color + " pio: " + pair.get_pio());
                 if (pfp != null) {
                     Range r = ipt.rangeForPath(pfp);
                     Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
