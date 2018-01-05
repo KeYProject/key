@@ -60,8 +60,8 @@ public class SequentViewSearchBar extends SearchBar {
     private final List<Pair<Integer, Object>> searchResults;
     private int resultIteratorPos;
     private SequentView sequentView;
-    JCheckBox regExpCheckBox;
-    JComboBox<SearchMode> searchModeBox;
+    private JCheckBox regExpCheckBox;
+    private JComboBox<SearchMode> searchModeBox;
 
     public SequentViewSearchBar(SequentView sequentView) {
         this.sequentView = sequentView;
@@ -144,7 +144,8 @@ public class SequentViewSearchBar extends SearchBar {
     public void searchPrevious() {
         if (!searchResults.isEmpty()) {
             resetExtraHighlight();
-            resultIteratorPos--;
+            // Adding the size to avoid -1 underflow (bugfix, MU)
+            resultIteratorPos += searchResults.size() - 1;
             resultIteratorPos %= searchResults.size();
             setExtraHighlight(resultIteratorPos);
         }
