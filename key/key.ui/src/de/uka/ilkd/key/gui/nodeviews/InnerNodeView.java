@@ -176,6 +176,8 @@ public class InnerNodeView extends SequentView {
         if (app != null) {
             highlightRuleAppPosition(app);
         }
+
+        updateHidingProperty();
     }
 
 }

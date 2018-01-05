@@ -230,7 +230,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         updateUpdateHighlights();
         restorePosition();
         addMouseListener(listener);
-        repaint();
+        updateHidingProperty();
     }
 
     // last highlighted caret position

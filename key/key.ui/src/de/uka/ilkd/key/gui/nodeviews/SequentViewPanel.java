@@ -28,9 +28,6 @@ import javax.swing.border.TitledBorder;
  */
 class SequentViewPanel extends JPanel {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = -4052156449188977483L;
 
     protected SequentViewPanel(SequentView sequentView) {
@@ -67,9 +64,8 @@ class SequentViewPanel extends JPanel {
         gbc.weighty = 1.0;
         add(javax.swing.Box.createGlue(), gbc);
 
-        setBorder(new CompoundBorder(
-                new TitledBorder(sequentView.getTitle()),
-                new SequentHideWarningBorder(sequentView)));
+        setBorder(new SequentHideWarningBorder(sequentView.getTitle(), sequentView));
+//        setBorder(new TitledBorder("xxx"));
 
     }
 }

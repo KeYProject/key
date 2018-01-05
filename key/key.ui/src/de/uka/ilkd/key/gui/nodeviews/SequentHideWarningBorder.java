@@ -5,73 +5,76 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Insets;
+import java.beans.PropertyChangeEvent;
 
+import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
+/**
+ * A special purpose border that prints a warning window if the search bar
+ * filtering removes formulas from the display.
+ *
+ * @see SequentView#isHiding()
+ *
+ * @author Mattias Ulbrich
+ */
+@SuppressWarnings("serial")
+public class SequentHideWarningBorder extends TitledBorder {
 
+    /** The constant color is used as background for the window. */
+    private static final Color ALERT_COLOR = new Color(255, 178, 178);
 
-// XXX Is not updated correctly, yet.
-public class SequentHideWarningBorder implements Border {
+    /** The constant is used to write the warning. */
+    private static final Font FONT = new Font("sans-serif", Font.PLAIN, 12);
 
-    private static final String WARNING = "Some formulas have been hidden (by search phrase)";
-    private final Color ALERT_COLOR = new Color(255, 178, 178);
+    /** The warning message which is printed. */
+    private static final String WARNING =
+            "Some formulas have been hidden (by search phrase)";
+
+    /** The margin left to the box, horizontally. */
+    private static final int DELTAX = 5;
+
+    /** The component being shown */
     private SequentView sequentView;
 
-    public SequentHideWarningBorder(SequentView sequentView) {
+    /** The height of the original border text */
+    private int borderHeight;
+
+    /**
+     * Instantiates a new sequent border.
+     *
+     * @param title
+     *            the title to display
+     * @param sequentView
+     *            the sequent view which will be wrapped by the component
+     */
+    public SequentHideWarningBorder(String title, SequentView sequentView) {
+        super(title);
         this.sequentView = sequentView;
+        this.borderHeight = getBorderInsets(sequentView).top;
     }
 
     @Override
     public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
 
-        //System.out.println("SequentHideWarningBorder.paintBorder()");
-
-        SequentPrintFilter filter = sequentView.getFilter();
-        if(filter == null) {
+        super.paintBorder(c, g, x, y, width, height);
+        if (!sequentView.isHiding()) {
             return;
         }
 
-        Sequent originalSequent = filter.getOriginalSequent();
-        if(originalSequent == null) {
-            return;
-        }
+        Graphics g2 = g;
+        // g2 = g.create();
+        // g2.setClip(0, 0, width, height);
 
-        int orgSize = originalSequent.size();
-        int newSize = filter.getFilteredAntec().size() + filter.getFilteredSucc().size();
-        //System.out.println(orgSize + " -> " + newSize);
-        if(orgSize == newSize) {
-            return;
-        }
-
-        Graphics g2 = g.create();
-        g2.setClip(0, 0, width, height);
-
-        // XXX Make decent
-        g2.setFont(new Font("sans-serif", Font.PLAIN, 12));
+        g2.setFont(FONT);
         int strWidth = SwingUtilities.computeStringWidth(g2.getFontMetrics(), WARNING);
 
         int lx = (width-strWidth)/2;
         g2.setColor(ALERT_COLOR);
-        // XXX Make numbers decent
-        g2.fillRect(lx, 0, strWidth+10, 20);
+        g2.fillRect(lx, 0, strWidth + 2*DELTAX, borderHeight);
         g2.setColor(Color.BLACK);
-        g2.drawString(WARNING, lx+5, 12);
-
-        //System.out.println(g2.getClipBounds());
+        g2.drawString(WARNING, lx + DELTAX, borderHeight / 2 + 5);
 
     }
-
-    @Override
-    public Insets getBorderInsets(Component c) {
-        return new Insets(0,0,0,0);
-    }
-
-    @Override
-    public boolean isBorderOpaque() {
-        return false;
-    }
-
 }
