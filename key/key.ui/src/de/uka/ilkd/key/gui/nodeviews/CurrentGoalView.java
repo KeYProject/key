@@ -250,8 +250,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             for(SequentPrintFilterEntry entry : entryList) {
                 SequentFormula form = entry.getFilteredFormula();
                 int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form, getMax_age_for_heatmap() + 2);
-                System.out.println(age);
-                if(age <= getMax_age_for_heatmap()) {
+                if(age < getMax_age_for_heatmap()) {
                     Color color = computeColorForAge(age);
                     ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil().prepend(0).append(i); 
                     Range r = ipt.rangeForPath(list);
@@ -353,7 +352,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                     for (PIO_age pair : pio_age_list) {
                         if (pair.get_pio().sequentFormula().equals(sf) && !pair.get_pio().isInAntec()) {
                             pair.active = false;
-//                            System.out.println("removed antec: " + sf);
+//                            System.out.println("removed succ: " + sf);
                         }
                     }
                 }
@@ -373,18 +372,14 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         if (newest) { // ist das überhaupt wohldefiniert? Was ist mit Termen, die sich an derselben Stelle ändern?
             int j = 0;
             Iterator<PIO_age> it_pa = pio_age_list.iterator();
-            PIO_age tmp = it_pa.next();
             while (j <= max_age_for_heatmap && it_pa.hasNext()) {
                 PIO_age pair = it_pa.next();
-                while (it_pa.hasNext() && pair.get_pio().equals(it_pa.next().get_pio())) {
-//                    pair = it_pa.next();
-                }
                 if (!pair.active) {
                     continue;
                 }
                 Color color = computeColorForAge(j);
                 ImmutableList<Integer> pfp = ipt.pathForPosition(pair.get_pio(), filter);
-                System.out.println("age: " + j + " color: " + color + " pio: " + pair.get_pio());
+//                System.out.println("age: " + j + " color: " + color + " pio: " + pair.get_pio());
                 if (pfp != null) {
                     Range r = ipt.rangeForPath(pfp);
                     Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
@@ -396,12 +391,13 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             }
         } else {
             for (PIO_age pair : pio_age_list) {
-                if (!pair.active) {
+                if (!pair.active || pair.get_age() > getMax_age_for_heatmap()) {
                     continue;
                 }
                 PosInOccurrence pio = pair.get_pio();
                 Color color = computeColorForAge(pair.get_age());
                 ImmutableList<Integer> pfp = ipt.pathForPosition(pio, filter);
+//                System.out.println("age: " + pair.get_age() + " color: " + color + " pio: " + pair.get_pio());
                 if (pfp != null) {
                     Range r = ipt.rangeForPath(pfp);
                     Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
