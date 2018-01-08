@@ -22,6 +22,7 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
@@ -34,6 +35,7 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
@@ -265,7 +267,7 @@ public abstract class SequentView extends JEditorPane {
         if (seqText.length() > 0 && p != null) {
             int characterIndex = correctedViewToModel(p);
             return printer.getInitialPositionTable().
-                    getPosInSequent(characterIndex, filter);
+                    getPosInSequent(characterIndex, getFilter());
         } else {
             return null;
         }
@@ -478,6 +480,42 @@ public abstract class SequentView extends JEditorPane {
 		this.filter = sequentPrintFilter;
 		this.filter.setSequent(getMainWindow().getMediator().getSelectedNode().sequent());
 		printSequent();
+        getParent().revalidate();
 	}
+
+    protected SequentPrintFilter getFilter() {
+        return filter;
+    }
+
+    /**
+     * To update the enclosing components that might print a warning on hidden
+     * formulas, it suffices to repaint them.
+     */
+    protected void updateHidingProperty() {
+        if (getParent() != null) {
+            getParent().repaint();
+        }
+    }
+
+    /**
+     * Does this component hide formulas from the sequent due to the set search
+     * bar filter
+     *
+     * @return true iff at least one formula is not shown
+     */
+    public boolean isHiding() {
+        if (filter == null) {
+            return false;
+        }
+
+        Sequent originalSequent = filter.getOriginalSequent();
+        if (originalSequent == null) {
+            return false;
+        }
+
+        int orgSize = originalSequent.size();
+        int newSize = filter.getFilteredAntec().size() + filter.getFilteredSucc().size();
+        return orgSize != newSize;
+    }
 
 }

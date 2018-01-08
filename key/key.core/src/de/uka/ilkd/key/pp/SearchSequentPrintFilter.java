@@ -33,6 +33,8 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
      */
     public void setSearchString(String searchString) {
         this.searchString = searchString;
+        antec = null;
+        succ = null;
         filterSequent();
     }
 
