@@ -4,8 +4,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
+import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -63,18 +66,22 @@ public class SequentHideWarningBorder extends TitledBorder {
             return;
         }
 
-        Graphics g2 = g;
-        // g2 = g.create();
-        // g2.setClip(0, 0, width, height);
+        Map<?, ?> desktopHints = 
+                (Map<?, ?>) Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");
+        
+        Graphics2D g2d = (Graphics2D) g;
+        if (desktopHints != null) {
+            g2d.setRenderingHints(desktopHints);
+        }
 
-        g2.setFont(FONT);
-        int strWidth = SwingUtilities.computeStringWidth(g2.getFontMetrics(), WARNING);
+        g2d.setFont(FONT);
+        int strWidth = SwingUtilities.computeStringWidth(g2d.getFontMetrics(), WARNING);
 
         int lx = (width-strWidth)/2;
-        g2.setColor(ALERT_COLOR);
-        g2.fillRect(lx, 0, strWidth + 2*DELTAX, borderHeight);
-        g2.setColor(Color.BLACK);
-        g2.drawString(WARNING, lx + DELTAX, borderHeight / 2 + 5);
+        g2d.setColor(ALERT_COLOR);
+        g2d.fillRect(lx, 0, strWidth + 2*DELTAX, borderHeight);
+        g2d.setColor(Color.BLACK);
+        g2d.drawString(WARNING, lx + DELTAX, borderHeight / 2 + 5);
 
     }
 }
