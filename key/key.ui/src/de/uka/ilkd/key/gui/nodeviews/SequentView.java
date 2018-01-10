@@ -42,6 +42,7 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.Debug;
 
 /*
@@ -59,7 +60,7 @@ public abstract class SequentView extends JEditorPane {
         return mainWindow;
     }
 
-    /* 
+    /*
      * The current line width. Static declaration for this prevents constructors from
      * using lineWidth 0.
      */
@@ -108,7 +109,7 @@ public abstract class SequentView extends JEditorPane {
 
     SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
-        
+
         setContentType("text/html");
         syntaxHighlighter = new HTMLSyntaxHighlighter((HTMLDocument)getDocument());
 
@@ -134,7 +135,7 @@ public abstract class SequentView extends JEditorPane {
         addComponentListener(changeListener);
         addPropertyChangeListener("font", changeListener);
         addHierarchyBoundsListener(changeListener);
-        
+
         filter = new IdentitySequentPrintFilter();
     }
 
@@ -233,7 +234,7 @@ public abstract class SequentView extends JEditorPane {
     }
 
     public abstract String getTitle();
-    
+
     /* (non-Javadoc)
      * @see javax.swing.JEditorPane#getText()
      */
@@ -290,7 +291,7 @@ public abstract class SequentView extends JEditorPane {
     protected void setLogicPrinter(SequentViewLogicPrinter p) {
         printer = p;
     }
-    
+
     /**
      * @return The HTML syntax highlighter used for this sequent view.
      */
@@ -318,7 +319,7 @@ public abstract class SequentView extends JEditorPane {
         return s;
     }
 
-    public String getHighlightedText() {       
+    public String getHighlightedText() {
         return getHighlightedText(getPosInSequent(getMousePosition()));
     }
 
@@ -342,7 +343,7 @@ public abstract class SequentView extends JEditorPane {
                 = getFontMetrics(getFont()).charWidth(seqText.charAt(cursorPosition));
         int characterIndex = viewToModel(new Point((int) p.getX() - (previousCharacterWidth / 2),
                 (int) p.getY()));
-        
+
         // NOTE (DS): The below subtraction of 1 to the beginning is a
         // quick-and-dirty fix for the problem that the mouse pointer
         // has to point to the element one position left of the actual
@@ -350,7 +351,7 @@ public abstract class SequentView extends JEditorPane {
         // change to HTML documents in the JEditorPane (previous JTextArea)). If
         // something concerning highlighting does not work in the future, here
         // could be a starting place to find the mistake.
-        
+
         return characterIndex - 1;
     }
 
@@ -401,7 +402,7 @@ public abstract class SequentView extends JEditorPane {
     public void paintHighlights(Point p) {
         // Change highlight for additional Java statement ...
         paintHighlight(getFirstStatementRange(p), additionalJavaHighlight);
-        // Change Highlighter for currently selected sequent part 
+        // Change Highlighter for currently selected sequent part
         paintHighlight(getHighlightRange(p), currentHighlight);
     }
 
@@ -413,7 +414,7 @@ public abstract class SequentView extends JEditorPane {
         String seqText = getText();
         if (seqText.length() > 0) {
             int characterIndex = correctedViewToModel(p);
-            
+
             // NOTE (DS): The below addition of 1 to the beginning is a quick-and-dirty
             // fix for a shift of highlighted areas to the left that occurred after the
             // change to HTML documents in the JEditorPane (previous JTextArea). If
@@ -421,7 +422,7 @@ public abstract class SequentView extends JEditorPane {
             // be a starting place to find the mistake.
             Range result = printer.getInitialPositionTable().rangeForIndex(characterIndex);
             result = new Range(result.start() + 1, result.end() + 1);
-            
+
             return result;
         } else {
             return null;
@@ -478,7 +479,11 @@ public abstract class SequentView extends JEditorPane {
 
 	public void setFilter(SequentPrintFilter sequentPrintFilter) {
 		this.filter = sequentPrintFilter;
-		this.filter.setSequent(getMainWindow().getMediator().getSelectedNode().sequent());
+		Node selectedNode = getMainWindow().getMediator().getSelectedNode();
+		if (selectedNode != null) {
+		    // bugfix #1458 (gitlab). The selected node may be null if no proof.
+		    this.filter.setSequent(selectedNode.sequent());
+		}
 		printSequent();
         getParent().revalidate();
 	}
