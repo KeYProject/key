@@ -304,16 +304,21 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         Node node = getMainWindow().getMediator().getSelectedNode();
         nodeList.add(node);
         int i = 0;
-        while (i < getMax_age_for_heatmap()-1 && node.parent() != null) {
+        // some sort of limit might make sense here for big sequents, but since 
+        // for the newest term heatmap duplicates will be removed,
+        // this list has to be longer than max_age_for_heatmap.
+        while (node.parent() != null) {
             node = node.parent(); 
             nodeList.addFirst(node);
             ++i;
         }
-        LinkedList<PIO_age> pio_age_list = new LinkedList<>();
+        System.out.println(nodeList.size());
+        ArrayList<PIO_age> pio_age_list = new ArrayList<>();
         Iterator<Node> it = nodeList.iterator();
         int age = nodeList.size() - 1;
         while (it.hasNext()) {
             node = it.next();
+            System.out.println("In " + node.serialNr());
             if (node.getNodeInfo().getSequentChangeInfo() != null) {
                 ImmutableList<SequentFormula> added_ante = node.getNodeInfo().getSequentChangeInfo().addedFormulas(true);
                 ImmutableList<SequentFormula> added_succ = node.getNodeInfo().getSequentChangeInfo().addedFormulas(false);
@@ -338,7 +343,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                         }
                     }
                     }
-//                    System.out.println("modified: " + fci.getOriginalFormula().toString());
+                    System.out.println("modified: " + fci.getOriginalFormula().toString() + " in " + node.serialNr());
                 }
                 for (SequentFormula sf : node.getNodeInfo().getSequentChangeInfo().removedFormulas(true)) {
                     for (PIO_age pair : pio_age_list) {
@@ -357,7 +362,8 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                     }
                 }
 
-            }
+            } else
+            System.out.println("SEQCH NULL " + node.serialNr());
             --age; 
         }
         InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
@@ -370,16 +376,21 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         });
         
         if (newest) { // ist das überhaupt wohldefiniert? Was ist mit Termen, die sich an derselben Stelle ändern?
-            int j = 0;
-            Iterator<PIO_age> it_pa = pio_age_list.iterator();
-            while (j <= max_age_for_heatmap && it_pa.hasNext()) {
-                PIO_age pair = it_pa.next();
+            int a = 0;
+            for (int j = 0; j < pio_age_list.size() && j < getMax_age_for_heatmap(); ++j) {
+                PIO_age pair = pio_age_list.get(j);
                 if (!pair.active) {
                     continue;
                 }
+                
+                while (j+1 < pio_age_list.size() && pio_age_list.get(j+1).get_pio().equals(pair.get_pio())) {
+                    pair = pio_age_list.get(j+1);
+                    pio_age_list.remove(j);
+                }
+                
                 Color color = computeColorForAge(j);
                 ImmutableList<Integer> pfp = ipt.pathForPosition(pair.get_pio(), filter);
-//                System.out.println("age: " + j + " color: " + color + " pio: " + pair.get_pio());
+                System.out.println("age: " + j + " color: " + color + " pio: " + pair.get_pio());
                 if (pfp != null) {
                     Range r = ipt.rangeForPath(pfp);
                     Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
@@ -387,7 +398,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                     heatMapHighlights.add(tag);
                     paintHighlight(newR, tag);
                 }
-                j++;
             }
         } else {
             for (PIO_age pair : pio_age_list) {
