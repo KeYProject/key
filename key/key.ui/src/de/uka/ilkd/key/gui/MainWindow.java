@@ -723,7 +723,7 @@ public final class MainWindow extends JFrame  {
         
         view.addSeparator();
         
-        HeatmapUtil.setupHeatmapMenu(view, currentGoalView);
+        HeatmapUtil.setupHeatmapMenu(view, currentGoalView, this);
         
         return view;
     }

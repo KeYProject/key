@@ -9,17 +9,30 @@ import java.text.NumberFormat;
 import javax.swing.ButtonGroup;
 import javax.swing.JFormattedTextField;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.text.NumberFormatter;
 
+import de.uka.ilkd.key.gui.actions.HeatmapSettingsAction;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings.HeatmapMode;
 
 public class HeatmapUtil {
+    
+    int sf_age;
+    int sf_num;
+    int terms_age;
+    int terms_num;
 
-    public static void setupHeatmapMenu(JMenu view, CurrentGoalView cgv) {
+    public static void setupHeatmapMenu(JMenu view, CurrentGoalView cgv, MainWindow mw) {
+        
+        JMenuItem hm = new JMenuItem(new HeatmapSettingsAction(mw));
+        hm.setText("Heatmap Options");
+        view.add(hm);
+        
+        // to be deleted maybe
         ButtonGroup group = new ButtonGroup();
         JRadioButtonMenuItem nope = new JRadioButtonMenuItem("No Heatmap");
         group.add(nope);
