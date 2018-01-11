@@ -21,10 +21,10 @@ import de.uka.ilkd.key.settings.ViewSettings.HeatmapMode;
 
 public class HeatmapUtil {
     
-    int sf_age;
-    int sf_num;
-    int terms_age;
-    int terms_num;
+    private static int sf_age;
+    private static int sf_num;
+    private static int terms_age;
+    private static int terms_num;
 
     public static void setupHeatmapMenu(JMenu view, CurrentGoalView cgv, MainWindow mw) {
         
@@ -104,5 +104,37 @@ public class HeatmapUtil {
         });
         
         view.add(max_age);
+    }
+
+    int getSf_age() {
+        return sf_age;
+    }
+
+    static void setSf_age(int sf_age) {
+        HeatmapUtil.sf_age = sf_age;
+    }
+
+    int getSf_num() {
+        return sf_num;
+    }
+
+    static void setSf_num(int sf_num) {
+        HeatmapUtil.sf_num = sf_num;
+    }
+
+    int getTerms_age() {
+        return terms_age;
+    }
+
+    static void setTerms_age(int terms_age) {
+        HeatmapUtil.terms_age = terms_age;
+    }
+
+    int getTerms_num() {
+        return terms_num;
+    }
+
+    static void setTerms_num(int terms_num) {
+        HeatmapUtil.terms_num = terms_num;
     }
 }

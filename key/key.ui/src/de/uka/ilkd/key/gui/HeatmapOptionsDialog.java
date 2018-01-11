@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 
 import javax.swing.BorderFactory;
@@ -29,7 +31,7 @@ public class HeatmapOptionsDialog extends JDialog {
      */
     private static final long serialVersionUID = 5731407140427140088L;
     
-    //TODO Textfeld-Action listener, ok button nimmt textfeldwerte und enter-taste, doku im programm, doku im code
+    //TODO ok button nimmt textfeldwerte und enter-taste, doku im programm, doku im code
 
     public HeatmapOptionsDialog() {
         JPanel panel = new JPanel();
@@ -74,8 +76,28 @@ public class HeatmapOptionsDialog extends JDialog {
         JFormattedTextField[] textFields = new JFormattedTextField[numOfTextFields];
 
         for (int i = 0; i < numOfTextFields; i++) {
-            textFields[i] = new JFormattedTextField(formatter);
-            textFields[i].setPreferredSize(new Dimension(40, 20));
+            final int innerI = new Integer(i);
+            JFormattedTextField tf = new JFormattedTextField(formatter);
+            textFields[i] = tf;
+            tf.setPreferredSize(new Dimension(40, 20));
+            tf.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if (tf.getValue() != null) {
+                        switch (innerI) {
+                            case 0: HeatmapUtil.setSf_age((int) tf.getValue());
+                                    break;
+                            case 1: HeatmapUtil.setSf_num((int) tf.getValue());
+                                    break;
+                            case 2: HeatmapUtil.setTerms_age((int) tf.getValue());
+                                    break;
+                            case 3: HeatmapUtil.setTerms_num((int) tf.getValue());
+                                    break;
+                            default: break;
+                        }
+                    }
+                }
+            });
         }
         
         for (int i = 0; i < numButtons; i++) {
