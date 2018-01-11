@@ -16,13 +16,15 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.text.NumberFormatter;
 
+import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.ViewSettings.HeatmapMode;
+import de.uka.ilkd.key.settings.ViewSettings;
 
 public class HeatmapOptionsDialog extends JDialog {
 
@@ -31,10 +33,10 @@ public class HeatmapOptionsDialog extends JDialog {
      */
     private static final long serialVersionUID = 5731407140427140088L;
     
-    //TODO ok button nimmt textfeldwerte und enter-taste, doku im programm, doku im code
+    //TODO nur noch ein feld; werte übernehmen; anpassung verhalten in curgoalview; schön machen
 
     public HeatmapOptionsDialog() {
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new BorderLayout());
         
         final int numButtons = 5;
         JRadioButton[] radioButtons = new JRadioButton[numButtons];
@@ -128,25 +130,38 @@ public class HeatmapOptionsDialog extends JDialog {
         okButton = new JButton("OK");
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String command = group.getSelection().getActionCommand();
-
-                if (command == defaultCommand) {
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.NONE);
-                } else if (command == sf_age_command) {
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.AGE_SF);
-                } else if (command == sf_newest_command) {
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.NEWEST_SF);
-                } else if (command == terms_age_command) {
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.AGE_TERMS);
-                } else if (command == terms_newest_command) {
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHeatmapMode(HeatmapMode.NEWEST_TERMS);
+                if (group.getSelection() == null) {
+                    dispose();
+                    return;
                 }
+                String command = group.getSelection().getActionCommand();
+                ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+                if (command == defaultCommand) {
+                    vs.setShowHeatmap(false);
+                } else if (command == sf_age_command) {
+                    vs.setShowHeatmap(true);
+                    vs.setHeatmapSF(true);
+                    vs.setHeatmapNewest(false);
+                } else if (command == sf_newest_command) {
+                    vs.setShowHeatmap(true);
+                    vs.setHeatmapSF(true);
+                    vs.setHeatmapNewest(true);
+                } else if (command == terms_age_command) {
+                    vs.setShowHeatmap(true);
+                    vs.setHeatmapSF(false);
+                    vs.setHeatmapNewest(false);
+                } else if (command == terms_newest_command) {
+                    vs.setShowHeatmap(true);
+                    vs.setHeatmapSF(false);
+                    vs.setHeatmapNewest(true);
+                }
+                dispose();
             }
         });
         JPanel box  = new JPanel();
         box.setLayout(new BoxLayout(box, BoxLayout.Y_AXIS));
         for (int i = 0; i < numButtons; i++) {
-            subPanels[i].setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            subPanels[i].setBorder(BorderFactory.createBevelBorder(0));
             box.add(subPanels[i]);
             
         }

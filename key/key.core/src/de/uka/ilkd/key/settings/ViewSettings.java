@@ -42,6 +42,7 @@ public class ViewSettings implements Settings, Cloneable {
     private static final String SYNTAX_HIGHLIGHTING = "[View]SyntaxHighlighting";
     private static final String HIDE_PACKAGE_PREFIX = "[View]HidePackagePrefix";
     private static final String CONFIRM_EXIT = "[View]ConfirmExit";
+    private static final String HEATMAP_OPTIONS = "[View]HeatmapOptions";
     
     /** default max number of displayed tooltip lines is 40 */
     private int maxTooltipLines = 40;
@@ -69,25 +70,16 @@ public class ViewSettings implements Settings, Cloneable {
     /**Show Taclet uninstantiated in tooltip -- for learning  */
     private boolean showUninstantiatedTaclet = false;
     /** Show heatmap of most recently used sequent formulae*/
+    private boolean showHeatmap = true;
+    /** Show heatmap for sequent formulas (true) or terms (false) */
+    private boolean heatmapSF = true;
+    /** Highlight newest formulas/terms (true) or all formulas/terms below specified age (false) */
+    private boolean heatmapNewest = true;
+    /** Maximum age/number of newest terms/formulas for heatmap highlighting */
+    private int maxAgeForHeatmap = 5;
     
     private LinkedList<SettingsListener> listenerList =
         new LinkedList<SettingsListener>();
-
-    public static enum HeatmapMode {
-        NONE("None"), AGE_SF("All"), NEWEST_SF("Newest"), AGE_TERMS("Terms_age"), NEWEST_TERMS("Terms_newest");
-        private String displayName;
-
-        private HeatmapMode(String name) {
-            this.displayName = name;
-        }
-        
-        @Override
-        public String toString() {
-            return this.displayName;
-        }
-    }
-    
-    private HeatmapMode heatmapMode;
     
     /**
      * @return the current maxTooltipLines
@@ -254,6 +246,7 @@ public class ViewSettings implements Settings, Cloneable {
         String val10 = props.getProperty(SYNTAX_HIGHLIGHTING);
 		String hidePackage = props.getProperty(HIDE_PACKAGE_PREFIX);
 		String confirmExit = props.getProperty(CONFIRM_EXIT);
+		String hm = props.getProperty(HEATMAP_OPTIONS);
 		if (val1 != null) {
 		        maxTooltipLines = Integer.valueOf(val1).intValue();
 		}
@@ -295,6 +288,13 @@ public class ViewSettings implements Settings, Cloneable {
 		if (confirmExit != null) {
 		    this.confirmExit = Boolean.valueOf(confirmExit);
 		}
+		if (hm != null) {
+		    String[] s = hm.split(" ");
+		    this.setShowHeatmap(Boolean.valueOf(s[0]));
+		    this.setHeatmapSF(Boolean.valueOf(s[1]));
+		    this.setHeatmapNewest(Boolean.valueOf(s[2]));
+		    this.setMaxAgeForHeatmap(Integer.valueOf(s[3]));
+		}
 	}
 
 
@@ -324,6 +324,7 @@ public class ViewSettings implements Settings, Cloneable {
         props.setProperty(SYNTAX_HIGHLIGHTING, "" + useSyntaxHighlighting);
         props.setProperty(HIDE_PACKAGE_PREFIX, "" + hidePackagePrefix);
     	props.setProperty(CONFIRM_EXIT, ""+confirmExit);
+    	props.setProperty(HEATMAP_OPTIONS, "" + isShowHeatmap() + " " + isHeatmapSF() + " " + isHeatmapNewest() + " " + getMaxAgeForHeatmap());
     }
 
     /** sends the message that the state of this setting has been
@@ -431,13 +432,39 @@ public void setUseUnicode(boolean useUnicode) {
 		    fireSettingsChanged();
     }
 
-    public HeatmapMode getHeatmapMode() {
-        return heatmapMode;
+    public boolean isShowHeatmap() {
+        return showHeatmap;
     }
 
-    public void setHeatmapMode(HeatmapMode heatmapMode) {
-        this.heatmapMode = heatmapMode;
+    public void setShowHeatmap(boolean showHeatmap) {
+        this.showHeatmap = showHeatmap;
         fireSettingsChanged();
     }
 
+    public boolean isHeatmapSF() {
+        return heatmapSF;
+    }
+
+    public void setHeatmapSF(boolean heatmapSF) {
+        this.heatmapSF = heatmapSF;
+        fireSettingsChanged();
+    }
+
+    public boolean isHeatmapNewest() {
+        return heatmapNewest;
+    }
+
+    public void setHeatmapNewest(boolean heatmapNewest) {
+        this.heatmapNewest = heatmapNewest;
+        fireSettingsChanged();
+    }
+
+    public int getMaxAgeForHeatmap() {
+        return maxAgeForHeatmap;
+    }
+
+    public void setMaxAgeForHeatmap(int maxAgeForHeatmap) {
+        this.maxAgeForHeatmap = maxAgeForHeatmap;
+        fireSettingsChanged();
+    }
 }
