@@ -78,9 +78,9 @@ public class ViewSettings implements Settings, Cloneable {
     private boolean heatmapNewest = true;
     /** Maximum age/number of newest terms/formulas for heatmap highlighting */
     private int maxAgeForHeatmap = 5;
-    
+    /** List of listeners that are notified if the settings change */
     private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
-    
+
     /**
      * @return the current maxTooltipLines
      */
@@ -294,7 +294,7 @@ public class ViewSettings implements Settings, Cloneable {
             this.setHeatmapSF(Boolean.valueOf(s[1]));
             this.setHeatmapNewest(Boolean.valueOf(s[2]));
             this.setMaxAgeForHeatmap(Integer.valueOf(s[3]));
-		}
+        }
 	}
 
 
@@ -324,7 +324,7 @@ public class ViewSettings implements Settings, Cloneable {
         props.setProperty(SYNTAX_HIGHLIGHTING, "" + useSyntaxHighlighting);
         props.setProperty(HIDE_PACKAGE_PREFIX, "" + hidePackagePrefix);
     	props.setProperty(CONFIRM_EXIT, ""+confirmExit);
-    	props.setProperty(HEATMAP_OPTIONS, "" + isShowHeatmap() + " " + 
+        props.setProperty(HEATMAP_OPTIONS, "" + isShowHeatmap() + " " +
                     isHeatmapSF() + " " + isHeatmapNewest() + " " + getMaxAgeForHeatmap());
     }
 
@@ -432,24 +432,32 @@ public void setUseUnicode(boolean useUnicode) {
 	this.showUninstantiatedTaclet = b;
 		    fireSettingsChanged();
     }
-    
+
     /** @return whether heatmaps should be displayed */
     public boolean isShowHeatmap() {
         return showHeatmap;
     }
-    
-    /** Set whether heatmaps should be displayed */
+
+    /**
+     * Set whether heatmaps should be displayed
+     * 
+     * @param showHeatmap
+     *            true if heatmap on
+     */
     public void setShowHeatmap(boolean showHeatmap) {
         this.showHeatmap = showHeatmap;
         fireSettingsChanged();
     }
-    
+
     /** @return whether sequent formulas or terms should be highlighted */
     public boolean isHeatmapSF() {
         return heatmapSF;
     }
 
-    /** Set whether sequent formulas or terms should be highlighted */
+    /**
+     * Set whether sequent formulas or terms should be highlighted * @param
+     * heatmapSF true for sequent formulas, false for terms
+     */
     public void setHeatmapSF(boolean heatmapSF) {
         this.heatmapSF = heatmapSF;
         fireSettingsChanged();
@@ -460,18 +468,32 @@ public void setUseUnicode(boolean useUnicode) {
         return heatmapNewest;
     }
 
-    /** Set whether to highlight "newest" or "up to age" */
+    /**
+     * Set whether to highlight "newest" or "up to age"
+     * 
+     * @param heatmapNewest
+     *            true if newest, false for "up to age"
+     */
     public void setHeatmapNewest(boolean heatmapNewest) {
         this.heatmapNewest = heatmapNewest;
         fireSettingsChanged();
     }
 
-    /** @return the maximum age for term or sequent formulas, concerning heatmap highlighting */
+    /**
+     * @return the maximum age for term or sequent formulas, concerning heatmap
+     *         highlighting
+     */
     public int getMaxAgeForHeatmap() {
         return maxAgeForHeatmap;
     }
 
-    /** Set the maximum age for term or sequent formulas, concerning heatmap highlighting */
+    /**
+     * Set the maximum age for term or sequent formulas, concerning heatmap
+     * highlighting
+     * 
+     * @param the
+     *            new maxmimum age
+     */
     public void setMaxAgeForHeatmap(int maxAgeForHeatmap) {
         this.maxAgeForHeatmap = maxAgeForHeatmap;
         fireSettingsChanged();

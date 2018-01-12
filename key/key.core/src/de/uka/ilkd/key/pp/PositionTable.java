@@ -122,13 +122,17 @@ public class PositionTable {
      *            the length of the whole string corresponding to this position
      *            table. Needed in case it turns out the index belongs to the
      *            top level.
+     *            
+     * @return the character range of the `lowest' subtable that includes
+     * <code>index</code> in its range.
      */
     public Range rangeForIndex(int index, int length) {
         int sub = searchEntry(index);
         if (sub == -1) {
             return new Range(0, length);
         } else {
-            Range r = children[sub].rangeForIndex(index - startPos[sub], endPos[sub] - startPos[sub]);
+            Range r = children[sub].rangeForIndex(index - startPos[sub], 
+                    endPos[sub] - startPos[sub]);
             r.start += startPos[sub];
             r.end += startPos[sub];
             return r;
@@ -156,7 +160,7 @@ public class PositionTable {
     }
 
     /**
-     * Returns the character range of the first java statement in a program
+     * @return Returns the character range of the first java statement in a program
      * modality for <i>this</i>position table. If this is not a program
      * modality, returns null. Note that this will be overridden in the subclass
      * {@link ModalityPositionTable}.
@@ -166,7 +170,9 @@ public class PositionTable {
     }
 
     /**
-     * Returns the character range for the subtable indicated by the given
+     * @param path the given integer list, i.e. path
+     * @param length length of the range
+     * @return Returns the character range for the subtable indicated by the given
      * integer list.
      */
     public Range rangeForPath(ImmutableList<Integer> path, int length) {
@@ -256,9 +262,12 @@ public class PositionTable {
      * @param filter
      *            the sequent print filter from that was used to print the
      *            sequent
+     *            
+     * @return  a PosInSequent for the given position list
      */
 
-    protected PosInSequent getSequentPIS(ImmutableList<Integer> posList, SequentPrintFilter filter) {
+    protected PosInSequent getSequentPIS(ImmutableList<Integer> posList, 
+            SequentPrintFilter filter) {
         int cfmaNo = posList.head().intValue();
         ImmutableList<Integer> tail = posList.tail();
 
@@ -286,7 +295,8 @@ public class PositionTable {
      * @param pio
      *            the PosInOccurrence leading to the current term
      */
-    private PosInSequent getTermPIS(SequentPrintFilterEntry filterEntry, ImmutableList<Integer> posList,
+    private PosInSequent getTermPIS(SequentPrintFilterEntry filterEntry, 
+            ImmutableList<Integer> posList,
             PosInOccurrence pio) {
         if (posList.isEmpty()) {
             return PosInSequent.createCfmaPos(pio);
@@ -300,7 +310,8 @@ public class PositionTable {
 
     private static SequentPrintFilterEntry getFilterEntry(int cfmaNo, SequentPrintFilter filter) {
         int i = cfmaNo;
-        ImmutableList<SequentPrintFilterEntry> list = filter.getFilteredAntec().append(filter.getFilteredSucc());
+        ImmutableList<SequentPrintFilterEntry> list = 
+                filter.getFilteredAntec().append(filter.getFilteredSucc());
         while (i-- != 0)
             list = list.tail();
         return list.head();
