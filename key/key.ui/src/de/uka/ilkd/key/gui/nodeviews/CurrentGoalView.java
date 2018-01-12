@@ -23,10 +23,8 @@ import java.awt.dnd.DragSource;
 import java.awt.dnd.DropTarget;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.EventObject;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -35,12 +33,10 @@ import javax.swing.SwingUtilities;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.axiom_abstraction.signanalysis.Pos;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ApplyTacletDialog;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.PIO_age;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -56,7 +52,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.ViewSettings.HeatmapMode;
+import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -303,14 +299,12 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         LinkedList<Node> nodeList = new LinkedList<>();
         Node node = getMainWindow().getMediator().getSelectedNode();
         nodeList.add(node);
-        int i = 0;
         // some sort of limit might make sense here for big sequents, but since 
         // for the newest term heatmap duplicates will be removed,
         // this list has to be longer than max_age_for_heatmap.
         while (node.parent() != null) {
             node = node.parent(); 
             nodeList.addFirst(node);
-            ++i;
         }
         System.out.println(nodeList.size());
         ArrayList<PIO_age> pio_age_list = new ArrayList<>();
@@ -324,11 +318,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 ImmutableList<SequentFormula> added_succ = node.getNodeInfo().getSequentChangeInfo().addedFormulas(false);
                 for (SequentFormula sf : added_ante) {
                     pio_age_list.add(new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), age));
-//                    System.out.println("added_ante: " + sf.toString());
                 }
                 for (SequentFormula sf : added_succ) {
                     pio_age_list.add(new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), age));
-//                    System.out.println("added_succ: " + sf.toString());
                 }
                 ImmutableList<FormulaChangeInfo> modified = node.getNodeInfo().getSequentChangeInfo().modifiedFormulas();
                 for (FormulaChangeInfo fci : modified) {
@@ -349,7 +341,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                     for (PIO_age pair : pio_age_list) {
                         if (pair.get_pio().sequentFormula().equals(sf) && pair.get_pio().isInAntec()) {
                             pair.active = false;
-//                            System.out.println("removed antec: " + sf);
                         }
                     }
                 }
@@ -357,13 +348,11 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                     for (PIO_age pair : pio_age_list) {
                         if (pair.get_pio().sequentFormula().equals(sf) && !pair.get_pio().isInAntec()) {
                             pair.active = false;
-//                            System.out.println("removed succ: " + sf);
                         }
                     }
                 }
 
             } else
-            System.out.println("SEQCH NULL " + node.serialNr());
             --age; 
         }
         InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
@@ -375,8 +364,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 }
         });
         
-        if (newest) { // ist das überhaupt wohldefiniert? Was ist mit Termen, die sich an derselben Stelle ändern?
-            int a = 0;
+        if (newest) {
             for (int j = 0; j < pio_age_list.size() && j < getMax_age_for_heatmap(); ++j) {
                 PIO_age pair = pio_age_list.get(j);
                 if (!pair.active) {
@@ -390,7 +378,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 
                 Color color = computeColorForAge(j);
                 ImmutableList<Integer> pfp = ipt.pathForPosition(pair.get_pio(), filter);
-                System.out.println("age: " + j + " color: " + color + " pio: " + pair.get_pio());
                 if (pfp != null) {
                     Range r = ipt.rangeForPath(pfp);
                     Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
@@ -407,7 +394,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 PosInOccurrence pio = pair.get_pio();
                 Color color = computeColorForAge(pair.get_age());
                 ImmutableList<Integer> pfp = ipt.pathForPosition(pio, filter);
-//                System.out.println("age: " + pair.get_age() + " color: " + color + " pio: " + pair.get_pio());
                 if (pfp != null) {
                     Range r = ipt.rangeForPath(pfp);
                     Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
@@ -505,16 +491,21 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
         updateUpdateHighlights();
         heatMapHighlights.clear();
-        HeatmapMode hm = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHeatmapMode();
-        if (hm == HeatmapMode.NONE) {
-        } else if (hm == HeatmapMode.AGE_SF) {
-            updateHeatmapHighlights(false);
-        } else if (hm == HeatmapMode.NEWEST_SF) {
-            updateHeatmapHighlights(true);
-        } else if (hm == HeatmapMode.AGE_TERMS) {
-            updateTermHighlights(false);
-        } else if (hm == HeatmapMode.NEWEST_TERMS) {
-            updateTermHighlights(true);
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        if (vs.isShowHeatmap()) {
+            if (vs.isHeatmapSF()) {
+                if (vs.isHeatmapNewest()) {
+                    updateHeatmapHighlights(true);
+                } else {
+                    updateHeatmapHighlights(false);
+                }
+            } else {
+                if (vs.isHeatmapNewest()) {
+                    updateTermHighlights(true);
+                } else {
+                    updateTermHighlights(false);
+                }
+            }
         }
         restorePosition();
         addMouseListener(listener);
