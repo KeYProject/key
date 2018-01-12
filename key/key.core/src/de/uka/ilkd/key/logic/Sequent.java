@@ -457,9 +457,8 @@ public class Sequent implements Iterable<SequentFormula> {
 
     /**
      * used to check whether this sequent contains a given sequent formula.
-     * 
-     * @param form
-     *            the given formula
+     *
+     * @param form the given formula
      * @return true if this sequent contains the given formula
      */
     public boolean contains(SequentFormula form) {

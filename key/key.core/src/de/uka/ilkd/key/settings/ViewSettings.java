@@ -440,7 +440,7 @@ public void setUseUnicode(boolean useUnicode) {
 
     /**
      * Set whether heatmaps should be displayed
-     * 
+     *
      * @param showHeatmap
      *            true if heatmap on
      */
@@ -455,8 +455,8 @@ public void setUseUnicode(boolean useUnicode) {
     }
 
     /**
-     * Set whether sequent formulas or terms should be highlighted * @param
-     * heatmapSF true for sequent formulas, false for terms
+     * Set whether sequent formulas or terms should be highlighted * 
+     * @param heatmapSF true for sequent formulas, false for terms
      */
     public void setHeatmapSF(boolean heatmapSF) {
         this.heatmapSF = heatmapSF;
@@ -470,7 +470,7 @@ public void setUseUnicode(boolean useUnicode) {
 
     /**
      * Set whether to highlight "newest" or "up to age"
-     * 
+     *
      * @param heatmapNewest
      *            true if newest, false for "up to age"
      */
@@ -490,9 +490,8 @@ public void setUseUnicode(boolean useUnicode) {
     /**
      * Set the maximum age for term or sequent formulas, concerning heatmap
      * highlighting
-     * 
-     * @param the
-     *            new maxmimum age
+     *
+     * @param maxAgeForHeatmap the new maxmimum age
      */
     public void setMaxAgeForHeatmap(int maxAgeForHeatmap) {
         this.maxAgeForHeatmap = maxAgeForHeatmap;

@@ -43,9 +43,7 @@ public class PositionTable {
     // the end positions of the direct subterms (or parts of sequent, etc.)
     protected int[] endPos;
 
-    /**
-     * the PositionTables for the direct subterms (or parts of sequent, etc.)
-     */
+    /** the PositionTables for the direct subterms (or parts of sequent, etc.) */
     protected PositionTable[] children;
 
     // the current active entry number.
@@ -122,7 +120,7 @@ public class PositionTable {
      *            the length of the whole string corresponding to this position
      *            table. Needed in case it turns out the index belongs to the
      *            top level.
-     *            
+     *
      * @return the character range of the `lowest' subtable that includes
      * <code>index</code> in its range.
      */
@@ -131,7 +129,7 @@ public class PositionTable {
         if (sub == -1) {
             return new Range(0, length);
         } else {
-            Range r = children[sub].rangeForIndex(index - startPos[sub], 
+            Range r = children[sub].rangeForIndex(index - startPos[sub],
                     endPos[sub] - startPos[sub]);
             r.start += startPos[sub];
             r.end += startPos[sub];
@@ -262,11 +260,11 @@ public class PositionTable {
      * @param filter
      *            the sequent print filter from that was used to print the
      *            sequent
-     *            
+     *
      * @return  a PosInSequent for the given position list
      */
 
-    protected PosInSequent getSequentPIS(ImmutableList<Integer> posList, 
+    protected PosInSequent getSequentPIS(ImmutableList<Integer> posList,
             SequentPrintFilter filter) {
         int cfmaNo = posList.head().intValue();
         ImmutableList<Integer> tail = posList.tail();
@@ -295,7 +293,7 @@ public class PositionTable {
      * @param pio
      *            the PosInOccurrence leading to the current term
      */
-    private PosInSequent getTermPIS(SequentPrintFilterEntry filterEntry, 
+    private PosInSequent getTermPIS(SequentPrintFilterEntry filterEntry,
             ImmutableList<Integer> posList,
             PosInOccurrence pio) {
         if (posList.isEmpty()) {
@@ -310,7 +308,7 @@ public class PositionTable {
 
     private static SequentPrintFilterEntry getFilterEntry(int cfmaNo, SequentPrintFilter filter) {
         int i = cfmaNo;
-        ImmutableList<SequentPrintFilterEntry> list = 
+        ImmutableList<SequentPrintFilterEntry> list =
                 filter.getFilteredAntec().append(filter.getFilteredSucc());
         while (i-- != 0)
             list = list.tail();
