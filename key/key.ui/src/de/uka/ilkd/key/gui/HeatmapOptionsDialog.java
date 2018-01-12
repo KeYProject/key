@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
@@ -24,6 +37,17 @@ import javax.swing.text.NumberFormatter;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+
+/**
+ * This Dialog contains options for highlighting sequent formulas 
+ * or terms according to their age, i.e., when they were first introduced
+ * into the proof. It is possible to highlight all sf/terms up to a 
+ * specified age, or to highlight the x newest sf/terms, x being 
+ * specified by the user.
+ * 
+ * @author jschiffl
+ *
+ */
 
 public class HeatmapOptionsDialog extends JDialog {
 

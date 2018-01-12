@@ -203,7 +203,14 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
     }
     
-    private void updateHeatmapHighlights(int max_age, boolean newest) {
+    
+    /**
+     * Highlights sequent formulas according to their age (if newest is false),
+     * or the newest sequent formulas.
+     * @param max_age maximum age up to which sf's are highlighted, or number of recent sf's to highlight. 
+     * @param newest Are newest sf's highlighted (true) or all up to max_age (false)?
+     */
+    private void updateHeatmapSFHighlights(int max_age, boolean newest) {
         if (getLogicPrinter() == null) {
             return;
         }
@@ -259,6 +266,13 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
     }
     
+    
+    /**
+     * Utility class consisting of a pair of the PosInOccurrence of a term, and its age.
+     * Used for term heatmap highlighting.
+     * @author jschiffl
+     *
+     */
     class PIO_age {
         PosInOccurrence pio;
         int age;
@@ -294,7 +308,14 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
     }
     
-    private void updateTermHighlights(int max_age, boolean newest) {
+    
+    /**
+     * Highlights terms according to their age (if newest is false),
+     * or the newest terms.
+     * @param max_age maximum age up to which terms are highlighted, or number of recent terms to highlight. 
+     * @param newest Are newest terms highlighted (true) or all up to max_age (false)?
+     */
+    private void updateHeatmapTermHighlights(int max_age, boolean newest) {
         LinkedList<Node> nodeList = new LinkedList<>();
         Node node = getMainWindow().getMediator().getSelectedNode();
         nodeList.add(node);
@@ -308,6 +329,8 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         ArrayList<PIO_age> pio_age_list = new ArrayList<>();
         Iterator<Node> it = nodeList.iterator();
         int age = nodeList.size() - 1;
+        
+        // preparation of the list of terms
         while (it.hasNext()) {
             node = it.next();
             if (node.getNodeInfo().getSequentChangeInfo() != null) {
@@ -360,6 +383,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 }
         });
         
+        // actual highlighting
         if (newest) {
             for (int j = 0; j < pio_age_list.size() && j < max_age; ++j) {
                 PIO_age pair = pio_age_list.get(j);
@@ -401,6 +425,13 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
     }
 
+    /**
+     * computes the appropriate color for a given age and maximum age. 
+     * Implements linear interpolation between the starting colour and white.
+     * @param max_age the maximum age of a term / sf, specified in viewsettings
+     * @param age the age of the given term / sf
+     * @return the appropriate color
+     */
     private Color computeColorForAge(int max_age, int age) {
         float[] color = HEATMAP_DEFAULT_START_COLOR.getRGBColorComponents(null);
         float redDiff = (1.f - color[0]);
@@ -417,6 +448,16 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         return new Color(red, green, blue);
     }
 
+    /**
+     * computes the age of a given sequent formula, i.e., 
+     * its distance to the root of the proof tree. If the formula is older 
+     * than max_age, we do not care, because this method is only used for 
+     * heatmap highlighting, and older formulas are not considered anyway.
+     * @param node the current node
+     * @param form the given sf
+     * @param max_age the maximum age, specified in viewSettings
+     * @return the sf's age
+     */
     private int computeSeqFormulaAge(Node node, SequentFormula form, int max_age) {
         int age = -1;
         while (age < max_age && node != null && node.sequent().contains(form)) {
@@ -492,15 +533,15 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         if (vs.isShowHeatmap()) {
             if (vs.isHeatmapSF()) {
                 if (vs.isHeatmapNewest()) {
-                    updateHeatmapHighlights(max_age, true);
+                    updateHeatmapSFHighlights(max_age, true);
                 } else {
-                    updateHeatmapHighlights(max_age, false);
+                    updateHeatmapSFHighlights(max_age, false);
                 }
             } else {
                 if (vs.isHeatmapNewest()) {
-                    updateTermHighlights(max_age, true);
+                    updateHeatmapTermHighlights(max_age, true);
                 } else {
-                    updateTermHighlights(max_age, false);
+                    updateHeatmapTermHighlights(max_age, false);
                 }
             }
         }
