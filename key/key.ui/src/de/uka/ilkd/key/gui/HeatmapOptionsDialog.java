@@ -32,6 +32,9 @@ public class HeatmapOptionsDialog extends JDialog {
     //TODO nur noch ein feld; werte übernehmen; anpassung verhalten in curgoalview; schön machen
 
     public HeatmapOptionsDialog() {
+        
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        
         JPanel panel = new JPanel(new BorderLayout());
         
         final int numButtons = 5;
@@ -84,22 +87,41 @@ public class HeatmapOptionsDialog extends JDialog {
             
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setMaxAgeForHeatmap((int) textField.getValue());
+                if (textField.getValue() != null ) {
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setMaxAgeForHeatmap((int) textField.getValue());
+                }
             }
             
         });
         
+        textField.setValue(vs.getMaxAgeForHeatmap());
+        
         for (int i = 0; i < numButtons; i++) {
             textPanels[i] = new JPanel();
             textPanels[i].add(new JLabel(descriptions[i]));
-        }
-     
-        for (int i = 0; i < numButtons; i++) {
             group.add(radioButtons[i]);
             subPanels[i] = new JPanel();
             subPanels[i].setLayout(new BoxLayout(subPanels[i], BoxLayout.Y_AXIS));
             subPanels[i].add(radioButtons[i]);
             subPanels[i].add(textPanels[i]);
+        }
+        
+        if (vs.isShowHeatmap()) {
+            if (vs.isHeatmapSF()) {
+                if (vs.isHeatmapNewest()) {
+                    radioButtons[2].setSelected(true);
+                } else {
+                    radioButtons[1].setSelected(true);
+                }
+            } else {
+                if (vs.isHeatmapNewest()) {
+                    radioButtons[4].setSelected(true);
+                } else {
+                    radioButtons[3].setSelected(true);
+                }
+            } 
+        } else {
+            radioButtons[0].setSelected(true);
         }
 
         okButton = new JButton("OK");
@@ -142,6 +164,7 @@ public class HeatmapOptionsDialog extends JDialog {
         }
 //        panel.setBorder(BorderFactory.createEmptyBorder(30, 50, 100, 20));
         panel.add(box, BorderLayout.PAGE_START);
+        panel.add(textField);
         panel.add(okButton, BorderLayout.PAGE_END);
         
         add(panel);

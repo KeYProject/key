@@ -306,13 +306,11 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             node = node.parent(); 
             nodeList.addFirst(node);
         }
-        System.out.println(nodeList.size());
         ArrayList<PIO_age> pio_age_list = new ArrayList<>();
         Iterator<Node> it = nodeList.iterator();
         int age = nodeList.size() - 1;
         while (it.hasNext()) {
             node = it.next();
-            System.out.println("In " + node.serialNr());
             if (node.getNodeInfo().getSequentChangeInfo() != null) {
                 ImmutableList<SequentFormula> added_ante = node.getNodeInfo().getSequentChangeInfo().addedFormulas(true);
                 ImmutableList<SequentFormula> added_succ = node.getNodeInfo().getSequentChangeInfo().addedFormulas(false);
@@ -335,7 +333,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                         }
                     }
                     }
-                    System.out.println("modified: " + fci.getOriginalFormula().toString() + " in " + node.serialNr());
                 }
                 for (SequentFormula sf : node.getNodeInfo().getSequentChangeInfo().removedFormulas(true)) {
                     for (PIO_age pair : pio_age_list) {
