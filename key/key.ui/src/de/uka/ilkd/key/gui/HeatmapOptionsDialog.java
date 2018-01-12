@@ -2,6 +2,9 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -29,13 +32,18 @@ public class HeatmapOptionsDialog extends JDialog {
      */
     private static final long serialVersionUID = 5731407140427140088L;
     
-    //TODO nur noch ein feld; werte übernehmen; anpassung verhalten in curgoalview; schön machen
-
     public HeatmapOptionsDialog() {
+        
+        setTitle("Heatmap Options");
         
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         
-        JPanel panel = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(20, 5, 20, 5);
+        c.ipadx = 0;
+        c.ipady = 0;
         
         final int numButtons = 5;
         JRadioButton[] radioButtons = new JRadioButton[numButtons];
@@ -43,7 +51,9 @@ public class HeatmapOptionsDialog extends JDialog {
         JPanel[] textPanels = new JPanel[numButtons];
         
         final ButtonGroup group = new ButtonGroup();
-        JButton okButton = null;
+        JButton okButton = new JButton("OK");
+        JButton cancelButton = new JButton("Cancel");
+
 
         final String defaultCommand = "default";
         final String sf_age_command = "sf_age";
@@ -95,15 +105,16 @@ public class HeatmapOptionsDialog extends JDialog {
         });
         
         textField.setValue(vs.getMaxAgeForHeatmap());
+        textField.setToolTipText("Please enter a value between " + formatter.getMinimum() + " and " + formatter.getMaximum() + ".");
         
         for (int i = 0; i < numButtons; i++) {
             textPanels[i] = new JPanel();
             textPanels[i].add(new JLabel(descriptions[i]));
             group.add(radioButtons[i]);
             subPanels[i] = new JPanel();
-            subPanels[i].setLayout(new BoxLayout(subPanels[i], BoxLayout.Y_AXIS));
-            subPanels[i].add(radioButtons[i]);
-            subPanels[i].add(textPanels[i]);
+            subPanels[i].setLayout(new BorderLayout());
+            subPanels[i].add(radioButtons[i], BorderLayout.PAGE_START);
+            subPanels[i].add(textPanels[i], BorderLayout.PAGE_END);
         }
         
         if (vs.isShowHeatmap()) {
@@ -124,13 +135,8 @@ public class HeatmapOptionsDialog extends JDialog {
             radioButtons[0].setSelected(true);
         }
 
-        okButton = new JButton("OK");
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (group.getSelection() == null) {
-                    dispose();
-                    return;
-                }
                 String command = group.getSelection().getActionCommand();
                 ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
                 if (command == defaultCommand) {
@@ -155,6 +161,14 @@ public class HeatmapOptionsDialog extends JDialog {
                 dispose();
             }
         });
+        
+        
+        cancelButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
+        
         JPanel box  = new JPanel();
         box.setLayout(new BoxLayout(box, BoxLayout.Y_AXIS));
         for (int i = 0; i < numButtons; i++) {
@@ -162,12 +176,33 @@ public class HeatmapOptionsDialog extends JDialog {
             box.add(subPanels[i]);
             
         }
-//        panel.setBorder(BorderFactory.createEmptyBorder(30, 50, 100, 20));
-        panel.add(box, BorderLayout.PAGE_START);
-        panel.add(textField);
-        panel.add(okButton, BorderLayout.PAGE_END);
+
+        JPanel tfPanel = new JPanel();
+        tfPanel.setLayout(new BoxLayout(tfPanel, BoxLayout.Y_AXIS));
+        tfPanel.add(new JLabel("Enter a value for the maximum age of highlighted terms or formulas."));
+        tfPanel.add(textField);
+        tfPanel.setBorder(BorderFactory.createBevelBorder(0));
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.add(okButton);
+        buttonPanel.add(new JLabel("                     "));
+        buttonPanel.add(cancelButton);
+        
+        c.gridy = 0;
+        panel.add(new JLabel("<html><body>Heatmaps can be used to highlight the most recently <br>"
+                + "             changed terms or sequent formulas. Below, you can specify <br> "
+                + "             how many terms should be highlighted.</body></html>"), c);
+        c.gridy++;
+        panel.add(box, c);
+        c.gridy++;
+        panel.add(tfPanel, c);
+        c.gridy++;
+        panel.add(buttonPanel, c);
         
         add(panel);
+        getRootPane().setDefaultButton(okButton);
+        
         pack();
         setLocationRelativeTo(null);
         setVisible(true);

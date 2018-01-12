@@ -77,8 +77,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
     // default starting color for heatmaps
     private static final Color HEATMAP_DEFAULT_START_COLOR = new Color(.7f, .5f, .5f);
-    // maximum age of a sequent formula for heatmap
-    private int max_age_for_heatmap = 5;
+
 
     // the mediator
     private final KeYMediator mediator;
@@ -204,7 +203,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
     }
     
-    private void updateHeatmapHighlights(boolean newest) {
+    private void updateHeatmapHighlights(int max_age, boolean newest) {
         if (getLogicPrinter() == null) {
             return;
         }
@@ -228,9 +227,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 }
             });
             for (SequentPrintFilterEntry entry : entryList) {
-                for (int j = 0; j < max_age_for_heatmap && j < sortedArray.length; ++j) {
+                for (int j = 0; j < max_age && j < sortedArray.length; ++j) {
                     if (sortedArray[j].equals(entry)) {
-                        Color color = computeColorForAge(j);
+                        Color color = computeColorForAge(max_age, j);
                         ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil()
                                 .prepend(0).append(i);
                         Range r = ipt.rangeForPath(list);
@@ -245,9 +244,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         } else {    // all formulas below MAX_AGE_FOR_HEATMAP are highlighted.
             for(SequentPrintFilterEntry entry : entryList) {
                 SequentFormula form = entry.getFilteredFormula();
-                int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form, getMax_age_for_heatmap() + 2);
-                if(age < getMax_age_for_heatmap()) {
-                    Color color = computeColorForAge(age);
+                int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form, max_age + 2);
+                if(age < max_age) {
+                    Color color = computeColorForAge(max_age, age);
                     ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil().prepend(0).append(i); 
                     Range r = ipt.rangeForPath(list);
                     Range newR = new Range(r.start()+1, r.end()+1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
@@ -295,7 +294,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
     }
     
-    private void updateTermHighlights(boolean newest) {
+    private void updateTermHighlights(int max_age, boolean newest) {
         LinkedList<Node> nodeList = new LinkedList<>();
         Node node = getMainWindow().getMediator().getSelectedNode();
         nodeList.add(node);
@@ -329,9 +328,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                             if(positionOfMod.posInTerm().isPrefixOf(pair.get_pio().posInTerm())) {
                                 pair.active = false;
                             } else {
-                            pair.set_pio(new PosInOccurrence(fci.getNewFormula(), pair.get_pio().posInTerm(), pair.get_pio().isInAntec()));
+                                pair.set_pio(new PosInOccurrence(fci.getNewFormula(), pair.get_pio().posInTerm(), pair.get_pio().isInAntec()));
+                            }
                         }
-                    }
                     }
                 }
                 for (SequentFormula sf : node.getNodeInfo().getSequentChangeInfo().removedFormulas(true)) {
@@ -349,7 +348,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                     }
                 }
 
-            } else
+            }
             --age; 
         }
         InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
@@ -362,7 +361,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         });
         
         if (newest) {
-            for (int j = 0; j < pio_age_list.size() && j < getMax_age_for_heatmap(); ++j) {
+            for (int j = 0; j < pio_age_list.size() && j < max_age; ++j) {
                 PIO_age pair = pio_age_list.get(j);
                 if (!pair.active) {
                     continue;
@@ -373,7 +372,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                     pio_age_list.remove(j);
                 }
                 
-                Color color = computeColorForAge(j);
+                Color color = computeColorForAge(max_age, j);
                 ImmutableList<Integer> pfp = ipt.pathForPosition(pair.get_pio(), filter);
                 if (pfp != null) {
                     Range r = ipt.rangeForPath(pfp);
@@ -385,11 +384,11 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             }
         } else {
             for (PIO_age pair : pio_age_list) {
-                if (!pair.active || pair.get_age() > getMax_age_for_heatmap()) {
+                if (!pair.active || pair.get_age() > max_age) {
                     continue;
                 }
                 PosInOccurrence pio = pair.get_pio();
-                Color color = computeColorForAge(pair.get_age());
+                Color color = computeColorForAge(max_age, pair.get_age());
                 ImmutableList<Integer> pfp = ipt.pathForPosition(pio, filter);
                 if (pfp != null) {
                     Range r = ipt.rangeForPath(pfp);
@@ -402,7 +401,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
     }
 
-    private Color computeColorForAge(int age) {
+    private Color computeColorForAge(int max_age, int age) {
         float[] color = HEATMAP_DEFAULT_START_COLOR.getRGBColorComponents(null);
         float redDiff = (1.f - color[0]);
         float greenDiff = (1.f - color[1]);
@@ -411,7 +410,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         // float diff = (float) (1.f - Math.pow(.5f, age-1)); 
         
         // linearer abfall
-        float diff = (float) age / getMax_age_for_heatmap();
+        float diff = (float) age / max_age;
         float red = color[0] + redDiff * diff;
         float green = color[1] + greenDiff * diff;
         float blue = color[2] + blueDiff * diff;
@@ -489,18 +488,19 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         updateUpdateHighlights();
         heatMapHighlights.clear();
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        int max_age = vs.getMaxAgeForHeatmap();
         if (vs.isShowHeatmap()) {
             if (vs.isHeatmapSF()) {
                 if (vs.isHeatmapNewest()) {
-                    updateHeatmapHighlights(true);
+                    updateHeatmapHighlights(max_age, true);
                 } else {
-                    updateHeatmapHighlights(false);
+                    updateHeatmapHighlights(max_age, false);
                 }
             } else {
                 if (vs.isHeatmapNewest()) {
-                    updateTermHighlights(true);
+                    updateTermHighlights(max_age, true);
                 } else {
-                    updateTermHighlights(false);
+                    updateTermHighlights(max_age, false);
                 }
             }
         }
@@ -626,14 +626,5 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     @Override
     public String getTitle() {
         return "Current Goal";
-    }
-
-    public int getMax_age_for_heatmap() {
-        return max_age_for_heatmap;
-    }
-
-    public void setMax_age_for_heatmap(int max_age_for_heatmap) {
-        this.max_age_for_heatmap = max_age_for_heatmap;
-        printSequent();
     }
 }
