@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,13 +15,10 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JTextField;
 import javax.swing.text.NumberFormatter;
 
-import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
@@ -51,6 +47,13 @@ public class HeatmapOptionsDialog extends JDialog {
         final String sf_newest_command = "sf_newest";
         final String terms_age_command = "terms_age";
         final String terms_newest_command = "terms_newest";
+        
+        String[] descriptions = new String[numButtons];
+        descriptions[0] = "No Heatmaps are shown.";
+        descriptions[1] = "All sequent formulas below the spefied age are highlighted.";
+        descriptions[2] = "The newest sequent formulas are highlighted.";
+        descriptions[3] = "All terms below the spefied age are highlighted.";
+        descriptions[4] = "The newest terms are highlighted.";
 
         radioButtons[0] = new JRadioButton("No Heatmap");
         radioButtons[0].setActionCommand(defaultCommand);
@@ -74,51 +77,23 @@ public class HeatmapOptionsDialog extends JDialog {
         formatter.setMaximum(1000);
         formatter.setAllowsInvalid(true);
         
-        int numOfTextFields = 4;
-        JFormattedTextField[] textFields = new JFormattedTextField[numOfTextFields];
+        JFormattedTextField textField = new JFormattedTextField(formatter);
 
-        for (int i = 0; i < numOfTextFields; i++) {
-            final int innerI = new Integer(i);
-            JFormattedTextField tf = new JFormattedTextField(formatter);
-            textFields[i] = tf;
-            tf.setPreferredSize(new Dimension(40, 20));
-            tf.addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    if (tf.getValue() != null) {
-                        switch (innerI) {
-                            case 0: HeatmapUtil.setSf_age((int) tf.getValue());
-                                    break;
-                            case 1: HeatmapUtil.setSf_num((int) tf.getValue());
-                                    break;
-                            case 2: HeatmapUtil.setTerms_age((int) tf.getValue());
-                                    break;
-                            case 3: HeatmapUtil.setTerms_num((int) tf.getValue());
-                                    break;
-                            default: break;
-                        }
-                    }
-                }
-            });
-        }
+        textField.setPreferredSize(new Dimension(40, 20));
+        textField.addPropertyChangeListener(new PropertyChangeListener() {
+            
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setMaxAgeForHeatmap((int) textField.getValue());
+            }
+            
+        });
         
         for (int i = 0; i < numButtons; i++) {
             textPanels[i] = new JPanel();
+            textPanels[i].add(new JLabel(descriptions[i]));
         }
-        textPanels[0].add(new JLabel("No Heatmaps are shown."));
-        textPanels[1].add(new JLabel("Sequent formulas up to age "));
-        textPanels[1].add(textFields[0]);
-        textPanels[1].add(new JLabel(" will be highlighted according to their age."));
-        textPanels[2].add(new JLabel("The "));
-        textPanels[2].add(textFields[1]);
-        textPanels[2].add(new JLabel(" newest sequent formulas will be highlighted."));
-        textPanels[3].add(new JLabel("Terms formulas up to age "));
-        textPanels[3].add(textFields[2]);
-        textPanels[3].add(new JLabel(" will be highlighted according to their age."));
-        textPanels[4].add(new JLabel("The "));
-        textPanels[4].add(textFields[3]);
-        textPanels[4].add(new JLabel(" newest terms will be highlighted."));
-        
+     
         for (int i = 0; i < numButtons; i++) {
             group.add(radioButtons[i]);
             subPanels[i] = new JPanel();
