@@ -40,18 +40,20 @@ public class PositionTable {
     // the start positions of the direct subterms (or parts of sequent, etc.)
     protected int[] startPos;
 
-    //the end positions of the direct subterms (or parts of sequent, etc.)   
+    // the end positions of the direct subterms (or parts of sequent, etc.)
     protected int[] endPos;
 
-    // the PositionTables for the direct subterms (or parts of sequent, etc.)
-    protected PositionTable[] children;    
+    /**
+     * the PositionTables for the direct subterms (or parts of sequent, etc.)
+     */
+    protected PositionTable[] children;
 
     // the current active entry number.
     // When a new "in-order" element is started, the counter is increased.
     // A new "out-of-order" element resets the counter to a fresh value.
     private int currentEntry = -1;
 
-    // the number of rows in the above arrays. Equals the number of direct 
+    // the number of rows in the above arrays. Equals the number of direct
     // subterms (or parts of sequent, etc.)
     private final int rows;
 
@@ -65,15 +67,15 @@ public class PositionTable {
      *            information is represented by the constructed object.
      */
     public PositionTable(int rows) {
-	this.rows=rows;
-	startPos=new int[rows];
-	endPos=new int[rows];
-	children=new PositionTable[rows];
-	for (int i=0; i<rows; i++) {
-	    startPos[i]=-1;
-	    endPos[i]=-1;
-	    children[i]=null;
-	}
+        this.rows = rows;
+        startPos = new int[rows];
+        endPos = new int[rows];
+        children = new PositionTable[rows];
+        for (int i = 0; i < rows; i++) {
+            startPos[i] = -1;
+            endPos[i] = -1;
+            children[i] = null;
+        }
     }
 
     /**
@@ -81,20 +83,20 @@ public class PositionTable {
      */
     private int searchEntry(int index) {
 
-	//linear search:
-	for (int m=0; m<rows; m++) {
-	    if ((startPos[m]<=index) && (index < endPos[m])) {
-		return m;
-	    }
-	}
+        // linear search:
+        for (int m = 0; m < rows; m++) {
+            if ((startPos[m] <= index) && (index < endPos[m])) {
+                return m;
+            }
+        }
 
-	//binary search (ordered arrays are precondition!), NOT CHECKED SO FAR:
+        // binary search (ordered arrays are precondition!), NOT CHECKED SO FAR:
         /*
          * int l=0; int r=rows-1; int m; while (r<l) { m=(l+r)/2; if
          * ((startPos[m]<=index) && (endPos[m]>index)) { return m; } if
          * (index<startPos[m]) { r=m; } else { l=m; } }
          */
-	return -1;
+        return -1;
     }
 
     /**
@@ -102,13 +104,12 @@ public class PositionTable {
      * <code>index</code> in its range.
      */
     protected ImmutableList<Integer> pathForIndex(int index) {
-	int sub=searchEntry(index);
-	if (sub == -1) {
-	    return ImmutableSLList.<Integer>nil();
-	} else {
-	    return children[sub].pathForIndex(index-startPos[sub])
-		.prepend(Integer.valueOf(sub));
-	}
+        int sub = searchEntry(index);
+        if (sub == -1) {
+            return ImmutableSLList.<Integer>nil();
+        } else {
+            return children[sub].pathForIndex(index - startPos[sub]).prepend(Integer.valueOf(sub));
+        }
     }
 
     /**
@@ -122,17 +123,16 @@ public class PositionTable {
      *            table. Needed in case it turns out the index belongs to the
      *            top level.
      */
-    public Range rangeForIndex(int index,int length) {
-	int sub=searchEntry(index);
-	if (sub==-1) {
-	    return new Range(0,length);
-	} else {
-	    Range r = children[sub].rangeForIndex(index-startPos[sub],
-					       endPos[sub]-startPos[sub]);
-	    r.start += startPos[sub];
-	    r.end   += startPos[sub];
-	    return r;
-	}
+    public Range rangeForIndex(int index, int length) {
+        int sub = searchEntry(index);
+        if (sub == -1) {
+            return new Range(0, length);
+        } else {
+            Range r = children[sub].rangeForIndex(index - startPos[sub], endPos[sub] - startPos[sub]);
+            r.start += startPos[sub];
+            r.end += startPos[sub];
+            return r;
+        }
     }
 
     /**
@@ -142,45 +142,43 @@ public class PositionTable {
      * modality, it returns null.
      */
     public Range firstStatementRangeForIndex(int index) {
-	int sub=searchEntry(index);
-	if (sub==-1) {
-	    return getFirstStatementRange();
-	} else {
-	    Range r = children[sub].
-		firstStatementRangeForIndex(index-startPos[sub]);
-	    if (r!=null) {
-		r.start += startPos[sub];
-		r.end   += startPos[sub];
-	    }
-	    return r;
-	}
+        int sub = searchEntry(index);
+        if (sub == -1) {
+            return getFirstStatementRange();
+        } else {
+            Range r = children[sub].firstStatementRangeForIndex(index - startPos[sub]);
+            if (r != null) {
+                r.start += startPos[sub];
+                r.end += startPos[sub];
+            }
+            return r;
+        }
     }
-    
+
     /**
      * Returns the character range of the first java statement in a program
      * modality for <i>this</i>position table. If this is not a program
      * modality, returns null. Note that this will be overridden in the subclass
      * {@link ModalityPositionTable}.
      */
-    public Range getFirstStatementRange(){
-	return null;
+    public Range getFirstStatementRange() {
+        return null;
     }
 
     /**
      * Returns the character range for the subtable indicated by the given
      * integer list.
      */
-    public Range rangeForPath(ImmutableList<Integer> path,int length) {
-	if (path.isEmpty()) {
-	    return new Range(0,length);
-	} else {
-	    int sub = path.head().intValue();
-	    Range r = children[sub].rangeForPath(path.tail(),
-					      endPos[sub]-startPos[sub]);
-	    r.start += startPos[sub];
-	    r.end   += startPos[sub];
-	    return r;	    
-	}
+    public Range rangeForPath(ImmutableList<Integer> path, int length) {
+        if (path.isEmpty()) {
+            return new Range(0, length);
+        } else {
+            int sub = path.head().intValue();
+            Range r = children[sub].rangeForPath(path.tail(), endPos[sub] - startPos[sub]);
+            r.start += startPos[sub];
+            r.end += startPos[sub];
+            return r;
+        }
     }
 
     /**
@@ -190,7 +188,7 @@ public class PositionTable {
      *
      * @param end
      *            char position that ends the sub-element started by the
-     * corresponding start entry in the position table
+     *            corresponding start entry in the position table
      * @param child
      *            PositionTable for the sub-element from start to end
      */
@@ -229,21 +227,20 @@ public class PositionTable {
      * Return of the children of this PositionTable
      */
     public PositionTable getChild(int i) {
-	
-	return children[i];
+        return children[i];
     }
 
     /**
      * returns a String representation of the position table
      */
     public String toString() {
-	String result="[";
-	for (int i=0; i<rows; i++) {
-	    result=result+"<"+startPos[i]+","+endPos[i]+","+children[i]+">";
+        String result = "[";
+        for (int i = 0; i < rows; i++) {
+            result = result + "<" + startPos[i] + "," + endPos[i] + "," + children[i] + ">";
             if (rows - 1 != i)
                 result = result + ",";
-	}
-	return result+"]";
+        }
+        return result + "]";
     }
 
     /**
@@ -259,26 +256,22 @@ public class PositionTable {
      * @param filter
      *            the sequent print filter from that was used to print the
      *            sequent
-     */    
-    
-    protected PosInSequent getSequentPIS(ImmutableList<Integer> posList,
-				       SequentPrintFilter filter) {
-	int cfmaNo = posList.head().intValue();
-	ImmutableList<Integer> tail = posList.tail();
+     */
 
-	SequentPrintFilterEntry filterEntry = 
-	    getFilterEntry(cfmaNo, filter);
+    protected PosInSequent getSequentPIS(ImmutableList<Integer> posList, SequentPrintFilter filter) {
+        int cfmaNo = posList.head().intValue();
+        ImmutableList<Integer> tail = posList.tail();
 
-	SequentFormula cfma = filterEntry.getOriginalFormula();
+        SequentPrintFilterEntry filterEntry = getFilterEntry(cfmaNo, filter);
 
-	PosInOccurrence currentPos = 
-	    new PosInOccurrence ( cfma, PosInTerm.getTopLevel(),
-				  filter.getOriginalSequent ().antecedent().contains(cfma) );
-	
-	return children[cfmaNo].getTermPIS(filterEntry,tail,
-					currentPos);
+        SequentFormula cfma = filterEntry.getOriginalFormula();
+
+        PosInOccurrence currentPos = new PosInOccurrence(cfma, PosInTerm.getTopLevel(),
+                filter.getOriginalSequent().antecedent().contains(cfma));
+
+        return children[cfmaNo].getTermPIS(filterEntry, tail, currentPos);
     }
-    
+
     /**
      * Returns a PosInSequent for a given position list, but without filling in
      * the bounds. It is assumed that this is a position table corresponding to
@@ -293,29 +286,23 @@ public class PositionTable {
      * @param pio
      *            the PosInOccurrence leading to the current term
      */
-    private PosInSequent getTermPIS(SequentPrintFilterEntry filterEntry,
-				    ImmutableList<Integer> posList,
-				    PosInOccurrence pio) {
-	if(posList.isEmpty()) {
-	    return PosInSequent.createCfmaPos(pio);
-	} else {
-	    int subNo  =  posList.head().intValue();
-	    PosInOccurrence subpio = pio.down ( subNo );	   
+    private PosInSequent getTermPIS(SequentPrintFilterEntry filterEntry, ImmutableList<Integer> posList,
+            PosInOccurrence pio) {
+        if (posList.isEmpty()) {
+            return PosInSequent.createCfmaPos(pio);
+        } else {
+            int subNo = posList.head().intValue();
+            PosInOccurrence subpio = pio.down(subNo);
 
-	    return children[subNo].getTermPIS(filterEntry,
-					   posList.tail(),
-					   subpio);
-	}
+            return children[subNo].getTermPIS(filterEntry, posList.tail(), subpio);
+        }
     }
-    
-    private static SequentPrintFilterEntry 
-	getFilterEntry(int cfmaNo, 
-		       SequentPrintFilter filter) {
-	int i = cfmaNo;
-	ImmutableList<SequentPrintFilterEntry> list =
-	    filter.getFilteredAntec().append(filter.getFilteredSucc());
+
+    private static SequentPrintFilterEntry getFilterEntry(int cfmaNo, SequentPrintFilter filter) {
+        int i = cfmaNo;
+        ImmutableList<SequentPrintFilterEntry> list = filter.getFilteredAntec().append(filter.getFilteredSucc());
         while (i-- != 0)
             list = list.tail();
-	return list.head ();
+        return list.head();
     }
 }

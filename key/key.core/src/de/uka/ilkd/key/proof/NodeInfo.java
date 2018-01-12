@@ -71,6 +71,7 @@ public class NodeInfo {
     /** User-provided plain-text annotations to the node. */
     private String notes;
 
+    /** Information about changes respective to the parent of this node. */
     private SequentChangeInfo sequentChangeInfo;
 
 

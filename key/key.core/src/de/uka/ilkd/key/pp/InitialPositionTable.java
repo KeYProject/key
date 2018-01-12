@@ -91,7 +91,7 @@ public class InitialPositionTable extends PositionTable{
 	if (posList.isEmpty() || posList.tail().isEmpty()) {
 	    return PosInSequent.createSequentPos();	
 	} else {
-	    return children[0].getSequentPIS(posList.tail(),filter);
+            return children[0].getSequentPIS(posList.tail(),filter);
 	}
     }
 
