@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -65,7 +66,7 @@ public class HeatmapOptionsDialog extends JDialog {
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(20, 5, 20, 5);
+        c.insets = new Insets(10, 5, 10, 5);
         c.ipadx = 0;
         c.ipady = 0;
         
@@ -117,6 +118,7 @@ public class HeatmapOptionsDialog extends JDialog {
         JFormattedTextField textField = new JFormattedTextField(formatter);
 
         textField.setPreferredSize(new Dimension(40, 20));
+        textField.setMaximumSize(textField.getPreferredSize());
         textField.addPropertyChangeListener(new PropertyChangeListener() {
             
             @Override
@@ -127,7 +129,6 @@ public class HeatmapOptionsDialog extends JDialog {
             }
             
         });
-        
         textField.setValue(vs.getMaxAgeForHeatmap());
         textField.setToolTipText("Please enter a value between " + formatter.getMinimum() + " and " + formatter.getMaximum() + ".");
         
@@ -138,7 +139,7 @@ public class HeatmapOptionsDialog extends JDialog {
             subPanels[i] = new JPanel();
             subPanels[i].setLayout(new BorderLayout());
             subPanels[i].add(radioButtons[i], BorderLayout.PAGE_START);
-            subPanels[i].add(textPanels[i], BorderLayout.PAGE_END);
+            subPanels[i].add(textPanels[i], BorderLayout.WEST);
         }
         
         if (vs.isShowHeatmap()) {
@@ -198,13 +199,14 @@ public class HeatmapOptionsDialog extends JDialog {
         for (int i = 0; i < numButtons; i++) {
             subPanels[i].setBorder(BorderFactory.createBevelBorder(0));
             box.add(subPanels[i]);
-            
         }
 
         JPanel tfPanel = new JPanel();
         tfPanel.setLayout(new BoxLayout(tfPanel, BoxLayout.Y_AXIS));
-        tfPanel.add(new JLabel("Enter a value for the maximum age of highlighted terms or formulas."));
-        tfPanel.add(textField);
+        tfPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        tfPanel.add(new JLabel("Maximum age of highlighted terms or formulas"));
+        JPanel tmp = new JPanel(); tmp.add(textField);
+        tfPanel.add(tmp);
         tfPanel.setBorder(BorderFactory.createBevelBorder(0));
 
         JPanel buttonPanel = new JPanel();
@@ -223,6 +225,8 @@ public class HeatmapOptionsDialog extends JDialog {
         panel.add(tfPanel, c);
         c.gridy++;
         panel.add(buttonPanel, c);
+        
+//        panel.setSize(200, 4000);
         
         add(panel);
         getRootPane().setDefaultButton(okButton);
