@@ -88,12 +88,12 @@ public class HeatmapOptionsDialog extends JDialog {
         
         String[] descriptions = new String[numButtons];
         descriptions[0] = "No Heatmaps are shown.";
-        descriptions[1] = "All sequent formulas below the spefied age are highlighted.";
+        descriptions[1] = "All sequent formulas below the specified age are highlighted.";
         descriptions[2] = "The newest sequent formulas are highlighted.";
-        descriptions[3] = "All terms below the spefied age are highlighted.";
+        descriptions[3] = "All terms below the specified age are highlighted.";
         descriptions[4] = "The newest terms are highlighted.";
 
-        radioButtons[0] = new JRadioButton("No Heatmap");
+        radioButtons[0] = new JRadioButton("No Heatmaps");
         radioButtons[0].setActionCommand(defaultCommand);
 
         radioButtons[1] = new JRadioButton("Sequent formulas up to age");
@@ -204,7 +204,8 @@ public class HeatmapOptionsDialog extends JDialog {
         JPanel tfPanel = new JPanel();
         tfPanel.setLayout(new BoxLayout(tfPanel, BoxLayout.Y_AXIS));
         tfPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        tfPanel.add(new JLabel("Maximum age of highlighted terms or formulas"));
+        tfPanel.add(new JLabel("<html><body>Maximum age of highlighted <br>terms or formulas, "
+                + "or number of <br> newest terms or formulas</body></html>"));
         JPanel tmp = new JPanel(); tmp.add(textField);
         tfPanel.add(tmp);
         tfPanel.setBorder(BorderFactory.createBevelBorder(0));
@@ -217,8 +218,8 @@ public class HeatmapOptionsDialog extends JDialog {
         
         c.gridy = 0;
         panel.add(new JLabel("<html><body>Heatmaps can be used to highlight the most recently <br>"
-                + "             changed terms or sequent formulas. Below, you can specify <br> "
-                + "             how many terms should be highlighted.</body></html>"), c);
+                + "changed terms or sequent formulas. Below, you can <br> "
+                + "specify how many terms should be highlighted.</body></html>"), c);
         c.gridy++;
         panel.add(box, c);
         c.gridy++;
