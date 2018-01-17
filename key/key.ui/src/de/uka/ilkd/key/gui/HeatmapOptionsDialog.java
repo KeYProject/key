@@ -50,7 +50,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
  */
 
 public class HeatmapOptionsDialog extends JDialog {
-    //TODO "k", färbung erklären, zweiteilung erklären.
+    //TODO zweiteilung erklären.
     /**
      * Version ID
      */
@@ -60,9 +60,12 @@ public class HeatmapOptionsDialog extends JDialog {
     
     private static final int MAX_AGE = 1000;
 
-    private static final String INTRO_LABEL = "<html><body>Heatmaps can be used to highlight the most recently <br>"
-            + "changed terms or sequent formulas. Below, you can <br> "
-            + "specify how many terms should be highlighted.</body></html>";
+    private static final String INTRO_LABEL = "<html><body>Heatmaps can be used to highlight the most recent <br>"
+            + "changes in the sequent. You can choose to highlight <br> "
+            + "entire sequent formulas or subterms.  Highlighting can either <br>"
+            + "be done on the newest expressions, or on all expressions <br>"
+            + "that have changed whithin the last <i> k </i> steps of the proof. <br>"
+            + "Newer expressions will have a stronger highlight. </body></html>";
 
     private static final String TEXTFIELD_LABEL = "<html><body>Maximum age of highlighted <br>terms or formulas, "
             + "or number of <br> newest terms or formulas</body></html>";
@@ -75,10 +78,10 @@ public class HeatmapOptionsDialog extends JDialog {
             "Newest sequent formulas", "Terms up to age", "Newest terms"};
     
     public static final String[] DESCRIPTIONS = {"No Heatmaps are shown.",
-            "All sequent formulas below the specified age are highlighted.",
-            "The newest sequent formulas are highlighted.",
-            "All terms below the specified age are highlighted.",
-            "The newest terms are highlighted."};
+            "<html><body>All sequent formulas that have changed in the last <i> k </i> steps are highlighted.</body></html>",
+            "<html><body>The <i> k </i> newest sequent formulas are highlighted.</body></html>",
+            "<html><body>All terms that have changed in the last <i> k </i> steps are highlighted.</body></html>",
+            "<html><body>The <i> k </i> newest terms are highlighted.</body></html>"};
     
     private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and 1000";
     
@@ -196,11 +199,10 @@ public class HeatmapOptionsDialog extends JDialog {
         }
 
         JPanel tfPanel = new JPanel();
-        tfPanel.setLayout(new BoxLayout(tfPanel, BoxLayout.Y_AXIS));
-        tfPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        tfPanel.add(new JLabel(TEXTFIELD_LABEL));
-        JPanel tmp = new JPanel(); tmp.add(textField);
-        tfPanel.add(tmp);
+        tfPanel.setLayout(new BorderLayout());
+        tfPanel.add(new JLabel(TEXTFIELD_LABEL), BorderLayout.NORTH);
+        JPanel tmp = new JPanel(); tmp.add(new JLabel("k = ")); tmp.add(textField);
+        tfPanel.add(tmp, BorderLayout.CENTER);
         tfPanel.setBorder(BorderFactory.createBevelBorder(0));
 
         JPanel buttonPanel = new JPanel();
