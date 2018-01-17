@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -23,6 +22,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -50,7 +51,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
  */
 
 public class HeatmapOptionsDialog extends JDialog {
-    //TODO zweiteilung erklären.
+    //TODO textfield verhalten bei no heatmap + falsche eingabe; docu (checkstyle!)
     /**
      * Version ID
      */
@@ -143,43 +144,8 @@ public class HeatmapOptionsDialog extends JDialog {
         } else {
             radioButtons[0].setSelected(true);
         }
-
-        okButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String command = group.getSelection().getActionCommand();
-                if (command == COMMANDS[0]) {
-                    vs.setShowHeatmap(false);
-                    dispose();
-                } else if (command == COMMANDS[1]) {
-                    vs.setShowHeatmap(true);
-                    vs.setHeatmapSF(true);
-                    vs.setHeatmapNewest(false);
-                } else if (command == COMMANDS[2]) {
-                    vs.setShowHeatmap(true);
-                    vs.setHeatmapSF(true);
-                    vs.setHeatmapNewest(true);
-                } else if (command == COMMANDS[3]) {
-                    vs.setShowHeatmap(true);
-                    vs.setHeatmapSF(false);
-                    vs.setHeatmapNewest(false);
-                } else if (command == COMMANDS[4]) {
-                    vs.setShowHeatmap(true);
-                    vs.setHeatmapSF(false);
-                    vs.setHeatmapNewest(true);
-                }
-                if (textField.getValue() != null ) {
-                    if (textField.isEditValid()) {
-                        vs.setMaxAgeForHeatmap((int) textField.getValue());
-                        dispose();
-                    } else {
-                        JOptionPane.showMessageDialog(panel,
-                                INPUT_ERROR_MESSAGE,
-                                "Invalid Input",
-                                JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            }
-        });
+        
+        
         
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -222,6 +188,57 @@ public class HeatmapOptionsDialog extends JDialog {
         
         add(panel);
         getRootPane().setDefaultButton(okButton);
+        
+        Action action = new AbstractAction() {
+            
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String command = group.getSelection().getActionCommand();
+                if (command == COMMANDS[0]) {
+                    vs.setShowHeatmap(false);
+                    dispose();
+                } else if (command == COMMANDS[1]) {
+                    vs.setShowHeatmap(true);
+                    vs.setHeatmapSF(true);
+                    vs.setHeatmapNewest(false);
+                } else if (command == COMMANDS[2]) {
+                    vs.setShowHeatmap(true);
+                    vs.setHeatmapSF(true);
+                    vs.setHeatmapNewest(true);
+                } else if (command == COMMANDS[3]) {
+                    vs.setShowHeatmap(true);
+                    vs.setHeatmapSF(false);
+                    vs.setHeatmapNewest(false);
+                } else if (command == COMMANDS[4]) {
+                    vs.setShowHeatmap(true);
+                    vs.setHeatmapSF(false);
+                    vs.setHeatmapNewest(true);
+                }
+                if (textField.getValue() != null ) {
+                    if (textField.isEditValid()) {
+                        vs.setMaxAgeForHeatmap((int) textField.getValue());
+                        dispose();
+                    } else {
+                        if (vs.isShowHeatmap()) {
+                            JOptionPane.showMessageDialog(panel,
+                                    INPUT_ERROR_MESSAGE,
+                                    "Invalid Input",
+                                    JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            dispose();
+                        }
+                    }
+                }
+            }
+        };
+
+        okButton.addActionListener(action);
+        textField.addActionListener(action);
         
         pack();
         setLocationRelativeTo(null);
