@@ -21,8 +21,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 
 import javax.swing.BorderFactory;
@@ -32,6 +30,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.text.NumberFormatter;
@@ -51,11 +50,37 @@ import de.uka.ilkd.key.settings.ViewSettings;
  */
 
 public class HeatmapOptionsDialog extends JDialog {
-
+    //TODO "k", färbung erklären, zweiteilung erklären.
     /**
      * Version ID
      */
     private static final long serialVersionUID = 5731407140427140088L;
+    
+    private static final int MIN_AGE = 1;
+    
+    private static final int MAX_AGE = 1000;
+
+    private static final String INTRO_LABEL = "<html><body>Heatmaps can be used to highlight the most recently <br>"
+            + "changed terms or sequent formulas. Below, you can <br> "
+            + "specify how many terms should be highlighted.</body></html>";
+
+    private static final String TEXTFIELD_LABEL = "<html><body>Maximum age of highlighted <br>terms or formulas, "
+            + "or number of <br> newest terms or formulas</body></html>";
+
+    private static final String TOOLTIP_TEXT = "Please enter a number between " + MIN_AGE + " and " + MAX_AGE + ".";
+    
+    public static final String[] COMMANDS = {"default", "sf_age", "sf_newest", "terms_age", "terms_newest"};
+    
+    public static final String[] BUTTON_DESC = {"No Heatmaps", "Sequent formulas up to age", 
+            "Newest sequent formulas", "Terms up to age", "Newest terms"};
+    
+    public static final String[] DESCRIPTIONS = {"No Heatmaps are shown.",
+            "All sequent formulas below the specified age are highlighted.",
+            "The newest sequent formulas are highlighted.",
+            "All terms below the specified age are highlighted.",
+            "The newest terms are highlighted."};
+    
+    private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and 1000";
     
     public HeatmapOptionsDialog() {
         
@@ -70,76 +95,32 @@ public class HeatmapOptionsDialog extends JDialog {
         c.ipadx = 0;
         c.ipady = 0;
         
-        final int numButtons = 5;
-        JRadioButton[] radioButtons = new JRadioButton[numButtons];
-        JPanel[] subPanels = new JPanel[numButtons];
-        JPanel[] textPanels = new JPanel[numButtons];
+        final int numRadioButtons = 5;
+        JRadioButton[] radioButtons = new JRadioButton[numRadioButtons];
         
         final ButtonGroup group = new ButtonGroup();
         JButton okButton = new JButton("OK");
         JButton cancelButton = new JButton("Cancel");
-
-
-        final String defaultCommand = "default";
-        final String sf_age_command = "sf_age";
-        final String sf_newest_command = "sf_newest";
-        final String terms_age_command = "terms_age";
-        final String terms_newest_command = "terms_newest";
-        
-        String[] descriptions = new String[numButtons];
-        descriptions[0] = "No Heatmaps are shown.";
-        descriptions[1] = "All sequent formulas below the specified age are highlighted.";
-        descriptions[2] = "The newest sequent formulas are highlighted.";
-        descriptions[3] = "All terms below the specified age are highlighted.";
-        descriptions[4] = "The newest terms are highlighted.";
-
-        radioButtons[0] = new JRadioButton("No Heatmaps");
-        radioButtons[0].setActionCommand(defaultCommand);
-
-        radioButtons[1] = new JRadioButton("Sequent formulas up to age");
-        radioButtons[1].setActionCommand(sf_age_command);
-
-        radioButtons[2] = new JRadioButton("Newest sequent formulas");
-        radioButtons[2].setActionCommand(sf_newest_command);
-
-        radioButtons[3] = new JRadioButton("Terms up to age");
-        radioButtons[3].setActionCommand(terms_age_command);
-
-        radioButtons[4] = new JRadioButton("Newest terms");
-        radioButtons[4].setActionCommand(terms_newest_command);
         
         NumberFormat format = NumberFormat.getInstance();
         NumberFormatter formatter = new NumberFormatter(format);
         formatter.setValueClass(Integer.class);
-        formatter.setMinimum(1);
-        formatter.setMaximum(1000);
+        formatter.setMinimum(MIN_AGE);
+        formatter.setMaximum(MAX_AGE);
         formatter.setAllowsInvalid(true);
         
         JFormattedTextField textField = new JFormattedTextField(formatter);
 
         textField.setPreferredSize(new Dimension(40, 20));
         textField.setMaximumSize(textField.getPreferredSize());
-        textField.addPropertyChangeListener(new PropertyChangeListener() {
-            
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (textField.getValue() != null ) {
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setMaxAgeForHeatmap((int) textField.getValue());
-                }
-            }
-            
-        });
+        textField.setFocusLostBehavior(JFormattedTextField.COMMIT);
         textField.setValue(vs.getMaxAgeForHeatmap());
-        textField.setToolTipText("Please enter a value between " + formatter.getMinimum() + " and " + formatter.getMaximum() + ".");
+        textField.setToolTipText(TOOLTIP_TEXT);
         
-        for (int i = 0; i < numButtons; i++) {
-            textPanels[i] = new JPanel();
-            textPanels[i].add(new JLabel(descriptions[i]));
+        for (int i = 0; i < numRadioButtons; i++) {
+            radioButtons[i] = new JRadioButton(BUTTON_DESC[i]);
+            radioButtons[i].setActionCommand(COMMANDS[i]);
             group.add(radioButtons[i]);
-            subPanels[i] = new JPanel();
-            subPanels[i].setLayout(new BorderLayout());
-            subPanels[i].add(radioButtons[i], BorderLayout.PAGE_START);
-            subPanels[i].add(textPanels[i], BorderLayout.WEST);
         }
         
         if (vs.isShowHeatmap()) {
@@ -163,30 +144,39 @@ public class HeatmapOptionsDialog extends JDialog {
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String command = group.getSelection().getActionCommand();
-                ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
-                if (command == defaultCommand) {
+                if (command == COMMANDS[0]) {
                     vs.setShowHeatmap(false);
-                } else if (command == sf_age_command) {
+                    dispose();
+                } else if (command == COMMANDS[1]) {
                     vs.setShowHeatmap(true);
                     vs.setHeatmapSF(true);
                     vs.setHeatmapNewest(false);
-                } else if (command == sf_newest_command) {
+                } else if (command == COMMANDS[2]) {
                     vs.setShowHeatmap(true);
                     vs.setHeatmapSF(true);
                     vs.setHeatmapNewest(true);
-                } else if (command == terms_age_command) {
+                } else if (command == COMMANDS[3]) {
                     vs.setShowHeatmap(true);
                     vs.setHeatmapSF(false);
                     vs.setHeatmapNewest(false);
-                } else if (command == terms_newest_command) {
+                } else if (command == COMMANDS[4]) {
                     vs.setShowHeatmap(true);
                     vs.setHeatmapSF(false);
                     vs.setHeatmapNewest(true);
                 }
-                dispose();
+                if (textField.getValue() != null ) {
+                    if (textField.isEditValid()) {
+                        vs.setMaxAgeForHeatmap((int) textField.getValue());
+                        dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(panel,
+                                INPUT_ERROR_MESSAGE,
+                                "Invalid Input",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                }
             }
         });
-        
         
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -194,18 +184,21 @@ public class HeatmapOptionsDialog extends JDialog {
             }
         });
         
-        JPanel box  = new JPanel();
-        box.setLayout(new BoxLayout(box, BoxLayout.Y_AXIS));
-        for (int i = 0; i < numButtons; i++) {
-            subPanels[i].setBorder(BorderFactory.createBevelBorder(0));
-            box.add(subPanels[i]);
+        JPanel radioBoxes  = new JPanel();
+        radioBoxes.setLayout(new BoxLayout(radioBoxes, BoxLayout.Y_AXIS));
+        for (int i = 0; i < numRadioButtons; i++) {
+            JPanel p = new JPanel();
+            p.setLayout(new BorderLayout());
+            p.add(radioButtons[i], BorderLayout.PAGE_START);
+            p.add(new JLabel(DESCRIPTIONS[i]));
+            p.setBorder(BorderFactory.createBevelBorder(0));
+            radioBoxes.add(p);
         }
 
         JPanel tfPanel = new JPanel();
         tfPanel.setLayout(new BoxLayout(tfPanel, BoxLayout.Y_AXIS));
         tfPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        tfPanel.add(new JLabel("<html><body>Maximum age of highlighted <br>terms or formulas, "
-                + "or number of <br> newest terms or formulas</body></html>"));
+        tfPanel.add(new JLabel(TEXTFIELD_LABEL));
         JPanel tmp = new JPanel(); tmp.add(textField);
         tfPanel.add(tmp);
         tfPanel.setBorder(BorderFactory.createBevelBorder(0));
@@ -213,21 +206,17 @@ public class HeatmapOptionsDialog extends JDialog {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.add(okButton);
-        buttonPanel.add(new JLabel("                     "));
+        buttonPanel.add(new JLabel("                   "));
         buttonPanel.add(cancelButton);
         
         c.gridy = 0;
-        panel.add(new JLabel("<html><body>Heatmaps can be used to highlight the most recently <br>"
-                + "changed terms or sequent formulas. Below, you can <br> "
-                + "specify how many terms should be highlighted.</body></html>"), c);
+        panel.add(new JLabel(INTRO_LABEL), c);
         c.gridy++;
-        panel.add(box, c);
+        panel.add(radioBoxes, c);
         c.gridy++;
         panel.add(tfPanel, c);
         c.gridy++;
         panel.add(buttonPanel, c);
-        
-//        panel.setSize(200, 4000);
         
         add(panel);
         getRootPane().setDefaultButton(okButton);
