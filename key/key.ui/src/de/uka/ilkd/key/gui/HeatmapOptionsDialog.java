@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -36,8 +39,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.text.NumberFormatter;
 
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.ViewSettings;
 
 /**
  * This Dialog contains options for highlighting sequent formulas 
@@ -53,14 +54,17 @@ import de.uka.ilkd.key.settings.ViewSettings;
 public class HeatmapOptionsDialog extends JDialog {
     //TODO textfield verhalten bei no heatmap + falsche eingabe; docu (checkstyle!)
     /**
-     * Version ID
+     * Version ID.
      */
     private static final long serialVersionUID = 5731407140427140088L;
     
+    /** Minimal setting for number of highlighted terms */
     private static final int MIN_AGE = 1;
     
+    /** Maximal setting for number of highlighted terms */
     private static final int MAX_AGE = 1000;
 
+    /** Text for introductory heatmap explanation */
     private static final String INTRO_LABEL = "<html><body>Heatmaps can be used to highlight the most recent <br>"
             + "changes in the sequent. You can choose to highlight <br> "
             + "entire sequent formulas or subterms.  Highlighting can either <br>"
@@ -68,24 +72,33 @@ public class HeatmapOptionsDialog extends JDialog {
             + "that have changed whithin the last <i> k </i> steps of the proof. <br>"
             + "Newer expressions will have a stronger highlight. </body></html>";
 
+    /** Explanation for age textfield */
     private static final String TEXTFIELD_LABEL = "<html><body>Maximum age of highlighted <br>terms or formulas, "
             + "or number of <br> newest terms or formulas</body></html>";
 
+    /** Tool tip for age textfield */
     private static final String TOOLTIP_TEXT = "Please enter a number between " + MIN_AGE + " and " + MAX_AGE + ".";
-    
+
+    /** Button command names */
     public static final String[] COMMANDS = {"default", "sf_age", "sf_newest", "terms_age", "terms_newest"};
-    
-    public static final String[] BUTTON_DESC = {"No Heatmaps", "Sequent formulas up to age", 
+
+    /** Button names */
+    public static final String[] BUTTON_NAMES = {"No Heatmaps", "Sequent formulas up to age", 
             "Newest sequent formulas", "Terms up to age", "Newest terms"};
-    
+
+    /** Descriptions for heatmap options */
     public static final String[] DESCRIPTIONS = {"No Heatmaps are shown.",
             "<html><body>All sequent formulas that have changed in the last <i> k </i> steps are highlighted.</body></html>",
             "<html><body>The <i> k </i> newest sequent formulas are highlighted.</body></html>",
             "<html><body>All terms that have changed in the last <i> k </i> steps are highlighted.</body></html>",
             "<html><body>The <i> k </i> newest terms are highlighted.</body></html>"};
-    
+
+    /** Error message on invalid textfield input */
     private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and 1000";
     
+    /**
+     * Opens a dialog for choosing if and how to display heatmap highlighting.
+     */
     public HeatmapOptionsDialog() {
         
         setTitle("Heatmap Options");
@@ -106,15 +119,14 @@ public class HeatmapOptionsDialog extends JDialog {
         JButton okButton = new JButton("OK");
         JButton cancelButton = new JButton("Cancel");
         
+        // set up age textfield
         NumberFormat format = NumberFormat.getInstance();
         NumberFormatter formatter = new NumberFormatter(format);
         formatter.setValueClass(Integer.class);
         formatter.setMinimum(MIN_AGE);
         formatter.setMaximum(MAX_AGE);
         formatter.setAllowsInvalid(true);
-        
         JFormattedTextField textField = new JFormattedTextField(formatter);
-
         textField.setPreferredSize(new Dimension(40, 20));
         textField.setMaximumSize(textField.getPreferredSize());
         textField.setFocusLostBehavior(JFormattedTextField.COMMIT);
@@ -122,11 +134,12 @@ public class HeatmapOptionsDialog extends JDialog {
         textField.setToolTipText(TOOLTIP_TEXT);
         
         for (int i = 0; i < numRadioButtons; i++) {
-            radioButtons[i] = new JRadioButton(BUTTON_DESC[i]);
+            radioButtons[i] = new JRadioButton(BUTTON_NAMES[i]);
             radioButtons[i].setActionCommand(COMMANDS[i]);
             group.add(radioButtons[i]);
         }
         
+        // Display the current settings
         if (vs.isShowHeatmap()) {
             if (vs.isHeatmapSF()) {
                 if (vs.isHeatmapNewest()) {
@@ -144,8 +157,6 @@ public class HeatmapOptionsDialog extends JDialog {
         } else {
             radioButtons[0].setSelected(true);
         }
-        
-        
         
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -189,13 +200,11 @@ public class HeatmapOptionsDialog extends JDialog {
         add(panel);
         getRootPane().setDefaultButton(okButton);
         
+        // action for okButton and textfield
         Action action = new AbstractAction() {
-            
-            /**
-             * 
-             */
-            private static final long serialVersionUID = 1L;
-            
+
+            private static final long serialVersionUID = -5840137383763071948L;
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 String command = group.getSelection().getActionCommand();
