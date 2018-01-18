@@ -289,29 +289,33 @@ public class HeatmapOptionsDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String command = group.getSelection().getActionCommand();
+                boolean showHm = VS.isShowHeatmap();
+                boolean SF = VS.isHeatmapSF();
+                boolean newest = VS.isHeatmapNewest();
+                int ma = VS.getMaxAgeForHeatmap();
                 if (command == COMMANDS[0]) {
-                    VS.setShowHeatmap(false);
+                    VS.setHeatmapOptions(false, SF, newest, ma);
                     dispose();
                 } else if (command == COMMANDS[1]) {
-                    VS.setShowHeatmap(true);
-                    VS.setHeatmapSF(true);
-                    VS.setHeatmapNewest(false);
+                    showHm = true;
+                    SF = true;
+                    newest = false;
                 } else if (command == COMMANDS[2]) {
-                    VS.setShowHeatmap(true);
-                    VS.setHeatmapSF(true);
-                    VS.setHeatmapNewest(true);
+                    showHm = true;
+                    SF = true;
+                    newest = true;
                 } else if (command == COMMANDS[3]) {
-                    VS.setShowHeatmap(true);
-                    VS.setHeatmapSF(false);
-                    VS.setHeatmapNewest(false);
+                    showHm = true;
+                    SF = false;
+                    newest = false;
                 } else if (command == COMMANDS[4]) {
-                    VS.setShowHeatmap(true);
-                    VS.setHeatmapSF(false);
-                    VS.setHeatmapNewest(true);
+                    showHm = true;
+                    SF = false;
+                    newest = true;
                 }
                 if (textField.getValue() != null) {
                     if (textField.isEditValid()) {
-                        VS.setMaxAgeForHeatmap((int) textField.getValue());
+                        VS.setHeatmapOptions(showHm, SF, newest, (int) textField.getValue());
                         dispose();
                     } else {
                         if (VS.isShowHeatmap()) {

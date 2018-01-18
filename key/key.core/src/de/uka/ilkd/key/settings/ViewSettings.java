@@ -44,7 +44,7 @@ public class ViewSettings implements Settings, Cloneable {
     private static final String CONFIRM_EXIT = "[View]ConfirmExit";
     /** Heatmap options property */
     private static final String HEATMAP_OPTIONS = "[View]HeatmapOptions";
-    
+
     /** default max number of displayed tooltip lines is 40 */
     private int maxTooltipLines = 40;
     /** do not print the find, varcond and heuristics part of taclets in
@@ -232,6 +232,7 @@ public class ViewSettings implements Settings, Cloneable {
      * represents the stored settings
      * @param props the collection of properties
      */
+    @Override
     public void readSettings(Object sender, Properties props) {
 		String val1 = props.getProperty(MAX_TOOLTIP_LINES_KEY);
 		String val2 = props.getProperty(FONT_INDEX);
@@ -290,10 +291,8 @@ public class ViewSettings implements Settings, Cloneable {
 		}
         if (hm != null) {
             String[] s = hm.split(" ");
-            this.setShowHeatmap(Boolean.valueOf(s[0]));
-            this.setHeatmapSF(Boolean.valueOf(s[1]));
-            this.setHeatmapNewest(Boolean.valueOf(s[2]));
-            this.setMaxAgeForHeatmap(Integer.valueOf(s[3]));
+            this.setHeatmapOptions(Boolean.valueOf(s[0]), Boolean.valueOf(s[1]),
+                    Boolean.valueOf(s[2]), Integer.valueOf(s[3]));
         }
 	}
 
@@ -307,6 +306,7 @@ public class ViewSettings implements Settings, Cloneable {
 	 *           the Properties object where to write the settings as (key,
 	 *           value) pair
 	 */
+    @Override
     public void writeSettings(Object sender,Properties props) {
     	props.setProperty(MAX_TOOLTIP_LINES_KEY, "" + maxTooltipLines);
     	props.setProperty(SHOW_WHOLE_TACLET, "" + showWholeTaclet);
@@ -341,6 +341,7 @@ public class ViewSettings implements Settings, Cloneable {
      * adds a listener to the settings object
      * @param l the listener
      */
+    @Override
     public void addSettingsListener(SettingsListener l) {
 	listenerList.add(l);
     }
@@ -439,13 +440,25 @@ public void setUseUnicode(boolean useUnicode) {
     }
 
     /**
-     * Set whether heatmaps should be displayed
+     * Updates heatmap settings (all of the at the same time, so that
+     * fireSettingsChanged is called only once.
      *
      * @param showHeatmap
      *            true if heatmap on
+     * @param heatmapSF
+     *            true for sequent formulas, false for terms
+     * @param heatmapNewest
+     *            true if newest, false for "up to age"
+     * @param maxAgeForHeatmap
+     *            the maximum age for term or sequent formulas, concerning
+     *            heatmap highlighting
      */
-    public void setShowHeatmap(boolean showHeatmap) {
+    public void setHeatmapOptions(boolean showHeatmap, boolean heatmapSF, boolean heatmapNewest,
+            int maxAgeForHeatmap) {
         this.showHeatmap = showHeatmap;
+        this.heatmapSF = heatmapSF;
+        this.heatmapNewest = heatmapNewest;
+        this.maxAgeForHeatmap = maxAgeForHeatmap;
         fireSettingsChanged();
     }
 
@@ -454,29 +467,9 @@ public void setUseUnicode(boolean useUnicode) {
         return heatmapSF;
     }
 
-    /**
-     * Set whether sequent formulas or terms should be highlighted * 
-     * @param heatmapSF true for sequent formulas, false for terms
-     */
-    public void setHeatmapSF(boolean heatmapSF) {
-        this.heatmapSF = heatmapSF;
-        fireSettingsChanged();
-    }
-
     /** @return whether to highlight "newest" or "up to age" */
     public boolean isHeatmapNewest() {
         return heatmapNewest;
-    }
-
-    /**
-     * Set whether to highlight "newest" or "up to age"
-     *
-     * @param heatmapNewest
-     *            true if newest, false for "up to age"
-     */
-    public void setHeatmapNewest(boolean heatmapNewest) {
-        this.heatmapNewest = heatmapNewest;
-        fireSettingsChanged();
     }
 
     /**
@@ -485,16 +478,5 @@ public void setUseUnicode(boolean useUnicode) {
      */
     public int getMaxAgeForHeatmap() {
         return maxAgeForHeatmap;
-    }
-
-    /**
-     * Set the maximum age for term or sequent formulas, concerning heatmap
-     * highlighting
-     *
-     * @param maxAgeForHeatmap the new maxmimum age
-     */
-    public void setMaxAgeForHeatmap(int maxAgeForHeatmap) {
-        this.maxAgeForHeatmap = maxAgeForHeatmap;
-        fireSettingsChanged();
     }
 }
