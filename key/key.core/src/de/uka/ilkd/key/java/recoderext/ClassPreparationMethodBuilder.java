@@ -98,9 +98,7 @@ public class ClassPreparationMethodBuilder
     	    result = ce.isCompileTimeConstant(spec.getInitializer()); 
     	} catch (java.lang.ArithmeticException t) {
     	    result = false;
-    	} catch (NumberFormatException e) {
-            // throw new PosConvertException(e.getMessage(), spec.getStartPosition().getLine(), spec.getStartPosition().getColumn());
-    	    // SLTranslationException(e.getMessage(), "", spec.getStartPosition().getLine(), spec.getStartPosition().getColumn());
+        } catch (NumberFormatException e) {
             result = false;
     	}
     	

@@ -109,21 +109,21 @@ public class ClassInitializeMethodBuilder
      * constant fields is due to binary compatibility reasons.
      */
     private boolean isConstantField(FieldSpecification spec) {
-	boolean result = spec.isStatic() && spec.isFinal();
-	if (!result) {
-		return result;
-	}
-	recoder.service.ConstantEvaluator ce = services.getConstantEvaluator(); 
-	
-	try {
-	    result = ce.isCompileTimeConstant(spec.getInitializer()); 
-	} catch (NumberFormatException e) {
-	    result = false;
-	} catch (java.lang.ArithmeticException t) {
-	    result = false;
-	}
-	
-	return result;
+        boolean result = spec.isStatic() && spec.isFinal();
+        if (!result) {
+            return result;
+        }
+        recoder.service.ConstantEvaluator ce = services.getConstantEvaluator();
+
+        try {
+            result = ce.isCompileTimeConstant(spec.getInitializer());
+        } catch (NumberFormatException e) {
+            result = false;
+        } catch (java.lang.ArithmeticException t) {
+            result = false;
+        }
+
+        return result;
     }
 
     /** creates the package reference java.lang */

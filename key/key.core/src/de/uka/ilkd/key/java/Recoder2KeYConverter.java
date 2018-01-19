@@ -951,12 +951,16 @@ public class Recoder2KeYConverter {
         return new FloatLiteral(collectComments(floatLit), floatLit.getValue());
     }
 
-    /** convert a recoder LongLiteral to a KeY LongLiteral */
+    /** convert a recoder LongLiteral to a KeY LongLiteral
+     * @param longLit the LongLiteral from recoder
+     * @return a KeY LongLiteral (immutable)*/
     public LongLiteral convert(recoder.java.expression.literal.LongLiteral longLit) {
         return new LongLiteral(collectComments(longLit), longLit.getValue());
     }
 
-    /** convert a recoder CharLiteral to a KeY CharLiteral */
+    /** convert a recoder CharLiteral to a KeY CharLiteral
+     * @param charLit the CharLiteral from recoder
+     * @return a KeY CharLiteral (immutable)*/
     public CharLiteral convert(recoder.java.expression.literal.CharLiteral charLit) {
         return new CharLiteral(collectComments(charLit), charLit.getValue());
     }
@@ -2192,10 +2196,14 @@ public class Recoder2KeYConverter {
         return new UnsignedShiftRightAssignment(collectChildrenAndComments(arg));
     }
 
-//    public Negative convert(recoder.java.expression.operator.Negative arg) {
-//        return new Negative(collectChildrenAndComments(arg));
-//    }
-
+    /**
+     * Converts the Negative from recoder to the corresponding KeY JavaProgramElement.
+     * If the minus sign belongs to the (decimal) literal, it is included into the literal
+     * and the corresponding Int-/LongLiteral is returned. Otherwise a KeY Negative is returned.
+     * @param arg the recoder Negative
+     * @return a KeY Int-/LongLiteral if the minus sign belongs to the literal or a KeY Negative
+     * otherwise
+     */
     public JavaProgramElement convert(recoder.java.expression.operator.Negative arg) {
         /* if the minus surrounds a decimal Int-/LongLiteral
          * -> minus belongs to the literal, no separate javaUnaryMinus(...) */
