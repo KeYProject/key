@@ -191,6 +191,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 	    try {
 		ProofJavaParser.initialize(in);
 		CompilationUnit res = ProofJavaParser.CompilationUnit();
+		JavaDumper.dump(res);
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {

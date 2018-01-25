@@ -189,6 +189,7 @@ import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.java.NonTerminalProgramElement;
+import recoder.java.SourceElement;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTList;
 
@@ -543,8 +544,18 @@ public class Recoder2KeYConverter {
     private PositionInfo positionInfo(recoder.java.SourceElement se) {
         Position relPos = new Position(se.getRelativePosition().getLine(), se
                 .getRelativePosition().getColumn());
-        Position startPos = new Position(se.getStartPosition().getLine(), se
-                .getStartPosition().getColumn());
+        
+        SourceElement s = se;
+        recoder.java.SourceElement.Position start = s.getStartPosition();
+        while(s != null && start == recoder.java.SourceElement.Position.UNDEFINED) {
+        	SourceElement first = s.getFirstElement();
+        	if(first == s)
+        		s = null;
+        		else
+			s = first;
+        }
+        
+        Position startPos = new Position(start.getLine(), start.getColumn());
         Position endPos = new Position(se.getEndPosition().getLine(), se
                 .getEndPosition().getColumn());
         if ((!inLoopInit))
