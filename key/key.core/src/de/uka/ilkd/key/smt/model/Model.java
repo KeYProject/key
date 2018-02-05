@@ -585,7 +585,7 @@ public class Model {
 		}
 		ObjectVal o = getObject(constants.get(objName), heap);
 		int i = 1;
-		while(!o.equals(nullString) && i < l.length){			
+		while(!o.getName().equals(nullString) && i < l.length){			
 			result.add(o);
 			//System.out.println(o.getName()+"."+l[i]);
 			String pointed = o.getFieldUsingSimpleName(l[i]);
@@ -615,7 +615,7 @@ public class Model {
 		}
 		ObjectVal o = getObject(constants.get(objName), heap);
 		int i = 1;
-		while(!o.equals(nullString) && i < l.length){			
+		while(!o.getName().equals(nullString) && i < l.length){			
 			
 			//System.out.println(o.getName()+"."+l[i]);
 			String pointed = o.getFieldUsingSimpleName(l[i]);
