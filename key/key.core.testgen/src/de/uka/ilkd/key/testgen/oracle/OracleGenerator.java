@@ -341,9 +341,9 @@ public class OracleGenerator {
 			
 			//System.out.println(services.getVariableNamer().getRenamingMap());
 			
-			LocationVariable loc = (LocationVariable) var;
+			//LocationVariable loc = (LocationVariable) var;
 			//System.out.println("Term: "+loc.sort()+" "+loc.name());
-			return new OracleConstant(loc.name().toString(), loc.sort());
+			return new OracleConstant(var.name().toString(), var.sort());
 		}
 		
 		else{
