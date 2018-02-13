@@ -75,7 +75,7 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
                             Set<TermLabel> labels) {
       if (rule instanceof WhileInvariantRule && "LoopBodyModality".equals(hint) ||
           ( rule instanceof BlockContractRule && 
-                  ((BlockContractRule.BlockContractHint)hint).getExcecptionalVariable() != null) 
+                  ((BlockContractRule.BlockContractHint)hint).getExceptionalVariable() != null) 
           ) {
          TermLabel label = CollectionUtil.searchAndRemove(labels, new IFilter<TermLabel>() {
             @Override

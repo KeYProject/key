@@ -71,7 +71,7 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
                             JavaBlock newTermJavaBlock,
                             Set<TermLabel> labels) {
        if (rule instanceof BlockContractRule &&
-               ((BlockContractRule.BlockContractHint)hint).getExcecptionalVariable() != null 
+               ((BlockContractRule.BlockContractHint)hint).getExceptionalVariable() != null 
                && 
                SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
            if (CollectionUtil.search(labels, new IFilter<TermLabel>() {
@@ -80,7 +80,7 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
                    return element instanceof BlockContractValidityTermLabel;
                }
            }) == null) {
-               labels.add(new BlockContractValidityTermLabel(((BlockContractRule.BlockContractHint)hint).getExcecptionalVariable()));
+               labels.add(new BlockContractValidityTermLabel(((BlockContractRule.BlockContractHint)hint).getExceptionalVariable()));
            }
       }
    }
