@@ -32,6 +32,8 @@ public class IntegerOpHandler implements SMTHandler {
 
         supportedOperators.put(integerLDT.getLessOrEquals(), "<=");
         supportedOperators.put(integerLDT.getLessThan(), "<");
+        supportedOperators.put(integerLDT.getGreaterOrEquals(), ">=");
+        supportedOperators.put(integerLDT.getGreaterThan(), ">");
     }
 
     @Override
@@ -48,10 +50,11 @@ public class IntegerOpHandler implements SMTHandler {
         assert smtOp != null;
 
         Type resultType;
-        if(smtOp.contains("<") || smtOp.contains(">"))
+        if(smtOp.contains("<") || smtOp.contains(">")) {
             resultType = Type.BOOL;
-        else
+        } else {
             resultType = Type.INT;
+        }
 
         return new SExpr(smtOp, resultType, children);
     }
