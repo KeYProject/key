@@ -25,9 +25,10 @@ import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
+import de.uka.ilkd.key.rule.AbstractBlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.BlockContractSeparateRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
@@ -127,6 +128,7 @@ public class JavaProfile extends AbstractProfile {
         builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
                                    .prepend(LoopScopeInvariantRule.INSTANCE)
                                    .prepend(BlockContractRule.INSTANCE)
+                                   .prepend(BlockContractSeparateRule.INSTANCE)
                                    .prepend(UseDependencyContractRule.INSTANCE)
                                    .prepend(getOneStepSimpilifier())
                                    .prepend(QueryExpand.INSTANCE)
@@ -229,6 +231,6 @@ public class JavaProfile extends AbstractProfile {
    public boolean isSpecificationInvolvedInRuleApp(RuleApp app) {
       return app instanceof LoopInvariantBuiltInRuleApp ||
              app instanceof AbstractContractRuleApp ||
-             app instanceof BlockContractBuiltInRuleApp;
+             app instanceof AbstractBlockContractBuiltInRuleApp;
    }
 }

@@ -27,10 +27,14 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
+import de.uka.ilkd.key.rule.AbstractBlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Terms;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
@@ -189,7 +193,7 @@ public class ExecutionBlockContract extends AbstractExecutionNode<SourceElement>
     */
    @Override
    public BlockContract getContract() {
-      return ((BlockContractBuiltInRuleApp)getProofNode().getAppliedRuleApp()).getContract();
+      return ((AbstractBlockContractBuiltInRuleApp)getProofNode().getAppliedRuleApp()).getContract();
    }
 
    /**
@@ -197,6 +201,6 @@ public class ExecutionBlockContract extends AbstractExecutionNode<SourceElement>
     */
    @Override
    public StatementBlock getBlock() {
-      return ((BlockContractBuiltInRuleApp)getProofNode().getAppliedRuleApp()).getBlock();
+      return ((AbstractBlockContractBuiltInRuleApp)getProofNode().getAppliedRuleApp()).getBlock();
    }
 }

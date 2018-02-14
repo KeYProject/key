@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.BlockContractSeparateRule;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
@@ -72,6 +73,12 @@ public class StaticFeatureCollection {
     protected static Feature blockContractFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(BlockContractRule.INSTANCE);
+        return ConditionalFeature.createConditional(filter, cost);
+    }
+
+    protected static Feature blockContractSeparateFeature(Feature cost) {
+        SetRuleFilter filter = new SetRuleFilter();
+        filter.addRuleToSet(BlockContractSeparateRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 

@@ -49,13 +49,16 @@ public class BlockContractCompletion implements InteractiveRuleApplicationComple
             }
         }
         final Services services = goal.proof().getServices();
-        final Instantiation instantiation = BlockContractRule.INSTANCE.instantiate(application.posInOccurrence().subTerm(), goal, services);
-        final ImmutableSet<BlockContract> contracts = BlockContractRule.getApplicableContracts(instantiation, goal, services);
+        final Instantiation instantiation =
+                BlockContractRule.INSTANCE.instantiate(application.posInOccurrence().subTerm(), goal, services);
+        final ImmutableSet<BlockContract> contracts =
+                BlockContractRule.getApplicableContracts(instantiation, goal, services);
         final BlockContractConfigurator configurator = new BlockContractConfigurator(
                 mainWindow, services, contracts.toArray(new BlockContract[contracts.size()]),
                 "Contracts for Block: " + instantiation.block, true);
         if (configurator.wasSuccessful()) {
-            final List<LocationVariable> heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());
+            final List<LocationVariable> heaps =
+                    HeapContext.getModHeaps(services, instantiation.isTransactional());
             result.update(instantiation.block, configurator.getContract(), heaps);
         }
         return result;

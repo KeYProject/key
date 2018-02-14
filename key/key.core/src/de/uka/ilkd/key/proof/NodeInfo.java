@@ -31,8 +31,8 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.AbstractBlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -201,7 +201,7 @@ public class NodeInfo {
      * @return {@code true} symbolic execution is performed, {@code false} otherwise.
      */
     public static boolean isSymbolicExecutionRuleApplied(RuleApp app) {
-       return app instanceof BlockContractBuiltInRuleApp ||
+       return app instanceof AbstractBlockContractBuiltInRuleApp ||
               app instanceof AbstractContractRuleApp ||
               app instanceof LoopInvariantBuiltInRuleApp ||
               app instanceof TacletApp && NodeInfo.isSymbolicExecution(((TacletApp) app).taclet());

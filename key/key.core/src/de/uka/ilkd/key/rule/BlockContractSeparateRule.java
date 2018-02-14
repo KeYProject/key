@@ -145,7 +145,7 @@ public class BlockContractSeparateRule extends AbstractBlockContractRule {
         if (WellDefinednessCheck.isOn()) {
             result = goal.split(3);
 
-            configurator.setUpWdGoal(result.tail().tail().tail().head(),
+            configurator.setUpWdGoal(result.tail().tail().head(),
                                      contract, wdUpdate,
                                      localAnonUpdate, heaps.get(0),
                                      anonymisationHeaps.get(heaps.get(0)),

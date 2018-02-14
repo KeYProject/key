@@ -95,10 +95,18 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "Leave loops untouched." + "</html>";
     public static final String TOOL_TIP_BLOCK_CONTRACT
             = "<html>"
-            + "If block contracts are specified, Java blocks are replaced by their contract.<br>"
-            + "Three properties have to be shown:"
-            + "<ul><li>Validity of block contract</li>"
+            + "Java blocks are replaced by their contracts.<br>"
+            + "Three properties are shown:"
+            + "<ul><li>Validity of block contract in the method context</li>"
             + "<li>Precondition of contract holds</li>"
+            + "<li>Postcondition holds after block terminates</li>"
+            + "</ul>"
+            + "</html>";
+    public static final String TOOL_TIP_BLOCK_CONTRACT_SEPARATE
+            = "<html>"
+            + "Java blocks are replaced by their contracts.<br>"
+            + "Two properties are shown:"
+            + "<ul><li>Precondition of contract holds</li>"
             + "<li>Postcondition holds after block terminates</li>"
             + "</ul></html>";
     public static final String TOOL_TIP_BLOCK_EXPAND
@@ -353,6 +361,9 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.BLOCK_CONTRACT,
                                 "Contract", TOOL_TIP_BLOCK_CONTRACT),
+                        new StrategyPropertyValueDefinition(
+                                StrategyProperties.BLOCK_CONTRACT_SEPARATE,
+                                "Contract (Separate)", TOOL_TIP_BLOCK_CONTRACT_SEPARATE),
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.BLOCK_EXPAND, "Expand",
                                 TOOL_TIP_BLOCK_EXPAND));

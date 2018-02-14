@@ -236,8 +236,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                         .getProperty(StrategyProperties.BLOCK_OPTIONS_KEY);
         if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT)) {
             blockFeature = blockContractFeature(longConst(Long.MIN_VALUE));
-        }
-        else {
+        } else if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_SEPARATE)) {
+            blockFeature = blockContractSeparateFeature(longConst(Long.MIN_VALUE));
+        } else {
             blockFeature = blockContractFeature(inftyConst());
         }
 

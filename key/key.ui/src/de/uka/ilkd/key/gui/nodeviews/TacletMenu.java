@@ -62,6 +62,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.join.JoinIsApplicable;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
 import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.BlockContractSeparateRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
@@ -335,6 +336,17 @@ public class TacletMenu extends JMenu {
                     builtInRule.displayName(),
                     APPLY_RULE,
                     "Applies a known and complete block specification immediately.",
+                    CHOOSE_AND_APPLY_CONTRACT,
+                    "Asks to select the contract to be applied.", builtInRule);
+            item.addActionListener(control);
+            add(item);
+        }
+        else if (builtInRule == BlockContractSeparateRule.INSTANCE) {
+            // we add two items in this case: one for auto one for interactive
+            item = new MenuItemForTwoModeRules(
+                    builtInRule.displayName(),
+                    APPLY_RULE,
+                    "All available contracts of the block are combined and applied.",
                     CHOOSE_AND_APPLY_CONTRACT,
                     "Asks to select the contract to be applied.", builtInRule);
             item.addActionListener(control);
