@@ -23,13 +23,15 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
+import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
+import de.uka.ilkd.key.rule.BlockContractBuilders.UpdatesBuilder;
+import de.uka.ilkd.key.rule.BlockContractBuilders.VariablesCreatorAndRegistrar;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 
 public class BlockContractRule extends AbstractBlockContractRule {
-    public static final String FULL_PRECONDITION_TERM_HINT = "fullPrecondition";
-    public static final String NEW_POSTCONDITION_TERM_HINT = "newPostcondition";
     
     public static final BlockContractRule INSTANCE = new BlockContractRule();
 
@@ -56,9 +58,20 @@ public class BlockContractRule extends AbstractBlockContractRule {
         return lastInstantiation;
     }
 
+    @Override
+    public Name name() {
+        return NAME;
+    }
+
     
     protected void setLastInstantiation(Instantiation lastInstantiation) {
         this.lastInstantiation = lastInstantiation;
+    }
+
+    @Override
+    public BlockContractBuiltInRuleApp createApp(final PosInOccurrence occurrence,
+                                                 TermServices services) {
+        return new BlockContractBuiltInRuleApp(this, occurrence);
     }
 
     @Override
@@ -120,9 +133,7 @@ public class BlockContractRule extends AbstractBlockContractRule {
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term wdUpdate = services.getTermBuilder().parallel(contextUpdate, remembranceUpdate);
-        Term anonUpdate = createLocalAnonUpdate(localOutVariables, services); // can still be null
-        final Term localAnonUpdate =
-                anonUpdate != null ? anonUpdate : services.getTermBuilder().skip();
+        Term localAnonUpdate = createLocalAnonUpdate(localOutVariables, services);
         final Term anonymisationUpdate =
                 updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps,
                                                         /*anonymisationLocalVariables, */
@@ -197,16 +208,5 @@ public class BlockContractRule extends AbstractBlockContractRule {
         }
 
         return result;
-    }
-
-    @Override
-    public BlockContractBuiltInRuleApp createApp(final PosInOccurrence occurrence,
-                                                 TermServices services) {
-        return new BlockContractBuiltInRuleApp(this, occurrence);
-    }
-
-    @Override
-    public Name name() {
-        return NAME;
     }
 }
