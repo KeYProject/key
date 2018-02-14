@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractRule;
-import de.uka.ilkd.key.rule.BlockContractRule.Instantiation;
+import de.uka.ilkd.key.rule.AbstractBlockContractRule.Instantiation;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -49,7 +49,7 @@ public class BlockContractCompletion implements InteractiveRuleApplicationComple
             }
         }
         final Services services = goal.proof().getServices();
-        final Instantiation instantiation = BlockContractRule.instantiate(application.posInOccurrence().subTerm(), goal, services);
+        final Instantiation instantiation = BlockContractRule.INSTANCE.instantiate(application.posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<BlockContract> contracts = BlockContractRule.getApplicableContracts(instantiation, goal, services);
         final BlockContractConfigurator configurator = new BlockContractConfigurator(
                 mainWindow, services, contracts.toArray(new BlockContract[contracts.size()]),
