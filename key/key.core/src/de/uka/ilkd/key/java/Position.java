@@ -123,6 +123,10 @@ public class Position {
     public int compareTo(Position p) {
 	return (line == p.line) ? (column - p.column) : (line - p.line);
     }
+    
+    public boolean isNegative() {
+    	return line < 0 || column < 0;
+    }
 
     /**
        Returns a string representation of this object.

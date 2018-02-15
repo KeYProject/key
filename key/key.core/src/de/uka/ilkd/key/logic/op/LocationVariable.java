@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -26,6 +28,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public final class LocationVariable extends ProgramVariable
 			            implements UpdateableOperator {
    
+	//TODO: remove
+	PositionInfo posInfo = PositionInfo.UNDEFINED;
+	
     public LocationVariable(ProgramElementName name,
                         KeYJavaType        t,
                         KeYJavaType        containingType,
@@ -62,7 +67,25 @@ public final class LocationVariable extends ProgramVariable
     public LocationVariable(ProgramElementName name, Sort s) {
         super(name, s, null, null, false, false, false);
     }
+    
+    public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isFinal,
+			PositionInfo positionInfo) {
+		this(name, t, isFinal);
+		if (name != null && name.toString().equals("k")) {
+			System.out.println("k..");
+		}
+		this.posInfo = positionInfo;
+	}
 
+	@Override
+    public Position getStartPosition() {
+    	return posInfo.getStartPosition();
+    }
+	
+	@Override
+    public Position getEndPosition() {
+    	return posInfo.getEndPosition();
+    }
 
     @Override
     public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {

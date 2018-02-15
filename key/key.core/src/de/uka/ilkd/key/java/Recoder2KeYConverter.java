@@ -823,7 +823,7 @@ public class Recoder2KeYConverter {
 
     /** convert a recoder IntLiteral to a KeY IntLiteral */
     public IntLiteral convert(recoder.java.expression.literal.IntLiteral intLit) {
-        return new IntLiteral(collectComments(intLit), intLit.getValue());
+        return new IntLiteral(collectComments(intLit), intLit.getValue(), positionInfo(intLit));
     }
 
     /** convert a recoder BooleanLiteral to a KeY BooleanLiteral */
@@ -1281,8 +1281,13 @@ public class Recoder2KeYConverter {
 
             final ProgramElementName name = VariableNamer
                     .parseName(makeAdmissibleName(recoderVarSpec.getName()));
+            if (name.toString().equals("k")) {
+            	System.out.println("k");
+            }
+            //final ProgramVariable pv = new LocationVariable(name,
+            //        getKeYJavaType(recoderType), recoderVarSpec.isFinal());
             final ProgramVariable pv = new LocationVariable(name,
-                    getKeYJavaType(recoderType), recoderVarSpec.isFinal());
+                    getKeYJavaType(recoderType), recoderVarSpec.isFinal(), positionInfo(recoderVarSpec.getFirstElement()));
             varSpec = new VariableSpecification(
                     collectChildren(recoderVarSpec), pv, recoderVarSpec
                     .getDimensions(), pv.getKeYJavaType());

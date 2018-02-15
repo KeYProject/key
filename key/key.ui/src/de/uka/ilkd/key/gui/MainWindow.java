@@ -46,6 +46,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -173,6 +174,7 @@ public final class MainWindow extends JFrame  {
     private final MainFrame mainFrame;
 
     private final JTabbedPane sourceTabs;
+    private final JLabel sourceStatusBar;
 
     /** SequentView for the current goal */
     public final CurrentGoalView currentGoalView;
@@ -279,6 +281,7 @@ public final class MainWindow extends JFrame  {
         mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
         sourceTabs = new JTabbedPane();
+        sourceStatusBar = new JLabel();
         proofList = new TaskTree(mediator);
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(mediator);
@@ -452,8 +455,14 @@ public final class MainWindow extends JFrame  {
 	rightPane.add(mainFrame, BorderLayout.CENTER);
 	rightPane.add(sequentViewSearchBar,
                 BorderLayout.SOUTH);
+	
+		JPanel sourcePanel = new JPanel();
+		sourcePanel.setLayout(new BorderLayout());
+		sourcePanel.add(sourceTabs, BorderLayout.CENTER);
+		sourcePanel.add(sourceStatusBar,BorderLayout.SOUTH);
+		//sourceStatusBar.setText("");
 
-        JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourceTabs);
+        JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourcePanel);
         pane.setResizeWeight(0.5);
         pane.setOneTouchExpandable(true);
         pane.setName("split2");
@@ -888,6 +897,10 @@ public final class MainWindow extends JFrame  {
 
     public JTabbedPane getSourceTabs() {
         return sourceTabs;
+    }
+    
+    public JLabel getSourceStatusBar() {
+    	return sourceStatusBar;
     }
 
     /**

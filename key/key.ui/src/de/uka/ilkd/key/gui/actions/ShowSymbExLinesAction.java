@@ -6,9 +6,12 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
@@ -27,9 +30,25 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.expression.Operator;
+import de.uka.ilkd.key.java.expression.operator.PlusAssignment;
+import de.uka.ilkd.key.java.recoderext.ExtendedIdentifier;
+import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.statement.Else;
+import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 
 public class ShowSymbExLinesAction extends MainWindowAction {
@@ -357,8 +376,8 @@ public class ShowSymbExLinesAction extends MainWindowAction {
 
         if (symbExNode == null) {
             return;
-        }
-
+        }        
+        
         // get PositionInfo of all symbEx nodes
         LinkedList<PositionInfo> lines = constructLinesSet(symbExNode);
         if (lines == null) {
@@ -376,7 +395,6 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             } else {
                 System.out.println(l);
             }
-            // TODO: NPE here with SumAndMax (maybe l has no filename?)
             m.putIfAbsent(l.getFileName(), new File(l.getFileName()));
         }
 
@@ -404,27 +422,35 @@ public class ShowSymbExLinesAction extends MainWindowAction {
                 int curr = styles;
 
                 // for each PositionInfo, highlight the corresponding lines in the corresponding file
-                for (PositionInfo pos : lines) {
+               for (PositionInfo pos : lines) {
                     if (pos.getFileName().equals(l.getKey())) { // TODO: overhead!
                         // convert line numbers to offsets/lengths in the String
                         Position start = pos.getStartPosition();
                         Position end = pos.getEndPosition();
-                        // TODO: Position doc: first line is line 1, first column is column 1
-                        int startIndex = li[start.getLine()-1].getOffset() + start.getColumn()-1;    // TODO: shifting necessary?
+                        // TODO: Position doc: first line is line 1, first column is column 0
+                        int startIndex = li[Math.max(start.getLine()-1, 0)].getOffset() + Math.max(start.getColumn()-1, 0);    // TODO: shifting necessary?
                         int endIndex = li[end.getLine()-1].getOffset() + end.getColumn()-1;
-                        int length = endIndex - startIndex + 1;
-                        System.out.println("start: " + startIndex + " end: " + endIndex + " length: " + length);
+                        int length = endIndex - startIndex + 1;		// the char at endIndex is included!
 
+                        // random colors for debugging
+                        int r = (int) Math.round(255 * Math.random());
+                        int g = (int) Math.round(255 * Math.random());
+                        int b = (int) Math.round(255 * Math.random());
+                        
                         // more recent lines have a more saturated color
                         Style i = textPane.addStyle(Integer.toString(curr), null);
-                        StyleConstants.setBackground(i, new Color(255, 255, 255 - 255 / styles * curr--));
+                        //StyleConstants.setBackground(i, new Color(255, 255, 255 - 255 / styles * curr--));
+                        StyleConstants.setBackground(i, new Color(r, g, b));
 
-                        doc.setCharacterAttributes(startIndex, length, i, false);
+                        doc.setCharacterAttributes(startIndex, length, i, true);
                     }
                 }
 
                 // for each File, create a Tab in TabbedPane
-                tabs.addTab(l.getKey(), textPane);
+                JScrollPane textScrollPane = new JScrollPane(textPane);
+                textScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                textScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+                tabs.addTab(l.getValue().getName(), textScrollPane);
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
@@ -438,26 +464,116 @@ public class ShowSymbExLinesAction extends MainWindowAction {
         } else {
             tabs.setBorder(new TitledBorder("No source loaded"));
         }
+        // set the path information in the status bar
+        mainWindow.getSourceStatusBar().setText(collectPathInformation(symbExNode));
     }
 
+    /**
+     * Collects the set of lines to highlight starting from the given node in the proof tree.
+     * @param cur the given node
+     * @return a linked list of PositionInfo objects containing the start and end positions for the highlighting.
+     */
     public LinkedList<PositionInfo> constructLinesSet(Node cur) {
         LinkedList<PositionInfo> list = new LinkedList<PositionInfo>();
 
         if (cur == null) {
             return null;
         }
-
+        
         do {
-            SourceElement activeStatement = cur.getNodeInfo().getActiveStatement();
+        	SourceElement activeStatement = cur.getNodeInfo().getActiveStatement();
             if (activeStatement != null) {
-                PositionInfo pos = activeStatement.getPositionInfo();
-                if (pos != null && !pos.equals(PositionInfo.UNDEFINED)) {
-                    list.addLast(pos);
+            	
+            	System.out.println("------------------------------------------------------------");
+            	JavaDumper.dump(activeStatement);
+            	System.out.println("------------------------------------------------------------");
+            	
+            	if (activeStatement instanceof SourceElement) {
+                	PositionInfo pos = joinPositionsRec((SourceElement)activeStatement);
+                	//PositionInfo pos = activeStatement.getPositionInfo();
+            		
+                	// we are only interested in well defined PositionInfo objects with a file name
+                	if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
+                			&& pos.getFileName() != null) {
+                		System.out.println("          Add to list: " + pos);
+                		//list.addLast(pos);
+                		list.addFirst(pos);
+                	}
+                } else {
+                	System.out.println("Not a SE!");
                 }
             }
             cur = cur.parent();
 
         } while (cur != null);
         return list;
+    }
+    
+    /**
+     * Joins all PositionInfo object of the given SourceElement and its children.
+     * @param se the given SourceElement
+     * @return a new PositionInfo starting at the minimum of all the contained positions and
+     * ending at the maximum position
+     */
+    private PositionInfo joinPositionsRec(SourceElement se) {
+    	if (se instanceof ExtendedIdentifier) {
+    		int i = 0;
+    		System.out.println(i);
+    	}
+    	if (se instanceof NonTerminalProgramElement) {
+    		
+        	NonTerminalProgramElement ntpe = (NonTerminalProgramElement)se;
+        	PositionInfo pos = se.getPositionInfo();
+        	
+        	// TODO: case distinction for different classes (e.g.: we don't want to highlight the whole If block)
+        	/*if (se instanceof MethodReference
+        			|| se instanceof ProgramElementName
+        			|| se instanceof Then
+        			//|| se instanceof If
+        			//|| se instanceof Else
+        			|| se instanceof StatementBlock
+        			|| se instanceof LocationVariable
+        			|| se instanceof Operator
+        			|| se instanceof LocalVariableDeclaration
+        			|| se instanceof TypeRef
+        			|| se instanceof VariableSpecification
+        			) {*/
+        		for (int i = 0; i < ntpe.getChildCount(); i++) {
+        			ProgramElement pe2 = ntpe.getChildAt(i);
+        			pos = PositionInfo.join(pos, joinPositionsRec(pe2));
+        		}
+        	//}
+        	return pos;
+    	} else {
+        	return se.getPositionInfo();
+        }
+    }
+    
+    /**
+     * Collects the information from the tree to which branch the current node belongs:
+     * <ul>
+     * 		<li>Invariant initially valid</li>
+     * 		<li>Body preserves invariant</li>
+     * 		<li>Use case</li>
+     * 		<li>...</li>
+     * </ul>
+     * @param node
+     * @return a String containing the path information to display
+     */
+    private String collectPathInformation(Node node) {
+    	
+    	while (node != null) {
+    		if (node.getNodeInfo() != null && node.getNodeInfo().getBranchLabel() != null) {
+    			String label = node.getNodeInfo().getBranchLabel();
+    			if (label.equals("Invariant initially valid")
+    				|| label.equals("Body preserves invariant")
+    				|| label.equals("Use case")
+    				|| label.contains("if")) {		// TODO: additional labels
+    				return label;
+    			}
+    		}
+    		node = node.parent();
+    	}
+    	return "";
     }
 }

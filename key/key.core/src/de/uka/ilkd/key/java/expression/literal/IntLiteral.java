@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java.expression.literal;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -80,8 +81,8 @@ public class IntLiteral extends Literal {
 	 * @param value
 	 *            the value of the literal
 	 */
-	public IntLiteral(ExtList children, String value) {
-		super(children);
+	public IntLiteral(ExtList children, String value, PositionInfo pos) {
+		super(children, pos);
     	this.value = value.intern();
     }
 
