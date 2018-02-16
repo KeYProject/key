@@ -489,8 +489,8 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             	System.out.println("------------------------------------------------------------");
             	
             	if (activeStatement instanceof SourceElement) {
-                	PositionInfo pos = joinPositionsRec((SourceElement)activeStatement);
-                	//PositionInfo pos = activeStatement.getPositionInfo();
+                	//PositionInfo pos = joinPositionsRec((SourceElement)activeStatement);
+                	PositionInfo pos = activeStatement.getPositionInfo();
             		
                 	// we are only interested in well defined PositionInfo objects with a file name
                 	if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
