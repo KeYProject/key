@@ -1504,7 +1504,7 @@ VariableSpecification VariableDeclarator(boolean isForField) :
     } else {
         result = factory.createVariableSpecification(id, dim, init);
     }
-    //    setPrefixInfo(result); // only after "=" !!!!!!!!!!!!!!!
+        setPrefixInfo(result); // only after "=" !!!!!!!!!!!!!!!
     checkConstruction(result);
     setPostfixInfo(result);
     return result;
@@ -2000,7 +2000,7 @@ TypeReference PrimitiveType() :
     result = factory.createTypeReference(id);
     checkConstruction(result);
     setPostfixInfo(result);
-    //    setPrefixInfo(result);
+    setPrefixInfo(result);      // TODO: WP: originally commented out in recoder -> why?
     return result;
   }
 }
