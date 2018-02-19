@@ -18,6 +18,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -95,6 +96,8 @@ public interface BlockContract extends SpecificationElement {
     public String getUniqueName();
 
     public String getHtmlText(Services services);
+
+    public String getPlainText(Services services);
 
     public String getPlainText(Services services, Terms terms);
 
@@ -501,6 +504,39 @@ public interface BlockContract extends SpecificationElement {
             this.remembranceLocalVariables = remembranceLocalVariables;
         }
 
-    }
+        public Terms(Variables variables, TermBuilder tb) {
+            this(
+                    tb.var(variables.self),
+                    convertFlagMap(variables.breakFlags, tb),
+                    convertFlagMap(variables.continueFlags, tb),
+                    tb.var(variables.returnFlag),
+                    tb.var(variables.result),
+                    tb.var(variables.exception),
+                    convertHeapMap(variables.remembranceHeaps, tb),
+                    convertHeapMap(variables.remembranceLocalVariables, tb)
+            );
+        }
 
+        private static Map<LocationVariable, Term> convertHeapMap(
+                Map<LocationVariable, LocationVariable> map, TermBuilder tb) {
+            return map.entrySet().stream().collect(
+                    Collectors.<Map.Entry<LocationVariable, LocationVariable>,
+                        LocationVariable, Term>toMap(
+                            Map.Entry::getKey,
+                            entry -> tb.var(entry.getValue())
+                    )
+           );
+        }
+
+        private static Map<Label, Term> convertFlagMap(
+                Map<Label, ProgramVariable> map, TermBuilder tb) {
+            return map.entrySet().stream().collect(
+                            Collectors.<Map.Entry<Label, ProgramVariable>, Label, Term>toMap(
+                                    Map.Entry::getKey,
+                                    entry -> tb.var(entry.getValue())
+                            )
+                   );
+        }
+
+    }
 }

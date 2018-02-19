@@ -233,19 +233,21 @@ public interface Contract extends SpecificationElement {
         public final Map<LocationVariable, ProgramVariable> atPres;
         public final ImmutableList<ProgramVariable> params;
 
+        @SuppressWarnings("unchecked")
         public OriginalVariables(ProgramVariable selfVar,
                                  ProgramVariable resVar,
                                  ProgramVariable excVar,
-                                 Map<LocationVariable, ProgramVariable> atPreVars,
-                                 ImmutableList<ProgramVariable> paramVars) {
+                                 Map<? extends LocationVariable, ? extends ProgramVariable>
+                                        atPreVars,
+                                 ImmutableList<? extends ProgramVariable> paramVars) {
             this.self = selfVar;
             this.result = resVar;
             this.exception = excVar;
-            this.atPres = atPreVars;
+            this.atPres = (Map<LocationVariable, ProgramVariable>) atPreVars;
             if (paramVars == null) {
                 this.params = ImmutableSLList.<ProgramVariable>nil();
             } else {
-                this.params = paramVars;
+                this.params = (ImmutableList<ProgramVariable>) paramVars;
             }
         }
 

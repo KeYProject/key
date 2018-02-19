@@ -35,6 +35,7 @@ import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -45,6 +46,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.macros.WellDefinednessMacro;
@@ -54,8 +56,8 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule.BlockContractHint;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule.Instantiation;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockWellDefinedness;
 import de.uka.ilkd.key.speclang.BlockContract.Terms;
+import de.uka.ilkd.key.speclang.BlockWellDefinedness;
 
 /**
  * This contains various builders used in building formulae and terms for block contracts.
@@ -245,14 +247,22 @@ public class BlockContractBuilders {
                 LocationVariable newVariable =
                         new LocationVariable(new ProgramElementName(newName),
                                              placeholderVariable.getKeYJavaType());
-                goal.addProgramVariable(newVariable);
+                
+                if (goal != null) {
+                    goal.addProgramVariable(newVariable);
+                } else {
+                    Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
+                    if (newVariable != null && progVarNames.lookup(placeholderVariable.name()) == null) {
+                        progVarNames.addSafely(newVariable);
+                    }
+                }
+                
                 return newVariable;
             }
             else {
                 return null;
             }
         }
-
     }
 
     public static final class UpdatesBuilder extends TermBuilder {

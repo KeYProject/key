@@ -419,6 +419,11 @@ public final class SimpleBlockContract implements BlockContract {
     }
 
     @Override
+    public String getPlainText(Services services) {
+        return getPlainText(services, new Terms(variables, services.getTermBuilder()));
+    }
+
+    @Override
     public String getPlainText(final Services services, Terms terms) {
         assert services != null;
         // TODO Clean up.
@@ -1280,5 +1285,4 @@ public final class SimpleBlockContract implements BlockContract {
         }
 
     }
-
 }
