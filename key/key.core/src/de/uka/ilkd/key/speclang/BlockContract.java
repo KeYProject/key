@@ -45,6 +45,16 @@ import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 
+/**
+ * <p> A block contract. </p>
+ * 
+ * <p>
+ * 	When a block contract is encountered in an existing proof, a {@code BlockContract} is used.
+ * 	To generate a new proof obligation for a block contract, use {@link FunctionalBlockContract}
+ *  instead.
+ * </p>
+ * 
+ */
 public interface BlockContract extends SpecificationElement {
 
     public StatementBlock getBlock();

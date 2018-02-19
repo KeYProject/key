@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.BlockContractBuilders;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule.Instantiation;
 import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
+import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.BlockContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.VariablesCreatorAndRegistrar;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -30,6 +31,9 @@ import de.uka.ilkd.key.speclang.FunctionalBlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.MiscTools;
 
+/**
+ * A proof obligation for a {@link FunctionalBlockContract}.
+ */
 public class FunctionalBlockContractPO extends AbstractPO implements ContractPO {
 
     public static Map<Boolean,String> TRANSACTION_TAGS = new LinkedHashMap<Boolean,String>();
@@ -59,8 +63,8 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         
         final StatementBlock block = getBlock();
         final ProgramVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
-        final Term selfTerm = tb.var(selfVar);
         register(selfVar, services);
+        final Term selfTerm = selfVar == null ? null : tb.var(selfVar);
 
         final TermLabelState termLabelState = new TermLabelState();
 
@@ -102,17 +106,9 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term frameCondition = conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
-        final Term wellFormedAnonymisationHeapsCondition =
-                conditionsAndClausesBuilder
-                .buildWellFormedAnonymisationHeapsCondition(anonOutHeaps);
-        final Term reachableOutCondition =
-                conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
-        final Term atMostOneFlagSetCondition =
-                conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
-        final Term wdUpdate = services.getTermBuilder().parallel(/*anonInUpdate*/tb.skip(), remembranceUpdate);
         
         Term anonOutUpdate = null;
         
@@ -133,11 +129,21 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             anonOutUpdate = tb.skip();
         }
         
-        final Term anonymisationUpdate =
-                updatesBuilder.buildAnonymisationUpdate(anonOutHeaps,
-                                                        modifiesClauses);
+        final GoalsConfigurator configurator = new GoalsConfigurator(null,
+                termLabelState,
+                new Instantiation(tb.skip(), tb.tt(), contract.getModality(), selfTerm, block, null),
+                contract.getBlockContract().getLabels(),
+                variables,
+                null,
+                services,
+                null);
         
-        termPOs.add(tb.imp(precondition, postcondition));
+        termPOs.add(configurator.setUpValidityGoal(null,
+                new Term[] {remembranceUpdate},
+                new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition },
+                new Term[] { postcondition, frameCondition },
+                exceptionParameter,
+                conditionsAndClausesBuilder.getTerms()));
         
         assignPOTerms(termPOs.toArray(new Term[termPOs.size()]));
         collectClassAxioms(getCalleeKeYJavaType(), proofConfig);

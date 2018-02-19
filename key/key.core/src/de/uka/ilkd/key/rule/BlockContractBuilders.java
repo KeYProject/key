@@ -43,6 +43,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
@@ -188,7 +189,7 @@ public class BlockContractBuilders {
     
     /**
      * This class contains methods to create new variables from the contract's placeholder variables
-     * (see {@link BlockContract#getPlaceholderVariables()}), and adds them to the goal.
+     * (see {@link BlockContract#getPlaceholderVariables()}), and register them.
      */
     public static final class VariablesCreatorAndRegistrar {
 
@@ -196,6 +197,13 @@ public class BlockContractBuilders {
         private final BlockContract.Variables placeholderVariables;
         private final TermServices services;
 
+        /**
+         * 
+         * @param goal If this is not null, all created variables are added to it.
+         * 	If it is null, the variables are instead added to the {@code services}' namespace.
+         * @param placeholderVariables the placeholders from which to create the variables.
+         * @param services
+         */
         public VariablesCreatorAndRegistrar(final Goal goal,
                                             final BlockContract.Variables placeholderVariables,
                                             final TermServices services) {
@@ -340,6 +348,10 @@ public class BlockContractBuilders {
             this.variables = variables;
             this.terms = variables.termify(self);
         }
+
+		public Terms getTerms() {
+			return terms;
+		}
 
         public Term buildPrecondition()
         {
@@ -497,13 +509,12 @@ public class BlockContractBuilders {
         {
             return equals(var(flag), FALSE());
         }
-
     }
 
     /**
      * This class contains methods to add the premisses for the block contract rule to the goal.
      */
-    protected final static class GoalsConfigurator {
+    public final static class GoalsConfigurator {
         private final AbstractBlockContractBuiltInRuleApp application;
         private final TermLabelState termLabelState;
         private final Instantiation instantiation;
@@ -553,16 +564,23 @@ public class BlockContractBuilders {
                                         services);
             goal.changeFormula(wdBlock, occurrence);
         }
-
-        public void setUpValidityGoal(final Goal goal, final Term[] updates,
+        
+        /**
+         * 
+         * @param goal If this is not {@code null}, the returned term is added to this goal.
+         * @param updates
+         * @param assumptions
+         * @param postconditions
+         * @param exceptionParameter
+         * @param terms
+         * @return the term for the validity goal.
+         */
+        public Term setUpValidityGoal(final Goal goal, final Term[] updates,
                                       final Term[] assumptions,
                                       final Term[] postconditions,
                                       final ProgramVariable exceptionParameter,
                                       final Terms terms) {
-            goal.setBranchLabel("Validity");
             final TermBuilder tb = services.getTermBuilder();
-            goal.addFormula(new SequentFormula(
-                    tb.applySequential(updates, tb.and(assumptions))), true, false);
             final StatementBlock block =
                     new ValidityProgramConstructor(labels, instantiation.block,
                                                    variables, exceptionParameter,
@@ -573,42 +591,60 @@ public class BlockContractBuilders {
             Term newPost = tb.and(postconditions);
             newPost = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services, newPost, ImmutableSLList.<LocationVariable>nil().prepend(terms.remembranceLocalVariables.keySet()), terms.exception);
             newPost = TermLabelManager.refactorTerm(termLabelState, services, null, newPost, rule, goal, BlockContractRule.NEW_POSTCONDITION_TERM_HINT, null);
-            goal.changeFormula(new SequentFormula(
-                  tb.applySequential(
-                    updates,
-                    tb.prog(instantiation.modality,
-                            newJavaBlock, 
-                            newPost,
-                            TermLabelManager.instantiateLabels(termLabelState,
-                                                               services, 
-                                                               occurrence, 
-                                                               application.rule(), 
-                                                               application,
-                                                               goal, 
-                                                               BlockContractHint.
-                                                               createValidityBranchHint(variables.exception),
-                                                               null, 
-                                                               instantiation.modality,
-                                                               new ImmutableArray<Term>(newPost), 
-                                                               null, 
-                                                               newJavaBlock, 
-                                                               instantiation.formula.getLabels())))),
-                            occurrence);
-            TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(), goal, null, null);
-            final boolean oldInfFlowCheckInfoValue =
-                    goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-                    goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY);
-            StrategyInfoUndoMethod undo =
-                    new StrategyInfoUndoMethod() {
+            
+                        
+            Term term;
+            
+            if (goal != null) {
+                goal.setBranchLabel("Validity");
+                goal.addFormula(new SequentFormula(
+                        tb.applySequential(updates, tb.and(assumptions))), true, false);
+                
+            	ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(termLabelState,
+            			services, 
+                        occurrence, 
+                        application.rule(), 
+                        application,
+                        goal, 
+                        BlockContractHint.
+                        createValidityBranchHint(variables.exception),
+                        null, 
+                        instantiation.modality,
+                        new ImmutableArray<Term>(newPost), 
+                        null, 
+                        newJavaBlock, 
+                        instantiation.formula.getLabels());
+                
+                term = tb.applySequential(
+                                updates,
+                                tb.prog(instantiation.modality,
+                                        newJavaBlock, 
+                                        newPost,
+                                        labels));
+            	
+            	goal.changeFormula(new SequentFormula(term), occurrence);
+                TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(), goal, null, null);
+                final boolean oldInfFlowCheckInfoValue =
+                        goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
+                        goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY);
+                StrategyInfoUndoMethod undo =
+                        new StrategyInfoUndoMethod() {
 
-                        @Override
-                        public void undo(
-                                de.uka.ilkd.key.util.properties.Properties strategyInfos) {
-                            strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY,
-                                              oldInfFlowCheckInfoValue);
-                        }
-                    };
-            goal.addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, false, undo);
+                            @Override
+                            public void undo(
+                                    de.uka.ilkd.key.util.properties.Properties strategyInfos) {
+                                strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY,
+                                                  oldInfFlowCheckInfoValue);
+                            }
+                        };
+                goal.addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, false, undo);
+            } else {
+            	Term pre = tb.and(assumptions);
+                Term prog = tb.prog(instantiation.modality, newJavaBlock, newPost, new ImmutableArray<>());
+                term = tb.applySequential(updates, tb.imp(pre, prog));
+            }
+            
+            return term;
         }
 
         private Statement wrapInMethodFrameIfContextIsAvailable(final StatementBlock block) {

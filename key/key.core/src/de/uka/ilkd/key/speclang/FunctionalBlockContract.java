@@ -2,6 +2,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -10,14 +11,17 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.speclang.BlockContract.Variables;
 
 /**
  * This class is only used to generate a proof obligation for a block
@@ -27,8 +31,11 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
  */
 public class FunctionalBlockContract implements Contract {
     
-    final BlockContract contract;
-    final int id;
+	private final BlockContract contract;
+    private final int id;
+    private final String name;
+    private final String displayName;
+    private final String typeName;
     
     public FunctionalBlockContract(BlockContract contract) {
         this(contract, Contract.INVALID_ID);
@@ -37,16 +44,23 @@ public class FunctionalBlockContract implements Contract {
     public FunctionalBlockContract(BlockContract contract, int id) {
         this.contract = contract;
         this.id = id;
+        
+        name = ContractFactory
+        		.generateContractName("BlockContract", getKJT(), getTarget(), getKJT(), id);
+        displayName = ContractFactory
+        		.generateDisplayName("BlockContract", getKJT(), getTarget(), getKJT(), id);
+        typeName = ContractFactory
+        		.generateContractTypeName("BlockContract", getKJT(), getTarget(), getKJT());
     }
 
     @Override
     public String getName() {
-        return "Block Contract Separate";
+        return name;
     }
 
     @Override
     public String getDisplayName() {
-        return getName();
+        return displayName;
     }
 
     @Override
@@ -99,14 +113,7 @@ public class FunctionalBlockContract implements Contract {
 
     @Override
     public OriginalVariables getOrigVars() {
-        BlockContract.Variables vars = contract.getPlaceholderVariables();
-        return new OriginalVariables(
-                vars.self,
-                vars.result,
-                vars.exception,
-                vars.remembranceLocalVariables,
-                null
-        );
+        return contract.getOrigVars();
     }
 
     @Override
@@ -114,8 +121,19 @@ public class FunctionalBlockContract implements Contract {
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars,
             Services services) {
-        // TODO Auto-generated method stub
-        return null;
+    	@SuppressWarnings("unchecked")
+		Map<LocationVariable, ProgramVariable> atPreVars0 =
+			(Map<LocationVariable, ProgramVariable>) atPreVars;
+        return contract.getPrecondition(
+        		heap,
+        		selfVar,
+        		atPreVars0.entrySet().stream().collect(Collectors
+        				.<Map.Entry<LocationVariable, ProgramVariable>,
+        					LocationVariable, LocationVariable>toMap(
+        							Map.Entry::getKey,
+        							entry -> (LocationVariable) entry.getValue()
+        			)),
+        		services);
     }
 
     @Override
@@ -123,16 +141,27 @@ public class FunctionalBlockContract implements Contract {
             ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars,
             Services services) {
-        // TODO Auto-generated method stub
-        return null;
+    	TermBuilder tb = services.getTermBuilder();
+    	Term result = null;
+    	
+        for (LocationVariable heap : heapContext) {
+            final Term p = getPre(heap, selfVar, paramVars, atPreVars, services);
+            
+            if (result == null) {
+                result = p;
+            } else {
+                result = tb.and(result, p);
+            }
+        }
+        
+        return result;
     }
 
     @Override
     public Term getPre(LocationVariable heap, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
             Services services) {
-        // TODO Auto-generated method stub
-        return null;
+        return contract.getPrecondition(heap, heapTerm, selfTerm, atPres, services);
     }
 
     @Override
@@ -140,8 +169,20 @@ public class FunctionalBlockContract implements Contract {
             Map<LocationVariable, Term> heapTerms, Term selfTerm,
             ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
             Services services) {
-        // TODO Auto-generated method stub
-        return null;
+    	TermBuilder tb = services.getTermBuilder();
+    	Term result = null;
+    	
+        for (LocationVariable heap : heapContext) {
+            final Term p = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
+
+            if (result == null) {
+                result = p;
+            } else if (p != null) {
+                result = tb.and(result, p);
+            }
+        }
+        
+        return result;
     }
 
     @Override
@@ -149,28 +190,24 @@ public class FunctionalBlockContract implements Contract {
             ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars,
             Services services) {
-        // TODO Auto-generated method stub
-        return null;
+        return services.getTermBuilder().allLocs();
     }
 
     @Override
     public Term getDep(LocationVariable heap, boolean atPre, Term heapTerm,
             Term selfTerm, ImmutableList<Term> paramTerms,
             Map<LocationVariable, Term> atPres, Services services) {
-        // TODO Auto-generated method stub
-        return null;
+        return services.getTermBuilder().allLocs();
     }
 
     @Override
     public Term getRequires(LocationVariable heap) {
-        // TODO Auto-generated method stub
-        return null;
+        return contract.getRequires(heap);
     }
 
     @Override
     public Term getAssignable(LocationVariable heap) {
-        // TODO Auto-generated method stub
-        return null;
+        return contract.getAssignable(heap);
     }
 
     @Override
@@ -226,8 +263,7 @@ public class FunctionalBlockContract implements Contract {
 
     @Override
     public ProofOblInput getProofObl(Services services) {
-        // TODO Auto-generated method stub
-        return null;
+        return services.getSpecificationRepository().getPO(this);
     }
 
     @Override
@@ -255,7 +291,7 @@ public class FunctionalBlockContract implements Contract {
 
     @Override
     public String getTypeName() {
-        return ContractFactory.generateContractTypeName("BlockContract", getKJT(), getTarget(), getKJT());
+        return typeName;
     }
 
     @Override
@@ -278,5 +314,13 @@ public class FunctionalBlockContract implements Contract {
     public IProgramMethod getMethod() {
         return contract.getMethod();
     }
+
+	public Variables getPlaceholderVariables() {
+		return contract.getPlaceholderVariables();
+	}
+
+	public Modality getModality() {
+		return contract.getModality();
+	}
 
 }

@@ -47,6 +47,9 @@ import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
+/**
+ * Default implementation of {@link BlockContract}.
+ */
 public final class SimpleBlockContract implements BlockContract {
 
     public static BlockContract combine(ImmutableSet<BlockContract> contracts, Services services) {
