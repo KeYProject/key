@@ -33,7 +33,9 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.AbstractBlockContractRule;
 import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.BlockContractSeparateRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
@@ -51,7 +53,8 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
    public ImmutableList<Name> getSupportedRuleNames() {
       return ImmutableSLList.<Name>nil()
                             .prepend(WhileInvariantRule.INSTANCE.name())
-                            .prepend(BlockContractRule.INSTANCE.name());
+                            .prepend(BlockContractRule.INSTANCE.name())
+                            .prepend(BlockContractSeparateRule.INSTANCE.name());
    }
 
    /**
@@ -74,8 +77,8 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
                             JavaBlock newTermJavaBlock,
                             Set<TermLabel> labels) {
       if (rule instanceof WhileInvariantRule && "LoopBodyModality".equals(hint) ||
-          ( rule instanceof BlockContractRule && 
-                  ((BlockContractRule.BlockContractHint)hint).getExceptionalVariable() != null) 
+          ( rule instanceof AbstractBlockContractRule && 
+                  ((AbstractBlockContractRule.BlockContractHint)hint).getExceptionalVariable() != null) 
           ) {
          TermLabel label = CollectionUtil.searchAndRemove(labels, new IFilter<TermLabel>() {
             @Override
