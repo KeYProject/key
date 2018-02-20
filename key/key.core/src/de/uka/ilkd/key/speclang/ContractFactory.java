@@ -291,6 +291,16 @@ public class ContractFactory {
             return false;
         }
     }
+    
+    /**
+     * Create a new {@link FunctionalBlockContract} from an existing {@link BlockContract}.
+     * 
+     * @param blockContract
+     * @return a new {@link FunctionalBlockContract}.
+     */
+    public FunctionalBlockContract funcBlock(BlockContract blockContract) {
+    	return new FunctionalBlockContract(blockContract);
+    }
 
     public FunctionalOperationContract func (IProgramMethod pm, InitiallyClause ini) throws SLTranslationException{
             return new JMLSpecFactory(services).initiallyClauseToContract(ini, pm);

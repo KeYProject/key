@@ -37,11 +37,11 @@ public class FunctionalBlockContract implements Contract {
     private final String displayName;
     private final String typeName;
     
-    public FunctionalBlockContract(BlockContract contract) {
+    FunctionalBlockContract(BlockContract contract) {
         this(contract, Contract.INVALID_ID);
     }
     
-    public FunctionalBlockContract(BlockContract contract, int id) {
+    FunctionalBlockContract(BlockContract contract, int id) {
         this.contract = contract;
         this.id = id;
         

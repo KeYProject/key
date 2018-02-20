@@ -69,7 +69,6 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractAxiom;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.speclang.FunctionalBlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
@@ -1547,7 +1546,7 @@ public final class SpecificationRepository {
                 block, block.getStartPosition().getLine());
         blockContracts.put(b, getBlockContracts(block).add(contract));
         
-        addContract(new FunctionalBlockContract(contract));
+        addContract(cf.funcBlock(contract));
     }
 
     /**
