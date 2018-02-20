@@ -11,7 +11,10 @@ import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -19,8 +22,8 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.rule.BlockContractBuilders;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule.Instantiation;
+import de.uka.ilkd.key.rule.BlockContractBuilders;
 import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.BlockContractBuilders.UpdatesBuilder;
@@ -129,9 +132,21 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             anonOutUpdate = tb.skip();
         }
         
+        final KeYJavaType kjt = getCalleeKeYJavaType();
+        
         final GoalsConfigurator configurator = new GoalsConfigurator(null,
                 termLabelState,
-                new Instantiation(tb.skip(), tb.tt(), contract.getModality(), selfTerm, block, null),
+                new Instantiation(
+                        tb.skip(),
+                        tb.tt(), 
+                        contract.getModality(),
+                        selfTerm,
+                        block,
+                        new ExecutionContext(
+                                new TypeRef(new ProgramElementName(kjt.getName()), 0, selfVar, kjt),
+                                getProgramMethod(),
+                                selfVar)
+                ),
                 contract.getBlockContract().getLabels(),
                 variables,
                 null,
@@ -139,7 +154,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                 null);
         
         termPOs.add(configurator.setUpValidityGoal(null,
-                new Term[] {remembranceUpdate},
+                new Term[] { remembranceUpdate },
                 new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition },
                 new Term[] { postcondition, frameCondition },
                 exceptionParameter,
