@@ -247,8 +247,7 @@ public class FunctionalBlockContract implements Contract {
 
     @Override
     public boolean transactionApplicableContract() {
-        // TODO Auto-generated method stub
-        return false;
+        return contract.isTransactionApplicable();
     }
 
     @Override
