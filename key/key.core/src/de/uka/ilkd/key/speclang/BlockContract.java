@@ -73,7 +73,6 @@ public interface BlockContract extends SpecificationElement {
      */
     public boolean hasModifiesClause(LocationVariable heap);
 
-    // TODO Why do we need remembranceHeaps for the precondition? Do we also need remembranceLocalVariables?
     public Term getPrecondition(LocationVariable heap,
                                 ProgramVariable self,
                                 Map<LocationVariable, LocationVariable> remembranceHeaps,
@@ -201,8 +200,28 @@ public interface BlockContract extends SpecificationElement {
         public final ProgramVariable returnFlag;
         public final ProgramVariable result;
         public final ProgramVariable exception;
+        
+        /**
+         * A map from every heap {@code heap} to {@code heap_Before_BLOCK}.
+         */
         public final Map<LocationVariable, LocationVariable> remembranceHeaps;
+        
+        /**
+         * A map from every heap {@code heap} to {@code heap_Before_METHOD}.
+         */
+        public final Map<LocationVariable, LocationVariable> outerRemembranceHeaps;
+        
+        /**
+         * A map from every variable {@code var} that is assignable inside the block
+         * to {@code var_Before_BLOCK}.
+         */
         public final Map<LocationVariable, LocationVariable> remembranceLocalVariables;
+        
+        /**
+         * A map from every variable {@code var} that is accessible inside the block
+         * to {@code var_Before_METHOD}.
+         */
+        public final Map<LocationVariable, LocationVariable> outerRemembranceLocalVariables;
 
         public Variables(final ProgramVariable self,
                          final Map<Label, ProgramVariable> breakFlags,
@@ -211,7 +230,10 @@ public interface BlockContract extends SpecificationElement {
                          final ProgramVariable result,
                          final ProgramVariable exception,
                          final Map<LocationVariable, LocationVariable> remembranceHeaps,
+                         final Map<LocationVariable, LocationVariable> outerRemembranceHeaps,
                          final Map<LocationVariable, LocationVariable> remembranceLocalVariables,
+                         final Map<LocationVariable, LocationVariable>
+                                 outerRemembranceLocalVariables,
                          final TermServices services)
         {
             this.services = services;
@@ -222,7 +244,9 @@ public interface BlockContract extends SpecificationElement {
             this.result = result;
             this.exception = exception;
             this.remembranceHeaps = remembranceHeaps;
+            this.outerRemembranceHeaps = outerRemembranceHeaps;
             this.remembranceLocalVariables = remembranceLocalVariables;
+            this.outerRemembranceLocalVariables = outerRemembranceLocalVariables;
         }
 
         public Map<LocationVariable, LocationVariable> combineRemembranceVariables()
@@ -380,6 +404,7 @@ public interface BlockContract extends SpecificationElement {
         private static final String RETURN_FLAG_NAME = "returned";
         private static final String FLAG_INFIX = "To";
         private static final String REMEMBRANCE_SUFFIX = "Before_BLOCK";
+        private static final String OUTER_REMEMBRANCE_SUFFIX = "Before_METHOD";
 
         private final StatementBlock block;
         private final List<Label> labels;
@@ -407,7 +432,9 @@ public interface BlockContract extends SpecificationElement {
                 resultVar(method, false),
                 excVar(method, false),
                 createRemembranceHeaps(),
+                createOuterRemembranceHeaps(),
                 createRemembranceLocalVariables(),
+                createOuterRemembranceLocalVariables(),
                 services
             );
         }
@@ -452,29 +479,50 @@ public interface BlockContract extends SpecificationElement {
             return createVariable(name, services.getJavaInfo().getKeYJavaType("boolean"));
         }
 
-        private Map<LocationVariable, LocationVariable> createRemembranceHeaps()
-        {
+        private Map<LocationVariable, LocationVariable> createRemembranceHeaps() {
+            return createRemembranceHeaps(REMEMBRANCE_SUFFIX);
+        }
+
+        private Map<LocationVariable, LocationVariable> createOuterRemembranceHeaps() {
+            return createRemembranceHeaps(OUTER_REMEMBRANCE_SUFFIX);
+        }
+
+        private Map<LocationVariable, LocationVariable> createRemembranceHeaps(String suffix) {
             final Map<LocationVariable, LocationVariable> result =
                     new LinkedHashMap<LocationVariable, LocationVariable>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                result.put(heap, heapAtPreVar(heap + "_" + REMEMBRANCE_SUFFIX, heap.sort(), false));
+                result.put(heap, heapAtPreVar(heap + "_" + suffix, heap.sort(), false));
             }
             return result;
         }
 
-        private Map<LocationVariable, LocationVariable> createRemembranceLocalVariables()
-        {
-            Map<LocationVariable, LocationVariable> result =
-                    new LinkedHashMap<LocationVariable, LocationVariable>();
+        private Map<LocationVariable, LocationVariable> createRemembranceLocalVariables() {
             ImmutableSet<ProgramVariable> localOutVariables =
                     MiscTools.getLocalOuts(block, services);
-            for (ProgramVariable localOutVariable : localOutVariables) {
+            
+            return createRemembranceVars(localOutVariables, REMEMBRANCE_SUFFIX);
+        }
+
+        private Map<LocationVariable, LocationVariable> createOuterRemembranceLocalVariables() {
+            ImmutableSet<ProgramVariable> localInVariables =
+                    MiscTools.getLocalIns(block, services);
+            
+            return createRemembranceVars(localInVariables, OUTER_REMEMBRANCE_SUFFIX);
+        }
+        
+        private Map<LocationVariable, LocationVariable> createRemembranceVars(
+                ImmutableSet<ProgramVariable> vars, String suffix) {
+            Map<LocationVariable, LocationVariable> result =
+                    new LinkedHashMap<LocationVariable, LocationVariable>();
+            
+            for (ProgramVariable var : vars) {
                 result.put(
-                    (LocationVariable) localOutVariable,
-                    createVariable(localOutVariable.name() + "_" + REMEMBRANCE_SUFFIX,
-                                   localOutVariable.getKeYJavaType())
+                    (LocationVariable) var,
+                    createVariable(var.name() + "_" + suffix,
+                                   var.getKeYJavaType())
                 );
             }
+            
             return result;
         }
 

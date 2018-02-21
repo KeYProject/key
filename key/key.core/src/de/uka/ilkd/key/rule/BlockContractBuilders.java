@@ -64,14 +64,9 @@ import de.uka.ilkd.key.speclang.BlockWellDefinedness;
  * This contains various builders used in building formulae and terms for block contracts.
  */
 public class BlockContractBuilders {
-    
-    /*
-     * TODO
-     * This should be renamed to anonOut or something similar.
-     * Also, all references to "anonymisation" should be changed to refer to
-     * "output anonymisation" instead.
-     */
-    public static final String ANONYMISATION_PREFIX = "anon_";
+
+    public static final String ANON_IN_PREFIX = "anonIn_";
+    public static final String ANON_OUT_PREFIX = "anonOut_";
 
     private BlockContractBuilders() { }
     
@@ -222,7 +217,11 @@ public class BlockContractBuilders {
                 createAndRegisterVariable(placeholderVariables.result),
                 createAndRegisterVariable(placeholderVariables.exception),
                 createAndRegisterRemembranceVariables(placeholderVariables.remembranceHeaps),
-                createAndRegisterRemembranceVariables(placeholderVariables.remembranceLocalVariables),
+                createAndRegisterRemembranceVariables(placeholderVariables.outerRemembranceHeaps),
+                createAndRegisterRemembranceVariables(
+                        placeholderVariables.remembranceLocalVariables),
+                createAndRegisterRemembranceVariables(
+                        placeholderVariables.outerRemembranceLocalVariables),
                 services
             );
         }
@@ -296,9 +295,23 @@ public class BlockContractBuilders {
             return result;
         }
 
-        public Term buildAnonymisationUpdate(final Map<LocationVariable, Function> anonymisationHeaps,
+        public Term buildOuterRemembranceUpdate(final List<LocationVariable> heaps) {
+            Term result = skip();
+            for (LocationVariable heap : heaps) {
+                final Term update = elementary(variables.outerRemembranceHeaps.get(heap), var(heap));
+                result = parallel(result, update);
+            }
+            for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable
+                    : variables.outerRemembranceLocalVariables.entrySet()) {
+                result = parallel(result, elementary(remembranceVariable.getValue(),
+                                                     var(remembranceVariable.getKey())));
+            }
+            return result;
+        }
+
+        public Term buildAnonOutUpdate(final Map<LocationVariable, Function> anonymisationHeaps,
                                              final Map<LocationVariable, Term> modifiesClauses) {
-            Term result = buildLocalVariablesAnonymisationUpdate();
+            Term result = buildLocalVariablesAnonOutUpdate();
             for (Map.Entry<LocationVariable, Function> anonymisationHeap
                     : anonymisationHeaps.entrySet()) {
                 Term anonymisationUpdate = skip();
@@ -313,18 +326,48 @@ public class BlockContractBuilders {
             return result;
         }
 
-        private Term buildLocalVariablesAnonymisationUpdate() {
-            Term result = skip();
+        public Term buildAnonInUpdate(final Map<LocationVariable, Function> anonymisationHeaps) {
+            Term result = buildLocalVariablesAnonInUpdate();
+            
+            for (Map.Entry<LocationVariable, Function> anonymisationHeap
+                    : anonymisationHeaps.entrySet()) {
+                Term anonymisationUpdate = skip();
+                
+                anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), allLocs(),
+                        services.getTermBuilder().label(
+                                services.getTermBuilder().func(anonymisationHeap.getValue()),
+                                ParameterlessTermLabel.ANON_HEAP_LABEL));
+                
+                result = parallel(result, anonymisationUpdate);
+            }
+            
+            return result;
+        }
+
+        private Term buildLocalVariablesAnonOutUpdate() {
             final Collection<LocationVariable> localOutVariables =
                     variables.remembranceLocalVariables.keySet();
-            for (LocationVariable variable : localOutVariables) {
-                final String anonymisationName = newName(ANONYMISATION_PREFIX + variable.name());
+            return buildLocalVariablesAnonUpdate(localOutVariables, ANON_OUT_PREFIX);
+        }
+
+        private Term buildLocalVariablesAnonInUpdate() {
+            final Collection<LocationVariable> localInVariables =
+                    variables.outerRemembranceLocalVariables.keySet();
+            return buildLocalVariablesAnonUpdate(localInVariables, ANON_IN_PREFIX);
+        }
+
+        private Term buildLocalVariablesAnonUpdate(Collection<LocationVariable> vars, String prefix) {
+            Term result = skip();
+
+            for (LocationVariable variable : vars) {
+                final String anonymisationName = newName(prefix + variable.name());
                 final Function anonymisationFunction =
                         new Function(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 final Term elementaryUpdate = elementary(variable, func(anonymisationFunction));
                 result = parallel(result, elementaryUpdate);
             }
+            
             return result;
         }
 

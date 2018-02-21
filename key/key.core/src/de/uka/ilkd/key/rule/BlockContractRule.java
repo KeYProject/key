@@ -135,7 +135,7 @@ public class BlockContractRule extends AbstractBlockContractRule {
         final Term wdUpdate = services.getTermBuilder().parallel(contextUpdate, remembranceUpdate);
         Term localAnonUpdate = createLocalAnonUpdate(localOutVariables, services);
         final Term anonymisationUpdate =
-                updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps,
+                updatesBuilder.buildAnonOutUpdate(anonymisationHeaps,
                                                         /*anonymisationLocalVariables, */
                                                         modifiesClauses);
         final ImmutableList<Goal> result;

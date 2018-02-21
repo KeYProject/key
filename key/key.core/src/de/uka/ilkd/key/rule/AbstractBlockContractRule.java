@@ -226,7 +226,7 @@ public abstract class AbstractBlockContractRule implements BuiltInRule  {
         for (LocationVariable variable : variables) {
             if(contract.hasModifiesClause(variable)) {
                 final String anonymisationName =
-                        tb.newName(BlockContractBuilders.ANONYMISATION_PREFIX + variable.name());
+                        tb.newName(BlockContractBuilders.ANON_OUT_PREFIX + variable.name());
                 final Function anonymisationFunction =
                         new Function(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);

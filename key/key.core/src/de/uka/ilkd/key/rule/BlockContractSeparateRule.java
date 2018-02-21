@@ -132,7 +132,7 @@ public class BlockContractSeparateRule extends AbstractBlockContractRule {
         final Term wdUpdate = services.getTermBuilder().parallel(contextUpdate, remembranceUpdate);
         Term localAnonUpdate = createLocalAnonUpdate(localOutVariables, services);
         final Term anonymisationUpdate =
-                updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps, modifiesClauses);
+                updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiesClauses);
         final ImmutableList<Goal> result;
         final GoalsConfigurator configurator = new GoalsConfigurator(application,
                                                                      termLabelState,

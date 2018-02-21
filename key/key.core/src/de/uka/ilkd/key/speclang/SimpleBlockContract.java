@@ -193,7 +193,8 @@ public final class SimpleBlockContract implements BlockContract {
         assert remembranceHeaps != null;
         assert services != null;
         final Map<ProgramVariable, ProgramVariable> replacementMap = createReplacementMap(
-            new Variables(self, null, null, null, null, null, remembranceHeaps, null, services), services
+            new Variables(self, null, null, null, null, null,
+                    remembranceHeaps, null, null, null, services), services
         );
         final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(preconditions.get(heap));
@@ -264,8 +265,8 @@ public final class SimpleBlockContract implements BlockContract {
         assert (self == null) == (variables.self == null);
         assert services != null;
         final Map<ProgramVariable, ProgramVariable> replacementMap =
-                createReplacementMap(new Variables(self, null, null, null, null,
-                                                   null, null, null, services),
+                createReplacementMap(new Variables(self, null, null, null, null, null,
+                                                   null, null, null, null, services),
                                      services);
         final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(modifiesClauses.get(heap));

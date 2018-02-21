@@ -387,8 +387,11 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 replaceVariable(variables.result),
                 replaceVariable(variables.exception),
                 replaceRemembranceHeaps(variables.remembranceHeaps),
+                replaceRemembranceHeaps(variables.outerRemembranceHeaps),
                 replaceRemembranceLocalVariables(
                         variables.remembranceLocalVariables),
+                replaceRemembranceLocalVariables(
+                        variables.outerRemembranceLocalVariables),
                 services);
     }
 

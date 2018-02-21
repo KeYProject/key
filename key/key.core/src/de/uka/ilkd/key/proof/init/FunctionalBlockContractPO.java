@@ -74,14 +74,12 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
         final ImmutableSet<ProgramVariable> localInVariables =
                 MiscTools.getLocalIns(block, services);
-        final ImmutableSet<ProgramVariable> localOutVariables =
-                MiscTools.getLocalOuts(block, services);
-
+        
         Map<LocationVariable, Function> anonOutHeaps = new LinkedHashMap<LocationVariable, Function>(40);
         for (LocationVariable heap : heaps) {
             if(contract.hasModifiesClause(heap)) {
                 final String anonymisationName =
-                        tb.newName(BlockContractBuilders.ANONYMISATION_PREFIX + heap.name());
+                        tb.newName(BlockContractBuilders.ANON_OUT_PREFIX + heap.name());
                 final Function anonymisationFunction =
                         new Function(new Name(anonymisationName), heap.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
@@ -112,25 +110,21 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
+        final Term outerRemembranceUpdate = updatesBuilder.buildOuterRemembranceUpdate(heaps);
         
-        Term anonOutUpdate = null;
+        Map<LocationVariable, Function> anonHeaps = new LinkedHashMap<LocationVariable, Function>(40);
+        final TermBuilder tb = services.getTermBuilder();
         
-        for (ProgramVariable pv : localOutVariables) {
-            final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
-            final Function anonFunc = new Function(anonFuncName, pv.sort(), true);
-            services.getNamespaces().functions().addSafely(anonFunc);
-            final Term elemUpd = tb.elementary((LocationVariable)pv, tb.func(anonFunc));
-            
-            if (anonOutUpdate == null) {
-                anonOutUpdate = elemUpd;
-            } else {
-                anonOutUpdate = tb.parallel(anonOutUpdate, elemUpd);
-            }
+        for (LocationVariable heap : heaps) {
+            final String anonymisationName =
+                    tb.newName(BlockContractBuilders.ANON_IN_PREFIX + heap.name());
+            final Function anonymisationFunction =
+                    new Function(new Name(anonymisationName), heap.sort(), true);
+            services.getNamespaces().functions().addSafely(anonymisationFunction);
+            anonHeaps.put(heap, anonymisationFunction);
         }
         
-        if (anonOutUpdate == null) {
-            anonOutUpdate = tb.skip();
-        }
+        final Term anonInUpdate = updatesBuilder.buildAnonInUpdate(anonHeaps);
         
         final KeYJavaType kjt = getCalleeKeYJavaType();
         
@@ -154,7 +148,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                 null);
         
         termPOs.add(configurator.setUpValidityGoal(null,
-                new Term[] { remembranceUpdate },
+                new Term[] { outerRemembranceUpdate, anonInUpdate, remembranceUpdate },
                 new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition },
                 new Term[] { postcondition, frameCondition },
                 exceptionParameter,
