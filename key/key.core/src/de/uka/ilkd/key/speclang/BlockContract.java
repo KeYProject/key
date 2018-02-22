@@ -131,6 +131,13 @@ public interface BlockContract extends SpecificationElement {
      */
     public boolean hasMby();
 
+    public Term getMby();
+    
+    public Term getMby(ProgramVariable selfVar, Services services);
+    
+    public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
+            Map<LocationVariable, Term> atPres, Services services);
+
 
     public boolean hasInfFlowSpecs();
 
@@ -249,12 +256,19 @@ public interface BlockContract extends SpecificationElement {
             this.outerRemembranceLocalVariables = outerRemembranceLocalVariables;
         }
 
-        public Map<LocationVariable, LocationVariable> combineRemembranceVariables()
-        {
+        public Map<LocationVariable, LocationVariable> combineRemembranceVariables() {
             final Map<LocationVariable, LocationVariable> result =
                     new LinkedHashMap<LocationVariable, LocationVariable>();
             result.putAll(remembranceHeaps);
             result.putAll(remembranceLocalVariables);
+            return result;
+        }
+
+        public Map<LocationVariable, LocationVariable> combineOuterRemembranceVariables() {
+            final Map<LocationVariable, LocationVariable> result =
+                    new LinkedHashMap<LocationVariable, LocationVariable>();
+            result.putAll(outerRemembranceHeaps);
+            result.putAll(outerRemembranceLocalVariables);
             return result;
         }
 

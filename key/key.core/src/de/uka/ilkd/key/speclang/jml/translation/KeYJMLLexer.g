@@ -62,6 +62,7 @@ lexer grammar KeYJMLLexer;
     ALLFIELDS            : '\\all_fields';  //KeY extension, not official JML
     ALLOBJECTS           : '\\all_objects';  //KeY extension, not official JML
     BACKUP               : '\\backup';  //KeY extension, not official JML
+    BEFORE               : '\\before';  //KeY extension, not official JML
     BIGINT               : '\\bigint';
     BSUM                 : '\\bsum';  //KeY extension, not official JML
     BY                   : '\\by';  //KeY extension, not official JML

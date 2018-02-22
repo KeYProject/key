@@ -86,29 +86,25 @@ public class FunctionalBlockContract implements Contract {
 
     @Override
     public boolean hasMby() {
-        // TODO Auto-generated method stub
-        return false;
+        return contract.hasMby();
     }
 
     @Override
     public Term getMby() {
-        // TODO Auto-generated method stub
-        return null;
+        return contract.getMby();
     }
 
     @Override
     public Term getMby(ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, Services services) {
-        // TODO Auto-generated method stub
-        return null;
+        return contract.getMby(selfVar, services);
     }
 
     @Override
     public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
             ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
             Services services) {
-        // TODO Auto-generated method stub
-        return null;
+        return contract.getMby(heapTerms, selfTerm, atPres, services);
     }
 
     @Override

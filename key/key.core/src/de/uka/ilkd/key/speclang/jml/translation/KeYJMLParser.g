@@ -59,11 +59,11 @@ options {
     private ProgramVariable resultVar;
     private ProgramVariable excVar;
     private Map<LocationVariable,Term> atPres;
+    private Map<LocationVariable,Term> atBefores;
 
     // Helper objects
     private JMLResolverManager resolverManager;
     private JavaIntegerSemanticsHelper intHelper;
-
 
     private KeYJMLParser(KeYJMLLexer lexer,
 		String fileName,
@@ -73,7 +73,8 @@ options {
 		ImmutableList<ProgramVariable> paramVars,
 		ProgramVariable result,
 		ProgramVariable exc,
-		Map<LocationVariable,Term> atPres) {
+		Map<LocationVariable,Term> atPres,
+		Map<LocationVariable,Term> atBefores) {
 	this(new CommonTokenStream(lexer));
 
 	// save parameters
@@ -95,6 +96,7 @@ options {
 	this.resultVar      = result;
 	this.excVar	    = exc;
 	this.atPres         = atPres;
+    this.atPres         = atBefores;
 
         intHelper = new JavaIntegerSemanticsHelper(services, excManager);
 	// initialize helper objects
@@ -123,13 +125,34 @@ options {
     }
 
     public KeYJMLParser(PositionedString ps,
+        Services services,
+        KeYJavaType specInClass,
+        ProgramVariable self,
+        ImmutableList<ProgramVariable> paramVars,
+        ProgramVariable result,
+        ProgramVariable exc,
+        Map<LocationVariable,Term> atPres) {
+    this(new KeYJMLLexer(createANTLRStringStream(ps)),
+         ps.fileName,
+         services,
+         specInClass,
+         self,
+         paramVars,
+         result,
+         exc,
+         atPres,
+         atPres);
+    }
+
+    public KeYJMLParser(PositionedString ps,
 		Services services,
 		KeYJavaType specInClass,
 		ProgramVariable self,
 		ImmutableList<ProgramVariable> paramVars,
 		ProgramVariable result,
 		ProgramVariable exc,
-		Map<LocationVariable,Term> atPres) {
+		Map<LocationVariable,Term> atPres,
+        Map<LocationVariable,Term> atBefores) {
 	this(new KeYJMLLexer(createANTLRStringStream(ps)),
 	     ps.fileName,
 	     services,
@@ -138,7 +161,8 @@ options {
 	     paramVars,
 	     result,
 	     exc,
-	     atPres);
+	     atPres,
+	     atBefores);
     }
 
 
@@ -249,7 +273,8 @@ options {
 	}
 
     /**
-     * Converts a term so that all of its non-rigid operators refer to the pre-state.
+     * Converts a term so that all of its non-rigid operators refer to the pre-state of the
+     * current method ({@link atPres}).
      */
     // TODO: remove when all clients have been moved to JMLTranslator
     private Term convertToOld(final Term term) {
@@ -264,6 +289,25 @@ options {
         }
 	    OpReplacer or = new OpReplacer(map, tb.tf());
 	    return or.replace(term);
+    }
+    
+    /**
+     * Converts a term so that all of its non-rigid operators refer to the pre-state of the
+     * current block ({@link atBefores}).
+     */
+    // TODO: remove when all clients have been moved to JMLTranslator
+    private Term convertToBefore(final Term term) {
+        assert atBefores != null && atBefores.get(getBaseHeap()) != null;
+        Map<Term, Term> map = new LinkedHashMap<Term, Term>();
+        for (LocationVariable var : atBefores.keySet()) {
+            // caution: That may now also be other variables than only heaps.
+            Term varAtPre = atBefores.get(var);
+            if (varAtPre != null) {
+                map.put(tb.var(var), varAtPre);
+            }
+        }
+        OpReplacer or = new OpReplacer(map, tb.tf());
+        return or.replace(term);
     }
 
     private Term convertToBackup(Term term) {
@@ -1559,6 +1603,8 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
         (LPAREN SEQDEF) => result=seqdefterm
     |
 	(OLD | PRE) => result=oldexpression
+	|
+    BEFORE => result=beforeexpression
 
     |   result = transactionUpdated
     |
@@ -1949,6 +1995,29 @@ oldexpression returns [SLExpression ret=null] throws SLTranslationException
                                     result.getType());
         } else {
           result = new SLExpression(convertToOld(result.getTerm()));
+        }
+    }
+;
+
+beforeexpression returns [SLExpression ret=null] throws SLTranslationException
+@init {
+    KeYJavaType typ;
+}
+@after {ret = result;}
+:
+    ( BEFORE LPAREN result=expression RPAREN )
+    {
+        if (atBefores == null || atBefores.get(getBaseHeap()) == null) {
+        raiseError("JML construct " +
+               "\\before not allowed in this context.");
+        }
+
+        typ = result.getType();
+        if(typ != null) {
+          result = new SLExpression(convertToBefore(result.getTerm()),
+                                    result.getType());
+        } else {
+          result = new SLExpression(convertToBefore(result.getTerm()));
         }
     }
 ;

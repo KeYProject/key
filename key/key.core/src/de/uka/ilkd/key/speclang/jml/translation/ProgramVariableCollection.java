@@ -31,11 +31,22 @@ public class ProgramVariableCollection {
     public ProgramVariable excVar;
     public Map<LocationVariable,LocationVariable> atPreVars;
     public Map<LocationVariable,Term> atPres;
+    public Map<LocationVariable,LocationVariable> atBeforeVars;
+    public Map<LocationVariable,Term> atBefores;
     
     public ProgramVariableCollection(ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar, ProgramVariable excVar,
             Map<LocationVariable,LocationVariable> atPreVars, Map<LocationVariable,Term> atPres) {
+        this (selfVar, paramVars, resultVar, excVar, atPreVars, atPres, atPreVars, atPres);
+    }
+    
+    public ProgramVariableCollection(ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar, ProgramVariable excVar,
+            Map<LocationVariable,LocationVariable> atPreVars, Map<LocationVariable,Term> atPres,
+            Map<LocationVariable,LocationVariable> atBeforeVars,
+                Map<LocationVariable,Term> atBefores) {
         super();
         this.selfVar = selfVar;
         this.paramVars = paramVars;
@@ -43,6 +54,8 @@ public class ProgramVariableCollection {
         this.excVar = excVar;
         this.atPreVars = atPreVars;
         this.atPres = atPres;
+        this.atBeforeVars = atBeforeVars;
+        this.atBefores = atBefores;
     }
 
     public ProgramVariableCollection() {

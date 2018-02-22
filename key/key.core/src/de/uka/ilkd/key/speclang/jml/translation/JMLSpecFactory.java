@@ -1277,7 +1277,7 @@ public class JMLSpecFactory {
         final ContractClauses clauses = translateJMLClauses(method,
                 specificationCase, programVariables, behavior);
         return new SimpleBlockContract.Creator(block, labels, method, behavior,
-                variables, clauses.requires, clauses.ensures,
+                variables, clauses.requires, clauses.measuredBy, clauses.ensures,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues,
                 clauses.returns, clauses.signals, clauses.signalsOnly,
                 clauses.diverges, clauses.assignables, clauses.hasMod, services)
@@ -1289,11 +1289,14 @@ public class JMLSpecFactory {
             final BlockContract.Variables variables) {
         final Map<LocationVariable, LocationVariable> remembranceVariables = variables
                 .combineRemembranceVariables();
+        final Map<LocationVariable, LocationVariable> outerRemembranceVariables = variables
+                .combineOuterRemembranceVariables();
         return new ProgramVariableCollection(variables.self,
                 append(ImmutableSLList.nil(), method.collectParameters())
                         .append(collectLocalVariablesVisibleTo(block, method)),
-                variables.result, variables.exception, remembranceVariables,
-                termify(remembranceVariables));
+                variables.result, variables.exception,
+                outerRemembranceVariables, termify(outerRemembranceVariables),
+                remembranceVariables, termify(remembranceVariables));
     }
 
     private Map<LocationVariable, Term> termify(

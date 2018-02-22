@@ -63,6 +63,7 @@ public final class SimpleBlockContract implements BlockContract {
     private Term instantiationSelf;
 
     private final Map<LocationVariable, Term> preconditions;
+    private final Term measuredBy;
     private final Map<LocationVariable, Term> postconditions;
     private final Map<LocationVariable, Term> modifiesClauses;
     private ImmutableList<InfFlowSpec> infFlowSpecs;
@@ -79,6 +80,7 @@ public final class SimpleBlockContract implements BlockContract {
                                final IProgramMethod method,
                                final Modality modality,
                                final Map<LocationVariable, Term> preconditions,
+                               final Term measuredBy,
                                final Map<LocationVariable, Term> postconditions,
                                final Map<LocationVariable, Term> modifiesClauses,
                                final ImmutableList<InfFlowSpec> infFlowSpecs,
@@ -103,6 +105,7 @@ public final class SimpleBlockContract implements BlockContract {
         this.method = method;
         this.modality = modality;
         this.preconditions = preconditions;
+        this.measuredBy = measuredBy;
         this.postconditions = postconditions;
         this.modifiesClauses = modifiesClauses;        
         this.infFlowSpecs = infFlowSpecs;
@@ -181,6 +184,28 @@ public final class SimpleBlockContract implements BlockContract {
         return variables.termify(selfTerm);
     }
 
+    @Override
+    public Term getMby() {
+        return measuredBy;
+    }
+
+    @Override
+    public Term getMby(ProgramVariable selfVar, Services services) {
+        final Map<ProgramVariable, ProgramVariable> replacementMap = createReplacementMap(
+                new Variables(selfVar, null, null, null, null, null,
+                        null, null, null, null, services), services);
+        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
+        return replacer.replace(measuredBy);
+    }
+
+    @Override
+    public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
+            Map<LocationVariable, Term> atPres, Services services) {
+        final Map<Term, Term> replacementMap = createReplacementMap(
+                null, new Terms(selfTerm, null, null, null, null, null, atPres, null), services);
+        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
+        return replacer.replace(measuredBy);
+    }
 
     @Override
     public Term getPrecondition(final LocationVariable heap,
@@ -505,7 +530,7 @@ public final class SimpleBlockContract implements BlockContract {
                                 final ImmutableList<InfFlowSpec> newinfFlowSpecs,
                                 final Variables newVariables) {
         return new SimpleBlockContract(newBlock, labels, method, modality,
-                                       newPreconditions, newPostconditions,
+                                       newPreconditions, measuredBy, newPostconditions,
                                        newModifiesClauses, newinfFlowSpecs,
                                        newVariables,
                                        transactionApplicable, hasMod);
@@ -521,7 +546,7 @@ public final class SimpleBlockContract implements BlockContract {
         assert newPM instanceof IProgramMethod;
         assert newKJT.equals(newPM.getContainerType());
         return new SimpleBlockContract(block, labels, (IProgramMethod)newPM, modality,
-                                       preconditions, postconditions, modifiesClauses,
+                                       preconditions, measuredBy, postconditions, modifiesClauses,
                                        infFlowSpecs, variables, transactionApplicable, hasMod);
     }
 
@@ -709,7 +734,7 @@ public final class SimpleBlockContract implements BlockContract {
 
     @Override
     public boolean hasMby() {
-        return false;
+        return measuredBy != null;
     }
 
     @Override
@@ -849,6 +874,7 @@ public final class SimpleBlockContract implements BlockContract {
         private final IProgramMethod method;
         private final Behavior behavior;
         private final Variables variables;
+        private final Term measuredBy;
         private final Map<LocationVariable, Term> requires;
         private final Map<LocationVariable, Term> ensures;
         private final ImmutableList<InfFlowSpec> infFlowSpecs;
@@ -868,6 +894,7 @@ public final class SimpleBlockContract implements BlockContract {
                        final Behavior behavior,
                        final Variables variables,
                        final Map<LocationVariable, Term> requires,
+                       final Term measuredBy,
                        final Map<LocationVariable, Term> ensures,
                        final ImmutableList<InfFlowSpec> infFlowSpecs,
                        final Map<Label, Term> breaks,
@@ -886,6 +913,7 @@ public final class SimpleBlockContract implements BlockContract {
             this.behavior = behavior;
             this.variables = variables;
             this.requires = requires;
+            this.measuredBy = measuredBy;
             this.ensures = ensures;
             this.infFlowSpecs = infFlowSpecs;
             this.breaks = breaks;
@@ -1102,14 +1130,14 @@ public final class SimpleBlockContract implements BlockContract {
             result = result.add(
                 new SimpleBlockContract(
                     block, labels, method, diverges.equals(ff()) ? Modality.DIA : Modality.BOX,
-                    preconditions, postconditions, modifiesClauses,
+                    preconditions, measuredBy, postconditions, modifiesClauses,
                     infFlowSpecs, variables, transactionApplicable, hasMod)
                 );
             if (ifDivergesConditionCannotBeExpressedByAModality()) {
                 result = result.add(
                     new SimpleBlockContract(
                         block, labels, method, Modality.DIA,
-                        addNegatedDivergesConditionToPreconditions(preconditions),
+                        addNegatedDivergesConditionToPreconditions(preconditions), measuredBy,
                         postconditions, modifiesClauses, infFlowSpecs, variables,
                         transactionApplicable, hasMod)
                     );
@@ -1191,6 +1219,7 @@ public final class SimpleBlockContract implements BlockContract {
             }
             return new SimpleBlockContract(head.getBlock(), head.getLabels(),
                                            head.getMethod(), head.getModality(), preconditions,
+                                           contracts[0].getMby(),
                                            postconditions, modifiesClauses, head.getInfFlowSpecs(),
                                            placeholderVariables,
                                            head.isTransactionApplicable(), hasMod);
