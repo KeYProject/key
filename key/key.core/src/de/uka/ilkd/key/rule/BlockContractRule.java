@@ -104,7 +104,7 @@ public class BlockContractRule extends AbstractBlockContractRule {
 
         final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(
             goal, contract.getPlaceholderVariables(), services
-        ).createAndRegister(instantiation.self);
+        ).createAndRegister(instantiation.self, true);
         final ProgramVariable exceptionParameter =
                     createLocalVariable("e", variables.exception.getKeYJavaType(),
                                         services);
@@ -132,7 +132,6 @@ public class BlockContractRule extends AbstractBlockContractRule {
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
-        final Term outerRemembranceUpdate = updatesBuilder.buildOuterRemembranceUpdate(heaps);
         final Term wdUpdate = services.getTermBuilder().parallel(contextUpdate, remembranceUpdate);
         Term localAnonUpdate = createLocalAnonUpdate(localOutVariables, services);
         final Term anonymisationUpdate =
@@ -161,18 +160,17 @@ public class BlockContractRule extends AbstractBlockContractRule {
         }
 
         configurator.setUpPreconditionGoal(result.tail().head(),
-                                           conditionsAndClausesBuilder
-                                               .sequential(outerRemembranceUpdate, contextUpdate),
+                                           contextUpdate,
                                            new Term[] {precondition, wellFormedHeapsCondition,
                                                        reachableInCondition});
         configurator.setUpUsageGoal(result.head(),
-                                    new Term[] {outerRemembranceUpdate, contextUpdate, remembranceUpdate,
+                                    new Term[] {contextUpdate, remembranceUpdate,
                                                 anonymisationUpdate},
                                     new Term[] {postcondition, wellFormedAnonymisationHeapsCondition,
                                                 reachableOutCondition, atMostOneFlagSetCondition});
         if (!InfFlowCheckInfo.isInfFlow(goal)) {
             configurator.setUpValidityGoal(result.tail().tail().head(),
-                                           new Term[] {outerRemembranceUpdate, contextUpdate, remembranceUpdate},
+                                           new Term[] {contextUpdate, remembranceUpdate},
                                            new Term[] {precondition, wellFormedHeapsCondition,
                                                        reachableInCondition},
                                            new Term[] {postcondition, frameCondition

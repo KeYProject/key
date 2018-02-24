@@ -207,23 +207,44 @@ public class BlockContractBuilders {
             this.services = services;
         }
 
-        public BlockContract.Variables createAndRegister(Term self)
+        public BlockContract.Variables createAndRegister(Term self, boolean existingPO)
         {
-            return new BlockContract.Variables(
-                self != null ? self.op(ProgramVariable.class) : null,
-                createAndRegisterFlags(placeholderVariables.breakFlags),
-                createAndRegisterFlags(placeholderVariables.continueFlags),
-                createAndRegisterVariable(placeholderVariables.returnFlag),
-                createAndRegisterVariable(placeholderVariables.result),
-                createAndRegisterVariable(placeholderVariables.exception),
-                createAndRegisterRemembranceVariables(placeholderVariables.remembranceHeaps),
-                createAndRegisterRemembranceVariables(placeholderVariables.outerRemembranceHeaps),
-                createAndRegisterRemembranceVariables(
-                        placeholderVariables.remembranceLocalVariables),
-                createAndRegisterRemembranceVariables(
-                        placeholderVariables.outerRemembranceLocalVariables),
-                services
-            );
+            if (existingPO) {
+                // In an existing PO, the outer remembrance vars already exist and refer to the
+                // current method's prestate.
+                return new BlockContract.Variables(
+                    placeholderVariables.self,
+                    createAndRegisterFlags(placeholderVariables.breakFlags),
+                    createAndRegisterFlags(placeholderVariables.continueFlags),
+                    createAndRegisterVariable(placeholderVariables.returnFlag),
+                    createAndRegisterVariable(placeholderVariables.result),
+                    createAndRegisterVariable(placeholderVariables.exception),
+                    createAndRegisterRemembranceVariables(placeholderVariables.remembranceHeaps),
+                    createAndRegisterRemembranceVariables(
+                            placeholderVariables.remembranceLocalVariables),
+                    placeholderVariables.outerRemembranceHeaps,
+                    placeholderVariables.outerRemembranceVariables,
+                    services);
+            } else {
+                // In a mew PO, the outer remembrance vars don't exist yet.
+                return new BlockContract.Variables(
+                    self != null ? self.op(ProgramVariable.class) : null,
+                    createAndRegisterFlags(placeholderVariables.breakFlags),
+                    createAndRegisterFlags(placeholderVariables.continueFlags),
+                    createAndRegisterVariable(placeholderVariables.returnFlag),
+                    createAndRegisterVariable(placeholderVariables.result),
+                    createAndRegisterVariable(placeholderVariables.exception),
+                    createAndRegisterRemembranceVariables(placeholderVariables.remembranceHeaps),
+                    createAndRegisterRemembranceVariables(
+                            placeholderVariables.remembranceLocalVariables),
+                    createAndRegisterRemembranceVariables(
+                            placeholderVariables.outerRemembranceHeaps),
+                    createAndRegisterRemembranceVariables(
+                            placeholderVariables.outerRemembranceVariables),
+                    services
+               );              
+            }
+
         }
 
         private Map<Label, ProgramVariable> createAndRegisterFlags(final Map<Label,
@@ -254,7 +275,7 @@ public class BlockContractBuilders {
                 LocationVariable newVariable =
                         new LocationVariable(new ProgramElementName(newName),
                                              placeholderVariable.getKeYJavaType());
-                
+
                 if (goal != null) {
                     goal.addProgramVariable(newVariable);
                 } else {
@@ -295,17 +316,14 @@ public class BlockContractBuilders {
             return result;
         }
 
-        public Term buildOuterRemembranceUpdate(final List<LocationVariable> heaps) {
+        public Term buildOuterRemembranceUpdate() {
             Term result = skip();
-            for (LocationVariable heap : heaps) {
-                final Term update = elementary(variables.outerRemembranceHeaps.get(heap), var(heap));
+            
+            for (LocationVariable var : variables.outerRemembranceVariables.keySet()) {
+                final Term update = elementary(variables.outerRemembranceVariables.get(var), var(var));
                 result = parallel(result, update);
             }
-            for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable
-                    : variables.outerRemembranceLocalVariables.entrySet()) {
-                result = parallel(result, elementary(remembranceVariable.getValue(),
-                                                     var(remembranceVariable.getKey())));
-            }
+
             return result;
         }
 
@@ -345,15 +363,14 @@ public class BlockContractBuilders {
         }
 
         private Term buildLocalVariablesAnonOutUpdate() {
-            final Collection<LocationVariable> localOutVariables =
-                    variables.remembranceLocalVariables.keySet();
-            return buildLocalVariablesAnonUpdate(localOutVariables, ANON_OUT_PREFIX);
+            return buildLocalVariablesAnonUpdate(variables.remembranceLocalVariables.keySet(),
+                    ANON_OUT_PREFIX);
         }
 
         private Term buildLocalVariablesAnonInUpdate() {
-            final Collection<LocationVariable> localInVariables =
-                    variables.outerRemembranceLocalVariables.keySet();
-            return buildLocalVariablesAnonUpdate(localInVariables, ANON_IN_PREFIX);
+            
+            return buildLocalVariablesAnonUpdate(variables.outerRemembranceVariables.keySet(),
+                    ANON_IN_PREFIX);
         }
 
         private Term buildLocalVariablesAnonUpdate(Collection<LocationVariable> vars, String prefix) {
@@ -402,7 +419,7 @@ public class BlockContractBuilders {
             for (LocationVariable heap : heaps) {
                 result = and(result,
                              contract.getPrecondition(heap, getBaseHeap(), terms.self,
-                                                      terms.remembranceHeaps, services));
+                                                      terms.outerRemembranceVariables, services));
             }
             return result;
         }

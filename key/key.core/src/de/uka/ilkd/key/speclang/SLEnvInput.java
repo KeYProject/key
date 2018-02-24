@@ -245,7 +245,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                     final ImmutableSet<BlockContract> blockContracts =
                             specExtractor.extractBlockContracts(pm, (StatementBlock) block);
                     for (BlockContract specification : blockContracts) {
-                    	specRepos.addBlockContract(specification);
+                    	specRepos.addBlockContract(specification, true);
                     }
                 }
 
@@ -271,7 +271,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                     final ImmutableSet<BlockContract> blockContracts =
                             specExtractor.extractBlockContracts(pm, (LabeledStatement) labeled);
                     for (BlockContract specification : blockContracts) {
-                        specRepos.addBlockContract(specification);
+                        specRepos.addBlockContract(specification, true);
                     }
                 }
             }

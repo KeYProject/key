@@ -202,7 +202,7 @@ public final class SimpleBlockContract implements BlockContract {
     public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
             Map<LocationVariable, Term> atPres, Services services) {
         final Map<Term, Term> replacementMap = createReplacementMap(
-                null, new Terms(selfTerm, null, null, null, null, null, atPres, null), services);
+                null, new Terms(selfTerm, null, null, null, null, null, null, null, atPres), services);
         final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(measuredBy);
     }
@@ -210,16 +210,16 @@ public final class SimpleBlockContract implements BlockContract {
     @Override
     public Term getPrecondition(final LocationVariable heap,
                                 final ProgramVariable self,
-                                final Map<LocationVariable, LocationVariable> remembranceHeaps,
+                                final Map<LocationVariable, LocationVariable> atPres,
                                 final Services services)
     {
         assert heap != null;
         assert (self == null) == (variables.self == null);
-        assert remembranceHeaps != null;
+        assert atPres != null;
         assert services != null;
         final Map<ProgramVariable, ProgramVariable> replacementMap = createReplacementMap(
             new Variables(self, null, null, null, null, null,
-                    remembranceHeaps, null, null, null, services), services
+                    null, null, null, atPres, services), services
         );
         final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(preconditions.get(heap));
@@ -229,25 +229,24 @@ public final class SimpleBlockContract implements BlockContract {
     public Term getPrecondition(final LocationVariable heapVariable,
                                 final Term heap,
                                 final Term self,
-                                final Map<LocationVariable, Term> remembranceHeaps,
-                                final Services services)
-    {
+                                final Map<LocationVariable, Term> atPres,
+                                final Services services) {
         assert heapVariable != null;
         assert heap != null;
         assert (self == null) == (variables.self == null);
-        assert remembranceHeaps != null;
+        assert atPres != null;
         assert services != null;
         final Map<Term, Term> replacementMap = createReplacementMap(
-            heap, new Terms(self, null, null, null, null, null, remembranceHeaps, null), services
+            heap, new Terms(self, null, null, null, null, null, null, null, atPres), services
         );
         final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(preconditions.get(heapVariable));
     }
 
     @Override
-    public Term getPrecondition(final LocationVariable heap, final Services services)
-    {
-        return getPrecondition(heap, variables.self, variables.remembranceHeaps, services);
+    public Term getPrecondition(final LocationVariable heap, final Services services) {
+        return getPrecondition(heap, variables.self, variables.outerRemembranceVariables,
+                services);
     }
 
     @Override
@@ -277,8 +276,7 @@ public final class SimpleBlockContract implements BlockContract {
     }
 
     @Override
-    public Term getPostcondition(final LocationVariable heap, final Services services)
-    {
+    public Term getPostcondition(final LocationVariable heap, final Services services) {
         return getPostcondition(heap, variables, services);
     }
 
@@ -305,15 +303,14 @@ public final class SimpleBlockContract implements BlockContract {
         assert (self == null) == (variables.self == null);
         assert services != null;
         final Map<Term, Term> replacementMap = createReplacementMap(
-            heap, new Terms(self, null, null, null, null, null, null, null), services
+            heap, new Terms(self, null, null, null, null, null, null, null, null), services
         );
         final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(modifiesClauses.get(heapVariable));
     }
 
     @Override
-    public Term getModifiesClause(final LocationVariable heap, final Services services)
-    {
+    public Term getModifiesClause(final LocationVariable heap, final Services services) {
         return getModifiesClause(heap, variables.self, services);
     }
 
@@ -708,6 +705,9 @@ public final class SimpleBlockContract implements BlockContract {
         result.replaceRemembranceLocalVariables(variables.remembranceLocalVariables,
                                                 newVariables.remembranceLocalVariables,
                                                 services);
+        result.replaceRemembranceLocalVariables(variables.outerRemembranceVariables,
+                         newVariables.outerRemembranceVariables,
+                         services);
         return result;
     }
 
@@ -728,6 +728,9 @@ public final class SimpleBlockContract implements BlockContract {
         result.replaceRemembranceLocalVariables(variables.remembranceLocalVariables,
                                                 newTerms.remembranceLocalVariables,
                                                 services);
+        result.replaceRemembranceLocalVariables(variables.outerRemembranceVariables,
+                         newTerms.outerRemembranceVariables,
+                         services);
         return result;
     }
 

@@ -75,12 +75,12 @@ public interface BlockContract extends SpecificationElement {
 
     public Term getPrecondition(LocationVariable heap,
                                 ProgramVariable self,
-                                Map<LocationVariable, LocationVariable> remembranceHeaps,
+                                Map<LocationVariable, LocationVariable> atPres,
                                 Services services);
     public Term getPrecondition(LocationVariable heapVariable,
                                 Term heap,
                                 Term self,
-                                Map<LocationVariable, Term> remembranceHeaps,
+                                Map<LocationVariable, Term> atPres,
                                 Services services);
     public Term getPrecondition(LocationVariable heap, Services services);
 
@@ -214,21 +214,22 @@ public interface BlockContract extends SpecificationElement {
         public final Map<LocationVariable, LocationVariable> remembranceHeaps;
         
         /**
-         * A map from every heap {@code heap} to {@code heap_Before_METHOD}.
-         */
-        public final Map<LocationVariable, LocationVariable> outerRemembranceHeaps;
-        
-        /**
          * A map from every variable {@code var} that is assignable inside the block
          * to {@code var_Before_BLOCK}.
          */
         public final Map<LocationVariable, LocationVariable> remembranceLocalVariables;
         
         /**
-         * A map from every variable {@code var} that is accessible inside the block
-         * to {@code var_Before_METHOD}.
+         * A map from every heap {@code heap} that is accessible
+         * inside the block to {@code heap_Before_METHOD}.
          */
-        public final Map<LocationVariable, LocationVariable> outerRemembranceLocalVariables;
+        public final Map<LocationVariable, LocationVariable> outerRemembranceHeaps;
+        
+        /**
+         * A map from every variable {@code var} that is accessible
+         * inside the block to {@code var_Before_METHOD}.
+         */
+        public final Map<LocationVariable, LocationVariable> outerRemembranceVariables;
 
         public Variables(final ProgramVariable self,
                          final Map<Label, ProgramVariable> breakFlags,
@@ -237,10 +238,11 @@ public interface BlockContract extends SpecificationElement {
                          final ProgramVariable result,
                          final ProgramVariable exception,
                          final Map<LocationVariable, LocationVariable> remembranceHeaps,
-                         final Map<LocationVariable, LocationVariable> outerRemembranceHeaps,
                          final Map<LocationVariable, LocationVariable> remembranceLocalVariables,
                          final Map<LocationVariable, LocationVariable>
-                                 outerRemembranceLocalVariables,
+                             outerRemembranceHeaps,
+                         final Map<LocationVariable, LocationVariable>
+                                 outerRemembranceVariables,
                          final TermServices services)
         {
             this.services = services;
@@ -251,9 +253,9 @@ public interface BlockContract extends SpecificationElement {
             this.result = result;
             this.exception = exception;
             this.remembranceHeaps = remembranceHeaps;
-            this.outerRemembranceHeaps = outerRemembranceHeaps;
             this.remembranceLocalVariables = remembranceLocalVariables;
-            this.outerRemembranceLocalVariables = outerRemembranceLocalVariables;
+            this.outerRemembranceHeaps = outerRemembranceHeaps;
+            this.outerRemembranceVariables = outerRemembranceVariables;
         }
 
         public Map<LocationVariable, LocationVariable> combineRemembranceVariables() {
@@ -268,7 +270,7 @@ public interface BlockContract extends SpecificationElement {
             final Map<LocationVariable, LocationVariable> result =
                     new LinkedHashMap<LocationVariable, LocationVariable>();
             result.putAll(outerRemembranceHeaps);
-            result.putAll(outerRemembranceLocalVariables);
+            result.putAll(outerRemembranceVariables);
             return result;
         }
 
@@ -282,7 +284,8 @@ public interface BlockContract extends SpecificationElement {
                 termifyVariable(result),
                 termifyVariable(exception),
                 termifyRemembranceVariables(remembranceHeaps),
-                termifyRemembranceVariables(remembranceLocalVariables)
+                termifyRemembranceVariables(remembranceLocalVariables),
+                termifyRemembranceVariables(outerRemembranceVariables)
             );
         }
 
@@ -388,6 +391,14 @@ public interface BlockContract extends SpecificationElement {
             else if (!remembranceLocalVariables
                     .equals(other.remembranceLocalVariables))
                 return false;
+            if (outerRemembranceVariables == null) {
+                if (other.outerRemembranceVariables != null)
+                    return false;
+            }
+            else if (!outerRemembranceVariables
+                    .equals(other.outerRemembranceVariables))
+                return false;
+            
             if (result == null) {
                 if (other.result != null)
                     return false;
@@ -417,8 +428,8 @@ public interface BlockContract extends SpecificationElement {
         private static final String CONTINUE_FLAG_BASE_NAME = "continued";
         private static final String RETURN_FLAG_NAME = "returned";
         private static final String FLAG_INFIX = "To";
-        private static final String REMEMBRANCE_SUFFIX = "Before_BLOCK";
-        private static final String OUTER_REMEMBRANCE_SUFFIX = "Before_METHOD";
+        private static final String REMEMBRANCE_SUFFIX = "_Before_BLOCK";
+        private static final String OUTER_REMEMBRANCE_SUFFIX = "_Before_METHOD";
 
         private final StatementBlock block;
         private final List<Label> labels;
@@ -438,6 +449,7 @@ public interface BlockContract extends SpecificationElement {
         public Variables create()
         {
             createAndStoreFlags();
+            
             return new Variables(
                 selfVar(method, method.getContainerType(), false),
                 breakFlags,
@@ -446,8 +458,8 @@ public interface BlockContract extends SpecificationElement {
                 resultVar(method, false),
                 excVar(method, false),
                 createRemembranceHeaps(),
-                createOuterRemembranceHeaps(),
                 createRemembranceLocalVariables(),
+                createOuterRemembranceHeaps(),
                 createOuterRemembranceLocalVariables(),
                 services
             );
@@ -497,15 +509,11 @@ public interface BlockContract extends SpecificationElement {
             return createRemembranceHeaps(REMEMBRANCE_SUFFIX);
         }
 
-        private Map<LocationVariable, LocationVariable> createOuterRemembranceHeaps() {
-            return createRemembranceHeaps(OUTER_REMEMBRANCE_SUFFIX);
-        }
-
         private Map<LocationVariable, LocationVariable> createRemembranceHeaps(String suffix) {
             final Map<LocationVariable, LocationVariable> result =
                     new LinkedHashMap<LocationVariable, LocationVariable>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                result.put(heap, heapAtPreVar(heap + "_" + suffix, heap.sort(), false));
+                result.put(heap, heapAtPreVar(heap + suffix, heap.sort(), false));
             }
             return result;
         }
@@ -513,28 +521,33 @@ public interface BlockContract extends SpecificationElement {
         private Map<LocationVariable, LocationVariable> createRemembranceLocalVariables() {
             ImmutableSet<ProgramVariable> localOutVariables =
                     MiscTools.getLocalOuts(block, services);
+            Map<LocationVariable, LocationVariable> result =
+                    new LinkedHashMap<LocationVariable, LocationVariable>();
             
-            return createRemembranceVars(localOutVariables, REMEMBRANCE_SUFFIX);
+            for (ProgramVariable var : localOutVariables) {
+                result.put(
+                    (LocationVariable) var,
+                    createVariable(var.name() + REMEMBRANCE_SUFFIX, var.getKeYJavaType())
+                );
+            }
+            
+            return result;
+        }
+
+        private Map<LocationVariable, LocationVariable> createOuterRemembranceHeaps() {
+            return createRemembranceHeaps(OUTER_REMEMBRANCE_SUFFIX);
         }
 
         private Map<LocationVariable, LocationVariable> createOuterRemembranceLocalVariables() {
             ImmutableSet<ProgramVariable> localInVariables =
                     MiscTools.getLocalIns(block, services);
-            
-            return createRemembranceVars(localInVariables, OUTER_REMEMBRANCE_SUFFIX);
-        }
-        
-        private Map<LocationVariable, LocationVariable> createRemembranceVars(
-                ImmutableSet<ProgramVariable> vars, String suffix) {
             Map<LocationVariable, LocationVariable> result =
                     new LinkedHashMap<LocationVariable, LocationVariable>();
             
-            for (ProgramVariable var : vars) {
+            for (ProgramVariable var : localInVariables) {
                 result.put(
-                    (LocationVariable) var,
-                    createVariable(var.name() + "_" + suffix,
-                                   var.getKeYJavaType())
-                );
+                        (LocationVariable) var,
+                        createVariable(var.name() + OUTER_REMEMBRANCE_SUFFIX, var.getKeYJavaType()));
             }
             
             return result;
@@ -556,6 +569,7 @@ public interface BlockContract extends SpecificationElement {
         public final Term exception;
         public final Map<LocationVariable, Term> remembranceHeaps;
         public final Map<LocationVariable, Term> remembranceLocalVariables;
+        public final Map<LocationVariable, Term> outerRemembranceVariables;
 
         public Terms(final Term self,
                      final Map<Label, Term> breakFlags,
@@ -564,7 +578,8 @@ public interface BlockContract extends SpecificationElement {
                      final Term result,
                      final Term exception,
                      final Map<LocationVariable, Term> remembranceHeaps,
-                     final Map<LocationVariable, Term> remembranceLocalVariables)
+                     final Map<LocationVariable, Term> remembranceLocalVariables,
+                     final Map<LocationVariable, Term> outerRemembranceVariables)
         {
             this.self = self;
             this.breakFlags = breakFlags;
@@ -574,6 +589,7 @@ public interface BlockContract extends SpecificationElement {
             this.exception= exception;
             this.remembranceHeaps = remembranceHeaps;
             this.remembranceLocalVariables = remembranceLocalVariables;
+            this.outerRemembranceVariables = outerRemembranceVariables;
         }
 
         public Terms(Variables variables, TermBuilder tb) {
@@ -585,7 +601,8 @@ public interface BlockContract extends SpecificationElement {
                     tb.var(variables.result),
                     tb.var(variables.exception),
                     convertHeapMap(variables.remembranceHeaps, tb),
-                    convertHeapMap(variables.remembranceLocalVariables, tb)
+                    convertHeapMap(variables.remembranceLocalVariables, tb),
+                    convertHeapMap(variables.outerRemembranceVariables, tb)
             );
         }
 

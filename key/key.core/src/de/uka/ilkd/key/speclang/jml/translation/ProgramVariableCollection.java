@@ -38,7 +38,7 @@ public class ProgramVariableCollection {
             ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar, ProgramVariable excVar,
             Map<LocationVariable,LocationVariable> atPreVars, Map<LocationVariable,Term> atPres) {
-        this (selfVar, paramVars, resultVar, excVar, atPreVars, atPres, atPreVars, atPres);
+        this (selfVar, paramVars, resultVar, excVar, atPreVars, atPres, null, null);
     }
     
     public ProgramVariableCollection(ProgramVariable selfVar,

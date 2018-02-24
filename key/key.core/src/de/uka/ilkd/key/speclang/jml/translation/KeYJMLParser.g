@@ -96,7 +96,7 @@ options {
 	this.resultVar      = result;
 	this.excVar	    = exc;
 	this.atPres         = atPres;
-    this.atPres         = atBefores;
+    this.atBefores      = atBefores;
 
         intHelper = new JavaIntegerSemanticsHelper(services, excManager);
 	// initialize helper objects
@@ -141,7 +141,7 @@ options {
          result,
          exc,
          atPres,
-         atPres);
+         null);
     }
 
     public KeYJMLParser(PositionedString ps,
@@ -1604,8 +1604,7 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
     |
 	(OLD | PRE) => result=oldexpression
 	|
-    BEFORE => result=beforeexpression
-
+    (BEFORE) => result=beforeexpression
     |   result = transactionUpdated
     |
 	BACKUP LPAREN result=expression RPAREN

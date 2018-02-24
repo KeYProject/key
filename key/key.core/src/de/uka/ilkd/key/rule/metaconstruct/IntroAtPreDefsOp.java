@@ -41,6 +41,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
@@ -72,7 +73,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         final ProgramElement pe = target.javaBlock().program();
         assert pe != null;
 
-        // collect all loops in the innermost method frame
+        // collect all loops, blocks, and merge point statements in the innermost method frame
         final Quadruple<MethodFrame, ImmutableSet<LoopStatement>, ImmutableSet<StatementBlock>, ImmutableSet<MergePointStatement>> frameAndLoopsAndBlocks = new JavaASTVisitor(
                 pe, services) {
             private MethodFrame frame = null;
@@ -104,6 +105,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         final MethodFrame frame = frameAndLoopsAndBlocks.first;
         final ImmutableSet<LoopStatement> loops = frameAndLoopsAndBlocks.second;
+        final ImmutableSet<StatementBlock> blocks = frameAndLoopsAndBlocks.third;
         final ImmutableSet<MergePointStatement> mpss = frameAndLoopsAndBlocks.fourth;
 
         // determine "self"
@@ -121,8 +123,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         final String methodName = frame.getProgramMethod().getName();
 
         Term atPreUpdate = null;
-        Map<LocationVariable, Term> atPres = new LinkedHashMap<LocationVariable, Term>();
-        Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
+        Map<LocationVariable, Term> atPres = new LinkedHashMap<>();
+        Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
+        Map<LocationVariable, LocationVariable> atPreHeapVars = new LinkedHashMap<>();
+        
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                 .getAllHeaps()) {
             final LocationVariable l = TB.heapAtPreVar(
@@ -135,8 +139,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             } else {
                 atPreUpdate = TB.parallel(atPreUpdate, u);
             }
+            
             atPres.put(heap, TB.var(l));
             atPreVars.put(heap, l);
+            atPreHeapVars.put(heap, l);
         }
 
         // create atPre for parameters
@@ -171,6 +177,62 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 }
             }
         }
+        
+        for (StatementBlock block : blocks) {
+            ImmutableSet<BlockContract> contracts
+                = services.getSpecificationRepository().getBlockContracts(block);
+            
+            for (BlockContract contract : contracts) {
+                List<LocationVariable> keys = new ArrayList<LocationVariable>(
+                        contract.getPlaceholderVariables().outerRemembranceVariables.keySet());
+                
+                Collections.sort(keys, LOCVAR_COMPARATOR);
+                for (LocationVariable var : keys) {
+                    if (atPres.containsKey(var)) {
+                        continue;
+                    }
+                    final LocationVariable l = TB.heapAtPreVar(
+                            var.name() + "Before_" + methodName, var.sort(),
+                            true);
+                    services.getNamespaces().programVariables().addSafely(l);
+                    
+                    final Term u = TB.elementary(l, TB.var(var));
+                    if (atPreUpdate == null) {
+                        atPreUpdate = u;
+                    } else {
+                        atPreUpdate = TB.parallel(atPreUpdate, u);
+                    }
+                    
+                    atPres.put(var, TB.var(l));
+                    atPreVars.put(var, l);
+                }
+                
+                keys.clear();
+                keys.addAll(contract.getPlaceholderVariables().outerRemembranceHeaps.keySet());
+                
+                Collections.sort(keys, LOCVAR_COMPARATOR);
+                for (LocationVariable var : keys) {
+                    if (atPres.containsKey(var)) {
+                        continue;
+                    }
+                    final LocationVariable l = TB.heapAtPreVar(
+                            var.name() + "Before_" + methodName, var.sort(),
+                            true);
+                    services.getNamespaces().programVariables().addSafely(l);
+                    
+                    final Term u = TB.elementary(l, TB.var(var));
+                    if (atPreUpdate == null) {
+                        atPreUpdate = u;
+                    } else {
+                        atPreUpdate = TB.parallel(atPreUpdate, u);
+                    }
+                    
+                    atPres.put(var, TB.var(l));
+                    atPreVars.put(var, l);
+                    atPreHeapVars.put(var, l);
+                }
+            }
+        }
 
         for (MergePointStatement mps : mpss) {
             ImmutableSet<MergeContract> mergeContracts = services
@@ -201,6 +263,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                             var.name() + "Before_" + methodName, var.sort(),
                             true);
                     services.getNamespaces().programVariables().addSafely(l);
+                    
                     final Term u = TB.elementary(l, TB.var(var));
                     if (atPreUpdate == null) {
                         atPreUpdate = u;
@@ -305,12 +368,15 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             }
         }
 
-        //@formatter:off
-        /*//update block contracts
+        //update block contracts
         for (StatementBlock block : blocks) {
             ImmutableSet<BlockContract> contracts =
                     services.getSpecificationRepository().getBlockContracts(block);
             for (BlockContract contract : contracts) {
+                Map<LocationVariable, LocationVariable> nonHeapVars = new LinkedHashMap<>();
+                nonHeapVars.putAll(atPreVars);
+                atPreHeapVars.forEach((key, val) -> nonHeapVars.remove(key)); 
+                
                 final BlockContract.Variables variables = contract.getPlaceholderVariables();
                 final BlockContract.Variables newVariables = new BlockContract.Variables(
                         variables.self,
@@ -319,8 +385,11 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                         variables.returnFlag,
                         variables.result,
                         variables.exception,
-                        atPreVars,
-                        variables.remembranceLocalVariables
+                        variables.remembranceHeaps,
+                        variables.remembranceLocalVariables,
+                        atPreHeapVars,
+                        nonHeapVars,
+                        services
                 );
                 final Map<LocationVariable, Term> newPreconditions =
                         new LinkedHashMap<LocationVariable, Term>();
@@ -328,13 +397,13 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                         new LinkedHashMap<LocationVariable, Term>();
                 final Map<LocationVariable, Term> newModifiesClauses =
                         new LinkedHashMap<LocationVariable, Term>();
-                ImmutableList<Triple<ImmutableList<Term>,
-                                     ImmutableList<Term>,
-                                     ImmutableList<Term>>> newRespectsClause =
-                        ImmutableSLList.<Triple<ImmutableList<Term>,
-                                                ImmutableList<Term>,
-                                                ImmutableList<Term>>>nil();
-                for (LocationVariable heap : HeapContext.getModHeaps(services, transaction)) {
+
+                for (LocationVariable heap : services.getTypeConverter()
+                        .getHeapLDT().getAllHeaps()) {
+                    if (heap == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
+                        continue;
+                    }
+                    
                     newPreconditions.put(heap,
                                          contract.getPrecondition(heap, newVariables.self,
                                                                   atPreVars, services));
@@ -343,16 +412,15 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     newModifiesClauses.put(heap,
                                            contract.getModifiesClause(heap, newVariables.self,
                                                                       services));
-                    newRespectsClause = contract.getRespectsClause(newVariables.self,
-                                                                   services);
                 }
                 final BlockContract newBlockContract =
                         contract.update(block, newPreconditions, newPostconditions,
-                                        newModifiesClauses, newRespectsClause, newVariables);
-                services.getSpecificationRepository().addBlockContract(newBlockContract);
+                                        newModifiesClauses, contract.getInfFlowSpecs(), newVariables);
+                
+                services.getSpecificationRepository().removeBlockContract(contract);
+                services.getSpecificationRepository().addBlockContract(newBlockContract, false);
             }
-        }*/
-        //@formatter:on
+        }
 
         return TB.apply(atPreUpdate, target, null);
     }

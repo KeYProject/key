@@ -89,7 +89,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
         final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(
                 null, contract.getPlaceholderVariables(), services
-                ).createAndRegister(selfTerm);
+                ).createAndRegister(selfTerm, false);
         final ProgramVariable exceptionParameter =
                 KeYJavaASTFactory.localVariable(services.getVariableNamer()
                         .getTemporaryNameProposal("e"), variables.exception.getKeYJavaType());
@@ -110,7 +110,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
-        final Term outerRemembranceUpdate = updatesBuilder.buildOuterRemembranceUpdate(heaps);
+        final Term outerRemembranceUpdate = updatesBuilder.buildOuterRemembranceUpdate();
         
         Map<LocationVariable, Function> anonHeaps = new LinkedHashMap<LocationVariable, Function>(40);
         final TermBuilder tb = services.getTermBuilder();

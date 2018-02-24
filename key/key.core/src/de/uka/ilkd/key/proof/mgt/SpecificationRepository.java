@@ -69,6 +69,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractAxiom;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.DependencyContract;
+import de.uka.ilkd.key.speclang.FunctionalBlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
@@ -1540,13 +1541,48 @@ public final class SpecificationRepository {
         return result;
     }
 
+    /**
+     * Adds a new {@code BlockContract} and a new {@link FunctionalBlockContract}
+     * to the repository.
+     * 
+     * @param contract the {@code BlockContract} to add.
+     */
     public void addBlockContract(final BlockContract contract) {
+        addBlockContract(contract, false);
+    }
+
+    /**
+     * Adds a new {@code BlockContract} to the repository.
+     * 
+     * @param contract the {@code BlockContract} to add.
+     * @param addFunctionalContract whether or not to add a new {@link FunctionalBlockContract}
+     *  based on {@code contract}.
+     */
+    public void addBlockContract(final BlockContract contract, boolean addFunctionalContract) {
         final StatementBlock block = contract.getBlock();
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
         blockContracts.put(b, getBlockContracts(block).add(contract));
         
-        addContract(cf.funcBlock(contract));
+        if (addFunctionalContract) {
+            addContract(cf.funcBlock(contract));
+        }
+    }
+    
+    /**
+     * <p> Removes a {@code BlockContract} from the repository. </p>
+     * 
+     * <p> The associated {@link FunctionalBlockContract} is not removed. </p>
+     * 
+     * @param contract the {@code BlockContract} to remove.
+     */
+    public void removeBlockContract(final BlockContract contract) {
+        final StatementBlock block = contract.getBlock();
+        final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
+                block, block.getStartPosition().getLine());
+        
+        ImmutableSet<BlockContract> set = blockContracts.get(b);
+        blockContracts.put(b, set.remove(contract));
     }
 
     /**

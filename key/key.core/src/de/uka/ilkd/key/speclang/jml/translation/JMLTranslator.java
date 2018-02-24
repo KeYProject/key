@@ -1735,11 +1735,42 @@ public final class JMLTranslator {
             }
         });
     }
+    
+    public static <T> T translate(PositionedString expr,
+            KeYJavaType specInClass,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar,
+            ProgramVariable excVar,
+            Map<LocationVariable,Term> atPres,
+            Class<T> resultClass,
+            Services services)
+                    throws SLTranslationException {
 
-
-    /**
-     *
-     */
+        final KeYJMLParser parser = new KeYJMLParser(expr, services,
+                specInClass, selfVar,
+                paramVars, resultVar,
+                excVar, atPres);
+        Object result = null;
+        try {
+            result = parser.top();
+            // maybe return pair<T, Warnings>?
+            //List<PositionedString> warnings = parser.getWarnings();            
+        } catch (RecognitionException e) {
+            throw parser.getExceptionManager().convertException(e);
+        }
+        if (resultClass.equals(Term.class)) {
+            if (expr.hasLabels()) {
+                T o = castToReturnType(result, resultClass);
+                assert o instanceof Term;
+                Term t = (Term)o;
+                t = services.getTermBuilder().label((Term)castToReturnType(result, resultClass), expr.getLabels());
+                return castToReturnType(t, resultClass);
+            }
+        }
+        return castToReturnType(result, resultClass);
+    }
+    
     public static <T> T translate(PositionedString expr,
                                   KeYJavaType specInClass,
                                   ProgramVariable selfVar,
@@ -1747,6 +1778,7 @@ public final class JMLTranslator {
                                   ProgramVariable resultVar,
                                   ProgramVariable excVar,
                                   Map<LocationVariable,Term> atPres,
+                                  Map<LocationVariable,Term> atBefores,
                                   Class<T> resultClass,
                                   Services services)
             throws SLTranslationException {
@@ -1754,7 +1786,7 @@ public final class JMLTranslator {
         final KeYJMLParser parser = new KeYJMLParser(expr, services,
                                                      specInClass, selfVar,
                                                      paramVars, resultVar,
-                                                     excVar, atPres);
+                                                     excVar, atPres, atBefores);
         Object result = null;
         try {
             result = parser.top();
