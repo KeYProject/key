@@ -147,12 +147,14 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                 services,
                 null);
         
-        termPOs.add(configurator.setUpValidityGoal(null,
+        Term validity = configurator.setUpValidityGoal(null,
                 new Term[] { outerRemembranceUpdate, anonInUpdate, remembranceUpdate },
                 new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition },
                 new Term[] { postcondition, frameCondition },
                 exceptionParameter,
-                conditionsAndClausesBuilder.getTerms()));
+                conditionsAndClausesBuilder.getTerms());
+        
+        termPOs.add(tb.imp(conditionsAndClausesBuilder.buildMeasuredByClause(), validity));
         
         assignPOTerms(termPOs.toArray(new Term[termPOs.size()]));
         collectClassAxioms(getCalleeKeYJavaType(), proofConfig);

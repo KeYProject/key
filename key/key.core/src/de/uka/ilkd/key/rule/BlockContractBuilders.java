@@ -413,8 +413,7 @@ public class BlockContractBuilders {
 			return terms;
 		}
 
-        public Term buildPrecondition()
-        {
+        public Term buildPrecondition() {
             Term result = tt();
             for (LocationVariable heap : heaps) {
                 result = and(result,
@@ -424,13 +423,22 @@ public class BlockContractBuilders {
             return result;
         }
 
-        public Term buildWellFormedHeapsCondition()
-        {
+        public Term buildWellFormedHeapsCondition() {
             Term result = tt();
             for (LocationVariable heap : heaps) {
                 result = and(result, wellFormed(heap));
             }
             return result;
+        }
+
+        public Term buildMeasuredByClause() {
+            Term mby = contract.getMby();
+            
+            if (mby == null) {
+                return measuredByEmpty();
+            } else {                
+                return measuredBy(mby);
+            }
         }
 
         public Term buildReachableInCondition(final ImmutableSet<ProgramVariable> localInVariables)
