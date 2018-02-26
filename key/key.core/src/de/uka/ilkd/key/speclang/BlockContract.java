@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Label;
@@ -83,6 +84,9 @@ public interface BlockContract extends SpecificationElement {
                                 Map<LocationVariable, Term> atPres,
                                 Services services);
     public Term getPrecondition(LocationVariable heap, Services services);
+    public Term getPrecondition(LocationVariable heap, Variables variables, Services services);
+    public Term getPrecondition(LocationVariable heapVariable, Term heap,
+            Terms terms, Services services);
 
     public Term getPostcondition(LocationVariable heap, Variables variables, Services services);
     public Term getPostcondition(LocationVariable heapVariable, Term heap,
@@ -285,6 +289,7 @@ public interface BlockContract extends SpecificationElement {
                 termifyVariable(exception),
                 termifyRemembranceVariables(remembranceHeaps),
                 termifyRemembranceVariables(remembranceLocalVariables),
+                termifyRemembranceVariables(outerRemembranceHeaps),
                 termifyRemembranceVariables(outerRemembranceVariables)
             );
         }
@@ -418,6 +423,17 @@ public interface BlockContract extends SpecificationElement {
             else if (!self.equals(other.self))
                 return false;
             return true;
+        }
+
+        public OriginalVariables toOrigVars() {
+            Map<LocationVariable, ProgramVariable> atPreVars =
+                    new LinkedHashMap<LocationVariable, ProgramVariable>();
+            for (LocationVariable h: remembranceLocalVariables.keySet()) {
+                atPreVars.put(h, remembranceLocalVariables.get(h));
+            }
+            return new OriginalVariables(self, result,
+                                         exception, atPreVars,
+                                         ImmutableSLList.<ProgramVariable>nil());
         }
 
     }
@@ -569,6 +585,7 @@ public interface BlockContract extends SpecificationElement {
         public final Term exception;
         public final Map<LocationVariable, Term> remembranceHeaps;
         public final Map<LocationVariable, Term> remembranceLocalVariables;
+        public final Map<LocationVariable, Term> outerRemembranceHeaps;
         public final Map<LocationVariable, Term> outerRemembranceVariables;
 
         public Terms(final Term self,
@@ -579,6 +596,7 @@ public interface BlockContract extends SpecificationElement {
                      final Term exception,
                      final Map<LocationVariable, Term> remembranceHeaps,
                      final Map<LocationVariable, Term> remembranceLocalVariables,
+                     final Map<LocationVariable, Term> outerRemembranceHeaps,
                      final Map<LocationVariable, Term> outerRemembranceVariables)
         {
             this.self = self;
@@ -589,6 +607,7 @@ public interface BlockContract extends SpecificationElement {
             this.exception= exception;
             this.remembranceHeaps = remembranceHeaps;
             this.remembranceLocalVariables = remembranceLocalVariables;
+            this.outerRemembranceHeaps = outerRemembranceHeaps;
             this.outerRemembranceVariables = outerRemembranceVariables;
         }
 
@@ -602,6 +621,7 @@ public interface BlockContract extends SpecificationElement {
                     tb.var(variables.exception),
                     convertHeapMap(variables.remembranceHeaps, tb),
                     convertHeapMap(variables.remembranceLocalVariables, tb),
+                    convertHeapMap(variables.outerRemembranceHeaps, tb),
                     convertHeapMap(variables.outerRemembranceVariables, tb)
             );
         }

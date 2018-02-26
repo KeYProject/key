@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.proof.init;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +31,7 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalBlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -62,7 +62,6 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         final boolean makeNamesUnique = true;
         final Services services = postInit();
         final IProgramMethod pm = getProgramMethod();
-        final List<Term> termPOs = new ArrayList<Term>();
         
         final StatementBlock block = getBlock();
         final ProgramVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
@@ -74,6 +73,8 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
         final ImmutableSet<ProgramVariable> localInVariables =
                 MiscTools.getLocalIns(block, services);
+        final ImmutableSet<ProgramVariable> localOutVariables =
+                MiscTools.getLocalOuts(block, services);
         
         Map<LocationVariable, Function> anonOutHeaps = new LinkedHashMap<LocationVariable, Function>(40);
         for (LocationVariable heap : heaps) {
@@ -90,6 +91,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(
                 null, contract.getPlaceholderVariables(), services
                 ).createAndRegister(selfTerm, false);
+        
         final ProgramVariable exceptionParameter =
                 KeYJavaASTFactory.localVariable(services.getVariableNamer()
                         .getTemporaryNameProposal("e"), variables.exception.getKeYJavaType());
@@ -153,10 +155,40 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                 new Term[] { postcondition, frameCondition },
                 exceptionParameter,
                 conditionsAndClausesBuilder.getTerms());
+        validity = tb.imp(conditionsAndClausesBuilder.buildMeasuredByClause(), validity);
         
-        termPOs.add(tb.imp(conditionsAndClausesBuilder.buildMeasuredByClause(), validity));
+        if (WellDefinednessCheck.isOn()) {
+            final Term wdUpdate = services.getTermBuilder().parallel(anonInUpdate, remembranceUpdate);
+            
+            Term localAnonUpdate = null;
+            for(ProgramVariable pv : localOutVariables) {
+                final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
+                final Function anonFunc = new Function(anonFuncName, pv.sort(), true);
+                services.getNamespaces().functions().addSafely(anonFunc);
+                final Term elemUpd = tb.elementary((LocationVariable)pv, tb.func(anonFunc))
+                        ;
+                if(localAnonUpdate == null) {
+                    localAnonUpdate = elemUpd;
+                } else {
+                    localAnonUpdate = tb.parallel(localAnonUpdate, elemUpd);
+                }
+            }
+            
+            if (localAnonUpdate == null) {
+                localAnonUpdate = tb.skip();
+            }
+            
+            Term wellDefinedness = configurator.setUpWdGoal(null,
+                    contract.getBlockContract(), wdUpdate,
+                    localAnonUpdate, heaps.get(0),
+                    anonOutHeaps.get(heaps.get(0)),
+                    localInVariables);
+            
+            assignPOTerms(tb.andSC(wellDefinedness, validity));
+        } else {
+            assignPOTerms(validity);
+        }
         
-        assignPOTerms(termPOs.toArray(new Term[termPOs.size()]));
         collectClassAxioms(getCalleeKeYJavaType(), proofConfig);
         generateWdTaclets(proofConfig);
     }
@@ -182,7 +214,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
     @Override
     protected InitConfig getCreatedInitConfigForSingleProof() {
-        return environmentConfig.deepCopy();
+        return proofConfig;
     }
 
     @Override

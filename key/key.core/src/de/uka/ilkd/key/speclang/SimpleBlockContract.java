@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.StringUtil;
 
@@ -202,7 +201,8 @@ public final class SimpleBlockContract implements BlockContract {
     public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
             Map<LocationVariable, Term> atPres, Services services) {
         final Map<Term, Term> replacementMap = createReplacementMap(
-                null, new Terms(selfTerm, null, null, null, null, null, null, null, atPres), services);
+                null, new Terms(selfTerm, null, null, null, null, null, null, null, null,
+                        atPres), services);
         final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(measuredBy);
     }
@@ -237,7 +237,7 @@ public final class SimpleBlockContract implements BlockContract {
         assert atPres != null;
         assert services != null;
         final Map<Term, Term> replacementMap = createReplacementMap(
-            heap, new Terms(self, null, null, null, null, null, null, null, atPres), services
+            heap, new Terms(self, null, null, null, null, null, null, null, null, atPres), services
         );
         final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(preconditions.get(heapVariable));
@@ -247,6 +247,30 @@ public final class SimpleBlockContract implements BlockContract {
     public Term getPrecondition(final LocationVariable heap, final Services services) {
         return getPrecondition(heap, variables.self, variables.outerRemembranceVariables,
                 services);
+    }
+    
+    @Override
+    public Term getPrecondition(LocationVariable heap, Variables variables, Services services) {
+        assert heap != null;
+        assert variables != null;
+        assert (variables.self == null) == (this.variables.self == null);
+        assert services != null;
+        final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services), 
+                                                   services.getTermFactory());
+        return replacer.replace(preconditions.get(heap));
+    }
+    
+    @Override
+    public Term getPrecondition(LocationVariable heapVariable, Term heap,
+            Terms terms, Services services) {
+        assert heapVariable != null;
+        assert heap != null;
+        assert terms != null;
+        assert (terms.self == null) == (variables.self == null);
+        assert services != null;
+        final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services), 
+                                                   services.getTermFactory());
+        return replacer.replace(preconditions.get(heapVariable));
     }
 
     @Override
@@ -303,7 +327,7 @@ public final class SimpleBlockContract implements BlockContract {
         assert (self == null) == (variables.self == null);
         assert services != null;
         final Map<Term, Term> replacementMap = createReplacementMap(
-            heap, new Terms(self, null, null, null, null, null, null, null, null), services
+            heap, new Terms(self, null, null, null, null, null, null, null, null, null), services
         );
         final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(modifiesClauses.get(heapVariable));
@@ -548,14 +572,7 @@ public final class SimpleBlockContract implements BlockContract {
     }
 
     public OriginalVariables getOrigVars() {
-        Map<LocationVariable, ProgramVariable> atPreVars =
-                new LinkedHashMap<LocationVariable, ProgramVariable>();
-        for (LocationVariable h: variables.remembranceLocalVariables.keySet()) {
-            atPreVars.put(h, variables.remembranceLocalVariables.get(h));
-        }
-        return new OriginalVariables(variables.self, variables.result,
-                                     variables.exception, atPreVars,
-                                     ImmutableSLList.<ProgramVariable>nil());
+        return variables.toOrigVars();
     }
 
     /* (non-Javadoc)
@@ -705,6 +722,9 @@ public final class SimpleBlockContract implements BlockContract {
         result.replaceRemembranceLocalVariables(variables.remembranceLocalVariables,
                                                 newVariables.remembranceLocalVariables,
                                                 services);
+        result.replaceRemembranceHeaps(variables.outerRemembranceHeaps,
+                newVariables.outerRemembranceHeaps,
+                services);
         result.replaceRemembranceLocalVariables(variables.outerRemembranceVariables,
                          newVariables.outerRemembranceVariables,
                          services);
@@ -728,6 +748,9 @@ public final class SimpleBlockContract implements BlockContract {
         result.replaceRemembranceLocalVariables(variables.remembranceLocalVariables,
                                                 newTerms.remembranceLocalVariables,
                                                 services);
+        result.replaceRemembranceHeaps(variables.outerRemembranceHeaps,
+                newTerms.outerRemembranceHeaps,
+                services);
         result.replaceRemembranceLocalVariables(variables.outerRemembranceVariables,
                          newTerms.outerRemembranceVariables,
                          services);

@@ -417,8 +417,7 @@ public class BlockContractBuilders {
             Term result = tt();
             for (LocationVariable heap : heaps) {
                 result = and(result,
-                             contract.getPrecondition(heap, getBaseHeap(), terms.self,
-                                                      terms.outerRemembranceVariables, services));
+                             contract.getPrecondition(heap, getBaseHeap(), terms, services));
             }
             return result;
         }
@@ -611,17 +610,24 @@ public class BlockContractBuilders {
             this.rule = rule;
         }
 
-        public void setUpWdGoal(final Goal goal, final BlockContract contract,
+        /**
+         * 
+         * @param goal If this is not {@code null}, the returned formula is added to this goal.
+         * @param contract
+         * @param update
+         * @param anonUpdate
+         * @param heap
+         * @param anonHeap
+         * @param localIns
+         * @return the well-definedness formula.
+         */
+        public Term setUpWdGoal(final Goal goal, final BlockContract contract,
                                 final Term update, final Term anonUpdate,
                                 final LocationVariable heap, final Function anonHeap,
                                 final ImmutableSet<ProgramVariable> localIns) {
-            if (goal == null) {
-                return;
-            }
             // FIXME: Handling of \old-references needs to be investigated,
             //        however only completeness is lost, soundness is guaranteed
-            goal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
-            final BlockWellDefinedness bwd = new BlockWellDefinedness(contract, localIns, services);
+            final BlockWellDefinedness bwd = new BlockWellDefinedness(contract, variables, localIns, services);
             services.getSpecificationRepository().addWdStatement(bwd);
             final LocationVariable heapAtPre = variables.remembranceHeaps.get(heap);
             final Term anon = anonHeap != null ? services.getTermBuilder().func(anonHeap) : null;
@@ -630,7 +636,13 @@ public class BlockContractBuilders {
                                         variables.result, heap, heapAtPre,
                                         anon, localIns, update, anonUpdate,
                                         services);
-            goal.changeFormula(wdBlock, occurrence);
+            
+            if (goal != null) {
+                goal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
+                goal.changeFormula(wdBlock, occurrence);
+            }
+            
+            return wdBlock.formula();
         }
         
         /**

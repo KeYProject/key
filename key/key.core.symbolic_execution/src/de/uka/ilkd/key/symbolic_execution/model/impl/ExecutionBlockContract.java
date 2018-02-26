@@ -134,7 +134,7 @@ public class ExecutionBlockContract extends AbstractExecutionNode<SourceElement>
                               exception, 
                               remembranceHeaps, 
                               remembranceLocalVariables, // remembranceLocalVariables are not used by getPlainText()
-                              null); // outerRemembranceVariables are not used by getPlainText()
+                              null, null); // outerRemembranceVariables are not used by getPlainText()
                               
       // Compute text
       return getContract().getPlainText(getServices(), terms);

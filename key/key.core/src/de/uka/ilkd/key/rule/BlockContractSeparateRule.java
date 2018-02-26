@@ -22,7 +22,6 @@ import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.BlockContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.VariablesCreatorAndRegistrar;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 
 public class BlockContractSeparateRule extends AbstractBlockContractRule {
@@ -129,8 +128,6 @@ public class BlockContractSeparateRule extends AbstractBlockContractRule {
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
-        final Term wdUpdate = services.getTermBuilder().parallel(contextUpdate, remembranceUpdate);
-        Term localAnonUpdate = createLocalAnonUpdate(localOutVariables, services);
         final Term anonymisationUpdate =
                 updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiesClauses);
         final ImmutableList<Goal> result;
@@ -142,17 +139,7 @@ public class BlockContractSeparateRule extends AbstractBlockContractRule {
                                                                      application.posInOccurrence(),
                                                                      services,
                                                                      this);
-        if (WellDefinednessCheck.isOn()) {
-            result = goal.split(3);
-
-            configurator.setUpWdGoal(result.tail().tail().head(),
-                                     contract, wdUpdate,
-                                     localAnonUpdate, heaps.get(0),
-                                     anonymisationHeaps.get(heaps.get(0)),
-                                     localInVariables);
-        } else {
-            result = goal.split(2);
-        }
+        result = goal.split(2);
 
         configurator.setUpPreconditionGoal(result.tail().head(),
                 contextUpdate,

@@ -45,17 +45,18 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
         this.block = block;
     }
 
-    public BlockWellDefinedness(BlockContract block, ImmutableSet<ProgramVariable> params,
+    public BlockWellDefinedness(BlockContract block, BlockContract.Variables variables,
+                                ImmutableSet<ProgramVariable> params,
                                 Services services) {
         super(block.getName(), block.getBlock().getStartPosition().getLine(), block.getMethod(),
-              block.getOrigVars().add(convertParams(params)), Type.BLOCK_CONTRACT, services);
+                variables.toOrigVars().add(convertParams(params)), Type.BLOCK_CONTRACT, services);
         assert block != null;
         final LocationVariable h = getHeap();
         this.block = block;
-        setRequires(block.getRequires(h));
+        setRequires(block.getPrecondition(h, variables, services));
         setAssignable(block.hasModifiesClause(h) ? block.getAssignable(h) : TB.strictlyNothing(),
                       services);
-        setEnsures(block.getEnsures(h));
+        setEnsures(block.getPostcondition(h, variables, services));
     }
 
     @Override
