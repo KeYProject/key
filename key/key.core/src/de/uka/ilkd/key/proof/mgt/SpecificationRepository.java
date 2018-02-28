@@ -94,7 +94,8 @@ import de.uka.ilkd.key.util.Pair;
  */
 public final class SpecificationRepository {
 
-    private static final String CONTRACT_COMBINATION_MARKER = "#";
+    public static final String CONTRACT_COMBINATION_MARKER = "#";
+    
     private final ContractFactory cf;
 
     private final Map<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<Contract>> contracts = new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<Contract>>();

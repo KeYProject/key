@@ -55,6 +55,27 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         super(initConfig, contract.getName());
         this.contract = contract;
     }
+    
+    @Override
+    public boolean implies(ProofOblInput po) {
+    	if (!(po instanceof FunctionalBlockContractPO)) {
+    		return false;
+    	}
+    	
+    	FunctionalBlockContractPO other = (FunctionalBlockContractPO) po;
+    	return contract.equals(other.contract);
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+    	if (!(obj instanceof FunctionalBlockContractPO)) {
+    		return false;
+    	}
+    	
+    	FunctionalBlockContractPO other = (FunctionalBlockContractPO) obj;
+    	return contract.equals(other.contract)
+    			&& environmentConfig.equals(other.environmentConfig);
+    }
 
     @Override
     public void readProblem() throws ProofInputException {

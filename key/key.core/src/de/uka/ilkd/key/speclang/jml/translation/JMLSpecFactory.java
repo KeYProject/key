@@ -1278,7 +1278,8 @@ public class JMLSpecFactory {
                 method, block, variables);
         final ContractClauses clauses = translateJMLClauses(method,
                 specificationCase, programVariables, behavior);
-        return new SimpleBlockContract.Creator(block, labels, method, behavior,
+        return new SimpleBlockContract.Creator("JML " + behavior + "block contract",
+        		block, labels, method, behavior,
                 variables, clauses.requires, clauses.measuredBy, clauses.ensures,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues,
                 clauses.returns, clauses.signals, clauses.signalsOnly,

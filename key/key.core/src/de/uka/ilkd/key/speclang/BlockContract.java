@@ -65,6 +65,24 @@ public interface BlockContract extends SpecificationElement {
     public Variables getPlaceholderVariables();
     public boolean isTransactionApplicable();
     public boolean isReadOnly(Services services);
+	public String getBaseName();
+	
+
+	/**
+	 * 
+	 * @return all {@link FunctionalBlockContract}s with a valid id that correspond to this
+	 * 	{@code BlockContract}. Unless this contract is a combination of other contracts
+	 * 	(see {@link SimpleBlockContract#combine(ImmutableSet, Services)}, the resulting set
+	 * 	will only contain one element.
+	 */
+	public ImmutableSet<FunctionalBlockContract> getFunctionalContracts();
+	
+	/**
+	 * 
+	 * @param contract
+	 * @see #getFunctionalContracts()
+	 */
+	public void setFunctionalBlockContract(FunctionalBlockContract contract);
     
     /**
      * Returns <code>true</code> iff the method (according to the contract) does
@@ -73,6 +91,8 @@ public interface BlockContract extends SpecificationElement {
      * @return whether this contract is strictly pure.
      */
     public boolean hasModifiesClause(LocationVariable heap);
+    
+	Term getInstantiationSelfTerm();
 
     public Term getPrecondition(LocationVariable heap,
                                 ProgramVariable self,

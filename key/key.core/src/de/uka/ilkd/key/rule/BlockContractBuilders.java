@@ -415,10 +415,12 @@ public class BlockContractBuilders {
 
         public Term buildPrecondition() {
             Term result = tt();
+            
             for (LocationVariable heap : heaps) {
                 result = and(result,
                              contract.getPrecondition(heap, getBaseHeap(), terms, services));
             }
+            
             return result;
         }
 

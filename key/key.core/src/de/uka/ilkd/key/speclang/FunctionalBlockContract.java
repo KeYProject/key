@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.speclang;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
@@ -21,6 +23,7 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
 
 /**
@@ -30,7 +33,7 @@ import de.uka.ilkd.key.speclang.BlockContract.Variables;
  * If a block is encountered during a proof, {@link BlockContract} is used instead.
  */
 public class FunctionalBlockContract implements Contract {
-    
+	
 	private final BlockContract contract;
     private final int id;
     private final String name;
@@ -45,12 +48,24 @@ public class FunctionalBlockContract implements Contract {
         this.contract = contract;
         this.id = id;
         
-        name = ContractFactory
-        		.generateContractName("BlockContract", getKJT(), getTarget(), getKJT(), id);
-        displayName = ContractFactory
-        		.generateDisplayName("BlockContract", getKJT(), getTarget(), getKJT(), id);
-        typeName = ContractFactory
-        		.generateContractTypeName("BlockContract", getKJT(), getTarget(), getKJT());
+        if (id != Contract.INVALID_ID) {
+            contract.setFunctionalBlockContract(this);
+        }
+        
+        name = generateName(contract.getBaseName(), str
+        		-> ContractFactory.generateContractName(str, getKJT(), getTarget(), getKJT(), id));
+        displayName = generateName(contract.getBaseName(), str
+        		-> ContractFactory.generateDisplayName(str, getKJT(), getTarget(), getKJT(), id));
+        typeName = generateName(contract.getBaseName(), str
+        		-> ContractFactory.generateContractTypeName(str, getKJT(), getTarget(), getKJT()));
+    }
+    
+    private String generateName(String baseName, UnaryOperator<String> generator) {
+    	return Arrays.stream(baseName.split(SpecificationRepository.CONTRACT_COMBINATION_MARKER))
+    			.map(generator)
+    			.reduce((acc, curr)
+    					-> acc + SpecificationRepository.CONTRACT_COMBINATION_MARKER + curr)
+    			.get();
     }
 
     @Override
@@ -65,8 +80,7 @@ public class FunctionalBlockContract implements Contract {
 
     @Override
     public VisibilityModifier getVisibility() {
-        assert false;
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -80,7 +94,7 @@ public class FunctionalBlockContract implements Contract {
     }
 
     @Override
-    public IObserverFunction getTarget() {
+    public IProgramMethod getTarget() {
         return contract.getTarget();
     }
 
@@ -234,7 +248,6 @@ public class FunctionalBlockContract implements Contract {
 
     @Override
     public boolean toBeSaved() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -314,5 +327,4 @@ public class FunctionalBlockContract implements Contract {
 	public Modality getModality() {
 		return contract.getModality();
 	}
-
 }

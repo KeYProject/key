@@ -18,7 +18,6 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -42,6 +41,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -67,14 +67,18 @@ public final class SimpleBlockContract implements BlockContract {
     private final Map<LocationVariable, Term> modifiesClauses;
     private ImmutableList<InfFlowSpec> infFlowSpecs;
 
-
-    private final Variables variables;
+	private final Variables variables;
 
     private final boolean transactionApplicable;
     
     private final Map<LocationVariable,Boolean> hasMod;
 
-    public SimpleBlockContract(final StatementBlock block,
+	private final String baseName;
+	
+	ImmutableSet<FunctionalBlockContract> functionalContracts;
+
+    public SimpleBlockContract(final String baseName,
+    		                   final StatementBlock block,
                                final List<Label> labels,
                                final IProgramMethod method,
                                final Modality modality,
@@ -85,7 +89,8 @@ public final class SimpleBlockContract implements BlockContract {
                                final ImmutableList<InfFlowSpec> infFlowSpecs,
                                final Variables variables,
                                final boolean transactionApplicable,
-                               final Map<LocationVariable,Boolean> hasMod)
+                               final Map<LocationVariable,Boolean> hasMod,
+                               ImmutableSet<FunctionalBlockContract> functionalContracts)
     {
         assert block != null;
         assert labels != null;
@@ -99,6 +104,7 @@ public final class SimpleBlockContract implements BlockContract {
         assert variables.exception != null;
         assert variables.remembranceHeaps != null && variables.remembranceHeaps.size() > 0;
         assert variables.remembranceLocalVariables != null;
+        this.baseName = baseName;
         this.block = block;
         this.labels = labels;
         this.method = method;
@@ -111,7 +117,28 @@ public final class SimpleBlockContract implements BlockContract {
         this.variables = variables;
         this.transactionApplicable = transactionApplicable;
         this.hasMod = hasMod;
+        this.functionalContracts = functionalContracts == null
+        		? DefaultImmutableSet.nil()
+        	    : functionalContracts;
     }
+    
+    @Override
+	public ImmutableSet<FunctionalBlockContract> getFunctionalContracts() {
+    	return functionalContracts;
+    }
+
+    @Override
+	public void setFunctionalBlockContract(FunctionalBlockContract contract) {
+    	assert contract.id() != Contract.INVALID_ID;
+    	assert contract.getBlockContract().equals(this);
+    	
+    	functionalContracts = DefaultImmutableSet.<FunctionalBlockContract>nil().add(contract);
+    }
+    
+	@Override
+	public String getBaseName() {
+		return baseName;
+	}
 
     @Override
     public StatementBlock getBlock()
@@ -550,11 +577,11 @@ public final class SimpleBlockContract implements BlockContract {
                                 final Map<LocationVariable,Term> newModifiesClauses,
                                 final ImmutableList<InfFlowSpec> newinfFlowSpecs,
                                 final Variables newVariables) {
-        return new SimpleBlockContract(newBlock, labels, method, modality,
+        return new SimpleBlockContract(baseName, newBlock, labels, method, modality,
                                        newPreconditions, measuredBy, newPostconditions,
                                        newModifiesClauses, newinfFlowSpecs,
                                        newVariables,
-                                       transactionApplicable, hasMod);
+                                       transactionApplicable, hasMod, functionalContracts);
     }
 
     @Override 
@@ -566,9 +593,10 @@ public final class SimpleBlockContract implements BlockContract {
     public BlockContract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
         assert newKJT.equals(newPM.getContainerType());
-        return new SimpleBlockContract(block, labels, (IProgramMethod)newPM, modality,
+        return new SimpleBlockContract(baseName, block, labels, (IProgramMethod)newPM, modality,
                                        preconditions, measuredBy, postconditions, modifiesClauses,
-                                       infFlowSpecs, variables, transactionApplicable, hasMod);
+                                       infFlowSpecs, variables, transactionApplicable, hasMod,
+                                       functionalContracts);
     }
 
     public OriginalVariables getOrigVars() {
@@ -774,6 +802,11 @@ public final class SimpleBlockContract implements BlockContract {
     }
 
     @Override
+    public Term getInstantiationSelfTerm() {
+        return instantiationSelf;
+    }
+
+    @Override
     public Term getInstantiationSelfTerm(TermServices services) {
         if (instantiationSelf != null) {
             return instantiationSelf;
@@ -895,6 +928,7 @@ public final class SimpleBlockContract implements BlockContract {
 
     public static final class Creator extends TermBuilder {
 
+        private final String baseName;
         private final StatementBlock block;
         private final List<Label> labels;
         private final IProgramMethod method;
@@ -914,7 +948,8 @@ public final class SimpleBlockContract implements BlockContract {
         private final ImmutableList<LocationVariable> heaps;
         private final Map<LocationVariable,Boolean> hasMod;
 
-        public Creator(final StatementBlock block,
+        public Creator(final String baseName,
+        		       final StatementBlock block,
                        final List<Label> labels,
                        final IProgramMethod method,
                        final Behavior behavior,
@@ -933,6 +968,7 @@ public final class SimpleBlockContract implements BlockContract {
                        final Map<LocationVariable,Boolean> hasMod,
                        final Services services) {
             super(services.getTermFactory(), services);
+            this.baseName = baseName;
             this.block = block;
             this.labels = labels;
             this.method = method;
@@ -1154,18 +1190,18 @@ public final class SimpleBlockContract implements BlockContract {
                     modifiesClauses.get(
                             services.getTypeConverter().getHeapLDT().getSavedHeap()) != null;
             result = result.add(
-                new SimpleBlockContract(
+                new SimpleBlockContract(baseName, 
                     block, labels, method, diverges.equals(ff()) ? Modality.DIA : Modality.BOX,
                     preconditions, measuredBy, postconditions, modifiesClauses,
-                    infFlowSpecs, variables, transactionApplicable, hasMod)
+                    infFlowSpecs, variables, transactionApplicable, hasMod, null)
                 );
             if (ifDivergesConditionCannotBeExpressedByAModality()) {
                 result = result.add(
-                    new SimpleBlockContract(
+                    new SimpleBlockContract(baseName, 
                         block, labels, method, Modality.DIA,
                         addNegatedDivergesConditionToPreconditions(preconditions), measuredBy,
                         postconditions, modifiesClauses, infFlowSpecs, variables,
-                        transactionApplicable, hasMod)
+                        transactionApplicable, hasMod, null)
                     );
             }
             return result;
@@ -1226,29 +1262,48 @@ public final class SimpleBlockContract implements BlockContract {
             if (contracts.length == 1) {
                 return contracts[0];
             }
+            
             final BlockContract head = contracts[0];
+            String baseName = head.getBaseName();
+            
             for (int i = 1; i < contracts.length; i++) {
                 assert contracts[i].getBlock().equals(head.getBlock());
+                
+                baseName += SpecificationRepository.CONTRACT_COMBINATION_MARKER
+                		+ contracts[i].getBaseName();
             }
+            
             placeholderVariables = head.getPlaceholderVariables();
             remembranceVariables = placeholderVariables.combineRemembranceVariables();
+            
+            ImmutableSet<FunctionalBlockContract> functionalContracts = 
+            		DefaultImmutableSet.nil();
+            
             for (BlockContract contract : contracts) {
                 addConditionsFrom(contract);
+                functionalContracts = functionalContracts.union(contract.getFunctionalContracts());
             }
+            
             Map<LocationVariable,Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
             for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             	boolean hm = false;
+            	
                 for (int i = 1; i < contracts.length && !hm; i++) {
                     hm = contracts[i].hasModifiesClause(heap);
                 }
             	hasMod.put(heap, hm);
             }
-            return new SimpleBlockContract(head.getBlock(), head.getLabels(),
+            
+            SimpleBlockContract result = new SimpleBlockContract(baseName, 
+            							   head.getBlock(), head.getLabels(),
                                            head.getMethod(), head.getModality(), preconditions,
                                            contracts[0].getMby(),
                                            postconditions, modifiesClauses, head.getInfFlowSpecs(),
                                            placeholderVariables,
-                                           head.isTransactionApplicable(), hasMod);
+                                           head.isTransactionApplicable(), hasMod,
+                                           functionalContracts);
+            
+            return result;
         }
 
         private void addConditionsFrom(final BlockContract contract)
@@ -1332,6 +1387,7 @@ public final class SimpleBlockContract implements BlockContract {
             }
             else {
                 final Map<Term, Term> replacementMap = new LinkedHashMap<Term, Term>();
+                
                 for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable
                         : remembranceVariables.entrySet()) {
                     if (remembranceVariable.getValue() != null) {
@@ -1339,6 +1395,7 @@ public final class SimpleBlockContract implements BlockContract {
                                            var(remembranceVariable.getValue()));
                     }
                 }
+                
                 return new OpReplacer(replacementMap, services.getTermFactory()).replace(formula);
             }
         }

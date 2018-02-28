@@ -172,6 +172,7 @@ public class JavaProfile extends AbstractProfile {
     public RuleJustification getJustification(Rule r) {
         return r == UseOperationContractRule.INSTANCE 
                || r == UseDependencyContractRule.INSTANCE
+               || r == BlockContractSeparateRule.INSTANCE
                ? new ComplexRuleJustificationBySpec()
                : super.getJustification(r);
     }

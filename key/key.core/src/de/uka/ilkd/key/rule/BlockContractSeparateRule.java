@@ -17,11 +17,14 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
+import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.BlockContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.VariablesCreatorAndRegistrar;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.MiscTools;
 
 public class BlockContractSeparateRule extends AbstractBlockContractRule {
@@ -150,6 +153,15 @@ public class BlockContractSeparateRule extends AbstractBlockContractRule {
                                                 anonymisationUpdate},
                                     new Term[] {postcondition, wellFormedAnonymisationHeapsCondition,
                                                 reachableOutCondition, atMostOneFlagSetCondition});
+        
+
+        final ComplexRuleJustificationBySpec cjust
+            	= (ComplexRuleJustificationBySpec)
+            		goal.proof().getInitConfig().getJustifInfo().getJustification(this);
+
+        for (Contract c : contract.getFunctionalContracts()) {
+        	cjust.add(application, new RuleJustificationBySpec(c));
+        }
         
         return result;
     }

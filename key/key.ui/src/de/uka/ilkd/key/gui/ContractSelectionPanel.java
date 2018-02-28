@@ -21,6 +21,7 @@ import java.awt.event.MouseListener;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -40,7 +41,12 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.DependencyContractImpl;
+import de.uka.ilkd.key.speclang.FunctionalBlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
+import de.uka.ilkd.key.speclang.InformationFlowContractImpl;
+import de.uka.ilkd.key.util.LinkedHashMap;
 
 
 /**
@@ -52,6 +58,15 @@ public class ContractSelectionPanel extends JPanel {
      *
      */
     private static final long serialVersionUID = 1681223715264203991L;
+    
+    private static final Map<Class<?>, Integer> CONTRACT_TYPE_ORDER = new LinkedHashMap<>();
+    static {
+    	CONTRACT_TYPE_ORDER.put(FunctionalOperationContractImpl.class, 0);
+    	CONTRACT_TYPE_ORDER.put(InformationFlowContractImpl.class, 1);
+    	CONTRACT_TYPE_ORDER.put(DependencyContractImpl.class, 2);
+    	CONTRACT_TYPE_ORDER.put(FunctionalBlockContract.class, 3);
+    }
+    
     private final Services services;
     private final JList<Contract> contractList;
     private final TitledBorder border;
@@ -175,10 +190,22 @@ public class ContractSelectionPanel extends JPanel {
             return;
         }
 
-        //sort contracts by id (for the user's convenience)
+        //sort contracts by contract type, then by id
         Arrays.sort(contracts, new Comparator<Contract> () {
             public int compare(Contract c1, Contract c2) {
-                int res = c1.id() - c2.id();
+            	Integer o1 = CONTRACT_TYPE_ORDER.get(c1.getClass());
+            	Integer o2 = CONTRACT_TYPE_ORDER.get(c2.getClass());
+            	int res = 0;
+            	
+            	if (o1 != null && o2 != null) {
+            		res = o1 - o2;
+            	}
+            	
+            	if (res != 0) {
+            		return res;
+            	}
+            	
+                res = c1.id() - c2.id();
                 if (res == 0) {
                     return c2.getName().compareTo(c1.getName());
                 }
