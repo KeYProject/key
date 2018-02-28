@@ -529,15 +529,11 @@ public final class ProblemInitializer {
                         }
                     }
                 }
-                try {
                 for(ProgramMethod pm
                         : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
                     if(!(pm.isVoid() || pm.isConstructor())) {
                         functions.add(pm);
                     }
-                }
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
                 }
             }
         } else

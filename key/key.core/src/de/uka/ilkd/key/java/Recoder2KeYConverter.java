@@ -1557,6 +1557,25 @@ public class Recoder2KeYConverter {
     }
 
     /**
+     * converts a recoder array length reference to a usual KeY field reference
+     */
+    public FieldReference convert(
+            recoder.java.reference.ArrayLengthReference alr) {
+        recoder.abstraction.Type recoderType = getServiceConfiguration()
+        .getCrossReferenceSourceInfo()
+        .getType(alr.getReferencePrefix());
+        ArrayDeclaration ad = (ArrayDeclaration) getKeYJavaType(recoderType)
+        .getJavaType();
+
+        final ProgramVariable length = find("length", filterField(ad.length()));
+        // the invocation of callConvert should work well as each array
+        // length reference must have a reference prefix (at least this
+        // is what i think)
+        return new FieldReference(length, (ReferencePrefix) callConvert(alr
+                .getReferencePrefix()));
+    }
+
+    /**
      * converts a recoder field reference. A ProgramVariable is created
      * replacing the field reference.
      *

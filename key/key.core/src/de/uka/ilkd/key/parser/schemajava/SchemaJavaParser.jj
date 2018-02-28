@@ -3071,8 +3071,7 @@ Expression PrimaryExpression() :
 		s = ((SVWrapper)tmpResult).getSV().sort();
 	    }
 	    if ("length".equals(suffix.id.getText()) && isLeftHandSide(s)) {
-		    //result = new ArrayLengthReference(tmpResult);
-            result = new FieldReference(tmpResult, new Identifier("length")); // TODO: WP: is this working as expected?
+		    result = new ArrayLengthReference(tmpResult);
 		    checkConstruction(result);
 		    setPrefixInfo(result);
 		    return result;

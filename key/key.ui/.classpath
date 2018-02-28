@@ -6,6 +6,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/key.core.testgen"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/key.core.symbolic_execution"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/RECODER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
