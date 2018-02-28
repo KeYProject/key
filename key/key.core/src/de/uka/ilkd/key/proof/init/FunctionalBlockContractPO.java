@@ -176,7 +176,6 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                 new Term[] { postcondition, frameCondition },
                 exceptionParameter,
                 conditionsAndClausesBuilder.getTerms());
-        validity = tb.imp(conditionsAndClausesBuilder.buildMeasuredByClause(), validity);
         
         if (WellDefinednessCheck.isOn()) {
             final Term wdUpdate = services.getTermBuilder().parallel(anonInUpdate, remembranceUpdate);

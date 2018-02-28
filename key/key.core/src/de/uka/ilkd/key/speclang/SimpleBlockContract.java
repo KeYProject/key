@@ -996,10 +996,47 @@ public final class SimpleBlockContract implements BlockContract {
 
         private Map<LocationVariable, Term> buildPreconditions() {
             final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
-            for (LocationVariable heap : heaps) {
+            for (LocationVariable heap : heaps) {     
+            	// Add JML precondition to precondition
                 if (requires.get(heap) != null) {
                     result.put(heap, convertToFormula(requires.get(heap)));
                 }
+                
+                // Add measured by term to precondition
+            	Term old = result.get(heap);
+                Term mbyTerm;
+                
+                if (measuredBy != null && !measuredBy.equals(measuredByEmpty())) {
+                    Map<Term, Term> replacementMap = new LinkedHashMap<Term, Term>();
+                    
+                    for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable
+                            : variables.outerRemembranceVariables.entrySet()) {
+                        if (remembranceVariable.getValue() != null) {
+                            replacementMap.put(var(remembranceVariable.getKey()),
+                                               var(remembranceVariable.getValue()));
+                        }
+                    }
+                    
+                    for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable
+                            : variables.outerRemembranceHeaps.entrySet()) {
+                        if (remembranceVariable.getValue() != null) {
+                            replacementMap.put(var(remembranceVariable.getKey()),
+                                               var(remembranceVariable.getValue()));
+                        }
+                    }
+                    
+                    mbyTerm = measuredBy(
+                    		new OpReplacer(replacementMap, services.getTermFactory()).replace(measuredBy));
+                } else {
+                	mbyTerm = measuredByEmpty();
+                }
+                
+
+            	if (old == null) {
+            		result.put(heap, mbyTerm);
+            	} else {
+            		result.put(heap, and(mbyTerm, old));
+            	}
             }
             return result;
         }
