@@ -30,7 +30,7 @@ import de.uka.ilkd.key.util.Triple;
  * textual form. Is also used for block contracts.
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
-
+	
     private final Behavior behavior;
     private PositionedString workingSpace = null;
     private ImmutableList<PositionedString> measuredBy =
@@ -48,6 +48,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private ImmutableList<PositionedString> continues =
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> returns =
+            ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> decreases =
             ImmutableSLList.<PositionedString>nil();
 
     private ImmutableList<Triple<PositionedString,PositionedString,PositionedString>> abbreviations =
@@ -190,6 +192,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addMeasuredBy(ImmutableList<PositionedString> l) {
         measuredBy = measuredBy.append(l);
+    }
+
+    public void addDecreases(PositionedString ps) {
+        decreases = decreases.append(ps);
+        setPosition(ps);
+    }
+
+    public void addDecreases(ImmutableList<PositionedString> l) {
+    	decreases = decreases.append(l);
     }
 
 
@@ -363,6 +374,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return measuredBy;
     }
 
+    public ImmutableList<PositionedString> getDecreases() {
+        return decreases;
+    }
 
     public ImmutableList<PositionedString> getAssignable() {
         return assignables.get(HeapLDT.BASE_HEAP_NAME.toString());

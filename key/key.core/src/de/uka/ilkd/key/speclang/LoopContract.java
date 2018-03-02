@@ -11,7 +11,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement.Variables;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
@@ -41,6 +40,8 @@ public interface LoopContract extends BlockSpecificationElement {
      * @see #getFunctionalContracts()
      */
     public void setFunctionalLoopContract(FunctionalLoopContract contract);
+
+	public Term getDecreases();
 
     public LoopContract update(StatementBlock newBlock,
                                 Map<LocationVariable,Term> newPreconditions,

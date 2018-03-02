@@ -30,10 +30,12 @@ import de.uka.ilkd.key.speclang.PositionedString;
  * in textual, unprocessed form.
  */
 public abstract class TextualJMLConstruct {
-    
+
+
     protected final ImmutableList<String> mods;
     private Position approxPos = Position.UNDEFINED;
     private String sourceFile = null;
+	private boolean loopContract;
     
     /** A user-provided identifier to keep an overview over large specification collections */
     protected String name;
@@ -47,6 +49,14 @@ public abstract class TextualJMLConstruct {
     public TextualJMLConstruct(ImmutableList<String> mods, String name){
         this(mods);
         this.name = name;
+    }
+    
+    public final boolean isLoopContract() {
+    	return loopContract;
+    }
+    
+    final void setLoopContract(boolean loopContract) {
+    	this.loopContract = loopContract;
     }
     
     

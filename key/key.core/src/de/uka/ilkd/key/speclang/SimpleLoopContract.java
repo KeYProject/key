@@ -23,8 +23,10 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
-public class SimpleLoopContract
+public final class SimpleLoopContract
         extends AbstractBlockSpecificationElement implements LoopContract {
+	
+    private final Term decreases;
 
     public static LoopContract combine(ImmutableSet<LoopContract> contracts, Services services) {
         return new Combinator(
@@ -48,6 +50,7 @@ public class SimpleLoopContract
                                final Variables variables,
                                final boolean transactionApplicable,
                                final Map<LocationVariable,Boolean> hasMod,
+                               final Term decreases,
                                ImmutableSet<FunctionalLoopContract> functionalContracts) {
         super(baseName,
                 block,
@@ -63,7 +66,13 @@ public class SimpleLoopContract
                 transactionApplicable,
                 hasMod);
         
+        this.decreases = decreases;
         this.functionalContracts = functionalContracts;
+    }
+    
+    @Override
+    public Term getDecreases() {
+    	return decreases;
     }
     
     @Override
@@ -116,7 +125,8 @@ public class SimpleLoopContract
                                        newPreconditions, measuredBy, newPostconditions,
                                        newModifiesClauses, newinfFlowSpecs,
                                        newVariables,
-                                       transactionApplicable, hasMod, functionalContracts);
+                                       transactionApplicable, hasMod, decreases,
+                                       functionalContracts);
     }
 
     @Override 
@@ -131,7 +141,7 @@ public class SimpleLoopContract
         return new SimpleLoopContract(baseName, block, labels, (IProgramMethod)newPM, modality,
                                        preconditions, measuredBy, postconditions, modifiesClauses,
                                        infFlowSpecs, variables, transactionApplicable, hasMod,
-                                       functionalContracts);
+                                       decreases, functionalContracts);
     }
 
     @Override
@@ -148,7 +158,9 @@ public class SimpleLoopContract
     }
     
     public static class Creator
-            extends AbstractBlockSpecificationElement.Creator<SimpleLoopContract> {
+            extends AbstractBlockSpecificationElement.Creator<LoopContract> {
+    	
+    	private Term decreases;
 
         public Creator(String baseName, StatementBlock block,
                 List<Label> labels, IProgramMethod method, Behavior behavior,
@@ -158,22 +170,25 @@ public class SimpleLoopContract
                 Map<Label, Term> breaks, Map<Label, Term> continues,
                 Term returns, Term signals, Term signalsOnly, Term diverges,
                 Map<LocationVariable, Term> assignables,
-                Map<LocationVariable, Boolean> hasMod, Services services) {
+                Map<LocationVariable, Boolean> hasMod, Term decreases, Services services) {
             super(baseName, block, labels, method, behavior, variables, requires,
                     measuredBy, ensures, infFlowSpecs, breaks, continues, returns, signals,
                     signalsOnly, diverges, assignables, hasMod, services);
+            
+            this.decreases = decreases;
 
             //TODO For now, only blocks that begin with a while loop may have a loop contract.
             // This should later be expanded to include blocks that begin with for and do-while loops,
             // as well as free-standing loops that are not inside of a block.
             if (!(block.getFirstElement() instanceof While)) {
                 throw new IllegalArgumentException(
-                        "Only blocks that begin with a while loop may have a loop contract!");
+                        "Only blocks that begin with a while loop may have a loop contract! \n"
+                		+ "This block begins with " + block.getFirstElement());
             }
         }
 
         @Override
-        protected SimpleLoopContract build(String baseName,
+        protected LoopContract build(String baseName,
                 StatementBlock block, List<Label> labels, IProgramMethod method,
                 Modality modality, Map<LocationVariable, Term> preconditions,
                 Term measuredBy, Map<LocationVariable, Term> postconditions,
@@ -181,9 +196,10 @@ public class SimpleLoopContract
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
                 boolean transactionApplicable,
                 Map<LocationVariable, Boolean> hasMod) {
-            return new SimpleLoopContract(baseName, block, labels, method, modality, preconditions,
+        	return new SimpleLoopContract(
+            		baseName, block, labels, method, modality, preconditions,
                     measuredBy, postconditions, modifiesClauses, infFlowSpecs, variables,
-                    transactionApplicable, hasMod, null);
+                    transactionApplicable, hasMod, decreases, null);
         }
     }
     
@@ -238,7 +254,7 @@ public class SimpleLoopContract
                                            contracts[0].getMby(),
                                            postconditions, modifiesClauses, head.getInfFlowSpecs(),
                                            placeholderVariables,
-                                           head.isTransactionApplicable(), hasMod,
+                                           head.isTransactionApplicable(), hasMod, contracts[0].getDecreases(),
                                            functionalContracts);
             
             return result;

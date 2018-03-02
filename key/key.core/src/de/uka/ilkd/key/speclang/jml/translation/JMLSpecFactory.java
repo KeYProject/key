@@ -72,6 +72,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.InitiallyClauseImpl;
+import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecImpl;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
@@ -79,6 +80,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.speclang.SimpleBlockContract;
+import de.uka.ilkd.key.speclang.SimpleLoopContract;
 import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
@@ -191,6 +193,7 @@ public class JMLSpecFactory {
         public Map<LocationVariable, Term> requires = new LinkedHashMap<LocationVariable, Term>();
         public Map<LocationVariable, Term> requiresFree = new LinkedHashMap<LocationVariable, Term>();
         public Term measuredBy;
+        public Term decreases;
         public Map<LocationVariable, Term> assignables = new LinkedHashMap<LocationVariable, Term>();
         public Map<ProgramVariable, Term> accessibles = new LinkedHashMap<ProgramVariable, Term>();
         public Map<LocationVariable, Term> ensures = new LinkedHashMap<LocationVariable, Term>();
@@ -334,6 +337,10 @@ public class JMLSpecFactory {
 
         clauses.measuredBy = translateMeasuredBy(pm, progVars.selfVar,
                 progVars.paramVars, textualSpecCase.getMeasuredBy());
+        
+        clauses.decreases = translateDecreases(pm, progVars.selfVar, progVars.paramVars,
+        		progVars.atPres, progVars.atBefores, textualSpecCase.getDecreases());
+        
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                 .getAllHeaps()) {
             clauses.hasMod.put(heap, !translateStrictlyPure(pm,
@@ -726,6 +733,28 @@ public class JMLSpecFactory {
             }
         }
         return measuredBy;
+    }
+
+    private Term translateDecreases(IProgramMethod pm, ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, Term> atPres,
+            Map<LocationVariable, Term> atBefores,
+            ImmutableList<PositionedString> originalDecreases)
+            throws SLTranslationException {
+        Term decreases = null;
+        if (!originalDecreases.isEmpty()) {
+            for (PositionedString expr : originalDecreases) {
+                Term translated = JMLTranslator.translate(expr,
+                        pm.getContainerType(), selfVar, paramVars, null, null, atPres, atBefores,
+                        Term.class, services);
+                if (decreases == null) {
+                	decreases = translated;
+                } else {
+                	decreases = TB.pair(decreases, translated);
+                }
+            }
+        }
+        return decreases;
     }
 
     private String generateName(IProgramMethod pm,
@@ -1271,6 +1300,10 @@ public class JMLSpecFactory {
             final StatementBlock block,
             final TextualJMLSpecCase specificationCase)
             throws SLTranslationException {
+    	if (specificationCase.isLoopContract()) {
+    		return DefaultImmutableSet.nil();
+    	}
+    	
         final Behavior behavior = specificationCase.getBehavior();
         final BlockContract.Variables variables = BlockContract.Variables
                 .create(block, labels, method, services);
@@ -1284,6 +1317,31 @@ public class JMLSpecFactory {
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues,
                 clauses.returns, clauses.signals, clauses.signalsOnly,
                 clauses.diverges, clauses.assignables, clauses.hasMod, services)
+                        .create();
+    }
+
+    public ImmutableSet<LoopContract> createJMLLoopContracts(
+            final IProgramMethod method, final List<Label> labels,
+            final StatementBlock block,
+            final TextualJMLSpecCase specificationCase)
+            throws SLTranslationException {
+    	if (!specificationCase.isLoopContract()) {
+    		return DefaultImmutableSet.nil();
+    	}
+    	
+        final Behavior behavior = specificationCase.getBehavior();
+        final LoopContract.Variables variables = LoopContract.Variables
+                .create(block, labels, method, services);
+        final ProgramVariableCollection programVariables = createProgramVariables(
+                method, block, variables);
+        final ContractClauses clauses = translateJMLClauses(method,
+                specificationCase, programVariables, behavior);
+        return new SimpleLoopContract.Creator("JML " + behavior + "loop contract",
+        		block, labels, method, behavior,
+                variables, clauses.requires, clauses.measuredBy, clauses.ensures,
+                clauses.infFlowSpecs, clauses.breaks, clauses.continues,
+                clauses.returns, clauses.signals, clauses.signalsOnly,
+                clauses.diverges, clauses.assignables, clauses.hasMod, clauses.decreases, services)
                         .create();
     }
 

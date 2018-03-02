@@ -20,7 +20,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalLoopContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -268,8 +267,8 @@ public class FunctionalLoopContract implements Contract {
     @Override
     public ProofOblInput createProofObl(InitConfig initConfig,
             Contract contract) {
-        assert contract instanceof FunctionalBlockContract;
-        return new FunctionalBlockContractPO(initConfig, (FunctionalBlockContract) contract);
+        assert contract instanceof FunctionalLoopContract;
+        return new FunctionalLoopContractPO(initConfig, (FunctionalLoopContract) contract);
     }
 
     @Override

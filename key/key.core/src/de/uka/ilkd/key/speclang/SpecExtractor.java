@@ -60,6 +60,13 @@ public interface SpecExtractor {
             throws SLTranslationException;
 
     /**
+     * Returns the loop contracts for the passed block.
+     */
+    public ImmutableSet<LoopContract> extractLoopContracts(
+            IProgramMethod method, StatementBlock block)
+            throws SLTranslationException;
+
+    /**
      * Returns the {@link MergeContract}s for the given
      * {@link MergePointStatement}.
      * 
@@ -76,6 +83,14 @@ public interface SpecExtractor {
      * a block.
      */
     public ImmutableSet<BlockContract> extractBlockContracts(
+            IProgramMethod method, LabeledStatement labeled)
+            throws SLTranslationException;
+
+    /**
+     * Returns the loop contracts for the passed labeled statement if it labels
+     * a block.
+     */
+    public ImmutableSet<LoopContract> extractLoopContracts(
             IProgramMethod method, LabeledStatement labeled)
             throws SLTranslationException;
 
