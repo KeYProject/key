@@ -46,6 +46,8 @@ import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.BlockSpecificationElement;
+import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
@@ -266,6 +268,18 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     @Override
+    public void performActionOnLoopContract(final StatementBlock oldBlock,
+            final StatementBlock newBlock) {
+        ImmutableSet<LoopContract> oldContracts = services
+                .getSpecificationRepository().getLoopContracts(oldBlock);
+        for (LoopContract oldContract : oldContracts) {
+            services.getSpecificationRepository()
+                    .addLoopContract(createNewLoopContract(oldContract,
+                            newBlock, !oldBlock.equals(newBlock)));
+        }
+    }
+
+    @Override
     public void performActionOnMergeContract(MergeContract oldContract) {
         services.getSpecificationRepository()
                 .removeMergeContracts(oldContract.getMergePointStatement());
@@ -378,9 +392,51 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 newVariables) : oldContract;
     }
 
-    private BlockContract.Variables replaceBlockContractVariables(
-            final BlockContract.Variables variables) {
-        return new BlockContract.Variables(replaceVariable(variables.self),
+    private LoopContract createNewLoopContract(
+            final LoopContract oldContract, final StatementBlock newBlock,
+            final boolean blockChanged) {
+        final LoopContract.Variables newVariables = replaceBlockContractVariables(
+                oldContract.getPlaceholderVariables());
+        final Map<LocationVariable, Term> newPreconditions = new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> newModifiesClauses = new LinkedHashMap<LocationVariable, Term>();
+        boolean changed = blockChanged;
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
+                .getAllHeaps()) {
+            final Term oldPrecondition = oldContract.getPrecondition(heap,
+                    services);
+            final Term oldPostcondition = oldContract.getPostcondition(heap,
+                    services);
+            final Term oldModifies = oldContract.getModifiesClause(heap,
+                    services);
+
+            final Term newPrecondition = replaceVariablesInTerm(
+                    oldPrecondition);
+            final Term newPostcondition = replaceVariablesInTerm(
+                    oldPostcondition);
+            final Term newModifies = replaceVariablesInTerm(oldModifies);
+
+            newPreconditions.put(heap, (newPrecondition != oldPrecondition)
+                    ? newPrecondition : oldPrecondition);
+            newPostconditions.put(heap, (newPostcondition != oldPostcondition)
+                    ? newPostcondition : oldPostcondition);
+            newModifiesClauses.put(heap,
+                    (newModifies != oldModifies) ? newModifies : oldModifies);
+
+            changed |= ((newPrecondition != oldPrecondition)
+                    || (newPostcondition != oldPostcondition)
+                    || (newModifies != oldModifies));
+        }
+        final ImmutableList<InfFlowSpec> newInfFlowSpecs = replaceVariablesInTermListTriples(
+                oldContract.getInfFlowSpecs());
+        return changed ? oldContract.update(newBlock, newPreconditions,
+                newPostconditions, newModifiesClauses, newInfFlowSpecs,
+                newVariables) : oldContract;
+    }
+
+    private BlockSpecificationElement.Variables replaceBlockContractVariables(
+            final BlockSpecificationElement.Variables variables) {
+        return new BlockSpecificationElement.Variables(replaceVariable(variables.self),
                 replaceFlags(variables.breakFlags),
                 replaceFlags(variables.continueFlags),
                 replaceVariable(variables.returnFlag),

@@ -228,6 +228,11 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         // do nothing
     }
 
+    protected void performActionOnLoopContract(final StatementBlock oldBlock,
+            final StatementBlock newBlock) {
+        // do nothing
+    }
+
     @Override
     public void performActionOnMergePointStatement(MergePointStatement x) {
         DefaultAction def = new DefaultAction(x) {

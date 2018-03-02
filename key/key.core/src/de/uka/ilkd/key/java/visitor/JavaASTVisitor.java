@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 
@@ -863,6 +864,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     
     @Override
     public void performActionOnBlockContract(BlockContract x) {
+        // do nothing
+    }
+    
+    @Override
+    public void performActionOnLoopContract(LoopContract x) {
         // do nothing
     }
 

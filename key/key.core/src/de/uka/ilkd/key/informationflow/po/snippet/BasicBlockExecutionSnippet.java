@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.BlockContractBuilders;
-import de.uka.ilkd.key.speclang.BlockContract.Variables;
+import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 
 
 /**
@@ -106,7 +106,8 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
         //create block call
         final Label[] labelsArray = (Label[]) d.get(BasicSnippetData.Key.LABELS);
         final ImmutableArray<Label> labels = new ImmutableArray<Label>(labelsArray);
-        final Variables variables = (Variables) d.get(BasicSnippetData.Key.BLOCK_VARS);
+        final BlockSpecificationElement.Variables variables =
+                (BlockSpecificationElement.Variables) d.get(BasicSnippetData.Key.BLOCK_VARS);
         final StatementBlock block = (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
         final StatementBlock sb =
                 new BlockContractBuilders.ValidityProgramConstructor(labels, block,

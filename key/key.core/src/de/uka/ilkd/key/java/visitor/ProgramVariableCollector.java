@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
@@ -178,6 +179,46 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
     @Override
     public void performActionOnBlockContract(BlockContract x) {
+        TermProgramVariableCollector collector = services.getFactory()
+                .create(services);
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
+                .getAllHeaps()) {
+            Term precondition = x.getPrecondition(heap, services);
+            if (precondition != null) {
+                precondition.execPostOrder(collector);
+            }
+        }
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
+                .getAllHeaps()) {
+            Term postcondition = x.getPostcondition(heap, services);
+            if (postcondition != null) {
+                postcondition.execPostOrder(collector);
+            }
+        }
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
+                .getAllHeaps()) {
+            Term modifiesClause = x.getModifiesClause(heap, services);
+            if (modifiesClause != null) {
+                modifiesClause.execPostOrder(collector);
+            }
+        }
+        ImmutableList<InfFlowSpec> infFlowSpecs = x.getInfFlowSpecs();
+        for (InfFlowSpec ts : infFlowSpecs) {
+            for (Term t : ts.preExpressions) {
+                t.execPostOrder(collector);
+            }
+            for (Term t : ts.postExpressions) {
+                t.execPostOrder(collector);
+            }
+            for (Term t : ts.newObjects) {
+                t.execPostOrder(collector);
+            }
+        }
+        result.addAll(collector.result());
+    }
+
+    @Override
+    public void performActionOnLoopContract(LoopContract x) {
         TermProgramVariableCollector collector = services.getFactory()
                 .create(services);
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()

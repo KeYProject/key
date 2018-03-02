@@ -244,7 +244,6 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
     @Override
     public Term getMbyAtPre() {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

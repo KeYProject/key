@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
@@ -25,6 +12,7 @@ import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -35,23 +23,20 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
-/**
- * Default implementation of {@link BlockContract}.
- */
-public final class SimpleBlockContract
-        extends AbstractBlockSpecificationElement implements BlockContract {
+public class SimpleLoopContract
+        extends AbstractBlockSpecificationElement implements LoopContract {
 
-    public static BlockContract combine(ImmutableSet<BlockContract> contracts, Services services) {
+    public static LoopContract combine(ImmutableSet<LoopContract> contracts, Services services) {
         return new Combinator(
-                contracts.toArray(new BlockContract[contracts.size()]),
+                contracts.toArray(new LoopContract[contracts.size()]),
                 services)
                 .combine();
     }
-	
-	private ImmutableSet<FunctionalBlockContract> functionalContracts;
+    
+    private ImmutableSet<FunctionalLoopContract> functionalContracts;
 
-    public SimpleBlockContract(final String baseName,
-    		                   final StatementBlock block,
+    public SimpleLoopContract(final String baseName,
+                               final StatementBlock block,
                                final List<Label> labels,
                                final IProgramMethod method,
                                final Modality modality,
@@ -63,7 +48,7 @@ public final class SimpleBlockContract
                                final Variables variables,
                                final boolean transactionApplicable,
                                final Map<LocationVariable,Boolean> hasMod,
-                               ImmutableSet<FunctionalBlockContract> functionalContracts) {
+                               ImmutableSet<FunctionalLoopContract> functionalContracts) {
         super(baseName,
                 block,
                 labels,
@@ -82,52 +67,52 @@ public final class SimpleBlockContract
     }
     
     @Override
-	public ImmutableSet<FunctionalBlockContract> getFunctionalContracts() {
-    	return functionalContracts;
+    public ImmutableSet<FunctionalLoopContract> getFunctionalContracts() {
+        return functionalContracts;
     }
 
     @Override
-	public void setFunctionalBlockContract(FunctionalBlockContract contract) {
-    	assert contract.id() != Contract.INVALID_ID;
-    	assert contract.getBlockContract().equals(this);
-    	
-    	functionalContracts = DefaultImmutableSet.<FunctionalBlockContract>nil().add(contract);
+    public void setFunctionalLoopContract(FunctionalLoopContract contract) {
+        assert contract.id() != Contract.INVALID_ID;
+        assert contract.getLoopContract().equals(this);
+        
+        functionalContracts = DefaultImmutableSet.<FunctionalLoopContract>nil().add(contract);
     }
 
     @Override
     public void visit(final Visitor visitor) {
         assert visitor != null;
-        visitor.performActionOnBlockContract(this);
+        visitor.performActionOnLoopContract(this);
     }
 
     @Override
     public String getName() {
-        return "Block Contract";
+        return "Loop Contract";
     }
 
     @Override
     public String getUniqueName() {
         if (getTarget() != null)
-            return "Block Contract " + getBlock().getStartPosition().getLine() +
+            return "Loop Contract " + getBlock().getStartPosition().getLine() +
                     " " + getTarget().getUniqueName();
         else
-            return "Block Contract " + getBlock().getStartPosition().getLine() +
+            return "Loop Contract " + getBlock().getStartPosition().getLine() +
                     " " + Math.abs(getBlock().hashCode());
     }
 
     @Override
     public String getDisplayName() {
-        return "Block Contract";
+        return "Loop Contract";
     }
 
     @Override
-    public BlockContract update(final StatementBlock newBlock,
+    public LoopContract update(final StatementBlock newBlock,
                                 final Map<LocationVariable,Term> newPreconditions,
                                 final Map<LocationVariable,Term> newPostconditions,
                                 final Map<LocationVariable,Term> newModifiesClauses,
                                 final ImmutableList<InfFlowSpec> newinfFlowSpecs,
                                 final Variables newVariables) {
-        return new SimpleBlockContract(baseName, newBlock, labels, method, modality,
+        return new SimpleLoopContract(baseName, newBlock, labels, method, modality,
                                        newPreconditions, measuredBy, newPostconditions,
                                        newModifiesClauses, newinfFlowSpecs,
                                        newVariables,
@@ -135,15 +120,15 @@ public final class SimpleBlockContract
     }
 
     @Override 
-    public BlockContract setBlock(StatementBlock newBlock) {
+    public LoopContract setBlock(StatementBlock newBlock) {
         return update(newBlock, preconditions, postconditions, modifiesClauses,
                       infFlowSpecs, variables);
     }
 
-    public BlockContract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
+    public LoopContract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
         assert newKJT.equals(newPM.getContainerType());
-        return new SimpleBlockContract(baseName, block, labels, (IProgramMethod)newPM, modality,
+        return new SimpleLoopContract(baseName, block, labels, (IProgramMethod)newPM, modality,
                                        preconditions, measuredBy, postconditions, modifiesClauses,
                                        infFlowSpecs, variables, transactionApplicable, hasMod,
                                        functionalContracts);
@@ -151,7 +136,7 @@ public final class SimpleBlockContract
 
     @Override
     public String toString() {
-        return "SimpleBlockContract [block=" + block + ", labels=" + labels
+        return "SimpleLoopContract [block=" + block + ", labels=" + labels
                 + ", method=" + method + ", modality=" + modality
                 + ", instantiationSelf=" + instantiationSelf
                 + ", preconditions=" + preconditions + ", postconditions="
@@ -163,7 +148,7 @@ public final class SimpleBlockContract
     }
     
     public static class Creator
-            extends AbstractBlockSpecificationElement.Creator<BlockContract> {
+            extends AbstractBlockSpecificationElement.Creator<SimpleLoopContract> {
 
         public Creator(String baseName, StatementBlock block,
                 List<Label> labels, IProgramMethod method, Behavior behavior,
@@ -177,10 +162,18 @@ public final class SimpleBlockContract
             super(baseName, block, labels, method, behavior, variables, requires,
                     measuredBy, ensures, infFlowSpecs, breaks, continues, returns, signals,
                     signalsOnly, diverges, assignables, hasMod, services);
+
+            //TODO For now, only blocks that begin with a while loop may have a loop contract.
+            // This should later be expanded to include blocks that begin with for and do-while loops,
+            // as well as free-standing loops that are not inside of a block.
+            if (!(block.getFirstElement() instanceof While)) {
+                throw new IllegalArgumentException(
+                        "Only blocks that begin with a while loop may have a loop contract!");
+            }
         }
 
         @Override
-        protected BlockContract build(String baseName,
+        protected SimpleLoopContract build(String baseName,
                 StatementBlock block, List<Label> labels, IProgramMethod method,
                 Modality modality, Map<LocationVariable, Term> preconditions,
                 Term measuredBy, Map<LocationVariable, Term> postconditions,
@@ -188,27 +181,27 @@ public final class SimpleBlockContract
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
                 boolean transactionApplicable,
                 Map<LocationVariable, Boolean> hasMod) {
-            return new SimpleBlockContract(baseName, block, labels, method, modality, preconditions,
+            return new SimpleLoopContract(baseName, block, labels, method, modality, preconditions,
                     measuredBy, postconditions, modifiesClauses, infFlowSpecs, variables,
                     transactionApplicable, hasMod, null);
         }
     }
     
     protected static class Combinator
-            extends AbstractBlockSpecificationElement.Combinator<BlockContract> {
+            extends AbstractBlockSpecificationElement.Combinator<LoopContract> {
 
-        public Combinator(BlockContract[] contracts, Services services) {
+        public Combinator(LoopContract[] contracts, Services services) {
             super(contracts, services);
         }
 
         @Override
-        protected BlockContract combine() {
+        protected LoopContract combine() {
             assert contracts.length > 0;
             if (contracts.length == 1) {
                 return contracts[0];
             }
             
-            final BlockContract head = contracts[0];
+            final LoopContract head = contracts[0];
             String baseName = head.getBaseName();
             
             for (int i = 1; i < contracts.length; i++) {
@@ -221,10 +214,10 @@ public final class SimpleBlockContract
             placeholderVariables = head.getPlaceholderVariables();
             remembranceVariables = placeholderVariables.combineRemembranceVariables();
             
-            ImmutableSet<FunctionalBlockContract> functionalContracts = 
+            ImmutableSet<FunctionalLoopContract> functionalContracts = 
                     DefaultImmutableSet.nil();
             
-            for (BlockContract contract : contracts) {
+            for (LoopContract contract : contracts) {
                 addConditionsFrom(contract);
                 functionalContracts = functionalContracts.union(contract.getFunctionalContracts());
             }
@@ -239,7 +232,7 @@ public final class SimpleBlockContract
                 hasMod.put(heap, hm);
             }
             
-            SimpleBlockContract result = new SimpleBlockContract(baseName, 
+            SimpleLoopContract result = new SimpleLoopContract(baseName, 
                                            head.getBlock(), head.getLabels(),
                                            head.getMethod(), head.getModality(), preconditions,
                                            contracts[0].getMby(),

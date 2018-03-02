@@ -73,6 +73,7 @@ import de.uka.ilkd.key.speclang.FunctionalBlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
+import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
@@ -109,6 +110,7 @@ public final class SpecificationRepository {
     private final Map<ProofOblInput, ImmutableSet<Proof>> proofs = new LinkedHashMap<ProofOblInput, ImmutableSet<Proof>>();
     private final Map<Pair<LoopStatement, Integer>, LoopSpecification> loopInvs = new LinkedHashMap<Pair<LoopStatement, Integer>, LoopSpecification>();
     private final Map<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>> blockContracts = new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>>();
+    private final Map<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>> loopContracts = new LinkedHashMap<>();
     private Map<MergePointStatement, ImmutableSet<MergeContract>> mergeContracts = new LinkedHashMap<>();
     private final Map<IObserverFunction, IObserverFunction> unlimitedToLimited = new LinkedHashMap<IObserverFunction, IObserverFunction>();
     private final Map<IObserverFunction, IObserverFunction> limitedToUnlimited = new LinkedHashMap<IObserverFunction, IObserverFunction>();
@@ -1517,6 +1519,17 @@ public final class SpecificationRepository {
         }
     }
 
+    public ImmutableSet<LoopContract> getLoopContracts(StatementBlock block) {
+        final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
+                block, block.getStartPosition().getLine());
+        final ImmutableSet<LoopContract> contracts = loopContracts.get(b);
+        if (contracts == null) {
+            return DefaultImmutableSet.<LoopContract> nil();
+        } else {
+            return contracts;
+        }
+    }
+
     public ImmutableSet<MergeContract> getMergeContracts(
             MergePointStatement mps) {
         final ImmutableSet<MergeContract> contracts = mergeContracts.get(mps);
@@ -1532,6 +1545,21 @@ public final class SpecificationRepository {
         ImmutableSet<BlockContract> result = getBlockContracts(block);
         final Modality matchModality = getMatchModality(modality);
         for (BlockContract contract : result) {
+            if (!contract.getModality().equals(matchModality)
+                    || (modality.transaction()
+                            && !contract.isTransactionApplicable()
+                            && !contract.isReadOnly(services))) {
+                result = result.remove(contract);
+            }
+        }
+        return result;
+    }
+
+    public ImmutableSet<LoopContract> getLoopContracts(
+            final StatementBlock block, final Modality modality) {
+        ImmutableSet<LoopContract> result = getLoopContracts(block);
+        final Modality matchModality = getMatchModality(modality);
+        for (LoopContract contract : result) {
             if (!contract.getModality().equals(matchModality)
                     || (modality.transaction()
                             && !contract.isTransactionApplicable()
@@ -1584,6 +1612,50 @@ public final class SpecificationRepository {
         
         ImmutableSet<BlockContract> set = blockContracts.get(b);
         blockContracts.put(b, set.remove(contract));
+    }
+
+    /**
+     * Adds a new {@code LoopContract} and a new {@link FunctionalLoopContract}
+     * to the repository.
+     * 
+     * @param contract the {@code LoopContract} to add.
+     */
+    public void addLoopContract(final LoopContract contract) {
+        addLoopContract(contract, false);
+    }
+
+    /**
+     * Adds a new {@code LoopContract} to the repository.
+     * 
+     * @param contract the {@code LoopContract} to add.
+     * @param addFunctionalContract whether or not to add a new {@link FunctionalLoopContract}
+     *  based on {@code contract}.
+     */
+    public void addLoopContract(final LoopContract contract, boolean addFunctionalContract) {
+        final StatementBlock block = contract.getBlock();
+        final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
+                block, block.getStartPosition().getLine());
+        loopContracts.put(b, getLoopContracts(block).add(contract));
+        
+        if (addFunctionalContract) {
+            addContract(cf.funcLoop(contract));
+        }
+    }
+    
+    /**
+     * <p> Removes a {@code LoopContract} from the repository. </p>
+     * 
+     * <p> The associated {@link FunctionalLoopContract} is not removed. </p>
+     * 
+     * @param contract the {@code LoopContract} to remove.
+     */
+    public void removeLoopContract(final LoopContract contract) {
+        final StatementBlock block = contract.getBlock();
+        final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
+                block, block.getStartPosition().getLine());
+        
+        ImmutableSet<LoopContract> set = loopContracts.get(b);
+        loopContracts.put(b, set.remove(contract));
     }
 
     /**

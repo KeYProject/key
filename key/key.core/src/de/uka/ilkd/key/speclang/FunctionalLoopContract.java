@@ -21,50 +21,45 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
+import de.uka.ilkd.key.proof.init.FunctionalLoopContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
-/**
- * This class is only used to generate a proof obligation for a block
- * (see {@link FunctionalBlockContractPO}.
- * 
- * If a block is encountered during a proof, {@link BlockContract} is used instead.
- */
-public class FunctionalBlockContract implements Contract {
-	
-	private final BlockContract contract;
+public class FunctionalLoopContract implements Contract {
+    
+    private final LoopContract contract;
     private final int id;
     private final String name;
     private final String displayName;
     private final String typeName;
     
-    FunctionalBlockContract(BlockContract contract) {
+    FunctionalLoopContract(LoopContract contract) {
         this(contract, Contract.INVALID_ID);
     }
     
-    FunctionalBlockContract(BlockContract contract, int id) {
+    FunctionalLoopContract(LoopContract contract, int id) {
         this.contract = contract;
         this.id = id;
         
         if (id != Contract.INVALID_ID) {
-            contract.setFunctionalBlockContract(this);
+            contract.setFunctionalLoopContract(this);
         }
         
         name = generateName(contract.getBaseName(), str
-        		-> ContractFactory.generateContractName(str, getKJT(), getTarget(), getKJT(), id));
+                -> ContractFactory.generateContractName(str, getKJT(), getTarget(), getKJT(), id));
         displayName = generateName(contract.getBaseName(), str
-        		-> ContractFactory.generateDisplayName(str, getKJT(), getTarget(), getKJT(), id));
+                -> ContractFactory.generateDisplayName(str, getKJT(), getTarget(), getKJT(), id));
         typeName = generateName(contract.getBaseName(), str
-        		-> ContractFactory.generateContractTypeName(str, getKJT(), getTarget(), getKJT()));
+                -> ContractFactory.generateContractTypeName(str, getKJT(), getTarget(), getKJT()));
     }
     
     private String generateName(String baseName, UnaryOperator<String> generator) {
-    	return Arrays.stream(baseName.split(SpecificationRepository.CONTRACT_COMBINATION_MARKER))
-    			.map(generator)
-    			.reduce((acc, curr)
-    					-> acc + SpecificationRepository.CONTRACT_COMBINATION_MARKER + curr)
-    			.get();
+        return Arrays.stream(baseName.split(SpecificationRepository.CONTRACT_COMBINATION_MARKER))
+                .map(generator)
+                .reduce((acc, curr)
+                        -> acc + SpecificationRepository.CONTRACT_COMBINATION_MARKER + curr)
+                .get();
     }
 
     @Override
@@ -130,19 +125,19 @@ public class FunctionalBlockContract implements Contract {
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars,
             Services services) {
-    	@SuppressWarnings("unchecked")
-		Map<LocationVariable, ProgramVariable> atPreVars0 =
-			(Map<LocationVariable, ProgramVariable>) atPreVars;
+        @SuppressWarnings("unchecked")
+        Map<LocationVariable, ProgramVariable> atPreVars0 =
+            (Map<LocationVariable, ProgramVariable>) atPreVars;
         return contract.getPrecondition(
-        		heap,
-        		selfVar,
-        		atPreVars0.entrySet().stream().collect(Collectors
-        				.<Map.Entry<LocationVariable, ProgramVariable>,
-        					LocationVariable, LocationVariable>toMap(
-        							Map.Entry::getKey,
-        							entry -> (LocationVariable) entry.getValue()
-        			)),
-        		services);
+                heap,
+                selfVar,
+                atPreVars0.entrySet().stream().collect(Collectors
+                        .<Map.Entry<LocationVariable, ProgramVariable>,
+                            LocationVariable, LocationVariable>toMap(
+                                    Map.Entry::getKey,
+                                    entry -> (LocationVariable) entry.getValue()
+                    )),
+                services);
     }
 
     @Override
@@ -150,9 +145,9 @@ public class FunctionalBlockContract implements Contract {
             ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars,
             Services services) {
-    	TermBuilder tb = services.getTermBuilder();
-    	Term result = null;
-    	
+        TermBuilder tb = services.getTermBuilder();
+        Term result = null;
+        
         for (LocationVariable heap : heapContext) {
             final Term p = getPre(heap, selfVar, paramVars, atPreVars, services);
             
@@ -178,9 +173,9 @@ public class FunctionalBlockContract implements Contract {
             Map<LocationVariable, Term> heapTerms, Term selfTerm,
             ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
             Services services) {
-    	TermBuilder tb = services.getTermBuilder();
-    	Term result = null;
-    	
+        TermBuilder tb = services.getTermBuilder();
+        Term result = null;
+        
         for (LocationVariable heap : heapContext) {
             final Term p = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
 
@@ -262,7 +257,7 @@ public class FunctionalBlockContract implements Contract {
 
     @Override
     public ContractPO createProofObl(InitConfig initConfig) {
-       return new FunctionalBlockContractPO(initConfig, this);
+       return new FunctionalLoopContractPO(initConfig, this);
     }
 
     @Override
@@ -285,12 +280,12 @@ public class FunctionalBlockContract implements Contract {
 
     @Override
     public Contract setID(int newId) {
-        return new FunctionalBlockContract(contract, newId);
+        return new FunctionalLoopContract(contract, newId);
     }
 
     @Override
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
-        return new FunctionalBlockContract(contract.setTarget(newKJT, newPM), id);
+        return new FunctionalLoopContract(contract.setTarget(newKJT, newPM), id);
     }
 
     @Override
@@ -307,7 +302,7 @@ public class FunctionalBlockContract implements Contract {
         return contract.hasModifiesClause(heap);
     }
 
-    public BlockContract getBlockContract() {
+    public LoopContract getLoopContract() {
         return contract;
     }
 
@@ -319,11 +314,11 @@ public class FunctionalBlockContract implements Contract {
         return contract.getMethod();
     }
 
-	public BlockSpecificationElement.Variables getPlaceholderVariables() {
-		return contract.getPlaceholderVariables();
-	}
+    public BlockSpecificationElement.Variables getPlaceholderVariables() {
+        return contract.getPlaceholderVariables();
+    }
 
-	public Modality getModality() {
-		return contract.getModality();
-	}
+    public Modality getModality() {
+        return contract.getModality();
+    }
 }

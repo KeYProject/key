@@ -57,7 +57,7 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule.BlockContractHint;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule.Instantiation;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockContract.Terms;
+import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.speclang.BlockWellDefinedness;
 
 /**
@@ -409,7 +409,7 @@ public class BlockContractBuilders {
             this.terms = variables.termify(self);
         }
 
-		public Terms getTerms() {
+		public BlockSpecificationElement.Terms getTerms() {
 			return terms;
 		}
 
@@ -661,7 +661,7 @@ public class BlockContractBuilders {
                                       final Term[] assumptions,
                                       final Term[] postconditions,
                                       final ProgramVariable exceptionParameter,
-                                      final Terms terms) {
+                                      final BlockSpecificationElement.Terms terms) {
             final TermBuilder tb = services.getTermBuilder();
             final StatementBlock block =
                     new ValidityProgramConstructor(labels, instantiation.block,

@@ -36,8 +36,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.AbstractBlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockContract.Terms;
-import de.uka.ilkd.key.speclang.BlockContract.Variables;
+import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -110,7 +109,7 @@ public class ExecutionBlockContract extends AbstractExecutionNode<SourceElement>
       Term validitiyModalityTerm = TermBuilder.goBelowUpdates(SymbolicExecutionUtil.posInOccurrenceInOtherNode(getProofNode(), getModalityPIO(), validitiyNode));
       MethodFrame mf = JavaTools.getInnermostMethodFrame(validitiyModalityTerm.javaBlock(), getServices());
       StatementBlock sb = mf != null ? mf.getBody() : (StatementBlock) validitiyModalityTerm.javaBlock().program();
-      Variables variables = getContract().getVariables();
+      BlockSpecificationElement.Variables variables = getContract().getVariables();
       int statementIndex = variables.breakFlags.size() + variables.continueFlags.size(); // Skip break and continues
       Term returnFlag = null;
       Term result = null;
@@ -126,7 +125,7 @@ public class ExecutionBlockContract extends AbstractExecutionNode<SourceElement>
       if (variables.exception != null) {
          exception = declaredVariableAsTerm(sb, statementIndex);
       }
-      Terms terms = new Terms(self, 
+      BlockSpecificationElement.Terms terms = new BlockSpecificationElement.Terms(self, 
                               null, // breakFlags are not used by getPlainText() 
                               null, // continueFlags are not used by getPlainText() 
                               returnFlag, // returnFlag are not used by getPlainText() 

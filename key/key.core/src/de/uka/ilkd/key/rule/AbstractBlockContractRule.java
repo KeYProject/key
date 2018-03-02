@@ -56,7 +56,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockContract.Variables;
+import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.util.MiscTools;
 
 public abstract class AbstractBlockContractRule implements BuiltInRule  {
@@ -409,7 +409,7 @@ public abstract class AbstractBlockContractRule implements BuiltInRule  {
                                          final BlockContract contract,
                                          final Map<LocationVariable, Function> anonymisationHeaps,
                                          final Services services,
-                                         final Variables variables,
+                                         final BlockSpecificationElement.Variables variables,
                                          final ProgramVariable exceptionParameter,
                                          final List<LocationVariable> heaps,
                                          final ImmutableSet<ProgramVariable> localInVariables,
