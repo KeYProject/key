@@ -32,14 +32,14 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Makes sure that {@link SymbolicExecutionUtil#BLOCK_CONTRACT_VALIDITY_LABEL} is introduced
- * when a {@link BlockContractRule} is applied.
+ * when a {@link BlockContractInternalRule} is applied.
  * @author Martin Hentschel
  */
 public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
@@ -48,7 +48,7 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
     */
    @Override
    public ImmutableList<Name> getSupportedRuleNames() {
-      return ImmutableSLList.<Name>nil().append(BlockContractRule.INSTANCE.name());
+      return ImmutableSLList.<Name>nil().append(BlockContractInternalRule.INSTANCE.name());
    }
 
    /**
@@ -70,8 +70,8 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
                             ImmutableArray<QuantifiableVariable> newTermBoundVars,
                             JavaBlock newTermJavaBlock,
                             Set<TermLabel> labels) {
-       if (rule instanceof BlockContractRule &&
-               ((BlockContractRule.BlockContractHint)hint).getExceptionalVariable() != null 
+       if (rule instanceof BlockContractInternalRule &&
+               ((BlockContractInternalRule.BlockContractHint)hint).getExceptionalVariable() != null 
                && 
                SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
            if (CollectionUtil.search(labels, new IFilter<TermLabel>() {
@@ -80,7 +80,7 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
                    return element instanceof BlockContractValidityTermLabel;
                }
            }) == null) {
-               labels.add(new BlockContractValidityTermLabel(((BlockContractRule.BlockContractHint)hint).getExceptionalVariable()));
+               labels.add(new BlockContractValidityTermLabel(((BlockContractInternalRule.BlockContractHint)hint).getExceptionalVariable()));
            }
       }
    }

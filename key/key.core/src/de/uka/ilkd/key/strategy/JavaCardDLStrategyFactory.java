@@ -358,12 +358,13 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
                 = new OneOfStrategyPropertyDefinition(
                         StrategyProperties.BLOCK_OPTIONS_KEY,
                         "Block treatment",
+                        1,
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.BLOCK_CONTRACT,
-                                "Contract", TOOL_TIP_BLOCK_CONTRACT),
+                                "Contract (Internal)", TOOL_TIP_BLOCK_CONTRACT),
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.BLOCK_CONTRACT_SEPARATE,
-                                "Contract (Separate)", TOOL_TIP_BLOCK_CONTRACT_SEPARATE),
+                                "Contract (External)", TOOL_TIP_BLOCK_CONTRACT_SEPARATE),
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.BLOCK_EXPAND, "Expand",
                                 TOOL_TIP_BLOCK_EXPAND));

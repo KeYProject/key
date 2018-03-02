@@ -672,7 +672,7 @@ public class BlockContractBuilders {
             JavaBlock newJavaBlock = JavaBlock.createJavaBlock(finishedBlock);
             Term newPost = tb.and(postconditions);
             newPost = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services, newPost, ImmutableSLList.<LocationVariable>nil().prepend(terms.remembranceLocalVariables.keySet()), terms.exception);
-            newPost = TermLabelManager.refactorTerm(termLabelState, services, null, newPost, rule, goal, BlockContractRule.NEW_POSTCONDITION_TERM_HINT, null);
+            newPost = TermLabelManager.refactorTerm(termLabelState, services, null, newPost, rule, goal, BlockContractInternalRule.NEW_POSTCONDITION_TERM_HINT, null);
             
                         
             Term term;
@@ -756,7 +756,7 @@ public class BlockContractBuilders {
             final TermBuilder tb = services.getTermBuilder();
             goal.setBranchLabel("Precondition");
             Term fullPrecondition = tb.apply(update, tb.and(preconditions), null);
-            fullPrecondition = TermLabelManager.refactorTerm(termLabelState, services, null, fullPrecondition, rule, goal, BlockContractRule.FULL_PRECONDITION_TERM_HINT, null);
+            fullPrecondition = TermLabelManager.refactorTerm(termLabelState, services, null, fullPrecondition, rule, goal, BlockContractInternalRule.FULL_PRECONDITION_TERM_HINT, null);
             goal.changeFormula(new SequentFormula(fullPrecondition),
                                occurrence);
             TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(), goal, null, null);

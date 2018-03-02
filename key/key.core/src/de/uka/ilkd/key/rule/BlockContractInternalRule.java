@@ -31,17 +31,17 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 
-public class BlockContractRule extends AbstractBlockContractRule {
+public class BlockContractInternalRule extends AbstractBlockContractRule {
     
-    public static final BlockContractRule INSTANCE = new BlockContractRule();
+    public static final BlockContractInternalRule INSTANCE = new BlockContractInternalRule();
 
-    private static final Name NAME = new Name("Block Contract");
+    private static final Name NAME = new Name("Block Contract (Internal)");
 
     private Term lastFocusTerm;
     
     private Instantiation lastInstantiation;
 
-    private BlockContractRule() {
+    private BlockContractInternalRule() {
     }
     
     public Term getLastFocusTerm() {
@@ -69,20 +69,20 @@ public class BlockContractRule extends AbstractBlockContractRule {
     }
 
     @Override
-    public BlockContractBuiltInRuleApp createApp(final PosInOccurrence occurrence,
+    public BlockContractInternalBuiltInRuleApp createApp(final PosInOccurrence occurrence,
                                                  TermServices services) {
-        return new BlockContractBuiltInRuleApp(this, occurrence);
+        return new BlockContractInternalBuiltInRuleApp(this, occurrence);
     }
 
     @Override
     public ImmutableList<Goal> apply(final Goal goal, final Services services,
                                      final RuleApp application) throws RuleAbortException {
-        assert application instanceof BlockContractBuiltInRuleApp;
-        return apply(goal, services, (BlockContractBuiltInRuleApp) application);
+        assert application instanceof BlockContractInternalBuiltInRuleApp;
+        return apply(goal, services, (BlockContractInternalBuiltInRuleApp) application);
     }
 
     private ImmutableList<Goal> apply(final Goal goal, final Services services,
-                                      final BlockContractBuiltInRuleApp application)
+                                      final BlockContractInternalBuiltInRuleApp application)
                                               throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
         final Instantiation instantiation =

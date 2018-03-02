@@ -61,8 +61,8 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.join.JoinIsApplicable;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
-import de.uka.ilkd.key.rule.BlockContractRule;
-import de.uka.ilkd.key.rule.BlockContractSeparateRule;
+import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
@@ -330,7 +330,7 @@ public class TacletMenu extends JMenu {
             item.addActionListener(control);
             add(item);
         }
-        else if (builtInRule == BlockContractRule.INSTANCE) {
+        else if (builtInRule == BlockContractInternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(
                     builtInRule.displayName(),
@@ -341,7 +341,7 @@ public class TacletMenu extends JMenu {
             item.addActionListener(control);
             add(item);
         }
-        else if (builtInRule == BlockContractSeparateRule.INSTANCE) {
+        else if (builtInRule == BlockContractExternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(
                     builtInRule.displayName(),

@@ -131,9 +131,9 @@ public abstract class AbstractBlockContractRule implements BuiltInRule  {
         Node previousNode = null;
         while (selfOrParentNode != null) {
             RuleApp app = selfOrParentNode.getAppliedRuleApp();
-            if (app instanceof BlockContractBuiltInRuleApp) {
-                BlockContractBuiltInRuleApp blockRuleApp =
-                        (BlockContractBuiltInRuleApp)app;
+            if (app instanceof BlockContractInternalBuiltInRuleApp) {
+                BlockContractInternalBuiltInRuleApp blockRuleApp =
+                        (BlockContractInternalBuiltInRuleApp)app;
                 if (blockRuleApp.getBlock().equals(contract.getBlock()) && 
                         selfOrParentNode.getChildNr(previousNode) == 0) {
                     // prevent application of contract in its own check validity branch
@@ -414,7 +414,7 @@ public abstract class AbstractBlockContractRule implements BuiltInRule  {
                                          final List<LocationVariable> heaps,
                                          final ImmutableSet<ProgramVariable> localInVariables,
                                          final ImmutableSet<ProgramVariable> localOutVariables,
-                                         final BlockContractBuiltInRuleApp application,
+                                         final BlockContractInternalBuiltInRuleApp application,
                                          final Instantiation instantiation) {
         assert heaps.size() == 1 &&
                anonymisationHeaps.size() <= 1 : "information flow " +

@@ -8,8 +8,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule.Instantiation;
-import de.uka.ilkd.key.rule.BlockContractSeparateBuiltInRuleApp;
-import de.uka.ilkd.key.rule.BlockContractSeparateRule;
+import de.uka.ilkd.key.rule.BlockContractExternalBuiltInRuleApp;
+import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -25,8 +25,8 @@ public class BlockContractSeparateCompletion implements InteractiveRuleApplicati
     @Override
     public IBuiltInRuleApp complete(final IBuiltInRuleApp application,
             final Goal goal, final boolean force) {
-        BlockContractSeparateBuiltInRuleApp result =
-        		(BlockContractSeparateBuiltInRuleApp) application;
+        BlockContractExternalBuiltInRuleApp result =
+        		(BlockContractExternalBuiltInRuleApp) application;
         if (!result.complete() && result.cannotComplete(goal)) {
             return result;
         }
@@ -38,10 +38,10 @@ public class BlockContractSeparateCompletion implements InteractiveRuleApplicati
         }
         final Services services = goal.proof().getServices();
         final Instantiation instantiation =
-                BlockContractSeparateRule.INSTANCE
+                BlockContractExternalRule.INSTANCE
                 .instantiate(application.posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<BlockContract> contracts =
-                BlockContractSeparateRule.getApplicableContracts(instantiation, goal, services);
+                BlockContractExternalRule.getApplicableContracts(instantiation, goal, services);
         final BlockContractConfigurator configurator = new BlockContractConfigurator(
                 mainWindow, services, contracts.toArray(new BlockContract[contracts.size()]),
                 "Contracts for Block: " + instantiation.block, true);
@@ -63,6 +63,6 @@ public class BlockContractSeparateCompletion implements InteractiveRuleApplicati
      * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
      */
     public static boolean checkCanComplete(final IBuiltInRuleApp app) {
-       return app.rule() instanceof BlockContractSeparateRule;
+       return app.rule() instanceof BlockContractExternalRule;
    }
 }

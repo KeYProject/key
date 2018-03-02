@@ -119,8 +119,8 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.AbstractBlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.BlockContractSeparateBuiltInRuleApp;
+import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
+import de.uka.ilkd.key.rule.BlockContractExternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
@@ -2298,12 +2298,12 @@ public final class SymbolicExecutionUtil {
       
       // Make sure that branch is supported
       int childIndex = CollectionUtil.indexOf(parent.childrenIterator(), node);
-      if (app instanceof BlockContractBuiltInRuleApp && childIndex == 0) {
+      if (app instanceof BlockContractInternalBuiltInRuleApp && childIndex == 0) {
          // Validity branch
          return parent.proof().getServices().getTermBuilder().tt();
       }
-      else if ((app instanceof BlockContractBuiltInRuleApp && childIndex == 2)
-              || (app instanceof BlockContractSeparateBuiltInRuleApp && childIndex == 1)) {
+      else if ((app instanceof BlockContractInternalBuiltInRuleApp && childIndex == 2)
+              || (app instanceof BlockContractExternalBuiltInRuleApp && childIndex == 1)) {
          // Usage branch
          // Compute invariant (last antecedent formula of the use branch)
          Services services = parent.proof().getServices();

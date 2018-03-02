@@ -27,8 +27,8 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.AbstractBlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BlockContractRule;
-import de.uka.ilkd.key.rule.BlockContractSeparateRule;
+import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
@@ -127,8 +127,8 @@ public class JavaProfile extends AbstractProfile {
         
         builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
                                    .prepend(LoopScopeInvariantRule.INSTANCE)
-                                   .prepend(BlockContractRule.INSTANCE)
-                                   .prepend(BlockContractSeparateRule.INSTANCE)
+                                   .prepend(BlockContractInternalRule.INSTANCE)
+                                   .prepend(BlockContractExternalRule.INSTANCE)
                                    .prepend(UseDependencyContractRule.INSTANCE)
                                    .prepend(getOneStepSimpilifier())
                                    .prepend(QueryExpand.INSTANCE)
@@ -172,7 +172,7 @@ public class JavaProfile extends AbstractProfile {
     public RuleJustification getJustification(Rule r) {
         return r == UseOperationContractRule.INSTANCE 
                || r == UseDependencyContractRule.INSTANCE
-               || r == BlockContractSeparateRule.INSTANCE
+               || r == BlockContractExternalRule.INSTANCE
                ? new ComplexRuleJustificationBySpec()
                : super.getJustification(r);
     }

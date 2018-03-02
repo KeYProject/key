@@ -27,17 +27,17 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.MiscTools;
 
-public class BlockContractSeparateRule extends AbstractBlockContractRule {
+public class BlockContractExternalRule extends AbstractBlockContractRule {
     
-    public static final BlockContractSeparateRule INSTANCE = new BlockContractSeparateRule();
+    public static final BlockContractExternalRule INSTANCE = new BlockContractExternalRule();
 
-    private static final Name NAME = new Name("Block Contract (Separate)");
+    private static final Name NAME = new Name("Block Contract (External)");
 
     private Term lastFocusTerm;
     
     private Instantiation lastInstantiation;
 
-    private BlockContractSeparateRule() { }
+    private BlockContractExternalRule() { }
     
     public Term getLastFocusTerm() {
         return lastFocusTerm;
@@ -66,7 +66,7 @@ public class BlockContractSeparateRule extends AbstractBlockContractRule {
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos,
             TermServices services) {
-        return new BlockContractSeparateBuiltInRuleApp(this, pos);
+        return new BlockContractExternalBuiltInRuleApp(this, pos);
     }
 
     @Override
@@ -77,12 +77,12 @@ public class BlockContractSeparateRule extends AbstractBlockContractRule {
     @Override
     public ImmutableList<Goal> apply(final Goal goal, final Services services,
                                      final RuleApp application) throws RuleAbortException {
-        assert application instanceof BlockContractSeparateBuiltInRuleApp;
-        return apply(goal, services, (BlockContractSeparateBuiltInRuleApp) application);
+        assert application instanceof BlockContractExternalBuiltInRuleApp;
+        return apply(goal, services, (BlockContractExternalBuiltInRuleApp) application);
     }
 
     private ImmutableList<Goal> apply(final Goal goal, final Services services,
-                                      final BlockContractSeparateBuiltInRuleApp application)
+                                      final BlockContractExternalBuiltInRuleApp application)
                                               throws RuleAbortException {
         if (InfFlowCheckInfo.isInfFlow(goal)) {
             throw new RuleAbortException(

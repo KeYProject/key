@@ -27,8 +27,8 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule;
-import de.uka.ilkd.key.rule.BlockContractRule;
-import de.uka.ilkd.key.rule.BlockContractSeparateRule;
+import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
@@ -66,8 +66,8 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
    public ImmutableList<Name> getSupportedRuleNames() {
       return ImmutableSLList.<Name>nil().prepend(UseOperationContractRule.INSTANCE.name())
                                         .prepend(WhileInvariantRule.INSTANCE.name())
-                                        .prepend(BlockContractRule.INSTANCE.name())
-                                        .prepend(BlockContractSeparateRule.INSTANCE.name());
+                                        .prepend(BlockContractInternalRule.INSTANCE.name())
+                                        .prepend(BlockContractExternalRule.INSTANCE.name());
    }
 
    /**
