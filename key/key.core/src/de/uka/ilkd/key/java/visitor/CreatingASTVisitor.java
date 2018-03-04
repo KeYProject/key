@@ -217,6 +217,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             ProgramElement createNewElement(ExtList changeList) {
                 StatementBlock newBlock = new StatementBlock(changeList);
                 performActionOnBlockContract(x, newBlock);
+                performActionOnLoopContract(x, newBlock);
                 return newBlock;
             }
         };

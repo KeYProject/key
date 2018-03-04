@@ -7,6 +7,8 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.LoopContractExternalRule;
+import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.QueryExpand;
@@ -70,15 +72,27 @@ public class StaticFeatureCollection {
         return ConditionalFeature.createConditional(filterLoopInv, costStdInv, ConditionalFeature.createConditional(filterLoopScopeInv, costLoopScopeInv));
     }
 
-    protected static Feature blockContractFeature(Feature cost) {
+    protected static Feature blockContractInternalFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(BlockContractInternalRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 
-    protected static Feature blockContractSeparateFeature(Feature cost) {
+    protected static Feature blockContractExternalFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(BlockContractExternalRule.INSTANCE);
+        return ConditionalFeature.createConditional(filter, cost);
+    }
+
+    protected static Feature loopContractInternalFeature(Feature cost) {
+        SetRuleFilter filter = new SetRuleFilter();
+        filter.addRuleToSet(LoopContractInternalRule.INSTANCE);
+        return ConditionalFeature.createConditional(filter, cost);
+    }
+
+    protected static Feature loopContractExternalFeature(Feature cost) {
+        SetRuleFilter filter = new SetRuleFilter();
+        filter.addRuleToSet(LoopContractExternalRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 

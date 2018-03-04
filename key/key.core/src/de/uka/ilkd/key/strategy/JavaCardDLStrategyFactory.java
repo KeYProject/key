@@ -93,7 +93,7 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "Unroll loop body." + "</html>";
     public static final String TOOL_TIP_LOOP_NONE = "<html>"
             + "Leave loops untouched." + "</html>";
-    public static final String TOOL_TIP_BLOCK_CONTRACT
+    public static final String TOOL_TIP_BLOCK_CONTRACT_INTERNAL
             = "<html>"
             + "Java blocks are replaced by their contracts.<br>"
             + "Three properties are shown:"
@@ -102,7 +102,7 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "<li>Postcondition holds after block terminates</li>"
             + "</ul>"
             + "</html>";
-    public static final String TOOL_TIP_BLOCK_CONTRACT_SEPARATE
+    public static final String TOOL_TIP_BLOCK_CONTRACT_EXTERNAL
             = "<html>"
             + "Java blocks are replaced by their contracts.<br>"
             + "Two properties are shown:"
@@ -360,11 +360,11 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
                         "Block treatment",
                         1,
                         new StrategyPropertyValueDefinition(
-                                StrategyProperties.BLOCK_CONTRACT,
-                                "Contract (Internal)", TOOL_TIP_BLOCK_CONTRACT),
+                                StrategyProperties.BLOCK_CONTRACT_INTERNAL,
+                                "Contract (Internal)", TOOL_TIP_BLOCK_CONTRACT_INTERNAL),
                         new StrategyPropertyValueDefinition(
-                                StrategyProperties.BLOCK_CONTRACT_SEPARATE,
-                                "Contract (External)", TOOL_TIP_BLOCK_CONTRACT_SEPARATE),
+                                StrategyProperties.BLOCK_CONTRACT_EXTERNAL,
+                                "Contract (External)", TOOL_TIP_BLOCK_CONTRACT_EXTERNAL),
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.BLOCK_EXPAND, "Expand",
                                 TOOL_TIP_BLOCK_EXPAND));

@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.rule.AbstractBlockContractRule.Instantiation;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule.Instantiation;
 import de.uka.ilkd.key.rule.BlockContractBuilders;
 import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;

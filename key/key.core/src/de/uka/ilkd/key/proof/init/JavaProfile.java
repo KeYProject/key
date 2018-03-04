@@ -25,11 +25,13 @@ import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rule.AbstractBlockContractBuiltInRuleApp;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
+import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.LoopContractExternalRule;
+import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
@@ -129,6 +131,8 @@ public class JavaProfile extends AbstractProfile {
                                    .prepend(LoopScopeInvariantRule.INSTANCE)
                                    .prepend(BlockContractInternalRule.INSTANCE)
                                    .prepend(BlockContractExternalRule.INSTANCE)
+                                   .prepend(LoopContractInternalRule.INSTANCE)
+                                   .prepend(LoopContractExternalRule.INSTANCE)
                                    .prepend(UseDependencyContractRule.INSTANCE)
                                    .prepend(getOneStepSimpilifier())
                                    .prepend(QueryExpand.INSTANCE)
@@ -173,6 +177,7 @@ public class JavaProfile extends AbstractProfile {
         return r == UseOperationContractRule.INSTANCE 
                || r == UseDependencyContractRule.INSTANCE
                || r == BlockContractExternalRule.INSTANCE
+               || r == LoopContractExternalRule.INSTANCE
                ? new ComplexRuleJustificationBySpec()
                : super.getJustification(r);
     }
@@ -232,6 +237,6 @@ public class JavaProfile extends AbstractProfile {
    public boolean isSpecificationInvolvedInRuleApp(RuleApp app) {
       return app instanceof LoopInvariantBuiltInRuleApp ||
              app instanceof AbstractContractRuleApp ||
-             app instanceof AbstractBlockContractBuiltInRuleApp;
+             app instanceof AbstractBlockSpecificationElementBuiltInRuleApp;
    }
 }

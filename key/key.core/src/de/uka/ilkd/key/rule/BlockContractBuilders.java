@@ -55,7 +55,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule.BlockContractHint;
-import de.uka.ilkd.key.rule.AbstractBlockContractRule.Instantiation;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule.Instantiation;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.speclang.BlockWellDefinedness;
@@ -392,13 +392,13 @@ public class BlockContractBuilders {
     
     public static final class ConditionsAndClausesBuilder extends TermBuilder {
 
-        private final BlockContract contract;
+        private final BlockSpecificationElement contract;
         private final List<LocationVariable> heaps;
         private final BlockContract.Variables variables;
         
         protected final BlockContract.Terms terms;
 
-        public ConditionsAndClausesBuilder(final BlockContract contract,
+        public ConditionsAndClausesBuilder(final BlockSpecificationElement contract,
                                            final List<LocationVariable> heaps,
                                            final BlockContract.Variables variables,
                                            final Term self, final Services services) {
@@ -584,23 +584,23 @@ public class BlockContractBuilders {
      * This class contains methods to add the premisses for the block contract rule to the goal.
      */
     public final static class GoalsConfigurator {
-        private final AbstractBlockContractBuiltInRuleApp application;
+        private final AbstractBlockSpecificationElementBuiltInRuleApp application;
         private final TermLabelState termLabelState;
         private final Instantiation instantiation;
         private final List<Label> labels;
-        private final BlockContract.Variables variables;
+        private final BlockSpecificationElement.Variables variables;
         private final PosInOccurrence occurrence;
         private final Services services;
-        private final AbstractBlockContractRule rule;
+        private final AbstractBlockSpecificationElementRule rule;
 
-        public GoalsConfigurator(final AbstractBlockContractBuiltInRuleApp application,
+        public GoalsConfigurator(final AbstractBlockSpecificationElementBuiltInRuleApp application,
                                  final TermLabelState termLabelState,
                                  final Instantiation instantiation,
                                  final List<Label> labels,
-                                 final BlockContract.Variables variables,
+                                 final BlockSpecificationElement.Variables variables,
                                  final PosInOccurrence occurrence,
                                  final Services services,
-                                 final AbstractBlockContractRule rule)
+                                 final AbstractBlockSpecificationElementRule rule)
         {
             this.application = application;
             this.termLabelState = termLabelState;

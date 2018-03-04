@@ -35,6 +35,8 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.LoopContractExternalRule;
+import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -54,7 +56,9 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
       return ImmutableSLList.<Name>nil()
                             .prepend(WhileInvariantRule.INSTANCE.name())
                             .prepend(BlockContractInternalRule.INSTANCE.name())
-                            .prepend(BlockContractExternalRule.INSTANCE.name());
+                            .prepend(BlockContractExternalRule.INSTANCE.name())
+                            .prepend(LoopContractInternalRule.INSTANCE.name())
+                            .prepend(LoopContractExternalRule.INSTANCE.name());
    }
 
    /**

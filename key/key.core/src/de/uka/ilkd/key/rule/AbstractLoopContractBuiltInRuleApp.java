@@ -11,49 +11,49 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.SimpleBlockContract;
+import de.uka.ilkd.key.speclang.LoopContract;
+import de.uka.ilkd.key.speclang.SimpleLoopContract;
 
-public abstract class AbstractBlockContractBuiltInRuleApp
+public abstract class AbstractLoopContractBuiltInRuleApp
         extends AbstractBlockSpecificationElementBuiltInRuleApp {
 
-    protected BlockContract contract;
+    protected LoopContract contract;
 
-    public AbstractBlockContractBuiltInRuleApp(BuiltInRule rule,
+    public AbstractLoopContractBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence occurrence,
             ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
     }
-    
+
     @Override
-    public BlockContract getContract() {
+    public LoopContract getContract() {
         return contract;
     }
-    
-    public AbstractBlockContractBuiltInRuleApp tryToInstantiate(final Goal goal, final AbstractBlockContractRule rule) {
+
+    public AbstractLoopContractBuiltInRuleApp tryToInstantiate(final Goal goal, final AbstractLoopContractRule rule) {
         if (complete() || cannotComplete(goal)) {
             return this;
         }
         final Services services = goal.proof().getServices();
-        final AbstractBlockContractRule.Instantiation instantiation =
+        final AbstractLoopContractRule.Instantiation instantiation =
                 rule.instantiate(posInOccurrence().subTerm(), goal, services);
-        final ImmutableSet<BlockContract> contracts =
-                AbstractBlockContractRule.getApplicableContracts(instantiation, goal, services);
+        final ImmutableSet<LoopContract> contracts =
+                AbstractLoopContractRule.getApplicableContracts(instantiation, goal, services);
         block = instantiation.block;
-        ImmutableSet<BlockContract> cons = DefaultImmutableSet.<BlockContract>nil();
-        for (BlockContract cont : contracts) {
+        ImmutableSet<LoopContract> cons = DefaultImmutableSet.<LoopContract>nil();
+        for (LoopContract cont : contracts) {
             if (cont.getBlock().getStartPosition().getLine() == block.getStartPosition().getLine()) {
                 cons = cons.add(cont);
             }
         }
-        contract = SimpleBlockContract.combine(cons, services);
+        contract = SimpleLoopContract.combine(cons, services);
         heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());
         return this;
     }
 
-    public void update(final StatementBlock block, final BlockContract contract,
-                       final List<LocationVariable> heaps) {
+    public void update(final StatementBlock block, final LoopContract contract,
+            final List<LocationVariable> heaps) {
         this.block = block;
         this.contract = contract;
         this.heaps = heaps;

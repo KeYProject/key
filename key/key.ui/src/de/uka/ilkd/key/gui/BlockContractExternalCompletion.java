@@ -7,18 +7,18 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.AbstractBlockContractRule.Instantiation;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule.Instantiation;
 import de.uka.ilkd.key.rule.BlockContractExternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
-public class BlockContractSeparateCompletion implements InteractiveRuleApplicationCompletion {
+public class BlockContractExternalCompletion implements InteractiveRuleApplicationCompletion {
 
     private final MainWindow mainWindow;
     
-    BlockContractSeparateCompletion(MainWindow mainWindow){
+    BlockContractExternalCompletion(MainWindow mainWindow){
         this.mainWindow = mainWindow;
     }
 
@@ -42,9 +42,11 @@ public class BlockContractSeparateCompletion implements InteractiveRuleApplicati
                 .instantiate(application.posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<BlockContract> contracts =
                 BlockContractExternalRule.getApplicableContracts(instantiation, goal, services);
-        final BlockContractConfigurator configurator = new BlockContractConfigurator(
-                mainWindow, services, contracts.toArray(new BlockContract[contracts.size()]),
-                "Contracts for Block: " + instantiation.block, true);
+        final BlockSpecificationElementConfigurator<BlockContract> configurator
+            = new BlockSpecificationElementConfigurator<>("Block Contract Configurator",
+                    new BlockContractSelectionPanel(services, true),
+                    mainWindow, services, contracts.toArray(new BlockContract[contracts.size()]),
+                    "Contracts for Block: " + instantiation.block);
         if (configurator.wasSuccessful()) {
             final List<LocationVariable> heaps =
                     HeapContext.getModHeaps(services, instantiation.isTransactional());

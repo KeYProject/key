@@ -26,9 +26,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.AbstractBlockContractRule;
-import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
+import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.LoopContractExternalRule;
+import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
@@ -37,7 +39,7 @@ import de.uka.ilkd.key.rule.WhileInvariantRule;
  * This {@link TermLabelRefactoring} removes the supported {@link TermLabel}
  * in check branches. These are:
  * <ul>
- *    <li>{@link AbstractBlockContractRule}: Pre</li>
+ *    <li>{@link AbstractBlockSpecificationElementRule}: Pre</li>
  *    <li>{@link UseOperationContractRule}: Pre</li>
  *    <li>{@link UseOperationContractRule}: Null reference</li>
  *    <li>{@link WhileInvariantRule}: Invariant Initially Valid</li>
@@ -67,7 +69,9 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
       return ImmutableSLList.<Name>nil().prepend(UseOperationContractRule.INSTANCE.name())
                                         .prepend(WhileInvariantRule.INSTANCE.name())
                                         .prepend(BlockContractInternalRule.INSTANCE.name())
-                                        .prepend(BlockContractExternalRule.INSTANCE.name());
+                                        .prepend(BlockContractExternalRule.INSTANCE.name())
+                                        .prepend(LoopContractInternalRule.INSTANCE.name())
+                                        .prepend(LoopContractExternalRule.INSTANCE.name());
    }
 
    /**
@@ -92,7 +96,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
                   goal.node().getNodeInfo().getBranchLabel().startsWith("Invariant Initially Valid")) {
             return RefactoringScope.SEQUENT;
          }
-         else if (rule instanceof AbstractBlockContractRule &&
+         else if (rule instanceof AbstractBlockSpecificationElementRule &&
                   goal.node().getNodeInfo().getBranchLabel().startsWith("Precondition")) {
               return RefactoringScope.SEQUENT;
            }

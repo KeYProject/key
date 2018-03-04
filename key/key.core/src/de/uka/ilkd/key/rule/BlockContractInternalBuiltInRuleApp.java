@@ -25,7 +25,8 @@ import de.uka.ilkd.key.speclang.BlockContract;
 
 public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBuiltInRuleApp {
 
-    public BlockContractInternalBuiltInRuleApp(final BuiltInRule rule, final PosInOccurrence occurrence) {
+    public BlockContractInternalBuiltInRuleApp(final BuiltInRule rule,
+            final PosInOccurrence occurrence) {
         this(rule, occurrence, null, null, null, null);
     }
 
@@ -46,11 +47,13 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
 
     @Override
     public BlockContractInternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
-        return new BlockContractInternalBuiltInRuleApp(builtInRule, newOccurrence, ifInsts,block, contract, heaps);
+        return new BlockContractInternalBuiltInRuleApp(
+                builtInRule, newOccurrence, ifInsts,block, contract, heaps);
     }
 
     @Override
-    public BlockContractInternalBuiltInRuleApp setIfInsts(final ImmutableList<PosInOccurrence> ifInstantiations) {
+    public BlockContractInternalBuiltInRuleApp setIfInsts(
+            final ImmutableList<PosInOccurrence> ifInstantiations) {
         setMutable(ifInstantiations);
         return this;
     }

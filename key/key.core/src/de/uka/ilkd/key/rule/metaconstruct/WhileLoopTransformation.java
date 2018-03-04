@@ -65,6 +65,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.Debug;
 
 /** Walks through a java AST in depth-left-fist-order. 
@@ -306,6 +307,16 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                         services.getSpecificationRepository().addBlockContract(bc);
                     }
                 }
+                
+                ImmutableSet<LoopContract> lcs
+                    = services.getSpecificationRepository().getLoopContracts(x);
+                if (bcs != null) {
+                    for (LoopContract lc : lcs) {
+                        lc = lc.setBlock(newBlock);
+                        services.getSpecificationRepository().addLoopContract(lc);
+                    }
+                }
+                
                 return newBlock;
             }
         };

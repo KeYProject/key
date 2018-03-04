@@ -1695,7 +1695,9 @@ public final class SpecificationRepository {
                 addLoopInvariant((LoopSpecification) spec);
             } else if (spec instanceof BlockContract) {
                 addBlockContract((BlockContract) spec);
-            } else if (spec instanceof MergeContract) {
+            } else if (spec instanceof LoopContract) {
+                addLoopContract((LoopContract) spec);
+            }else if (spec instanceof MergeContract) {
                 addMergeContract((MergeContract) spec);
             } else {
                 assert false : "unexpected spec: " + spec + "\n("

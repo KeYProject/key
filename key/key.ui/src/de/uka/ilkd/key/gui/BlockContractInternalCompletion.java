@@ -22,16 +22,16 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
-import de.uka.ilkd.key.rule.AbstractBlockContractRule.Instantiation;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule.Instantiation;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
-public class BlockContractCompletion implements InteractiveRuleApplicationCompletion {
+public class BlockContractInternalCompletion implements InteractiveRuleApplicationCompletion {
     
     private final MainWindow mainWindow;
     
-    BlockContractCompletion(MainWindow mainWindow){
+    BlockContractInternalCompletion(MainWindow mainWindow){
         this.mainWindow = mainWindow;
     }
 
@@ -53,9 +53,11 @@ public class BlockContractCompletion implements InteractiveRuleApplicationComple
                 BlockContractInternalRule.INSTANCE.instantiate(application.posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<BlockContract> contracts =
                 BlockContractInternalRule.getApplicableContracts(instantiation, goal, services);
-        final BlockContractConfigurator configurator = new BlockContractConfigurator(
+        final BlockSpecificationElementConfigurator<BlockContract> configurator
+            = new BlockSpecificationElementConfigurator<>("Block Contract Configurator",
+                new BlockContractSelectionPanel(services, true),
                 mainWindow, services, contracts.toArray(new BlockContract[contracts.size()]),
-                "Contracts for Block: " + instantiation.block, true);
+                "Contracts for Block: " + instantiation.block);
         if (configurator.wasSuccessful()) {
             final List<LocationVariable> heaps =
                     HeapContext.getModHeaps(services, instantiation.isTransactional());

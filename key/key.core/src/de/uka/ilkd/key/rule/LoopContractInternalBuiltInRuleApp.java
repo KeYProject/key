@@ -8,25 +8,24 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.LoopContract;
 
-public class BlockContractExternalBuiltInRuleApp
-        extends AbstractBlockContractBuiltInRuleApp {
+public class LoopContractInternalBuiltInRuleApp extends AbstractLoopContractBuiltInRuleApp {
 
-    public BlockContractExternalBuiltInRuleApp(final BuiltInRule rule,
+    public LoopContractInternalBuiltInRuleApp(final BuiltInRule rule,
             final PosInOccurrence occurrence) {
         this(rule, occurrence, null, null, null, null);
     }
 
-    public BlockContractExternalBuiltInRuleApp(final BuiltInRule rule,
+    public LoopContractInternalBuiltInRuleApp(final BuiltInRule rule,
                                        final PosInOccurrence occurrence,
                                        final ImmutableList<PosInOccurrence> ifInstantiations,
                                        final StatementBlock block,
-                                       final BlockContract contract,
+                                       final LoopContract contract,
                                        final List<LocationVariable> heaps) {
         super(rule, occurrence, ifInstantiations);
         assert rule != null;
-        assert rule instanceof BlockContractExternalRule;
+        assert rule instanceof LoopContractInternalRule;
         assert occurrence != null;
         this.block = block;
         this.contract = contract;
@@ -34,21 +33,22 @@ public class BlockContractExternalBuiltInRuleApp
     }
 
     @Override
-    public BlockContractExternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
-        return new BlockContractExternalBuiltInRuleApp(
+    public LoopContractInternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
+        return new LoopContractInternalBuiltInRuleApp(
                 builtInRule, newOccurrence, ifInsts,block, contract, heaps);
     }
 
     @Override
-    public BlockContractExternalBuiltInRuleApp setIfInsts(
+    public LoopContractInternalBuiltInRuleApp setIfInsts(
             final ImmutableList<PosInOccurrence> ifInstantiations) {
         setMutable(ifInstantiations);
         return this;
     }
 
     @Override
-    public BlockContractExternalBuiltInRuleApp tryToInstantiate(final Goal goal) {
-        return (BlockContractExternalBuiltInRuleApp)
-                super.tryToInstantiate(goal, BlockContractExternalRule.INSTANCE);
+    public LoopContractInternalBuiltInRuleApp tryToInstantiate(final Goal goal) {
+
+        return (LoopContractInternalBuiltInRuleApp)
+                super.tryToInstantiate(goal, LoopContractInternalRule.INSTANCE);
     }
 }

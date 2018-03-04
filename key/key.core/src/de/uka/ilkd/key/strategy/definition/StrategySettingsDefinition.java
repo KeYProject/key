@@ -115,7 +115,7 @@ public class StrategySettingsDefinition {
 
                                 newProps.setProperty(
                                         StrategyProperties.BLOCK_OPTIONS_KEY,
-                                        StrategyProperties.BLOCK_CONTRACT);
+                                        StrategyProperties.BLOCK_CONTRACT_INTERNAL);
 
                                 newProps.setProperty(
                                         StrategyProperties.METHOD_OPTIONS_KEY,

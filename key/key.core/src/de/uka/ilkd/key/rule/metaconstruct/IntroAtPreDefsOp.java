@@ -42,6 +42,8 @@ import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.BlockSpecificationElement;
+import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
@@ -179,10 +181,16 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         }
         
         for (StatementBlock block : blocks) {
-            ImmutableSet<BlockContract> contracts
-                = services.getSpecificationRepository().getBlockContracts(block);
+            ImmutableSet<BlockSpecificationElement> contracts = DefaultImmutableSet.nil();
             
-            for (BlockContract contract : contracts) {
+            for (BlockContract c : services.getSpecificationRepository().getBlockContracts(block)) {
+                contracts = contracts.add(c);
+            }
+            for (LoopContract c : services.getSpecificationRepository().getLoopContracts(block)) {
+                contracts = contracts.add(c);
+            }
+            
+            for (BlockSpecificationElement contract : contracts) {
                 List<LocationVariable> keys = new ArrayList<LocationVariable>(
                         contract.getPlaceholderVariables().outerRemembranceVariables.keySet());
                 
@@ -370,15 +378,22 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         //update block contracts
         for (StatementBlock block : blocks) {
-            ImmutableSet<BlockContract> contracts =
-                    services.getSpecificationRepository().getBlockContracts(block);
-            for (BlockContract contract : contracts) {
+            ImmutableSet<BlockSpecificationElement> contracts = DefaultImmutableSet.nil();
+            
+            for (BlockContract c : services.getSpecificationRepository().getBlockContracts(block)) {
+                contracts = contracts.add(c);
+            }
+            for (LoopContract c : services.getSpecificationRepository().getLoopContracts(block)) {
+                contracts = contracts.add(c);
+            }
+            
+            for (BlockSpecificationElement contract : contracts) {
                 Map<LocationVariable, LocationVariable> nonHeapVars = new LinkedHashMap<>();
                 nonHeapVars.putAll(atPreVars);
                 atPreHeapVars.forEach((key, val) -> nonHeapVars.remove(key)); 
                 
-                final BlockContract.Variables variables = contract.getPlaceholderVariables();
-                final BlockContract.Variables newVariables = new BlockContract.Variables(
+                final BlockSpecificationElement.Variables variables = contract.getPlaceholderVariables();
+                final BlockSpecificationElement.Variables newVariables = new BlockSpecificationElement.Variables(
                         variables.self,
                         variables.breakFlags,
                         variables.continueFlags,
@@ -413,12 +428,17 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                                            contract.getModifiesClause(heap, newVariables.self,
                                                                       services));
                 }
-                final BlockContract newBlockContract =
+                final BlockSpecificationElement newBlockContract =
                         contract.update(block, newPreconditions, newPostconditions,
                                         newModifiesClauses, contract.getInfFlowSpecs(), newVariables);
                 
-                services.getSpecificationRepository().removeBlockContract(contract);
-                services.getSpecificationRepository().addBlockContract(newBlockContract, false);
+                if (newBlockContract instanceof BlockContract) {
+                    services.getSpecificationRepository().removeBlockContract((BlockContract) contract);
+                    services.getSpecificationRepository().addBlockContract((BlockContract) newBlockContract, false);
+                } else if (newBlockContract instanceof LoopContract) {
+                    services.getSpecificationRepository().removeLoopContract((LoopContract) contract);
+                    services.getSpecificationRepository().addLoopContract((LoopContract) newBlockContract, false);
+                }
             }
         }
 
