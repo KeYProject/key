@@ -54,7 +54,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
        int proofNum = 0;
        String baseContractName = null;
        int ind = -1;
-       for (String tag : FunctionalLoopContractPO.TRANSACTION_TAGS.values()) {
+       for (String tag : FunctionalBlockContractPO.TRANSACTION_TAGS.values()) {
            ind = contractName.indexOf("." + tag);
           if (ind > 0) {
               break;
