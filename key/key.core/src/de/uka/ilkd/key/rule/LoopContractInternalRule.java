@@ -168,7 +168,7 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
                 nextRemembranceUpdate,
                 anonymisationHeaps,
                 modifiesClauses,
-                new Term[] { precondition,wellFormedHeapsCondition, reachableInCondition },
+                new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition },
                 decreasesCheck,
                 new Term[] { postcondition, frameCondition },
                 new Term[] { nextPostcondition },

@@ -1,16 +1,38 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.key_project.util.collection.ImmutableSet;
+
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule.Instantiation;
+import de.uka.ilkd.key.rule.BlockContractBuilders;
+import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
+import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
+import de.uka.ilkd.key.rule.BlockContractBuilders.UpdatesBuilder;
+import de.uka.ilkd.key.rule.BlockContractBuilders.VariablesCreatorAndRegistrar;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalLoopContract;
+import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.LoopContract;
+import de.uka.ilkd.key.util.MiscTools;
 
 public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
@@ -33,7 +55,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof FunctionalBlockContractPO)) {
+        if (!(po instanceof FunctionalLoopContractPO)) {
             return false;
         }
         
@@ -54,7 +76,125 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
     @Override
     public void readProblem() throws ProofInputException {
-        //TODO
+        assert proofConfig == null;
+        final boolean makeNamesUnique = true;
+        final Services services = postInit();
+        final IProgramMethod pm = getProgramMethod();
+        
+        final StatementBlock block = getBlock();
+        final ProgramVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
+        register(selfVar, services);
+        final Term selfTerm = selfVar == null ? null : tb.var(selfVar);
+
+        final TermLabelState termLabelState = new TermLabelState();
+
+        final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        final ImmutableSet<ProgramVariable> localInVariables =
+                MiscTools.getLocalIns(block, services);
+        
+        Map<LocationVariable, Function> anonOutHeaps = new LinkedHashMap<LocationVariable, Function>(40);
+        for (LocationVariable heap : heaps) {
+            if(contract.hasModifiesClause(heap)) {
+                final String anonymisationName =
+                        tb.newName(BlockContractBuilders.ANON_OUT_PREFIX + heap.name());
+                final Function anonymisationFunction =
+                        new Function(new Name(anonymisationName), heap.sort(), true);
+                services.getNamespaces().functions().addSafely(anonymisationFunction);
+                anonOutHeaps.put(heap, anonymisationFunction);
+            }
+        }
+
+        final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(
+                null, contract.getPlaceholderVariables(), services
+                ).createAndRegister(selfTerm, false);
+        
+        final ProgramVariable exceptionParameter =
+                KeYJavaASTFactory.localVariable(services.getVariableNamer()
+                        .getTemporaryNameProposal("e"), variables.exception.getKeYJavaType());
+        
+        final LoopContract.Variables nextVariables = new VariablesCreatorAndRegistrar(
+                null, variables, services).createAndRegisterCopies("_NEXT");
+
+        final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
+                new ConditionsAndClausesBuilder(contract.getLoopContract(), heaps, variables,
+                                                selfTerm, services);
+        final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
+        final Term wellFormedHeapsCondition =
+                conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
+        final Term reachableInCondition =
+                conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
+        final Map<LocationVariable, Term> modifiesClauses =
+                conditionsAndClausesBuilder.buildModifiesClauses();
+        final Term decreasesCheck =
+                conditionsAndClausesBuilder.buildDecreasesCheck();
+        final Term nextPostcondition =
+                new ConditionsAndClausesBuilder(contract.getLoopContract(), heaps, nextVariables,
+                        selfTerm, services)
+                .buildPostcondition();
+
+        final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
+        final Term frameCondition = conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
+
+        final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
+        final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
+        final Term outerRemembranceUpdate = updatesBuilder.buildOuterRemembranceUpdate();
+        final Term nextRemembranceUpdate =
+                new UpdatesBuilder(nextVariables, services).buildRemembranceUpdate(heaps);
+        
+        Map<LocationVariable, Function> anonHeaps = new LinkedHashMap<LocationVariable, Function>(40);
+        final TermBuilder tb = services.getTermBuilder();
+        
+        for (LocationVariable heap : heaps) {
+            final String anonymisationName =
+                    tb.newName(BlockContractBuilders.ANON_IN_PREFIX + heap.name());
+            final Function anonymisationFunction =
+                    new Function(new Name(anonymisationName), heap.sort(), true);
+            services.getNamespaces().functions().addSafely(anonymisationFunction);
+            anonHeaps.put(heap, anonymisationFunction);
+        }
+        
+        final Term anonInUpdate = updatesBuilder.buildAnonInUpdate(anonHeaps);
+        
+        final KeYJavaType kjt = getCalleeKeYJavaType();
+        
+        final GoalsConfigurator configurator = new GoalsConfigurator(null,
+                termLabelState,
+                new Instantiation(
+                        tb.skip(),
+                        tb.tt(), 
+                        contract.getModality(),
+                        selfTerm,
+                        block,
+                        new ExecutionContext(
+                                new TypeRef(new ProgramElementName(kjt.getName()), 0, selfVar, kjt),
+                                getProgramMethod(),
+                                selfVar)
+                ),
+                contract.getLoopContract().getLabels(),
+                variables,
+                null,
+                services,
+                null);
+        
+        Term validity = configurator.setUpLoopValidityGoal(
+                null,
+                contract.getLoopContract(),
+                tb.sequential(outerRemembranceUpdate, anonInUpdate),
+                remembranceUpdate,
+                nextRemembranceUpdate,
+                anonHeaps,
+                modifiesClauses,
+                new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition },
+                decreasesCheck,
+                new Term[] { postcondition, frameCondition },
+                new Term[] { nextPostcondition },
+                exceptionParameter,
+                variables.termify(selfTerm),
+                nextVariables);
+        
+        assignPOTerms(validity);
+        collectClassAxioms(getCalleeKeYJavaType(), proofConfig);
+        generateWdTaclets(proofConfig);
     }
 
     public StatementBlock getBlock() {

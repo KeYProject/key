@@ -20,7 +20,6 @@ import de.uka.ilkd.key.java.statement.Continue;
 import de.uka.ilkd.key.java.statement.LabelJumpStatement;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -433,8 +432,10 @@ public interface BlockSpecificationElement extends SpecificationElement {
                 breakFlags,
                 continueFlags,
                 returnFlag,
-                resultVar(method, false),
-                excVar(method, false),
+                resultVar(services.getVariableNamer()
+                        .getTemporaryNameProposal("result").toString(), method, false),
+                excVar(services.getVariableNamer()
+                        .getTemporaryNameProposal("exc").toString(), method, false),
                 createRemembranceHeaps(),
                 createRemembranceLocalVariables(),
                 createOuterRemembranceHeaps(),
@@ -532,7 +533,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
         }
 
         private LocationVariable createVariable(final String name, final KeYJavaType type) {
-            return new LocationVariable(new ProgramElementName(name), type);
+            return new LocationVariable(services.getVariableNamer()
+                    .getTemporaryNameProposal(name), type);
         }
 
     }
