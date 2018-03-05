@@ -170,6 +170,12 @@ public abstract class AbstractBlockSpecificationElement
     }
 
     @Override
+    public Term getMby(Variables variables, Services services) {
+        Map<ProgramVariable, ProgramVariable> map = createReplacementMap(variables, services);
+        return new OpReplacer(map, services.getTermFactory()).replace(measuredBy);
+    }
+
+    @Override
     public Term getMby(ProgramVariable selfVar, Services services) {
         final Map<ProgramVariable, ProgramVariable> replacementMap = createReplacementMap(
                 new Variables(selfVar, null, null, null, null, null,
@@ -638,7 +644,7 @@ public abstract class AbstractBlockSpecificationElement
         return result;
     }
 
-    private Map<ProgramVariable, ProgramVariable>
+    protected Map<ProgramVariable, ProgramVariable>
                 createReplacementMap(final Variables newVariables,
                                      final Services services) {
         final VariableReplacementMap result = new VariableReplacementMap();
@@ -663,7 +669,7 @@ public abstract class AbstractBlockSpecificationElement
         return result;
     }
 
-    private Map<Term, Term> createReplacementMap(final Term newHeap,
+    protected Map<Term, Term> createReplacementMap(final Term newHeap,
                                                  final Terms newTerms,
                                                  final Services services) {
         final TermReplacementMap result = new TermReplacementMap();
@@ -864,7 +870,7 @@ public abstract class AbstractBlockSpecificationElement
                           buildModifiesClauses(), infFlowSpecs);
         }
 
-        private Map<LocationVariable, Term> buildPreconditions() {
+        protected Map<LocationVariable, Term> buildPreconditions() {
             final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
             for (LocationVariable heap : heaps) {     
                 // Add JML precondition to precondition
@@ -911,7 +917,7 @@ public abstract class AbstractBlockSpecificationElement
             return result;
         }
 
-        private Map<LocationVariable, Term> buildPostconditions() {
+        protected Map<LocationVariable, Term> buildPostconditions() {
             final Map<LocationVariable,Term> postconditions =
                     new LinkedHashMap<LocationVariable,Term>();
             for (LocationVariable heap : heaps) {

@@ -88,10 +88,8 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
                 MiscTools.getLocalIns(instantiation.block, services);
         final ImmutableSet<ProgramVariable> localOutVariables =
                 MiscTools.getLocalOuts(instantiation.block, services);
-        // final boolean isStrictlyPure = !application.getContract().hasModifiesClause();
         final Map<LocationVariable, Function> anonymisationHeaps =
                 createAndRegisterAnonymisationVariables(heaps, contract, services);
-        //final Map<LocationVariable, Function> anonymisationLocalVariables = createAndRegisterAnonymisationVariables(localOutVariables, services);
 
         final LoopContract.Variables variables = new VariablesCreatorAndRegistrar(
             goal, contract.getPlaceholderVariables(), services
@@ -99,6 +97,9 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
         final ProgramVariable exceptionParameter =
                     createLocalVariable("e", variables.exception.getKeYJavaType(),
                                         services);
+        final LoopContract.Variables nextVariables = new VariablesCreatorAndRegistrar(
+                goal, variables, services).createAndRegisterCopies("_NEXT");
+                
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
                 new ConditionsAndClausesBuilder(contract, heaps, variables,
@@ -120,12 +121,23 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
                 conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
         final Term atMostOneFlagSetCondition =
                 conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
+        final Term decreasesCheck =
+                conditionsAndClausesBuilder.buildDecreasesCheck();
+        final Term nextPostcondition =
+                new ConditionsAndClausesBuilder(contract, heaps, nextVariables,
+                        instantiation.self, services)
+                .buildPostcondition();
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate =
                 updatesBuilder.buildAnonOutUpdate(anonymisationHeaps,
                                                         modifiesClauses);
+        
+        final Term nextRemembranceUpdate =
+                new UpdatesBuilder(nextVariables, services).buildRemembranceUpdate(heaps);
+        
+        
         final ImmutableList<Goal> result;
         final GoalsConfigurator configurator = new GoalsConfigurator(application,
                                                                      termLabelState,
@@ -148,14 +160,21 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
                 new Term[] {postcondition, wellFormedAnonymisationHeapsCondition,
                         reachableOutCondition, atMostOneFlagSetCondition});
 
-        configurator.setUpValidityGoal(result.tail().tail().head(),
-                new Term[] {contextUpdate, remembranceUpdate},
-                new Term[] {precondition, wellFormedHeapsCondition,
-                        reachableInCondition},
-                new Term[] {postcondition, frameCondition
-                        /*, atMostOneFlagSetCondition*/},
+        configurator.setUpLoopValidityGoal(
+                goal,
+                contract,
+                contextUpdate,
+                remembranceUpdate,
+                nextRemembranceUpdate,
+                anonymisationHeaps,
+                modifiesClauses,
+                new Term[] { precondition,wellFormedHeapsCondition, reachableInCondition },
+                decreasesCheck,
+                new Term[] { postcondition, frameCondition },
+                new Term[] { nextPostcondition },
                 exceptionParameter,
-                conditionsAndClausesBuilder.terms);
+                variables.termify(instantiation.self),
+                nextVariables);
 
         return result;
     }

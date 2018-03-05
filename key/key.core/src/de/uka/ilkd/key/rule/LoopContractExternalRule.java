@@ -84,11 +84,6 @@ public class LoopContractExternalRule extends AbstractLoopContractRule {
     private ImmutableList<Goal> apply(final Goal goal, final Services services,
                                       final LoopContractExternalBuiltInRuleApp application)
                                               throws RuleAbortException {
-        if (InfFlowCheckInfo.isInfFlow(goal)) {
-            throw new RuleAbortException(
-                    "LoopContractRuleSeparate does not support information flow goals!");
-        }
-        
         final TermLabelState termLabelState = new TermLabelState();
         final Instantiation instantiation =
                 instantiate(application.posInOccurrence().subTerm(), goal, services);
@@ -108,6 +103,7 @@ public class LoopContractExternalRule extends AbstractLoopContractRule {
         final LoopContract.Variables variables = new VariablesCreatorAndRegistrar(
             goal, contract.getPlaceholderVariables(), services
         ).createAndRegister(instantiation.self, true);
+                
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
                 new ConditionsAndClausesBuilder(contract, heaps, variables,
@@ -132,7 +128,10 @@ public class LoopContractExternalRule extends AbstractLoopContractRule {
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate =
-                updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiesClauses);
+                updatesBuilder.buildAnonOutUpdate(anonymisationHeaps,
+                                                        modifiesClauses);
+        
+        
         final ImmutableList<Goal> result;
         final GoalsConfigurator configurator = new GoalsConfigurator(application,
                                                                      termLabelState,
@@ -142,6 +141,7 @@ public class LoopContractExternalRule extends AbstractLoopContractRule {
                                                                      application.posInOccurrence(),
                                                                      services,
                                                                      this);
+        
         result = goal.split(2);
 
         configurator.setUpPreconditionGoal(result.tail().head(),
@@ -149,11 +149,10 @@ public class LoopContractExternalRule extends AbstractLoopContractRule {
                 new Term[] {precondition, wellFormedHeapsCondition,
                         reachableInCondition});
         configurator.setUpUsageGoal(result.head(),
-                                    new Term[] {contextUpdate, remembranceUpdate,
-                                                anonymisationUpdate},
-                                    new Term[] {postcondition, wellFormedAnonymisationHeapsCondition,
-                                                reachableOutCondition, atMostOneFlagSetCondition});
-        
+                new Term[] {contextUpdate, remembranceUpdate,
+                        anonymisationUpdate},
+                new Term[] {postcondition, wellFormedAnonymisationHeapsCondition,
+                        reachableOutCondition, atMostOneFlagSetCondition});
 
         final ComplexRuleJustificationBySpec cjust
                 = (ComplexRuleJustificationBySpec)
@@ -162,7 +161,7 @@ public class LoopContractExternalRule extends AbstractLoopContractRule {
         for (Contract c : contract.getFunctionalContracts()) {
             cjust.add(application, new RuleJustificationBySpec(c));
         }
-        
+
         return result;
     }
 }

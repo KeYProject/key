@@ -217,7 +217,6 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
                 else {
                     element = element.getFirstElement();
                 }
-                System.out.println();
             }
             return null;
         }

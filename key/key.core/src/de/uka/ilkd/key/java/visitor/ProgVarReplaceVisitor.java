@@ -45,6 +45,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.speclang.LoopContract;
@@ -387,9 +388,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
         final ImmutableList<InfFlowSpec> newInfFlowSpecs = replaceVariablesInTermListTriples(
                 oldContract.getInfFlowSpecs());
+        
+        OpReplacer replacer = new OpReplacer(replaceMap, services.getTermFactory());
+        
         return changed ? oldContract.update(newBlock, newPreconditions,
                 newPostconditions, newModifiesClauses, newInfFlowSpecs,
-                newVariables) : oldContract;
+                newVariables,
+                replacer.replace(oldContract.getMby())) : oldContract;
     }
 
     private LoopContract createNewLoopContract(
@@ -429,9 +434,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
         final ImmutableList<InfFlowSpec> newInfFlowSpecs = replaceVariablesInTermListTriples(
                 oldContract.getInfFlowSpecs());
+        
+        OpReplacer replacer = new OpReplacer(replaceMap, services.getTermFactory());
+        
         return changed ? oldContract.update(newBlock, newPreconditions,
                 newPostconditions, newModifiesClauses, newInfFlowSpecs,
-                newVariables) : oldContract;
+                newVariables,
+                replacer.replace(oldContract.getMby()),
+                replacer.replace(oldContract.getDecreases())) : oldContract;
     }
 
     private BlockSpecificationElement.Variables replaceBlockContractVariables(

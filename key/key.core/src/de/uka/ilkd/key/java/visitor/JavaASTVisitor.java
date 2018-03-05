@@ -69,6 +69,12 @@ public abstract class JavaASTVisitor extends JavaASTWalker
             for (BlockContract bc : bcs) {
                 performActionOnBlockContract(bc);
             }
+            
+            ImmutableSet<LoopContract> lcs = services.getSpecificationRepository()
+                    .getLoopContracts((StatementBlock) node);
+            for (LoopContract lc : lcs) {
+                performActionOnLoopContract(lc);
+            }
         } else if (node instanceof MergePointStatement && services != null) {
             ImmutableSet<MergeContract> mcs = services
                     .getSpecificationRepository()

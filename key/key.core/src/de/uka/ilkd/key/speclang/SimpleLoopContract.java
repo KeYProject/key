@@ -1,17 +1,23 @@
 package de.uka.ilkd.key.speclang;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
@@ -19,14 +25,14 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 public final class SimpleLoopContract
         extends AbstractBlockSpecificationElement implements LoopContract {
-	
-    private final Term decreases;
 
     public static LoopContract combine(ImmutableSet<LoopContract> contracts, Services services) {
         return new Combinator(
@@ -36,6 +42,15 @@ public final class SimpleLoopContract
     }
     
     private ImmutableSet<FunctionalLoopContract> functionalContracts;
+    
+    private final Term decreases;
+    
+    private final Expression guard;
+    private final StatementBlock body;
+    private final StatementBlock tail;
+    private final While loop;
+    
+    private final List<Label> loopLabels;
 
     public SimpleLoopContract(final String baseName,
                                final StatementBlock block,
@@ -68,11 +83,80 @@ public final class SimpleLoopContract
         
         this.decreases = decreases;
         this.functionalContracts = functionalContracts;
+        
+        loopLabels = new ArrayList<>();
+        
+        SourceElement first = block.getFirstElement();
+        while (first instanceof LabeledStatement) {
+            LabeledStatement s = (LabeledStatement) first;
+            loopLabels.add(s.getLabel());
+            first = s.getBody();
+        }
+
+        //TODO For now, only blocks that begin with a while loop may have a loop contract.
+        // This should later be expanded to include blocks that begin with for and do-while loops,
+        // as well as free-standing loops that are not inside of a block.
+        if (!(first instanceof While)) {
+            throw new IllegalArgumentException(
+                    "Only blocks that begin with a while loop may have a loop contract! \n"
+                    + "This block begins with " + block.getFirstElement());
+        }
+
+        While loop = (While) first;
+        
+        guard = loop.getGuardExpression();
+        
+        if (loop.getBody() instanceof StatementBlock) {
+            body = (StatementBlock) loop.getBody();
+        } else {
+            body = new StatementBlock(loop.getBody());
+        }
+        
+        this.loop = new While(guard, body);
+
+        ExtList tailStatements = new ExtList();
+        for (int i = 1; i < block.getStatementCount(); ++i) {
+            tailStatements.add(block.getStatementAt(i));
+        }
+        
+        tail = new StatementBlock(tailStatements);
+    }    
+
+    @Override
+    public Expression getGuard() {
+        return guard;
+    }
+
+    @Override
+    public StatementBlock getBody() {
+        return body;
     }
     
     @Override
+    public StatementBlock getTail() {
+        return tail;
+    }
+    
+    @Override
+    public While getLoop() {
+        return loop;
+    }
+
+    @Override
+    public List<Label> getLoopLabels() {
+        return loopLabels;
+    }
+
+
+    @Override
     public Term getDecreases() {
     	return decreases;
+    }
+
+    @Override
+    public Term getDecreases(Variables variables, Services services) {
+        Map<ProgramVariable, ProgramVariable> map = createReplacementMap(variables, services);
+        return new OpReplacer(map, services.getTermFactory()).replace(decreases);
     }
     
     @Override
@@ -116,23 +200,24 @@ public final class SimpleLoopContract
 
     @Override
     public LoopContract update(final StatementBlock newBlock,
-                                final Map<LocationVariable,Term> newPreconditions,
-                                final Map<LocationVariable,Term> newPostconditions,
-                                final Map<LocationVariable,Term> newModifiesClauses,
-                                final ImmutableList<InfFlowSpec> newinfFlowSpecs,
-                                final Variables newVariables) {
+            final Map<LocationVariable,Term> newPreconditions,
+            final Map<LocationVariable,Term> newPostconditions,
+            final Map<LocationVariable,Term> newModifiesClauses,
+            final ImmutableList<InfFlowSpec> newinfFlowSpecs,
+            final Variables newVariables,
+            final Term newMeasuredBy, final Term newDecreases) {
         return new SimpleLoopContract(baseName, newBlock, labels, method, modality,
-                                       newPreconditions, measuredBy, newPostconditions,
-                                       newModifiesClauses, newinfFlowSpecs,
-                                       newVariables,
-                                       transactionApplicable, hasMod, decreases,
-                                       functionalContracts);
+                newPreconditions, newMeasuredBy, newPostconditions,
+                newModifiesClauses, newinfFlowSpecs,
+                newVariables,
+                transactionApplicable, hasMod, newDecreases,
+                functionalContracts);
     }
 
     @Override 
     public LoopContract setBlock(StatementBlock newBlock) {
         return update(newBlock, preconditions, postconditions, modifiesClauses,
-                      infFlowSpecs, variables);
+                      infFlowSpecs, variables, measuredBy, decreases);
     }
 
     public LoopContract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
@@ -176,15 +261,6 @@ public final class SimpleLoopContract
                     signalsOnly, diverges, assignables, hasMod, services);
             
             this.decreases = decreases;
-
-            //TODO For now, only blocks that begin with a while loop may have a loop contract.
-            // This should later be expanded to include blocks that begin with for and do-while loops,
-            // as well as free-standing loops that are not inside of a block.
-            if (!(block.getFirstElement() instanceof While)) {
-                throw new IllegalArgumentException(
-                        "Only blocks that begin with a while loop may have a loop contract! \n"
-                		+ "This block begins with " + block.getFirstElement());
-            }
         }
 
         @Override
@@ -200,6 +276,19 @@ public final class SimpleLoopContract
             		baseName, block, labels, method, modality, preconditions,
                     measuredBy, postconditions, modifiesClauses, infFlowSpecs, variables,
                     transactionApplicable, hasMod, decreases, null);
+        }
+
+        @Override
+        protected Map<LocationVariable, Term> buildPreconditions() {
+            final Map<LocationVariable, Term> result = super.buildPreconditions();
+            
+            if (decreases != null) {
+                for (Entry<LocationVariable, Term> entry : result.entrySet()) {
+                    result.put(entry.getKey(), and(entry.getValue(), geq(decreases, zero())));
+                }
+            }
+            
+            return result;
         }
     }
     

@@ -126,9 +126,10 @@ public final class SimpleBlockContract
                                 final Map<LocationVariable,Term> newPostconditions,
                                 final Map<LocationVariable,Term> newModifiesClauses,
                                 final ImmutableList<InfFlowSpec> newinfFlowSpecs,
-                                final Variables newVariables) {
+                                final Variables newVariables,
+                                Term newMeasuredBy) {
         return new SimpleBlockContract(baseName, newBlock, labels, method, modality,
-                                       newPreconditions, measuredBy, newPostconditions,
+                                       newPreconditions, newMeasuredBy, newPostconditions,
                                        newModifiesClauses, newinfFlowSpecs,
                                        newVariables,
                                        transactionApplicable, hasMod, functionalContracts);
@@ -137,7 +138,7 @@ public final class SimpleBlockContract
     @Override 
     public BlockContract setBlock(StatementBlock newBlock) {
         return update(newBlock, preconditions, postconditions, modifiesClauses,
-                      infFlowSpecs, variables);
+                      infFlowSpecs, variables, measuredBy);
     }
 
     public BlockContract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {

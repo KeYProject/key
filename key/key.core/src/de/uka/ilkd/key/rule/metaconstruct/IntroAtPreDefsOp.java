@@ -36,10 +36,12 @@ import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockSpecificationElement;
@@ -428,16 +430,24 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                                            contract.getModifiesClause(heap, newVariables.self,
                                                                       services));
                 }
-                final BlockSpecificationElement newBlockContract =
-                        contract.update(block, newPreconditions, newPostconditions,
-                                        newModifiesClauses, contract.getInfFlowSpecs(), newVariables);
                 
-                if (newBlockContract instanceof BlockContract) {
+                if (contract instanceof BlockContract) {
+                    final BlockContract newBlockContract =
+                            ((BlockContract) contract).update(block, newPreconditions, newPostconditions,
+                                            newModifiesClauses, contract.getInfFlowSpecs(), newVariables,
+                                            contract.getMby(newVariables, services));
+                    
                     services.getSpecificationRepository().removeBlockContract((BlockContract) contract);
                     services.getSpecificationRepository().addBlockContract((BlockContract) newBlockContract, false);
-                } else if (newBlockContract instanceof LoopContract) {
+                } else if (contract instanceof LoopContract) {
+                    final LoopContract newLoopContract =
+                            ((LoopContract) contract).update(block, newPreconditions, newPostconditions,
+                                            newModifiesClauses, contract.getInfFlowSpecs(), newVariables,
+                                            contract.getMby(newVariables, services),
+                                            ((LoopContract) contract).getDecreases());
+                    
                     services.getSpecificationRepository().removeLoopContract((LoopContract) contract);
-                    services.getSpecificationRepository().addLoopContract((LoopContract) newBlockContract, false);
+                    services.getSpecificationRepository().addLoopContract((LoopContract) newLoopContract, false);
                 }
             }
         }

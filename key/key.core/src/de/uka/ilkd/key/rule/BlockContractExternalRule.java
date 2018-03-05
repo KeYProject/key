@@ -153,7 +153,6 @@ public class BlockContractExternalRule extends AbstractBlockContractRule {
                                                 anonymisationUpdate},
                                     new Term[] {postcondition, wellFormedAnonymisationHeapsCondition,
                                                 reachableOutCondition, atMostOneFlagSetCondition});
-        
 
         final ComplexRuleJustificationBySpec cjust
             	= (ComplexRuleJustificationBySpec)

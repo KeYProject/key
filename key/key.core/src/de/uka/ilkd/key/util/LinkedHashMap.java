@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.util;
 
 import java.util.Iterator;
+import java.util.Map;
 
 public class LinkedHashMap<K, V>
 	extends java.util.LinkedHashMap<K, V>
@@ -24,6 +25,11 @@ public class LinkedHashMap<K, V>
 
     public LinkedHashMap() {
 	super();
+    }
+
+
+    public LinkedHashMap(Map<? extends K, ? extends V> m) {
+    super(m);
     }
 
 

@@ -59,7 +59,8 @@ public interface BlockContract extends BlockSpecificationElement {
                                 Map<LocationVariable,Term> newPostconditions,
                                 Map<LocationVariable,Term> newModifiesClauses,
                                 final ImmutableList<InfFlowSpec> newInfFlowSpecs,
-                                Variables newVariables);
+                                Variables newVariables,
+                                Term newMeasuredBy);
     public BlockContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
     public BlockContract setBlock(StatementBlock newBlock);
 }

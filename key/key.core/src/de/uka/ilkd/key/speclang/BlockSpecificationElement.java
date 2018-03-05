@@ -105,6 +105,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
     public boolean hasMby();
 
     public Term getMby();
+
+    Term getMby(Variables variables, Services services);
     
     public Term getMby(ProgramVariable selfVar, Services services);
     
@@ -145,14 +147,6 @@ public interface BlockSpecificationElement extends SpecificationElement {
      * Returns the original used variables like self, result etc..
      */
     public Variables getVariables();
-
-    // TODO Find better name: Creates a new block contract with the given changes.
-    public BlockSpecificationElement update(StatementBlock newBlock,
-                                Map<LocationVariable,Term> newPreconditions,
-                                Map<LocationVariable,Term> newPostconditions,
-                                Map<LocationVariable,Term> newModifiesClauses,
-                                final ImmutableList<InfFlowSpec> newInfFlowSpecs,
-                                Variables newVariables);
     public BlockSpecificationElement setTarget(KeYJavaType newKJT, IObserverFunction newPM);
     public BlockSpecificationElement setBlock(StatementBlock newBlock);
 
@@ -460,7 +454,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
 
             final Set<Label> breakLabels = collectLabels(breaks);
             final Set<Label> continueLabels = collectLabels(continues);
-
+            
             breakFlags = createFlags(breakLabels, BREAK_FLAG_BASE_NAME);
             continueFlags = createFlags(continueLabels, CONTINUE_FLAG_BASE_NAME);
             returnFlag = returnOccurred ? createFlag(RETURN_FLAG_NAME) : null;
