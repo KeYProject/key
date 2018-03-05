@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.proof.init;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.key_project.util.collection.ImmutableSet;
 
@@ -35,6 +37,51 @@ import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
+
+    /**
+     * Instantiates a new proof obligation with the given settings.
+     * @param initConfig The already load {@link InitConfig}.
+     * @param properties The settings of the proof obligation to instantiate.
+     * @return The instantiated proof obligation.
+     * @throws IOException Occurred Exception.
+     */
+    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
+            throws IOException {
+       String contractName = properties.getProperty("contract");
+       int proofNum = 0;
+       String baseContractName = null;
+       int ind = -1;
+       for (String tag : FunctionalLoopContractPO.TRANSACTION_TAGS.values()) {
+           ind = contractName.indexOf("." + tag);
+          if (ind > 0) {
+              break;
+          }
+          proofNum++;
+       }
+       if (ind == -1) {
+           baseContractName = contractName;
+           proofNum = 0;
+       }
+       else {
+           baseContractName = contractName.substring(0, ind);
+       }
+       final Contract contract =
+               initConfig.getServices().getSpecificationRepository()
+                                .getContractByName(baseContractName);
+       if (contract == null) {
+           throw new RuntimeException("Contract not found: " + baseContractName);
+       }
+       else {
+           ProofOblInput po = contract.createProofObl(initConfig);
+           return new LoadedPOContainer(po, proofNum);
+       }
+    }
+    
+    @Override
+    public void fillSaveProperties(Properties properties) throws IOException {
+        super.fillSaveProperties(properties);
+        properties.setProperty("contract", contract.getName());
+    }
 
     public static Map<Boolean,String> TRANSACTION_TAGS = new LinkedHashMap<Boolean,String>();
 
