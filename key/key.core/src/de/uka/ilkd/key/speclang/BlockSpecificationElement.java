@@ -7,18 +7,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.LoopInitializer;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.java.statement.Continue;
+import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LabelJumpStatement;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
+import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -500,6 +506,23 @@ public interface BlockSpecificationElement extends SpecificationElement {
         private Map<LocationVariable, LocationVariable> createRemembranceLocalVariables() {
             ImmutableSet<ProgramVariable> localOutVariables =
                     MiscTools.getLocalOuts(block, services);
+            
+            SourceElement first = block.getFirstElement();
+            while (first instanceof LabeledStatement) {
+                LabeledStatement s = (LabeledStatement) first;
+                first = s.getBody();
+            }
+            
+            if (first instanceof For) {
+            	ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
+    			ProgramVariableCollector collector = new ProgramVariableCollector(new StatementBlock(inits), services);
+    			collector.start();
+    			
+    			for (LocationVariable var : collector.result()) {
+    				localOutVariables = localOutVariables.add(var);
+    			}
+            }
+            
             Map<LocationVariable, LocationVariable> result =
                     new LinkedHashMap<LocationVariable, LocationVariable>();
             
@@ -520,6 +543,23 @@ public interface BlockSpecificationElement extends SpecificationElement {
         private Map<LocationVariable, LocationVariable> createOuterRemembranceLocalVariables() {
             ImmutableSet<ProgramVariable> localInVariables =
                     MiscTools.getLocalIns(block, services);
+            
+            SourceElement first = block.getFirstElement();
+            while (first instanceof LabeledStatement) {
+                LabeledStatement s = (LabeledStatement) first;
+                first = s.getBody();
+            }
+            
+            if (first instanceof For) {
+            	ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
+    			ProgramVariableCollector collector = new ProgramVariableCollector(new StatementBlock(inits), services);
+    			collector.start();
+    			
+    			for (LocationVariable var : collector.result()) {
+    				localInVariables = localInVariables.add(var);
+    			}
+            }
+            
             Map<LocationVariable, LocationVariable> result =
                     new LinkedHashMap<LocationVariable, LocationVariable>();
             

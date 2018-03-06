@@ -131,12 +131,14 @@ public final class SimpleLoopContract
             head = new StatementBlock(headStatements);
             
             guard = loop.getGuardExpression();
-            
-            if (loop.getBody() instanceof StatementBlock) {
-                body = (StatementBlock) loop.getBody();
-            } else {
-                body = new StatementBlock(loop.getBody());
+
+            ExtList bodyStatements = new ExtList();
+            bodyStatements.add(loop.getBody());
+            for (Expression statement : loop.getUpdates()) {
+            	bodyStatements.add(statement);
             }
+            
+            body = new StatementBlock(bodyStatements);
             
             this.loop = new While(guard, body);
 

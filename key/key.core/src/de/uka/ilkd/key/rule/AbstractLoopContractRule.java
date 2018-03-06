@@ -123,7 +123,16 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
         final ImmutableSet<LoopContract> contracts =
                 getApplicableContracts(instantiation, goal, goal.proof().getServices());
         
-        return !contracts.isEmpty();
+        for (LoopContract contract : contracts) {
+        	// The rule is only applicable if the block starts with a while loop.
+        	// If the head is not empty, then the block must start with a for loop,
+        	// which must be transformed into a while loop before the rule can be applied.
+        	if (contract.getHead().isEmpty()) {
+        		return true;
+        	}
+        }
+        
+        return false;
     }
 
     public Instantiation instantiate(final Term formula,
