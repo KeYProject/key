@@ -34,26 +34,25 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.rule.AbstractBlockContractBuiltInRuleApp;
-import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockSpecificationElement;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockContract;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockSpecificationElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * The default implementation of {@link IExecutionBlockContract}.
+ * The default implementation of {@link IExecutionBlockSpecificationElement}.
  * @author Martin Hentschel
  */
-public class ExecutionBlockContract extends AbstractExecutionNode<SourceElement> implements IExecutionBlockContract {
+public class ExecutionBlockSpecificationElement extends AbstractExecutionNode<SourceElement> implements IExecutionBlockSpecificationElement {
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public ExecutionBlockContract(ITreeSettings settings, 
+   public ExecutionBlockSpecificationElement(ITreeSettings settings, 
                                  Node proofNode) {
       super(settings, proofNode);
    }
@@ -192,8 +191,8 @@ public class ExecutionBlockContract extends AbstractExecutionNode<SourceElement>
     * {@inheritDoc}
     */
    @Override
-   public BlockContract getContract() {
-      return ((AbstractBlockContractBuiltInRuleApp)getProofNode().getAppliedRuleApp()).getContract();
+   public BlockSpecificationElement getContract() {
+      return ((AbstractBlockSpecificationElementBuiltInRuleApp)getProofNode().getAppliedRuleApp()).getContract();
    }
 
    /**
@@ -201,6 +200,6 @@ public class ExecutionBlockContract extends AbstractExecutionNode<SourceElement>
     */
    @Override
    public StatementBlock getBlock() {
-      return ((AbstractBlockContractBuiltInRuleApp)getProofNode().getAppliedRuleApp()).getBlock();
+      return ((AbstractBlockSpecificationElementBuiltInRuleApp)getProofNode().getAppliedRuleApp()).getBlock();
    }
 }

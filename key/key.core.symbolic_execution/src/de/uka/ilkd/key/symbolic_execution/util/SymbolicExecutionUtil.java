@@ -118,6 +118,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.AbstractBlockContractBuiltInRuleApp;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractExternalBuiltInRuleApp;
@@ -1159,13 +1160,13 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the given node should be represented as block contract.
+    * Checks if the given node should be represented as block/loop contract.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
     * @return {@code true} represent node as block contract, {@code false} represent node as something else. 
     */
-   public static boolean isBlockContract(Node node, RuleApp ruleApp) {
-      return ruleApp instanceof AbstractBlockContractBuiltInRuleApp;
+   public static boolean isBlockSpecificationElement(Node node, RuleApp ruleApp) {
+      return ruleApp instanceof AbstractBlockSpecificationElementBuiltInRuleApp;
    }
 
    /**
@@ -1580,7 +1581,7 @@ public final class SymbolicExecutionUtil {
          else if (isLoopInvariant(node, ruleApp)) {
             return true;
          }
-         else if (isBlockContract(node, ruleApp)) {
+         else if (isBlockSpecificationElement(node, ruleApp)) {
             return true;
          }
          else {

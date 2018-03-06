@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -70,10 +71,11 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
                             ImmutableArray<QuantifiableVariable> newTermBoundVars,
                             JavaBlock newTermJavaBlock,
                             Set<TermLabel> labels) {
-       if (rule instanceof BlockContractInternalRule &&
-               ((BlockContractInternalRule.BlockContractHint)hint).getExceptionalVariable() != null 
-               && 
-               SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
+       if ((rule instanceof BlockContractInternalRule
+    		   || rule instanceof LoopContractInternalRule)
+    		   && ((BlockContractInternalRule.BlockContractHint)hint).getExceptionalVariable()
+    		   		!= null 
+               && SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
            if (CollectionUtil.search(labels, new IFilter<TermLabel>() {
                @Override
                public boolean select(TermLabel element) {

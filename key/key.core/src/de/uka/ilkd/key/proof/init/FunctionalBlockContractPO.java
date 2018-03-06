@@ -251,7 +251,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                     anonOutHeaps.get(heaps.get(0)),
                     localInVariables);
             
-            assignPOTerms(tb.andSC(wellDefinedness, validity));
+            assignPOTerms(tb.and(wellDefinedness, validity));
         } else {
             assignPOTerms(validity);
         }

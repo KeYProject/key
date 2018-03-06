@@ -43,6 +43,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContractImpl;
 import de.uka.ilkd.key.speclang.FunctionalBlockContract;
+import de.uka.ilkd.key.speclang.FunctionalLoopContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 import de.uka.ilkd.key.speclang.InformationFlowContractImpl;
@@ -65,6 +66,7 @@ public class ContractSelectionPanel extends JPanel {
     	CONTRACT_TYPE_ORDER.put(InformationFlowContractImpl.class, 1);
     	CONTRACT_TYPE_ORDER.put(DependencyContractImpl.class, 2);
     	CONTRACT_TYPE_ORDER.put(FunctionalBlockContract.class, 3);
+    	CONTRACT_TYPE_ORDER.put(FunctionalLoopContract.class, 4);
     }
     
     private final Services services;
@@ -203,6 +205,14 @@ public class ContractSelectionPanel extends JPanel {
             	
             	if (res != 0) {
             		return res;
+            	}
+            	
+            	if (o1 != null) {
+            		return -1;
+            	}
+            	
+            	if (o2 != null) {
+            		return 1;
             	}
             	
                 res = c1.id() - c2.id();
