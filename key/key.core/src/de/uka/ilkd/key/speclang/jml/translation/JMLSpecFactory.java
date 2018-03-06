@@ -31,6 +31,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
@@ -44,6 +45,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.Name;
@@ -1352,10 +1354,26 @@ public class JMLSpecFactory {
                 .combineRemembranceVariables();
         final Map<LocationVariable, LocationVariable> outerRemembranceVariables = variables
                 .combineOuterRemembranceVariables();
+        
+        ImmutableList<ProgramVariable> vars;
+        
+        SourceElement first = block.getFirstElement();
+        while (first instanceof LabeledStatement) {
+            first = ((LabeledStatement) first).getBody();
+        }
+        
+        if (first instanceof For) {
+            vars = append(
+                    collectLocalVariables(method.getBody(), (For) first),
+                    method.collectParameters())
+                    .append(collectLocalVariablesVisibleTo(block, method));
+        } else {
+            vars = append(ImmutableSLList.nil(), method.collectParameters())
+                    .append(collectLocalVariablesVisibleTo(block, method));
+        }
 
         return new ProgramVariableCollection(variables.self,
-                append(ImmutableSLList.nil(), method.collectParameters())
-                        .append(collectLocalVariablesVisibleTo(block, method)),
+                vars,
                 variables.result, variables.exception,
                 outerRemembranceVariables, termify(outerRemembranceVariables),
                 remembranceVariables, termify(remembranceVariables));

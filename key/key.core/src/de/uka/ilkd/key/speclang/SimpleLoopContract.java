@@ -15,8 +15,10 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -31,6 +33,9 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
+/**
+ * Default implementation for {@link LoopContract}.
+ */
 public final class SimpleLoopContract
         extends AbstractBlockSpecificationElement implements LoopContract {
 
@@ -44,7 +49,8 @@ public final class SimpleLoopContract
     private ImmutableSet<FunctionalLoopContract> functionalContracts;
     
     private final Term decreases;
-    
+
+    private final StatementBlock head;
     private final Expression guard;
     private final StatementBlock body;
     private final StatementBlock tail;
@@ -93,34 +99,64 @@ public final class SimpleLoopContract
             first = s.getBody();
         }
 
-        //TODO For now, only blocks that begin with a while loop may have a loop contract.
-        // This should later be expanded to include blocks that begin with for and do-while loops,
-        // as well as free-standing loops that are not inside of a block.
-        if (!(first instanceof While)) {
+        if (first instanceof While) {
+            While loop = (While) first;
+            
+            head = new StatementBlock();
+            
+            guard = loop.getGuardExpression();
+            
+            if (loop.getBody() instanceof StatementBlock) {
+                body = (StatementBlock) loop.getBody();
+            } else {
+                body = new StatementBlock(loop.getBody());
+            }
+            
+            this.loop = new While(guard, body);
+
+            ExtList tailStatements = new ExtList();
+            for (int i = 1; i < block.getStatementCount(); ++i) {
+                tailStatements.add(block.getStatementAt(i));
+            }
+            
+            tail = new StatementBlock(tailStatements);
+        } else if (first instanceof For) {
+            For loop = (For) first;
+
+            ExtList headStatements = new ExtList();
+            for (Statement statement : loop.getInitializers()) {
+                headStatements.add(statement);
+            }
+            
+            head = new StatementBlock(headStatements);
+            
+            guard = loop.getGuardExpression();
+            
+            if (loop.getBody() instanceof StatementBlock) {
+                body = (StatementBlock) loop.getBody();
+            } else {
+                body = new StatementBlock(loop.getBody());
+            }
+            
+            this.loop = new While(guard, body);
+
+            ExtList tailStatements = new ExtList();
+            for (int i = 1; i < block.getStatementCount(); ++i) {
+                tailStatements.add(block.getStatementAt(i));
+            }
+            
+            tail = new StatementBlock(tailStatements);
+        } else {
             throw new IllegalArgumentException(
-                    "Only blocks that begin with a while loop may have a loop contract! \n"
+                    "Only blocks that begin with a while or a for loop may have a loop contract! \n"
                     + "This block begins with " + block.getFirstElement());
         }
-
-        While loop = (While) first;
-        
-        guard = loop.getGuardExpression();
-        
-        if (loop.getBody() instanceof StatementBlock) {
-            body = (StatementBlock) loop.getBody();
-        } else {
-            body = new StatementBlock(loop.getBody());
-        }
-        
-        this.loop = new While(guard, body);
-
-        ExtList tailStatements = new ExtList();
-        for (int i = 1; i < block.getStatementCount(); ++i) {
-            tailStatements.add(block.getStatementAt(i));
-        }
-        
-        tail = new StatementBlock(tailStatements);
     }    
+
+    @Override
+    public StatementBlock getHead() {
+        return head;
+    }
 
     @Override
     public Expression getGuard() {

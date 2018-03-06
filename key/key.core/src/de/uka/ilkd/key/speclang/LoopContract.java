@@ -52,12 +52,40 @@ public interface LoopContract extends BlockSpecificationElement {
     public LoopContract setBlock(StatementBlock newBlock);
 
 
+    /**
+     * <p> This contains any statements that are executed before the loop. </p>
+     * 
+     * <p> It is only used if the loop is a for loop, in which case it contains the loop
+     * initializers </p>
+     * 
+     * @return statements to execute before the loop.
+     */
+    public StatementBlock getHead();
+    
+    /**
+     * @return the loop guard.
+     */
     public Expression getGuard();
+    
+    /**
+     * @return the loop body.
+     */
     public StatementBlock getBody();
+    
+    /**
+     * @return all statements after the loop.
+     */
     public StatementBlock getTail();
 
+    /**
+     * @return a loop of the form <code> while(&lt;getGuard()&gt;) { &lt;getBody()&gt; } </code>
+     */
     public While getLoop();
     
+    /**
+     * @return all labels that belong to the loop, or an empty list if the loop is not a labeled
+     *  statement.
+     */
     public List<Label> getLoopLabels();
 
     LoopContract update(StatementBlock newBlock,
