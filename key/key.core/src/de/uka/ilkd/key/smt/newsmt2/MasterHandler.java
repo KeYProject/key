@@ -134,11 +134,18 @@ public class MasterHandler {
     }
 
     public List<SExpr> getDeclarations() {
-        return declarations ;
+        return declarations;
     }
 
     public void addDeclaration(SExpr decl) {
         declarations.add(decl);
     }
 
+    public void addAxiom(SExpr decl) {
+        axioms.add(decl);
+    }
+
+    public List<SExpr> getAxioms() {
+        return axioms;
+    }
 }
