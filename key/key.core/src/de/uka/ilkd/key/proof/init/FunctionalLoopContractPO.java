@@ -239,6 +239,12 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
                 variables.termify(selfTerm),
                 nextVariables);
         
+        Term wellFormedAnonymisationHeapsCondition =
+                conditionsAndClausesBuilder.buildWellFormedAnonymisationHeapsCondition(anonHeaps);
+        validity = tb.imp(
+                tb.and(wellFormedHeapsCondition, wellFormedAnonymisationHeapsCondition),
+                validity);
+        
         assignPOTerms(validity);
         collectClassAxioms(getCalleeKeYJavaType(), proofConfig);
         generateWdTaclets(proofConfig);

@@ -224,6 +224,12 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                 exceptionParameter,
                 conditionsAndClausesBuilder.getTerms());
         
+        Term wellFormedAnonymisationHeapsCondition =
+                conditionsAndClausesBuilder.buildWellFormedAnonymisationHeapsCondition(anonHeaps);
+        validity = tb.imp(
+                tb.and(wellFormedHeapsCondition, wellFormedAnonymisationHeapsCondition),
+                validity);
+        
         if (WellDefinednessCheck.isOn()) {
             final Term wdUpdate = services.getTermBuilder().parallel(anonInUpdate, remembranceUpdate);
             
