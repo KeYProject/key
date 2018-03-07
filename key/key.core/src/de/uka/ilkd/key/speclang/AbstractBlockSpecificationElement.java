@@ -801,6 +801,12 @@ public abstract class AbstractBlockSpecificationElement
     
 
 
+    /**
+     * This class contains a builder method for {@link AbstractBlockSpecificationElement}s
+     * ({@link Creator#create()}). It should be overridden in every subclass.
+     *
+     * @param <T> the type of the subclass.
+     */
     protected static abstract class Creator<T extends BlockSpecificationElement>
             extends TermBuilder {
 
@@ -1163,6 +1169,12 @@ public abstract class AbstractBlockSpecificationElement
 
     }
 
+    /**
+     * This class is used to to combine multiple contracts for the same block and apply them
+     * simultaneously. It should be overridden in every subclass.
+     *
+     * @param <T> the type of the subclass.
+     */
     protected static abstract class Combinator<T extends BlockSpecificationElement> extends TermBuilder {
 
         protected final T[] contracts;

@@ -38,6 +38,9 @@ import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 
+/**
+ * Super-interface for {@link BlockContract} and {@link LoopContract}.
+ */
 public interface BlockSpecificationElement extends SpecificationElement {
 
     public StatementBlock getBlock();
@@ -162,6 +165,10 @@ public interface BlockSpecificationElement extends SpecificationElement {
 
     public OriginalVariables getOrigVars();
 
+    /**
+     * This class contains all new variables that are introduced during a
+     * {@link BlockSpecificationElement}'s instantiation.
+     */
     public static class Variables {
         private final TermServices services;
 
@@ -405,6 +412,9 @@ public interface BlockSpecificationElement extends SpecificationElement {
 
     }
 
+    /**
+     * @see Variables#create(StatementBlock, List, IProgramMethod, Services)
+     */
     public static class VariablesCreator extends TermBuilder {
 
         private static final String BREAK_FLAG_BASE_NAME = "broke";
@@ -579,6 +589,9 @@ public interface BlockSpecificationElement extends SpecificationElement {
 
     }
 
+    /**
+     * @see Variables#termify(Term)
+     */
     public static class Terms {
 
         public final Term self;

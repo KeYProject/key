@@ -15,6 +15,9 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.SimpleLoopContract;
 
+/**
+ * Application of {@link AbstractLoopContractRule}.
+ */
 public abstract class AbstractLoopContractBuiltInRuleApp
         extends AbstractBlockSpecificationElementBuiltInRuleApp {
 

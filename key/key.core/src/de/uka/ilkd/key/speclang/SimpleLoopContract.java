@@ -35,6 +35,8 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
  * Default implementation for {@link LoopContract}.
+ * 
+ * @see SimpleLoopContract.Creator
  */
 public final class SimpleLoopContract
         extends AbstractBlockSpecificationElement implements LoopContract {
@@ -280,6 +282,11 @@ public final class SimpleLoopContract
                 + ", hasMod=" + hasMod + "]";
     }
     
+    /**
+     * This class is used to build {@link SimpleLoopContract}s.
+     * 
+     * @see Creator#create()
+     */
     public static class Creator
             extends AbstractBlockSpecificationElement.Creator<LoopContract> {
     	

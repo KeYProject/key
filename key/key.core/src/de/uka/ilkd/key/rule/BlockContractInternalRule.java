@@ -13,15 +13,25 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
-import org.key_project.util.collection.*;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
@@ -31,6 +41,19 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 
+/**
+ * <p>Rule for the application of {@link BlockContract}s.</p>
+ * 
+ * <p> This splits the goal into two branches:
+ *    <ol>
+ *      <li> Validity </li>
+ *      <li> Precondition </li>
+ *      <li> Usage </li>
+ *    </ol>
+ * </p>
+ * 
+ * @see BlockContractInternalBuiltInRuleApp
+ */
 public class BlockContractInternalRule extends AbstractBlockContractRule {
     
     public static final BlockContractInternalRule INSTANCE = new BlockContractInternalRule();

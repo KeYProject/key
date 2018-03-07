@@ -84,6 +84,8 @@ public class BlockContractBuilders {
     
     /**
      * This class is used to construct {@code block'} from {@code block} (see Wacker 2012, 3.3).
+     * 
+     * @see ValidityProgramConstructor#construct()
      */
     public static final class ValidityProgramConstructor {
 

@@ -37,6 +37,8 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
  * Default implementation of {@link BlockContract}.
+ * 
+ * @see SimpleBlockContract.Creator
  */
 public final class SimpleBlockContract
         extends AbstractBlockSpecificationElement implements BlockContract {
@@ -163,6 +165,11 @@ public final class SimpleBlockContract
                 + ", hasMod=" + hasMod + "]";
     }
     
+    /**
+     * This class is used to build {@link SimpleBlockContract}s.
+     * 
+     * @see Creator#create()
+     */
     public static class Creator
             extends AbstractBlockSpecificationElement.Creator<BlockContract> {
 

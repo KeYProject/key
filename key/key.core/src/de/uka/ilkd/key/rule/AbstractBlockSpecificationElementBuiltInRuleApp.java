@@ -12,6 +12,9 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 
+/**
+ * Application for {@link AbstractBlockSpecificationElementRule}.
+ */
 public abstract class AbstractBlockSpecificationElementBuiltInRuleApp
         extends AbstractBuiltInRuleApp {
 

@@ -15,6 +15,9 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.SimpleBlockContract;
 
+/**
+ * Application of {@link AbstractBlockContractRule}.
+ */
 public abstract class AbstractBlockContractBuiltInRuleApp
         extends AbstractBlockSpecificationElementBuiltInRuleApp {
 

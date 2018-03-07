@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.FunctionalLoopContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
@@ -27,6 +28,22 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.MiscTools;
 
+/**
+ * <p>Rule for the application of {@link LoopContract}s.</p>
+ * 
+ * <p> This splits the goal into two branches:
+ *    <ol>
+ *      <li> Precondition </li>
+ *      <li> Usage </li>
+ *    </ol>
+ * </p>
+ * 
+ * <p> The validity of all {@link LoopContract}s that were used in the application of this rule must
+ * be proven in a {@link FunctionalLoopContractPO} before the current proof is considered closed.
+ * </p>
+ * 
+ * @see LoopContractExternalBuiltInRuleApp
+ */
 public class LoopContractExternalRule extends AbstractLoopContractRule {
     
     public static final LoopContractExternalRule INSTANCE = new LoopContractExternalRule();

@@ -21,8 +21,21 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule;
 import de.uka.ilkd.key.speclang.BlockSpecificationElement;
+import de.uka.ilkd.key.speclang.SimpleBlockContract;
+import de.uka.ilkd.key.speclang.SimpleLoopContract;
 
+/**
+ * This panel used to select which {@code T}(s) to use for a
+ * {@link AbstractBlockSpecificationElementRule}.
+ *
+ * @param <T>
+ * 
+ * @see BlockSpecificationElementConfigurator
+ * @see SimpleBlockContract#combine(org.key_project.util.collection.ImmutableSet, Services)
+ * @see SimpleLoopContract#combine(org.key_project.util.collection.ImmutableSet, Services)
+ */
 public abstract class BlockSpecificationElementSelectionPanel<T extends BlockSpecificationElement>
         extends JPanel {
     

@@ -25,6 +25,12 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
+/**
+ * This class is only used to generate a proof obligation for a block that starts with a loop
+ * (see {@link FunctionalLoopContractPO}.
+ * 
+ * If a block is encountered during a proof, {@link LoopContract} is used instead.
+ */
 public class FunctionalLoopContract implements Contract {
     
     private final LoopContract contract;

@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
@@ -27,6 +28,22 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.MiscTools;
 
+/**
+ * <p>Rule for the application of {@link BlockContract}s.</p>
+ * 
+ * <p> This splits the goal into two branches:
+ *    <ol>
+ *      <li> Precondition </li>
+ *      <li> Usage </li>
+ *    </ol>
+ * </p>
+ * 
+ * <p> The validity of all {@link BlockContract}s that were used in the application of this rule must
+ * be proven in a {@link FunctionalBlockContractPO} before the current proof is considered closed.
+ * </p>
+ * 
+ * @see BlockContractExternalBuiltInRuleApp
+ */
 public class BlockContractExternalRule extends AbstractBlockContractRule {
     
     public static final BlockContractExternalRule INSTANCE = new BlockContractExternalRule();

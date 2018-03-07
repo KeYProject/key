@@ -27,8 +27,14 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.util.MiscTools;
 
+/**
+ * <p>Rule for the application of {@link BlockSpecificationElement}s.</p>
+ * 
+ * @see AbstractBlockSpecificationElementBuiltInRuleApp
+ */
 public abstract class AbstractBlockSpecificationElementRule implements BuiltInRule {
     
     public static final String FULL_PRECONDITION_TERM_HINT = "fullPrecondition";

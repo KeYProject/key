@@ -46,6 +46,11 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.util.MiscTools;
 
+/**
+ * <p>Rule for the application of {@link BlockContract}s.</p>
+ * 
+ * @see AbstractBlockContractBuiltInRuleApp
+ */
 public abstract class AbstractBlockContractRule extends AbstractBlockSpecificationElementRule {
 
     public static ImmutableSet<BlockContract> getApplicableContracts(final Instantiation instantiation,

@@ -25,6 +25,11 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.LoopContract;
 
+/**
+ * <p>Rule for the application of {@link LoopContract}s.</p>
+ * 
+ * @see AbstractLoopContractBuiltInRuleApp
+ */
 public abstract class AbstractLoopContractRule extends AbstractBlockSpecificationElementRule {
 
     public static ImmutableSet<LoopContract> getApplicableContracts(final Instantiation instantiation,

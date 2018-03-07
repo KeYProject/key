@@ -32,6 +32,11 @@ import javax.swing.KeyStroke;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 
+/**
+ * A window to contain a {@link BlockSpecificationElementSelectionPanel}.
+ *
+ * @param <T>
+ */
 public class BlockSpecificationElementConfigurator<T extends BlockSpecificationElement>
         extends JDialog {
 

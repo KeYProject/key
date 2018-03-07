@@ -36,6 +36,9 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.MiscTools;
 
+/**
+ * A proof obligation for a {@link FunctionalLoopContract}.
+ */
 public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
     /**

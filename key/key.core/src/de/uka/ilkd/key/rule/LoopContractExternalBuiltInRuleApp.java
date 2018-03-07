@@ -10,6 +10,9 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopContract;
 
+/**
+ * Application of {@link LoopContractExternalRule}.
+ */
 public class LoopContractExternalBuiltInRuleApp
         extends AbstractLoopContractBuiltInRuleApp {
 

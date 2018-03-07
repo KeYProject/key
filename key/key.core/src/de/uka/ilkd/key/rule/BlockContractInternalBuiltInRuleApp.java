@@ -23,6 +23,9 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.BlockContract;
 
+/**
+ * Application of {@link BlockContractInternalRule}.
+ */
 public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBuiltInRuleApp {
 
     public BlockContractInternalBuiltInRuleApp(final BuiltInRule rule,

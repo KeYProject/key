@@ -23,6 +23,19 @@ import de.uka.ilkd.key.rule.BlockContractBuilders.VariablesCreatorAndRegistrar;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.MiscTools;
 
+/**
+ * <p>Rule for the application of {@link LoopContract}s.</p>
+ * 
+ * <p> This splits the goal into two branches:
+ *    <ol>
+ *      <li> Validity </li>
+ *      <li> Precondition </li>
+ *      <li> Usage </li>
+ *    </ol>
+ * </p>
+ * 
+ * @see LoopContractInternalBuiltInRuleApp
+ */
 public class LoopContractInternalRule extends AbstractLoopContractRule {
     
     public static final LoopContractInternalRule INSTANCE = new LoopContractInternalRule();
