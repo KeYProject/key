@@ -17,10 +17,11 @@ public final class SideProofStatistics extends Statistics {
                                 int smtSolverApps,
                                 int dependencyContractApps,
                                 int operationContractApps,
+                                int blockLoopContractApps,
                                 int loopInvApps,
                                 long autoModeTime) {
         super(nodes, branches, interactiveSteps, symbExApps, quantifierInstantiations, ossApps, mergeRuleApps, totalRuleApps, smtSolverApps, 
-                dependencyContractApps, operationContractApps, loopInvApps, 
+                dependencyContractApps, operationContractApps, blockLoopContractApps, loopInvApps, 
                 autoModeTime, 
                 -1, nodes<=sideProofs? .0f: (autoModeTime/(float)(nodes-sideProofs)));
         this.sideProofs = sideProofs;
@@ -38,6 +39,7 @@ public final class SideProofStatistics extends Statistics {
                                        stat.smtSolverApps,
                                        stat.dependencyContractApps,
                                        stat.operationContractApps,
+                                       stat.blockLoopContractApps,
                                        stat.loopInvApps,
                                        stat.autoModeTimeInMillis);
     }
@@ -54,6 +56,7 @@ public final class SideProofStatistics extends Statistics {
                                        stat.smtSolverApps,
                                        stat.dependencyContractApps,
                                        stat.operationContractApps,
+                                       stat.blockLoopContractApps,
                                        stat.loopInvApps,
                                        stat.autoModeTimeInMillis);
     }
@@ -71,6 +74,7 @@ public final class SideProofStatistics extends Statistics {
                                            this.smtSolverApps + stat.smtSolverApps,
                                            this.dependencyContractApps + stat.dependencyContractApps,
                                            this.operationContractApps + stat.operationContractApps,
+                                           this.blockLoopContractApps + stat.blockLoopContractApps,
                                            this.loopInvApps + stat.loopInvApps,
                                            this.autoModeTimeInMillis + stat.autoModeTimeInMillis);
     }
@@ -87,6 +91,7 @@ public final class SideProofStatistics extends Statistics {
                                            this.smtSolverApps + stat.smtSolverApps,
                                            this.dependencyContractApps + stat.dependencyContractApps,
                                            this.operationContractApps + stat.operationContractApps,
+                                           this.blockLoopContractApps + stat.blockLoopContractApps,
                                            this.loopInvApps + stat.loopInvApps,
                                            this.autoModeTimeInMillis + stat.autoModeTimeInMillis);
     }
@@ -94,6 +99,6 @@ public final class SideProofStatistics extends Statistics {
     public SideProofStatistics setAutoModeTime(long autoTime) {
         return new SideProofStatistics(sideProofs, nodes, branches, interactiveSteps, symbExApps,
                         quantifierInstantiations, ossApps, mergeRuleApps, totalRuleApps, smtSolverApps,
-                        dependencyContractApps, operationContractApps, loopInvApps, autoTime);
+                        dependencyContractApps, operationContractApps, blockLoopContractApps, loopInvApps, autoTime);
     }
 }

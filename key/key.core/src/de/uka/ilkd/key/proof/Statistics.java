@@ -7,6 +7,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.SideProofStatistics;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementBuiltInRuleApp;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
@@ -35,6 +36,7 @@ public class Statistics {
     public final int smtSolverApps;
     public final int dependencyContractApps;
     public final int operationContractApps;
+    public final int blockLoopContractApps;
     public final int loopInvApps;
     public final long autoModeTimeInMillis;
     public final long timeInMillis;
@@ -57,6 +59,7 @@ public class Statistics {
                        int smtSolverApps,
                        int dependencyContractApps,
                        int operationContractApps,
+                       int blockLoopContractApps,
                        int loopInvApps,
                        long autoModeTimeInMillis,
                        long timeInMillis, float timePerStepInMillis) {
@@ -71,6 +74,7 @@ public class Statistics {
         this.smtSolverApps = smtSolverApps;
         this.dependencyContractApps = dependencyContractApps;
         this.operationContractApps = operationContractApps;
+        this.blockLoopContractApps = blockLoopContractApps;
         this.loopInvApps = loopInvApps;
         this.autoModeTimeInMillis = autoModeTimeInMillis;
         this.timeInMillis = timeInMillis;
@@ -89,6 +93,7 @@ public class Statistics {
                                   side.smtSolverApps,
                                   side.dependencyContractApps,
                                   side.operationContractApps,
+                                  side.blockLoopContractApps,
                                   side.loopInvApps,
                                   side.autoModeTimeInMillis,
                                   System.currentTimeMillis() - creationTime, side.timePerStepInMillis);
@@ -112,6 +117,7 @@ public class Statistics {
         int tmpSmt = 0; // SMT rule apps
         int tmpDep = 0; // dependency contract apps
         int tmpContr = 0; // functional contract apps
+        int tmpBlock = 0; // block and loop contract apps
         int tmpInv = 0; // loop invariants
 
         while (it.hasNext()) {
@@ -156,7 +162,9 @@ public class Statistics {
                     tmpDep++;
                 } else if (ruleApp instanceof ContractRuleApp) {
                     tmpContr++;
-                } else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
+                } else if (ruleApp instanceof AbstractBlockSpecificationElementBuiltInRuleApp) {
+                    tmpBlock++;
+                }else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
                     tmpInv++;
                 } else if (ruleApp instanceof MergeRuleBuiltInRuleApp) {
                     tmpMergeApps++;
@@ -183,6 +191,7 @@ public class Statistics {
         this.smtSolverApps = tmpSmt;
         this.dependencyContractApps = tmpDep;
         this.operationContractApps = tmpContr;
+        this.blockLoopContractApps = tmpBlock;
         this.loopInvApps = tmpInv;
         this.autoModeTimeInMillis = startNode.proof().getAutoModeTime();
         this.timeInMillis = (System.currentTimeMillis() - startNode.proof().creationTime);
@@ -243,6 +252,8 @@ public class Statistics {
                         stat.dependencyContractApps));
         summaryList.add(new Pair<String, String>("Operation Contract apps", "" +
                         stat.operationContractApps));
+        summaryList.add(new Pair<String, String>("Block/Loop Contract apps", "" +
+                stat.blockLoopContractApps));
         summaryList.add(new Pair<String, String>("Loop invariant apps", "" +
                         stat.loopInvApps));
         summaryList.add(new Pair<String, String>("Merge Rule apps", "" +
