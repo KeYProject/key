@@ -296,6 +296,7 @@ public class HeatmapOptionsDialog extends JDialog {
                 if (command == COMMANDS[0]) {
                     VS.setHeatmapOptions(false, SF, newest, ma);
                     dispose();
+                    return;
                 } else if (command == COMMANDS[1]) {
                     showHm = true;
                     SF = true;
