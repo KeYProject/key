@@ -39,6 +39,9 @@ public class NewSMTTTest {
     private MasterHandler mh;
     private static Sort intType;
     private static Sort boolType;
+    private static Sort heapType;
+    private static Sort objectType;
+    private static Sort fieldType;
 
     File file = new File("/home/i57/cnodes/jschiffl/tmp/smttest/smttestfile");
     FileWriter fw = null;
@@ -50,10 +53,9 @@ public class NewSMTTTest {
         nss = s.getNamespaces();
         intType = nss.sorts().lookup("int");
         boolType = nss.sorts().lookup("boolean");
-        Namespace<QuantifiableVariable> varNS = new Namespace<>();
-        varNS.add(new LogicVariable(new Name("p"), boolType));
-        varNS.add(new LogicVariable(new Name("q"), boolType));
-        nss.setVariables(varNS);
+        heapType = nss.sorts().lookup("Heap");
+        objectType = nss.sorts().lookup("java.lang.Object");
+        fieldType = nss.sorts().lookup("Field");
         this.tb = s.getTermBuilder();
         this.trans = new ModularSMTLib2Translator();
         this.mh = new MasterHandler(s);
@@ -145,7 +147,7 @@ public class NewSMTTTest {
         Term y = tb.var(ySym);
         Term all = tb.all(yVar, tb.all(xVar, tb.gt(tb.add(x, y), x)));
         Assert.assertEquals(
-                "(forall ((var_y int)) (forall ((var_x int)) (> (+ (u2i ui_x) (u2i ui_y)) (u2i ui_x))))",
+                "(forall ((var_y u)) (forall ((var_x u)) (> (+ (u2i ui_x) (u2i ui_y)) (u2i ui_x))))",
                 mh.translate(all).toString());
     }
 
@@ -153,15 +155,15 @@ public class NewSMTTTest {
     public void q2Test() throws IllegalFormulaException, IOException {
         String st = "\\forall int x; \\forall int y; x != y";
         Term all = s2t(st);
-        String ts = trans.translateProblem(all, s, null).toString();
-        writeToTestFile(ts);
+        // String ts = trans.translateProblem(all, s, null).toString();
+        // writeToTestFile(ts);
 
-        Assert.assertEquals("(forall ((var_x int)) (forall ((var_y int)) (not (= var_x var_y))))",
+        Assert.assertEquals("(forall ((var_x u)) (forall ((var_y u)) (not (= var_x var_y))))",
                 mh.translate(all).toString());
     }
 
     @Test
-    public void testContraposition() {
+    public void testContraposition() throws IllegalFormulaException, IOException {
         Function pSym = new Function(new Name("p"), Sort.FORMULA);
         Function qSym = new Function(new Name("q"), Sort.FORMULA);
 
@@ -169,25 +171,24 @@ public class NewSMTTTest {
         Term q = tb.func(qSym);
 
         Term cp = tb.imp(tb.imp(p, q), tb.imp(tb.not(q), tb.not(p)));
+
         Assert.assertEquals(
                 "(=> (=> (u2b ui_p) (u2b ui_q)) (=> (not (u2b ui_q)) (not (u2b ui_p))))",
                 mh.translate(cp).toString());
     }
 
     @Test
-    public void testContraposition2() {
-        String str = "(p ==> q) ==> (!q ==> !p)";
-        KeYLexerF l = new KeYLexerF(str, null);
-        KeYParserF p = new KeYParserF(ParserMode.PROBLEM, l, s, nss);
-        Term cp = null;
-        try {
-            cp = p.term();
-        } catch (Exception e) {
-            Assert.fail("Term building failed");
-        }
-        Assert.assertEquals(
-                "(=> (=> (u2b ui_p) (u2b ui_q)) (=> (not (u2b ui_q)) (not (u2b ui_p))))",
-                mh.translate(cp).toString());
+    public void selectTest() throws IllegalFormulaException, IOException {
+        Function select = new Function(new Name("select"), Sort.ANY, heapType, objectType,
+                fieldType);
+        Term h = tb.var(new LocationVariable(new ProgramElementName("h"), heapType));
+        Term o = tb.var(new LocationVariable(new ProgramElementName("o"), objectType));
+        Term f = tb.var(new LocationVariable(new ProgramElementName("f"), fieldType));
+
+        Term sel = tb.func(select, h, o, f);
+        String ts = trans.translateProblem(sel, s, null).toString();
+        writeToTestFile(ts);
+        Assert.assertEquals("(ui_select ui_h ui_o ui_f)", mh.translate(sel).toString());
     }
 }
 

@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -8,6 +9,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
@@ -33,15 +37,47 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
         Operator op = term.op();
         String name = PREFIX + op.name().toString();
         if(!trans.isKnownSymbol(name)) {
-            op.arity();
-            SExpr signature = new SExpr(Collections.nCopies(op.arity(), new SExpr("u")));
-            trans.addDeclaration(new SExpr("declare-function",
-                    new SExpr(name), signature, new SExpr("u")));
+            int a = op.arity();
+            SExpr signature = new SExpr(Collections.nCopies(a, new SExpr("u")));
+            trans.addDeclaration(
+                    new SExpr("declare-fun", new SExpr(name), signature, new SExpr("u")));
             trans.addKnownSymbol(name);
+
+            if (op.arity() > 0 && op instanceof SortedOperator) {
+                SExpr axiom = funTypeAxiomFromTerm(term, (SortedOperator) op);
+                trans.addAxiom(axiom);
+            }
         }
 
         List<SExpr> children = trans.translate(term.subs(), Type.UNIVERSE);
         return new SExpr(name, Type.UNIVERSE, children);
+    }
+
+    private SExpr funTypeAxiomFromTerm(Term term, SortedOperator op) {
+        List<SExpr> vars = new ArrayList<>();
+
+        for (int i = 0; i < op.arity(); ++i) {
+            vars.add(new SExpr(LogicalVariableHandler.VAR_PREFIX + i, Type.NONE, "u"));
+        }
+        List<SExpr> tos = new ArrayList<>();
+        int i = 0;
+        for (Sort sort : op.argSorts()) {
+            SExpr var = new SExpr(LogicalVariableHandler.VAR_PREFIX + i);
+            SExpr to = new SExpr("typeof", var);
+            tos.add(new SExpr("=", to, new SExpr(sort.toString())));
+            ++i;
+        }
+        SExpr ante;
+        if (tos.size() == 1) {
+            ante = tos.get(0);
+        } else {
+            ante = new SExpr("and", tos);
+        }
+        SExpr cons = new SExpr("subtype",
+                new SExpr("typeof", new SExpr(op.toString())), new SExpr(op.sort().toString()));
+        SExpr matrix = new SExpr("=>", ante, cons);
+        SExpr axiom = new SExpr("forall", Type.BOOL, new SExpr(vars), matrix);
+        return new SExpr("assert", axiom);
     }
 
 }

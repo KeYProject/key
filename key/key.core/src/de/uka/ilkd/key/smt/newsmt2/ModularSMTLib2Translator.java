@@ -9,6 +9,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.IllegalFormulaException;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslator;
@@ -37,9 +38,26 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         sb.append(PREAMBLE);
 
         sb.append("; --- Declarations\n\n");
+
+        StringBuffer sortsb = new StringBuffer();
+        sortsb.append("(distinct ");
+        for (Sort s : services.getNamespaces().sorts().elements()) {
+            String sortString = "sort_" + s.toString();
+            sb.append("(declare-const " + sortString + " T)\n");
+            sortsb.append(sortString + " ");
+        }
+        sortsb.append(")\n");
+        sb.append(sortsb);
+        sb.append("\n");
         for(SExpr decl : master.getDeclarations()) {
             decl.appendTo(sb);
             sb.append("\n");
+        }
+
+        sb.append("; --- Axioms\n\n");
+        for (SExpr ax : master.getAxioms()) {
+            ax.appendTo(sb);
+            sb.append("\n\n");
         }
 
         sb.append("; --- Sequent\n\n");
@@ -59,8 +77,9 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         try {
             String line;
             StringBuilder sb = new StringBuilder();
-            while((line = r.readLine()) != null)
+            while((line = r.readLine()) != null) {
                 sb.append(line).append("\n");
+            }
 
             return sb.toString();
         } catch (IOException e) {
