@@ -71,9 +71,6 @@ public final class LocationVariable extends ProgramVariable
     public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isFinal,
 			PositionInfo positionInfo) {
 		this(name, t, isFinal);
-		if (name != null && name.toString().equals("k")) {
-			System.out.println("k..");
-		}
 		this.posInfo = positionInfo;
 	}
 

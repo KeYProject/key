@@ -544,7 +544,7 @@ public class Recoder2KeYConverter {
     private PositionInfo positionInfo(recoder.java.SourceElement se) {
         Position relPos = new Position(se.getRelativePosition().getLine(), se
                 .getRelativePosition().getColumn());
-        
+        /*
         SourceElement s = se;
         recoder.java.SourceElement.Position start = s.getStartPosition();
         while(s != null && start == recoder.java.SourceElement.Position.UNDEFINED) {
@@ -555,7 +555,9 @@ public class Recoder2KeYConverter {
 			s = first;
         }
         
-        Position startPos = new Position(start.getLine(), start.getColumn());
+        Position startPos = new Position(start.getLine(), start.getColumn());*/
+        Position startPos = new Position(se.getStartPosition().getLine(),
+                se.getStartPosition().getColumn());
         Position endPos = new Position(se.getEndPosition().getLine(), se
                 .getEndPosition().getColumn());
         if ((!inLoopInit))
@@ -1281,9 +1283,6 @@ public class Recoder2KeYConverter {
 
             final ProgramElementName name = VariableNamer
                     .parseName(makeAdmissibleName(recoderVarSpec.getName()));
-            if (name.toString().equals("k")) {
-            	System.out.println("k");
-            }
             //final ProgramVariable pv = new LocationVariable(name,
             //        getKeYJavaType(recoderType), recoderVarSpec.isFinal());
             final ProgramVariable pv = new LocationVariable(name,
