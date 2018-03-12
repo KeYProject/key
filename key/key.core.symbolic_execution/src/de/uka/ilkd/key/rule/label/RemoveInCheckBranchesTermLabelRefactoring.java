@@ -30,7 +30,6 @@ import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.LoopContractExternalRule;
-import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
@@ -70,7 +69,6 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
                                         .prepend(WhileInvariantRule.INSTANCE.name())
                                         .prepend(BlockContractInternalRule.INSTANCE.name())
                                         .prepend(BlockContractExternalRule.INSTANCE.name())
-                                        .prepend(LoopContractInternalRule.INSTANCE.name())
                                         .prepend(LoopContractExternalRule.INSTANCE.name());
    }
 

@@ -31,7 +31,6 @@ import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.LoopContractExternalRule;
-import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
@@ -131,7 +130,6 @@ public class JavaProfile extends AbstractProfile {
                                    .prepend(LoopScopeInvariantRule.INSTANCE)
                                    .prepend(BlockContractInternalRule.INSTANCE)
                                    .prepend(BlockContractExternalRule.INSTANCE)
-                                   .prepend(LoopContractInternalRule.INSTANCE)
                                    .prepend(LoopContractExternalRule.INSTANCE)
                                    .prepend(UseDependencyContractRule.INSTANCE)
                                    .prepend(getOneStepSimpilifier())
