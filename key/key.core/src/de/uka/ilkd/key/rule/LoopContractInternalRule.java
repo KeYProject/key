@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
@@ -149,6 +151,22 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
         
         final Term nextRemembranceUpdate =
                 new UpdatesBuilder(nextVariables, services).buildRemembranceUpdate(heaps);
+        final Term outerRemembranceUpdate = updatesBuilder.buildOuterRemembranceUpdate();
+        
+        Map<LocationVariable, Function> anonHeaps = new LinkedHashMap<LocationVariable, Function>(40);
+        final TermBuilder tb = services.getTermBuilder();
+        
+        for (LocationVariable heap : heaps) {
+            final String anonymisationName =
+                    tb.newName(BlockContractBuilders.ANON_IN_PREFIX + heap.name());
+            final Function anonymisationFunction =
+                    new Function(new Name(anonymisationName), heap.sort(), true);
+            services.getNamespaces().functions().addSafely(anonymisationFunction);
+            anonHeaps.put(heap, anonymisationFunction);
+        }
+        
+        
+        final Term anonInUpdate = updatesBuilder.buildAnonInUpdate(anonHeaps);
         
         
         final ImmutableList<Goal> result;
@@ -176,7 +194,7 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
         configurator.setUpLoopValidityGoal(
                 goal,
                 contract,
-                contextUpdate,
+                tb.sequential(outerRemembranceUpdate, anonInUpdate),
                 remembranceUpdate,
                 nextRemembranceUpdate,
                 anonymisationHeaps,
