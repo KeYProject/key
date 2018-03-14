@@ -80,9 +80,9 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
         Node previousNode = null;
         while (selfOrParentNode != null) {
             RuleApp app = selfOrParentNode.getAppliedRuleApp();
-            if (app instanceof AbstractLoopContractBuiltInRuleApp) {
-                AbstractLoopContractBuiltInRuleApp blockRuleApp =
-                        (AbstractLoopContractBuiltInRuleApp)app;
+            if (app instanceof LoopContractInternalBuiltInRuleApp) {
+                LoopContractInternalBuiltInRuleApp blockRuleApp =
+                        (LoopContractInternalBuiltInRuleApp)app;
                 if (blockRuleApp.getBlock().equals(contract.getBlock()) && 
                         selfOrParentNode.getChildNr(previousNode) == 0) {
                     // prevent application of contract in its own check validity branch

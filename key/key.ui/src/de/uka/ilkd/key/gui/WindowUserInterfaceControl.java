@@ -96,6 +96,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         completions.add(new LoopInvariantRuleCompletion());
         completions.add(new BlockContractInternalCompletion(mainWindow));
         completions.add(new BlockContractExternalCompletion(mainWindow));
+        completions.add(new LoopContractInternalCompletion(mainWindow));
         completions.add(new LoopContractExternalCompletion(mainWindow));
         completions.add(MergeRuleCompletion.INSTANCE);
     }
