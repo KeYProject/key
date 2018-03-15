@@ -1,6 +1,7 @@
 example.name = Parallel Gcd
 example.path = Benchmarks/VerifyThis2015
 example.additionalFile.1 = src/ParallelGcd.java
+# Please ensure that the following file is included into the group reload_examples within automaticJAVADL.txt.
 example.proofFile = parallelGcd.proof
 
 This is the second challenge from the VerifyThis competition @ ETAPS 2015 organized by M. Huisman, V. Klebanov, and R. Monahan.
