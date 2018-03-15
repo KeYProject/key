@@ -1,0 +1,231 @@
+subprojects {
+    apply plugin: "java"
+    apply plugin: "java-library"
+
+    repositories {
+        flatDir { dirs 'lib', "${rootDir}/key.core/lib" }
+    }
+
+    sourceSets {
+        main {
+            java      { srcDirs = ['src']}
+            resources { srcDirs = ['resources'] }
+        }
+
+        test {//normal does not have tests
+            java      { srcDirs = [] }
+            resources { srcDirs = [] }
+        }
+    }
+
+    compileJava{
+//        dependsOn(compileGenJava)
+ //       source    += sourceSets.gen.java
+    }
+}
+
+plugins {
+    id "ca.coglinc.javacc" version "2.4.0"
+}
+
+apply plugin: 'antlr'
+
+repositories {
+    flatDir { dirs 'lib' }
+}
+
+def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
+sourceSets.main.java.srcDirs += javaCCOutputDir
+sourceSets.main.antlr.srcDirs = [file("src")]
+
+dependencies {
+    compile project(':key.util')
+    antlr name: 'antlr'
+    //    javacc 'net.java.dev.javacc:javacc:[version]'
+    // Jars
+    compile name: 'antlr'
+    compile name: 'javacc'
+    compile name: 'recoderKey'
+}
+
+def callGit(args) {
+    return "git %s".execute().text.trim()
+}
+
+task gitInfo() {
+    doLast {
+        callGit("rev-parse --short HEAD")
+        callGit("rev-parse --abbrev-ref HEAD")
+    }
+}
+
+generateGrammarSource {
+    source = fileTree("src/") {
+        include "de/uka/ilkd/key/parser/KeYLexer.g",
+                "de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.g",
+                "de/uka/ilkd/key/speclang/jml/translation/KeYJMLLexer.g",
+                "de/uka/ilkd/key/parser/KeYParser.g",
+                "de/uka/ilkd/key/speclang/jml/translation/KeYJMLParser.g",
+                "de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.g"
+    }
+
+    outputDirectory = file("${projectDir}/build/generated-src/antlr/main")
+    arguments += ["-visitor"]
+}
+
+compileJavacc {
+    outputDirectory = javaCCOutputDir
+    inputDirectory = file('src/')
+
+    doLast {
+        copy {
+            from("src/de/uka/ilkd/key/parser/schemajava/Token.java.source") {
+                rename 'Token.java.source', 'Token.java'
+            }
+            into file("${buildDir}/generated-src/javacc/de/uka/ilkd/key/parser/schemajava/")
+        }
+        copy {
+            from("src/de/uka/ilkd/key/parser/proofjava/Token.java.source") {
+                rename 'Token.java.source', 'Token.java'
+            }
+            into file("${buildDir}/generated-src/javacc/de/uka/ilkd/key/parser/proofjava/")
+        }
+    }
+    /*
+    "/de/uka/ilkd/key/parser/proofjava/ProofJavaParser.jj"
+    outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/proofjava"
+    javacchome="${ext.dir}"
+    -->*/
+}
+
+/*
+generateGrammarSource.enabled = false
+generateTestGrammarSource.enabled = false
+
+task generateKeyGrammar(type: AntlrTask) {
+    arguments += ["-visitor", "-long-messages",
+                  "-package", "de.uka.ilkd.key.parser"]
+    source "src/de/uka/ilkd/key/parser/KeY*.g"
+}
+
+task generatePreJMLGrammar(type: AntlrTask) {
+    arguments += ["-visitor", "-long-messages",
+                  "-package", "de.uka.ilkd.key.speclang.jml.pretranslation"]
+    include "src/de/uka/ilkd/key/speclang/jml/pretranslation/*.g"
+}
+
+task generateJMLGrammar(type: AntlrTask) {
+    arguments += ["-visitor", "-long-messages",
+                  "-package", "de.uka.ilkd.key.speclang.jml.translation"]
+    include "src/de/uka/ilkd/key/speclang/jml/translation"
+}
+
+compileJava.dependsOn += [generateJMLGrammar, generateKeyGrammar,
+                          generatePreJMLGrammar]
+*/dependencies {
+    compile project(":key.core")
+}dependencies {
+    compile project(":key.core")
+}sourceSets {
+    main {
+        java { srcDirs = [] }
+        resources { srcDirs = [] }
+    }
+    test {
+        java { srcDirs = ['src'] }
+        resources { srcDirs = ['resources'] }
+    }
+}
+
+dependencies {
+    testCompile project(":key.core.proof_references")
+    testCompile project(":key.util.test")
+    testCompile project(":key.core.test")
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}dependencies {
+    compile project(':key.core')
+}dependencies {
+    compile project(':key.core.symbolic_execution')
+}sourceSets {
+    main {
+        java { srcDirs = [] }
+        resources { srcDirs = [] }
+    }
+    test {
+        java { srcDirs = ['src'] }
+        resources { srcDirs = ['resources'] }
+    }
+}
+
+dependencies {
+    testCompile project(':key.core.symbolic_execution')
+    testCompile project(':key.core.test')
+}sourceSets {
+    main {
+        java { srcDirs = [] }
+        resources { srcDirs = [] }
+    }
+    test {
+        java { srcDirs = ['src'] }
+        resources { srcDirs = ['resources'] }
+    }
+}
+
+dependencies {
+    testCompile project(':key.core')
+    testCompile project(':key.util.test')
+}dependencies {
+    compile project(':key.core')
+}sourceSets {
+    main {
+        java { srcDirs = [] }
+        resources { srcDirs = [] }
+    }
+    test {
+        java { srcDirs = ['src'] }
+        resources { srcDirs = ['resources'] }
+    }
+}
+dependencies {
+    testCompile project(':key.core.testgen')
+    testCompile project(':key.core.test')
+}dependencies {
+    compile project(":key.core")
+}sourceSets {
+    main {
+        java { srcDirs = [] }
+        resources { srcDirs = [] }
+    }
+    test {
+        java { srcDirs = ['src'] }
+        resources { srcDirs = ['resources'] }
+    }
+}
+
+dependencies {
+    testCompile project(":key.removegenerics")
+    testCompile project(":key.util.test")
+}apply plugin: 'application'
+
+dependencies {
+    compile project(':key.core')
+    compile project(':key.core.testgen')
+    compile project(':key.core.symbolic_execution')
+/*    compile name: 'antlr'
+    compile name: 'javacc'
+    compile name: 'recoderKey'*/
+}sourceSets {
+    main {
+        java { srcDirs = [] }
+        resources { srcDirs = [] }
+    }
+    test {
+        java { srcDirs = ['src'] }
+        resources { srcDirs = ['resources'] }
+    }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
