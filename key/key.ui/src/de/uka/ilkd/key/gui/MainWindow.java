@@ -974,7 +974,7 @@ public final class MainWindow extends JFrame  {
         @Override
         public void modalDialogClosed(EventObject e) {
             if (e.getSource() instanceof ApplyTacletDialog) {
-                // enable all previously diabled elements ...
+                // enable all previously disabled elements ...
                 enableMenuBar(MainWindow.this.getJMenuBar(), true);
                 MainWindow.this.mainFrame.setEnabled(true);
                 mainWindowTabbedPane.setEnabledForAllTabs(true);

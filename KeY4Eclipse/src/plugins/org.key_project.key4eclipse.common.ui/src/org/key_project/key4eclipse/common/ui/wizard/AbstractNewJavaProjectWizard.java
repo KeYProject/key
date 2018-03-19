@@ -111,6 +111,7 @@ public abstract class AbstractNewJavaProjectWizard extends JavaProjectWizard {
             if (roots[i].getResource() != null) {
                sourceDirectory = roots[i].getResource();
             }
+            i++;
          }
       }
       return sourceDirectory;

@@ -86,10 +86,8 @@ mod: false" pathCondition="and(equals(exc_0,null),not(equals(obj,null)))" pathCo
                <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call AllNodeTypesTest.main(_obj)&gt;&gt;" pathCondition="equals(obj,null)" pathConditionChanged="false" methodReturnCondition="equals(obj,null)">
                   <branchCondition name="true" pathCondition="equals(obj,null)" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <branchCondition name="true" pathCondition="equals(obj,null)" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <branchCondition name="true" pathCondition="equals(obj,null)" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
-                           <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(obj,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="false">
-                           </termination>
-                        </branchCondition>
+                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(obj,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="false">
+                        </termination>
                      </branchCondition>
                   </branchCondition>
                </exceptionalMethodReturn>
@@ -101,5 +99,5 @@ mod: false" pathCondition="and(equals(exc_0,null),not(equals(obj,null)))" pathCo
    </methodCall>
    <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-   <terminationEntry path="/0/0/1/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0/0/0"/>
 </start>
