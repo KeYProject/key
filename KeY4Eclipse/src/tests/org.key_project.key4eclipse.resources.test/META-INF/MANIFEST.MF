@@ -26,3 +26,4 @@ Bundle-Vendor: KeY Project
 Export-Package: org.key_project.key4eclipse.resources.test.suite,
  org.key_project.key4eclipse.resources.test.testcase.junit,
  org.key_project.key4eclipse.resources.test.util
+Automatic-Module-Name: org.key_project.key4eclipse.resources.test

@@ -27,3 +27,4 @@ Export-Package: org.key_project.jmlediting.core.compilation,
  org.key_project.jmlediting.core.resolver.typecomputer,
  org.key_project.jmlediting.core.utilities,
  org.key_project.jmlediting.core.validation
+Automatic-Module-Name: org.key_project.jmlediting.core

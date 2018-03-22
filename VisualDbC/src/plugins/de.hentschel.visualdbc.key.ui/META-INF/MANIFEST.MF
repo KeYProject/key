@@ -27,3 +27,4 @@ Export-Package: de.hentschel.visualdbc.key.ui.adapter,
  de.hentschel.visualdbc.key.ui.editor,
  de.hentschel.visualdbc.key.ui.util,
  de.hentschel.visualdbc.key.ui.view
+Automatic-Module-Name: de.hentschel.visualdbc.key.ui

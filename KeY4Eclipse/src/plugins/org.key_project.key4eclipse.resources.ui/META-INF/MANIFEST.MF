@@ -30,3 +30,4 @@ Export-Package: org.key_project.key4eclipse.resources.ui.handler,
  org.key_project.key4eclipse.resources.ui.provider,
  org.key_project.key4eclipse.resources.ui.view,
  org.key_project.key4eclipse.resources.ui.wizard
+Automatic-Module-Name: org.key_project.key4eclipse.resources.ui

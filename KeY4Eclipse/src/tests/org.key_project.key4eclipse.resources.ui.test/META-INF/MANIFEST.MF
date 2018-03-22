@@ -21,3 +21,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.key4eclipse.resources.ui.test.suite.swtbot
+Automatic-Module-Name: org.key_project.key4eclipse.resources.ui.test

@@ -17,3 +17,4 @@ Bundle-Vendor: KeY Project
 Export-Package: org.key_project.stubby.core.customization,
  org.key_project.stubby.core.jdt,
  org.key_project.stubby.core.util
+Automatic-Module-Name: org.key_project.stubby.core

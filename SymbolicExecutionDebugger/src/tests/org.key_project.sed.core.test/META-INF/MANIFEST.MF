@@ -24,3 +24,4 @@ Export-Package: org.key_project.sed.core.test.example.fixed_launch_content,
  org.key_project.sed.core.test.suite,
  org.key_project.sed.core.test.suite.swtbot,
  org.key_project.sed.core.test.util
+Automatic-Module-Name: org.key_project.sed.core.test

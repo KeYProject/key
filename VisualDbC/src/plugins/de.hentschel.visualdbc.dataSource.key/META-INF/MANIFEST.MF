@@ -21,3 +21,4 @@ Export-Package: de.hentschel.visualdbc.datasource.key.intern.helper,
  de.hentschel.visualdbc.datasource.key.rule,
  de.hentschel.visualdbc.datasource.key.util
 Bundle-Vendor: Martin Hentschel
+Automatic-Module-Name: de.hentschel.visualdbc.dataSource.key

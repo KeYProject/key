@@ -41,3 +41,4 @@ Export-Package: org.key_project.keyide.ui.composite,
  org.key_project.keyide.ui.util,
  org.key_project.keyide.ui.views
 Import-Package: org.eclipse.jdt.internal.debug.core.breakpoints
+Automatic-Module-Name: org.key_project.keyide.ui

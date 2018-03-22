@@ -13,3 +13,4 @@ Export-Package: de.hentschel.visualdbc.dbcmodel,
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.ecore;bundle-version="2.7.0";visibility:=reexport
 Bundle-ActivationPolicy: lazy
+Automatic-Module-Name: de.hentschel.visualdbc.dbcmodel

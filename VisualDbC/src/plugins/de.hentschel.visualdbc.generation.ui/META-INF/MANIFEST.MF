@@ -17,3 +17,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: Martin Hentschel
 Export-Package: de.hentschel.visualdbc.generation.ui.util,
  de.hentschel.visualdbc.generation.ui.wizard
+Automatic-Module-Name: de.hentschel.visualdbc.generation.ui

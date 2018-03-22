@@ -16,3 +16,4 @@ Export-Package: de.uka.ilkd.key.macros,
  de.uka.ilkd.key.smt.testgen,
  de.uka.ilkd.key.testgen,
  de.uka.ilkd.key.testgen.oracle
+Automatic-Module-Name: org.key_project.core.testgen

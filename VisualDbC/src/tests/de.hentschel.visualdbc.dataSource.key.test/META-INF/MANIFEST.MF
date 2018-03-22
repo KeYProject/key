@@ -31,3 +31,4 @@ Export-Package: de.hentschel.visualdbc.datasource.key.test.suite,
  de.hentschel.visualdbc.datasource.key.test.testCase,
  de.hentschel.visualdbc.datasource.key.test.util
 Bundle-Vendor: Martin Hentschel
+Automatic-Module-Name: de.hentschel.visualdbc.dataSource.key.test

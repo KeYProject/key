@@ -33,3 +33,4 @@ Bundle-Vendor: KeY Project
 Export-Package: org.key_project.sed.ui.visualization.test.suite,
  org.key_project.sed.ui.visualization.test.suite.swtbot,
  org.key_project.sed.ui.visualization.test.util
+Automatic-Module-Name: org.key_project.sed.ui.visualization.test

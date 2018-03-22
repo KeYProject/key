@@ -16,3 +16,4 @@ Export-Package: de.hentschel.visualdbc.datasource.model,
  de.hentschel.visualdbc.datasource.model.memory,
  de.hentschel.visualdbc.datasource.util
 Bundle-Vendor: Martin Hentschel
+Automatic-Module-Name: de.hentschel.visualdbc.dataSource

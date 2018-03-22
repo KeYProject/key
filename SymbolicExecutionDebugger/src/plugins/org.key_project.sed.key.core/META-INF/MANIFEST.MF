@@ -32,3 +32,4 @@ Export-Package: org.key_project.sed.key.core.breakpoints,
  org.key_project.sed.key.core.model,
  org.key_project.sed.key.core.slicing,
  org.key_project.sed.key.core.util
+Automatic-Module-Name: org.key_project.sed.key.core

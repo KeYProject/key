@@ -16,3 +16,4 @@ Bundle-Vendor: Martin Hentschel
 Export-Package: de.hentschel.visualdbc.datasource.test.dummyModel,
  de.hentschel.visualdbc.datasource.test.suite,
  de.hentschel.visualdbc.datasource.test.util
+Automatic-Module-Name: de.hentschel.visualdbc.dataSource.test

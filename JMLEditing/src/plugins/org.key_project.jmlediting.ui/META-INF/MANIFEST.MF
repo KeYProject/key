@@ -25,3 +25,4 @@ Export-Package: org.key_project.jmlediting.ui.completion,
  org.key_project.jmlediting.ui.preferencepages,
  org.key_project.jmlediting.ui.util
 Import-Package: org.eclipse.ui.views.contentoutline
+Automatic-Module-Name: org.key_project.jmlediting.ui

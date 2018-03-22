@@ -33,3 +33,4 @@ Export-Package: org.key_project.sed.ui.action,
  org.key_project.sed.ui.util,
  org.key_project.sed.ui.wizard,
  org.key_project.sed.ui.wizard.page
+Automatic-Module-Name: org.key_project.sed.ui

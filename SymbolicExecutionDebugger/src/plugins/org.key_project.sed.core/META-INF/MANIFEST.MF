@@ -29,3 +29,4 @@ Export-Package: org.key_project.sed.core.annotation,
  org.key_project.sed.core.util
 Import-Package: org.eclipse.graphiti.features,
  org.eclipse.graphiti.mm.pictograms
+Automatic-Module-Name: org.key_project.sed.core

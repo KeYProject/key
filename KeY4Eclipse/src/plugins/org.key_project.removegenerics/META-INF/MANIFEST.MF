@@ -13,3 +13,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
 Export-Package: de.uka.ilkd.key.util.removegenerics,
  de.uka.ilkd.key.util.removegenerics.monitor
+Automatic-Module-Name: org.key_project.removegenerics

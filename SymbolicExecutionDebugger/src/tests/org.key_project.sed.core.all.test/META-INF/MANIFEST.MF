@@ -26,3 +26,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.sed.core.all.test.suite,
  org.key_project.sed.core.all.test.suite.swtbot
+Automatic-Module-Name: org.key_project.sed.all.test

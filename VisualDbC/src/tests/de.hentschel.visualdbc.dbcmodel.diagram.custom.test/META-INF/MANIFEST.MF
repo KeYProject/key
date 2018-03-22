@@ -20,3 +20,4 @@ Export-Package: de.hentschel.visualdbc.dbcmodel.diagram.custom.test.suite,
  de.hentschel.visualdbc.dbcmodel.diagram.custom.test.suite.swtbot,
  de.hentschel.visualdbc.dbcmodel.diagram.custom.test.testCase,
  de.hentschel.visualdbc.dbcmodel.diagram.custom.test.testCase.swtbot
+Automatic-Module-Name: de.hentschel.visualdbc.dbcmodel.diagram.custom.test

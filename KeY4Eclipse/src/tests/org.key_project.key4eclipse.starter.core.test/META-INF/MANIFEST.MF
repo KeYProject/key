@@ -29,3 +29,4 @@ Bundle-Vendor: KeY Project
 Export-Package: org.key_project.key4eclipse.starter.core.test.suite,
  org.key_project.key4eclipse.starter.core.test.suite.swtbot,
  org.key_project.key4eclipse.starter.core.test.util
+Automatic-Module-Name: org.key_project.key4eclipse.starter.core.test

@@ -23,3 +23,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: de.hentschel.visualdbc.example.test.suite,
  de.hentschel.visualdbc.example.test.suite.swtbot
 Bundle-Vendor: Martin Hentschel
+Automatic-Module-Name: de.hentschel.visualdbc.example.test
