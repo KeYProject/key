@@ -119,7 +119,7 @@ public final class KeYModelUtil {
       CollectionUtil.addAll(removedChildren, oldChildren);
       for (int i = 0; i < executionChildren.length; i++) {
          for (int old = 0; old < oldChildren.length; old ++) {
-            if (executionChildren[i].equals(oldChildren[old])) { // maybe == instead of equals
+            if (executionChildren[i].equals(oldChildren[old].getExecutionNode())) { // maybe == instead of equals
                result[i] = oldChildren[old];
                removedChildren.remove(oldChildren[old]);
                break;
