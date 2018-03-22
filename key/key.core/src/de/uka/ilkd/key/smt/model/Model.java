@@ -371,11 +371,9 @@ public class Model {
      * @return the formatted value
      */
     public String processAnyValue(String val) {
-
         if (val == null) {
             return null;
         }
-
         // System.out.println("AnyVal: "+val);
         // if val is in hexadecimal transform it to binary first
         if (val.startsWith("#x")) {
@@ -383,8 +381,7 @@ public class Model {
             val = val.replace("x", "");
             int x = Integer.parseInt(val, 16);
 
-            long anySize = types.getSort(SMTObjTranslator.ANY_SORT)
-                    .getBitSize();
+            long anySize = types.getSort(SMTObjTranslator.ANY_SORT).getBitSize();
             String binString = Integer.toBinaryString(x);
 
             while (binString.length() < anySize) {
@@ -513,51 +510,21 @@ public class Model {
     public void addAliases() {
         for (Heap h : heaps) {
             for (ObjectVal o : h.getObjects()) {
-
                 if (reversedConstants.containsKey(o.getName())) {
                     o.setName(getAliasedName(o.getName()));
                 }
-                Map<String, String> newFieldValues = new HashMap<String, String>();
-                for (Entry<String, String> e : o.getFieldvalues().entrySet()) {
-                    if (reversedConstants.containsKey(e.getValue())) {
-                        newFieldValues.put(e.getKey(),
-                                getAliasedName(e.getValue()));
-                    } else {
-                        newFieldValues.put(e.getKey(), e.getValue());
-                    }
-                }
-
+                Map<String, String> newFieldValues = extractFieldValuesFor(o);
                 o.setFieldvalues(newFieldValues);
-
                 if (o.getSort() != null
                         && o.getSort().name().toString().endsWith("[]")) {
-                    Map<Integer, String> newArrayValues = new HashMap<Integer, String>();
-                    for (int i = 0; i < o.getLength(); i++) {
-                        if (reversedConstants.containsKey(o.getArrayValue(i))) {
-                            newArrayValues.put(i,
-                                    getAliasedName(o.getArrayValue(i)));
-                        } else {
-                            newArrayValues.put(i, o.getArrayValue(i));
-                        }
-                    }
+                    Map<Integer, String> newArrayValues = extractArrayValuesFor(o);
                     o.setArrayValues(newArrayValues);
                 }
-
-                Map<String, String> newFunValues = new HashMap<String, String>();
-                for (Entry<String, String> e : o.getFunValues().entrySet()) {
-                    if (reversedConstants.containsKey(e.getValue())) {
-                        newFunValues.put(e.getKey(),
-                                getAliasedName(e.getValue()));
-                    } else {
-                        newFunValues.put(e.getKey(), e.getValue());
-                    }
-                }
+                Map<String, String> newFunValues = extractFunctionValuesFor(o);
                 o.setFunValues(newFunValues);
-
             }
-
         }
-
+        
         for (LocationSet ls : locsets) {
             if (reversedConstants.containsKey(ls.getName())) {
                 ls.setName(getAliasedName(ls.getName()));
@@ -567,11 +534,10 @@ public class Model {
                 String newObjectID = reversedConstants.containsKey(
                         l.getObjectID()) ? getAliasedName(l.getObjectID())
                                 : l.getObjectID();
-                        String newFieldID = reversedConstants.containsKey(
-                                l.getFieldID()) ? getAliasedName(l.getFieldID())
-                                        : l.getFieldID();
-                                newLocations.add(new Location(newObjectID, newFieldID));
-
+                String newFieldID = 
+                        reversedConstants.containsKey(l.getFieldID()) ? 
+                                getAliasedName(l.getFieldID()) : l.getFieldID();
+                newLocations.add(new Location(newObjectID, newFieldID));
             }
             ls.setLocations(newLocations);
         }
@@ -580,16 +546,63 @@ public class Model {
             if (reversedConstants.containsKey(s.getName())) {
                 s.setName(getAliasedName(s.getName()));
             }
-
             for (int i = 0; i < s.getLength(); ++i) {
                 if (reversedConstants.containsKey(s.get(i))) {
                     s.set(i, getAliasedName(s.get(i)));
                 }
-
             }
-
         }
+    }
 
+    /**
+     * extracts all function values for the specified object
+     * @param o the ObjectVal 
+     * @return set with all function values
+     */
+    private Map<String, String> extractFunctionValuesFor(ObjectVal o) {
+        Map<String, String> newFunValues = new HashMap<String, String>();
+        for (Entry<String, String> e : o.getFunValues().entrySet()) {
+            if (reversedConstants.containsKey(e.getValue())) {
+                newFunValues.put(e.getKey(), getAliasedName(e.getValue()));
+            } else {
+                newFunValues.put(e.getKey(), e.getValue());
+            }
+        }
+        return newFunValues;
+    }
+
+    /**
+     * extracts all array values for the specified object
+     * @param o the ObjectVal 
+     * @return set with all array values
+     */
+    private Map<Integer, String> extractArrayValuesFor(ObjectVal o) {
+        Map<Integer, String> newArrayValues = new HashMap<Integer, String>();
+        for (int i = 0; i < o.getLength(); i++) {
+            if (reversedConstants.containsKey(o.getArrayValue(i))) {
+                newArrayValues.put(i, getAliasedName(o.getArrayValue(i)));
+            } else {
+                newArrayValues.put(i, o.getArrayValue(i));
+            }
+        }
+        return newArrayValues;
+    }
+
+    /**
+     * extracts all field values for the specified object
+     * @param o the ObjectVal 
+     * @return set with all field values
+     */
+    private Map<String, String> extractFieldValuesFor(ObjectVal o) {
+        Map<String, String> newFieldValues = new HashMap<String, String>();
+        for (Entry<String, String> e : o.getFieldvalues().entrySet()) {
+            if (reversedConstants.containsKey(e.getValue())) {
+                newFieldValues.put(e.getKey(), getAliasedName(e.getValue()));
+            } else {
+                newFieldValues.put(e.getKey(), e.getValue());
+            }
+        }
+        return newFieldValues;
     }
 
     /**
