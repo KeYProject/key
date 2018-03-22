@@ -21,8 +21,7 @@ import java.net.URISyntaxException;
  * represents a group of three Positions: relativePosition,
  * startPosition, endPosition
  */
-public class 
- {
+public class PositionInfo {
 
     final Position relPos;
     final Position startPos;
@@ -58,7 +57,7 @@ public class
      * E.g. Input "/A/B/../D" - Output "/A/D"
      * @author gladisch*/
     private static String simplifyPath(String path) {
-        if (path != null && !path.isEmpty()) {
+        if (path != null && !path.isEmpty()) { 
             path = new File(path).toURI().normalize().getPath();
         }
         return path;

@@ -24,7 +24,9 @@ public final class StrategyProperties extends Properties {
     public final static String INF_FLOW_CHECK_TRUE = "INF_FLOW_CHECK_TRUE";
     public final static String INF_FLOW_CHECK_FALSE = "INF_FLOW_CHECK_FALSE";
 
-    // Section key for storage file to identify strategy settings 
+    /**
+     *  Section key for storage file to identify strategy settings 
+     */
     private final static String STRATEGY_PROPERTY = "[StrategyProperty]";
     
     public final static String STOPMODE_OPTIONS_KEY = "STOPMODE_OPTIONS_KEY";
