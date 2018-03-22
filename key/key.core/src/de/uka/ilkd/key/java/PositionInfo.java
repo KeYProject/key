@@ -13,6 +13,10 @@
 
 package de.uka.ilkd.key.java;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+
 /**
  * represents a group of three Positions: relativePosition,
  * startPosition, endPosition
@@ -53,17 +57,10 @@ public class PositionInfo {
      * E.g. Input "/A/B/../D" - Output "/A/D"
      * @author gladisch*/
     private static String simplifyPath(String path){
-	if(path==null || path.length()==0)
-	    return path;
-	int idx = path.indexOf("/../");
-        while(idx > 0){
-	    int pre= path.lastIndexOf("/", idx-1);
-	    if(pre!=-1){
-		path = path.substring(0, pre) + path.substring(idx+3);
-	    }
-	    idx = path.indexOf("/../");
-	}
-	return path;
+        if (path != null && !path.isEmpty()) { 
+            path = new File(path).toURI().normalize().getPath();
+        }
+        return path;
     }
 
     public Position getRelativePosition() {
