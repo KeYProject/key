@@ -99,7 +99,7 @@ import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * @author Stefan Käsdorf
+ * @author Stefan Kaesdorf
  */
 public class KeYResourcesUtil {
    
@@ -604,7 +604,7 @@ public class KeYResourcesUtil {
     * @return the proof folder
     */
    public static IFolder getProofFolder(IProject project){
-      if(isKeYProject(project)){
+      if (isKeYProject(project)){
          return project.getFolder(PROOF_FOLDER_NAME);
       }
       return null;
