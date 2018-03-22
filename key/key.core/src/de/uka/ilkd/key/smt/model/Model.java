@@ -39,7 +39,7 @@ public class Model {
      * marks an empty model
      */
     private boolean empty;
-    
+
     /**
      * Maps constant names to constant values. (constantName, constantValue)
      */
@@ -66,6 +66,9 @@ public class Model {
      */
     private ProblemTypeInformation types;
 
+    /**
+     * creates an empty SMT model
+     */
     public Model() {
         empty = true;
         constants = new HashMap<String, String>();
@@ -75,10 +78,18 @@ public class Model {
         sequences = new LinkedList<Sequence>();
     }
 
+    /**
+     * returns true if the model is empty
+     * @return true if the model is empty
+     */
     public boolean isEmpty() {
         return empty;
     }
 
+    /**
+     * marks the model as empty or full
+     * @param empty indicates model status
+     */
     public void setEmpty(boolean empty) {
         this.empty = empty;
     }
@@ -321,21 +332,16 @@ public class Model {
      *         the constant, and n the decimal value of the constant
      */
     public String processConstantValue(String val, SMTSort s) {
-
         if (val.equals("true") || val.equals("false")) {
             return val;
-        }
+        }        
 
         if (val.startsWith("#x")) {
-            val = val.replace("#", "");
-            val = val.replace("x", "");
-            int x = Integer.parseInt(val, 16);
-            val = "#b" + Integer.toBinaryString(x);
+            val = val.replace("#", "").replace("x", "");
+            val = "#b" + Integer.toBinaryString(Integer.parseInt(val, 16));
         }
 
-        val = val.replace("#", "");
-        val = val.replace("b", "");
-
+        val = val.replace("#", "").replace("b", "");
         int x = Integer.parseInt(val, 2);
 
         if (s.getId().equals(SMTObjTranslator.BINT_SORT)) {
@@ -343,19 +349,15 @@ public class Model {
                     .getBound();
             // long intSize =
             // types.getSort(SMTObjTranslator.BINT_SORT).getBitSize();
-
             if (x >= intBound / 2) {
                 x = (int) (x - intBound);
             }
             val = Integer.toString(x);
             return val;
         }
-
         val = "#" + s.getId().charAt(0) + x;
         val = val.toLowerCase();
-
         return val;
-
     }
 
     /**
@@ -415,43 +417,34 @@ public class Model {
                 x = (int) (x - intBound);
             }
             val = Integer.toString(x);
-        }
-        // val is of type bool
-        else if (val.startsWith(types.getPrefixForSort(SMTSort.BOOL))) {
+        } else if (val.startsWith(types.getPrefixForSort(SMTSort.BOOL))) {
+            // val is of type bool
             val = val.substring(3);
             int x = Integer.parseInt(val, 2);
             if (x == 0) {
                 val = "false";
-            }
-            else {
+            } else {
                 val = "true";
             }
-        }
-        // val is of type sequence
-        else if (val.startsWith(types
+        } else if (val.startsWith(types
                 .getPrefixForSort(types.getSort(SMTObjTranslator.SEQ_SORT)))) {
+            // val is of type sequence
             val = formatAny(val, types.getSort(SMTObjTranslator.SEQ_SORT));
-        }
-        // val is of type heap - should never happen!
-        else if (val.startsWith(types
+        } else if (val.startsWith(types
                 .getPrefixForSort(types.getSort(SMTObjTranslator.HEAP_SORT)))) {
+            // val is of type heap - should never happen!
             val = formatAny(val, types.getSort(SMTObjTranslator.HEAP_SORT));
-        }
-        // val is of type location set
-        else if (val.startsWith(types.getPrefixForSort(
+        } else if (val.startsWith(types.getPrefixForSort(
                 types.getSort(SMTObjTranslator.LOCSET_SORT)))) {
+            // val is of type location set
             val = formatAny(val, types.getSort(SMTObjTranslator.LOCSET_SORT));
-        }
-        // val can only be of type object
-        else {
-
+        } else {
+            // val can only be of type object
             val = val.substring(3);
             long objSize = types.getSort(SMTObjTranslator.OBJECT_SORT)
                     .getBitSize();
             val = val.substring(val.length() - (int) objSize);
-            int x = Integer.parseInt(val, 2);
-
-            val = "#o" + x;
+            val = "#o" + Integer.parseInt(val, 2);
             // if(reversedConstants.containsKey(val)){
             // val = val + "/" + reversedConstants.get(val);
             // }
@@ -496,19 +489,12 @@ public class Model {
      * form
      */
     public void processSeqValues() {
-
         for (Sequence s : sequences) {
             for (int i = 0; i < s.getLength(); ++i) {
-
-                String val = s.get(i);
-
-                val = processAnyValue(val);
-
+                String val = processAnyValue(s.get(i));
                 s.set(i, val);
-
             }
         }
-
     }
 
     /**
@@ -525,22 +511,18 @@ public class Model {
      * values.
      */
     public void addAliases() {
-
         for (Heap h : heaps) {
-
             for (ObjectVal o : h.getObjects()) {
 
                 if (reversedConstants.containsKey(o.getName())) {
                     o.setName(getAliasedName(o.getName()));
                 }
-
                 Map<String, String> newFieldValues = new HashMap<String, String>();
                 for (Entry<String, String> e : o.getFieldvalues().entrySet()) {
                     if (reversedConstants.containsKey(e.getValue())) {
                         newFieldValues.put(e.getKey(),
                                 getAliasedName(e.getValue()));
-                    }
-                    else {
+                    } else {
                         newFieldValues.put(e.getKey(), e.getValue());
                     }
                 }
@@ -554,8 +536,7 @@ public class Model {
                         if (reversedConstants.containsKey(o.getArrayValue(i))) {
                             newArrayValues.put(i,
                                     getAliasedName(o.getArrayValue(i)));
-                        }
-                        else {
+                        } else {
                             newArrayValues.put(i, o.getArrayValue(i));
                         }
                     }
@@ -567,8 +548,7 @@ public class Model {
                     if (reversedConstants.containsKey(e.getValue())) {
                         newFunValues.put(e.getKey(),
                                 getAliasedName(e.getValue()));
-                    }
-                    else {
+                    } else {
                         newFunValues.put(e.getKey(), e.getValue());
                     }
                 }
@@ -587,10 +567,10 @@ public class Model {
                 String newObjectID = reversedConstants.containsKey(
                         l.getObjectID()) ? getAliasedName(l.getObjectID())
                                 : l.getObjectID();
-                String newFieldID = reversedConstants.containsKey(
-                        l.getFieldID()) ? getAliasedName(l.getFieldID())
-                                : l.getFieldID();
-                newLocations.add(new Location(newObjectID, newFieldID));
+                        String newFieldID = reversedConstants.containsKey(
+                                l.getFieldID()) ? getAliasedName(l.getFieldID())
+                                        : l.getFieldID();
+                                newLocations.add(new Location(newObjectID, newFieldID));
 
             }
             ls.setLocations(newLocations);
@@ -602,7 +582,6 @@ public class Model {
             }
 
             for (int i = 0; i < s.getLength(); ++i) {
-
                 if (reversedConstants.containsKey(s.get(i))) {
                     s.set(i, getAliasedName(s.get(i)));
                 }
@@ -641,7 +620,6 @@ public class Model {
             if (pointed == null) {
                 break;
             }
-
             o = getObject(pointed, heap);
             i++;
         }
@@ -650,7 +628,9 @@ public class Model {
     }
 
     /**
-     *  finds the object the ref parameter is refering to
+     *  finds the object the ref parameter is referring to
+     *  @param ref the reference to the object
+     *  @return the object the ref parameter is referring to or null otherwise
      */
     public ObjectVal findObject(String ref) {
         String[] l = ref.split("\\.");
@@ -667,7 +647,6 @@ public class Model {
         ObjectVal o = getObject(constants.get(objName), heap);
         int i = 1;
         while (!o.getName().equals(nullString) && i < l.length) {
-
             // System.out.println(o.getName()+"."+l[i]);
             String pointed = o.getFieldUsingSimpleName(l[i]);
             if (pointed == null) {
@@ -810,20 +789,19 @@ public class Model {
     public ObjectVal getObject(String name, Heap heap) {
         // System.out.println(name+"@"+heap.getName());
         for (ObjectVal o : heap.getObjects()) {
-
             if (o.getName().startsWith(name)) {
                 return o;
             }
-
         }
 
         return null;
-
     }
 
     /**
      * removes the pipe character at the start and end from the given string
-     * @return string identical to the parameter except with pipe characters at the start and end removed
+     * @param s the String to process
+     * @return String identical to the parameter except with pipe characters 
+     * at the start and end removed
      */
     public static String removePipes(String s) {
         if (s.startsWith("|")) {
@@ -851,8 +829,7 @@ public class Model {
             SMTSort s = types.getTypeForConstant(c);
             if (s == null) {
                 // System.err.println("No sort for: "+c);
-            }
-            else {
+            } else {
                 newConstants.put(c, processConstantValue(value, s));
             }
 
@@ -862,26 +839,23 @@ public class Model {
         fillReversedTable();
 
         for (Heap h : heaps) {
-
             for (ObjectVal o : h.getObjects()) {
                 Map<String, String> newFieldValues = new HashMap<String, String>();
                 for (String f : o.getFieldvalues().keySet()) {
-
                     String value = o.getFieldvalues().get(f);
                     newFieldValues.put(f, processAnyValue(value));
 
                 }
                 o.setFieldvalues(newFieldValues);
             }
-
         }
 
         processLocSetNames();
-
     }
 
     /**
      * returns a string representation of this SMT model
+     * @return string representation of the model for debugging purposes
      */
     public String toString() {
         String result = "Constants";
