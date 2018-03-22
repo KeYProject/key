@@ -145,7 +145,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         getMediator().addGUIListener(guiListener);
 
         updateHighlights = new LinkedList<Object>();
-
     }
 
     /**
@@ -226,7 +225,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 }
             } while (errorocc);
         }
-
         updateUpdateHighlights();
         restorePosition();
         addMouseListener(listener);
