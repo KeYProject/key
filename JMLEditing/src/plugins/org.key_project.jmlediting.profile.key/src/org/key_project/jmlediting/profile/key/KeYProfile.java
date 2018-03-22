@@ -81,7 +81,7 @@ public class KeYProfile extends JMLReferenceProfile {
    private final Set<ParseFunction> additionalPrimarySuffixes;
 
    public KeYProfile() {
-      super(KeywordLocale.AMERICAN);
+      super(KeywordLocale.BOTH);
 
       final Set<IKeyword> supportedKeywords = this
             .getSupportedKeywordsInternal();
