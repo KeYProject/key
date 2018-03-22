@@ -21,7 +21,8 @@ import java.net.URISyntaxException;
  * represents a group of three Positions: relativePosition,
  * startPosition, endPosition
  */
-public class PositionInfo {
+public class 
+ {
 
     final Position relPos;
     final Position startPos;
@@ -56,8 +57,8 @@ public class PositionInfo {
      * to that substring. Otherwise java.io.FileReader would have a problem.
      * E.g. Input "/A/B/../D" - Output "/A/D"
      * @author gladisch*/
-    private static String simplifyPath(String path){
-        if (path != null && !path.isEmpty()) { 
+    private static String simplifyPath(String path) {
+        if (path != null && !path.isEmpty()) {
             path = new File(path).toURI().normalize().getPath();
         }
         return path;
