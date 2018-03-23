@@ -192,14 +192,19 @@ public class ProofManager {
    private LinkedList<ProofElement> computeProofElementsAndUpdateProjectInfo() throws CoreException {
       ProjectInfo projectInfo = ProjectInfoManager.getInstance().getProjectInfo(project);
       Set<KeYJavaType> kjts = environment.getJavaInfo().getAllKeYJavaTypes();
+      
       KeYJavaType[] kjtsarr = KeYUtil.sortKeYJavaTypes(kjts);
       LinkedList<ProofElement> proofElements = new LinkedList<ProofElement>();
       Map<AbstractTypeContainer, Integer> typeIndexMap = new HashMap<AbstractTypeContainer, Integer>();
       int packageIndex = 0;
       Map<String, PackageInfo> alreadyTreatedPackages = new HashMap<String, PackageInfo>();
       Map<String, TypeInfo> typeInfoMap = new HashMap<String, TypeInfo>();
+      final String[] excludedJavaTypes = properties.getExcludedJavaTypes();
       for (KeYJavaType type : kjtsarr) {
-         // Find java file
+          if (Arrays.binarySearch(excludedJavaTypes,type.getFullName()) >= 0) {
+              continue;
+          }
+          // Find java file
          ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(type);
          Type javaType = type.getJavaType();
          IFile javaFile = null;
