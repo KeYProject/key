@@ -48,3 +48,4 @@ Export-Package: org.key_project.sed.ui.visualization,
  org.key_project.sed.ui.visualization.preference.page,
  org.key_project.sed.ui.visualization.util,
  org.key_project.sed.ui.visualization.view
+Automatic-Module-Name: org.key_project.sed.ui.visualization

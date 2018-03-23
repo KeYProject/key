@@ -31,3 +31,4 @@ Export-Package: org.key_project.jmlediting.profile.jmlref,
  org.key_project.jmlediting.profile.jmlref.type
 Import-Package: org.eclipse.core.resources
 Bundle-Vendor: KeY Project
+Automatic-Module-Name: org.key_project.jmlediting.profile.jmlref

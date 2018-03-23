@@ -21,9 +21,6 @@ import javax.swing.UIManager;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
-
-
-
 /** this class is used to set some default gui properties */
 public class Config {
 
@@ -60,6 +57,7 @@ public class Config {
         new ArrayList<ConfigChangeListener>(5);
 
     private Config() {
+        setDefaultFonts();
     }
 
     public void larger() {

@@ -16,3 +16,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
 Export-Package: de.uka.ilkd.key.suite
+Automatic-Module-Name: org.key_project.core.testgen.test

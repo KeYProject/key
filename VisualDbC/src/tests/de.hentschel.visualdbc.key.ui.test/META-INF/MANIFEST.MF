@@ -32,3 +32,4 @@ Bundle-Vendor: Martin Hentschel
 Export-Package: de.hentschel.visualdbc.key.ui.test.suite,
  de.hentschel.visualdbc.key.ui.test.suite.swtbot,
  de.hentschel.visualdbc.key.ui.test.util
+Automatic-Module-Name: de.hentschel.visualdbc.key.ui.test

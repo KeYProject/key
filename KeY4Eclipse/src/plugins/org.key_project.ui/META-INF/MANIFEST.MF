@@ -36,3 +36,4 @@ Export-Package: de.uka.ilkd.key.core,
  de.uka.ilkd.key.util,
  org.key_project.ui,
  org.key_project.ui.util
+Automatic-Module-Name: org.key_project.ui

@@ -42,3 +42,4 @@ Export-Package: de.uka.ilkd.key.java,
  de.uka.ilkd.key.util.pp,
  org.key_project.core.test.suite,
  org.key_project.core.test.util
+Automatic-Module-Name: org.key_project.core.test

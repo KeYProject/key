@@ -21,3 +21,4 @@ Export-Package: de.hentschel.visualdbc.datasource.ui.composite,
  de.hentschel.visualdbc.datasource.ui.util,
  de.hentschel.visualdbc.datasource.ui.wizard.page
 Bundle-Vendor: Martin Hentschel
+Automatic-Module-Name: de.hentschel.visualdbc.dataSource.ui

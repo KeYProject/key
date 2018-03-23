@@ -22,3 +22,4 @@ Bundle-ActivationPolicy: lazy
 Export-Package: org.key_project.ui.test.suite,
  org.key_project.ui.test.util
 Bundle-Vendor: KeY Project
+Automatic-Module-Name: org.key_project.ui.test

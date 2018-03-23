@@ -26,3 +26,4 @@ Export-Package: org.key_project.javaeditor.extension,
 Import-Package: org.eclipse.emf.common,
  org.eclipse.emf.edit,
  org.eclipse.jdt.core.manipulation
+Automatic-Module-Name: org.key_project.javaeditor

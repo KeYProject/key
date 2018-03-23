@@ -30,3 +30,4 @@ Export-Package: org.key_project.sed.key.evaluation.model.definition,
  org.key_project.sed.key.evaluation.model.tooling,
  org.key_project.sed.key.evaluation.model.util,
  org.key_project.sed.key.evaluation.model.validation
+Automatic-Module-Name: org.key_project.sed.key.evaluation.model

@@ -27,3 +27,4 @@ Export-Package: org.key_project.monkey.product.ui.application,
  org.key_project.monkey.product.ui.provider,
  org.key_project.monkey.product.ui.util,
  org.key_project.monkey.product.ui.view
+Automatic-Module-Name: org.key_project.monkey.product.ui

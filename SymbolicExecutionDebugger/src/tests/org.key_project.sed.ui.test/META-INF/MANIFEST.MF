@@ -20,3 +20,4 @@ Bundle-Vendor: KeY Project
 Export-Package: org.key_project.sed.ui.test.suite,
  org.key_project.sed.ui.test.suite.swtbot,
  org.key_project.sed.ui.test.testcase.swtbot
+Automatic-Module-Name: org.key_project.sed.ui.test

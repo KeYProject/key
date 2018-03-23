@@ -39,3 +39,4 @@ Export-Package: org.key_project.util.helper,
  org.key_project.util.test.view,
  org.key_project.util.testcase.collection,
  org.key_project.util.testcase.java
+Automatic-Module-Name: org.key_project.util.test

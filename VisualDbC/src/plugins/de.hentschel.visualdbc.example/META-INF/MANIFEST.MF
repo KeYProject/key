@@ -21,3 +21,4 @@ Bundle-Vendor: Martin Hentschel
 Export-Package: de.hentschel.visualdbc.example.action,
  de.hentschel.visualdbc.example.util,
  de.hentschel.visualdbc.example.wizard
+Automatic-Module-Name: de.hentschel.visualdbc.example

@@ -94,3 +94,4 @@ Export-Package: org.apache.commons.math3,
  org.key_project.sed.key.evaluation.server.util
 Bundle-ClassPath: lib/commons-math3-3.5.jar,
  .
+Automatic-Module-Name: org.key_project.sed.key.evaluation.server

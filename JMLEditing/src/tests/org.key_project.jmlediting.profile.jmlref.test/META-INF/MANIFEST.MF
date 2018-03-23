@@ -25,3 +25,4 @@ Import-Package: org.eclipse.core.resources,
  org.key_project.util.jdt,
  org.key_project.util.test.testcase,
  org.key_project.util.test.util
+Automatic-Module-Name: org.key_project.jmlediting.profile.jmlref.test

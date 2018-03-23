@@ -19,3 +19,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.stubby.core.test.suite,
  org.key_project.stubby.core.test.testcase
+Automatic-Module-Name: org.key_project.stubby.core.test

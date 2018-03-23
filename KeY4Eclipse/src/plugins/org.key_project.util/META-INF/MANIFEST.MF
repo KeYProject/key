@@ -39,3 +39,4 @@ Export-Package: org.key_project.util,
  org.key_project.util.jdt,
  org.key_project.util.reflection,
  org.key_project.util.thread
+Automatic-Module-Name: org.key_project.util

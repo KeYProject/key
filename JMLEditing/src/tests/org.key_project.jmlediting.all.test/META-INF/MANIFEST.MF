@@ -18,3 +18,4 @@ Bundle-ActivationPolicy: lazy
 Export-Package: org.key_project.jmlediting.all.test.suite,
  org.key_project.jmlediting.all.test.suite.swtbot
 Bundle-Vendor: KeY Project
+Automatic-Module-Name: org.key_project.jmlediting.all.test
