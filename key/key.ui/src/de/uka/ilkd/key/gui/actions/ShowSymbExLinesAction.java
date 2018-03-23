@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.gui.actions;
 
+import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
+
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.Shape;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.IOException;
@@ -17,32 +17,32 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Document;
 import javax.swing.text.Element;
-import javax.swing.text.Highlighter;
-import javax.swing.text.JTextComponent;
+import javax.swing.text.Highlighter.Highlight;
+import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
@@ -50,27 +50,65 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.statement.Else;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 
+/**
+ * This action is responsible for showing the symbolic execution path of the currently selected
+ * node. This is done by adding tabs containing the source code and highlighting the lines which
+ * were symbolically executed in the path from the root node down to the current node.
+ * In addition, by clicking on such a highlighted line the user can jump to the first node in the
+ * proof tree where a statement from this line is symbolically executed.
+ *
+ * Editing the source code in the tabs is currently not supported.
+ *
+ * @author WP
+ */
 public class ShowSymbExLinesAction extends MainWindowAction {
-    
-    public class JavaDocument extends DefaultStyledDocument {
-        
-        private SimpleAttributeSet string = new SimpleAttributeSet();
-        private SimpleAttributeSet normal = new SimpleAttributeSet();
-        private SimpleAttributeSet keyword = new SimpleAttributeSet();
-        private SimpleAttributeSet number = new SimpleAttributeSet();
-        private SimpleAttributeSet comment = new SimpleAttributeSet();
-        private SimpleAttributeSet javadoc = new SimpleAttributeSet();
-        private SimpleAttributeSet jml = new SimpleAttributeSet();
-        private SimpleAttributeSet jmlkeyword = new SimpleAttributeSet();
-        
-        private Map<String, SimpleAttributeSet> keywords = new HashMap<String, SimpleAttributeSet>();
-        private Map<String, SimpleAttributeSet> JMLkeywords = new HashMap<String, SimpleAttributeSet>();
-        
-        private int currentPos = 0;
-        private int mode = NORMAL_MODE;
-        
+    /**
+     * ToolTip for the textPanes containing the source code.
+     */
+    private static final String TEXTPANE_TOOLTIP = "Click on a highlighted line to jump to the "
+            + "first occurrence of this line in symbolic execution.";
+
+    /**
+     * String to display in an empty source code textPane.
+     */
+    private static final String NO_SOURCE = "No source loaded.";
+
+    /**
+     * The font for the JTextPane containing the source code.
+     * We use the same font as in SequentView for consistency.
+     */
+    private static final Font SOURCE_FONT = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
+
+    /**
+     * The container for the tabs containing source code.
+     */
+    private final JTabbedPane tabs;
+
+    /**
+     * The status bar for displaying information about the current proof branch.
+     */
+    private final JLabel sourceStatusBar;
+
+    /**
+     * HashMap with all files (of the current proof!).         // TODO: What if a file changes?
+     */
+    private HashMap<String, File> files = new HashMap<String, File>();
+
+    /**
+     * Lines to highlight (contains all highlights of the current proof) and corresponding Nodes.
+     */
+    private LinkedList<Pair> lines;
+
+    /**
+     * This document performs syntax highlighting when strings are inserted.
+     * However, when editing the document the highlighting is not updating correctly at the moment.
+     *
+     * @author WP (still very much based on an example from the web, has to be adapted further)
+     */
+    public class JavaDocument extends DefaultStyledDocument {   // TODO: complete rework
         public final static int STRING_MODE = 10;
         public final static int NORMAL_MODE = 11;
         public final static int KEYWORD_MODE = 12;
@@ -81,7 +119,22 @@ public class ShowSymbExLinesAction extends MainWindowAction {
         public final static int ANNOTATION_MODE = 17;
         public final static int JML_MODE = 18;
         public final static int JML_KEYWORD_MODE = 19;
-        
+
+        private SimpleAttributeSet string = new SimpleAttributeSet();
+        private SimpleAttributeSet normal = new SimpleAttributeSet();
+        private SimpleAttributeSet keyword = new SimpleAttributeSet();
+        private SimpleAttributeSet number = new SimpleAttributeSet();
+        private SimpleAttributeSet comment = new SimpleAttributeSet();
+        private SimpleAttributeSet javadoc = new SimpleAttributeSet();
+        private SimpleAttributeSet jml = new SimpleAttributeSet();
+        private SimpleAttributeSet jmlkeyword = new SimpleAttributeSet();
+
+        private Map<String, SimpleAttributeSet> keywords = new HashMap<String, SimpleAttributeSet>();
+        private Map<String, SimpleAttributeSet> JMLkeywords = new HashMap<String, SimpleAttributeSet>();
+
+        private int currentPos = 0;
+        private int mode = NORMAL_MODE;
+
         public JavaDocument () {
             StyleConstants.setBold(keyword, true);
             StyleConstants.setForeground(keyword, new Color(127, 0, 85));
@@ -92,33 +145,33 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             StyleConstants.setForeground(jml, Color.ORANGE);
             StyleConstants.setForeground(jmlkeyword, Color.ORANGE);
             StyleConstants.setBold(jmlkeyword, true);
-            
+
             final String[] keywordArray = {"package", "class", "import", "interface", "enum",
-                    "extends", "implements",
-                    "public", "protected", "private",
-                    "byte", "int", "long", "char", "float", "double", "boolean", "void",
-                    "true", "false",
-                    "this", "super", "null",
-                    "if", "else", "for", "while", "do", "switch", "case", "break", "continue",
-                    "return",
-                    "try", "catch", "finally",
-                    "static", "volatile", "new", "abstract", "final"  // TODO: 
+                "extends", "implements",
+                "public", "protected", "private",
+                "byte", "int", "long", "char", "float", "double", "boolean", "void",
+                "true", "false",
+                "this", "super", "null",
+                "if", "else", "for", "while", "do", "switch", "case", "break", "continue",
+                "return",
+                "try", "catch", "finally",
+                "static", "volatile", "new", "abstract", "final"  // TODO: additional keywords
             };
             for (String k : keywordArray) {
                 keywords.put(k, keyword);
             }
-            
-            final String[] JMLkeywordArray = {"normal_behavior", "exceptional_behavior", "model_behavior",
-                    "ensures", "requires", "measured_by", "signals", "signals_only",
-                    "ghost", "model", "\\old", "\\result", "\\nothing",
-                    "\\forall", "\\exists", "accessible", "assignable", "invariant", "helper"
-                    
+
+            final String[] JMLkeywordArray = {
+                "normal_behavior", "exceptional_behavior", "model_behavior",
+                "ensures", "requires", "measured_by", "signals", "signals_only",
+                "ghost", "model", "\\old", "\\result", "\\nothing",
+                "\\forall", "\\exists", "accessible", "assignable", "invariant", "helper"
             };
             for (String k : JMLkeywordArray) {
                 JMLkeywords.put(k, jmlkeyword);
             }
         }
-        
+
         private void checkForComment() {
             int offs = this.currentPos;
             Element element = this.getParagraphElement(offs);
@@ -137,9 +190,9 @@ public class ShowSymbExLinesAction extends MainWindowAction {
                 return;
             }
             int i = 0;
-     
+
             if (element.getStartOffset() > 0) {
-                // translates backward if neccessary
+                // translates backward if necessary
                 offs = offs - element.getStartOffset();
             }
             if ((offs >= 1) && (offs <= strLen - 1)) {
@@ -168,10 +221,10 @@ public class ShowSymbExLinesAction extends MainWindowAction {
                         this.insertCommentString("*/", currentPos - 1);
                     }
                 }
-     
+
             }
         }
-        
+
         private void checkForKeyword() {
             if (mode != NORMAL_MODE && mode != JML_MODE) {
                 return;
@@ -193,7 +246,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
                 return;
             }
             int i = 0;
-     
+
             if (element.getStartOffset() > 0) {
                 // translates backward if neccessary
                 offs = offs - element.getStartOffset();
@@ -215,8 +268,8 @@ public class ShowSymbExLinesAction extends MainWindowAction {
                         if (i != 0) {
                             i++;
                         }
-                        String word = elementText.substring(i, offs);// skip the period
-     
+                        String word = elementText.substring(i, offs); // skip the period
+
                         String s = word.trim().toLowerCase();
                         // this is what actually checks for a matching keyword
                         if (mode == NORMAL_MODE && keywords.containsKey(s) ||
@@ -228,7 +281,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
                 }
             }
         }
-        
+
         private void processChar(String str) {
             char strChar = str.charAt(0);
             if (mode != COMMENT_MODE && mode != LINE_COMMENT_MODE
@@ -299,9 +352,8 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             } else if (mode == ANNOTATION_MODE) {
                 //insertAnnotationString(str, this.currentPos);
             }
-     
         }
-        
+
         private void insertCommentString(String str, int pos) {
             try {
                 // remove the old word and formatting
@@ -311,7 +363,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
                 ex.printStackTrace();
             }
         }
-        
+
         private void insertKeyword(String str, int pos, AttributeSet as) {
             try {
                 // remove the old word and formatting
@@ -326,7 +378,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
                 ex.printStackTrace();
             }
         }
-     
+
         private void insertJavadocString(String str, int pos) {
             try {
                 // remove the old word and formatting
@@ -336,26 +388,32 @@ public class ShowSymbExLinesAction extends MainWindowAction {
                 ex.printStackTrace();
             }
         }
-        
+
         @Override
         public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
             super.insertString(offs, str, normal);
-            
+
             int strLen = str.length();
             int endpos = offs + strLen;
             int strpos;
             for (int i = offs; i < endpos; i++) {
                 currentPos = i;
                 strpos = i - offs;
-                processChar( Character.toString(str.charAt(strpos)));
+                processChar(Character.toString(str.charAt(strpos)));
             }
             currentPos = offs;
         }
     }
 
+    /**
+     * Creates a new Action with the given MainWindow and adds change listeners.
+     * @param mainWindow the MainWindow of the GUI
+     */
     public ShowSymbExLinesAction(MainWindow mainWindow) {
         super(mainWindow);
-        this.setName("Show Symbolic Execution Path");
+        tabs = mainWindow.getSourceTabs();
+        sourceStatusBar = mainWindow.getSourceStatusBar();
+        setName("Show Symbolic Execution Path");
 
         // add a listener for changes in the proof tree
         getMediator().addKeYSelectionListener(new KeYSelectionListener() {
@@ -365,128 +423,13 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             }
 
             public void selectedProofChanged(KeYSelectionEvent e) {
+                clearCaches();
                 actionPerformed(null);  // TODO: null
             }
         });
     }
-    
-    class SymbExHighlighter implements Highlighter.HighlightPainter, MouseMotionListener, CaretListener, MouseListener {
 
-        private JTextComponent comp;
-        private Rectangle lastView;
-        private int line = 0;
-        
-        public SymbExHighlighter(JTextComponent comp) {
-            this.comp = comp;
-            comp.addMouseMotionListener(this);
-            comp.addCaretListener( this );
-            comp.addMouseListener( this );
-            
-            try {
-                comp.getHighlighter().addHighlight(0, 0, this);
-            } catch(BadLocationException ble) {
-                ble.printStackTrace();
-            }
-        }
-        
-        @Override
-        public void mouseDragged(MouseEvent e) {
-            //resetHighlight();
-        }
-
-        @Override
-        public void mouseMoved(MouseEvent e) {
-            line = comp.viewToModel(e.getPoint());
-            comp.setCaretPosition(line);
-            resetHighlight();
-        }
-
-        @Override
-        public void paint(Graphics g, int p0, int p1, Shape bounds, JTextComponent c) {
-            try {
-                // TODO: get rid of caret?
-                Rectangle r = c.modelToView(c.getCaretPosition());
-                //Rectangle r = c.modelToView(line);
-                //System.out.println(r);
-                g.setColor(Color.LIGHT_GRAY);
-                g.fillRect(0, r.y, c.getWidth(), r.height);
-                
-                if (lastView == null) {
-                    lastView = r;
-                }
-            }
-            catch (BadLocationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        
-        private void resetHighlight() {
-            //  Use invokeLater to make sure updates to the Document are completed,
-            //  otherwise Undo processing causes the modelToView method to loop.
-
-            SwingUtilities.invokeLater(new Runnable()
-            {
-                public void run()
-                {
-                    try
-                    {
-                        int offset = comp.getCaretPosition();
-                        Rectangle currentView = comp.modelToView(offset);
-                        //Rectangle currentView = comp.modelToView(line);
-
-                        //  Remove the highlighting from the previously highlighted line
-
-                        if (lastView.y != currentView.y)
-                        {
-                            comp.repaint(0, lastView.y, comp.getWidth(), lastView.height);
-                            lastView = currentView;
-                            //System.out.println(line);
-                        }
-                    }
-                    catch(BadLocationException ble) {}
-                }
-            });
-        }
-
-        @Override
-        public void mouseClicked(MouseEvent e) { }
-        
-        @Override
-        public void mousePressed(MouseEvent e) {
-            //resetHighlight();
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {}
-        @Override
-        public void mouseEntered(MouseEvent e) {}
-        @Override
-        public void mouseExited(MouseEvent e) {}
-
-        @Override
-        public void caretUpdate(CaretEvent e) {
-            resetHighlight();
-        }
-    }
-    
-    class SourceMouseListener {
-
-        private HashMap<Integer, Node> map;
-        
-        SourceMouseListener(HashMap<Integer, Node> map) {
-            this.map = map;
-        }
-        
-        public void execute(int line) {
-            Node n = map.get(line);
-            if (n != null) {
-                getMediator().getSelectionModel().setSelectedNode(n);
-            }
-        }
-    }
-    
-    class Pair {
+    static class Pair {
         public Node node;
         public PositionInfo pos;
         Pair(Node node, PositionInfo pos) {
@@ -494,317 +437,305 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             this.pos = pos;
         }
     }
-    
-    class LineOffset {
-        public int start;
-        public int end;
-        public LineOffset(int start, int end) {
-            this.start = start;
-            this.end = end;
+
+    /**
+     * This listener checks if a highlighted section is clicked. If true, a jump in the proof tree
+     * to the first node containing the highlighted statement is performed.<br>
+     * <b>Note:</b> No jumping down in the proof tree is possible. Implementing this would be
+     * non-trivial, because it was not unique into which branch we would want to descent.
+     *
+     * @author WP
+     */
+    private class TextPaneMouseAdapter extends MouseAdapter {
+        LineInformation[] li;
+        HighlightPainter painter;
+        JTextPane textPane;
+        String filename;
+
+        public TextPaneMouseAdapter(JTextPane textPane, LineInformation[] li,
+                HighlightPainter painter, String filename) {
+            this.textPane = textPane;
+            this.li = li;
+            this.painter = painter;
+            this.filename = filename;
+        }
+
+        /**
+         * Checks if the given position is within a highlight.
+         * @param pos the position to check
+         * @return true if highlighted and false if not
+         */
+        private boolean isHighlighted(int pos) {
+            Highlight[] hs = textPane.getHighlighter().getHighlights();
+            for (Highlight h : hs) {
+                // search for highlight by the same painter
+                if (h.getPainter() == painter) {
+                    // check if the position is within the highlighted range
+                    if (h.getStartOffset() <= pos && h.getEndOffset() >= pos) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            int pos = textPane.viewToModel(e.getPoint());
+            if (isHighlighted(pos)) {
+                int line = 0;
+                // calculate the line number
+                while (line < li.length - 1) {
+                    if (li[line].getOffset() <= pos && pos < li[line + 1].getOffset()) {
+                        break;
+                    }
+                    line++;
+                }
+                // jump in proof tree (get corresponding node from list)
+                Node n = null;
+                for (Pair p : lines) {
+                    if (p.pos.getStartPosition().getLine() == line + 1
+                            && p.pos.getFileName().equals(filename)) {
+                        n = p.node;
+                        break;
+                    }
+                }
+                if (n != null) {
+                    getMediator().getSelectionModel().setSelectedNode(n);
+                }
+            }
+        }
+    }
+
+    /**
+     * Paints the highlights for symbolically executed lines.
+     * @param textPane the JTextPane containing the source code
+     * @param li precalculated start indices of the lines
+     * @param filename the filename corresponding to the given JTextPane
+     * @param hp the painter to use for highlighting
+     */
+    private void paintSymbExHighlights(JTextPane textPane, LineInformation[] li, String filename,
+            HighlightPainter hp) {
+        try {
+            for (Pair l : lines) {
+                if (filename.equals(l.pos.getFileName())) {
+                    Range r = calculateLineRange(textPane,
+                            li[l.pos.getStartPosition().getLine() - 1].getOffset());
+                    textPane.getHighlighter().addHighlight(r.start(), r.end(), hp);
+                }
+            }
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Paints the highlight for the line where the mouse pointer currently points to.
+     * @param textPane the textPane to highlight lines
+     * @param p the current position of the mouse pointer
+     * @param tag the highlight to change
+     */
+    private static void paintSelectionHighlight(JTextPane textPane, Point p, Object tag) {
+        Range r = calculateLineRange(textPane, p);
+        try {
+            textPane.getHighlighter().changeHighlight(tag, r.start(), r.end());
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Calculates the range of actual text (not whitespace) in the line under the given point.
+     * @param textPane the JTextPane with the text
+     * @param p the point to check
+     * @return the range of text (may be empty if there is just whitespace in the line)
+     */
+    private static Range calculateLineRange(JTextPane textPane, Point p) {
+        return calculateLineRange(textPane, textPane.viewToModel(p));
+    }
+
+    /**
+     * Calculates the range of actual text (not whitespace) in the line containing the given
+     * position.
+     * @param textPane the JTextPane with the text
+     * @param pos the position to check
+     * @return the range of text (may be empty if there is just whitespace in the line)
+     */
+    private static Range calculateLineRange(JTextPane textPane, int pos) {
+        Document doc = textPane.getDocument();
+        String text = "";
+        try {
+            text = doc.getText(0, doc.getLength());
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+
+        // find line end
+        int end = text.indexOf('\n', pos);
+        end = end == -1 ? text.length() : end;      // last line?
+
+        // find line start
+        int start = text.lastIndexOf('\n', pos - 1);          // TODO: different line endings?
+        start = start == -1 ? 0 : start;            // first line?
+
+        // ignore whitespace at the beginning of the line
+        while (start < text.length() && start < end && Character.isWhitespace(text.charAt(start))) {
+            start++;
+        }
+
+        return new Range(start, end);
+    }
+
+    /**
+     * Clears cached files, lines, and existing tabs.
+     */
+    private void clearCaches() {
+        files.clear();
+        lines = null;
+        tabs.removeAll();
+    }
+
+    /**
+     * Initializes the given JTextPane with the source code from the file in the HashMap entry.
+     * In addition, listeners are added and highlights are painted.
+     * @param textPane the JTextPane to initialize
+     * @param entry the HashMap entry containing the file
+     */
+    private void initTextPane(JTextPane textPane, Entry<String, File> entry) {
+        try {                                                 // TODO: scope?
+            String source = IOUtil.readFrom(entry.getValue());
+            LineInformation[] li = IOUtil.computeLineInformation(entry.getValue());
+
+            textPane.setFont(SOURCE_FONT);
+            textPane.setToolTipText(TEXTPANE_TOOLTIP);
+            textPane.setEditable(false);
+
+            JavaDocument doc = new JavaDocument();
+            textPane.setDocument(doc);
+            doc.insertString(0, source, new SimpleAttributeSet());
+
+            // add a listener to highlight the line currently pointed to
+            Object selectionHL = textPane.getHighlighter().addHighlight(0, 0,
+                    new DefaultHighlightPainter(DEFAULT_HIGHLIGHT_COLOR));
+            textPane.addMouseMotionListener(new MouseMotionListener() {
+                @Override
+                public void mouseMoved(MouseEvent e) {
+                    paintSelectionHighlight(textPane, e.getPoint(), selectionHL);
+                }
+
+                @Override
+                public void mouseDragged(MouseEvent e) {
+                }
+            });
+
+            // paint the highlights (symbolically executed lines) for this file
+            HighlightPainter hp = new DefaultHighlightPainter(Color.YELLOW);
+            paintSymbExHighlights(textPane, li, entry.getKey(), hp);
+
+            textPane.addMouseListener(new TextPaneMouseAdapter(textPane, li, hp,
+                    entry.getKey()));
+
+            /* for each File, create a Tab in TabbedPane
+             * (additional panel is needed to prevent line wrapping) */
+            JPanel nowrap = new JPanel(new BorderLayout());
+            nowrap.add(textPane);
+            JScrollPane textScrollPane = new JScrollPane();
+            textScrollPane.setViewportView(nowrap);
+            textScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            textScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+            tabs.addTab(entry.getValue().getName(), textScrollPane);
+
+            // add the full path as tooltip for the tab
+            int index = tabs.indexOfTab(entry.getValue().getName());
+            tabs.setToolTipTextAt(index, entry.getValue().getAbsolutePath());
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        } catch (BadLocationException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    /**
+     * Fills the HashMaps containing Files and translations from lines (in source code) to
+     * corresponding nodes in proof tree.
+     */
+    private void fillMaps() {
+        for (Pair p : lines) {
+            PositionInfo l = p.pos;
+            files.putIfAbsent(l.getFileName(), new File(l.getFileName()));
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         Node symbExNode = getMediator().getSelectedNode();
-        final JTabbedPane tabs = mainWindow.getSourceTabs();
         tabs.removeAll();
-        
+
         if (symbExNode == null) {
-            tabs.setBorder(new TitledBorder("No source loaded"));
+            tabs.setBorder(new TitledBorder(NO_SOURCE));
             return;
-        }        
-        
+        }
+
         // get PositionInfo of all symbEx nodes
-        LinkedList<Pair> lines = constructLinesSet(symbExNode);
+        lines = constructLinesSet(symbExNode);
         if (lines == null) {
-            tabs.setBorder(new TitledBorder("No source loaded"));
+            tabs.setBorder(new TitledBorder(NO_SOURCE));
             return;
         }
 
-        // get Files from PositionInfos and put them into a HashMap
-        HashMap<String, File> m = new HashMap<String, File>();
-        for (Pair p : lines) {
-            PositionInfo l = p.pos;
-            m.putIfAbsent(l.getFileName(), new File(l.getFileName()));
-        }
-        
-        // map for translation from line number to first node in tree
-        HashMap<Integer, Node> m2 = new HashMap<Integer, Node>();
-        for (Pair p : lines) {
-            PositionInfo l = p.pos;
-            // subtract 1: first line has index 0
-            m2.put(l.getStartPosition().getLine() - 1, p.node);
-        }
+        fillMaps();
 
-        for (Entry<String, File> l : m.entrySet()) {
-            final JTextPane textPane = new JTextPane();
-
-            try {                                                 // TODO: scope?
-                String source = IOUtil.readFrom(l.getValue());
-                //textPane.setText(source);
-                LineInformation[] li = IOUtil.computeLineInformation(l.getValue());
-                LineOffset[] linePositions = new LineOffset[li.length];
-                for (int i = 0; i < li.length - 1; i++) {
-                    linePositions[i] = new LineOffset(li[i].getOffset(), li[i+1].getOffset()-1);
-                }
-                if (li.length > 0) {
-                    int k = li.length-1;
-                    linePositions[k] = new LineOffset(li[k].getOffset(), source.length());
-                }
-
-                textPane.setFont(ExceptionDialog.MESSAGE_FONT);
-                textPane.setFont(new Font("Courier New", Font.PLAIN, 16));
-                textPane.setEditable(false);
-
-                JavaDocument doc = new JavaDocument();
-                textPane.setDocument(doc);
-                doc.insertString(0, source, new SimpleAttributeSet());
-
-                Style highlighted = textPane.addStyle("highlighted", null);
-                Style strikeout = textPane.addStyle("strikeout", null);
-                StyleConstants.setStrikeThrough(strikeout, true);
-                Style underline = textPane.addStyle("underline", null);
-                Style mouseover = textPane.addStyle("mouseover", null);
-                StyleConstants.setBackground(mouseover, Color.RED);
-                
-                textPane.addMouseListener(new MouseAdapter() {
-                    
-                    @Override
-                    public void mouseReleased(MouseEvent e) {
-                    }
-                    
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                    }
-                    
-                    @Override
-                    public void mouseExited(MouseEvent e) {
-                    }
-                    
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
-                    }
-                    
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        // find the line offset of the current selection
-                        int ind = textPane.viewToModel(e.getPoint());
-                        int line = 0;
-                        while (line < li.length - 1) {
-                            if (li[line].getOffset() <= ind && ind < li[line+1].getOffset()) {
-                                break;
-                            }
-                            line++;
-                        }
-                        
-                        Element ele = doc.getCharacterElement(ind);
-                        AttributeSet as = ele.getAttributes();
-                        SourceMouseListener sml = (SourceMouseListener)as.getAttribute("action");
-                        if(sml != null) {
-                            sml.execute(line);
-                        }
-                    }
-                });
-//                
-//                textPane.addMouseMotionListener(new MouseAdapter() {
-//                    // used to store and reset the style before highlighting
-//                    //Element prev;
-//                    int prevLine = -1;
-//                    AttributeSet prevAS;
-//                    String prevText;
-//                    LinkedList<AttributeSet> prevAttributes;
-//
-//                    @Override
-//                    public void mouseMoved(MouseEvent e) {      // TODO: implement for whole lines
-//                        //Element ele = doc.getCharacterElement(textPane.viewToModel(e.getPoint()));
-//                        
-//                        // find the line offset of the current selection
-//                        int ind = textPane.viewToModel(e.getPoint());
-//                        int line = 0;
-//                        while (line < li.length - 1) {
-//                            if (li[line].getOffset() <= ind && ind < li[line+1].getOffset()) {
-//                                break;
-//                            }
-//                            line++;
-//                        }
-//                        // int start = li[line].getOffset();
-//                        // int length = li[line+1].getOffset() - start;
-//                        int start = linePositions[line].start;
-//                        int length = linePositions[line].end - start;
-//                        
-//                        // change nothing if the "selected" Element didn't change
-//                        //if (prev == ele) {
-//                        if (prevLine == line) {
-//                            return;
-//                        }
-//
-//                        //if (prev != null) {
-//                        if (prevLine >= 0) {
-//                            if (prevAS != null) {
-//                                // reset style of previously selected Element
-//                                //doc.setCharacterAttributes(prev.getStartOffset(),
-//                                //        prev.getEndOffset() - prev.getStartOffset(), prevAS, true);
-//                                /*doc.setCharacterAttributes(linePositions[prevLine].start,
-//                                        linePositions[prevLine].end-linePositions[prevLine].start,
-//                                        prevAS, true);*/
-//                                try {
-//                                    doc.replace(linePositions[prevLine].start,
-//                                        linePositions[prevLine].end-linePositions[prevLine].start,
-//                                        prevText, new SimpleAttributeSet());
-//                                } catch (BadLocationException e1) {
-//                                    // TODO Auto-generated catch block
-//                                    e1.printStackTrace();
-//                                }
-//                            }
-//                        } else {
-//                            //prev = ele;
-//                            prevLine = line;
-//                            try {
-//                                prevText = doc.getText(start, length);
-//                            } catch (BadLocationException e1) {
-//                                // TODO Auto-generated catch block
-//                                e1.printStackTrace();
-//                            }
-//                        }
-//                        /* Copy (!) the attributes, otherwise the setCharacterAttributes method
-//                         * would change prevAS as well */
-//                        //prevAS = ele.getAttributes().copyAttributes();
-//                        //prevAS = strikeout; // TODO: debug 
-//                        
-//                        Element elem = doc.getParagraphElement(ind);
-//                        prevAS = elem.getAttributes();
-//
-//                        // set highlighting for current selection
-//                        //doc.setCharacterAttributes(ele.getStartOffset(),
-//                        //        ele.getEndOffset() - ele.getStartOffset(), mouseover, false);
-//                        
-//                        //doc.setCharacterAttributes(start, length, mouseover, false);
-//                        doc.removeElement(elem);
-//                        
-//                        // store the previously selected Element (for resetting style)
-//                        //prev = ele;
-//                        prevLine = line; 
-//                        try {
-//                            prevText = doc.getText(start, length);
-//                        }
-//                        catch (BadLocationException e1) {
-//                            // TODO Auto-generated catch block
-//                            e1.printStackTrace();
-//                        }
-//                    }
-//                });
-                
-                textPane.setToolTipText("Click on a highlighted line to jump to the first "
-                        + "occurrence of this line in symbolic execution.");
-                
-                SymbExHighlighter highlighter = new SymbExHighlighter(textPane);
-                
-             // TODO: map depends on selection -> no jumping "down" possible
-             // implementing this would be non-trivial: descend into which branch?   
-                highlighted.addAttribute("action", new SourceMouseListener(m2));
-                StyleConstants.setBackground(highlighted, new Color(1.0f, 1.0f, 0.0f, 0.5f)); //Color.YELLOW);
-                
-                //int styles = lines.size();
-                //int curr = styles;
-
-                // for each PositionInfo, highlight the corresponding lines in the corresponding file
-                for (Pair p : lines) {
-                    PositionInfo pos = p.pos;
-                    if (pos.getFileName().equals(l.getKey())) { // TODO: overhead!
-                        // convert line numbers to offsets/lengths in the String
-                        Position start = pos.getStartPosition();
-                        Position end = pos.getEndPosition();
-                        // TODO: Position doc: first line is line 1, first column is column 0
-                        //int startIndex = li[Math.max(start.getLine()-1, 0)].getOffset() + Math.max(start.getColumn()-1, 0);    // TODO: shifting necessary?
-                        //int endIndex = li[end.getLine()-1].getOffset() + end.getColumn()-1;
-                        
-                        int startIndex = li[Math.max(start.getLine()-1, 0)].getOffset();    // TODO: shifting necessary?
-                        int endIndex = li[end.getLine()].getOffset() - 1;
-                        
-                        int length = endIndex - startIndex + 1;		// the char at endIndex is included!
-
-                        // random colors for debugging
-                        //int r = (int) Math.round(255 * Math.random());
-                        //int g = (int) Math.round(255 * Math.random());
-                        //int b = (int) Math.round(255 * Math.random());
-                        
-                        // more recent lines have a more saturated color
-                        //Style i = textPane.addStyle(Integer.toString(curr), null);
-                        //StyleConstants.setBackground(i, new Color(255, 255, 255 - 255 / styles * curr--));
-                        //StyleConstants.setBackground(i, new Color(r, g, b));
-
-                        doc.setCharacterAttributes(startIndex, length, highlighted, false);
-                    }
-                }
-
-                // for each File, create a Tab in TabbedPane
-                JScrollPane textScrollPane = new JScrollPane(textPane);
-                textScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-                textScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-                tabs.addTab(l.getValue().getName(), textScrollPane);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-            catch (BadLocationException e1) {
-                e1.printStackTrace();
-            }
+        // create and initialize a new TextPane for every file
+        for (Entry<String, File> entry : files.entrySet()) {
+            initTextPane(new JTextPane(), entry);
         }
         if (tabs.getTabCount() > 0) {
             tabs.setBorder(new EmptyBorder(0, 0, 0, 0));
-            
+
             // activate the tab with the most recent file
-            PositionInfo p = lines.getFirst().pos;
+            PositionInfo p = lines.isEmpty() ? null : lines.getFirst().pos;
             if (p != null) {
-                String s = m.get(p.getFileName()).getName();
+                String s = files.get(p.getFileName()).getName();
                 for (int i = 0; i < tabs.getTabCount(); i++) {
                     if (tabs.getTitleAt(i).equals(s)) {
                         tabs.setSelectedIndex(i);
                     }
                 }
+                // TODO: different color for most recent
             }
         } else {
-            tabs.setBorder(new TitledBorder("No source loaded"));
+            tabs.setBorder(new TitledBorder(NO_SOURCE));
         }
         // set the path information in the status bar
-        mainWindow.getSourceStatusBar().setText(collectPathInformation(symbExNode));
+        sourceStatusBar.setText(collectPathInformation(symbExNode));
     }
 
     /**
      * Collects the set of lines to highlight starting from the given node in the proof tree.
      * @param cur the given node
-     * @return a linked list of PositionInfo objects containing the start and end positions for the highlighting.
+     * @return a linked list of Pairs with PositionInfo objects containing the start and end
+     * positions for the highlighting and Nodes.
      */
-    public LinkedList<Pair> constructLinesSet(Node cur) {
+    private static LinkedList<Pair> constructLinesSet(Node cur) {
         LinkedList<Pair> list = new LinkedList<Pair>();
 
         if (cur == null) {
             return null;
         }
-        
+
         do {
-        	SourceElement activeStatement = cur.getNodeInfo().getActiveStatement();
+            SourceElement activeStatement = cur.getNodeInfo().getActiveStatement();
             if (activeStatement != null) {
-            	
-                /*
-            	System.out.println("------------------------------------------------------------");
-            	JavaDumper.dump(activeStatement);
-            	System.out.println("------------------------------------------------------------");
-            	*/
-            	
-            	if (activeStatement instanceof SourceElement) {
-                	PositionInfo pos = joinPositionsRec((SourceElement)activeStatement);
-                	//PositionInfo pos = activeStatement.getPositionInfo();
-            		
-                	// we are only interested in well defined PositionInfo objects with a file name
-                	if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
-                			&& pos.getFileName() != null) {
-                		System.out.println("          Add to list: " + pos);
-                		list.addLast(new Pair(cur, pos));
-                		//list.addFirst(pos);
-                	}
+                if (activeStatement instanceof SourceElement) {
+                    PositionInfo pos = joinPositionsRec((SourceElement)activeStatement);
+
+                    // we are only interested in well defined PositionInfo objects with a file name
+                    if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
+                            && pos.getFileName() != null) {
+                        list.addLast(new Pair(cur, pos));
+                    }
                 } else {
-                	System.out.println("Not a SE!");
+                    System.out.println("Not a SE!");
                 }
             }
             cur = cur.parent();
@@ -812,79 +743,68 @@ public class ShowSymbExLinesAction extends MainWindowAction {
         } while (cur != null);
         return list;
     }
-    
+
     /**
      * Joins all PositionInfo objects of the given SourceElement and its children.
      * @param se the given SourceElement
      * @return a new PositionInfo starting at the minimum of all the contained positions and
      * ending at the maximum position
      */
-    private PositionInfo joinPositionsRec(SourceElement se) {
-    	/*if (se instanceof ExtendedIdentifier) {
-    		int i = 0;
-    		System.out.println(i);
-    	}*/
-    	if (se instanceof NonTerminalProgramElement) {
-    	    if (se instanceof If
-    	            || se instanceof Then
-    	            || se instanceof Else
-    	            || se instanceof LocalVariableDeclaration) {
-    	        return PositionInfo.UNDEFINED;
-    	    }
-    		
-        	NonTerminalProgramElement ntpe = (NonTerminalProgramElement)se;
-        	PositionInfo pos = se.getPositionInfo();
-        	
-        	// TODO: case distinction for different classes (e.g.: we don't want to highlight the whole If block)
-        	/*if (se instanceof If
-        	        //||se instanceof MethodReference
-        			//|| se instanceof ProgramElementName
-        			|| se instanceof Then
-        			//|| se instanceof If
-        			|| se instanceof Else
-        			//|| se instanceof StatementBlock
-        			//|| se instanceof LocationVariable
-        			//|| se instanceof Operator
-        			|| se instanceof LocalVariableDeclaration
-        			//|| se instanceof TypeRef
-        			//|| se instanceof VariableSpecification
-        			) {*/
-        		for (int i = 0; i < ntpe.getChildCount(); i++) {
-        			ProgramElement pe2 = ntpe.getChildAt(i);
-        			pos = PositionInfo.join(pos, joinPositionsRec(pe2));
-        		}
-        	//}
-        	return pos;
-    	} else {
-        	return se.getPositionInfo();
+    private static PositionInfo joinPositionsRec(SourceElement se) {
+        if (se instanceof NonTerminalProgramElement) {
+            if (se instanceof If
+                    || se instanceof Then
+                    || se instanceof Else
+                    || se instanceof LocalVariableDeclaration) {
+                return PositionInfo.UNDEFINED;
+            }
+
+            NonTerminalProgramElement ntpe = (NonTerminalProgramElement)se;
+            PositionInfo pos = se.getPositionInfo();
+
+            for (int i = 0; i < ntpe.getChildCount(); i++) {
+                ProgramElement pe2 = ntpe.getChildAt(i);
+                pos = PositionInfo.join(pos, joinPositionsRec(pe2));
+            }
+            return pos;
+        } else {
+            return se.getPositionInfo();
         }
     }
-    
+
     /**
      * Collects the information from the tree to which branch the current node belongs:
      * <ul>
-     * 		<li>Invariant initially valid</li>
-     * 		<li>Body preserves invariant</li>
-     * 		<li>Use case</li>
-     * 		<li>...</li>
+     *      <li>Invariant Initially Valid</li>
+     *      <li>Body Preserves Invariant</li>
+     *      <li>Use Case</li>
+     *      <li>...</li>
      * </ul>
-     * @param node
+     * @param node the current node
      * @return a String containing the path information to display
      */
     private String collectPathInformation(Node node) {
-    	
-    	while (node != null) {
-    		if (node.getNodeInfo() != null && node.getNodeInfo().getBranchLabel() != null) {
-    			String label = node.getNodeInfo().getBranchLabel();
-    			if (label.equals("Invariant initially valid")
-    				|| label.equals("Body preserves invariant")
-    				|| label.equals("Use case")
-    				|| label.contains("if")) {		// TODO: additional labels
-    				return label;
-    			}
-    		}
-    		node = node.parent();
-    	}
-    	return "";
+
+        while (node != null) {
+            if (node.getNodeInfo() != null && node.getNodeInfo().getBranchLabel() != null) {
+                String label = node.getNodeInfo().getBranchLabel();
+                if (label.equals("Invariant Initially Valid")
+                        || label.equals("Invariant Preserved and Used")
+                        || label.equals("Body Preserves Invariant")
+                        || label.equals("Use Case")
+                        || label.equals("Use Axiom")
+                        || label.equals("Show Axiom Satisfiability")
+                        || label.contains("Normal Execution")
+                        || label.contains("Null Reference")
+                        //|| label.contains("Postcondition")  // TODO:
+                        //|| label.contains("Assignable")
+                        || label.contains("Index Out of Bounds")) {
+                    return label;
+                }
+            }
+            node = node.parent();
+        }
+        // if no label was found we have to prove the postcondition
+        return "Show Postcondition/Assignable clause";
     }
 }

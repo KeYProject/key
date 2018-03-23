@@ -40,6 +40,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -57,10 +58,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -455,12 +459,19 @@ public final class MainWindow extends JFrame  {
 	rightPane.add(mainFrame, BorderLayout.CENTER);
 	rightPane.add(sequentViewSearchBar,
                 BorderLayout.SOUTH);
-	
+
+	    // set the same style as the main status line:
+	    sourceStatusBar.setBorder(new BevelBorder(BevelBorder.LOWERED));
+	    sourceStatusBar.setBackground(Color.gray);
+	    
+		// add extra height to make the status bar more noticeable
+	    sourceStatusBar.setPreferredSize(new Dimension(0, getFontMetrics(sourceStatusBar.getFont()).getHeight() + 6));
+	    sourceStatusBar.setHorizontalAlignment(SwingConstants.CENTER);
+
 		JPanel sourcePanel = new JPanel();
 		sourcePanel.setLayout(new BorderLayout());
 		sourcePanel.add(sourceTabs, BorderLayout.CENTER);
 		sourcePanel.add(sourceStatusBar,BorderLayout.SOUTH);
-		//sourceStatusBar.setText("");
 
         JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourcePanel);
         pane.setResizeWeight(0.5);
