@@ -23,6 +23,13 @@ compile:oraclejdk9:
     - javac -version
     - ant -f key/scripts/build.xml compileAll
 
+compile:oraclejdk10:
+  stage: primary
+  image: key-dev-jdk10
+  script:
+    - javac -version
+    - ant -f key/scripts/build.xml compileAll
+
 compile:openjdk8:
   stage: primary
   image: key-dev-openjdk8
