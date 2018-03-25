@@ -20,6 +20,8 @@ import java.awt.event.HierarchyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import de.uka.ilkd.key.gui.MainWindow;
+
 class SequentViewChangeListener implements ComponentListener, PropertyChangeListener, HierarchyBoundsListener {
 
     private final SequentView sequentView;
@@ -28,12 +30,14 @@ class SequentViewChangeListener implements ComponentListener, PropertyChangeList
         this.sequentView = sequentView;
     }
 
-    public void reprintOnLineWidthChange() {
+    public void reprint() {
         // reprint sequent
         int lw = sequentView.computeLineWidth();
         if (lw != SequentView.getLineWidth()) {
             SequentView.setLineWidth(lw);
             sequentView.printSequent();
+            // Update the search results, they are lost otherwise! (MU)
+            MainWindow.getInstance().sequentViewSearchBar.setSequentView(sequentView);
         }
     }
 
@@ -47,7 +51,7 @@ class SequentViewChangeListener implements ComponentListener, PropertyChangeList
 
     @Override
     public void componentResized(ComponentEvent e) {
-        reprintOnLineWidthChange();
+        reprint();
     }
 
     @Override
@@ -56,8 +60,7 @@ class SequentViewChangeListener implements ComponentListener, PropertyChangeList
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        // reprint sequent
-        sequentView.printSequent();
+        reprint();
     }
 
     @Override
@@ -66,7 +69,7 @@ class SequentViewChangeListener implements ComponentListener, PropertyChangeList
 
     @Override
     public void ancestorResized(HierarchyEvent e) {
-        reprintOnLineWidthChange();
+        reprint();
     }
 
 }

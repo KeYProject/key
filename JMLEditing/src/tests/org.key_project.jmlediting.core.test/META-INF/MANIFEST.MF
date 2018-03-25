@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.util;bundle-version="1.0.0",
  org.key_project.util.test;bundle-version="1.0.0",
  org.key_project.jmlediting.core
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.jmlediting.core.test,
@@ -22,3 +22,4 @@ Export-Package: org.key_project.jmlediting.core.test,
  org.key_project.jmlediting.core.test.profile,
  org.key_project.jmlediting.core.test.suite,
  org.key_project.jmlediting.core.test.utilities
+Automatic-Module-Name: org.key_project.jmlediting.core.test

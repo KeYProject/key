@@ -227,7 +227,11 @@ public class KeY4EclipseResourcesTestUtil {
    }
    
    
-   public static void setKeYProjectProperties(IProject project, boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles, boolean generateTestCases, boolean autoDeleteTestCases) throws CoreException{
+   public static void setKeYProjectProperties(IProject project, 
+           boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, 
+           boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles, 
+           boolean generateTestCases, boolean autoDeleteTestCases,
+           String[] excludedJavaTypes) throws CoreException{
       KeYProjectProperties.setEnableKeYResourcesBuilds(project, buildProofs);
       KeYProjectProperties.setEnableBuildOnStartup(project, startupBuilds);
       KeYProjectProperties.setEnableBuildProofsEfficient(project, buildProofsEfficient);
@@ -236,15 +240,20 @@ public class KeY4EclipseResourcesTestUtil {
       KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFiles);
       KeYProjectProperties.setGenerateTestCases(project, generateTestCases);
       KeYProjectProperties.setAutoDeleteTestCases(project, autoDeleteTestCases);
+      KeYProjectProperties.setExcludedJavaTypes(project, excludedJavaTypes);
    }
    
-   public static IProject initializeTest(String projectName, boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles, boolean generateTestCases, boolean autoDeleteTestCases) throws CoreException, InterruptedException{
+   public static IProject initializeTest(String projectName, boolean buildProofs, boolean startupBuilds, 
+           boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, 
+           boolean autoDeleteProofFiles, boolean generateTestCases, boolean autoDeleteTestCases, String[] excludedJavaTypes) throws CoreException, InterruptedException{
       //turn off autobuild
 //      enableAutoBuild(false);
       //create a KeYProject
       IJavaProject keyProject = createKeYProject(projectName);
       IProject project = keyProject.getProject();
-      setKeYProjectProperties(project, buildProofs, startupBuilds, buildProofsEfficient, enableMultiThreading, numberOfThreads, autoDeleteProofFiles, generateTestCases, autoDeleteTestCases);
+      setKeYProjectProperties(project, buildProofs, startupBuilds, buildProofsEfficient, 
+              enableMultiThreading, numberOfThreads, autoDeleteProofFiles, 
+              generateTestCases, autoDeleteTestCases, excludedJavaTypes);
       //build
       KeY4EclipseResourcesTestUtil.build(project);
       return project;

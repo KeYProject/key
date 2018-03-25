@@ -25,7 +25,7 @@ public class AutoModeStartingSpecificationTest extends AbstractResourceTest {
     */
    @Test
    public void testMethodContractAdded() throws Exception {
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoModeStartingSpecificationTest_testMethodContractAdded", true, false, false, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoModeStartingSpecificationTest_testMethodContractAdded", true, false, false, false, 1, false, false, false, new String[0]);
       try {
          doSourceFileChangeTest(project,
                                 "data/AddMethodContractTest/before/MethodContractTest.proof",
@@ -47,7 +47,7 @@ public class AutoModeStartingSpecificationTest extends AbstractResourceTest {
     */
    @Test
    public void testBlockContractAdded() throws Exception {
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoModeStartingSpecificationTest_testBlockContractAdded", true, false, false, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoModeStartingSpecificationTest_testBlockContractAdded", true, false, false, false, 1, false, false, false, new String[0]);
       try {
          doSourceFileChangeTest(project,
                                 "data/AddBlockContractTest/before/BlockContractTest.proof",
@@ -69,7 +69,7 @@ public class AutoModeStartingSpecificationTest extends AbstractResourceTest {
     */
    @Test
    public void testLoopInvariantAdded() throws Exception {
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoModeStartingSpecificationTest_testLoopInvariantAdded", true, false, false, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoModeStartingSpecificationTest_testLoopInvariantAdded", true, false, false, false, 1, false, false, false, new String[0]);
       try {
          doSourceFileChangeTest(project,
                                 "data/AddLoopInvariantTest/before/LoopInvariantExample.proof",

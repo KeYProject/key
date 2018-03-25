@@ -5,14 +5,84 @@
 # Jenkins runs are triggered from somewhere else.
 #
 
-image: key-ant-openjdk-8:latest
+stages:
+    - primary
+    - secondary
 
-compile:
+compile:oraclejdk8:
+  stage: primary
+  image: key-dev-jdk8
   script:
+    - javac -version
     - ant -f key/scripts/build.xml compileAll
-    
+
+compile:oraclejdk9:
+  stage: primary
+  image: key-dev-jdk9
+  script:
+    - javac -version
+    - ant -f key/scripts/build.xml compileAll
+
+compile:oraclejdk10:
+  stage: primary
+  image: key-dev-jdk10
+  script:
+    - javac -version
+    - ant -f key/scripts/build.xml compileAll
+
+compile:openjdk8:
+  stage: primary
+  image: key-dev-openjdk8
+  script:
+    - javac -version
+    - ant -f key/scripts/build.xml compileAll
+
+
+compile:openjdk9:
+  stage: secondary
+  image: key-dev-openjdk9   
+  script:
+    - javac -version
+    # due to the lack of javafx support
+    - ant -f key/key.util/build.xml compile
+    - ant -f key/key.core/build.xml compile
+    - ant -f key/key.removegenerics/build.xml compile    
+    - ant -f key/key.core.testgen/build.xml compile
+    - ant -f key/key.core.proof_references/build.xml compile
+    - ant -f key/key.core.symbolic_execution/build.xml compile
+    - ant -f key/key.util.test/build.xml compile
+    - ant -f key/key.core.test/build.xml compile
+    - ant -f key/key.core.testgen.test/build.xml compile
+    - ant -f key/key.core.proof_references.test/build.xml compile
+    - ant -f key/key.removegenerics.test/build.xml compile   
+    - ant -f key/key.core.symbolic_execution.test/build.xml compile
+
+
+
+compile:openjdk10:
+  stage: secondary
+  image: key-dev-openjdk10
+  allow_failure: true
+  script:
+    - javac -version
+    - ant -f key/key.util/build.xml compile
+    - ant -f key/key.core/build.xml compile
+    - ant -f key/key.removegenerics/build.xml compile    
+    - ant -f key/key.core.testgen/build.xml compile
+    - ant -f key/key.core.proof_references/build.xml compile
+    - ant -f key/key.core.symbolic_execution/build.xml compile
+    - ant -f key/key.util.test/build.xml compile
+    - ant -f key/key.core.test/build.xml compile
+    - ant -f key/key.core.testgen.test/build.xml compile
+    - ant -f key/key.core.proof_references.test/build.xml compile
+    - ant -f key/key.removegenerics.test/build.xml compile   
+    - ant -f key/key.core.symbolic_execution.test/build.xml compile
+
+
 checkstyle:
+  stage: primary
+  image: key-dev-openjdk8
   script:
     - echo "**** Check the commit's gitlab page for a readable checkstyle report ****"
     - (key/scripts/tools/checkstyle/runIncrementalCheckstyle.sh | tee report.txt) || true
-    - key/scripts/tools/checkstyle/publishAudit.pl report.txt
+    - key/scripts/tools/checkstyle/publishAudit.py report.txt
