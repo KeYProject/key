@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="key_core" target="1.8" />
+      <module name="key_core.example" target="1.8" />
+      <module name="key_core.exampleTest" target="1.8" />
+      <module name="key_core.removegenerics" target="1.8" />
+      <module name="key_core.removegenericsTest" target="1.8" />
+      <module name="key_core.symbolic_execution" target="1.8" />
+      <module name="key_core.symbolic_executionTest" target="1.8" />
+      <module name="key_core.testgen" target="1.8" />
+      <module name="key_core.testgenTest" target="1.8" />
+      <module name="key_core_test" target="1.8" />
+      <module name="key_coreExample" target="1.8" />
+      <module name="key_corePre" target="1.8" />
+      <module name="key_coreProofReferences" target="1.8" />
+      <module name="key_coreProofReferencesTest" target="1.8" />
+      <module name="key_coreRemovegenerics" target="1.8" />
+      <module name="key_coreSymbolicExecution" target="1.8" />
+      <module name="key_coreSymbolicExecutionTest" target="1.8" />
+      <module name="key_coreTest" target="1.8" />
+      <module name="key_coreTestgen" target="1.8" />
+      <module name="key_coreTestgenTest" target="1.8" />
+      <module name="key_main" target="1.8" />
+      <module name="key_removegenerics" target="1.8" />
+      <module name="key_removegenericsTest" target="1.8" />
+      <module name="key_test" target="1.8" />
+      <module name="key_ui" target="1.8" />
+      <module name="key_uiTest" target="1.8" />
+      <module name="key_util" target="1.8" />
+      <module name="key_utilTest" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
