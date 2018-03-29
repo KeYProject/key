@@ -38,9 +38,9 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
         String name = PREFIX + op.name().toString();
         if(!trans.isKnownSymbol(name)) {
             int a = op.arity();
-            SExpr signature = new SExpr(Collections.nCopies(a, new SExpr("u")));
+            SExpr signature = new SExpr(Collections.nCopies(a, new SExpr("U")));
             trans.addDeclaration(
-                    new SExpr("declare-fun", new SExpr(name), signature, new SExpr("u")));
+                    new SExpr("declare-fun", new SExpr(name), signature, new SExpr("U")));
             trans.addKnownSymbol(name);
 
             if (op.arity() > 0 && op instanceof SortedOperator) {
@@ -54,17 +54,19 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
     }
 
     private SExpr funTypeAxiomFromTerm(Term term, SortedOperator op) {
+        List<SExpr> vars_U = new ArrayList<>();
         List<SExpr> vars = new ArrayList<>();
-
         for (int i = 0; i < op.arity(); ++i) {
-            vars.add(new SExpr(LogicalVariableHandler.VAR_PREFIX + i, Type.NONE, "u"));
+            vars_U.add(new SExpr(LogicalVariableHandler.VAR_PREFIX + i, Type.NONE, "U"));
+            vars.add(new SExpr(LogicalVariableHandler.VAR_PREFIX + i));
         }
+
         List<SExpr> tos = new ArrayList<>();
         int i = 0;
         for (Sort sort : op.argSorts()) {
             SExpr var = new SExpr(LogicalVariableHandler.VAR_PREFIX + i);
             SExpr to = new SExpr("typeof", var);
-            tos.add(new SExpr("=", to, new SExpr(sort.toString())));
+            tos.add(new SExpr("=", to, SExpr.sortExpr(sort)));
             ++i;
         }
         SExpr ante;
@@ -73,10 +75,17 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
         } else {
             ante = new SExpr("and", tos);
         }
-        SExpr cons = new SExpr("subtype",
-                new SExpr("typeof", new SExpr(op.toString())), new SExpr(op.sort().toString()));
+        SExpr cons = new SExpr("typeof", new SExpr(op.toString(), new SExpr(vars)),
+                new SExpr(op.sort().toString()));
         SExpr matrix = new SExpr("=>", ante, cons);
-        SExpr axiom = new SExpr("forall", Type.BOOL, new SExpr(vars), matrix);
+        SExpr axiom = new SExpr("forall", Type.BOOL, new SExpr(vars_U),
+                SExpr.patternSExpr(matrix, vars_U.toArray(new SExpr[vars_U.size()]))); // TODO
+                                                                                       // nur
+                                                                                       // zum
+                                                                                       // ausprobieren.
+                                                                                       // kein
+                                                                                       // sinnvoller
+                                                                                       // trigger
         return new SExpr("assert", axiom);
     }
 

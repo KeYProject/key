@@ -17,6 +17,8 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 public class ModularSMTLib2Translator implements SMTTranslator {
 
+    public static final String SORT_PREFIX = "sort_";
+
     private static final String PREAMBLE = readPreamble();
 
     private List<Throwable> exceptions = Collections.emptyList();
@@ -42,9 +44,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         StringBuffer sortsb = new StringBuffer();
         sortsb.append("(distinct ");
         for (Sort s : services.getNamespaces().sorts().elements()) {
-            String sortString = "sort_" + s.toString();
-            sb.append("(declare-const " + sortString + " T)\n");
-            sortsb.append(sortString + " ");
+            sb.append("(declare-const " + SExpr.sortExpr(s) + " T)\n");
+            sortsb.append(SExpr.sortExpr(s) + " ");
         }
         sortsb.append(")\n");
         sb.append(sortsb);

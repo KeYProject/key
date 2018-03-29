@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import de.uka.ilkd.key.logic.sort.Sort;
+
 /**
  * This class models s-expressions to be used for the SMT translation.
  *
@@ -28,7 +30,9 @@ import java.util.regex.Pattern;
  */
 public class SExpr {
 
-    public enum Type { INT, BOOL, UNIVERSE, NONE }
+    public enum Type {
+        INT, BOOL, UNIVERSE, PATTERN, NONE
+    }
 
     private static final Pattern EXTRACHAR_PATTERN =
             Pattern.compile("[^-A-Za-z0-9+/*=%?!.$_~&^<>@]");
@@ -87,6 +91,15 @@ public class SExpr {
         this("", Type.NONE, children);
     }
 
+    public static SExpr patternSExpr(SExpr e, SExpr... patterns) {
+        return new SExpr("! " + e.toString() + " :pattern ", Type.PATTERN, new SExpr(patterns));
+    }
+
+    public static SExpr sortExpr(Sort sort) {
+        return new SExpr(ModularSMTLib2Translator.SORT_PREFIX + sort.toString());
+    }
+
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         appendTo(sb);
@@ -94,7 +107,7 @@ public class SExpr {
     }
 
     public String getEscapedName() {
-        if(EXTRACHAR_PATTERN.matcher(name).find()) {
+        if (EXTRACHAR_PATTERN.matcher(name).find() && type != Type.PATTERN) {
             return "|" + name + "|";
         } else {
             return name;
