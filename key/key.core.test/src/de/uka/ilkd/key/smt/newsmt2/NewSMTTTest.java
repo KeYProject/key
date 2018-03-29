@@ -9,9 +9,15 @@ import org.antlr.runtime.RecognitionException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+import org.stringtemplate.v4.compiler.STParser.templateAndEOF_return;
 
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.expression.operator.Instanceof;
+import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -21,6 +27,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.KeYLexer;
@@ -42,6 +50,7 @@ public class NewSMTTTest {
     private static Sort heapType;
     private static Sort objectType;
     private static Sort fieldType;
+    private static KeYJavaType javaInt;
 
     File file = new File("/home/i57/cnodes/jschiffl/tmp/smttest/smttestfile");
     FileWriter fw = null;
@@ -59,6 +68,7 @@ public class NewSMTTTest {
         this.tb = s.getTermBuilder();
         this.trans = new ModularSMTLib2Translator();
         this.mh = new MasterHandler(s);
+        javaInt = s.getJavaInfo().getKeYJavaType(intType);
     }
 
     private Term s2t(String str) {
@@ -179,16 +189,24 @@ public class NewSMTTTest {
 
     @Test
     public void selectTest() throws IllegalFormulaException, IOException {
-        Function select = new Function(new Name("select"), Sort.ANY, heapType, objectType,
-                fieldType);
+        Function select = new Function(new Name("select"), Sort.ANY, heapType);
         Term h = tb.var(new LocationVariable(new ProgramElementName("h"), heapType));
-        Term o = tb.var(new LocationVariable(new ProgramElementName("o"), objectType));
-        Term f = tb.var(new LocationVariable(new ProgramElementName("f"), fieldType));
+        LocationVariable x = new LocationVariable(new ProgramElementName("x"), intType);
 
-        Term sel = tb.func(select, h, o, f);
-        String ts = trans.translateProblem(sel, s, null).toString();
-        writeToTestFile(ts);
+        Term sel = tb.equals(tb.var(x), tb.func(select, h));
+        // String ts = trans.translateProblem(sel, s, null).toString();
+        // writeToTestFile(ts);
         Assert.assertEquals("(ui_select ui_h ui_o ui_f)", mh.translate(sel).toString());
+    }
+
+    @Test
+    public void instanceOfTest() throws IllegalFormulaException, IOException {
+        LogicVariable xVar = new LogicVariable(new ProgramElementName("x"), intType);
+        // TypeRef tr = new TypeRef(javaInt);
+        Term iot = tb.instance(intType, tb.var(xVar)); // TODO nicht was i
+        String ts = trans.translateProblem(iot, s, null).toString();
+        writeToTestFile(ts);
+        Assert.assertEquals("", mh.translate(iot, SExpr.Type.BOOL).toString());
     }
 }
 
