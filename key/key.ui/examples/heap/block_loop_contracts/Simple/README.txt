@@ -12,4 +12,4 @@ The methods in "LoopContractExamples" are based on an example found in:
     Thomas Tuerk. Local reasoning about while-loops. In In International Conference on Verified Software: Theories, Tools and Experiments - Theory Workshop (VS-Theory).
 
 
-2017, Florian Lanzinger
+2018, Florian Lanzinger

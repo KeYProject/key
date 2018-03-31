@@ -13,4 +13,4 @@ The method in "DualPivotQuicksort_sort_internal.java" is only provable with the 
     Bernhard Beckert, Jonas Schiffl, Peter H. Schmitt, and Mattias Ulbrich. Proving JDK’s dual pivot quicksort correct. In 9th Working Conference on Verified Software: Theories, Tools, and Experiments (VSTTE 2017), July 2017.
     
 
-2017, Florian Lanzinger
+2018, Florian Lanzinger

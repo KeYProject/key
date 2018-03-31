@@ -7,4 +7,4 @@ example.additionalFile.3 = src/IntNode.java
 This example demonstrates the use of loop contracts for operations on linked lists. It is heavily based on the "List with Sequences" example.
 
 
-2017, Florian Lanzinger
+2018, Florian Lanzinger
