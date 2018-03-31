@@ -14,13 +14,16 @@ heap/vstte10_01_SumAndMax/FIRSTTOUCH.txt
 # 05 seems to be broken ... deactivated
 # firstTouch/05-ReverseArray/README.txt
 firstTouch/06-BinarySearch/README.txt
-firstTouch/07-Cell/README.txt
 firstTouch/08-Java5/README.txt
 heap/removeDups/README.txt
 firstTouch/09-Quicktour/README.txt
 firstTouch/10-SITA/README.txt
 firstTouch/11-StateMerging/README.txt
 
+heap/block_loop_contracts/Simple/README.txt
+heap/block_loop_contracts/DualPivot/README.txt
+heap/block_loop_contracts/List/README.txt
+firstTouch/07-Cell/README.txt
 heap/SmansEtAl/README.txt
 heap/Transactions/README.txt
 heap/information_flow/README-ArrayList.txt
