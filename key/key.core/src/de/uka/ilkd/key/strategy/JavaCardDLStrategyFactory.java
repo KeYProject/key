@@ -361,10 +361,10 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
                         1,
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.BLOCK_CONTRACT_INTERNAL,
-                                "Contract (Internal)", TOOL_TIP_BLOCK_CONTRACT_INTERNAL),
+                                "Internal Contract", TOOL_TIP_BLOCK_CONTRACT_INTERNAL),
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.BLOCK_CONTRACT_EXTERNAL,
-                                "Contract (External)", TOOL_TIP_BLOCK_CONTRACT_EXTERNAL),
+                                "External Contract", TOOL_TIP_BLOCK_CONTRACT_EXTERNAL),
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.BLOCK_EXPAND, "Expand",
                                 TOOL_TIP_BLOCK_EXPAND));

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -20,8 +21,10 @@ import java.awt.Font;
 import java.awt.event.MouseListener;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -40,6 +43,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContractImpl;
 import de.uka.ilkd.key.speclang.FunctionalBlockContract;
@@ -72,6 +76,15 @@ public class ContractSelectionPanel extends JPanel {
     private final Services services;
     private final JList<Contract> contractList;
     private final TitledBorder border;
+    private Contract[] contracts = new Contract[0];
+    
+    /** 
+     * Whether or not an auxiliary contract should be grayed out if
+     *  is has not been applied in a proof for a non-auxiliary contract.
+     * 
+     * @see Contract#isAuxiliary()
+     */
+    private boolean grayOutAuxiliaryContracts = false;
 
 
     //-------------------------------------------------------------------------
@@ -129,32 +142,93 @@ public class ContractSelectionPanel extends JPanel {
 		                                             index,
 		                                             isSelected,
 		                                             cellHasFocus);
+		
+		// Find all contracts that were applied in a proof for a non-auxiliary contract.
+		Set<Contract> appliedContracts = new HashSet<>();
+		Set<Contract> consideredContracts = new HashSet<>();
+		
+		for (Contract c : contracts) {
+		    if (c.isAuxiliary()) {
+		        continue;
+		    }
+		    
+		    consideredContracts.add(c);
+		    Proof p = getClosedProof(c);
+		    
+		    if (p != null) {
+		        for (Contract used : p.mgt().getUsedContracts()) {
+	                appliedContracts.add(used);
+		        }
+		    }
+		}
+        
+		final int iterations = contracts.length - consideredContracts.size();
+		for (int i = 0; i < iterations; ++i) {
+	        for (Contract c : contracts) {
+	            if (consideredContracts.contains(c) || !appliedContracts.contains(c)) {
+	                continue;
+	            }
+
+	            consideredContracts.add(c);
+	            Proof p = getClosedProof(c);
+	            
+	            if (p != null) {
+	                for (Contract used : p.mgt().getUsedContracts()) {
+	                    appliedContracts.add(used);
+	                }
+	            }
+	        }
+		}
 
 		//create label and enclosing panel
-		JLabel label = new JLabel();
-		label.setText(contract.getHTMLText(serv));
-		label.setFont(PLAINFONT);
-		FlowLayout lay = new FlowLayout();
-		lay.setAlignment(FlowLayout.LEFT);
-		JPanel result = new JPanel(lay);
-		result.add(label);
-		label.setVerticalAlignment(SwingConstants.TOP);
+        JLabel label = new JLabel();
+        label.setText(contract.getHTMLText(serv));
+        label.setFont(PLAINFONT);
+        FlowLayout lay = new FlowLayout();
+        lay.setAlignment(FlowLayout.LEFT);
+        JPanel result = new JPanel(lay);
+        result.add(label);
+        label.setVerticalAlignment(SwingConstants.TOP);
 
-		//set background color
-		result.setBackground(supComp.getBackground());
+        result.setBackground(supComp.getBackground());
+        
+        // set border and text color
+        // (if applicable, gray out unnecessary auxiliary contracts)
+        TitledBorder border;
+        Font borderFont;
+        if (grayOutAuxiliaryContracts
+                && contract.isAuxiliary()
+                && !appliedContracts.contains(contract)) {
+            label.setForeground(Color.GRAY);
+            
+            border = new TitledBorder(
+                    BorderFactory.createEtchedBorder(),
+                    contract.getDisplayName(),
+                    TitledBorder.LEADING,
+                    TitledBorder.DEFAULT_POSITION,
+                    null,
+                    Color.GRAY);
 
-		//set border
-		TitledBorder border = new TitledBorder(
-				BorderFactory.createEtchedBorder(),
-                                contract.getDisplayName());
-
-                Font borderFont = border.getTitleFont();
-                if (borderFont == null) { // MS Windows issues
-                    borderFont = result.getFont();
-                    if (borderFont == null) {
-                        borderFont = PLAINFONT;
-                    }
+            borderFont = border.getTitleFont();
+            if (borderFont == null) { // MS Windows issues
+                borderFont = result.getFont();
+                if (borderFont == null) {
+                    borderFont = PLAINFONT;
                 }
+            }
+        } else {
+            border = new TitledBorder(
+                    BorderFactory.createEtchedBorder(),
+                    contract.getDisplayName());
+
+            borderFont = border.getTitleFont();
+            if (borderFont == null) { // MS Windows issues
+                borderFont = result.getFont();
+                if (borderFont == null) {
+                    borderFont = PLAINFONT;
+                }
+            }
+        }
 		border.setTitleFont(borderFont.deriveFont(Font.BOLD));
 		result.setBorder(border);
 
@@ -168,8 +242,18 @@ public class ContractSelectionPanel extends JPanel {
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
+    
+    private Proof getClosedProof(Contract c) {
+        ImmutableSet<Proof> proofs = services.getSpecificationRepository().getProofs(c);
 
+        for (Proof proof : proofs) {
+            if (proof.mgt().getStatus().getProofClosed()) {
+                return proof;
+            }
+        }
 
+        return null;
+    }
 
     //-------------------------------------------------------------------------
     //public interface
@@ -184,15 +268,27 @@ public class ContractSelectionPanel extends JPanel {
 	contractList.addListSelectionListener(lsl);
     }
 
+    /** 
+     * 
+     * @param grayOutAuxiliaryContracts whether or not an auxiliary contract should be grayed out if
+     *  it has not been applied in a proof for a non-auxiliary contract.
+     * 
+     * @see Contract#isAuxiliary()
+     */
+    public void setGrayOutAuxiliaryContracts(boolean grayOutAuxiliaryContracts) {
+        this.grayOutAuxiliaryContracts = grayOutAuxiliaryContracts;
+    }
+
 
     public void setContracts(Contract[] contracts, String title) {
         if (contracts == null || contracts.length == 0) {
-            contractList.setListData(new Contract[0]);
+            this.contracts = new Contract[0];
+            contractList.setListData(this.contracts);
             updateUI();
             return;
         }
 
-        //sort contracts by contract type, then by id
+        //sort contracts by contract type, then by name
         Arrays.sort(contracts, new Comparator<Contract> () {
             public int compare(Contract c1, Contract c2) {
             	Integer o1 = CONTRACT_TYPE_ORDER.get(c1.getClass());
@@ -201,28 +297,25 @@ public class ContractSelectionPanel extends JPanel {
             	
             	if (o1 != null && o2 != null) {
             		res = o1 - o2;
-            	}
+            	} else if (o1 != null) {
+                    return -1;
+                } else if (o2 != null) {
+                    return 1;
+                }
             	
             	if (res != 0) {
             		return res;
             	}
             	
-            	if (o1 != null) {
-            		return -1;
-            	}
-            	
-            	if (o2 != null) {
-            		return 1;
-            	}
-            	
-                res = c1.id() - c2.id();
+                res = c1.getDisplayName().compareTo(c2.getDisplayName());
                 if (res == 0) {
-                    return c2.getName().compareTo(c1.getName());
+                    return c1.id() - c2.id();
                 }
                 return res;
             }
         });
 
+        this.contracts = contracts;
         contractList.setListData(contracts);
         contractList.setSelectedIndex(0);
         if(title != null) {

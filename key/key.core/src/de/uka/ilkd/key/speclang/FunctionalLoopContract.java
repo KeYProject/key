@@ -66,6 +66,11 @@ public class FunctionalLoopContract implements Contract {
                         -> acc + SpecificationRepository.CONTRACT_COMBINATION_MARKER + curr)
                 .get();
     }
+    
+    @Override
+    public boolean isAuxiliary() {
+        return true;
+    }
 
     @Override
     public String getName() {

@@ -36,6 +36,16 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 public interface Contract extends SpecificationElement {
 
     public static final int INVALID_ID = Integer.MIN_VALUE;
+    
+    /**
+     * 
+     * @return {@code true} if any only if this contract does not necessarily need to be proven in
+     *  its own proof obligation.
+     *  E.g., this is true for {@link FunctionalBlockContract}s.
+     */
+    default boolean isAuxiliary() {
+        return false;
+    }
 
     /**
      * Returns the id number of the contract. If a contract has instances for
