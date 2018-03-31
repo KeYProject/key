@@ -53,6 +53,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -679,6 +680,42 @@ public class BlockContractBuilders {
             return result;
         }
 
+
+        /**
+         * Builds the assumptions for the {@code self} variable ({@code self != null & self.created == true & exactInstance(self)}) 
+         * 
+         * @param heaps
+         * @param pm
+         * @param selfVar
+         * @param services
+         * @return 
+         */
+        public Term buildSelfConditions(List<LocationVariable> heaps, IProgramMethod pm,
+                KeYJavaType selfKJT,
+                Term self, Services services) {
+           if (self != null && !pm.isConstructor()) {
+               Term notNull = not(equals(self, NULL()));
+               
+               Term created = null;
+               for(LocationVariable heap : heaps) {
+                   if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap())
+                       continue;
+                   final Term cr = created(var(heap), self);
+                   if(created == null) {
+                       created = cr;
+                   }else{
+                       created = and(created, cr);
+                   }
+               }
+               
+               Term exactType = exactInstance(selfKJT.getSort(), self);
+               
+               return or(notNull, created, exactType);
+           } else {
+               return tt();
+           }
+        }
+
         private List<Term> buildFlagsNotSetConditions(final Collection<ProgramVariable> flags) {
             final List<Term> result = new LinkedList<Term>();
             for (ProgramVariable flag : flags) {
@@ -859,7 +896,7 @@ public class BlockContractBuilders {
                 final Term context,
                 final Term remember,
                 final Term rememberNext,
-                final Map<LocationVariable, Function> anonymisationHeaps,
+                final Map<LocationVariable, Function> anonOutHeaps,
                 final Map<LocationVariable, Term> modifiesClauses,
                 final Term[] assumptions,
                 final Term decreasesCheck,
@@ -969,7 +1006,7 @@ public class BlockContractBuilders {
                                     .construct()))));
             
             Term anonOut = new UpdatesBuilder(variables, services)
-                    .buildAnonOutUpdate(contract.getLoop(), anonymisationHeaps, modifiesClauses);
+                    .buildAnonOutUpdate(contract.getLoop(), anonOutHeaps, modifiesClauses);
             
             Term post = tb.and(postconditions);
             post = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(

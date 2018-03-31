@@ -132,6 +132,9 @@ public class LoopContractExternalRule extends AbstractLoopContractRule {
                 conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
         final Map<LocationVariable, Term> modifiesClauses =
                 conditionsAndClausesBuilder.buildModifiesClauses();
+        final Term selfConditions =
+                conditionsAndClausesBuilder.buildSelfConditions(
+                        heaps, contract.getMethod(), contract.getKJT(), instantiation.self, services);
 
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term wellFormedAnonymisationHeapsCondition =
@@ -164,7 +167,7 @@ public class LoopContractExternalRule extends AbstractLoopContractRule {
         configurator.setUpPreconditionGoal(result.tail().head(),
                 contextUpdate,
                 new Term[] {precondition, wellFormedHeapsCondition,
-                        reachableInCondition});
+                        reachableInCondition, selfConditions});
         configurator.setUpUsageGoal(result.head(),
                 new Term[] {contextUpdate, remembranceUpdate,
                         anonymisationUpdate},

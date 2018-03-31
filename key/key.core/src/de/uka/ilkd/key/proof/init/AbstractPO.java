@@ -16,6 +16,7 @@ package de.uka.ilkd.key.proof.init;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -30,10 +31,12 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.JavaModel;
@@ -44,7 +47,11 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.speclang.ClassWellDefinedness;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.MethodWellDefinedness;
+import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -53,6 +60,7 @@ import de.uka.ilkd.key.util.Pair;
  */
 public abstract class AbstractPO implements IPersistablePO {
 
+    protected TermBuilder tb;
     protected final InitConfig environmentConfig;
     protected Services environmentServices;
     protected final JavaInfo javaInfo;
@@ -192,6 +200,74 @@ public abstract class AbstractPO implements IPersistablePO {
                  functionNames.addSafely(f);
              }
          }
+    }
+
+    /**
+     * Generates the general assumption that self is not null.
+     * @param pm The {@link IProgramMethod} to execute.
+     * @param selfVar The self variable.
+     * @return The term representing the general assumption.
+     */
+    protected Term generateSelfNotNull(IProgramMethod pm, ProgramVariable selfVar) {
+       return selfVar == null || pm.isConstructor() ?
+              tb.tt() :
+              tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
+    }
+
+    /**
+     * Generates the general assumption that self is created.
+     * @param pm The {@link IProgramMethod} to execute.
+     * @param selfVar The self variable.
+     * @return The term representing the general assumption.
+     */
+    protected Term generateSelfCreated(List<LocationVariable> heaps, IProgramMethod pm,
+                                       ProgramVariable selfVar, Services services) {
+       if(selfVar == null || pm.isConstructor()) {
+           return tb.tt();
+       }
+       Term created = null;
+       for(LocationVariable heap : heaps) {
+           if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap())
+               continue;
+           final Term cr = tb.created(tb.var(heap), tb.var(selfVar));
+           if(created == null) {
+               created = cr;
+           }else{
+               created = tb.and(created, cr);
+           }
+       }
+       return created;
+    }
+
+
+    /**
+     * Generates the general assumption which defines the type of self.
+     * @param pm The {@link IProgramMethod} to execute.
+     * @param selfVar The self variable.
+     * @param selfKJT The {@link KeYJavaType} of the self variable.
+     * @return The term representing the general assumption.
+     */
+    protected Term generateSelfExactType(IProgramMethod pm,
+                                         ProgramVariable selfVar,
+                                         KeYJavaType selfKJT) {
+        return selfVar == null || pm.isConstructor()
+               ? tb.tt() : generateSelfExactType(pm, tb.var(selfVar), selfKJT);
+    }
+
+    /**
+     * Generates the general assumption which defines the type of self.
+     * @param pm The {@link IProgramMethod} to execute.
+     * @param selfVar The self variable.
+     * @param selfKJT The {@link KeYJavaType} of the self variable.
+     * @return The term representing the general assumption.
+     */
+    protected Term generateSelfExactType(IProgramMethod pm, 
+                                         Term selfVar, 
+                                         KeYJavaType selfKJT) {
+       final Term selfExactType = selfVar == null || pm.isConstructor() ?
+             tb.tt() :
+             tb.exactInstance(selfKJT.getSort(), selfVar);
+       return selfExactType;
     }
 
     // ==================================================

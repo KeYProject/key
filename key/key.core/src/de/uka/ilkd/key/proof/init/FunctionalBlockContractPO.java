@@ -87,8 +87,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     }
 
     public static Map<Boolean,String> TRANSACTION_TAGS = new LinkedHashMap<Boolean,String>();
-
-    private TermBuilder tb;
+    
     private FunctionalBlockContract contract;
     private InitConfig proofConfig;
 
@@ -219,7 +218,10 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         
         Term validity = configurator.setUpValidityGoal(null,
                 new Term[] { outerRemembranceUpdate, anonInUpdate, remembranceUpdate },
-                new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition },
+                new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition,
+                        generateSelfNotNull(pm, selfVar),
+                        generateSelfCreated(heaps, pm, selfVar, services),
+                        generateSelfExactType(pm, selfVar, getCalleeKeYJavaType())},
                 new Term[] { postcondition, frameCondition },
                 exceptionParameter,
                 conditionsAndClausesBuilder.getTerms());

@@ -152,6 +152,9 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
                 conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
         final Term atMostOneFlagSetCondition =
                 conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
+        final Term selfConditions =
+                conditionsAndClausesBuilder.buildSelfConditions(
+                        heaps, contract.getMethod(), contract.getKJT(), instantiation.self, services);
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
@@ -185,7 +188,7 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
         configurator.setUpPreconditionGoal(result.tail().head(),
                                            contextUpdate,
                                            new Term[] {precondition, wellFormedHeapsCondition,
-                                                       reachableInCondition});
+                                                       reachableInCondition, selfConditions});
         configurator.setUpUsageGoal(result.head(),
                                     new Term[] {contextUpdate, remembranceUpdate,
                                                 anonymisationUpdate},
@@ -195,7 +198,7 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
             configurator.setUpValidityGoal(result.tail().tail().head(),
                                            new Term[] {contextUpdate, remembranceUpdate},
                                            new Term[] {precondition, wellFormedHeapsCondition,
-                                                       reachableInCondition},
+                                                       reachableInCondition, selfConditions},
                                            new Term[] {postcondition, frameCondition
                                                        /*, atMostOneFlagSetCondition*/},
                                            exceptionParameter,

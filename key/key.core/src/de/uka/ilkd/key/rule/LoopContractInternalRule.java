@@ -103,7 +103,7 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
                 MiscTools.getLocalIns(instantiation.block, services);
         final ImmutableSet<ProgramVariable> localOutVariables =
                 MiscTools.getLocalOuts(instantiation.block, services);
-        final Map<LocationVariable, Function> anonymisationHeaps =
+        final Map<LocationVariable, Function> anonOutHeaps =
                 createAndRegisterAnonymisationVariables(heaps, contract, services);
 
         final LoopContract.Variables variables = new VariablesCreatorAndRegistrar(
@@ -126,12 +126,15 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
                 conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
         final Map<LocationVariable, Term> modifiesClauses =
                 conditionsAndClausesBuilder.buildModifiesClauses();
+        final Term selfConditions =
+                conditionsAndClausesBuilder.buildSelfConditions(
+                        heaps, contract.getMethod(), contract.getKJT(), instantiation.self, services);
 
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term frameCondition = conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
         final Term wellFormedAnonymisationHeapsCondition =
                 conditionsAndClausesBuilder
-                .buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
+                .buildWellFormedAnonymisationHeapsCondition(anonOutHeaps);
         final Term reachableOutCondition =
                 conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
         final Term atMostOneFlagSetCondition =
@@ -142,18 +145,22 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
                 new ConditionsAndClausesBuilder(contract, heaps, nextVariables,
                         instantiation.self, services)
                 .buildPostcondition();
+        final Term nextFrameCondition =
+                new ConditionsAndClausesBuilder(contract, heaps, nextVariables,
+                        instantiation.self, services)
+                .buildFrameCondition(modifiesClauses);
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate =
-                updatesBuilder.buildAnonOutUpdate(anonymisationHeaps,
+                updatesBuilder.buildAnonOutUpdate(anonOutHeaps,
                                                         modifiesClauses);
         
         final Term nextRemembranceUpdate =
                 new UpdatesBuilder(nextVariables, services).buildRemembranceUpdate(heaps);
         final Term outerRemembranceUpdate = updatesBuilder.buildOuterRemembranceUpdate();
         
-        Map<LocationVariable, Function> anonHeaps = new LinkedHashMap<LocationVariable, Function>(40);
+        Map<LocationVariable, Function> anonInHeaps = new LinkedHashMap<LocationVariable, Function>(40);
         final TermBuilder tb = services.getTermBuilder();
         
         for (LocationVariable heap : heaps) {
@@ -162,11 +169,11 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
             final Function anonymisationFunction =
                     new Function(new Name(anonymisationName), heap.sort(), true);
             services.getNamespaces().functions().addSafely(anonymisationFunction);
-            anonHeaps.put(heap, anonymisationFunction);
+            anonInHeaps.put(heap, anonymisationFunction);
         }
         
         
-        final Term anonInUpdate = updatesBuilder.buildAnonInUpdate(anonHeaps);
+        final Term anonInUpdate = updatesBuilder.buildAnonInUpdate(anonInHeaps);
         
         
         final ImmutableList<Goal> result;
@@ -184,7 +191,7 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
         configurator.setUpPreconditionGoal(result.tail().head(),
                 contextUpdate,
                 new Term[] {precondition, wellFormedHeapsCondition,
-                        reachableInCondition});
+                        reachableInCondition, selfConditions});
         configurator.setUpUsageGoal(result.head(),
                 new Term[] {contextUpdate, remembranceUpdate,
                         anonymisationUpdate},
@@ -197,12 +204,14 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
                 tb.sequential(outerRemembranceUpdate, anonInUpdate),
                 remembranceUpdate,
                 nextRemembranceUpdate,
-                anonymisationHeaps,
+                anonOutHeaps,
                 modifiesClauses,
-                new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition },
+                new Term[] {
+                        precondition, wellFormedHeapsCondition,
+                        reachableInCondition, selfConditions },
                 decreasesCheck,
                 new Term[] { postcondition, frameCondition },
-                new Term[] { nextPostcondition },
+                new Term[] { nextPostcondition, nextFrameCondition },
                 exceptionParameter,
                 variables.termify(instantiation.self),
                 nextVariables);

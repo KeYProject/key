@@ -134,6 +134,9 @@ public class BlockContractExternalRule extends AbstractBlockContractRule {
                 conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
         final Term reachableInCondition =
                 conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
+        final Term selfConditions =
+                conditionsAndClausesBuilder.buildSelfConditions(
+                        heaps, contract.getMethod(), contract.getKJT(), instantiation.self, services);
         final Map<LocationVariable, Term> modifiesClauses =
                 conditionsAndClausesBuilder.buildModifiesClauses();
 
@@ -164,7 +167,7 @@ public class BlockContractExternalRule extends AbstractBlockContractRule {
         configurator.setUpPreconditionGoal(result.tail().head(),
                 contextUpdate,
                 new Term[] {precondition, wellFormedHeapsCondition,
-                        reachableInCondition});
+                        reachableInCondition, selfConditions});
         configurator.setUpUsageGoal(result.head(),
                                     new Term[] {contextUpdate, remembranceUpdate,
                                                 anonymisationUpdate},

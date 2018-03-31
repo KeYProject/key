@@ -48,7 +48,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -124,7 +123,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
    private final Set<Term> additionalUninterpretedPredicates = new HashSet<Term>();
 
    protected InitConfig proofConfig;
-   protected TermBuilder tb;
 
    /**
     * Constructor.
@@ -533,74 +531,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
       return tb.and(wellFormed != null ? wellFormed : tb.tt(), selfNotNull,
               selfCreated, selfExactType, paramsOK, mbyAtPreDef);
-   }
-
-   /**
-    * Generates the general assumption that self is not null.
-    * @param pm The {@link IProgramMethod} to execute.
-    * @param selfVar The self variable.
-    * @return The term representing the general assumption.
-    */
-   protected Term generateSelfNotNull(IProgramMethod pm, ProgramVariable selfVar) {
-      return selfVar == null || pm.isConstructor() ?
-             tb.tt() :
-             tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
-   }
-
-   /**
-    * Generates the general assumption that self is created.
-    * @param pm The {@link IProgramMethod} to execute.
-    * @param selfVar The self variable.
-    * @return The term representing the general assumption.
-    */
-   protected Term generateSelfCreated(List<LocationVariable> heaps, IProgramMethod pm,
-                                      ProgramVariable selfVar, Services services) {
-	  if(selfVar == null || pm.isConstructor()) {
-		  return tb.tt();
-	  }
-	  Term created = null;
-	  for(LocationVariable heap : heaps) {
-		  if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap())
-			  continue;
-		  final Term cr = tb.created(tb.var(heap), tb.var(selfVar));
-		  if(created == null) {
-			  created = cr;
-		  }else{
-			  created = tb.and(created, cr);
-		  }
-	  }
-	  return created;
-   }
-
-
-   /**
-    * Generates the general assumption which defines the type of self.
-    * @param pm The {@link IProgramMethod} to execute.
-    * @param selfVar The self variable.
-    * @param selfKJT The {@link KeYJavaType} of the self variable.
-    * @return The term representing the general assumption.
-    */
-   protected Term generateSelfExactType(IProgramMethod pm,
-                                        ProgramVariable selfVar,
-                                        KeYJavaType selfKJT) {
-       return selfVar == null || pm.isConstructor()
-              ? tb.tt() : generateSelfExactType(pm, tb.var(selfVar), selfKJT);
-   }
-
-   /**
-    * Generates the general assumption which defines the type of self.
-    * @param pm The {@link IProgramMethod} to execute.
-    * @param selfVar The self variable.
-    * @param selfKJT The {@link KeYJavaType} of the self variable.
-    * @return The term representing the general assumption.
-    */
-   protected Term generateSelfExactType(IProgramMethod pm, 
-                                        Term selfVar, 
-                                        KeYJavaType selfKJT) {
-      final Term selfExactType = selfVar == null || pm.isConstructor() ?
-            tb.tt() :
-            tb.exactInstance(selfKJT.getSort(), selfVar);
-      return selfExactType;
    }
 
    /**
