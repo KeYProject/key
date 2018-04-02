@@ -11,5 +11,6 @@ The method "BlockContractExamples.sum" is taken (in a slightly adapted form) fro
 The methods in "LoopContractExamples" are based on an example found in:
     Thomas Tuerk. Local reasoning about while-loops. In In International Conference on Verified Software: Theories, Tools and Experiments - Theory Workshop (VS-Theory).
 
+"BlockContractExamplesWithoutPreconditions" is same as "BlockContractExamples" but with all preconditions removed from the block contracts. Thus, the proof obligations in this class can only be proven using the rule "Internal Block Contract".
 
 2018, Florian Lanzinger
