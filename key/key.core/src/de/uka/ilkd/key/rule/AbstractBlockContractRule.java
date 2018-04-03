@@ -38,6 +38,7 @@ import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -121,6 +122,12 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         Services services = goal.proof().getServices();
         Proof proof = goal.proof();
         ProofOblInput po = services.getSpecificationRepository().getProofOblInput(proof);
+        
+        if (po instanceof FunctionalBlockContractPO
+                && contract.getBlock().equals(((FunctionalBlockContractPO) po).getBlock())) {
+            return true;
+        }
+        
         if (po instanceof SymbolicExecutionPO) {
             Goal initiatingGoal = ((SymbolicExecutionPO)po).getInitiatingGoal();
             return contractApplied(contract, initiatingGoal);
