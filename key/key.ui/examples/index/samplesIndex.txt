@@ -21,7 +21,8 @@ firstTouch/10-SITA/README.txt
 firstTouch/11-StateMerging/README.txt
 
 heap/block_loop_contracts/Simple/README.txt
-heap/block_loop_contracts/DualPivot/README.txt
+heap/block_loop_contracts/Divide/README.txt
+heap/block_loop_contracts/InternalExternal/README.txt
 heap/block_loop_contracts/List/README.txt
 firstTouch/07-Cell/README.txt
 heap/SmansEtAl/README.txt
