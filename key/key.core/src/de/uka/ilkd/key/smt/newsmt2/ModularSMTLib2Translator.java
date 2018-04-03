@@ -43,13 +43,17 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         StringBuffer sortsb = new StringBuffer();
         sortsb.append("(distinct ");
-        for (Sort s : services.getNamespaces().sorts().elements()) {
+        Collection<Sort> sorts = services.getNamespaces().sorts().elements();
+        for (Sort s : sorts) {
             sb.append("(declare-const " + SExpr.sortExpr(s) + " T)\n");
             sortsb.append(SExpr.sortExpr(s) + " ");
         }
         sortsb.append(")\n");
         sb.append(sortsb);
         sb.append("\n");
+
+        createSortTypeHierarchy(sorts, services);
+
         for(SExpr decl : master.getDeclarations()) {
             decl.appendTo(sb);
             sb.append("\n");
@@ -68,6 +72,16 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         return sb;
     }
 
+
+    private void createSortTypeHierarchy(Collection<Sort> sorts, Services services) {
+        for (Sort s : sorts) {
+            for (Sort t : sorts) {
+                if (s.extendsTrans(t)) {
+                    System.out.println(s.toString() + " is a subsort of " + t.toString());
+                }
+            }
+        }
+    }
 
     // Is there functionality to do this in KeY ?!
     private static String readPreamble() {

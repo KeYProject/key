@@ -203,7 +203,8 @@ public class NewSMTTTest {
     public void instanceOfTest() throws IllegalFormulaException, IOException {
         LogicVariable xVar = new LogicVariable(new ProgramElementName("x"), intType);
         // TypeRef tr = new TypeRef(javaInt);
-        Term iot = tb.instance(intType, tb.var(xVar)); // TODO nicht was i
+        Term iot = tb.instance(intType, tb.var(xVar)); // TODO nicht was ich
+                                                       // will
         String ts = trans.translateProblem(iot, s, null).toString();
         writeToTestFile(ts);
         Assert.assertEquals("", mh.translate(iot, SExpr.Type.BOOL).toString());
