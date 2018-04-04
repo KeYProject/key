@@ -89,6 +89,16 @@ public class ShowSymbExLinesAction extends MainWindowAction {
     private static final int TAB_SIZE = 4;      // TODO: Is there a global setting for this?
 
     /**
+     * The color of normal highlights in source code (yellow).
+     */
+    private static final Color NORMAL_HIGHLIGHT_COLOR = Color.YELLOW;
+
+    /**
+     * The color of the most recent highlight in source code (a light orange).
+     */
+    private static final Color MOST_RECENT_HIGHLIGHT_COLOR = new Color(255, 153, 0);
+
+    /**
      * The container for the tabs containing source code.
      */
     private final JTabbedPane tabs;
@@ -514,7 +524,8 @@ public class ShowSymbExLinesAction extends MainWindowAction {
     }
 
     /**
-     * Paints the highlights for symbolically executed lines.
+     * Paints the highlights for symbolically executed lines. The most recently executed line is
+     * highlighted with a different color.
      * @param textPane the JTextPane containing the source code
      * @param li precalculated start indices of the lines
      * @param filename the filename corresponding to the given JTextPane
@@ -523,11 +534,18 @@ public class ShowSymbExLinesAction extends MainWindowAction {
     private void paintSymbExHighlights(JTextPane textPane, LineInformation[] li, String filename,
             HighlightPainter hp) {
         try {
-            for (Pair l : lines) {
+            for (int i = 0; i < lines.size(); i++) {
+                Pair l = lines.get(i);
                 if (filename.equals(l.pos.getFileName())) {
                     Range r = calculateLineRange(textPane,
                             li[l.pos.getStartPosition().getLine() - 1].getOffset());
-                    textPane.getHighlighter().addHighlight(r.start(), r.end(), hp);
+                    // use a different color for most recent
+                    if (i == 0) {
+                        textPane.getHighlighter().addHighlight(r.start(), r.end(),
+                                new DefaultHighlightPainter(MOST_RECENT_HIGHLIGHT_COLOR));
+                    } else {
+                        textPane.getHighlighter().addHighlight(r.start(), r.end(), hp);
+                    }
                 }
             }
         } catch (BadLocationException e) {
@@ -653,7 +671,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             });
 
             // paint the highlights (symbolically executed lines) for this file
-            HighlightPainter hp = new DefaultHighlightPainter(Color.YELLOW);
+            HighlightPainter hp = new DefaultHighlightPainter(NORMAL_HIGHLIGHT_COLOR);
             paintSymbExHighlights(textPane, li, entry.getKey(), hp);
 
             textPane.addMouseListener(new TextPaneMouseAdapter(textPane, li, hp,
