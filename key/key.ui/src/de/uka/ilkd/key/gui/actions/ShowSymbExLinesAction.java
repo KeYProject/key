@@ -10,8 +10,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -37,7 +39,6 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
-
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -81,6 +82,11 @@ public class ShowSymbExLinesAction extends MainWindowAction {
      * We use the same font as in SequentView for consistency.
      */
     private static final Font SOURCE_FONT = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
+
+    /**
+     * Indicates how many spaces are inserted instead of one tab (used in source code window).
+     */
+    private static final int TAB_SIZE = 4;      // TODO: Is there a global setting for this?
 
     /**
      * The container for the tabs containing source code.
@@ -596,6 +602,20 @@ public class ShowSymbExLinesAction extends MainWindowAction {
     }
 
     /**
+     * Replaces each tab in the given String by TAB_SIZE spaces.
+     * @param s the String to replace
+     * @return the resulting String (without tabs)
+     */
+    private static String replaceTabs(String s) {
+        // fill a new array with the specified amount of spaces
+        char[] rep = new char[TAB_SIZE];
+        for (int i = 0; i < rep.length; i++) {
+            rep[i] = ' ';
+        }
+        return s.replace("\t", new String(rep));
+    }
+
+    /**
      * Initializes the given JTextPane with the source code from the file in the HashMap entry.
      * In addition, listeners are added and highlights are painted.
      * @param textPane the JTextPane to initialize
@@ -603,8 +623,12 @@ public class ShowSymbExLinesAction extends MainWindowAction {
      */
     private void initTextPane(JTextPane textPane, Entry<String, File> entry) {
         try {                                                 // TODO: scope?
-            String source = IOUtil.readFrom(entry.getValue());
-            LineInformation[] li = IOUtil.computeLineInformation(entry.getValue());
+            String original = IOUtil.readFrom(entry.getValue());
+            String source = replaceTabs(original);  // replace all tabs by spaces
+
+            // use input stream here to compute line information of the string with replaced tabs
+            InputStream inStream = new ByteArrayInputStream(source.getBytes());
+            LineInformation[] li = IOUtil.computeLineInformation(inStream);
 
             textPane.setFont(SOURCE_FONT);
             textPane.setToolTipText(TEXTPANE_TOOLTIP);
