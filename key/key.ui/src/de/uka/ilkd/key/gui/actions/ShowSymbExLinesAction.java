@@ -53,6 +53,7 @@ import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * This action is responsible for showing the symbolic execution path of the currently selected
@@ -116,7 +117,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
     /**
      * Lines to highlight (contains all highlights of the current proof) and corresponding Nodes.
      */
-    private LinkedList<Pair> lines;
+    private LinkedList<NodePosPair> lines;
 
     /**
      * This document performs syntax highlighting when strings are inserted.
@@ -435,20 +436,39 @@ public class ShowSymbExLinesAction extends MainWindowAction {
         getMediator().addKeYSelectionListener(new KeYSelectionListener() {
 
             public void selectedNodeChanged(KeYSelectionEvent e) {
-                actionPerformed(null);  // TODO: null
+                updateGUI();
             }
 
             public void selectedProofChanged(KeYSelectionEvent e) {
                 clearCaches();
-                actionPerformed(null);  // TODO: null
+                updateGUI();
             }
         });
     }
 
-    static class Pair {
-        public Node node;
-        public PositionInfo pos;
-        Pair(Node node, PositionInfo pos) {
+    /**
+     * A small container for a PositionInfo and a corresponding Node (used to store the first Node
+     * containing the statement at the specified position).
+     *
+     * @author WP
+     */
+    static class NodePosPair {
+        /**
+         * The Node.
+         */
+        public final Node node;
+
+        /**
+         * The PositionInfo.
+         */
+        public final PositionInfo pos;
+
+        /**
+         * Creates a new pair.
+         * @param node the Node corresponding to the given PositionInfo
+         * @param pos the PositionInfo
+         */
+        public NodePosPair(Node node, PositionInfo pos) {
             this.node = node;
             this.pos = pos;
         }
@@ -463,10 +483,25 @@ public class ShowSymbExLinesAction extends MainWindowAction {
      * @author WP
      */
     private class TextPaneMouseAdapter extends MouseAdapter {
-        LineInformation[] li;
-        HighlightPainter painter;
-        JTextPane textPane;
-        String filename;
+        /**
+         * The precalculated start indices of the lines. Used to compute the clicked line number.
+         */
+        final LineInformation[] li;
+
+        /**
+         * The Painter used for painting the highlights (except for the most recent one).
+         */
+        final HighlightPainter painter;
+
+        /**
+         * The JTextPane containing the source code.
+         */
+        final JTextPane textPane;
+
+        /**
+         * The filename of the file whose content is displayed in the JTextPane.
+         */
+        final String filename;
 
         public TextPaneMouseAdapter(JTextPane textPane, LineInformation[] li,
                 HighlightPainter painter, String filename) {
@@ -509,7 +544,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
                 }
                 // jump in proof tree (get corresponding node from list)
                 Node n = null;
-                for (Pair p : lines) {
+                for (NodePosPair p : lines) {
                     if (p.pos.getStartPosition().getLine() == line + 1
                             && p.pos.getFileName().equals(filename)) {
                         n = p.node;
@@ -535,7 +570,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             HighlightPainter hp) {
         try {
             for (int i = 0; i < lines.size(); i++) {
-                Pair l = lines.get(i);
+                NodePosPair l = lines.get(i);
                 if (filename.equals(l.pos.getFileName())) {
                     Range r = calculateLineRange(textPane,
                             li[l.pos.getStartPosition().getLine() - 1].getOffset());
@@ -549,7 +584,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
                 }
             }
         } catch (BadLocationException e) {
-            e.printStackTrace();
+            Debug.out(e);
         }
     }
 
@@ -564,7 +599,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
         try {
             textPane.getHighlighter().changeHighlight(tag, r.start(), r.end());
         } catch (BadLocationException e) {
-            e.printStackTrace();
+            Debug.out(e);
         }
     }
 
@@ -591,7 +626,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
         try {
             text = doc.getText(0, doc.getLength());
         } catch (BadLocationException e) {
-            e.printStackTrace();
+            Debug.out(e);
         }
 
         // find line end
@@ -640,7 +675,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
      * @param entry the HashMap entry containing the file
      */
     private void initTextPane(JTextPane textPane, Entry<String, File> entry) {
-        try {                                                 // TODO: scope?
+        try {
             String original = IOUtil.readFrom(entry.getValue());
             String source = replaceTabs(original);  // replace all tabs by spaces
 
@@ -690,10 +725,10 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             // add the full path as tooltip for the tab
             int index = tabs.indexOfTab(entry.getValue().getName());
             tabs.setToolTipTextAt(index, entry.getValue().getAbsolutePath());
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        } catch (BadLocationException e1) {
-            e1.printStackTrace();
+        } catch (IOException e) {
+            Debug.out("An error occurred while reading " + entry.getValue().getAbsolutePath(), e);
+        } catch (BadLocationException e) {
+            Debug.out(e);
         }
     }
 
@@ -702,7 +737,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
      * corresponding nodes in proof tree.
      */
     private void fillMaps() {
-        for (Pair p : lines) {
+        for (NodePosPair p : lines) {
             PositionInfo l = p.pos;
             files.putIfAbsent(l.getFileName(), new File(l.getFileName()));
         }
@@ -710,6 +745,19 @@ public class ShowSymbExLinesAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        updateGUI();
+    }
+
+    /**
+     * Performs an update of the GUI:
+     * <ul>
+     *      <li>updates the TabbedPane with the source files used</li>
+     *      <li>highlights the symbolically executed lines</li>
+     *      <li>updates the source status bar of the main window with information about the current
+     *          branch</li>
+     * </ul>
+     */
+    private void updateGUI() {
         Node symbExNode = getMediator().getSelectedNode();
         tabs.removeAll();
 
@@ -743,7 +791,6 @@ public class ShowSymbExLinesAction extends MainWindowAction {
                         tabs.setSelectedIndex(i);
                     }
                 }
-                // TODO: different color for most recent
             }
         } else {
             tabs.setBorder(new TitledBorder(NO_SOURCE));
@@ -755,11 +802,11 @@ public class ShowSymbExLinesAction extends MainWindowAction {
     /**
      * Collects the set of lines to highlight starting from the given node in the proof tree.
      * @param cur the given node
-     * @return a linked list of Pairs with PositionInfo objects containing the start and end
+     * @return a linked list of pairs of PositionInfo objects containing the start and end
      * positions for the highlighting and Nodes.
      */
-    private static LinkedList<Pair> constructLinesSet(Node cur) {
-        LinkedList<Pair> list = new LinkedList<Pair>();
+    private static LinkedList<NodePosPair> constructLinesSet(Node cur) {
+        LinkedList<NodePosPair> list = new LinkedList<NodePosPair>();
 
         if (cur == null) {
             return null;
@@ -774,10 +821,8 @@ public class ShowSymbExLinesAction extends MainWindowAction {
                     // we are only interested in well defined PositionInfo objects with a file name
                     if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
                             && pos.getFileName() != null) {
-                        list.addLast(new Pair(cur, pos));
+                        list.addLast(new NodePosPair(cur, pos));
                     }
-                } else {
-                    System.out.println("Not a SE!");
                 }
             }
             cur = cur.parent();
