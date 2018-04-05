@@ -76,7 +76,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
     public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
     // default starting color for heatmaps
-    private static final Color HEATMAP_DEFAULT_START_COLOR = new Color(.7f, .5f, .5f);
+    private static final Color HEATMAP_DEFAULT_START_COLOR = new Color(.8f, .7f, .5f);
 
 
     // the mediator
@@ -182,11 +182,11 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         for (Object updateHighlight : updateHighlights) {
             removeHighlight(updateHighlight);
         }
-        
+
         updateHighlights.clear();
         InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
         Range[] ranges = ipt.getUpdateRanges();
-        
+
         if (ranges != null) {
             for (Range range : ranges) {
                 // NOTE (DS): The below addition of 1 to the beginning is a quick-and-dirty
@@ -195,30 +195,30 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 // something concerning highlighting does not work in the future, here could
                 // be a starting place to find the mistake.
                 range = new Range(range.start() + 1, range.end() + 1);
-                
+
                 Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR);
                 updateHighlights.add(tag);
                 paintHighlight(range, tag);
             }
         }
     }
-    
-    
+
+
     /**
      * Highlights sequent formulas according to their age (if newest is false),
      * or the newest sequent formulas.
-     * @param max_age maximum age up to which sf's are highlighted, or number of recent sf's to highlight. 
+     * @param max_age maximum age up to which sf's are highlighted, or number of recent sf's to highlight.
      * @param newest Are newest sf's highlighted (true) or all up to max_age (false)?
      */
     private void updateHeatmapSFHighlights(int max_age, boolean newest) {
         if (getLogicPrinter() == null) {
             return;
         }
-        
+
         InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
-        
+
         int i = 0;
-        
+
         // 5 "youngest" sequent formulas are highlighted.
         ImmutableList<SequentPrintFilterEntry> entryList = filter.getFilteredAntec().append(filter.getFilteredSucc());
         if (newest) {
@@ -247,14 +247,14 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                     }
                 }
                 ++i;
-            } 
+            }
         } else {    // all formulas below MAX_AGE_FOR_HEATMAP are highlighted.
             for(SequentPrintFilterEntry entry : entryList) {
                 SequentFormula form = entry.getFilteredFormula();
                 int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form, max_age + 2);
                 if(age < max_age) {
                     Color color = computeColorForAge(max_age, age);
-                    ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil().prepend(0).append(i); 
+                    ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil().prepend(0).append(i);
                     Range r = ipt.rangeForPath(list);
                     Range newR = new Range(r.start()+1, r.end()+1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
                     Object tag = getColorHighlight(color);
@@ -265,8 +265,8 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             }
         }
     }
-    
-    
+
+
     /**
      * Utility class consisting of a pair of the PosInOccurrence of a term, and its age.
      * Used for term heatmap highlighting.
@@ -289,13 +289,13 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
         public void set_pio(PosInOccurrence pio) {
             this.pio = pio;
-            
+
         }
         @Override
         public String toString() {
             return "PIO_age [pio=" + pio + ", age=" + age + ", active=" + active + "]";
         }
-        
+
         @Override
         public boolean equals(Object o) {
             if (o instanceof PIO_age) {
@@ -307,29 +307,29 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             return false;
         }
     }
-    
-    
+
+
     /**
      * Highlights terms according to their age (if newest is false),
      * or the newest terms.
-     * @param max_age maximum age up to which terms are highlighted, or number of recent terms to highlight. 
+     * @param max_age maximum age up to which terms are highlighted, or number of recent terms to highlight.
      * @param newest Are newest terms highlighted (true) or all up to max_age (false)?
      */
     private void updateHeatmapTermHighlights(int max_age, boolean newest) {
         LinkedList<Node> nodeList = new LinkedList<>();
         Node node = getMainWindow().getMediator().getSelectedNode();
         nodeList.add(node);
-        // some sort of limit might make sense here for big sequents, but since 
+        // some sort of limit might make sense here for big sequents, but since
         // for the newest term heatmap duplicates will be removed,
         // this list has to be longer than max_age_for_heatmap.
         while (node.parent() != null) {
-            node = node.parent(); 
+            node = node.parent();
             nodeList.addFirst(node);
         }
         ArrayList<PIO_age> pio_age_list = new ArrayList<>();
         Iterator<Node> it = nodeList.iterator();
         int age = nodeList.size() - 1;
-        
+
         // preparation of the list of terms
         while (it.hasNext()) {
             node = it.next();
@@ -372,17 +372,17 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 }
 
             }
-            --age; 
+            --age;
         }
         InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
-        
+
         pio_age_list.sort(new Comparator<PIO_age>() {
                 @Override
                 public int compare(PIO_age o1, PIO_age o2) {
                     return o1.age >= o2.age ? 1 : -1;
                 }
         });
-        
+
         // actual highlighting
         if (newest) {
             for (int j = 0; j < pio_age_list.size() && j < max_age; ++j) {
@@ -390,12 +390,12 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 if (!pair.active) {
                     continue;
                 }
-                
+
                 while (j+1 < pio_age_list.size() && pio_age_list.get(j+1).get_pio().equals(pair.get_pio())) {
                     pair = pio_age_list.get(j+1);
                     pio_age_list.remove(j);
                 }
-                
+
                 Color color = computeColorForAge(max_age, j);
                 ImmutableList<Integer> pfp = ipt.pathForPosition(pair.get_pio(), filter);
                 if (pfp != null) {
@@ -426,7 +426,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     }
 
     /**
-     * computes the appropriate color for a given age and maximum age. 
+     * computes the appropriate color for a given age and maximum age.
      * Implements linear interpolation between the starting colour and white.
      * @param max_age the maximum age of a term / sf, specified in viewsettings
      * @param age the age of the given term / sf
@@ -438,8 +438,8 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         float greenDiff = (1.f - color[1]);
         float blueDiff = (1.f - color[2]);
         // exponentieller abfall - unterschiede zwischen ersten zwei, drei formeln deutlicher, danach kaum noch unterschied
-        // float diff = (float) (1.f - Math.pow(.5f, age-1)); 
-        
+        // float diff = (float) (1.f - Math.pow(.5f, age-1));
+
         // linearer abfall
         float diff = (float) age / max_age;
         float red = color[0] + redDiff * diff;
@@ -449,9 +449,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     }
 
     /**
-     * computes the age of a given sequent formula, i.e., 
-     * its distance to the root of the proof tree. If the formula is older 
-     * than max_age, we do not care, because this method is only used for 
+     * computes the age of a given sequent formula, i.e.,
+     * its distance to the root of the proof tree. If the formula is older
+     * than max_age, we do not care, because this method is only used for
      * heatmap highlighting, and older formulas are not considered anyway.
      * @param node the current node
      * @param form the given sf
@@ -466,9 +466,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
         return age;
     }
-    
+
     /**
-     * given a node and a sequent formula, returns the first node 
+     * given a node and a sequent formula, returns the first node
      * among the node's parents that contains the sequent formula @form.
      */
     public Node jumpToIntroduction(Node node, SequentFormula form) {
@@ -477,8 +477,8 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
         return node;
     }
-    
-    
+
+
 
     protected DragSource getDragSource() {
         return dragSource;
