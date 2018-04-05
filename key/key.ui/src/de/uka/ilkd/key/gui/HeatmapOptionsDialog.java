@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -34,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextArea;
 import javax.swing.text.NumberFormatter;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -69,17 +71,16 @@ public class HeatmapOptionsDialog extends JDialog {
     private static final int MAX_AGE = 1000;
 
     /** Text for introductory heatmap explanation */
-    private static final String INTRO_LABEL = "<html><body>Heatmaps can be used to "
-            + "highlight the most recent <br>"
-            + "changes in the sequent. You can choose to highlight <br> "
-            + "entire sequent formulas or subterms.  Highlighting can either <br>"
-            + "be done on the newest expressions, or on all expressions <br>"
-            + "that have changed whithin the last <i> k </i> steps of the proof. <br>"
-            + "Newer expressions will have a stronger highlight. </body></html>";
+    private static final String INTRO_LABEL = "Heatmaps can be used to "
+            + "highlight the most recent changes in the sequent. You can choose to highlight "
+            + "entire sequent formulas or subterms. Highlighting can either "
+            + "be done on the newest expressions, or on all expressions "
+            + "that have changed whithin the last k steps of the proof. "
+            + "Newer expressions will have a stronger highlight.";
 
     /** Explanation for age textfield */
-    private static final String TEXTFIELD_LABEL = "<html><body>Maximum age of highlighted <br>"
-            + "terms or formulas, or number of <br> newest terms or formulas</body></html>";
+    private static final String TEXTFIELD_LABEL = "Maximum age of highlighted "
+            + "terms or formulas, or number of newest terms or formulas";
 
     /** Tool tip for age textfield */
     private static final String TOOLTIP_TEXT = "Please enter a number between " + MIN_AGE + " and "
@@ -95,12 +96,10 @@ public class HeatmapOptionsDialog extends JDialog {
 
     /** Descriptions for heatmap options */
     private static final String[] DESCRIPTIONS = { "No Heatmaps are shown.",
-        "<html><body>All sequent formulas that have changed in the last <i> k </i> "
-                + "steps are highlighted.</body></html>",
-        "<html><body>The <i> k </i> newest sequent formulas are highlighted.</body></html>",
-        "<html><body>All terms that have changed in the last <i> k </i> "
-                + "steps are highlighted.</body></html>",
-        "<html><body>The <i> k </i> newest terms are highlighted.</body></html>" };
+        "All sequent formulas that have changed in the last k " + "steps are highlighted.",
+        "The k newest sequent formulas are highlighted.",
+        "All terms that have changed in the last k " + "steps are highlighted.",
+        "The k newest terms are highlighted." };
 
     /** Error message on invalid textfield input */
     private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and 1000";
@@ -118,8 +117,6 @@ public class HeatmapOptionsDialog extends JDialog {
         panel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(10, 5, 10, 5);
-        c.ipadx = 0;
-        c.ipady = 0;
 
         JRadioButton[] radioButtons = new JRadioButton[NUMRADIOBUTTONS];
 
@@ -146,12 +143,17 @@ public class HeatmapOptionsDialog extends JDialog {
             }
         });
 
-        JPanel radioBoxes = setupRadioPanel(radioButtons);
-        JPanel tfPanel = setupTextfieldPanel(textField);
+        JPanel radioBoxes = setupRadioPanel(radioButtons, panel.getBackground());
+        JPanel tfPanel = setupTextfieldPanel(textField, panel.getBackground());
         JPanel buttonPanel = setupButtonPanel(okButton, cancelButton);
 
         c.gridy = 0;
-        panel.add(new JLabel(INTRO_LABEL), c);
+        JTextArea l = new JTextArea(INTRO_LABEL, 5, 36);
+        l.setLineWrap(true);
+        l.setWrapStyleWord(true);
+        l.setEditable(false);
+        l.setBackground(panel.getBackground());
+        panel.add(l, c);
         c.gridy++;
         panel.add(radioBoxes, c);
         c.gridy++;
@@ -169,6 +171,7 @@ public class HeatmapOptionsDialog extends JDialog {
         textField.addActionListener(action);
 
         pack();
+        System.out.println(l.size());
         setLocationRelativeTo(null);
         setVisible(true);
         setResizable(false);
@@ -238,10 +241,15 @@ public class HeatmapOptionsDialog extends JDialog {
      *            the textfield shown on the panel
      * @return a panel with textfield and explanation
      */
-    private JPanel setupTextfieldPanel(JFormattedTextField textField) {
+    private JPanel setupTextfieldPanel(JFormattedTextField textField, Color bg) {
         JPanel tfPanel = new JPanel();
         tfPanel.setLayout(new BorderLayout());
-        tfPanel.add(new JLabel(TEXTFIELD_LABEL), BorderLayout.NORTH);
+        JTextArea l = new JTextArea(TEXTFIELD_LABEL);
+        l.setLineWrap(true);
+        l.setWrapStyleWord(true);
+        l.setEditable(false);
+        l.setBackground(bg);
+        tfPanel.add(l, BorderLayout.NORTH);
         JPanel tmp = new JPanel();
         tmp.add(new JLabel("k = "));
         tmp.add(textField);
@@ -253,16 +261,21 @@ public class HeatmapOptionsDialog extends JDialog {
     /**
      * @param radioButtons
      *            the radio buttons shown on the panel
+     * @param bg
+     *            the backgropund color
      * @return a panel with all the radio buttons and explanations
      */
-    private JPanel setupRadioPanel(JRadioButton[] radioButtons) {
+    private JPanel setupRadioPanel(JRadioButton[] radioButtons, Color bg) {
         JPanel radioBoxes = new JPanel();
         radioBoxes.setLayout(new BoxLayout(radioBoxes, BoxLayout.Y_AXIS));
         for (int i = 0; i < NUMRADIOBUTTONS; i++) {
             JPanel p = new JPanel();
             p.setLayout(new BorderLayout());
             p.add(radioButtons[i], BorderLayout.PAGE_START);
-            p.add(new JLabel(DESCRIPTIONS[i]));
+            JTextArea l = new JTextArea(DESCRIPTIONS[i]);
+            l.setEditable(false);
+            l.setBackground(bg);
+            p.add(l);
             p.setBorder(BorderFactory.createBevelBorder(0));
             radioBoxes.add(p);
         }
