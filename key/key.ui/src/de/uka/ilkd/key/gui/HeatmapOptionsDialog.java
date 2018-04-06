@@ -16,18 +16,29 @@ package de.uka.ilkd.key.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.text.NumberFormat;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
@@ -36,6 +47,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import javax.swing.text.NumberFormatter;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -96,9 +109,9 @@ public class HeatmapOptionsDialog extends JDialog {
 
     /** Descriptions for heatmap options */
     private static final String[] DESCRIPTIONS = { "No Heatmaps are shown.",
-        "All sequent formulas that have changed in the last k " + "steps are highlighted.",
+        "All sequent formulas that have changed in the last k steps are highlighted.",
         "The k newest sequent formulas are highlighted.",
-        "All terms that have changed in the last k " + "steps are highlighted.",
+        "All terms that have changed in the last k steps are highlighted.",
         "The k newest terms are highlighted." };
 
     /** Error message on invalid textfield input */
@@ -106,11 +119,16 @@ public class HeatmapOptionsDialog extends JDialog {
 
     /** number of radioButtons in the group */
     private static final int NUMRADIOBUTTONS = 5;
+
+    protected static final String[] INFO_IMG = null;
+
+    private static final Icon HELPICON = IconFactory
+            .scaleIcon(IconFactory.getImage("images/questionIcon.png"), 20, 20);
     /**
      * Opens a dialog for choosing if and how to display heatmap highlighting.
      */
     public HeatmapOptionsDialog() {
-
+        System.out.println(Paths.get("").toAbsolutePath().toString());
         setTitle("Heatmap Options");
 
         JPanel panel = new JPanel();
@@ -143,7 +161,7 @@ public class HeatmapOptionsDialog extends JDialog {
             }
         });
 
-        JPanel radioBoxes = setupRadioPanel(radioButtons, panel.getBackground());
+        JPanel radioBoxes = setupRadioPanel(radioButtons, panel.getBackground(), this);
         JPanel tfPanel = setupTextfieldPanel(textField, panel.getBackground());
         JPanel buttonPanel = setupButtonPanel(okButton, cancelButton);
 
@@ -265,13 +283,23 @@ public class HeatmapOptionsDialog extends JDialog {
      *            the backgropund color
      * @return a panel with all the radio buttons and explanations
      */
-    private JPanel setupRadioPanel(JRadioButton[] radioButtons, Color bg) {
+    private JPanel setupRadioPanel(JRadioButton[] radioButtons, Color bg, JDialog parent) {
         JPanel radioBoxes = new JPanel();
         radioBoxes.setLayout(new BoxLayout(radioBoxes, BoxLayout.Y_AXIS));
         for (int i = 0; i < NUMRADIOBUTTONS; i++) {
             JPanel p = new JPanel();
             p.setLayout(new BorderLayout());
-            p.add(radioButtons[i], BorderLayout.PAGE_START);
+            p.add(radioButtons[i], BorderLayout.WEST);
+            int j = i;
+            JButton infoButton = new JButton(new AbstractAction() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    InfoDialog id = new InfoDialog(DESCRIPTIONS[j], INFO_IMG[j], parent);
+                }
+            });
+            infoButton.setIcon(HELPICON);
+            p.add(infoButton, BorderLayout.EAST);
             JTextArea l = new JTextArea(DESCRIPTIONS[i]);
             l.setEditable(false);
             l.setBackground(bg);
@@ -345,5 +373,58 @@ public class HeatmapOptionsDialog extends JDialog {
             }
         };
         return action;
+    }
+
+    class InfoDialog extends JDialog {
+        public InfoDialog(String s, String imgPath, final JDialog owner) {
+            super(owner);
+            JPanel p = new JPanel(new BorderLayout());
+            JTextArea l = new JTextArea(s);
+            l.setLineWrap(true);
+            l.setWrapStyleWord(true);
+            l.setEditable(false);
+            l.setBackground(owner.getBackground());
+            ImagePanel ip = new ImagePanel(imgPath);
+            p.add(l, BorderLayout.NORTH);
+            p.add(ip, BorderLayout.SOUTH);
+            this.setContentPane(p);
+            this.pack();
+            this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            this.setLocationRelativeTo(owner);
+            this.setAlwaysOnTop(true);
+            this.addWindowFocusListener(new WindowFocusListener() {
+
+                @Override
+                public void windowGainedFocus(WindowEvent e) {
+                    // do nothing
+                }
+
+                @Override
+                public void windowLostFocus(WindowEvent e) {
+                    if (SwingUtilities.isDescendingFrom(e.getOppositeWindow(), InfoDialog.this)) {
+                        return;
+                    }
+                    InfoDialog.this.setVisible(false);
+                }
+            });
+        }
+    }
+
+    class ImagePanel extends JPanel {
+
+        private BufferedImage image;
+
+        public ImagePanel(String path) {
+            try {
+                image = ImageIO.read(new File(path));
+            } catch (IOException ex) {
+                // handle exception...
+            }
+        }
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.drawImage(image, 0, 0, this);
+        }
     }
 }
