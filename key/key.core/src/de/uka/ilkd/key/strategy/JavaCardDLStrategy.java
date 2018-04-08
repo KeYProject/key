@@ -232,18 +232,22 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         final Feature blockFeature;
         final Feature loopBlockFeature;
+        final Feature loopBlockApplyHeadFeature;
         final String blockProperty =
                 strategyProperties
                         .getProperty(StrategyProperties.BLOCK_OPTIONS_KEY);
         if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_INTERNAL)) {
             blockFeature = blockContractInternalFeature(longConst(Long.MIN_VALUE));
             loopBlockFeature = loopContractInternalFeature(longConst(Long.MIN_VALUE));
+            loopBlockApplyHeadFeature = loopContractApplyHead(longConst(Long.MIN_VALUE));
         } else if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_EXTERNAL)) {
             blockFeature = blockContractExternalFeature(longConst(Long.MIN_VALUE));
             loopBlockFeature = loopContractExternalFeature(longConst(Long.MIN_VALUE));
+            loopBlockApplyHeadFeature = loopContractApplyHead(longConst(Long.MIN_VALUE));
         } else {
             blockFeature = blockContractInternalFeature(inftyConst());
-            loopBlockFeature = loopContractExternalFeature(longConst(Long.MIN_VALUE));
+            loopBlockFeature = loopContractExternalFeature(inftyConst());
+            loopBlockApplyHeadFeature = loopContractApplyHead(inftyConst());
         }
 
         final Feature oneStepSimplificationF =
@@ -270,6 +274,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF,
                 // smtF,
                 methodSpecF, queryF, depSpecF, loopInvF, blockFeature, loopBlockFeature,
+                loopBlockApplyHeadFeature,
                 ifMatchedF, dispatcher);
     }
 

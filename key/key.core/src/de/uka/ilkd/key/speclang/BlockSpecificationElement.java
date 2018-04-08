@@ -529,7 +529,11 @@ public interface BlockSpecificationElement extends SpecificationElement {
     			collector.start();
     			
     			for (LocationVariable var : collector.result()) {
-    				localOutVariables = localOutVariables.add(var);
+    			    if (!var.getKeYJavaType()
+    			            .equals(services.getTypeConverter()
+    			                    .getHeapLDT().getHeap().getKeYJavaType())) {
+                        localOutVariables = localOutVariables.add(var);
+    			    }
     			}
             }
             
@@ -566,7 +570,11 @@ public interface BlockSpecificationElement extends SpecificationElement {
     			collector.start();
     			
     			for (LocationVariable var : collector.result()) {
-    				localInVariables = localInVariables.add(var);
+    			    if (!var.getKeYJavaType()
+                            .equals(services.getTypeConverter()
+                                    .getHeapLDT().getHeap().getKeYJavaType())) {
+                        localInVariables = localInVariables.add(var);
+                    }
     			}
             }
             

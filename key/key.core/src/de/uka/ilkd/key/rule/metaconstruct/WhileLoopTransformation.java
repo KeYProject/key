@@ -310,7 +310,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 
                 ImmutableSet<LoopContract> lcs
                     = services.getSpecificationRepository().getLoopContracts(x);
-                if (bcs != null) {
+                if (lcs != null) {
                     for (LoopContract lc : lcs) {
                         lc = lc.setBlock(newBlock);
                         services.getSpecificationRepository().addLoopContract(lc);

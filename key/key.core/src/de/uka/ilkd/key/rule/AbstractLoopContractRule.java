@@ -129,10 +129,11 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
                 getApplicableContracts(instantiation, goal, goal.proof().getServices());
         
         for (LoopContract contract : contracts) {
-        	// The rule is only applicable if the block starts with a while loop.
-        	// If the head is not empty, then the block must start with a for loop,
-        	// which must be transformed into a while loop before the rule can be applied.
-        	if (contract.getHead().isEmpty()) {
+        	// The rule is only applicable if
+            // (a) the block starts with a while loop or
+            // (b) the block starts with a for loop whose head has already been applied
+            //     via the rule LoopContractApplyHead.
+        	if (contract.getHead() == null) {
         		return true;
         	}
         }
