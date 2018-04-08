@@ -8,6 +8,9 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopContract;
 
+/**
+ * @see LoopContractApplyHeadRule
+ */
 public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
     
     protected LoopContractApplyHeadRule rule;

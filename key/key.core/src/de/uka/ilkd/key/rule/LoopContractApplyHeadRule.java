@@ -17,8 +17,21 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.metaconstruct.ForToWhileTransformation;
 import de.uka.ilkd.key.speclang.LoopContract;
 
+/**
+ * <p>This rule transforms a block that starts with a for loop into one that starts with a while loop.</p>
+ * 
+ * <p>This is necessary because the rules for loop contracts
+ * (subclasses of {@link AbstractLoopContractRule}) can only be applied on blocks that start
+ * with a while loop.</p>
+ * 
+ * <p> The transformation is equivalent to the {@link ForToWhileTransformation}, the only difference
+ * being that we transform the whole block containing the loop instead of just the loop itself.
+ * This is implemented as a built-in rule because the opening brace of the block on which it is
+ * applied belongs to the non-active prefix and thus cannot be matched by the taclet language. </p>
+ */
 public class LoopContractApplyHeadRule implements BuiltInRule {
     
     public static final LoopContractApplyHeadRule INSTANCE = new LoopContractApplyHeadRule();
