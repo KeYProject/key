@@ -13,6 +13,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
@@ -21,7 +22,9 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.visitor.InnerBreakAndContinueReplacer;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -57,6 +60,7 @@ public final class SimpleLoopContract
     private final StatementBlock body;
     private final StatementBlock tail;
     private final While loop;
+    private final Services services;
     
     private final List<Label> loopLabels;
 
@@ -74,7 +78,8 @@ public final class SimpleLoopContract
                                final boolean transactionApplicable,
                                final Map<LocationVariable,Boolean> hasMod,
                                final Term decreases,
-                               ImmutableSet<FunctionalLoopContract> functionalContracts) {
+                               ImmutableSet<FunctionalLoopContract> functionalContracts,
+                               Services services) {
         super(baseName,
                 block,
                 labels,
@@ -91,8 +96,13 @@ public final class SimpleLoopContract
         
         this.decreases = decreases;
         this.functionalContracts = functionalContracts;
+        this.services = services;
         
         loopLabels = new ArrayList<>();
+
+        Label outerLabel = new ProgramElementName("breakLoop");
+        Label innerLabel = new ProgramElementName("continueLoop");
+        loopLabels.add(outerLabel);
         
         SourceElement first = block.getFirstElement();
         while (first instanceof LabeledStatement) {
@@ -129,18 +139,27 @@ public final class SimpleLoopContract
             for (Statement statement : loop.getInitializers()) {
                 headStatements.add(statement);
             }
-            
-            head = new StatementBlock(headStatements);
-            
-            guard = loop.getGuardExpression();
 
             ExtList bodyStatements = new ExtList();
             bodyStatements.add(loop.getBody());
+            StatementBlock innerBody = new InnerBreakAndContinueReplacer(
+                    new StatementBlock(bodyStatements),
+                    loopLabels,
+                    outerLabel,
+                    innerLabel,
+                    services).replace();
+
+            ExtList updateStatements = new ExtList();
             for (Expression statement : loop.getUpdates()) {
-            	bodyStatements.add(statement);
+                updateStatements.add(statement);
             }
             
-            body = new StatementBlock(bodyStatements);
+            head = new StatementBlock(headStatements);
+            guard = loop.getGuardExpression();
+            body = new StatementBlock(new StatementBlock(
+                    new LabeledStatement(innerLabel, innerBody, PositionInfo.UNDEFINED),
+                    new StatementBlock(updateStatements)
+            ));
             
             this.loop = new While(guard, body);
 
@@ -251,7 +270,7 @@ public final class SimpleLoopContract
                 newModifiesClauses, newinfFlowSpecs,
                 newVariables,
                 transactionApplicable, hasMod, newDecreases,
-                functionalContracts);
+                functionalContracts, services);
     }
 
     @Override 
@@ -266,7 +285,7 @@ public final class SimpleLoopContract
         return new SimpleLoopContract(baseName, block, labels, (IProgramMethod)newPM, modality,
                                        preconditions, measuredBy, postconditions, modifiesClauses,
                                        infFlowSpecs, variables, transactionApplicable, hasMod,
-                                       decreases, functionalContracts);
+                                       decreases, functionalContracts, services);
     }
 
     @Override
@@ -320,7 +339,7 @@ public final class SimpleLoopContract
         	return new SimpleLoopContract(
             		baseName, block, labels, method, modality, preconditions,
                     measuredBy, postconditions, modifiesClauses, infFlowSpecs, variables,
-                    transactionApplicable, hasMod, decreases, null);
+                    transactionApplicable, hasMod, decreases, null, services);
         }
 
         @Override
@@ -389,7 +408,7 @@ public final class SimpleLoopContract
                                            postconditions, modifiesClauses, head.getInfFlowSpecs(),
                                            placeholderVariables,
                                            head.isTransactionApplicable(), hasMod, contracts[0].getDecreases(),
-                                           functionalContracts);
+                                           functionalContracts, services);
             
             return result;
         }

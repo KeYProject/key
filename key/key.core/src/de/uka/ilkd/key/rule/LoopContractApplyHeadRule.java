@@ -31,6 +31,9 @@ import de.uka.ilkd.key.speclang.LoopContract;
  * being that we transform the whole block containing the loop instead of just the loop itself.
  * This is implemented as a built-in rule because the opening brace of the block on which it is
  * applied belongs to the non-active prefix and thus cannot be matched by the taclet language. </p>
+ * 
+ * <p> Note that the actual transformation is performed in the constructor of
+ * {@link SimpleLoopContract}. </p>
  */
 public class LoopContractApplyHeadRule implements BuiltInRule {
     
