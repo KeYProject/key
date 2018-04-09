@@ -99,17 +99,19 @@ public class HeatmapOptionsDialog extends JDialog {
     /** Descriptions for heatmap options */
     private static final String[] DESCRIPTIONS = { "No Heatmaps are shown.",
         "All sequent formulae that have been added or changed in the last k steps are highlighted. "
-                + "More recent formulae will have a stronger highlight. It is possible that less than "
-                + "k formulae are highlighted, e.g. if one formula has changed multiple times.",
-        "All formulae in the sequent are sorted by how new they are, i.e., how recently they have been added or changed. "
-                + "The first k formulae of the sorted list are highlighted according to their position in the list,"
-                + " with the most recent formula receiving the strongest highlight.",
+            + "More recent formulae will have a stronger highlight. It is possible that less "
+            + "than k formulae are highlighted, e.g. if one formula has changed multiple times.",
+        "All formulae in the sequent are sorted by how new they are, i.e., how recently they have"
+            + " been added or changed. The first k formulae of the sorted list are highlighted "
+            + "according to their position in the list,"
+            + " with the most recent formula receiving the strongest highlight.",
         "All terms that have been added or changed in the last k steps are highlighted. "
                 + "More recent terms will have a stronger highlight. It is possible that less than "
                 + "k terms are highlighted, e.g. if one term has changed multiple times.",
-        "All terms in the sequent are sorted by how new they are, i.e., how recently they have been added or changed. "
-                + "The first k terms of the sorted list are highlighted according to their position in the list,"
-                + " with the most recent term receiving the strongest highlight.", };
+        "All terms in the sequent are sorted by how new they are, i.e., how recently they "
+            + "have been added or changed. The first k terms of the sorted list are highlighted "
+            + "according to their position in the list,"
+            + " with the most recent term receiving the strongest highlight.", };
 
     /** Error message on invalid textfield input */
     private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and 1000";
@@ -117,6 +119,7 @@ public class HeatmapOptionsDialog extends JDialog {
     /** number of radioButtons in the group */
     private static final int NUMRADIOBUTTONS = 5;
 
+    /** question mark icon */
     private static final Icon HELPICON = IconFactory
             .scaleIcon(IconFactory.getImage("images/questionIcon.png"), 20, 20);
     /**
@@ -308,6 +311,11 @@ public class HeatmapOptionsDialog extends JDialog {
             int j = i;
             JButton infoButton = new JButton(new AbstractAction() {
 
+                /**
+                 * version id
+                 */
+                private static final long serialVersionUID = 6910725367740582043L;
+
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     new InfoDialog(DESCRIPTIONS[j], parent);
@@ -342,33 +350,33 @@ public class HeatmapOptionsDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 String command = group.getSelection().getActionCommand();
                 boolean showHm = VS.isShowHeatmap();
-                boolean SF = VS.isHeatmapSF();
+                boolean sf = VS.isHeatmapSF();
                 boolean newest = VS.isHeatmapNewest();
                 int ma = VS.getMaxAgeForHeatmap();
                 if (command == COMMANDS[0]) {
-                    VS.setHeatmapOptions(false, SF, newest, ma);
+                    VS.setHeatmapOptions(false, sf, newest, ma);
                     dispose();
                     return;
                 } else if (command == COMMANDS[1]) {
                     showHm = true;
-                    SF = true;
+                    sf = true;
                     newest = false;
                 } else if (command == COMMANDS[2]) {
                     showHm = true;
-                    SF = true;
+                    sf = true;
                     newest = true;
                 } else if (command == COMMANDS[3]) {
                     showHm = true;
-                    SF = false;
+                    sf = false;
                     newest = false;
                 } else if (command == COMMANDS[4]) {
                     showHm = true;
-                    SF = false;
+                    sf = false;
                     newest = true;
                 }
                 if (textField.getValue() != null) {
                     if (textField.isEditValid()) {
-                        VS.setHeatmapOptions(showHm, SF, newest, (int) textField.getValue());
+                        VS.setHeatmapOptions(showHm, sf, newest, (int) textField.getValue());
                         dispose();
                     } else {
                         if (VS.isShowHeatmap()) {
@@ -386,7 +394,23 @@ public class HeatmapOptionsDialog extends JDialog {
         return action;
     }
 
+    /**
+     *
+     * @author jschiffl a small dialog that explains an option in more detail
+     */
     class InfoDialog extends JDialog {
+        /**
+         *
+         */
+        private static final long serialVersionUID = 479715116105454400L;
+
+        /**
+         *
+         * @param s
+         *            the description
+         * @param owner
+         *            the parent window
+         */
         public InfoDialog(String s, final JDialog owner) {
             super(owner);
             JPanel p = new JPanel(new BorderLayout());
