@@ -104,7 +104,7 @@ public final class SimpleLoopContract
         if (first instanceof While) {
             While loop = (While) first;
             
-            head = new StatementBlock();
+            head = null;
             
             guard = loop.getGuardExpression();
             
