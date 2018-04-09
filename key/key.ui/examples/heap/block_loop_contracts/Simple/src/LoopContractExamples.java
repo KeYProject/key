@@ -50,7 +50,8 @@ public class LoopContractExamples {
       @     arr[i] == \old(arr[i]) + 1);
       @*/
     public static void mapIncrement_loopInvariant(int[] arr) {
-      
+        int i = 0; 
+
         /*@ loop_invariant (0 <= i && i <= arr.length)
           @     && (\forall int j; 0 <= j && j < i; arr[j] == \old(arr[j]) + 1)
           @     && (\forall int j; i <= j && j < arr.length;
@@ -58,8 +59,9 @@ public class LoopContractExamples {
           @ assignable arr[i .. arr.length];
           @ decreases arr.length - i;
           @*/
-        for (int i = 0; i < arr.length; ++i) {
-                ++arr[i];
+        while (i < arr.length) {
+            ++arr[i];
+            ++i;
         }
     }
 }
