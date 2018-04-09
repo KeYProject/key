@@ -16,30 +16,24 @@ package de.uka.ilkd.key.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.text.NumberFormat;
 
-import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -47,7 +41,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
+import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 import javax.swing.text.NumberFormatter;
 
@@ -56,11 +50,10 @@ import de.uka.ilkd.key.settings.ViewSettings;
 
 
 /**
- * This Dialog contains options for highlighting sequent formulas
- * or terms according to their age, i.e., when they were first introduced
- * into the proof. It is possible to highlight all sf/terms up to a
- * specified age, or to highlight the x newest sf/terms, x being
- * specified by the user.
+ * This Dialog contains options for highlighting sequent formulae or terms
+ * according to their age, i.e., when they were first introduced into the proof.
+ * It is possible to highlight all sf/terms up to a specified age, or to
+ * highlight the x newest sf/terms, x being specified by the user.
  *
  * @author jschiffl
  *
@@ -85,15 +78,11 @@ public class HeatmapOptionsDialog extends JDialog {
 
     /** Text for introductory heatmap explanation */
     private static final String INTRO_LABEL = "Heatmaps can be used to "
-            + "highlight the most recent changes in the sequent. You can choose to highlight "
-            + "entire sequent formulas or subterms. Highlighting can either "
-            + "be done on the newest expressions, or on all expressions "
-            + "that have changed whithin the last k steps of the proof. "
-            + "Newer expressions will have a stronger highlight.";
+            + "highlight the most recent changes in the sequent.";
 
     /** Explanation for age textfield */
     private static final String TEXTFIELD_LABEL = "Maximum age of highlighted "
-            + "terms or formulas, or number of newest terms or formulas";
+            + "terms or formulae, or number of newest terms or formulae";
 
     /** Tool tip for age textfield */
     private static final String TOOLTIP_TEXT = "Please enter a number between " + MIN_AGE + " and "
@@ -104,15 +93,23 @@ public class HeatmapOptionsDialog extends JDialog {
         "terms_newest" };
 
     /** Button names */
-    private static final String[] BUTTON_NAMES = { "No Heatmaps", "Sequent formulas up to age",
-        "Newest sequent formulas", "Terms up to age", "Newest terms" };
+    private static final String[] BUTTON_NAMES = { "No Heatmaps", "Sequent formulae up to age",
+        "Newest sequent formulae", "Terms up to age", "Newest terms" };
 
     /** Descriptions for heatmap options */
     private static final String[] DESCRIPTIONS = { "No Heatmaps are shown.",
-        "All sequent formulas that have changed in the last k steps are highlighted.",
-        "The k newest sequent formulas are highlighted.",
-        "All terms that have changed in the last k steps are highlighted.",
-        "The k newest terms are highlighted." };
+        "All sequent formulae that have been added or changed in the last k steps are highlighted. "
+                + "More recent formulae will have a stronger highlight. It is possible that less than "
+                + "k formulae are highlighted, e.g. if one formula has changed multiple times.",
+        "All formulae in the sequent are sorted by how new they are, i.e., how recently they have been added or changed. "
+                + "The first k formulae of the sorted list are highlighted according to their position in the list,"
+                + " with the most recent formula receiving the strongest highlight.",
+        "All terms that have been added or changed in the last k steps are highlighted. "
+                + "More recent terms will have a stronger highlight. It is possible that less than "
+                + "k terms are highlighted, e.g. if one term has changed multiple times.",
+        "All terms in the sequent are sorted by how new they are, i.e., how recently they have been added or changed. "
+                + "The first k terms of the sorted list are highlighted according to their position in the list,"
+                + " with the most recent term receiving the strongest highlight.", };
 
     /** Error message on invalid textfield input */
     private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and 1000";
@@ -120,15 +117,12 @@ public class HeatmapOptionsDialog extends JDialog {
     /** number of radioButtons in the group */
     private static final int NUMRADIOBUTTONS = 5;
 
-    protected static final String[] INFO_IMG = null;
-
     private static final Icon HELPICON = IconFactory
             .scaleIcon(IconFactory.getImage("images/questionIcon.png"), 20, 20);
     /**
      * Opens a dialog for choosing if and how to display heatmap highlighting.
      */
     public HeatmapOptionsDialog() {
-        System.out.println(Paths.get("").toAbsolutePath().toString());
         setTitle("Heatmap Options");
 
         JPanel panel = new JPanel();
@@ -161,12 +155,16 @@ public class HeatmapOptionsDialog extends JDialog {
             }
         });
 
+        getRootPane().registerKeyboardAction(e -> {
+            dispose();
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+
         JPanel radioBoxes = setupRadioPanel(radioButtons, panel.getBackground(), this);
         JPanel tfPanel = setupTextfieldPanel(textField, panel.getBackground());
         JPanel buttonPanel = setupButtonPanel(okButton, cancelButton);
 
         c.gridy = 0;
-        JTextArea l = new JTextArea(INTRO_LABEL, 5, 36);
+        JTextArea l = new JTextArea(INTRO_LABEL, 5, 20);
         l.setLineWrap(true);
         l.setWrapStyleWord(true);
         l.setEditable(false);
@@ -189,8 +187,8 @@ public class HeatmapOptionsDialog extends JDialog {
         textField.addActionListener(action);
 
         pack();
-        System.out.println(l.size());
         setLocationRelativeTo(null);
+        setAlwaysOnTop(true);
         setVisible(true);
         setResizable(false);
     }
@@ -262,7 +260,7 @@ public class HeatmapOptionsDialog extends JDialog {
     private JPanel setupTextfieldPanel(JFormattedTextField textField, Color bg) {
         JPanel tfPanel = new JPanel();
         tfPanel.setLayout(new BorderLayout());
-        JTextArea l = new JTextArea(TEXTFIELD_LABEL);
+        JTextArea l = new JTextArea(TEXTFIELD_LABEL, 2, 20);
         l.setLineWrap(true);
         l.setWrapStyleWord(true);
         l.setEditable(false);
@@ -289,21 +287,34 @@ public class HeatmapOptionsDialog extends JDialog {
         for (int i = 0; i < NUMRADIOBUTTONS; i++) {
             JPanel p = new JPanel();
             p.setLayout(new BorderLayout());
+            JLabel dis = new JLabel("Disable Heatmaps");
+            dis.setAlignmentX(.5f);
+            JLabel sf = new JLabel("Highlight sequent formulae");
+            sf.setAlignmentX(.5f);
+            JLabel terms = new JLabel("Highlight terms");
+            terms.setAlignmentX(.5f);
+            if (i == 0) {
+                radioBoxes.add(dis);
+            }
+            if (i == 1) {
+                radioBoxes.add(new JLabel("                   "));
+                radioBoxes.add(sf);
+            }
+            if (i == 3) {
+                radioBoxes.add(new JLabel("                   "));
+                radioBoxes.add(terms);
+            }
             p.add(radioButtons[i], BorderLayout.WEST);
             int j = i;
             JButton infoButton = new JButton(new AbstractAction() {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    InfoDialog id = new InfoDialog(DESCRIPTIONS[j], INFO_IMG[j], parent);
+                    new InfoDialog(DESCRIPTIONS[j], parent);
                 }
             });
             infoButton.setIcon(HELPICON);
             p.add(infoButton, BorderLayout.EAST);
-            JTextArea l = new JTextArea(DESCRIPTIONS[i]);
-            l.setEditable(false);
-            l.setBackground(bg);
-            p.add(l);
             p.setBorder(BorderFactory.createBevelBorder(0));
             radioBoxes.add(p);
         }
@@ -376,22 +387,21 @@ public class HeatmapOptionsDialog extends JDialog {
     }
 
     class InfoDialog extends JDialog {
-        public InfoDialog(String s, String imgPath, final JDialog owner) {
+        public InfoDialog(String s, final JDialog owner) {
             super(owner);
             JPanel p = new JPanel(new BorderLayout());
-            JTextArea l = new JTextArea(s);
+            JTextArea l = new JTextArea(s, 10, 20);
             l.setLineWrap(true);
             l.setWrapStyleWord(true);
             l.setEditable(false);
             l.setBackground(owner.getBackground());
-            ImagePanel ip = new ImagePanel(imgPath);
             p.add(l, BorderLayout.NORTH);
-            p.add(ip, BorderLayout.SOUTH);
             this.setContentPane(p);
             this.pack();
             this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             this.setLocationRelativeTo(owner);
             this.setAlwaysOnTop(true);
+            this.setVisible(true);
             this.addWindowFocusListener(new WindowFocusListener() {
 
                 @Override
@@ -401,30 +411,12 @@ public class HeatmapOptionsDialog extends JDialog {
 
                 @Override
                 public void windowLostFocus(WindowEvent e) {
-                    if (SwingUtilities.isDescendingFrom(e.getOppositeWindow(), InfoDialog.this)) {
-                        return;
-                    }
-                    InfoDialog.this.setVisible(false);
+                    InfoDialog.this.dispose();
                 }
             });
-        }
-    }
-
-    class ImagePanel extends JPanel {
-
-        private BufferedImage image;
-
-        public ImagePanel(String path) {
-            try {
-                image = ImageIO.read(new File(path));
-            } catch (IOException ex) {
-                // handle exception...
-            }
-        }
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            g.drawImage(image, 0, 0, this);
+            getRootPane().registerKeyboardAction(e -> {
+                dispose();
+            }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         }
     }
 }
