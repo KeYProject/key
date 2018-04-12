@@ -53,6 +53,7 @@ public class NewSMTTTest {
     private static KeYJavaType javaInt;
 
     File file = new File("/home/i57/cnodes/jschiffl/tmp/smttest/smttestfile");
+    File castTestFile = new File("/home/i57/cnodes/jschiffl/tmp/smttest/CastTest.java");
     FileWriter fw = null;
     BufferedWriter writer = null;
 
@@ -157,8 +158,8 @@ public class NewSMTTTest {
         Term y = tb.var(ySym);
         Term all = tb.all(yVar, tb.all(xVar, tb.gt(tb.add(x, y), x)));
         Assert.assertEquals(
-                "(forall ((var_y u)) (forall ((var_x u)) (> (+ (u2i ui_x) (u2i ui_y)) (u2i ui_x))))",
-                mh.translate(all).toString());
+            "(forall ((var_y u)) (forall ((var_x u)) (> (+ (u2i ui_x) (u2i ui_y)) (u2i ui_x))))",
+            mh.translate(all).toString());
     }
 
     @Test
@@ -169,7 +170,7 @@ public class NewSMTTTest {
         // writeToTestFile(ts);
 
         Assert.assertEquals("(forall ((var_x u)) (forall ((var_y u)) (not (= var_x var_y))))",
-                mh.translate(all).toString());
+            mh.translate(all).toString());
     }
 
     @Test
@@ -183,31 +184,32 @@ public class NewSMTTTest {
         Term cp = tb.imp(tb.imp(p, q), tb.imp(tb.not(q), tb.not(p)));
 
         Assert.assertEquals(
-                "(=> (=> (u2b ui_p) (u2b ui_q)) (=> (not (u2b ui_q)) (not (u2b ui_p))))",
-                mh.translate(cp).toString());
+            "(=> (=> (u2b ui_p) (u2b ui_q)) (=> (not (u2b ui_q)) (not (u2b ui_p))))",
+            mh.translate(cp).toString());
     }
 
     @Test
     public void selectTest() throws IllegalFormulaException, IOException {
-        Function select = new Function(new Name("select"), Sort.ANY, heapType);
-        Term h = tb.var(new LocationVariable(new ProgramElementName("h"), heapType));
-        LocationVariable x = new LocationVariable(new ProgramElementName("x"), intType);
+        // TODO
+    }
 
-        Term sel = tb.equals(tb.var(x), tb.func(select, h));
-        // String ts = trans.translateProblem(sel, s, null).toString();
-        // writeToTestFile(ts);
-        Assert.assertEquals("(ui_select ui_h ui_o ui_f)", mh.translate(sel).toString());
+    @Test
+    public void castTest() throws IllegalFormulaException, IOException {
+        LogicVariable xVar = new LogicVariable(new ProgramElementName("x"), intType);
+        LogicVariable yVar = new LogicVariable(new ProgramElementName("y"), intType);
+        Term cast = tb.equals(tb.cast(intType, tb.var(xVar)), tb.var(yVar));
+        String ts = trans.translateProblem(cast, s, null).toString();
+        writeToTestFile(ts);
+        Assert.assertEquals("(= (cast var_x sort_int) var_y)", mh.translate(cast, SExpr.Type.BOOL).toString());
     }
 
     @Test
     public void instanceOfTest() throws IllegalFormulaException, IOException {
         LogicVariable xVar = new LogicVariable(new ProgramElementName("x"), intType);
-        // TypeRef tr = new TypeRef(javaInt);
-        Term iot = tb.instance(intType, tb.var(xVar)); // TODO nicht was ich
-                                                       // will
+        Term iot = tb.instance(intType, tb.var(xVar)); // TODO das wird zu "equals(io(x), true)" und ist blöd
         String ts = trans.translateProblem(iot, s, null).toString();
         writeToTestFile(ts);
-        Assert.assertEquals("", mh.translate(iot, SExpr.Type.BOOL).toString());
+        Assert.assertEquals("blurgh", mh.translate(iot, SExpr.Type.BOOL).toString());
     }
 }
 
