@@ -190,7 +190,13 @@ public class NewSMTTTest {
 
     @Test
     public void selectTest() throws IllegalFormulaException, IOException {
-        // TODO
+        Term h = tb.var(new LogicVariable(new Name("h"), heapType));
+        Term o = tb.var(new LogicVariable(new Name("o"), objectType));;
+        Term f = tb.var(new LogicVariable(new Name("f"), fieldType));;
+        Term sel = tb.select(intType, h, o, f);
+        String ts = trans.translateProblem(sel, s, null).toString();
+        writeToTestFile(ts);
+        Assert.assertEquals("(= (cast var_x sort_int) var_y)", mh.translate(sel, SExpr.Type.BOOL).toString());
     }
 
     @Test
