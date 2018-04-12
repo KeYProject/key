@@ -9,6 +9,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.IllegalFormulaException;
 import de.uka.ilkd.key.smt.SMTSettings;
@@ -25,7 +26,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     @Override
     public StringBuffer translateProblem(Term problem, Services services, SMTSettings settings)
-            throws IllegalFormulaException {
+        throws IllegalFormulaException {
 
         MasterHandler master = new MasterHandler(services);
 
@@ -42,17 +43,17 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         sb.append("; --- Declarations\n\n");
 
         StringBuffer sortsb = new StringBuffer();
-        sortsb.append("(distinct ");
+        sortsb.append("(assert (distinct ");
         Collection<Sort> sorts = services.getNamespaces().sorts().elements();
         for (Sort s : sorts) {
             sb.append("(declare-const " + SExpr.sortExpr(s) + " T)\n");
             sortsb.append(SExpr.sortExpr(s) + " ");
         }
-        sortsb.append(")\n");
+        sortsb.append("))\n");
         sb.append(sortsb);
         sb.append("\n");
 
-        createSortTypeHierarchy(sorts, services);
+        createSortTypeHierarchy(sorts, services, master);
 
         for(SExpr decl : master.getDeclarations()) {
             decl.appendTo(sb);
@@ -73,11 +74,25 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     }
 
 
-    private void createSortTypeHierarchy(Collection<Sort> sorts, Services services) {
+    private void createSortTypeHierarchy(Collection<Sort> sorts, Services services,
+        MasterHandler master) {
         for (Sort s : sorts) {
             for (Sort t : sorts) {
-                if (s.extendsTrans(t)) {
-                    System.out.println(s.toString() + " is a subsort of " + t.toString());
+                if (s.extendsTrans(t) && !s.equals(t)) { // subtype relation
+                    // TODO this does not make any sense as long as interfaces
+                    // are present in the sort list
+                    SExpr axiom = new SExpr("subtype", SORT_PREFIX + s.toString(),
+                        SORT_PREFIX + t.toString());
+                    //                    master.addAxiom(axiom); //TODO uncomment; too cluttering now
+                }
+                // forbid diamond inheritance. TODO remove interfaces from list
+                if (!(s instanceof NullSort) && !(t instanceof NullSort)
+                    && s.extendsSorts().equals(t.extendsSorts())) {
+                    SExpr axiom = new SExpr("forall", new SExpr("x", "T"),
+                        new SExpr("=>", Type.BOOL,
+                            new SExpr("subtype", "x", SORT_PREFIX + s.toString()), new SExpr("not",
+                                new SExpr("subtype", "x", SORT_PREFIX + t.toString()))));
+                    //                    master.addAxiom(axiom); //TODO uncomment; too cluttering now
                 }
             }
         }
@@ -86,8 +101,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     // Is there functionality to do this in KeY ?!
     private static String readPreamble() {
         BufferedReader r = new BufferedReader(
-                new InputStreamReader(
-                        ModularSMTLib2Translator.class.getResourceAsStream("preamble.smt2")));
+            new InputStreamReader(
+                ModularSMTLib2Translator.class.getResourceAsStream("preamble.smt2")));
 
         try {
             String line;
