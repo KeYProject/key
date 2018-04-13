@@ -44,7 +44,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
             trans.addKnownSymbol(name);
 
             if (op.arity() > 0 && op instanceof SortedOperator) {
-                SExpr axiom = funTypeAxiomFromTerm(term, (SortedOperator) op);
+                SExpr axiom = funTypeAxiomFromTerm(term);
                 trans.addAxiom(axiom);
             }
         }
@@ -53,7 +53,8 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
         return new SExpr(name, Type.UNIVERSE, children);
     }
 
-    private SExpr funTypeAxiomFromTerm(Term term, SortedOperator op) {
+    private SExpr funTypeAxiomFromTerm(Term term) {
+        SortedOperator op = (SortedOperator) term.op();
         List<SExpr> vars_U = new ArrayList<>();
         List<SExpr> vars = new ArrayList<>();
         for (int i = 0; i < op.arity(); ++i) {
