@@ -50,7 +50,7 @@ public class NewSMTTTest {
     private static Sort heapType;
     private static Sort objectType;
     private static Sort fieldType;
-    private static KeYJavaType javaInt;
+    private static Sort intArrayType;
 
     File file = new File("/home/i57/cnodes/jschiffl/tmp/smttest/smttestfile");
     File castTestFile = new File("/home/i57/cnodes/jschiffl/tmp/smttest/CastTest.java");
@@ -66,10 +66,10 @@ public class NewSMTTTest {
         heapType = nss.sorts().lookup("Heap");
         objectType = nss.sorts().lookup("java.lang.Object");
         fieldType = nss.sorts().lookup("Field");
+        intArrayType = nss.sorts().lookup("int[]");
         this.tb = s.getTermBuilder();
         this.trans = new ModularSMTLib2Translator();
         this.mh = new MasterHandler(s);
-        javaInt = s.getJavaInfo().getKeYJavaType(intType);
     }
 
     private Term s2t(String str) {
@@ -191,12 +191,15 @@ public class NewSMTTTest {
     @Test
     public void selectTest() throws IllegalFormulaException, IOException {
         Term h = tb.var(new LogicVariable(new Name("h"), heapType));
-        Term o = tb.var(new LogicVariable(new Name("o"), objectType));;
-        Term f = tb.var(new LogicVariable(new Name("f"), fieldType));;
+        Term o = tb.var(new LogicVariable(new Name("o"), objectType));
+        Term f = tb.var(new LogicVariable(new Name("f"), fieldType));
+        Term a = tb.var(new LogicVariable(new Name("a"), intArrayType));
+        Term arr = tb.var(new LogicVariable(new Name("arr(i)"), fieldType));
         Term sel = tb.select(intType, h, o, f);
-        String ts = trans.translateProblem(sel, s, null).toString();
+        Term selA = tb.select(intType, h, a, arr);
+        String ts = trans.translateProblem(selA, s, null).toString();
         writeToTestFile(ts);
-        Assert.assertEquals("(= (cast var_x sort_int) var_y)", mh.translate(sel, SExpr.Type.BOOL).toString());
+        Assert.assertEquals("", mh.translate(sel, SExpr.Type.BOOL).toString());
     }
 
     @Test
@@ -204,8 +207,8 @@ public class NewSMTTTest {
         LogicVariable xVar = new LogicVariable(new ProgramElementName("x"), intType);
         LogicVariable yVar = new LogicVariable(new ProgramElementName("y"), intType);
         Term cast = tb.equals(tb.cast(intType, tb.var(xVar)), tb.var(yVar));
-        String ts = trans.translateProblem(cast, s, null).toString();
-        writeToTestFile(ts);
+//        String ts = trans.translateProblem(cast, s, null).toString();
+//        writeToTestFile(ts);
         Assert.assertEquals("(= (cast var_x sort_int) var_y)", mh.translate(cast, SExpr.Type.BOOL).toString());
     }
 
@@ -213,8 +216,8 @@ public class NewSMTTTest {
     public void instanceOfTest() throws IllegalFormulaException, IOException {
         LogicVariable xVar = new LogicVariable(new ProgramElementName("x"), intType);
         Term iot = tb.instance(intType, tb.var(xVar)); // TODO das wird zu "equals(io(x), true)" und ist blöd
-        String ts = trans.translateProblem(iot, s, null).toString();
-        writeToTestFile(ts);
+//        String ts = trans.translateProblem(iot, s, null).toString();
+//        writeToTestFile(ts);
         Assert.assertEquals("blurgh", mh.translate(iot, SExpr.Type.BOOL).toString());
     }
 }
