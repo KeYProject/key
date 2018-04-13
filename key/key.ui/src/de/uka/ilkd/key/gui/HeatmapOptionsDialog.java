@@ -43,6 +43,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.text.NumberFormatter;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -68,7 +69,7 @@ public class HeatmapOptionsDialog extends JDialog {
 
     /** The view settings */
     private static final ViewSettings VS = ProofIndependentSettings.DEFAULT_INSTANCE
-            .getViewSettings();
+        .getViewSettings();
 
     /** Minimal setting for number of highlighted terms */
     private static final int MIN_AGE = 1;
@@ -78,15 +79,15 @@ public class HeatmapOptionsDialog extends JDialog {
 
     /** Text for introductory heatmap explanation */
     private static final String INTRO_LABEL = "Heatmaps can be used to "
-            + "highlight the most recent changes in the sequent.";
+        + "highlight the most recent changes in the sequent.";
 
     /** Explanation for age textfield */
     private static final String TEXTFIELD_LABEL = "Maximum age of highlighted "
-            + "terms or formulae, or number of newest terms or formulae";
+        + "terms or formulae, or number of newest terms or formulae";
 
     /** Tool tip for age textfield */
     private static final String TOOLTIP_TEXT = "Please enter a number between " + MIN_AGE + " and "
-            + MAX_AGE + ".";
+        + MAX_AGE + ".";
 
     /** Button command names */
     private static final String[] COMMANDS = { "default", "sf_age", "sf_newest", "terms_age",
@@ -106,12 +107,12 @@ public class HeatmapOptionsDialog extends JDialog {
             + "according to their position in the list,"
             + " with the most recent formula receiving the strongest highlight.",
         "All terms that have been added or changed in the last k steps are highlighted. "
-                + "More recent terms will have a stronger highlight. It is possible that less than "
-                + "k terms are highlighted, e.g. if one term has changed multiple times.",
+            + "More recent terms will have a stronger highlight. It is possible that less than "
+            + "k terms are highlighted, e.g. if one term has changed multiple times.",
         "All terms in the sequent are sorted by how new they are, i.e., how recently they "
             + "have been added or changed. The first k terms of the sorted list are highlighted "
             + "according to their position in the list,"
-            + " with the most recent term receiving the strongest highlight.", };
+            + " with the most recent term receiving the strongest highlight." };
 
     /** Error message on invalid textfield input */
     private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and 1000";
@@ -121,7 +122,7 @@ public class HeatmapOptionsDialog extends JDialog {
 
     /** question mark icon */
     private static final Icon HELPICON = IconFactory
-            .scaleIcon(IconFactory.getImage("images/questionIcon.png"), 20, 20);
+        .scaleIcon(IconFactory.getImage("images/questionIcon.png"), 20, 20);
     /**
      * Opens a dialog for choosing if and how to display heatmap highlighting.
      */
@@ -318,7 +319,7 @@ public class HeatmapOptionsDialog extends JDialog {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    new InfoDialog(DESCRIPTIONS[j], parent);
+                    new InfoDialog(BUTTON_NAMES[j], DESCRIPTIONS[j], parent);
                 }
             });
             infoButton.setIcon(HELPICON);
@@ -341,7 +342,7 @@ public class HeatmapOptionsDialog extends JDialog {
      * @return
      */
     private Action setupOkAction(JPanel panel, final ButtonGroup group,
-            JFormattedTextField textField) {
+        JFormattedTextField textField) {
         Action action = new AbstractAction() {
 
             private static final long serialVersionUID = -5840137383763071948L;
@@ -381,9 +382,9 @@ public class HeatmapOptionsDialog extends JDialog {
                     } else {
                         if (VS.isShowHeatmap()) {
                             JOptionPane.showMessageDialog(panel,
-                                    INPUT_ERROR_MESSAGE,
-                                    "Invalid Input",
-                                    JOptionPane.ERROR_MESSAGE);
+                                INPUT_ERROR_MESSAGE,
+                                "Invalid Input",
+                                JOptionPane.ERROR_MESSAGE);
                         } else {
                             dispose();
                         }
@@ -399,22 +400,25 @@ public class HeatmapOptionsDialog extends JDialog {
      * @author jschiffl a small dialog that explains an option in more detail
      */
     class InfoDialog extends JDialog {
-        /**
-         *
-         */
+
+        /** serial version id */
         private static final long serialVersionUID = 479715116105454400L;
 
         /**
          *
          * @param s
          *            the description
+         * @param title
+         *            title of the dialog
          * @param owner
          *            the parent window
          */
-        public InfoDialog(String s, final JDialog owner) {
+        public InfoDialog(String title, String s, final JDialog owner) {
             super(owner);
+            this.setTitle(title);
             JPanel p = new JPanel(new BorderLayout());
-            JTextArea l = new JTextArea(s, 10, 20);
+            JTextArea l = new JTextArea(s, 8, 20);
+            l.setBorder(new EmptyBorder(3, 10, 3, 10));
             l.setLineWrap(true);
             l.setWrapStyleWord(true);
             l.setEditable(false);
@@ -426,18 +430,20 @@ public class HeatmapOptionsDialog extends JDialog {
             this.setLocationRelativeTo(owner);
             this.setAlwaysOnTop(true);
             this.setVisible(true);
-            this.addWindowFocusListener(new WindowFocusListener() {
 
+            // exit on click elsewhere
+            this.addWindowFocusListener(new WindowFocusListener() {
                 @Override
                 public void windowGainedFocus(WindowEvent e) {
                     // do nothing
                 }
-
                 @Override
                 public void windowLostFocus(WindowEvent e) {
                     InfoDialog.this.dispose();
                 }
             });
+
+            //exit on escape button
             getRootPane().registerKeyboardAction(e -> {
                 dispose();
             }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
