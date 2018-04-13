@@ -138,6 +138,9 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
         }
     }
 
+    /**
+     * A builder for {@link Instantiation}s.
+     */
     protected static abstract class Instantiator {
 
         private final Term formula;

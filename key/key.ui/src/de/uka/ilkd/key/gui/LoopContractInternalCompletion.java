@@ -14,6 +14,9 @@ import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopContract;
 
+/**
+ * Interactive completion for {@link LoopContractInternalBuiltInRuleApp}.
+ */
 public class LoopContractInternalCompletion implements InteractiveRuleApplicationCompletion {
     
     private final MainWindow mainWindow;

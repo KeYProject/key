@@ -36,7 +36,16 @@ import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.rule.LoopContractApplyHeadRule;
+import de.uka.ilkd.key.speclang.SimpleLoopContract;
 
+/**
+ * This replaces all breaks and continues in a loop with {@code break l}, where {@code l} is a
+ * specified label. It is used in the transformation of a for loop to a while loop.
+ * 
+ * @see LoopContractApplyHeadRule
+ * @see SimpleLoopContract
+ */
 public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
     protected static final Boolean CHANGED = Boolean.TRUE;

@@ -14,6 +14,9 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+/**
+ * Interactive completion for {@link BlockContractExternalBuiltInRuleApp}.
+ */
 public class BlockContractExternalCompletion implements InteractiveRuleApplicationCompletion {
 
     private final MainWindow mainWindow;

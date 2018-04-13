@@ -4,6 +4,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopContractApplyHeadBuiltInRuleApp;
 
+/**
+ * Interactive completion for {@link LoopContractApplyHeadBuiltInRuleApp}.
+ */
 public class LoopContractApplyHeadCompletion
         implements InteractiveRuleApplicationCompletion {
     
