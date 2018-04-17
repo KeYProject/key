@@ -1,3 +1,9 @@
+(set-option :print-success true) 
+
+(set-option :produce-unsat-cores true)
+
+(set-option :produce-models true)
+
 (declare-sort T 0)
 (declare-sort U 0)
 

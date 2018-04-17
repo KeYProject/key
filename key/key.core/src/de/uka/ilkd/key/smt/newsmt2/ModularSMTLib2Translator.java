@@ -67,8 +67,10 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
 
         sb.append("; --- Sequent\n\n");
-        SExpr assertion = new SExpr("assert", Type.NONE, result);
+        SExpr assertion = new SExpr("assert", Type.NONE, new SExpr("not", Type.NONE, result));
         assertion.appendTo(sb);
+
+        sb.append("(check-sat)");
 
         return sb;
     }
