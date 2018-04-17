@@ -195,11 +195,12 @@ public class NewSMTTTest {
         Term f = tb.var(new LogicVariable(new Name("f"), fieldType));
         Term a = tb.var(new LogicVariable(new Name("a"), intArrayType));
         Term arr = tb.var(new LogicVariable(new Name("arr(i)"), fieldType));
-        Term sel = tb.select(intType, h, o, f);
-        Term selA = tb.select(intType, h, a, arr);
-        String ts = trans.translateProblem(selA, s, null).toString();
+        Term selA = tb.select(intType, h, o, f);
+        Term selB = tb.select(intType, h, a, arr);
+        Term and = tb.equals(selA, selB);
+        String ts = trans.translateProblem(and, s, null).toString();
         writeToTestFile(ts);
-        Assert.assertEquals("", mh.translate(sel, SExpr.Type.BOOL).toString());
+        Assert.assertEquals("", mh.translate(and, SExpr.Type.BOOL).toString());
     }
 
     @Test

@@ -53,7 +53,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
         return new SExpr(name, Type.UNIVERSE, children);
     }
 
-    private SExpr funTypeAxiomFromTerm(Term term) {
+    public static SExpr funTypeAxiomFromTerm(Term term) {
         SortedOperator op = (SortedOperator) term.op();
         List<SExpr> vars_U = new ArrayList<>();
         List<SExpr> vars = new ArrayList<>();
@@ -77,7 +77,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
             ante = new SExpr("and", tos);
         }
         SExpr cons = new SExpr("typeof", new SExpr(op.toString(), new SExpr(vars)),
-                new SExpr(op.sort().toString()));
+                SExpr.sortExpr(op.sort()));
         SExpr matrix = new SExpr("=>", ante, cons);
         SExpr axiom = new SExpr("forall", Type.BOOL, new SExpr(vars_U),
                 SExpr.patternSExpr(matrix, vars_U.toArray(new SExpr[vars_U.size()]))); // TODO
