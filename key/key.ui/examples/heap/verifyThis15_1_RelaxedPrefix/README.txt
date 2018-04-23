@@ -1,6 +1,7 @@
 example.name = Relaxed Prefix
 example.path = Benchmarks/VerifyThis2015
 example.additionalFile.1 = src/Relaxed.java
+# Please ensure that the following file is included into the group reload_examples within automaticJAVADL.txt.
 example.proofFile = relax.proof
 
 This is the first challenge from the VerifyThis competition @ ETAPS 2015 organized by M. Huisman, V. Klebanov, and R. Monahan.

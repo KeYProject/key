@@ -145,7 +145,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         getMediator().addGUIListener(guiListener);
 
         updateHighlights = new LinkedList<Object>();
-
     }
 
     /**
@@ -211,7 +210,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         setLineWidth(computeLineWidth());
 
         if (getLogicPrinter() != null) {
-            getLogicPrinter().update(filter, getLineWidth());
+            getLogicPrinter().update(getFilter(), getLineWidth());
             boolean errorocc;
             do {
                 errorocc = false;
@@ -226,11 +225,10 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 }
             } while (errorocc);
         }
-
         updateUpdateHighlights();
         restorePosition();
         addMouseListener(listener);
-        repaint();
+        updateHidingProperty();
     }
 
     // last highlighted caret position
@@ -254,7 +252,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      * sets the LogicPrinter to use
      */
     public void setPrinter(Goal goal) {
-        filter.setSequent(goal.sequent());
+        getFilter().setSequent(goal.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(null),
                                                     getMediator().getNotationInfo(),
                                                     mediator.getServices(),
@@ -262,7 +260,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     }
 
     protected SequentPrintFilter getSequentPrintFilter() {
-        return filter;
+        return getFilter();
     }
 
     /**

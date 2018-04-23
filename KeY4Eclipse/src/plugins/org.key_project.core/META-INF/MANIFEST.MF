@@ -24,6 +24,7 @@ Export-Package: .,
  antlr.debug,
  antlr.debug.misc,
  antlr.preprocessor,
+ de.uka.ilkd.key.api,
  de.uka.ilkd.key.axiom_abstraction,
  de.uka.ilkd.key.axiom_abstraction.boollattice,
  de.uka.ilkd.key.axiom_abstraction.predicateabstraction,
@@ -170,3 +171,4 @@ Export-Package: .,
 Bundle-Vendor: KeY Project
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.key_project.core.Activator
+Automatic-Module-Name: org.key_project.core

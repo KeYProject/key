@@ -24,8 +24,10 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 /**
- * @author jschiffl This filter takes a search string and yields a sequent
- *         containing only sequent formulas that match the search.
+ * This filter takes a search string and yields a sequent containing only
+ * sequent formulas that match the search.
+ *
+ * @author jschiffl
  */
 public class HideSequentPrintFilter extends SearchSequentPrintFilter {
 
@@ -43,6 +45,11 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
     protected void filterSequent() {
         Iterator<SequentFormula> it;
 
+        if(antec != null) {
+            // Result has already been computed. No need to recompute.
+            return;
+        }
+
         if (searchString == null || searchString.length() < 3) {
             filterIdentity();
             return;
@@ -50,6 +57,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
 
         Pattern p = createPattern();
         if (p == null) {
+            filterIdentity();
             return;
         }
 

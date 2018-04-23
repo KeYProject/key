@@ -19,3 +19,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: de.hentschel.visualdbc.generation.test.suite,
  de.hentschel.visualdbc.generation.test.util
 Bundle-Vendor: Martin Hentschel
+Automatic-Module-Name: de.hentschel.visualdbc.generation.test

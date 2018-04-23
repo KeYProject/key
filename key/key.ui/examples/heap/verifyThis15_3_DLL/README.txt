@@ -1,6 +1,7 @@
 example.name = Dancing Links
 example.path = Benchmarks/VerifyThis2015
 example.additionalFile.1 = src/DoubleLinkedList.java
+# Please ensure that the following file is included into the group reload_examples within automaticJAVADL.txt.
 example.proofFile = doUndo.proof
 
 This is the third challenge from the VerifyThis competition @ ETAPS 2015 organized by M. Huisman, V. Klebanov, and R. Monahan.
