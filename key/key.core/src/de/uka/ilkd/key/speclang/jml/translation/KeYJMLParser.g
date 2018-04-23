@@ -17,6 +17,10 @@ options {
     import de.uka.ilkd.key.java.abstraction.*;
     import de.uka.ilkd.key.java.expression.literal.StringLiteral;
     import de.uka.ilkd.key.java.expression.literal.CharLiteral;
+    import de.uka.ilkd.key.java.expression.Literal;
+    import de.uka.ilkd.key.java.expression.literal.CharLiteral;
+    import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+    import de.uka.ilkd.key.java.expression.literal.LongLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.ldt.*;
     import de.uka.ilkd.key.logic.*;
@@ -39,6 +43,26 @@ options {
 }
 
 @members {
+
+    /**
+     * maximum valid value of a signed int
+     */
+    private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
+    
+    /**
+     * maximum valid value of a signed long
+     */
+    private static final BigInteger MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
+
+    /**
+     * maximum valid value if an int was interpreted unsigned
+     */
+    private static final BigInteger MAX_UINT = new BigInteger("4294967295");
+    
+    /**
+     * maximum valid value if a long was interpreted unsigned
+     */
+    private static final BigInteger MAX_ULONG = new BigInteger("18446744073709551615");
 
     private TermBuilder tb;
 
@@ -63,7 +87,6 @@ options {
     // Helper objects
     private JMLResolverManager resolverManager;
     private JavaIntegerSemanticsHelper intHelper;
-
 
     private KeYJMLParser(KeYJMLLexer lexer,
 		String fileName,
@@ -1211,8 +1234,24 @@ unaryexpr returns [SLExpression ret=null] throws SLTranslationException
 
 	    result = intHelper.buildPromotedUnaryPlusExpression(result);
 	}
+	| (MINUS DECLITERAL) => MINUS declit=DECLITERAL
+	{
+	    String text = "-" + declit.getText();
+        
+        boolean isLong = text.endsWith("l") || text.endsWith("L");
+        try {
+            Literal literal = isLong ? new LongLiteral(text) : new IntLiteral(text);
+            Term intLit = 
+             services.getTypeConverter().getIntegerLDT().translateLiteral(literal, services);
+    
+            PrimitiveType literalType = isLong ? PrimitiveType.JAVA_LONG : PrimitiveType.JAVA_INT;
+            result = new SLExpression(intLit, javaInfo.getPrimitiveKeYJavaType(literalType));
+        } catch (NumberFormatException e) {
+            throw getExceptionManager().createException(e.getMessage(), e);
+        }
+	}	
     |
-	MINUS result=unaryexpr
+	minus=MINUS result=unaryexpr
 	{
 	    if (result.isType()) {
 		raiseError("Cannot build  -" + result.getType().getName() + ".");
@@ -1502,38 +1541,29 @@ javaliteral returns [SLExpression ret=null] throws SLTranslationException
 	}
     ;
 
-integerliteral returns [SLExpression ret=null] throws SLTranslationException
-@after {ret = result;}
+integerliteral returns [SLExpression result=null] throws SLTranslationException
+@init { int radix=10; }
 :
-	result=decimalintegerliteral
-    |
-	result=hexintegerliteral
-;
-
-hexintegerliteral returns [SLExpression result=null] throws SLTranslationException
-:
-    n=HEXNUMERAL
-    {
-	BigInteger decInteger = new BigInteger(n.getText().substring(2), 16);
-	result = new SLExpression(tb.zTerm(decInteger.toString()),
-	                          javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
-    }
-;
-
-decimalintegerliteral returns [SLExpression ret=null] throws SLTranslationException
-:
-	result=decimalnumeral{ret = result;}
-;
-
-decimalnumeral returns [SLExpression result=null] throws SLTranslationException
-:
-    n=DIGITS
-    {
-      if(n.getText().startsWith("0")) {
-          n.setText(new java.math.BigInteger(n.getText(), 8).toString());
-      }
-	  result = new SLExpression(tb.zTerm(n.getText()),
-	                            javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
+    n = ( HEXLITERAL {radix=16;}
+        | DECLITERAL
+        | OCTLITERAL {radix=8;}
+        | BINLITERAL {radix=2;}
+        )
+    {    
+        String text = n.getText();
+        
+        boolean isLong = text.endsWith("l") || text.endsWith("L");
+        try {
+            Literal literal = isLong ? new LongLiteral(text) : new IntLiteral(text);
+        
+            Term intLit = 
+	             services.getTypeConverter().getIntegerLDT().translateLiteral(literal, services);
+    
+            PrimitiveType literalType = isLong ? PrimitiveType.JAVA_LONG : PrimitiveType.JAVA_INT;
+            result = new SLExpression(intLit, javaInfo.getPrimitiveKeYJavaType(literalType));
+        } catch (NumberFormatException e) {
+            throw getExceptionManager().createException(e.getMessage(), e);
+        }
     }
 ;
 

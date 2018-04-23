@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -41,11 +40,8 @@ public final class MetaPow extends AbstractTermTransformer {
     	BigInteger bigIntArg1;
     	BigInteger bigIntArg2;
 
-    	bigIntArg1 = new
-    			BigInteger(convertToDecimalString(arg1, services));
-    	bigIntArg2 = new
-    			BigInteger(convertToDecimalString(arg2, services));
-    	
+        bigIntArg1 = new BigInteger(convertToDecimalString(arg1, services));
+        bigIntArg2 = new BigInteger(convertToDecimalString(arg2, services));
     	
     	if (bigIntArg2.compareTo(BigInteger.ZERO) <= -1 || bigIntArg2.compareTo(MetaShift.INT_MAX_VALUE) > 1) {
     		return term;
@@ -53,9 +49,6 @@ public final class MetaPow extends AbstractTermTransformer {
     	
     	BigInteger result = bigIntArg1.pow(bigIntArg2.intValue());
     	
-    	IntLiteral lit = new IntLiteral(result.toString());
-
-    	return services.getTypeConverter().convertToLogicElement(lit);
-
+        return services.getTermBuilder().zTerm(result.toString());
     }
 }

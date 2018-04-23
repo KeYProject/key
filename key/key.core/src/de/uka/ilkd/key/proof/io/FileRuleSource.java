@@ -8,12 +8,7 @@ import java.net.MalformedURLException;
 
 public class FileRuleSource extends RuleSource {
 
-    /**
-     * The non-<code>null</code> reference to the file from which rules are
-     * read.
-     */
-    protected final File ruleFile;
-
+    private final File ruleFile;
     private long numberOfChars;
 
     FileRuleSource(final File ruleFile) {

@@ -248,9 +248,6 @@ public class InstantiateCommand
         return "instantiate";
     }
 
-    /**
-     *
-     */
     public static class Parameters {
         @Option(value = "formula", required = false)
         public Term formula;

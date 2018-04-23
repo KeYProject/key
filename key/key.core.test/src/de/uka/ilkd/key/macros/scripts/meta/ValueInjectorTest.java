@@ -30,7 +30,7 @@ public class ValueInjectorTest {
     }
 
     @Test(expected = ArgumentRequiredException.class) public void testRequired()
-            throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException, ArgumentRequiredException,
+            throws ConversionException, InjectionReflectionException, NoSpecifiedConverter, ArgumentRequiredException,
             IllegalAccessException {
         PP pp = new PP();
         Map<String, String> args = new HashMap<>();

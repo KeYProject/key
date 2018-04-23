@@ -34,7 +34,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i)),equals(result_1,i)))))))))" pathConditionChanged="false">
                            <callStackEntry path="/0"/>
-                           <loopInvariant name="invariant: i_2 = javaUnaryMinusInt(1);
+                           <loopInvariant name="invariant: i_2 = -1;
 variant: i_2
 mod: false" pathCondition="not(or(not(equals(i_1_0,Z(neglit(1(#))))),not(imp(equals(i_1_0,Z(neglit(1(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
     b=goOnNice(array,i);
