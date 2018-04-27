@@ -1,0 +1,15 @@
+
+#####Test 1
+## script 1
+#rewrite find="==> (p -> q) -> !q -> !p" replace="p -> q ==> !q -> !p";
+
+## script 2
+#rule impRight;
+#rule impRight;
+
+
+
+#####Test 1
+## script 1
+macro nosplit-prop;
+rewrite find="self = null" replace="null = self";
