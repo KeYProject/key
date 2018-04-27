@@ -38,9 +38,9 @@ public class RewriteTest {
         Proof proof = env.getLoadedProof();
         System.out.println("TestStart:" + proof.openGoals().head().sequent());
 
-
+        File f =  new File("../key.core.test/src/de/uka/ilkd/key/macros/scripts/meta/rewrite.script");
         //KeY Script
-        ProofScriptEngine engine = new ProofScriptEngine(new File("C:/Users/Lulu/Desktop/Bachelor/key/key/key.core.test/src/de/uka/ilkd/key/macros/scripts/meta/rewrite.script"));
+        ProofScriptEngine engine = new ProofScriptEngine(f);
 
         engine.execute(env.getUi(), proof);
         System.out.println("TestEnd_head:" + proof.openGoals().take(1).head().sequent());
@@ -57,7 +57,9 @@ public class RewriteTest {
         //File
         KeYEnvironment<DefaultUserInterfaceControl> env = null;
         try {
-            env = KeYEnvironment.load(new File("C:/Users/Lulu/Desktop/Bachelor/key/key.ui/examples/heap/vstte10_01_SumAndMax/SumAndMax_sumAndMax.key"));
+            File f = new File("../key.core.test/resources/testcase/scriptCommands/transitive.key");
+           // env = KeYEnvironment.load(new File("../key.ui/examples/heap/vstte10_01_SumAndMax/SumAndMax_sumAndMax.key"));
+            env = KeYEnvironment.load(f);
         } catch (ProblemLoaderException e) {
             e.printStackTrace();
         }
@@ -66,10 +68,11 @@ public class RewriteTest {
 
 
         //KeY Script
-        ProofScriptEngine engine = new ProofScriptEngine(new File("C:/Users/Lulu/Desktop/Bachelor/key/key/key.core.test/src/de/uka/ilkd/key/macros/scripts/meta/rewrite.script"));
+        ProofScriptEngine engine = new ProofScriptEngine(new File("../key.core.test/src/de/uka/ilkd/key/macros/scripts/meta/rewrite.script"));
 
         engine.execute(env.getUi(), proof);
-        System.out.println("TestEnd_head:" + proof.openGoals().take(1).head().sequent());
+
+        System.out.println("TestEnd_head:" + proof.openGoals().take(0).head().sequent());
 
 
 

@@ -11,5 +11,9 @@
 
 #####Test 1
 ## script 1
-macro nosplit-prop;
-rewrite find="self = null" replace="null = self";
+#macro nosplit-prop;
+rule impRight;
+rule andLeft;
+rewrite find="f = x" replace="x = f";
+rewrite find="x = f" replace="f = x";
+#macro auto;

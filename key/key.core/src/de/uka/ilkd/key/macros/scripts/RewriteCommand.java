@@ -14,10 +14,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -136,62 +134,72 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
 
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp) {
-
-
                 PosTacletApp pta = (PosTacletApp) tacletApp;
-
-
-                if (pta.posInOccurrence().subTerm()
-                        .equals(p.find)) {
-                    System.out.println("________________________________________");
-                    System.out.println("Tacletapp an der Stelle: " + tacletApp.posInOccurrence());
-                    System.out.println("Tacletname an der Stelle: " + pta.taclet().displayName());
-                    //if Term already succ replaced, the skip
-                    if(succposInOccs.contains(pta.posInOccurrence())) {
-                        System.out.println("Term already successfully replaced.");
+                if (pta.taclet() instanceof RewriteTaclet) {
+                    if (pta.taclet().displayName().equals("cut_direct")) {
                         continue;
                     }
+                    if (pta.posInOccurrence().subTerm().equals(p.find) && pta.complete()) {
+                        System.out.println("________________________________________");
+                        System.out.println("Tacletapp an der Stelle: " + tacletApp.posInOccurrence());
+                        System.out.println("Tacletname an der Stelle: " + pta.taclet().displayName());
+                        //if Term already succ replaced, the skip
+                        if (succposInOccs.contains(pta.posInOccurrence())) {
+                            System.out.println("Term already successfully replaced.");
+                            continue;
+                        }
 
-                    // TODO: if taclet transforms find to replace then execute and add to list, else null
+                        // TODO: if taclet transforms find to replace then execute and add to list, else null
 
-                    try {
-                        System.out.println("Term NOT already successfully replaced.");
+                        try {
+                            System.out.println("Term NOT already successfully replaced.");
 
-                        Goal goalold = state.getFirstOpenGoal();
-                        System.out.println("Goal: " + goalold.sequent());
+                            Goal goalold = state.getFirstOpenGoal();
 
-                        Goal goal = goalold;
-                        goal.apply(tacletApp);
-                        //state.setGoal((Goal) null);
-
-                        //TODO: nicht immer an der gleichen pio
-                        if (pta.posInOccurrence().subTerm()
-                                .equals(p.replace)) {
-
-                            failposInOccs.remove(pta.posInOccurrence());
-                            succposInOccs.add(pta.posInOccurrence());
-                            System.out.println("Sucessful Replacement");
-                        } else {
-                            if (!failposInOccs.contains(pta.posInOccurrence())) {
-                                System.out.println("Unsucessful Replacement & add to failed list:");
-                                failposInOccs.add(pta.posInOccurrence());
-                                state.setGoal(goalold);
-                            } else {
-                                //prune
-                                System.out.println("Unsucessful Replacement & already in failed list");
-                                state.setGoal(goalold);
+                            //check the rewritten term
+                            RewriteTaclet rw = (RewriteTaclet) pta.taclet();
+                            if(pta.complete()) {
+                                //for top level formulas -> TODO what about subterm replacements
+                                SequentFormula rewriteResult = rw.getExecutor().getRewriteResult(goalold, null, goalold.proof().getServices(), pta);
+                                if(rewriteResult.formula().equals(p.replace)){
+                                    failposInOccs.remove(pta.posInOccurrence());
+                                    succposInOccs.add(pta.posInOccurrence());
+                                    System.out.println("Sucessful Replacement, applying rule app");
+                                    goalold.apply(pta);
+                                    break;
+                                } else {
+                                    System.out.println("Unsucessful Replacement & already in failed list");
+                                }
                             }
+                            /*//TODO: nicht immer an der gleichen pio
+                            if (pta.posInOccurrence().subTerm()
+                                    .equals(p.replace)) {
+
+                                failposInOccs.remove(pta.posInOccurrence());
+                                succposInOccs.add(pta.posInOccurrence());
+                                System.out.println("Sucessful Replacement");
+                            } else {
+                                if (!failposInOccs.contains(pta.posInOccurrence())) {
+                                    System.out.println("Unsucessful Replacement & add to failed list:");
+                                    failposInOccs.add(pta.posInOccurrence());
+                                    state.setGoal(goalold);
+                                } else {
+                                    //prune
+                                    System.out.println("Unsucessful Replacement & already in failed list");
+                                    state.setGoal(goalold);
+                                }
+                            }*/
+                        } catch (Exception e) {
+                            if (!failposInOccs.contains(pta.posInOccurrence())) {
+                                failposInOccs.add(pta.posInOccurrence());
+                            }
+                            System.out.println("TacletApp not applicable");
+                            e.printStackTrace();
+                            continue;
                         }
-                    } catch (Exception e) {
-                        if(!failposInOccs.contains(pta.posInOccurrence())) {
-                            failposInOccs.add(pta.posInOccurrence());
-                        }
-                        System.out.println("TacletApp not applicable");
-                        e.printStackTrace();
-                        continue;
+
+
                     }
-
-
                 }
             }
         }
