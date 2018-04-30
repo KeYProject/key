@@ -7,16 +7,6 @@ import de.uka.ilkd.key.proof.Node;
 
 import java.util.Map;
 
-/**
- * The script command tryclose" has two optional arguments:
- * <ul>
- *     <li>steps: INTEGER number of steps to use</li>
- *     <li>#2: STRING the branch which should be closed</li>
- * </ul>
- *
- * TryClose tries to close the specified branch. If it is not successful within the specified number
-
- */
 public class TryCloseCommand
         extends AbstractCommand<TryCloseCommand.TryCloseArguments> {
     public TryCloseCommand() {

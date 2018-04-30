@@ -3,36 +3,32 @@
    <methodCall name="&lt;call UseOperationContractNormalAndExceptionalBranchTest.main(value)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicNumber = magic(value);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = magic(value) catch(exc_0)
-pre: value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
-| value &lt; javaUnaryMinusInt(10)
+pre: value &lt; 0 &amp; value &gt;= -10
+| value &lt; -10
 | value &gt;= 0
 &amp; value &lt; 10
 | value &gt;= 10
-post: (   value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
+post: (   value &lt; 0 &amp; value &gt;= -10
    -&gt;   !exc_0 = null
       &amp; java.lang.Exception::instance(exc_0) = TRUE)
-&amp; (   value &lt; javaUnaryMinusInt(10)
+&amp; (   value &lt; -10
    -&gt;   !exc_0 = null
       &amp; java.lang.Exception::instance(exc_0) = TRUE)
 &amp; (   value &gt;= 0 &amp; value &lt; 10
    -&gt; result_0 = 42 &amp; exc_0 = null)
 &amp; (value &gt;= 10 -&gt; result_0 = 84 &amp; exc_0 = null)
-mod: \if (  value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
-          | value &lt; javaUnaryMinusInt(10)
+mod: \if (  value &lt; 0 &amp; value &gt;= -10
+          | value &lt; -10
           | value &gt;= 0
           &amp; value &lt; 10)
-         \then (     \if (    value &lt; 0
-                            &amp;    value
-                              &gt;= javaUnaryMinusInt(10)
-                          |   value
-                            &lt; javaUnaryMinusInt(10))
+         \then (     \if (  value &lt; 0 &amp; value &gt;= -10
+                          | value &lt; -10)
                          \then (     \if (  value &lt; 0
                                           &amp;    value
-                                            &gt;= javaUnaryMinusInt(10))
+                                            &gt;= -10)
                                          \then (allLocs)
                                          \else (allLocs)
-                                \cap \if (  value
-                                          &lt; javaUnaryMinusInt(10))
+                                \cap \if (value &lt; -10)
                                          \then (allLocs)
                                          \else (allLocs))
                          \else (allLocs)

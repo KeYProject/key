@@ -349,9 +349,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testValueChange() throws Exception {
       doSlicingTest("/slicing/valueChange/ValueChange.proof", 
-                    new ReturnSelector(113),
+                    new ReturnSelector(88),
                     true,
-                    109, 97, 81, 77, 52);
+                    84, 72, 56, 52,26);
    }
 
    /**
@@ -393,9 +393,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testIntEndTest() throws Exception {
       doSlicingTest("/slicing/intEndTest/IntEndTest.proof", 
-                    new ReturnSelector(22),
+                    new ReturnSelector(17),
                     false,
-                    18, 16);
+                    13, 11);
    }
 
    /**
@@ -514,9 +514,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testSimpleStaticFields() throws Exception {
       doSlicingTest("/slicing/simpleStaticFields/SimpleStaticFields.proof", 
-                    new ReturnSelector(63),
+                    new ReturnSelector(73),
                     false,
-                    57, 15, 8);
+                    59, 17, 10);
    }
    
    /**
@@ -525,9 +525,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testSimpleLocalVariables() throws Exception {
       doSlicingTest("/slicing/simpleLocalVariables/SimpleLocalVariables.proof", 
-                    new ReturnSelector(24),
+                    new ReturnSelector(23),
                     true,
-                    20, 11, 7);
+                    19, 11, 7);
    }
    
    /**

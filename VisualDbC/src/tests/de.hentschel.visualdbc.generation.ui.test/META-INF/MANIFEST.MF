@@ -27,3 +27,4 @@ Export-Package: de.hentschel.visualdbc.generation.ui.test.suite,
  de.hentschel.visualdbc.generation.ui.test.testCase,
  de.hentschel.visualdbc.generation.ui.test.testCase.swtbot,
  de.hentschel.visualdbc.generation.ui.test.util
+Automatic-Module-Name: de.hentschel.visualdbc.generation.ui.test

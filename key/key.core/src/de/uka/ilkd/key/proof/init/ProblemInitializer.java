@@ -26,6 +26,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.ParseExceptionInFile;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
@@ -310,7 +311,11 @@ public final class ProblemInitializer {
             }
         Vector<String> var = getClasses(javaPath);
         final String[] cus = var.toArray(new String[var.size()]);
-            r2k.readCompilationUnitsAsFiles(cus);
+            try {
+                r2k.readCompilationUnitsAsFiles(cus);
+            } catch (ParseExceptionInFile e) {
+                throw new ProofInputException(e);
+            }
         } else {
             reportStatus("Reading Java libraries");
             r2k.parseSpecialClasses();

@@ -201,23 +201,24 @@ LT_IMPLICIT_GT_DISPATCH
     ;
 
 LPAREN
-	:
-	'('
-	;
+    :
+    '('
+    ;
 
 RPAREN
-:	')'
+    :
+    ')'
     ;
 
 LBRACKET
-	:
-	'['
-	;
+    :
+    '['
+    ;
 
 RBRACKET
-	:
-	']'
-	;
+    :
+    ']'
+    ;
 
 fragment
 LETTER
@@ -231,9 +232,34 @@ LETTER
         '$'
 ;
 
+
+fragment
+BINDIGIT
+    :
+        '0'..'1'
+;
+
+fragment
+OCTDIGIT
+    :
+        '0'..'7'
+;
+
+fragment
+NONZERODECDIGIT
+    :
+        '1'..'9'
+;
+
+fragment
+DECDIGIT
+    :
+        '0'..'9'
+;
+
 fragment
 DIGIT
-	:
+    :
         '0'..'9'
 ;
 
@@ -242,6 +268,50 @@ HEXDIGIT
     :
         DIGIT | 'a' .. 'f'
               | 'A' .. 'F'
+;
+
+fragment
+BINPREFIX
+    :
+        '0' ('b'|'B')
+;
+
+fragment
+OCTPREFIX
+    :
+        '0'
+;
+
+fragment
+HEXPREFIX
+    :
+        '0' ('x'|'X')
+;
+
+fragment
+LONGSUFFIX
+    :
+        'l' | 'L'
+;
+
+BINLITERAL
+    :
+        BINPREFIX BINDIGIT ((BINDIGIT | '_')* BINDIGIT)? LONGSUFFIX?
+;
+
+OCTLITERAL
+    :
+        OCTPREFIX OCTDIGIT ((OCTDIGIT | '_')* OCTDIGIT)? LONGSUFFIX?
+;
+
+DECLITERAL
+    :
+        ('0' | (NONZERODECDIGIT ((DECDIGIT | '_')* DECDIGIT)?)) LONGSUFFIX?
+;
+
+HEXLITERAL
+    :
+        HEXPREFIX ((HEXDIGIT | '_')* HEXDIGIT)? LONGSUFFIX?
 ;
 
 fragment
@@ -256,7 +326,7 @@ IDENT
 ;
 
 fragment
-JML_IDENT 
+JML_IDENT
   :
   '\\' IDENT ;
 
@@ -270,25 +340,34 @@ BACKSLASH_PREFIXED:
  | JML_IDENT
  ;
 
-HEXNUMERAL
+/*
+HEXLITERAL
     :
-        '0' ('x'|'X') (HEXDIGIT)+
-;
+        '0' ('x'|'X') (HEXDIGIT)+ ( 'l'|'L' )?
+    ;
 
-DIGITS
+OCTLITERAL
     :
-        (DIGIT)+
-;
+        '0' (DIGIT)+ ( 'l'|'L' )?
+    ;
+
+DECLITERAL
+    :
+        (('1'..'9') (DIGIT)* | '0') ( 'l'|'L' )?
+    ;
+*/
 
 CHAR_LITERAL:
         '\''
-                ((' '..'&') |
-                 ('('..'[') |
-                 (']'..'~') |
-                 ('\\' ('\'' | '\\' | 'n' | 'r' | 't' | 'b' | 'f' | '"' | 'u' HEXDIGIT+ ))
+                (~('\''|'\\') |
+                 ('\\' ('\'' | '\\' | 'n' | 'r' | 't' | 'b' | 'f' | '"' | OCT_CHAR))
+                 // note: unicode escapes are processed earlier
                 )
       '\''
     ;
+
+fragment OCT_CHAR:
+        (('0'|'1'|'2'|'3') OCTDIGIT OCTDIGIT) | (OCTDIGIT OCTDIGIT) | OCTDIGIT;
 
 STRING_LITERAL
     : '"' ( ESC | ~('"'|'\\') )* '"'
@@ -296,30 +375,30 @@ STRING_LITERAL
 
 fragment
 ESC
-    :	'\\'
-    (	'n'
-	|	'r'
-	|	't'
-	|	'b'
-	|	'f'
-	|	'"'
-	|	'\''
-	|	'\\'
-	|	':'
-	|	' '
+    :   '\\'
+    (   'n'
+    |  'r'
+    |  't'
+    |  'b'
+    |  'f'
+    |  '"'
+    |  '\''
+    |  '\\'
+    |  ':'
+    |  ' '
     )
     ;
 
 WS
-	:	(' '
-	|	'\t'
-	|	'\n'
-	|	'\r'
-//	| PRAGMA (~';')* SEMI
+    :   (' '
+    |   '\t'
+    |   '\n'
+    |   '\r'
+//  | PRAGMA (~';')* SEMI
         |       '\u000C'
         |       '@')
-		{$channel=HIDDEN;}
-	;
+        {$channel=HIDDEN;}
+    ;
 
 
 INFORMAL_DESCRIPTION
@@ -339,15 +418,14 @@ SL_COMMENT
     ;
 
 DOC_COMMENT
-	:
-	'/**'
-	( options {greedy=false;} : . )*
-	'*/'
-	{$channel=HIDDEN;}
-	;
+    :
+    '/**'
+    ( options {greedy=false;} : . )*
+    '*/'
+    {$channel=HIDDEN;}
+    ;
 
 fragment PRAGMA
     :
     '\\nowarn'
     ;
-

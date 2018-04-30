@@ -6,13 +6,11 @@
 pre: self.&lt;inv&gt;
 post: result_0 = self.subMagic(x)
 &amp; (  (x &gt;= 0 -&gt; self.instanceField = 12)
-   &amp; (  (   x &lt; 0
-         -&gt; self.instanceField = javaUnaryMinusInt(21))
+   &amp; (  (x &lt; 0 -&gt; self.instanceField = -21)
       &amp; (  (   x &gt;= 0
             -&gt; QueryWithSideEffects.classField = 66)
          &amp; (  (   x &lt; 0
-               -&gt;   QueryWithSideEffects.classField
-                  = javaUnaryMinusInt(55))
+               -&gt; QueryWithSideEffects.classField = -55)
             &amp; self.&lt;inv&gt;))))
 &amp; exc_0 = null
 mod: {}

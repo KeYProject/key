@@ -26,7 +26,7 @@
 
 
 
-\javaSource "/export/home/i12pc6/richard/development/lps/system/proofExamples/java_dl/reverseArray";
+\javaSource "src";
 
 \programVariables {
 int _old10;
