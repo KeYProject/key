@@ -161,6 +161,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
                             if(pta.complete()) {
                                 //for top level formulas -> TODO what about subterm replacements
                                 SequentFormula rewriteResult = rw.getExecutor().getRewriteResult(goalold, null, goalold.proof().getServices(), pta);
+                                System.out.println("Rewrite Result =" + rewriteResult.toString());
                                 if(rewriteResult.formula().equals(p.replace)){
                                     failposInOccs.remove(pta.posInOccurrence());
                                     succposInOccs.add(pta.posInOccurrence());
