@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.InnerBreakAndContinueReplacer;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -91,8 +92,7 @@ public final class SimpleLoopContract
         this.functionalContracts = functionalContracts;
         this.services = services;
 
-        loopLabels = new ArrayList<>();
-
+        loopLabels = new ArrayList<Label>();
         Label outerLabel = new ProgramElementName("breakLoop");
         Label innerLabel = new ProgramElementName("continueLoop");
         loopLabels.add(outerLabel);
@@ -104,76 +104,117 @@ public final class SimpleLoopContract
             first = s.getBody();
         }
 
-        if (first instanceof While) {
-            While loop = (While) first;
+        final LoopStatement loop;
+        if (first != null && first instanceof While) {
+            loop = (While) first;
+        } else if (first != null && first instanceof For) {
+            loop = (For) first;
+        } else {
+            loop = null;
+            throw new IllegalArgumentException(
+                    "Only blocks that begin with a while or a for "
+                    + "loop may have a loop contract! \n"
+                    + "This block begins with " + block.getFirstElement());
+        }
 
-            head = null;
+        head = getHeadStatement(loop, block);
+        guard = loop.getGuardExpression();
+        body = getBodyStatement(loop, block, outerLabel, innerLabel,
+                                loopLabels, services);
+        this.loop = new While(guard, body);
+        tail = getTailStatement(loop, block);
+    }
 
-            guard = loop.getGuardExpression();
 
-            if (loop.getBody() instanceof StatementBlock) {
-                body = (StatementBlock) loop.getBody();
-            } else {
-                body = new StatementBlock(loop.getBody());
-            }
+    public static LoopContract combine(ImmutableSet<LoopContract> contracts,
+                                       Services services) {
+        return new Combinator(
+                contracts.toArray(new LoopContract[contracts.size()]),
+                services)
+                .combine();
+    }
 
-            this.loop = new While(guard, body);
-
-            ExtList tailStatements = new ExtList();
-            for (int i = 1; i < block.getStatementCount(); ++i) {
-                tailStatements.add(block.getStatementAt(i));
-            }
-
-            tail = new StatementBlock(tailStatements);
-        } else if (first instanceof For) {
-            For loop = (For) first;
-
+    private static StatementBlock getHeadStatement(LoopStatement loop,
+                                                   StatementBlock block) {
+        final StatementBlock sb;
+        if (loop != null && loop instanceof For) {
             ExtList headStatements = new ExtList();
             for (Statement statement : loop.getInitializers()) {
                 headStatements.add(statement);
             }
+            sb = new StatementBlock(headStatements);
+        } else if (loop != null && loop instanceof While) {
+            sb = null;
+        } else {
+            throw new IllegalArgumentException(
+                    "Only blocks that begin with a while or a for "
+                    + "loop may have a loop contract! \n"
+                    + "This block begins with " + block.getFirstElement());
+        }
+        return sb;
+    }
 
+    private static StatementBlock getBodyStatement(LoopStatement loop,
+                                                   StatementBlock block,
+                                                   Label outerLabel,
+                                                   Label innerLabel,
+                                                   List<Label> loopLabels,
+                                                   Services services) {
+        final StatementBlock sb;
+        if (loop != null && loop instanceof While) {
+            if (loop.getBody() instanceof StatementBlock) {
+                sb = (StatementBlock) loop.getBody();
+            } else {
+                sb = new StatementBlock(loop.getBody());
+            }
+        } else if (loop != null && loop instanceof For) {
             ExtList bodyStatements = new ExtList();
             bodyStatements.add(loop.getBody());
-            StatementBlock innerBody = new InnerBreakAndContinueReplacer(
-                    new StatementBlock(bodyStatements),
-                    loopLabels,
-                    outerLabel,
-                    innerLabel,
-                    services).replace();
+            StatementBlock innerBody =
+                    new InnerBreakAndContinueReplacer(
+                            new StatementBlock(bodyStatements),
+                            loopLabels,
+                            outerLabel,
+                            innerLabel,
+                            services).replace();
 
             ExtList updateStatements = new ExtList();
             for (Expression statement : loop.getUpdates()) {
                 updateStatements.add(statement);
             }
 
-            head = new StatementBlock(headStatements);
-            guard = loop.getGuardExpression();
-            body = new StatementBlock(new StatementBlock(
-                    new LabeledStatement(innerLabel, innerBody, PositionInfo.UNDEFINED),
-                    new StatementBlock(updateStatements)
-            ));
+            sb = new StatementBlock(
+                    new StatementBlock(
+                            new LabeledStatement(innerLabel, innerBody,
+                                                 PositionInfo.UNDEFINED),
+                            new StatementBlock(updateStatements)));
+        } else {
+            throw new IllegalArgumentException(
+                    "Only blocks that begin with a while or a for "
+                    + "loop may have a loop contract! \n"
+                    + "This block begins with " + block.getFirstElement());
+        }
+        return sb;
+    }
 
-            this.loop = new While(guard, body);
-
+    private static StatementBlock getTailStatement(LoopStatement loop,
+                                                   StatementBlock block) {
+        final StatementBlock sb;
+        if (loop != null
+              && (loop instanceof For
+                    || loop instanceof While)) {
             ExtList tailStatements = new ExtList();
             for (int i = 1; i < block.getStatementCount(); ++i) {
                 tailStatements.add(block.getStatementAt(i));
             }
-
-            tail = new StatementBlock(tailStatements);
+            sb = new StatementBlock(tailStatements);
         } else {
             throw new IllegalArgumentException(
-                    "Only blocks that begin with a while or a for loop may have a loop contract! \n"
+                    "Only blocks that begin with a while or a for "
+                    + "loop may have a loop contract! \n"
                     + "This block begins with " + block.getFirstElement());
         }
-    }
-
-    public static LoopContract combine(ImmutableSet<LoopContract> contracts, Services services) {
-        return new Combinator(
-                contracts.toArray(new LoopContract[contracts.size()]),
-                services)
-                .combine();
+        return sb;
     }
 
     @Override

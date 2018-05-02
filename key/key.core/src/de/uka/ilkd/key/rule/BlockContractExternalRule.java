@@ -46,7 +46,7 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @see BlockContractExternalBuiltInRuleApp
  */
-public class BlockContractExternalRule extends AbstractBlockContractRule {
+public final class BlockContractExternalRule extends AbstractBlockContractRule {
 
     public static final BlockContractExternalRule INSTANCE = new BlockContractExternalRule();
 

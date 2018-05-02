@@ -44,7 +44,7 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @see LoopContractExternalBuiltInRuleApp
  */
-public class LoopContractExternalRule extends AbstractLoopContractRule {
+public final class LoopContractExternalRule extends AbstractLoopContractRule {
 
     public static final LoopContractExternalRule INSTANCE = new LoopContractExternalRule();
 

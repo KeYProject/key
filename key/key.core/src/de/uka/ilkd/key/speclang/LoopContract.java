@@ -40,7 +40,7 @@ public interface LoopContract extends BlockSpecificationElement {
 
     /**
      *
-     * @param contract
+     * @param contract the {@code LoopContract}.
      * @see #getFunctionalContracts()
      */
     public void setFunctionalLoopContract(FunctionalLoopContract contract);

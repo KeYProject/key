@@ -99,9 +99,7 @@ public class Statistics {
         int tmpBlock = 0; // block and loop contract apps
         int tmpInv = 0; // loop invariants
 
-        while (it.hasNext()) {
-            tmpNodes++;
-            final Node node = it.next();
+        for (final Node node = it.next(); it.hasNext(); tmpNodes++) {
             final int c = node.childrenCount();
             if (c > 1) {
                 tmpBranches += c - 1;
@@ -109,10 +107,8 @@ public class Statistics {
 
             if (node.getNodeInfo().getInteractiveRuleApplication()) {
                 tmpInteractive++;
-
                 final String ruleAppName =
                         node.getAppliedRuleApp().rule().name().toString();
-
                 if (!interactiveAppsDetails.containsKey(ruleAppName)) {
                     interactiveAppsDetails.put(ruleAppName, 1);
                 } else {
@@ -148,8 +144,8 @@ public class Statistics {
                 } else if (ruleApp instanceof MergeRuleBuiltInRuleApp) {
                     tmpMergeApps++;
                 } else if (ruleApp instanceof TacletApp) {
-                    final de.uka.ilkd.key.rule.Taclet t = ((TacletApp)ruleApp).taclet();
-                    final String tName = t.name().toString();
+                    final String tName =
+                            ((TacletApp)ruleApp).taclet().name().toString();
                     if (tName.startsWith("allLeft")
                             || tName.startsWith("exRight")
                             || tName.startsWith("inst")) {

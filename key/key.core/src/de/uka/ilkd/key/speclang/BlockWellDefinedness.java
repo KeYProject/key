@@ -33,6 +33,9 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  */
 public class BlockWellDefinedness extends StatementWellDefinedness {
 
+    /**
+     * The jml block contract.
+     */
     private final BlockContract block;
 
     private BlockWellDefinedness(String name, int id, Type type, IObserverFunction target,

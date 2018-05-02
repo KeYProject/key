@@ -533,20 +533,16 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 changeList.removeFirst();
             }
             ILoopInit inits = null;
-
             IForUpdates updates = null;
-
             //the unchanged updates need to be extracted to initialize the
             //remaining 'for' statement
             IForUpdates unchangedUpdates = x.getIForUpdates();
 
             Guard guard;
             Statement body = null;
-
             if (changeList.get(0) instanceof ILoopInit) {
                 inits = (ILoopInit) changeList.removeFirst();
             }
-
             if (x.getGuard() != null) {
                 guard = (Guard) changeList.removeFirst();
                 if (guard.getExpression() == null) {
@@ -555,16 +551,13 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             } else {
                 guard = KeYJavaASTFactory.trueGuard();
             }
-
             if (changeList.get(0) instanceof IForUpdates) {
                 updates = (IForUpdates) changeList.removeFirst();
             }
             body = (Statement) changeList.removeFirst();
-
             For remainder =
                 KeYJavaASTFactory.forLoop(x.getGuard(), unchangedUpdates,
                                           x.getBody());
-
             if (innerLabelNeeded() && breakInnerLabel != null) {
                 body = KeYJavaASTFactory.labeledStatement(
                 breakInnerLabel.getLabel(), body, PositionInfo.UNDEFINED);
@@ -573,7 +566,6 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             final int updateSize = updates == null ? 0 : updates.size();
             Statement innerBlockStatements[] = new Statement[updateSize + 2];
             innerBlockStatements[0] = body;
-
             if (updates != null) {
                 for (int copyStatements = 0; copyStatements < updateSize; copyStatements++) {
                     innerBlockStatements[copyStatements + 1] =
@@ -582,9 +574,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             }
             innerBlockStatements[updateSize + 1] = remainder;
 
-
             final int initSize = inits == null ? 0 : inits.size();
-
             final Statement outerBlockStatements[] = new Statement[initSize + 1];
 
             if (inits != null) {
@@ -595,7 +585,6 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
             outerBlockStatements[initSize] =
                 KeYJavaASTFactory.ifThen(guard.getExpression(), innerBlockStatements);
-
             if (outerLabelNeeded() && breakOuterLabel != null) {
                 addChild(KeYJavaASTFactory.labeledStatement(
                     breakOuterLabel.getLabel(), outerBlockStatements, PositionInfo.UNDEFINED));

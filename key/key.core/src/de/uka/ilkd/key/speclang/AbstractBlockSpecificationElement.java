@@ -37,6 +37,9 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 public abstract class AbstractBlockSpecificationElement
         implements BlockSpecificationElement {
 
+    /**
+     * The statement block inside the {@link BlockSpecificationElement}.
+     */
     protected final StatementBlock block;
     protected final List<Label> labels;
     protected final IProgramMethod method;

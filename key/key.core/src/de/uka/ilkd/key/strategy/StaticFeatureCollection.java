@@ -61,7 +61,7 @@ import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class StaticFeatureCollection {
+public abstract class StaticFeatureCollection {
 
     protected static Feature loopInvFeature(Feature costStdInv, Feature costLoopScopeInv) {
         SetRuleFilter filterLoopInv = new SetRuleFilter();

@@ -285,23 +285,23 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
     public JavaCardDLStrategyFactory() {
     }
 
-    public static String TOOL_TIP_USER_OFF(int i) {
+    public static final String toolTipUserOff(int i) {
         return "Taclets of the rule set \"userTaclets" + i
                 + "\" are not applied automatically";
     }
 
-    public static String TOOL_TIP_USER_LOW(int i) {
+    public static final String toolTipUserLow(int i) {
         return "Taclets of the rule set \"userTaclets" + i
                 + "\" are applied automatically with low priority";
     }
 
-    public static String TOOL_TIP_USER_HIGH(int i) {
+    public static final String toolTipUserHigh(int i) {
         return "Taclets of the rule set \"userTaclets" + i
                 + "\" are applied automatically with high priority";
     }
 
     public Strategy create(Proof proof,
-            StrategyProperties strategyProperties) {
+                           StrategyProperties strategyProperties) {
         return new JavaCardDLStrategy(proof, strategyProperties);
     }
 
@@ -500,18 +500,18 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
         for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
             OneOfStrategyPropertyDefinition user
                     = new OneOfStrategyPropertyDefinition(
-                            StrategyProperties.USER_TACLETS_OPTIONS_KEY(i),
+                            StrategyProperties.userTacletsOptionsKey(i),
                             i + ":  ",
                             new StrategyPropertyValueDefinition(
                                     StrategyProperties.USER_TACLETS_OFF,
-                                    "Off", TOOL_TIP_USER_OFF(i), 3, 1),
+                                    "Off", toolTipUserOff(i), 3, 1),
                             new StrategyPropertyValueDefinition(
                                     StrategyProperties.USER_TACLETS_LOW,
-                                    "Low prior.", TOOL_TIP_USER_LOW(i), 4,
+                                    "Low prior.", toolTipUserLow(i), 4,
                                     2),
                             new StrategyPropertyValueDefinition(
                                     StrategyProperties.USER_TACLETS_HIGH,
-                                    "High prior.", TOOL_TIP_USER_HIGH(i),
+                                    "High prior.", toolTipUserHigh(i),
                                     6, 2));
             props.add(user);
         }

@@ -329,11 +329,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
         public boolean equals(Object obj) {
             if (this == obj) {
                 return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
+            } else if (obj == null || getClass() != obj.getClass()) {
                 return false;
             }
             Variables other = (Variables) obj;

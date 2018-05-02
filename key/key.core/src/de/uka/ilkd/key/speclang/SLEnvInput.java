@@ -176,14 +176,93 @@ public final class SLEnvInput extends AbstractEnvInput {
         return warnings;
     }
 
+    private void addLoopInvariants(SpecExtractor specExtractor,
+                                   final SpecificationRepository specRepos,
+                                   final KeYJavaType kjt,
+                                   final IProgramMethod pm)
+                                           throws ProofInputException {
+        //loop invariants
+        final JavaASTCollector collector =
+                new JavaASTCollector(pm.getBody(), LoopStatement.class);
+        collector.start();
+        for (ProgramElement loop : collector.getNodes()) {
+            LoopSpecification inv =
+                    specExtractor.extractLoopInvariant(pm,
+                                                       (LoopStatement) loop);
+            if (inv != null) {
+                specRepos.addLoopInvariant(inv.setTarget(kjt, pm));
+            }
+        }
+    }
+
+    private void addBlockAndLoopContracts(SpecExtractor specExtractor,
+                                          final SpecificationRepository specRepos,
+                                          final IProgramMethod pm)
+                                      throws ProofInputException {
+        //block and loop contracts
+        final JavaASTCollector blockCollector =
+                new JavaASTCollector(pm.getBody(), StatementBlock.class);
+        blockCollector.start();
+        for (ProgramElement block : blockCollector.getNodes()) {
+            final ImmutableSet<BlockContract> blockContracts =
+                    specExtractor.extractBlockContracts(pm, (StatementBlock) block);
+
+            for (BlockContract specification : blockContracts) {
+                specRepos.addBlockContract(specification, true);
+            }
+
+            final ImmutableSet<LoopContract> loopContracts =
+                    specExtractor.extractLoopContracts(pm, (StatementBlock) block);
+
+            for (LoopContract specification : loopContracts) {
+                specRepos.addLoopContract(specification, true);
+            }
+        }
+    }
+
+    private void addMergePointStatements(SpecExtractor specExtractor,
+                                         final SpecificationRepository specRepos,
+                                         final IProgramMethod pm,
+                                         final ImmutableSet<SpecificationElement>
+                                                    methodSpecs)
+                                      throws ProofInputException {
+        //merge point statements
+        final JavaASTCollector mpsCollector =
+                new JavaASTCollector(pm.getBody(), MergePointStatement.class);
+        mpsCollector.start();
+        for (ProgramElement mps : mpsCollector.getNodes()) {
+            final ImmutableSet<MergeContract> mergeContracts = //
+                    specExtractor.extractMergeContracts(pm,
+                            (MergePointStatement) mps,
+                            ((Contract) methodSpecs.iterator().next())
+                            .getOrigVars().params);
+
+            mergeContracts
+            .forEach(mc -> specRepos.addMergeContract(mc));
+        }
+    }
+
+    private void addLabeledBlockContracts(SpecExtractor specExtractor,
+                                          final SpecificationRepository specRepos,
+                                          final IProgramMethod pm)
+                                      throws ProofInputException {
+        final JavaASTCollector labeledCollector =
+                new JavaASTCollector(pm.getBody(), LabeledStatement.class);
+        labeledCollector.start();
+        for (ProgramElement labeled : labeledCollector.getNodes()) {
+            final ImmutableSet<BlockContract> blockContracts =
+                    specExtractor.extractBlockContracts(pm, (LabeledStatement) labeled);
+            for (BlockContract specification : blockContracts) {
+                specRepos.addBlockContract(specification, true);
+            }
+        }
+    }
 
     private ImmutableSet<PositionedString> createSpecs(SpecExtractor specExtractor)
             throws ProofInputException {
-        final JavaInfo javaInfo
-            = initConfig.getServices().getJavaInfo();
-        final SpecificationRepository specRepos
-            = initConfig.getServices().getSpecificationRepository();
-
+        final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
+        final SpecificationRepository specRepos =
+                initConfig.getServices().getSpecificationRepository();
 
         //read DL library specs before any other specs
         ImmutableSet<PositionedString> warnings = createDLLibrarySpecs();
@@ -225,64 +304,13 @@ public final class SLEnvInput extends AbstractEnvInput {
                     = specExtractor.extractMethodSpecs(pm, staticInvPresent);
                 specRepos.addSpecs(methodSpecs);
 
-                //loop invariants
-                final JavaASTCollector collector
-                    = new JavaASTCollector(pm.getBody(), LoopStatement.class);
-                collector.start();
-                for (ProgramElement loop : collector.getNodes()) {
-                    LoopSpecification inv =
-                            specExtractor.extractLoopInvariant(pm,
-                                                               (LoopStatement) loop);
-                    if (inv != null) {
-                        specRepos.addLoopInvariant(inv.setTarget(kjt, pm));
-                    }
-                }
+                addLoopInvariants(specExtractor, specRepos, kjt, pm);
 
-                //block and loop contracts
-                final JavaASTCollector blockCollector =
-                        new JavaASTCollector(pm.getBody(), StatementBlock.class);
-                blockCollector.start();
-                for (ProgramElement block : blockCollector.getNodes()) {
-                    final ImmutableSet<BlockContract> blockContracts =
-                            specExtractor.extractBlockContracts(pm, (StatementBlock) block);
+                addBlockAndLoopContracts(specExtractor, specRepos, pm);
 
-                    for (BlockContract specification : blockContracts) {
-                        specRepos.addBlockContract(specification, true);
-                    }
+                addMergePointStatements(specExtractor, specRepos, pm, methodSpecs);
 
-                    final ImmutableSet<LoopContract> loopContracts =
-                            specExtractor.extractLoopContracts(pm, (StatementBlock) block);
-
-                    for (LoopContract specification : loopContracts) {
-                        specRepos.addLoopContract(specification, true);
-                    }
-                }
-
-                //merge point statements
-                final JavaASTCollector mpsCollector =
-                        new JavaASTCollector(pm.getBody(), MergePointStatement.class);
-                mpsCollector.start();
-                for (ProgramElement mps : mpsCollector.getNodes()) {
-                    final ImmutableSet<MergeContract> mergeContracts = //
-                            specExtractor.extractMergeContracts(pm,
-                                    (MergePointStatement) mps,
-                                    ((Contract) methodSpecs.iterator().next())
-                                            .getOrigVars().params);
-
-                    mergeContracts
-                            .forEach(mc -> specRepos.addMergeContract(mc));
-                }
-
-                final JavaASTCollector labeledCollector =
-                        new JavaASTCollector(pm.getBody(), LabeledStatement.class);
-                labeledCollector.start();
-                for (ProgramElement labeled : labeledCollector.getNodes()) {
-                    final ImmutableSet<BlockContract> blockContracts =
-                            specExtractor.extractBlockContracts(pm, (LabeledStatement) labeled);
-                    for (BlockContract specification : blockContracts) {
-                        specRepos.addBlockContract(specification, true);
-                    }
-                }
+                addLabeledBlockContracts(specExtractor, specRepos, pm);
             }
 
             //constructor contracts

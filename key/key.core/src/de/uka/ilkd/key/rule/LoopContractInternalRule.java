@@ -38,7 +38,7 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @see LoopContractInternalBuiltInRuleApp
  */
-public class LoopContractInternalRule extends AbstractLoopContractRule {
+public final class LoopContractInternalRule extends AbstractLoopContractRule {
 
     public static final LoopContractInternalRule INSTANCE = new LoopContractInternalRule();
 

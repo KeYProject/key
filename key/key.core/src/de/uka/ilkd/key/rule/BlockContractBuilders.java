@@ -76,7 +76,7 @@ import de.uka.ilkd.key.util.MiscTools;
 /**
  * This contains various builders used in building formulae and terms for block and loop contracts.
  */
-public class BlockContractBuilders {
+public final class BlockContractBuilders {
 
     public static final String ANON_IN_PREFIX = "anonIn_";
     public static final String ANON_OUT_PREFIX = "anonOut_";

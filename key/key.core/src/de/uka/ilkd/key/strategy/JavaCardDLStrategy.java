@@ -131,6 +131,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private final HeapLDT heapLDT;
 
+    private final ArithTermFeatures tf;
+    private final FormulaTermFeatures ff;
+    private final ValueTermFeature vf;
+
+
     protected JavaCardDLStrategy(Proof proof,
                                  StrategyProperties strategyProperties) {
 
@@ -888,7 +893,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
             final String userTacletsProbs =
                     strategyProperties.getProperty(StrategyProperties
-                            .USER_TACLETS_OPTIONS_KEY(i));
+                            .userTacletsOptionsKey(i));
             if (StrategyProperties.USER_TACLETS_LOW.equals(userTacletsProbs)) {
                 bindRuleSet(d, "userTaclets" + i, 10000);
             } else if (StrategyProperties.USER_TACLETS_HIGH
@@ -1028,17 +1033,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private void setupSplitting(RuleSetDispatchFeature d) {
         final TermBuffer subFor = new TermBuffer();
-
         final Feature noCutsAllowed =
                 sum(subFor, AllowedCutPositionsGenerator.INSTANCE,
                         not(applyTF(subFor, ff.cutAllowed)));
-
         bindRuleSet(d, "beta", SumFeature.createSum(noCutsAllowed,
                 ifZero(PurePosDPathFeature.INSTANCE, longConst(-200)),
                 ScaleFeature.createScaled(CountPosDPathFeature.INSTANCE, -3.0),
                 ScaleFeature.createScaled(CountMaxDPathFeature.INSTANCE, 10.0),
                 longConst(20)));
-
         TermBuffer superF = new TermBuffer();
         final ProjectionToTerm splitCondition = sub(FocusProjection.INSTANCE, 0);
         bindRuleSet(d,
@@ -1054,20 +1056,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                 rec(ff.quantifiedFor,
                                         ifZero(ff.quantifiedFor,
                                                 longTermConst(-10)))),
-                        // prefer top level splits
-                        FindDepthFeature.INSTANCE,
+                        FindDepthFeature.INSTANCE, // prefer top level splits
                         ScaleFeature.createAffine(countOccurrences(splitCondition), -10, 10),
                         sum(superF, SuperTermGenerator.upwards(any(), getServices()),
                             applyTF(superF, not(ff.elemUpdate))),
                         ifZero(applyTF(FocusProjection.INSTANCE,
                                 ContainsExecutableCodeTermFeature.PROGRAMS),
                                 longConst(-100), longConst(25))));
-
         ProjectionToTerm cutFormula = instOf("cutFormula");
-
         Feature countOccurrencesInSeq =
                 ScaleFeature.createAffine(countOccurrences(cutFormula), -10, 10);
-
         bindRuleSet(
             d,
             "cut_direct",
@@ -1098,11 +1096,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                   not(AnonHeapTermFeature.INSTANCE))),
                                           longConst(0),
                                           longConst(1000)),
-                                   // standard costs
-                                   countOccurrencesInSeq,
+                                   countOccurrencesInSeq, // standard costs
                                    longConst(100)),
-                               // check for cuts below quantifiers
-                               SumFeature
+                               SumFeature // check for cuts below quantifiers
                                    .createSum(
                                        new Feature[] {
                                            applyTF(cutFormula,
@@ -2614,7 +2610,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private RuleSetDispatchFeature setupApprovalDispatcher() {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-
         final IntegerLDT numbers =
                 getServices().getTypeConverter().getIntegerLDT();
 
@@ -2653,17 +2648,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "inReachableStateImplication",
                 NonDuplicateAppModPositionFeature.INSTANCE);
-
         bindRuleSet(d, "limitObserver",
                 NonDuplicateAppModPositionFeature.INSTANCE);
-
         bindRuleSet(d, "partialInvAxiom",
                 NonDuplicateAppModPositionFeature.INSTANCE);
 
         setupClassAxiomApproval(d);
-
         setupQuantifierInstantiationApproval(d);
-
         setupSplittingApproval(d);
 
         bindRuleSet(
@@ -2678,7 +2669,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                 add(NoSelfApplicationFeature.INSTANCE,
                                         applyTF("t1",
                                                 IsSelectSkolemConstantTermFeature.INSTANCE)))));
-
         bindRuleSet(
                 d,
                 "apply_auxiliary_eq",
@@ -2852,10 +2842,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     //
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
-
-    private final ArithTermFeatures tf;
-    private final FormulaTermFeatures ff;
-    private final ValueTermFeature vf;
 
     @Override
     public boolean isStopAtFirstNonCloseableGoal() {

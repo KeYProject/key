@@ -41,7 +41,7 @@ import de.uka.ilkd.key.util.MiscTools;
  */
 public class FunctionalBlockContractPO extends AbstractPO implements ContractPO {
 
-    public static Map<Boolean, String> TRANSACTION_TAGS =
+    private static final Map<Boolean, String> TRANSACTION_TAGS =
             new LinkedHashMap<Boolean, String>();
 
     private FunctionalBlockContract contract;
@@ -112,14 +112,44 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((contract == null) ? 0 : contract.hashCode());
+        result = prime * result
+                + ((environmentConfig == null) ?
+                        0 : environmentConfig.hashCode());
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
         if (!(obj instanceof FunctionalBlockContractPO)) {
             return false;
         }
-
         FunctionalBlockContractPO other = (FunctionalBlockContractPO) obj;
-        return contract.equals(other.contract)
-                && environmentConfig.equals(other.environmentConfig);
+        if (contract == null) {
+            if (other.contract != null) {
+                return false;
+            }
+        } else if (!contract.equals(other.contract)) {
+            return false;
+        }
+        if (environmentConfig == null) {
+            if (other.environmentConfig != null) {
+                return false;
+            }
+        } else if (!environmentConfig.equals(other.environmentConfig)) {
+            return false;
+        }
+        return true;
     }
 
     @Override

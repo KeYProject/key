@@ -36,12 +36,10 @@ import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockSpecificationElement;
@@ -71,7 +69,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
     @Override
     public Term transform(Term term, SVInstantiations svInst,
             Services services) {
-        final TermBuilder TB = services.getTermBuilder();
+        final TermBuilder tb = services.getTermBuilder();
         final Term target = term.sub(0);
 
         // the target term should have a Java block
@@ -79,37 +77,9 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         assert pe != null;
 
         // collect all loops, blocks, and merge point statements in the innermost method frame
-        final Quadruple<MethodFrame, ImmutableSet<LoopStatement>, ImmutableSet<StatementBlock>,
-                        ImmutableSet<MergePointStatement>> frameAndLoopsAndBlocks =
-            new JavaASTVisitor(pe, services) {
-                private MethodFrame frame = null;
-                private ImmutableSet<LoopStatement> loops =
-                    DefaultImmutableSet.<LoopStatement> nil();
-                private ImmutableSet<StatementBlock> blocks =
-                    DefaultImmutableSet.nil();
-                private ImmutableSet<MergePointStatement> mpss =
-                    DefaultImmutableSet.nil();
-
-                protected void doDefaultAction(SourceElement node) {
-                    if (node instanceof MethodFrame && frame == null) {
-                        frame = (MethodFrame) node;
-                    } else if (frame == null && node instanceof LoopStatement) {
-                        loops = loops.add((LoopStatement) node);
-                    } else if (frame == null && node instanceof StatementBlock) {
-                        blocks = blocks.add((StatementBlock) node);
-                    } else if (frame == null
-                                 && node instanceof MergePointStatement) {
-                        mpss = mpss.add((MergePointStatement) node);
-                    }
-                }
-
-                public Quadruple<MethodFrame, ImmutableSet<LoopStatement>,
-                                 ImmutableSet<StatementBlock>,
-                                 ImmutableSet<MergePointStatement>> run() {
-                    walk(root());
-                    return new Quadruple<>(frame, loops, blocks, mpss);
-                }
-            }.run();
+        final Quadruple<MethodFrame, ImmutableSet<LoopStatement>,
+                        ImmutableSet<StatementBlock>, ImmutableSet<MergePointStatement>>
+                frameAndLoopsAndBlocks = collectLoopsBlocksAndMergePointStatements(pe, services);
 
         final MethodFrame frame = frameAndLoopsAndBlocks.first;
         final ImmutableSet<LoopStatement> loops = frameAndLoopsAndBlocks.second;
@@ -117,6 +87,70 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         final ImmutableSet<MergePointStatement> mpss = frameAndLoopsAndBlocks.fourth;
 
         // determine "self"
+        Term selfTerm = determineSelfTerm(frame, services);
+        // create atPre heap
+        final String methodName = frame.getProgramMethod().getName();
+
+        Map<LocationVariable, Term> atPres = new LinkedHashMap<>();
+        Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
+        Map<LocationVariable, LocationVariable> atPreHeapVars = new LinkedHashMap<>();
+
+        Term atPreUpdate = initAtPreUpdate(methodName, atPres, atPreVars,
+                                           atPreHeapVars, services, tb);
+        // create atPre for parameters
+        atPreUpdate =
+                updateAtPreUpdateForLoopInvariants(loops, methodName, atPres,
+                                                   atPreVars, atPreUpdate,
+                                                   services, tb);
+        atPreUpdate =
+                updateAtPreUpdateForBlockAndLoopContracts(blocks, methodName,
+                                                          atPres, atPreVars,
+                                                          atPreHeapVars,
+                                                          atPreUpdate,
+                                                          services, tb);
+        atPreUpdate =
+                updateAtPreUpdateForMergePointStatements(mpss, methodName,
+                                                         atPres, atPreVars,
+                                                         atPreUpdate, services,
+                                                         tb);
+        // update loop invariants
+        selfTerm = updateLoopInvariants(loops, frame, selfTerm, atPres,
+                                        services, tb);
+        // update merge contracts
+        updateMergeContracts(mpss, atPres, services);
+        //update block contracts
+        updateBlockContracts(blocks, atPreVars, atPreHeapVars, services);
+
+        return tb.apply(atPreUpdate, target, null);
+    }
+
+    private Term initAtPreUpdate(final String methodName,
+                                 Map<LocationVariable, Term> atPres,
+                                 Map<LocationVariable, LocationVariable> atPreVars,
+                                 Map<LocationVariable, LocationVariable> atPreHeapVars,
+                                 Services services, final TermBuilder tb) {
+        Term atPreUpdate = null;
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
+                .getAllHeaps()) {
+            final LocationVariable l = tb.heapAtPreVar(
+                    heap.name() + "Before_" + methodName, heap.sort(), true);
+            // buf fix. see #1197
+            services.getNamespaces().programVariables().addSafely(l);
+            final Term u = tb.elementary(l, tb.var(heap));
+            if (atPreUpdate == null) {
+                atPreUpdate = u;
+            } else {
+                atPreUpdate = tb.parallel(atPreUpdate, u);
+            }
+
+            atPres.put(heap, tb.var(l));
+            atPreVars.put(heap, l);
+            atPreHeapVars.put(heap, l);
+        }
+        return atPreUpdate;
+    }
+
+    private Term determineSelfTerm(final MethodFrame frame, Services services) {
         Term selfTerm;
         final ExecutionContext ec = (ExecutionContext) frame
                 .getExecutionContext();
@@ -126,34 +160,58 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         } else {
             selfTerm = services.getTypeConverter().convertToLogicElement(rp);
         }
+        return selfTerm;
+    }
 
-        // create atPre heap
-        final String methodName = frame.getProgramMethod().getName();
+    private Quadruple<MethodFrame, ImmutableSet<LoopStatement>,
+                      ImmutableSet<StatementBlock>,
+                      ImmutableSet<MergePointStatement>>
+                collectLoopsBlocksAndMergePointStatements(final ProgramElement pe,
+                                                          Services services) {
+        final Quadruple<MethodFrame, ImmutableSet<LoopStatement>,
+                        ImmutableSet<StatementBlock>,
+                        ImmutableSet<MergePointStatement>>
+            frameAndLoopsAndBlocks =
+                new JavaASTVisitor(pe, services) {
+            private MethodFrame frame = null;
+            private ImmutableSet<LoopStatement> loops =
+                    DefaultImmutableSet.<LoopStatement> nil();
+            private ImmutableSet<StatementBlock> blocks =
+                    DefaultImmutableSet.nil();
+            private ImmutableSet<MergePointStatement> mpss =
+                    DefaultImmutableSet.nil();
 
-        Term atPreUpdate = null;
-        Map<LocationVariable, Term> atPres = new LinkedHashMap<>();
-        Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
-        Map<LocationVariable, LocationVariable> atPreHeapVars = new LinkedHashMap<>();
-
-        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
-                .getAllHeaps()) {
-            final LocationVariable l = TB.heapAtPreVar(
-                    heap.name() + "Before_" + methodName, heap.sort(), true);
-            // buf fix. see #1197
-            services.getNamespaces().programVariables().addSafely(l);
-            final Term u = TB.elementary(l, TB.var(heap));
-            if (atPreUpdate == null) {
-                atPreUpdate = u;
-            } else {
-                atPreUpdate = TB.parallel(atPreUpdate, u);
+            protected void doDefaultAction(SourceElement node) {
+                if (node instanceof MethodFrame && frame == null) {
+                    frame = (MethodFrame) node;
+                } else if (frame == null && node instanceof LoopStatement) {
+                    loops = loops.add((LoopStatement) node);
+                } else if (frame == null && node instanceof StatementBlock) {
+                    blocks = blocks.add((StatementBlock) node);
+                } else if (frame == null
+                        && node instanceof MergePointStatement) {
+                    mpss = mpss.add((MergePointStatement) node);
+                }
             }
 
-            atPres.put(heap, TB.var(l));
-            atPreVars.put(heap, l);
-            atPreHeapVars.put(heap, l);
-        }
+            public Quadruple<MethodFrame, ImmutableSet<LoopStatement>,
+                             ImmutableSet<StatementBlock>,
+                             ImmutableSet<MergePointStatement>> run() {
+                walk(root());
+                return new Quadruple<>(frame, loops, blocks, mpss);
+            }
+        }.run();
+        return frameAndLoopsAndBlocks;
+    }
 
-        // create atPre for parameters
+    private Term
+        updateAtPreUpdateForLoopInvariants(final ImmutableSet<LoopStatement> loops,
+                                           final String methodName,
+                                           Map<LocationVariable, Term> atPres,
+                                           Map<LocationVariable, LocationVariable> atPreVars,
+                                           Term atPreUpdate,
+                                           Services services,
+                                           final TermBuilder tb) {
         for (LoopStatement loop : loops) {
             LoopSpecification inv = services.getSpecificationRepository()
                     .getLoopSpec(loop);
@@ -170,22 +228,30 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                         // loop
                         continue;
                     }
-                    final LocationVariable l = TB.heapAtPreVar(
+                    final LocationVariable l = tb.heapAtPreVar(
                             var.name() + "Before_" + methodName, var.sort(),
                             true);
                     services.getNamespaces().programVariables().addSafely(l);
-                    final Term u = TB.elementary(l, TB.var(var));
+                    final Term u = tb.elementary(l, tb.var(var));
                     if (atPreUpdate == null) {
                         atPreUpdate = u;
                     } else {
-                        atPreUpdate = TB.parallel(atPreUpdate, u);
+                        atPreUpdate = tb.parallel(atPreUpdate, u);
                     }
-                    atPres.put(var, TB.var(l));
+                    atPres.put(var, tb.var(l));
                     atPreVars.put(var, l);
                 }
             }
         }
+        return atPreUpdate;
+    }
 
+    private Term updateAtPreUpdateForBlockAndLoopContracts(
+            final ImmutableSet<StatementBlock> blocks, final String methodName,
+            Map<LocationVariable, Term> atPres,
+            Map<LocationVariable, LocationVariable> atPreVars,
+            Map<LocationVariable, LocationVariable> atPreHeapVars,
+            Term atPreUpdate, Services services, final TermBuilder tb) {
         for (StatementBlock block : blocks) {
             ImmutableSet<BlockSpecificationElement> contracts = DefaultImmutableSet.nil();
 
@@ -208,19 +274,19 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     if (atPres.containsKey(var)) {
                         continue;
                     }
-                    final LocationVariable l = TB.heapAtPreVar(
+                    final LocationVariable l = tb.heapAtPreVar(
                             var.name() + "Before_" + methodName, var.sort(),
                             true);
                     services.getNamespaces().programVariables().addSafely(l);
 
-                    final Term u = TB.elementary(l, TB.var(var));
+                    final Term u = tb.elementary(l, tb.var(var));
                     if (atPreUpdate == null) {
                         atPreUpdate = u;
                     } else {
-                        atPreUpdate = TB.parallel(atPreUpdate, u);
+                        atPreUpdate = tb.parallel(atPreUpdate, u);
                     }
 
-                    atPres.put(var, TB.var(l));
+                    atPres.put(var, tb.var(l));
                     atPreVars.put(var, l);
                 }
 
@@ -232,25 +298,32 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     if (atPres.containsKey(var)) {
                         continue;
                     }
-                    final LocationVariable l = TB.heapAtPreVar(
+                    final LocationVariable l = tb.heapAtPreVar(
                             var.name() + "Before_" + methodName, var.sort(),
                             true);
                     services.getNamespaces().programVariables().addSafely(l);
 
-                    final Term u = TB.elementary(l, TB.var(var));
+                    final Term u = tb.elementary(l, tb.var(var));
                     if (atPreUpdate == null) {
                         atPreUpdate = u;
                     } else {
-                        atPreUpdate = TB.parallel(atPreUpdate, u);
+                        atPreUpdate = tb.parallel(atPreUpdate, u);
                     }
 
-                    atPres.put(var, TB.var(l));
+                    atPres.put(var, tb.var(l));
                     atPreVars.put(var, l);
                     atPreHeapVars.put(var, l);
                 }
             }
         }
+        return atPreUpdate;
+    }
 
+    private Term updateAtPreUpdateForMergePointStatements(
+            final ImmutableSet<MergePointStatement> mpss,
+            final String methodName, Map<LocationVariable, Term> atPres,
+            Map<LocationVariable, LocationVariable> atPreVars, Term atPreUpdate,
+            Services services, final TermBuilder tb) {
         for (MergePointStatement mps : mpss) {
             ImmutableSet<MergeContract> mergeContracts = services
                     .getSpecificationRepository().getMergeContracts(mps);
@@ -278,36 +351,36 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                         // heaps and variables in loops have already been considered
                         continue;
                     }
-                    final LocationVariable l = TB.heapAtPreVar(
+                    final LocationVariable l = tb.heapAtPreVar(
                             var.name() + "Before_" + methodName, var.sort(),
                             true);
                     services.getNamespaces().programVariables().addSafely(l);
 
-                    final Term u = TB.elementary(l, TB.var(var));
+                    final Term u = tb.elementary(l, tb.var(var));
                     if (atPreUpdate == null) {
                         atPreUpdate = u;
                     } else {
-                        atPreUpdate = TB.parallel(atPreUpdate, u);
+                        atPreUpdate = tb.parallel(atPreUpdate, u);
                     }
-                    atPres.put(var, TB.var(l));
+                    atPres.put(var, tb.var(l));
                     atPreVars.put(var, l);
                 }
             }
         }
+        return atPreUpdate;
+    }
 
-        // update loop invariants
+    private Term updateLoopInvariants(final ImmutableSet<LoopStatement> loops,
+                                      final MethodFrame frame, Term selfTerm,
+                                      Map<LocationVariable, Term> atPres,
+                                      Services services, final TermBuilder tb) {
         for (LoopStatement loop : loops) {
-            LoopSpecification spec = services.getSpecificationRepository()
-                    .getLoopSpec(loop);
+            LoopSpecification spec = services.getSpecificationRepository().getLoopSpec(loop);
             if (spec != null) {
                 if (selfTerm != null && spec.getInternalSelfTerm() == null) {
-                    // we're calling a static method from an instance context
-                    selfTerm = null;
+                    selfTerm = null; // we're calling a static method from an instance context
                 }
-
-                final Term newVariant = spec.getVariant(selfTerm, atPres,
-                        services);
-
+                final Term newVariant = spec.getVariant(selfTerm, atPres, services);
                 Map<LocationVariable, Term> newMods =
                     new LinkedHashMap<LocationVariable, Term>();
                 Map<LocationVariable, ImmutableList<InfFlowSpec>> newInfFlowSpecs =
@@ -327,7 +400,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                             && spec.getInternalModifies()
                                     .get(services.getTypeConverter()
                                             .getHeapLDT().getHeap())
-                                    .equals(TB.strictlyNothing())) {
+                                    .equals(tb.strictlyNothing())) {
                         continue;
                     }
                     final Term m = spec.getModifies(heap, selfTerm, atPres,
@@ -349,9 +422,9 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                         newFreeInvariants.put(heap, freeInv);
                     }
                 }
-                ImmutableList<Term> newLocalIns = TB
+                ImmutableList<Term> newLocalIns = tb
                         .var(MiscTools.getLocalIns(loop, services));
-                ImmutableList<Term> newLocalOuts = TB
+                ImmutableList<Term> newLocalOuts = tb
                         .var(MiscTools.getLocalOuts(loop, services));
                 final LoopSpecification newInv = spec.create(loop,
                         frame.getProgramMethod(),
@@ -362,8 +435,12 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 services.getSpecificationRepository().addLoopInvariant(newInv);
             }
         }
+        return selfTerm;
+    }
 
-        // update merge contracts
+    private void updateMergeContracts(
+            final ImmutableSet<MergePointStatement> mpss,
+            Map<LocationVariable, Term> atPres, Services services) {
         for (MergePointStatement mps : mpss) {
             ImmutableSet<MergeContract> mergeContracts = services
                     .getSpecificationRepository().getMergeContracts(mps);
@@ -392,8 +469,53 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                                         services)));
             }
         }
+    }
 
-        //update block contracts
+    private static void
+        updateBlockOrLoopContract(StatementBlock block,
+                                  BlockSpecificationElement contract,
+                                  final BlockSpecificationElement.Variables newVariables,
+                                  final Map<LocationVariable, Term> newPreconditions,
+                                  final Map<LocationVariable, Term> newPostconditions,
+                                  final Map<LocationVariable, Term> newModifiesClauses,
+                                  Services services) {
+        if (contract instanceof BlockContract) {
+            final BlockContract newBlockContract =
+                    ((BlockContract) contract).update(block, newPreconditions,
+                                                      newPostconditions,
+                                                      newModifiesClauses,
+                                                      contract.getInfFlowSpecs(),
+                                                      newVariables,
+                                                      contract.getMby(newVariables,
+                                                                      services));
+
+            services.getSpecificationRepository()
+                .removeBlockContract((BlockContract) contract);
+            services.getSpecificationRepository()
+                .addBlockContract((BlockContract) newBlockContract, false);
+        } else if (contract instanceof LoopContract) {
+            final LoopContract newLoopContract =
+                    ((LoopContract) contract).update(block, newPreconditions,
+                                                     newPostconditions,
+                                                     newModifiesClauses,
+                                                     contract.getInfFlowSpecs(),
+                                                     newVariables,
+                                                     contract.getMby(newVariables,
+                                                                     services),
+                                                     ((LoopContract) contract)
+                                                         .getDecreases());
+
+            services.getSpecificationRepository()
+                .removeLoopContract((LoopContract) contract);
+            services.getSpecificationRepository()
+                .addLoopContract((LoopContract) newLoopContract, false);
+        }
+    }
+
+    private void updateBlockContracts(final ImmutableSet<StatementBlock> blocks,
+                                      Map<LocationVariable, LocationVariable> atPreVars,
+                                      Map<LocationVariable, LocationVariable> atPreHeapVars,
+                                      Services services) {
         for (StatementBlock block : blocks) {
             ImmutableSet<BlockSpecificationElement> contracts = DefaultImmutableSet.nil();
 
@@ -449,41 +571,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                                            contract.getModifiesClause(heap, newVariables.self,
                                                                       services));
                 }
-
-                if (contract instanceof BlockContract) {
-                    final BlockContract newBlockContract =
-                            ((BlockContract) contract).update(block, newPreconditions,
-                                                              newPostconditions,
-                                                              newModifiesClauses,
-                                                              contract.getInfFlowSpecs(),
-                                                              newVariables,
-                                                              contract.getMby(newVariables,
-                                                                              services));
-
-                    services.getSpecificationRepository()
-                        .removeBlockContract((BlockContract) contract);
-                    services.getSpecificationRepository()
-                        .addBlockContract((BlockContract) newBlockContract, false);
-                } else if (contract instanceof LoopContract) {
-                    final LoopContract newLoopContract =
-                            ((LoopContract) contract).update(block, newPreconditions,
-                                                             newPostconditions,
-                                                             newModifiesClauses,
-                                                             contract.getInfFlowSpecs(),
-                                                             newVariables,
-                                                             contract.getMby(newVariables,
-                                                                             services),
-                                                             ((LoopContract) contract)
-                                                                 .getDecreases());
-
-                    services.getSpecificationRepository()
-                        .removeLoopContract((LoopContract) contract);
-                    services.getSpecificationRepository()
-                        .addLoopContract((LoopContract) newLoopContract, false);
-                }
+                updateBlockOrLoopContract(block, contract, newVariables,
+                                          newPreconditions, newPostconditions,
+                                          newModifiesClauses, services);
             }
         }
-
-        return TB.apply(atPreUpdate, target, null);
     }
 }

@@ -169,7 +169,7 @@ public final class StrategyProperties extends Properties {
 
 
     //String identities.
-    private static final String[] stringPool = {
+    private static final String[] STRING_POOL = {
         INF_FLOW_CHECK_PROPERTY, INF_FLOW_CHECK_TRUE, INF_FLOW_CHECK_FALSE,
         STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT, STOPMODE_NONCLOSE,
         SPLITTING_OPTIONS_KEY, SPLITTING_NORMAL, SPLITTING_OFF,
@@ -194,8 +194,8 @@ public final class StrategyProperties extends Properties {
         AUTO_INDUCTION_RESTRICTED, AUTO_INDUCTION_ON, AUTO_INDUCTION_LEMMA_ON,
         USER_TACLETS_OPTIONS_KEY_BASE, USER_TACLETS_OFF, USER_TACLETS_LOW,
         USER_TACLETS_HIGH,
-        USER_TACLETS_OPTIONS_KEY(1), USER_TACLETS_OPTIONS_KEY(2),
-        USER_TACLETS_OPTIONS_KEY(3),
+        userTacletsOptionsKey(1), userTacletsOptionsKey(2),
+        userTacletsOptionsKey(3),
         SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
         SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY,
         SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER,
@@ -204,65 +204,65 @@ public final class StrategyProperties extends Properties {
         SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF };
 
 
-    private static final Properties defaultMap = new Properties();
+    private static final Properties DEFAULT_MAP = new Properties();
 
     static {
-        defaultMap.setProperty(SPLITTING_OPTIONS_KEY, SPLITTING_DELAYED);
-        defaultMap.setProperty(LOOP_OPTIONS_KEY, LOOP_INVARIANT);
-        defaultMap.setProperty(BLOCK_OPTIONS_KEY, BLOCK_CONTRACT_INTERNAL);
-        defaultMap.setProperty(METHOD_OPTIONS_KEY, METHOD_CONTRACT);
-        defaultMap.setProperty(MPS_OPTIONS_KEY, MPS_MERGE);
-        defaultMap.setProperty(OSS_OPTIONS_KEY, OSS_ON);
-        defaultMap.setProperty(DEP_OPTIONS_KEY, DEP_ON);
-        defaultMap.setProperty(QUERY_OPTIONS_KEY, QUERY_OFF);
-        defaultMap.setProperty(QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON);
-        defaultMap.setProperty(NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE);
-        defaultMap.setProperty(QUANTIFIERS_OPTIONS_KEY,
+        DEFAULT_MAP.setProperty(SPLITTING_OPTIONS_KEY, SPLITTING_DELAYED);
+        DEFAULT_MAP.setProperty(LOOP_OPTIONS_KEY, LOOP_INVARIANT);
+        DEFAULT_MAP.setProperty(BLOCK_OPTIONS_KEY, BLOCK_CONTRACT_INTERNAL);
+        DEFAULT_MAP.setProperty(METHOD_OPTIONS_KEY, METHOD_CONTRACT);
+        DEFAULT_MAP.setProperty(MPS_OPTIONS_KEY, MPS_MERGE);
+        DEFAULT_MAP.setProperty(OSS_OPTIONS_KEY, OSS_ON);
+        DEFAULT_MAP.setProperty(DEP_OPTIONS_KEY, DEP_ON);
+        DEFAULT_MAP.setProperty(QUERY_OPTIONS_KEY, QUERY_OFF);
+        DEFAULT_MAP.setProperty(QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON);
+        DEFAULT_MAP.setProperty(NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE);
+        DEFAULT_MAP.setProperty(QUANTIFIERS_OPTIONS_KEY,
                                QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
-            defaultMap.setProperty(USER_TACLETS_OPTIONS_KEY(i),
+            DEFAULT_MAP.setProperty(userTacletsOptionsKey(i),
                                    USER_TACLETS_OFF);
         }
-        defaultMap.setProperty(INF_FLOW_CHECK_PROPERTY, INF_FLOW_CHECK_FALSE);
-        defaultMap.setProperty(STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT);
-        defaultMap.setProperty(VBT_PHASE, VBT_SYM_EX);
-        defaultMap.setProperty(CLASS_AXIOM_OPTIONS_KEY, CLASS_AXIOM_FREE);
-        defaultMap.setProperty(AUTO_INDUCTION_OPTIONS_KEY,
+        DEFAULT_MAP.setProperty(INF_FLOW_CHECK_PROPERTY, INF_FLOW_CHECK_FALSE);
+        DEFAULT_MAP.setProperty(STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT);
+        DEFAULT_MAP.setProperty(VBT_PHASE, VBT_SYM_EX);
+        DEFAULT_MAP.setProperty(CLASS_AXIOM_OPTIONS_KEY, CLASS_AXIOM_FREE);
+        DEFAULT_MAP.setProperty(AUTO_INDUCTION_OPTIONS_KEY,
                                AUTO_INDUCTION_OFF); //chrisg
-        defaultMap.setProperty(SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
+        DEFAULT_MAP.setProperty(SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
                                SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
-        defaultMap.setProperty(SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
+        DEFAULT_MAP.setProperty(SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
                                SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
     }
 
     public StrategyProperties() {
-        put(SPLITTING_OPTIONS_KEY, defaultMap.get(SPLITTING_OPTIONS_KEY));
-        put(LOOP_OPTIONS_KEY, defaultMap.get(LOOP_OPTIONS_KEY));
-        put(BLOCK_OPTIONS_KEY, defaultMap.get(BLOCK_OPTIONS_KEY));
-        put(METHOD_OPTIONS_KEY, defaultMap.get(METHOD_OPTIONS_KEY));
-        put(MPS_OPTIONS_KEY, defaultMap.get(MPS_OPTIONS_KEY));
-        put(DEP_OPTIONS_KEY, defaultMap.get(DEP_OPTIONS_KEY));
-        put(QUERY_OPTIONS_KEY, defaultMap.get(QUERY_OPTIONS_KEY));
-        put(QUERYAXIOM_OPTIONS_KEY, defaultMap.get(QUERYAXIOM_OPTIONS_KEY));
-        put(NON_LIN_ARITH_OPTIONS_KEY, defaultMap.get(NON_LIN_ARITH_OPTIONS_KEY));
-        put(OSS_OPTIONS_KEY, defaultMap.get(OSS_OPTIONS_KEY));
-        put(QUANTIFIERS_OPTIONS_KEY, defaultMap.get(QUANTIFIERS_OPTIONS_KEY));
+        put(SPLITTING_OPTIONS_KEY, DEFAULT_MAP.get(SPLITTING_OPTIONS_KEY));
+        put(LOOP_OPTIONS_KEY, DEFAULT_MAP.get(LOOP_OPTIONS_KEY));
+        put(BLOCK_OPTIONS_KEY, DEFAULT_MAP.get(BLOCK_OPTIONS_KEY));
+        put(METHOD_OPTIONS_KEY, DEFAULT_MAP.get(METHOD_OPTIONS_KEY));
+        put(MPS_OPTIONS_KEY, DEFAULT_MAP.get(MPS_OPTIONS_KEY));
+        put(DEP_OPTIONS_KEY, DEFAULT_MAP.get(DEP_OPTIONS_KEY));
+        put(QUERY_OPTIONS_KEY, DEFAULT_MAP.get(QUERY_OPTIONS_KEY));
+        put(QUERYAXIOM_OPTIONS_KEY, DEFAULT_MAP.get(QUERYAXIOM_OPTIONS_KEY));
+        put(NON_LIN_ARITH_OPTIONS_KEY, DEFAULT_MAP.get(NON_LIN_ARITH_OPTIONS_KEY));
+        put(OSS_OPTIONS_KEY, DEFAULT_MAP.get(OSS_OPTIONS_KEY));
+        put(QUANTIFIERS_OPTIONS_KEY, DEFAULT_MAP.get(QUANTIFIERS_OPTIONS_KEY));
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
-            put(USER_TACLETS_OPTIONS_KEY(i), defaultMap.get(USER_TACLETS_OPTIONS_KEY(i)));
+            put(userTacletsOptionsKey(i), DEFAULT_MAP.get(userTacletsOptionsKey(i)));
         }
-        put(INF_FLOW_CHECK_PROPERTY, defaultMap.get(INF_FLOW_CHECK_PROPERTY));
-        put(STOPMODE_OPTIONS_KEY, defaultMap.get(STOPMODE_OPTIONS_KEY));
-        put(VBT_PHASE, defaultMap.getProperty(VBT_PHASE));
-        put(CLASS_AXIOM_OPTIONS_KEY, defaultMap.getProperty(CLASS_AXIOM_OPTIONS_KEY));
-        put(AUTO_INDUCTION_OPTIONS_KEY, defaultMap.getProperty(AUTO_INDUCTION_OPTIONS_KEY));
+        put(INF_FLOW_CHECK_PROPERTY, DEFAULT_MAP.get(INF_FLOW_CHECK_PROPERTY));
+        put(STOPMODE_OPTIONS_KEY, DEFAULT_MAP.get(STOPMODE_OPTIONS_KEY));
+        put(VBT_PHASE, DEFAULT_MAP.getProperty(VBT_PHASE));
+        put(CLASS_AXIOM_OPTIONS_KEY, DEFAULT_MAP.getProperty(CLASS_AXIOM_OPTIONS_KEY));
+        put(AUTO_INDUCTION_OPTIONS_KEY, DEFAULT_MAP.getProperty(AUTO_INDUCTION_OPTIONS_KEY));
     }
 
-    public static String USER_TACLETS_OPTIONS_KEY(int i) {
+    public static String userTacletsOptionsKey(int i) {
         return USER_TACLETS_OPTIONS_KEY_BASE + i;
     }
 
     public static String getDefaultProperty(String key) {
-        return defaultMap.getProperty(key);
+        return DEFAULT_MAP.getProperty(key);
     }
 
     public static StrategyProperties read(Properties p) {
@@ -280,7 +280,7 @@ public final class StrategyProperties extends Properties {
         sp.put(OSS_OPTIONS_KEY, readSingleOption(p, OSS_OPTIONS_KEY));
         sp.put(QUANTIFIERS_OPTIONS_KEY, readSingleOption(p, QUANTIFIERS_OPTIONS_KEY));
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
-            sp.put(USER_TACLETS_OPTIONS_KEY(i), readSingleOption(p, USER_TACLETS_OPTIONS_KEY(i)));
+            sp.put(userTacletsOptionsKey(i), readSingleOption(p, userTacletsOptionsKey(i)));
         }
         sp.put(INF_FLOW_CHECK_PROPERTY, readSingleOption(p, INF_FLOW_CHECK_PROPERTY));
         sp.put(STOPMODE_OPTIONS_KEY, readSingleOption(p, STOPMODE_OPTIONS_KEY));
@@ -374,7 +374,7 @@ public final class StrategyProperties extends Properties {
     private static Object readSingleOption(Properties p, String key) {
         String o = (String)p.get(STRATEGY_PROPERTY + key);
         if (o == null) {
-            o = (String)defaultMap.get(key);
+            o = (String)DEFAULT_MAP.get(key);
         }
         return getUniqueString(o);
     }
@@ -386,7 +386,7 @@ public final class StrategyProperties extends Properties {
      *         object identity.
      */
     private final static String getUniqueString(String in) {
-        for (String id : stringPool) {
+        for (String id : STRING_POOL) {
             if (id.equals(in)) {
                 return id;
             }
@@ -403,7 +403,7 @@ public final class StrategyProperties extends Properties {
         if (val != null) {
             return val;
         }
-        return defaultMap.getProperty(key);
+        return DEFAULT_MAP.getProperty(key);
     }
 
     public void write(Properties p) {
@@ -430,8 +430,8 @@ public final class StrategyProperties extends Properties {
         p.put(STRATEGY_PROPERTY + QUANTIFIERS_OPTIONS_KEY,
               get(QUANTIFIERS_OPTIONS_KEY));
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
-            p.put(STRATEGY_PROPERTY + USER_TACLETS_OPTIONS_KEY(i),
-                  get(USER_TACLETS_OPTIONS_KEY(i)));
+            p.put(STRATEGY_PROPERTY + userTacletsOptionsKey(i),
+                  get(userTacletsOptionsKey(i)));
         }
         p.put(STRATEGY_PROPERTY + INF_FLOW_CHECK_PROPERTY,
               get(INF_FLOW_CHECK_PROPERTY));
@@ -468,7 +468,7 @@ public final class StrategyProperties extends Properties {
 
     public boolean isDefault() {
         boolean result = true;
-        Set<Map.Entry<Object, Object>> defaults = defaultMap.entrySet();
+        Set<Map.Entry<Object, Object>> defaults = DEFAULT_MAP.entrySet();
         for (Map.Entry<Object, Object> def : defaults) {
             if (!def.getValue().equals(getProperty((String)def.getKey()))) {
                 result = false;
