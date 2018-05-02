@@ -51,7 +51,7 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
     @Override
     public BlockContractInternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
         return new BlockContractInternalBuiltInRuleApp(
-                builtInRule, newOccurrence, ifInsts,block, contract, heaps);
+                builtInRule, newOccurrence, ifInsts, block, contract, heaps);
     }
 
     @Override

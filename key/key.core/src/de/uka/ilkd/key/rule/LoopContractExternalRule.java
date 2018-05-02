@@ -30,42 +30,42 @@ import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * <p>Rule for the application of {@link LoopContract}s.</p>
- * 
+ *
  * <p> This splits the goal into two branches:
  *    <ol>
  *      <li> Precondition </li>
  *      <li> Usage </li>
  *    </ol>
  * </p>
- * 
+ *
  * <p> The validity of all {@link LoopContract}s that were used in the application of this rule must
  * be proven in a {@link FunctionalLoopContractPO} before the current proof is considered closed.
  * </p>
- * 
+ *
  * @see LoopContractExternalBuiltInRuleApp
  */
 public class LoopContractExternalRule extends AbstractLoopContractRule {
-    
+
     public static final LoopContractExternalRule INSTANCE = new LoopContractExternalRule();
 
     private static final Name NAME = new Name("Loop Contract (External)");
 
     private Term lastFocusTerm;
-    
+
     private Instantiation lastInstantiation;
 
     private LoopContractExternalRule() { }
-    
+
     public Term getLastFocusTerm() {
         return lastFocusTerm;
     }
 
-    
+
     protected void setLastFocusTerm(Term lastFocusTerm) {
         this.lastFocusTerm = lastFocusTerm;
     }
 
-    
+
     public Instantiation getLastInstantiation() {
         return lastInstantiation;
     }
@@ -75,7 +75,7 @@ public class LoopContractExternalRule extends AbstractLoopContractRule {
         return NAME;
     }
 
-    
+
     protected void setLastInstantiation(Instantiation lastInstantiation) {
         this.lastInstantiation = lastInstantiation;
     }
@@ -120,7 +120,7 @@ public class LoopContractExternalRule extends AbstractLoopContractRule {
         final LoopContract.Variables variables = new VariablesCreatorAndRegistrar(
             goal, contract.getPlaceholderVariables(), services
         ).createAndRegister(instantiation.self, true);
-                
+
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
                 new ConditionsAndClausesBuilder(contract, heaps, variables,
@@ -134,7 +134,8 @@ public class LoopContractExternalRule extends AbstractLoopContractRule {
                 conditionsAndClausesBuilder.buildModifiesClauses();
         final Term selfConditions =
                 conditionsAndClausesBuilder.buildSelfConditions(
-                        heaps, contract.getMethod(), contract.getKJT(), instantiation.self, services);
+                        heaps, contract.getMethod(), contract.getKJT(),
+                        instantiation.self, services);
 
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term wellFormedAnonymisationHeapsCondition =
@@ -150,8 +151,8 @@ public class LoopContractExternalRule extends AbstractLoopContractRule {
         final Term anonymisationUpdate =
                 updatesBuilder.buildAnonOutUpdate(anonymisationHeaps,
                                                         modifiesClauses);
-        
-        
+
+
         final ImmutableList<Goal> result;
         final GoalsConfigurator configurator = new GoalsConfigurator(application,
                                                                      termLabelState,
@@ -161,18 +162,18 @@ public class LoopContractExternalRule extends AbstractLoopContractRule {
                                                                      application.posInOccurrence(),
                                                                      services,
                                                                      this);
-        
+
         result = goal.split(2);
 
         configurator.setUpPreconditionGoal(result.tail().head(),
                 contextUpdate,
                 new Term[] {precondition, wellFormedHeapsCondition,
-                        reachableInCondition, selfConditions});
+                            reachableInCondition, selfConditions});
         configurator.setUpUsageGoal(result.head(),
                 new Term[] {contextUpdate, remembranceUpdate,
-                        anonymisationUpdate},
+                            anonymisationUpdate},
                 new Term[] {postcondition, wellFormedAnonymisationHeapsCondition,
-                        reachableOutCondition, atMostOneFlagSetCondition});
+                            reachableOutCondition, atMostOneFlagSetCondition});
 
         final ComplexRuleJustificationBySpec cjust
                 = (ComplexRuleJustificationBySpec)

@@ -49,14 +49,15 @@ import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * <p>Rule for the application of {@link BlockContract}s.</p>
- * 
+ *
  * @see AbstractBlockContractBuiltInRuleApp
  */
 public abstract class AbstractBlockContractRule extends AbstractBlockSpecificationElementRule {
 
-    public static ImmutableSet<BlockContract> getApplicableContracts(final Instantiation instantiation,
-                                                                     final Goal goal,
-                                                                     final Services services) {
+    public static ImmutableSet<BlockContract>
+                getApplicableContracts(final Instantiation instantiation,
+                                       final Goal goal,
+                                       final Services services) {
         if (instantiation == null) {
             return DefaultImmutableSet.nil();
         }
@@ -75,8 +76,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         if (modality == Modality.BOX) {
             collectedContracts = collectedContracts.union(
                     specifications.getBlockContracts(block, Modality.DIA));
-        }
-        else if (modality == Modality.BOX_TRANSACTION) {
+        } else if (modality == Modality.BOX_TRANSACTION) {
             collectedContracts = collectedContracts.union(
                     specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
         }
@@ -84,7 +84,8 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
     }
 
     protected static ImmutableSet<BlockContract>
-                        filterAppliedContracts(final ImmutableSet<BlockContract> collectedContracts,
+                        filterAppliedContracts(final ImmutableSet<BlockContract>
+                                                   collectedContracts,
                                                final Goal goal) {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
         for (BlockContract contract : collectedContracts) {
@@ -106,11 +107,11 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
             if (app instanceof BlockContractInternalBuiltInRuleApp) {
                 BlockContractInternalBuiltInRuleApp blockRuleApp =
                         (BlockContractInternalBuiltInRuleApp)app;
-                if (blockRuleApp.getBlock().equals(contract.getBlock()) && 
+                if (blockRuleApp.getBlock().equals(contract.getBlock()) &&
                         selfOrParentNode.getChildNr(previousNode) == 0) {
                     // prevent application of contract in its own check validity branch
-                    // but not in other branches, e.g., do-while 
-                    // loops might need to apply the same contract 
+                    // but not in other branches, e.g., do-while
+                    // loops might need to apply the same contract
                     // twice in its usage branch
                     return true;
                 }
@@ -122,12 +123,12 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         Services services = goal.proof().getServices();
         Proof proof = goal.proof();
         ProofOblInput po = services.getSpecificationRepository().getProofOblInput(proof);
-        
+
         if (po instanceof FunctionalBlockContractPO
                 && contract.getBlock().equals(((FunctionalBlockContractPO) po).getBlock())) {
             return true;
         }
-        
+
         if (po instanceof SymbolicExecutionPO) {
             Goal initiatingGoal = ((SymbolicExecutionPO)po).getInitiatingGoal();
             return contractApplied(contract, initiatingGoal);
@@ -171,12 +172,14 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
             return result;
         }
     }
-    
+
     protected Map<LocationVariable, Function>
-                createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables,
+                createAndRegisterAnonymisationVariables(final Iterable<LocationVariable>
+                                                            variables,
                                                         final BlockContract contract,
                                                         final TermServices services) {
-        Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>(40);
+        Map<LocationVariable, Function> result =
+            new LinkedHashMap<LocationVariable, Function>(40);
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
             if(contract.hasModifiesClause(variable)) {
@@ -190,10 +193,10 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         }
         return result;
     }
-    
+
     /*
      * Factory methods for information flow contracts.
-     * 
+     *
      * TODO These could be moved into a separate class (like BlockContractBuilders)
      * to allow them to be reused in other classes.
      */
@@ -204,7 +207,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         if (varTerm == null) {
             return null;
         }
-        assert varTerm.op() instanceof LocationVariable;        
+        assert varTerm.op() instanceof LocationVariable;
 
         final TermBuilder tb = services.getTermBuilder();
         KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
@@ -301,7 +304,8 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         return afterAssumptions;
     }
 
-    static SequentFormula buildBodyPreservesSequent(InfFlowPOSnippetFactory f, InfFlowProof proof) {
+    static SequentFormula buildBodyPreservesSequent(InfFlowPOSnippetFactory f,
+                                                    InfFlowProof proof) {
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
@@ -326,15 +330,17 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
                             SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         final Term uAssumptions =
                     tb.applySequential(new Term[] {contextUpdate, remembranceUpdate},
-                                    tb.and(infFlowValitidyData.preAssumption,
-                                           tb.apply(anonymisationUpdate, infFlowValitidyData.postAssumption)));
+                                       tb.and(infFlowValitidyData.preAssumption,
+                                              tb.apply(anonymisationUpdate,
+                                                       infFlowValitidyData.postAssumption)));
         usageGoal.addFormula(new SequentFormula(uAssumptions), true, false);
     }
-    
+
     protected InfFlowValidityData
                 setUpInfFlowValidityGoal(final Goal infFlowGoal,
                                          final BlockContract contract,
-                                         final Map<LocationVariable, Function> anonymisationHeaps,
+                                         final Map<LocationVariable, Function>
+                                             anonymisationHeaps,
                                          final Services services,
                                          final BlockSpecificationElement.Variables variables,
                                          final ProgramVariable exceptionParameter,
@@ -354,7 +360,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         final LocationVariable baseHeap =
                 services.getTypeConverter().getHeapLDT().getHeap();
         final TermBuilder tb = services.getTermBuilder();
-        
+
         assert infFlowGoal.proof() instanceof InfFlowProof;
         final InfFlowProof proof = (InfFlowProof) infFlowGoal.proof();
 
@@ -486,11 +492,17 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
     }
 
     public static class BlockContractHint {
-        protected final static BlockContractHint USAGE_BRANCH = new BlockContractHint("Usage Branch");
-        
+        protected final static BlockContractHint USAGE_BRANCH =
+            new BlockContractHint("Usage Branch");
+
         private final ProgramVariable excVar;
 
         private final String description;
+
+        public BlockContractHint(String description) {
+            this.description = description;
+            this.excVar = null;
+        }
 
         public BlockContractHint(String description, ProgramVariable excVar) {
             this.description = description;
@@ -505,13 +517,6 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
             return new BlockContractHint("Validity Branch", excVar);
         }
 
-
-
-        public BlockContractHint(String description) {
-            this.description = description;
-            this.excVar = null;
-        }
-
         public ProgramVariable getExceptionalVariable() {
             return excVar;
         }
@@ -520,11 +525,11 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
             return description;
         }
 
-
         @Override
         public String toString() {
-            return description + (excVar != null ? "Validity Branch: exceptionVar=" + excVar.name() : "");
-
+            return description
+                + (excVar != null ?
+                    "Validity Branch: exceptionVar=" + excVar.name() : "");
         }
     }
 }

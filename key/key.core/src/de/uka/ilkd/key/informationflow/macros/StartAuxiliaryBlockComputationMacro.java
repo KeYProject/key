@@ -98,8 +98,9 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro impl
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws Exception {
-        final BlockContractInternalBuiltInRuleApp blockRuleApp = 
-                (BlockContractInternalBuiltInRuleApp) goals.head().node().parent().getAppliedRuleApp();
+        final BlockContractInternalBuiltInRuleApp blockRuleApp =
+                (BlockContractInternalBuiltInRuleApp)
+                    goals.head().node().parent().getAppliedRuleApp();
 
         final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
 

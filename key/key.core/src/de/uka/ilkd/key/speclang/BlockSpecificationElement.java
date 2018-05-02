@@ -51,15 +51,15 @@ public interface BlockSpecificationElement extends SpecificationElement {
     public boolean isTransactionApplicable();
     public boolean isReadOnly(Services services);
     public String getBaseName();
-    
+
     /**
      * Returns <code>true</code> iff the method (according to the contract) does
      * not modify the heap at all, i.e., iff it is "strictly pure."
-     * 
+     *
      * @return whether this contract is strictly pure.
      */
     public boolean hasModifiesClause(LocationVariable heap);
-    
+
     Term getInstantiationSelfTerm();
 
     public Term getPrecondition(LocationVariable heap,
@@ -101,7 +101,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
     public String getPlainText(Services services);
 
     public String getPlainText(Services services, Terms terms);
-    
+
     /**
      * Returns the method in which the block is located.
      */
@@ -115,9 +115,9 @@ public interface BlockSpecificationElement extends SpecificationElement {
     public Term getMby();
 
     Term getMby(Variables variables, Services services);
-    
+
     public Term getMby(ProgramVariable selfVar, Services services);
-    
+
     public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
             Map<LocationVariable, Term> atPres, Services services);
 
@@ -170,44 +170,37 @@ public interface BlockSpecificationElement extends SpecificationElement {
      * {@link BlockSpecificationElement}'s instantiation.
      */
     public static class Variables {
-        private final TermServices services;
-
-        public static Variables create(final StatementBlock block,
-                                       final List<Label> labels,
-                                       final IProgramMethod method,
-                                       final Services services) {
-            return new VariablesCreator(block, labels, method, services).create();
-        }
-
         public final ProgramVariable self;
         public final Map<Label, ProgramVariable> breakFlags;
         public final Map<Label, ProgramVariable> continueFlags;
         public final ProgramVariable returnFlag;
         public final ProgramVariable result;
         public final ProgramVariable exception;
-        
+
         /**
          * A map from every heap {@code heap} to {@code heap_Before_BLOCK}.
          */
         public final Map<LocationVariable, LocationVariable> remembranceHeaps;
-        
+
         /**
          * A map from every variable {@code var} that is assignable inside the block
          * to {@code var_Before_BLOCK}.
          */
         public final Map<LocationVariable, LocationVariable> remembranceLocalVariables;
-        
+
         /**
          * A map from every heap {@code heap} that is accessible
          * inside the block to {@code heap_Before_METHOD}.
          */
         public final Map<LocationVariable, LocationVariable> outerRemembranceHeaps;
-        
+
         /**
          * A map from every variable {@code var} that is accessible
          * inside the block to {@code var_Before_METHOD}.
          */
         public final Map<LocationVariable, LocationVariable> outerRemembranceVariables;
+
+        private final TermServices services;
 
         public Variables(final ProgramVariable self,
                          final Map<Label, ProgramVariable> breakFlags,
@@ -221,8 +214,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
                              outerRemembranceHeaps,
                          final Map<LocationVariable, LocationVariable>
                                  outerRemembranceVariables,
-                         final TermServices services)
-        {
+                         final TermServices services) {
             this.services = services;
             this.self = self;
             this.breakFlags = breakFlags;
@@ -234,6 +226,13 @@ public interface BlockSpecificationElement extends SpecificationElement {
             this.remembranceLocalVariables = remembranceLocalVariables;
             this.outerRemembranceHeaps = outerRemembranceHeaps;
             this.outerRemembranceVariables = outerRemembranceVariables;
+        }
+
+        public static Variables create(final StatementBlock block,
+                                       final List<Label> labels,
+                                       final IProgramMethod method,
+                                       final Services services) {
+            return new VariablesCreator(block, labels, method, services).create();
         }
 
         public Map<LocationVariable, LocationVariable> combineRemembranceVariables() {
@@ -252,8 +251,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return result;
         }
 
-        public Terms termify(Term self)
-        {
+        public Terms termify(Term self) {
             return new Terms(
                 self,
                 termifyFlags(breakFlags),
@@ -268,8 +266,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
             );
         }
 
-        private Map<Label, Term> termifyFlags(final Map<Label, ProgramVariable> flags)
-        {
+        private Map<Label, Term> termifyFlags(final Map<Label, ProgramVariable> flags) {
             final Map<Label, Term> result = new LinkedHashMap<Label, Term>();
             for (Map.Entry<Label, ProgramVariable> flag : flags.entrySet()) {
                 result.put(flag.getKey(), termifyVariable(flag.getValue()));
@@ -288,12 +285,10 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return result;
         }
 
-        private Term termifyVariable(final ProgramVariable variable)
-        {
+        private Term termifyVariable(final ProgramVariable variable) {
             if (variable != null) {
                 return services.getTermBuilder().var(variable);
-            }
-            else {
+            } else {
                 return null;
             }
         }
@@ -332,70 +327,82 @@ public interface BlockSpecificationElement extends SpecificationElement {
          */
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            }
+            if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            }
+            if (getClass() != obj.getClass()) {
                 return false;
+            }
             Variables other = (Variables) obj;
             if (breakFlags == null) {
-                if (other.breakFlags != null)
+                if (other.breakFlags != null) {
                     return false;
-            }
-            else if (!breakFlags.equals(other.breakFlags))
+                }
+            } else if (!breakFlags.equals(other.breakFlags)) {
                 return false;
+            }
             if (continueFlags == null) {
-                if (other.continueFlags != null)
+                if (other.continueFlags != null) {
                     return false;
-            }
-            else if (!continueFlags.equals(other.continueFlags))
+                }
+            } else if (!continueFlags.equals(other.continueFlags)) {
                 return false;
+            }
             if (exception == null) {
-                if (other.exception != null)
+                if (other.exception != null) {
                     return false;
-            }
-            else if (!exception.equals(other.exception))
+                }
+            } else if (!exception.equals(other.exception)) {
                 return false;
+            }
             if (remembranceHeaps == null) {
-                if (other.remembranceHeaps != null)
+                if (other.remembranceHeaps != null) {
                     return false;
-            }
-            else if (!remembranceHeaps.equals(other.remembranceHeaps))
+                }
+            } else if (!remembranceHeaps.equals(other.remembranceHeaps)) {
                 return false;
+            }
             if (remembranceLocalVariables == null) {
-                if (other.remembranceLocalVariables != null)
+                if (other.remembranceLocalVariables != null) {
                     return false;
-            }
-            else if (!remembranceLocalVariables
-                    .equals(other.remembranceLocalVariables))
+                }
+            } else if (!remembranceLocalVariables
+                    .equals(other.remembranceLocalVariables)) {
                 return false;
+            }
             if (outerRemembranceVariables == null) {
-                if (other.outerRemembranceVariables != null)
+                if (other.outerRemembranceVariables != null) {
                     return false;
-            }
-            else if (!outerRemembranceVariables
-                    .equals(other.outerRemembranceVariables))
+                }
+            } else if (!outerRemembranceVariables
+                    .equals(other.outerRemembranceVariables)) {
                 return false;
-            
+            }
+
             if (result == null) {
-                if (other.result != null)
+                if (other.result != null) {
                     return false;
-            }
-            else if (!result.equals(other.result))
+                }
+            } else if (!result.equals(other.result)) {
                 return false;
+            }
             if (returnFlag == null) {
-                if (other.returnFlag != null)
+                if (other.returnFlag != null) {
                     return false;
-            }
-            else if (!returnFlag.equals(other.returnFlag))
+                }
+            } else if (!returnFlag.equals(other.returnFlag)) {
                 return false;
+            }
             if (self == null) {
-                if (other.self != null)
+                if (other.self != null) {
                     return false;
-            }
-            else if (!self.equals(other.self))
+                }
+            } else if (!self.equals(other.self)) {
                 return false;
+            }
             return true;
         }
 
@@ -439,10 +446,9 @@ public interface BlockSpecificationElement extends SpecificationElement {
             this.method = method;
         }
 
-        public Variables create()
-        {
+        public Variables create() {
             createAndStoreFlags();
-            
+
             return new Variables(
                 selfVar(method, method.getContainerType(), false),
                 breakFlags,
@@ -471,7 +477,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
 
             final Set<Label> breakLabels = collectLabels(breaks);
             final Set<Label> continueLabels = collectLabels(continues);
-            
+
             breakFlags = createFlags(breakLabels, BREAK_FLAG_BASE_NAME);
             continueFlags = createFlags(continueLabels, CONTINUE_FLAG_BASE_NAME);
             returnFlag = returnOccurred ? createFlag(RETURN_FLAG_NAME) : null;
@@ -495,8 +501,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return result;
         }
 
-        private ProgramVariable createFlag(final String name)
-        {
+        private ProgramVariable createFlag(final String name) {
             return createVariable(name, services.getJavaInfo().getKeYJavaType("boolean"));
         }
 
@@ -515,38 +520,38 @@ public interface BlockSpecificationElement extends SpecificationElement {
 
         private Map<LocationVariable, LocationVariable> createRemembranceLocalVariables() {
             ImmutableSet<ProgramVariable> localOutVariables =
-                    MiscTools.getLocalOuts(block, services);
-            
+                MiscTools.getLocalOuts(block, services);
+
             SourceElement first = block.getFirstElement();
             while (first instanceof LabeledStatement) {
                 LabeledStatement s = (LabeledStatement) first;
                 first = s.getBody();
             }
-            
+
             if (first instanceof For) {
-            	ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
-    			ProgramVariableCollector collector = new ProgramVariableCollector(new StatementBlock(inits), services);
-    			collector.start();
-    			
-    			for (LocationVariable var : collector.result()) {
-    			    if (!var.getKeYJavaType()
-    			            .equals(services.getTypeConverter()
-    			                    .getHeapLDT().getHeap().getKeYJavaType())) {
+                ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
+                ProgramVariableCollector collector =
+                    new ProgramVariableCollector(new StatementBlock(inits), services);
+                collector.start();
+
+                for (LocationVariable var : collector.result()) {
+                    if (!var.getKeYJavaType()
+                            .equals(services.getTypeConverter()
+                            .getHeapLDT().getHeap().getKeYJavaType())) {
                         localOutVariables = localOutVariables.add(var);
-    			    }
-    			}
+                    }
+                }
             }
-            
+
             Map<LocationVariable, LocationVariable> result =
-                    new LinkedHashMap<LocationVariable, LocationVariable>();
-            
+                new LinkedHashMap<LocationVariable, LocationVariable>();
+
             for (ProgramVariable var : localOutVariables) {
                 result.put(
                     (LocationVariable) var,
                     createVariable(var.name() + REMEMBRANCE_SUFFIX, var.getKeYJavaType())
                 );
             }
-            
             return result;
         }
 
@@ -556,37 +561,38 @@ public interface BlockSpecificationElement extends SpecificationElement {
 
         private Map<LocationVariable, LocationVariable> createOuterRemembranceLocalVariables() {
             ImmutableSet<ProgramVariable> localInVariables =
-                    MiscTools.getLocalIns(block, services);
-            
+                MiscTools.getLocalIns(block, services);
+
             SourceElement first = block.getFirstElement();
             while (first instanceof LabeledStatement) {
                 LabeledStatement s = (LabeledStatement) first;
                 first = s.getBody();
             }
-            
+
             if (first instanceof For) {
-            	ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
-    			ProgramVariableCollector collector = new ProgramVariableCollector(new StatementBlock(inits), services);
-    			collector.start();
-    			
-    			for (LocationVariable var : collector.result()) {
-    			    if (!var.getKeYJavaType()
+                ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
+                ProgramVariableCollector collector =
+                    new ProgramVariableCollector(new StatementBlock(inits), services);
+                collector.start();
+
+                for (LocationVariable var : collector.result()) {
+                    if (!var.getKeYJavaType()
                             .equals(services.getTypeConverter()
-                                    .getHeapLDT().getHeap().getKeYJavaType())) {
+                                .getHeapLDT().getHeap().getKeYJavaType())) {
                         localInVariables = localInVariables.add(var);
                     }
-    			}
+                }
             }
-            
+
             Map<LocationVariable, LocationVariable> result =
-                    new LinkedHashMap<LocationVariable, LocationVariable>();
-            
+                new LinkedHashMap<LocationVariable, LocationVariable>();
+
             for (ProgramVariable var : localInVariables) {
                 result.put(
                         (LocationVariable) var,
-                        createVariable(var.name() + OUTER_REMEMBRANCE_SUFFIX, var.getKeYJavaType()));
+                        createVariable(var.name() + OUTER_REMEMBRANCE_SUFFIX,
+                                       var.getKeYJavaType()));
             }
-            
             return result;
         }
 
@@ -594,7 +600,6 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return new LocationVariable(services.getVariableNamer()
                     .getTemporaryNameProposal(name), type);
         }
-
     }
 
     /**
@@ -622,14 +627,13 @@ public interface BlockSpecificationElement extends SpecificationElement {
                      final Map<LocationVariable, Term> remembranceHeaps,
                      final Map<LocationVariable, Term> remembranceLocalVariables,
                      final Map<LocationVariable, Term> outerRemembranceHeaps,
-                     final Map<LocationVariable, Term> outerRemembranceVariables)
-        {
+                     final Map<LocationVariable, Term> outerRemembranceVariables) {
             this.self = self;
             this.breakFlags = breakFlags;
             this.continueFlags = continueFlags;
             this.returnFlag = returnFlag;
-            this.result= result;
-            this.exception= exception;
+            this.result = result;
+            this.exception = exception;
             this.remembranceHeaps = remembranceHeaps;
             this.remembranceLocalVariables = remembranceLocalVariables;
             this.outerRemembranceHeaps = outerRemembranceHeaps;
@@ -637,18 +641,16 @@ public interface BlockSpecificationElement extends SpecificationElement {
         }
 
         public Terms(Variables variables, TermBuilder tb) {
-            this(
-                    tb.var(variables.self),
-                    convertFlagMap(variables.breakFlags, tb),
-                    convertFlagMap(variables.continueFlags, tb),
-                    tb.var(variables.returnFlag),
-                    tb.var(variables.result),
-                    tb.var(variables.exception),
-                    convertHeapMap(variables.remembranceHeaps, tb),
-                    convertHeapMap(variables.remembranceLocalVariables, tb),
-                    convertHeapMap(variables.outerRemembranceHeaps, tb),
-                    convertHeapMap(variables.outerRemembranceVariables, tb)
-            );
+            this(tb.var(variables.self),
+                 convertFlagMap(variables.breakFlags, tb),
+                 convertFlagMap(variables.continueFlags, tb),
+                 tb.var(variables.returnFlag),
+                 tb.var(variables.result),
+                 tb.var(variables.exception),
+                 convertHeapMap(variables.remembranceHeaps, tb),
+                 convertHeapMap(variables.remembranceLocalVariables, tb),
+                 convertHeapMap(variables.outerRemembranceHeaps, tb),
+                 convertHeapMap(variables.outerRemembranceVariables, tb));
         }
 
         private static Map<LocationVariable, Term> convertHeapMap(
@@ -657,7 +659,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
                     Collectors.<Map.Entry<LocationVariable, LocationVariable>,
                         LocationVariable, Term>toMap(
                             Map.Entry::getKey,
-                            entry -> tb.var(entry.getValue())
+                        entry -> tb.var(entry.getValue())
                     )
            );
         }
@@ -667,10 +669,9 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return map.entrySet().stream().collect(
                             Collectors.<Map.Entry<Label, ProgramVariable>, Label, Term>toMap(
                                     Map.Entry::getKey,
-                                    entry -> tb.var(entry.getValue())
+                                entry -> tb.var(entry.getValue())
                             )
                    );
         }
-
     }
 }

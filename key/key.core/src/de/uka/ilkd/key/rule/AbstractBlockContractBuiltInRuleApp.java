@@ -28,13 +28,15 @@ public abstract class AbstractBlockContractBuiltInRuleApp
             ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
     }
-    
+
     @Override
     public BlockContract getContract() {
         return contract;
     }
-    
-    public AbstractBlockContractBuiltInRuleApp tryToInstantiate(final Goal goal, final AbstractBlockContractRule rule) {
+
+    public AbstractBlockContractBuiltInRuleApp
+            tryToInstantiate(final Goal goal,
+                             final AbstractBlockContractRule rule) {
         if (complete() || cannotComplete(goal)) {
             return this;
         }
@@ -42,11 +44,13 @@ public abstract class AbstractBlockContractBuiltInRuleApp
         final AbstractBlockContractRule.Instantiation instantiation =
                 rule.instantiate(posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<BlockContract> contracts =
-                AbstractBlockContractRule.getApplicableContracts(instantiation, goal, services);
+                AbstractBlockContractRule.getApplicableContracts(instantiation,
+                                                                 goal, services);
         block = instantiation.block;
         ImmutableSet<BlockContract> cons = DefaultImmutableSet.<BlockContract>nil();
         for (BlockContract cont : contracts) {
-            if (cont.getBlock().getStartPosition().getLine() == block.getStartPosition().getLine()) {
+            if (cont.getBlock().getStartPosition().getLine()
+                  == block.getStartPosition().getLine()) {
                 cons = cons.add(cont);
             }
         }

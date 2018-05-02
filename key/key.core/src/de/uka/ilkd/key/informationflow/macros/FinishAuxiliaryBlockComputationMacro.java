@@ -75,7 +75,8 @@ public class FinishAuxiliaryBlockComputationMacro
         // and we assume that before calling this method, the applicability of the macro was checked
         final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
 
-        final BlockContractInternalBuiltInRuleApp blockRuleApp = (BlockContractInternalBuiltInRuleApp)app;
+        final BlockContractInternalBuiltInRuleApp blockRuleApp =
+                (BlockContractInternalBuiltInRuleApp)app;
         final BlockContract contract = blockRuleApp.getContract();
         IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
         ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();

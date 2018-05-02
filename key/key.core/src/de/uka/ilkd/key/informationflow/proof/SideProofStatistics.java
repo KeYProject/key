@@ -20,10 +20,14 @@ public final class SideProofStatistics extends Statistics {
                                 int blockLoopContractApps,
                                 int loopInvApps,
                                 long autoModeTime) {
-        super(nodes, branches, interactiveSteps, symbExApps, quantifierInstantiations, ossApps, mergeRuleApps, totalRuleApps, smtSolverApps, 
-                dependencyContractApps, operationContractApps, blockLoopContractApps, loopInvApps, 
-                autoModeTime, 
-                -1, nodes<=sideProofs? .0f: (autoModeTime/(float)(nodes-sideProofs)));
+        super(nodes, branches, interactiveSteps, symbExApps,
+              quantifierInstantiations, ossApps, mergeRuleApps, totalRuleApps,
+              smtSolverApps, dependencyContractApps, operationContractApps,
+              blockLoopContractApps, loopInvApps, autoModeTime,
+              -1,
+              nodes <= sideProofs ?
+                      .0f
+                      : (autoModeTime / (float)(nodes - sideProofs)));
         this.sideProofs = sideProofs;
     }
 
@@ -62,43 +66,50 @@ public final class SideProofStatistics extends Statistics {
     }
 
     SideProofStatistics add(SideProofStatistics stat) {
-    	return new SideProofStatistics(this.sideProofs + stat.sideProofs,
-    	                                   this.nodes + stat.nodes,
-                                           this.branches + stat.branches,
-                                           this.interactiveSteps + stat.interactiveSteps,
-                                           this.symbExApps + stat.symbExApps,
-                                           this.quantifierInstantiations + stat.quantifierInstantiations,
-                                           this.ossApps + stat.ossApps,
-                                           this.mergeRuleApps + stat.mergeRuleApps,
-                                           this.totalRuleApps + stat.totalRuleApps,
-                                           this.smtSolverApps + stat.smtSolverApps,
-                                           this.dependencyContractApps + stat.dependencyContractApps,
-                                           this.operationContractApps + stat.operationContractApps,
-                                           this.blockLoopContractApps + stat.blockLoopContractApps,
-                                           this.loopInvApps + stat.loopInvApps,
-                                           this.autoModeTimeInMillis + stat.autoModeTimeInMillis);
+        return new SideProofStatistics(this.sideProofs + stat.sideProofs,
+                                       this.nodes + stat.nodes,
+                                       this.branches + stat.branches,
+                                       this.interactiveSteps + stat.interactiveSteps,
+                                       this.symbExApps + stat.symbExApps,
+                                       this.quantifierInstantiations
+                                           + stat.quantifierInstantiations,
+                                       this.ossApps + stat.ossApps,
+                                       this.mergeRuleApps + stat.mergeRuleApps,
+                                       this.totalRuleApps + stat.totalRuleApps,
+                                       this.smtSolverApps + stat.smtSolverApps,
+                                       this.dependencyContractApps + stat.dependencyContractApps,
+                                       this.operationContractApps + stat.operationContractApps,
+                                       this.blockLoopContractApps + stat.blockLoopContractApps,
+                                       this.loopInvApps + stat.loopInvApps,
+                                       this.autoModeTimeInMillis + stat.autoModeTimeInMillis);
     }
 
     public SideProofStatistics add(Statistics stat) {
-    	return new SideProofStatistics(this.sideProofs+1, this.nodes + stat.nodes,
-                                           this.branches + stat.branches,
-                                           this.interactiveSteps + stat.interactiveSteps,
-                                           this.symbExApps + stat.symbExApps,
-                                           this.quantifierInstantiations + stat.quantifierInstantiations,
-                                           this.ossApps + stat.ossApps,
-                                           this.mergeRuleApps + stat.mergeRuleApps,
-                                           this.totalRuleApps + stat.totalRuleApps,
-                                           this.smtSolverApps + stat.smtSolverApps,
-                                           this.dependencyContractApps + stat.dependencyContractApps,
-                                           this.operationContractApps + stat.operationContractApps,
-                                           this.blockLoopContractApps + stat.blockLoopContractApps,
-                                           this.loopInvApps + stat.loopInvApps,
-                                           this.autoModeTimeInMillis + stat.autoModeTimeInMillis);
+        return new SideProofStatistics(this.sideProofs + 1, this.nodes + stat.nodes,
+                                       this.branches + stat.branches,
+                                       this.interactiveSteps + stat.interactiveSteps,
+                                       this.symbExApps + stat.symbExApps,
+                                       this.quantifierInstantiations
+                                           + stat.quantifierInstantiations,
+                                       this.ossApps + stat.ossApps,
+                                       this.mergeRuleApps + stat.mergeRuleApps,
+                                       this.totalRuleApps + stat.totalRuleApps,
+                                       this.smtSolverApps + stat.smtSolverApps,
+                                       this.dependencyContractApps + stat.dependencyContractApps,
+                                       this.operationContractApps + stat.operationContractApps,
+                                       this.blockLoopContractApps + stat.blockLoopContractApps,
+                                       this.loopInvApps + stat.loopInvApps,
+                                       this.autoModeTimeInMillis + stat.autoModeTimeInMillis);
     }
 
     public SideProofStatistics setAutoModeTime(long autoTime) {
-        return new SideProofStatistics(sideProofs, nodes, branches, interactiveSteps, symbExApps,
-                        quantifierInstantiations, ossApps, mergeRuleApps, totalRuleApps, smtSolverApps,
-                        dependencyContractApps, operationContractApps, blockLoopContractApps, loopInvApps, autoTime);
+        return new SideProofStatistics(sideProofs, nodes, branches,
+                                       interactiveSteps, symbExApps,
+                                       quantifierInstantiations, ossApps,
+                                       mergeRuleApps, totalRuleApps,
+                                       smtSolverApps, dependencyContractApps,
+                                       operationContractApps,
+                                       blockLoopContractApps, loopInvApps,
+                                       autoTime);
     }
 }

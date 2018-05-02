@@ -96,25 +96,59 @@ import de.uka.ilkd.key.util.Pair;
 public final class SpecificationRepository {
 
     public static final String CONTRACT_COMBINATION_MARKER = "#";
-    
+
     private final ContractFactory cf;
 
-    private final Map<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<Contract>> contracts = new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<Contract>>();
-    private final Map<Pair<KeYJavaType, IProgramMethod>, ImmutableSet<FunctionalOperationContract>> operationContracts = new LinkedHashMap<Pair<KeYJavaType, IProgramMethod>, ImmutableSet<FunctionalOperationContract>>();
-    private final Map<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<WellDefinednessCheck>> wdChecks = new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<WellDefinednessCheck>>();
-    private final Map<String, Contract> contractsByName = new LinkedHashMap<String, Contract>();
-    private final Map<KeYJavaType, ImmutableSet<IObserverFunction>> contractTargets = new LinkedHashMap<KeYJavaType, ImmutableSet<IObserverFunction>>();
-    private final Map<KeYJavaType, ImmutableSet<ClassInvariant>> invs = new LinkedHashMap<KeYJavaType, ImmutableSet<ClassInvariant>>();
-    private final Map<KeYJavaType, ImmutableSet<ClassAxiom>> axioms = new LinkedHashMap<KeYJavaType, ImmutableSet<ClassAxiom>>();
-    private final Map<KeYJavaType, ImmutableSet<InitiallyClause>> initiallyClauses = new LinkedHashMap<KeYJavaType, ImmutableSet<InitiallyClause>>();
-    private final Map<ProofOblInput, ImmutableSet<Proof>> proofs = new LinkedHashMap<ProofOblInput, ImmutableSet<Proof>>();
-    private final Map<Pair<LoopStatement, Integer>, LoopSpecification> loopInvs = new LinkedHashMap<Pair<LoopStatement, Integer>, LoopSpecification>();
-    private final Map<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>> blockContracts = new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>>();
-    private final Map<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>> loopContracts = new LinkedHashMap<>();
-    private Map<MergePointStatement, ImmutableSet<MergeContract>> mergeContracts = new LinkedHashMap<>();
-    private final Map<IObserverFunction, IObserverFunction> unlimitedToLimited = new LinkedHashMap<IObserverFunction, IObserverFunction>();
-    private final Map<IObserverFunction, IObserverFunction> limitedToUnlimited = new LinkedHashMap<IObserverFunction, IObserverFunction>();
-    private final Map<IObserverFunction, ImmutableSet<Taclet>> unlimitedToLimitTaclets = new LinkedHashMap<IObserverFunction, ImmutableSet<Taclet>>();
+    private final Map<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<Contract>>
+        contracts =
+            new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<Contract>>();
+    private final Map<Pair<KeYJavaType, IProgramMethod>, ImmutableSet<FunctionalOperationContract>>
+        operationContracts =
+            new LinkedHashMap<Pair<KeYJavaType, IProgramMethod>,
+                              ImmutableSet<FunctionalOperationContract>>();
+    private final Map<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<WellDefinednessCheck>>
+        wdChecks =
+            new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>,
+                              ImmutableSet<WellDefinednessCheck>>();
+    private final Map<String, Contract>
+        contractsByName =
+            new LinkedHashMap<String, Contract>();
+    private final Map<KeYJavaType, ImmutableSet<IObserverFunction>>
+        contractTargets =
+            new LinkedHashMap<KeYJavaType, ImmutableSet<IObserverFunction>>();
+    private final Map<KeYJavaType, ImmutableSet<ClassInvariant>>
+        invs =
+            new LinkedHashMap<KeYJavaType, ImmutableSet<ClassInvariant>>();
+    private final Map<KeYJavaType, ImmutableSet<ClassAxiom>>
+        axioms =
+            new LinkedHashMap<KeYJavaType, ImmutableSet<ClassAxiom>>();
+    private final Map<KeYJavaType, ImmutableSet<InitiallyClause>>
+        initiallyClauses =
+            new LinkedHashMap<KeYJavaType, ImmutableSet<InitiallyClause>>();
+    private final Map<ProofOblInput, ImmutableSet<Proof>>
+        proofs =
+            new LinkedHashMap<ProofOblInput, ImmutableSet<Proof>>();
+    private final Map<Pair<LoopStatement, Integer>, LoopSpecification>
+        loopInvs =
+            new LinkedHashMap<Pair<LoopStatement, Integer>, LoopSpecification>();
+    private final Map<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>>
+        blockContracts =
+            new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>>();
+    private final Map<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>
+        loopContracts =
+            new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>();
+    private Map<MergePointStatement, ImmutableSet<MergeContract>>
+        mergeContracts =
+            new LinkedHashMap<MergePointStatement, ImmutableSet<MergeContract>>();
+    private final Map<IObserverFunction, IObserverFunction>
+        unlimitedToLimited =
+            new LinkedHashMap<IObserverFunction, IObserverFunction>();
+    private final Map<IObserverFunction, IObserverFunction>
+        limitedToUnlimited =
+            new LinkedHashMap<IObserverFunction, IObserverFunction>();
+    private final Map<IObserverFunction, ImmutableSet<Taclet>>
+        unlimitedToLimitTaclets =
+            new LinkedHashMap<IObserverFunction, ImmutableSet<Taclet>>();
 
     /**
      * <p>
@@ -1573,7 +1607,7 @@ public final class SpecificationRepository {
     /**
      * Adds a new {@code BlockContract} and a new {@link FunctionalBlockContract}
      * to the repository.
-     * 
+     *
      * @param contract the {@code BlockContract} to add.
      */
     public void addBlockContract(final BlockContract contract) {
@@ -1582,7 +1616,7 @@ public final class SpecificationRepository {
 
     /**
      * Adds a new {@code BlockContract} to the repository.
-     * 
+     *
      * @param contract the {@code BlockContract} to add.
      * @param addFunctionalContract whether or not to add a new {@link FunctionalBlockContract}
      *  based on {@code contract}.
@@ -1592,24 +1626,24 @@ public final class SpecificationRepository {
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
         blockContracts.put(b, getBlockContracts(block).add(contract));
-        
+
         if (addFunctionalContract) {
             addContract(cf.funcBlock(contract));
         }
     }
-    
+
     /**
      * <p> Removes a {@code BlockContract} from the repository. </p>
-     * 
+     *
      * <p> The associated {@link FunctionalBlockContract} is not removed. </p>
-     * 
+     *
      * @param contract the {@code BlockContract} to remove.
      */
     public void removeBlockContract(final BlockContract contract) {
         final StatementBlock block = contract.getBlock();
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
-        
+
         ImmutableSet<BlockContract> set = blockContracts.get(b);
         blockContracts.put(b, set.remove(contract));
     }
@@ -1617,7 +1651,7 @@ public final class SpecificationRepository {
     /**
      * Adds a new {@code LoopContract} and a new {@link FunctionalLoopContract}
      * to the repository.
-     * 
+     *
      * @param contract the {@code LoopContract} to add.
      */
     public void addLoopContract(final LoopContract contract) {
@@ -1626,7 +1660,7 @@ public final class SpecificationRepository {
 
     /**
      * Adds a new {@code LoopContract} to the repository.
-     * 
+     *
      * @param contract the {@code LoopContract} to add.
      * @param addFunctionalContract whether or not to add a new {@link FunctionalLoopContract}
      *  based on {@code contract}.
@@ -1636,31 +1670,31 @@ public final class SpecificationRepository {
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
         loopContracts.put(b, getLoopContracts(block).add(contract));
-        
+
         if (addFunctionalContract) {
             addContract(cf.funcLoop(contract));
         }
     }
-    
+
     /**
      * <p> Removes a {@code LoopContract} from the repository. </p>
-     * 
+     *
      * <p> The associated {@link FunctionalLoopContract} is not removed. </p>
-     * 
+     *
      * @param contract the {@code LoopContract} to remove.
      */
     public void removeLoopContract(final LoopContract contract) {
         final StatementBlock block = contract.getBlock();
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
-        
+
         ImmutableSet<LoopContract> set = loopContracts.get(b);
         loopContracts.put(b, set.remove(contract));
     }
 
     /**
      * Registers a {@link MergeContract}.
-     * 
+     *
      * @param mc
      *            The {@link MergeContract} to register.
      */
@@ -1697,7 +1731,7 @@ public final class SpecificationRepository {
                 addBlockContract((BlockContract) spec);
             } else if (spec instanceof LoopContract) {
                 addLoopContract((LoopContract) spec);
-            }else if (spec instanceof MergeContract) {
+            } else if (spec instanceof MergeContract) {
                 addMergeContract((MergeContract) spec);
             } else {
                 assert false : "unexpected spec: " + spec + "\n("

@@ -43,7 +43,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * <p>Rule for the application of {@link BlockContract}s.</p>
- * 
+ *
  * <p> This splits the goal into two branches:
  *    <ol>
  *      <li> Validity </li>
@@ -51,32 +51,32 @@ import de.uka.ilkd.key.util.MiscTools;
  *      <li> Usage </li>
  *    </ol>
  * </p>
- * 
+ *
  * @see BlockContractInternalBuiltInRuleApp
  */
 public class BlockContractInternalRule extends AbstractBlockContractRule {
-    
+
     public static final BlockContractInternalRule INSTANCE = new BlockContractInternalRule();
 
     private static final Name NAME = new Name("Block Contract (Internal)");
 
     private Term lastFocusTerm;
-    
+
     private Instantiation lastInstantiation;
 
     private BlockContractInternalRule() {
     }
-    
+
     public Term getLastFocusTerm() {
         return lastFocusTerm;
     }
 
-    
+
     protected void setLastFocusTerm(Term lastFocusTerm) {
         this.lastFocusTerm = lastFocusTerm;
     }
 
-    
+
     public Instantiation getLastInstantiation() {
         return lastInstantiation;
     }
@@ -86,7 +86,7 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
         return NAME;
     }
 
-    
+
     protected void setLastInstantiation(Instantiation lastInstantiation) {
         this.lastInstantiation = lastInstantiation;
     }
@@ -123,7 +123,8 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
         // final boolean isStrictlyPure = !application.getContract().hasModifiesClause();
         final Map<LocationVariable, Function> anonymisationHeaps =
                 createAndRegisterAnonymisationVariables(heaps, contract, services);
-        //final Map<LocationVariable, Function> anonymisationLocalVariables = createAndRegisterAnonymisationVariables(localOutVariables, services);
+        //final Map<LocationVariable, Function> anonymisationLocalVariables =
+        //    createAndRegisterAnonymisationVariables(localOutVariables, services);
 
         final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(
             goal, contract.getPlaceholderVariables(), services
@@ -144,7 +145,8 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
                 conditionsAndClausesBuilder.buildModifiesClauses();
 
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
-        final Term frameCondition = conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
+        final Term frameCondition =
+            conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
         final Term wellFormedAnonymisationHeapsCondition =
                 conditionsAndClausesBuilder
                 .buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
@@ -154,7 +156,8 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
                 conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
         final Term selfConditions =
                 conditionsAndClausesBuilder.buildSelfConditions(
-                        heaps, contract.getMethod(), contract.getKJT(), instantiation.self, services);
+                        heaps, contract.getMethod(), contract.getKJT(),
+                        instantiation.self, services);
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
@@ -192,8 +195,10 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
         configurator.setUpUsageGoal(result.head(),
                                     new Term[] {contextUpdate, remembranceUpdate,
                                                 anonymisationUpdate},
-                                    new Term[] {postcondition, wellFormedAnonymisationHeapsCondition,
-                                                reachableOutCondition, atMostOneFlagSetCondition});
+                                    new Term[] {postcondition,
+                                                wellFormedAnonymisationHeapsCondition,
+                                                reachableOutCondition,
+                                                atMostOneFlagSetCondition});
         if (!InfFlowCheckInfo.isInfFlow(goal)) {
             configurator.setUpValidityGoal(result.tail().tail().head(),
                                            new Term[] {contextUpdate, remembranceUpdate},
@@ -212,8 +217,8 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
             validityGoal.clearAndDetachRuleAppIndex();
             final TermBuilder tb = services.getTermBuilder();
 
-            if (contract.hasModifiesClause(heaps.get(0)) &&
-                contract.hasInfFlowSpecs() ) {
+            if (contract.hasModifiesClause(heaps.get(0))
+                    && contract.hasInfFlowSpecs()) {
                 // set up information flow validity goal
                 InfFlowValidityData infFlowValidityData =
                     setUpInfFlowValidityGoal(validityGoal, contract,

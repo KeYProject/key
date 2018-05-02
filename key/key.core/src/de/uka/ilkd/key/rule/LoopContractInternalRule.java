@@ -27,7 +27,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * <p>Rule for the application of {@link LoopContract}s.</p>
- * 
+ *
  * <p> This splits the goal into two branches:
  *    <ol>
  *      <li> Validity </li>
@@ -35,31 +35,31 @@ import de.uka.ilkd.key.util.MiscTools;
  *      <li> Usage </li>
  *    </ol>
  * </p>
- * 
+ *
  * @see LoopContractInternalBuiltInRuleApp
  */
 public class LoopContractInternalRule extends AbstractLoopContractRule {
-    
+
     public static final LoopContractInternalRule INSTANCE = new LoopContractInternalRule();
 
     private static final Name NAME = new Name("Loop Contract (Internal)");
 
     private Term lastFocusTerm;
-    
+
     private Instantiation lastInstantiation;
 
     private LoopContractInternalRule() {  }
-    
+
     public Term getLastFocusTerm() {
         return lastFocusTerm;
     }
 
-    
+
     protected void setLastFocusTerm(Term lastFocusTerm) {
         this.lastFocusTerm = lastFocusTerm;
     }
 
-    
+
     public Instantiation getLastInstantiation() {
         return lastInstantiation;
     }
@@ -69,7 +69,7 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
         return NAME;
     }
 
-    
+
     protected void setLastInstantiation(Instantiation lastInstantiation) {
         this.lastInstantiation = lastInstantiation;
     }
@@ -114,7 +114,7 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
                                         services);
         final LoopContract.Variables nextVariables = new VariablesCreatorAndRegistrar(
                 goal, variables, services).createAndRegisterCopies("_NEXT");
-                
+
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
                 new ConditionsAndClausesBuilder(contract, heaps, variables,
@@ -128,10 +128,12 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
                 conditionsAndClausesBuilder.buildModifiesClauses();
         final Term selfConditions =
                 conditionsAndClausesBuilder.buildSelfConditions(
-                        heaps, contract.getMethod(), contract.getKJT(), instantiation.self, services);
+                        heaps, contract.getMethod(), contract.getKJT(),
+                        instantiation.self, services);
 
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
-        final Term frameCondition = conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
+        final Term frameCondition =
+            conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
         final Term wellFormedAnonymisationHeapsCondition =
                 conditionsAndClausesBuilder
                 .buildWellFormedAnonymisationHeapsCondition(anonOutHeaps);
@@ -155,14 +157,15 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
         final Term anonymisationUpdate =
                 updatesBuilder.buildAnonOutUpdate(anonOutHeaps,
                                                         modifiesClauses);
-        
+
         final Term nextRemembranceUpdate =
                 new UpdatesBuilder(nextVariables, services).buildRemembranceUpdate(heaps);
         final Term outerRemembranceUpdate = updatesBuilder.buildOuterRemembranceUpdate();
-        
-        Map<LocationVariable, Function> anonInHeaps = new LinkedHashMap<LocationVariable, Function>(40);
+
+        Map<LocationVariable, Function> anonInHeaps =
+            new LinkedHashMap<LocationVariable, Function>(40);
         final TermBuilder tb = services.getTermBuilder();
-        
+
         for (LocationVariable heap : heaps) {
             final String anonymisationName =
                     tb.newName(BlockContractBuilders.ANON_IN_PREFIX + heap.name());
@@ -171,11 +174,11 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
             services.getNamespaces().functions().addSafely(anonymisationFunction);
             anonInHeaps.put(heap, anonymisationFunction);
         }
-        
-        
+
+
         final Term anonInUpdate = updatesBuilder.buildAnonInUpdate(anonInHeaps);
-        
-        
+
+
         final ImmutableList<Goal> result;
         final GoalsConfigurator configurator = new GoalsConfigurator(application,
                                                                      termLabelState,
@@ -185,18 +188,18 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
                                                                      application.posInOccurrence(),
                                                                      services,
                                                                      this);
-        
+
         result = goal.split(3);
 
         configurator.setUpPreconditionGoal(result.tail().head(),
                 contextUpdate,
                 new Term[] {precondition, wellFormedHeapsCondition,
-                        reachableInCondition, selfConditions});
+                            reachableInCondition, selfConditions});
         configurator.setUpUsageGoal(result.head(),
                 new Term[] {contextUpdate, remembranceUpdate,
-                        anonymisationUpdate},
+                            anonymisationUpdate},
                 new Term[] {postcondition, wellFormedAnonymisationHeapsCondition,
-                        reachableOutCondition, atMostOneFlagSetCondition});
+                            reachableOutCondition, atMostOneFlagSetCondition});
 
         configurator.setUpLoopValidityGoal(
                 goal,
@@ -206,9 +209,8 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
                 nextRemembranceUpdate,
                 anonOutHeaps,
                 modifiesClauses,
-                new Term[] {
-                        precondition, wellFormedHeapsCondition,
-                        reachableInCondition, selfConditions },
+                new Term[] {precondition, wellFormedHeapsCondition,
+                            reachableInCondition, selfConditions},
                 decreasesCheck,
                 new Term[] { postcondition, frameCondition },
                 new Term[] { nextPostcondition, nextFrameCondition },

@@ -49,22 +49,22 @@ public abstract class AbstractBlockSpecificationElement
     protected ImmutableList<InfFlowSpec> infFlowSpecs;
     protected final Variables variables;
     protected final boolean transactionApplicable;
-    protected final Map<LocationVariable,Boolean> hasMod;
+    protected final Map<LocationVariable, Boolean> hasMod;
     protected final String baseName;
 
     public AbstractBlockSpecificationElement(final String baseName,
-                               final StatementBlock block,
-                               final List<Label> labels,
-                               final IProgramMethod method,
-                               final Modality modality,
-                               final Map<LocationVariable, Term> preconditions,
-                               final Term measuredBy,
-                               final Map<LocationVariable, Term> postconditions,
-                               final Map<LocationVariable, Term> modifiesClauses,
-                               final ImmutableList<InfFlowSpec> infFlowSpecs,
-                               final Variables variables,
-                               final boolean transactionApplicable,
-                               final Map<LocationVariable,Boolean> hasMod) {
+                                             final StatementBlock block,
+                                             final List<Label> labels,
+                                             final IProgramMethod method,
+                                             final Modality modality,
+                                             final Map<LocationVariable, Term> preconditions,
+                                             final Term measuredBy,
+                                             final Map<LocationVariable, Term> postconditions,
+                                             final Map<LocationVariable, Term> modifiesClauses,
+                                             final ImmutableList<InfFlowSpec> infFlowSpecs,
+                                             final Variables variables,
+                                             final boolean transactionApplicable,
+                                             final Map<LocationVariable, Boolean> hasMod) {
         assert block != null;
         assert labels != null;
         assert method != null;
@@ -85,13 +85,13 @@ public abstract class AbstractBlockSpecificationElement
         this.preconditions = preconditions;
         this.measuredBy = measuredBy;
         this.postconditions = postconditions;
-        this.modifiesClauses = modifiesClauses;        
+        this.modifiesClauses = modifiesClauses;
         this.infFlowSpecs = infFlowSpecs;
         this.variables = variables;
         this.transactionApplicable = transactionApplicable;
         this.hasMod = hasMod;
     }
-    
+
     @Override
     public String getBaseName() {
         return baseName;
@@ -143,7 +143,7 @@ public abstract class AbstractBlockSpecificationElement
                 == services.getTypeConverter().getLocSetLDT().getEmpty();
     }
 
-    
+
     @Override
     public boolean hasModifiesClause(LocationVariable heap) {
         return hasMod.get(heap);
@@ -234,18 +234,18 @@ public abstract class AbstractBlockSpecificationElement
         return getPrecondition(heap, variables.self, variables.outerRemembranceVariables,
                 services);
     }
-    
+
     @Override
     public Term getPrecondition(LocationVariable heap, Variables variables, Services services) {
         assert heap != null;
         assert variables != null;
         assert (variables.self == null) == (this.variables.self == null);
         assert services != null;
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services), 
+        final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services),
                                                    services.getTermFactory());
         return replacer.replace(preconditions.get(heap));
     }
-    
+
     @Override
     public Term getPrecondition(LocationVariable heapVariable, Term heap,
             Terms terms, Services services) {
@@ -254,7 +254,7 @@ public abstract class AbstractBlockSpecificationElement
         assert terms != null;
         assert (terms.self == null) == (variables.self == null);
         assert services != null;
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services), 
+        final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services),
                                                    services.getTermFactory());
         return replacer.replace(preconditions.get(heapVariable));
     }
@@ -267,7 +267,7 @@ public abstract class AbstractBlockSpecificationElement
         assert variables != null;
         assert (variables.self == null) == (this.variables.self == null);
         assert services != null;
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services), 
+        final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services),
                                                    services.getTermFactory());
         return replacer.replace(postconditions.get(heap));
     }
@@ -280,7 +280,7 @@ public abstract class AbstractBlockSpecificationElement
         assert terms != null;
         assert (terms.self == null) == (variables.self == null);
         assert services != null;
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services), 
+        final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services),
                                                    services.getTermFactory());
         return replacer.replace(postconditions.get(heapVariable));
     }
@@ -407,8 +407,7 @@ public abstract class AbstractBlockSpecificationElement
         if (variables.result != null) {
             stringBuilder.append(variables.result);
             stringBuilder.append(" = ");
-        }
-        else if (method.isConstructor()) {
+        } else if (method.isConstructor()) {
             stringBuilder.append(variables.self);
             stringBuilder.append(" = new ");
         }
@@ -459,7 +458,9 @@ public abstract class AbstractBlockSpecificationElement
                 + mods
                 + "<br><b>termination</b> "
                 + getModality()
-                /*+ (transactionApplicableContract() ? "<br><b>transactionApplicable applicable</b>" : "")*/
+                /*+ (transactionApplicableContract() ?
+                        "<br><b>transactionApplicable applicable</b>"
+                        : "")*/
                 + "</html>";
     }
 
@@ -478,8 +479,7 @@ public abstract class AbstractBlockSpecificationElement
         if (terms.result != null) {
             stringBuilder.append(terms.result);
             stringBuilder.append(" = ");
-        }
-        else if (method.isConstructor()) {
+        } else if (method.isConstructor()) {
             stringBuilder.append(terms.self);
             stringBuilder.append(" = new ");
         }
@@ -496,10 +496,14 @@ public abstract class AbstractBlockSpecificationElement
         String mods = "";
         Term baseHeapTerm = services.getTermBuilder().var(baseHeap);
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
-            Term modifiesClause = getModifiesClause(heap, services.getTermBuilder().var(heap), terms.self, services);
+            Term modifiesClause =
+                getModifiesClause(heap, services.getTermBuilder().var(heap),
+                                  terms.self, services);
             if (modifiesClause != null) {
                 mods = mods + "\nmod" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                        + StringUtil.trim(LogicPrinter.quickPrintTerm(modifiesClause, services));
+                        + StringUtil.trim(
+                            LogicPrinter.quickPrintTerm(modifiesClause, services)
+                          );
                 /*if (heap == baseHeap && !hasRealModifiesClause) {
                     mods = mods + "<b>, creates no new objects</b>";
                 }*/
@@ -507,27 +511,37 @@ public abstract class AbstractBlockSpecificationElement
         }
         String pres = "";
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
-            Term precondition = getPrecondition(heap, baseHeapTerm, terms.self, terms.remembranceHeaps, services);
+            Term precondition =
+                getPrecondition(heap, baseHeapTerm, terms.self,
+                                terms.remembranceHeaps, services);
             if (precondition != null) {
                 pres = pres + "\npre" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                        + StringUtil.trim(LogicPrinter.quickPrintTerm(precondition, services));
+                        + StringUtil.trim(
+                            LogicPrinter.quickPrintTerm(precondition, services)
+                          );
             }
         }
         String posts = "";
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
-            Term postcondition = getPostcondition(heap, baseHeapTerm, terms, services);
+            Term postcondition =
+                getPostcondition(heap, baseHeapTerm,
+                                 terms, services);
             if (postcondition != null) {
                 posts = posts + "\npost" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                         + StringUtil.trim(LogicPrinter.quickPrintTerm(postcondition, services));
+                         + StringUtil.trim(
+                             LogicPrinter.quickPrintTerm(postcondition, services)
+                           );
             }
         }
-        return stringBuilder.toString() 
+        return stringBuilder.toString()
                 + pres
                 + posts
                 + mods
                 + "termination "
                 + getModality()
-                /*+ (transactionApplicableContract() ? "<br><b>transactionApplicable applicable</b>" : "")*/
+                /*+ (transactionApplicableContract() ?
+                        "<br><b>transactionApplicable applicable</b>"
+                        : "")*/
                 ;
     }
 
@@ -537,82 +551,98 @@ public abstract class AbstractBlockSpecificationElement
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        AbstractBlockSpecificationElement other = (AbstractBlockSpecificationElement) obj;
+        }
+        AbstractBlockSpecificationElement other =
+            (AbstractBlockSpecificationElement) obj;
         if (block == null) {
-            if (other.block != null)
+            if (other.block != null) {
                 return false;
-        }
-        else if (!block.equals(other.block))
+            }
+        } else if (!block.equals(other.block)) {
             return false;
+        }
         if (hasMod == null) {
-            if (other.hasMod != null)
+            if (other.hasMod != null) {
                 return false;
-        }
-        else if (!hasMod.equals(other.hasMod))
+            }
+        } else if (!hasMod.equals(other.hasMod)) {
             return false;
+        }
         if (infFlowSpecs == null) {
-            if (other.infFlowSpecs != null)
+            if (other.infFlowSpecs != null) {
                 return false;
-        }
-        else if (!infFlowSpecs.equals(other.infFlowSpecs))
+            }
+        } else if (!infFlowSpecs.equals(other.infFlowSpecs)) {
             return false;
+        }
         if (instantiationSelf == null) {
-            if (other.instantiationSelf != null)
+            if (other.instantiationSelf != null) {
                 return false;
-        }
-        else if (!instantiationSelf.equals(other.instantiationSelf))
+            }
+        } else if (!instantiationSelf.equals(other.instantiationSelf)) {
             return false;
-        
+        }
+
         if (labels == null) {
-            if (other.labels != null)
+            if (other.labels != null) {
                 return false;
-        }
-        else if (!labels.equals(other.labels))
+            }
+        } else if (!labels.equals(other.labels)) {
             return false;
+        }
         if (method == null) {
-            if (other.method != null)
+            if (other.method != null) {
                 return false;
-        }
-        else if (!method.equals(other.method))
+            }
+        } else if (!method.equals(other.method)) {
             return false;
+        }
         if (modality == null) {
-            if (other.modality != null)
+            if (other.modality != null) {
                 return false;
-        }
-        else if (!modality.equals(other.modality))
+            }
+        } else if (!modality.equals(other.modality)) {
             return false;
+        }
         if (modifiesClauses == null) {
-            if (other.modifiesClauses != null)
+            if (other.modifiesClauses != null) {
                 return false;
-        }
-        else if (!modifiesClauses.equals(other.modifiesClauses))
+            }
+        } else if (!modifiesClauses.equals(other.modifiesClauses)) {
             return false;
+        }
         if (postconditions == null) {
-            if (other.postconditions != null)
+            if (other.postconditions != null) {
                 return false;
-        }
-        else if (!postconditions.equals(other.postconditions))
+            }
+        } else if (!postconditions.equals(other.postconditions)) {
             return false;
+        }
         if (preconditions == null) {
-            if (other.preconditions != null)
+            if (other.preconditions != null) {
                 return false;
+            }
+        } else if (!preconditions.equals(other.preconditions)) {
+            return false;
         }
-        else if (!preconditions.equals(other.preconditions))
+        if (transactionApplicable != other.transactionApplicable) {
             return false;
-        if (transactionApplicable != other.transactionApplicable)
-            return false;
+        }
         if (variables == null) {
-            if (other.variables != null)
+            if (other.variables != null) {
                 return false;
-        }
-        else if (!variables.equals(other.variables))
+            }
+        } else if (!variables.equals(other.variables)) {
             return false;
+        }
         return true;
     }
 
@@ -696,12 +726,14 @@ public abstract class AbstractBlockSpecificationElement
     }
 
 
-    private abstract static class ReplacementMap<S extends Sorted> extends LinkedHashMap<S, S> {
+    private abstract static class ReplacementMap<S extends Sorted>
+                extends LinkedHashMap<S, S> {
 
         private static final long serialVersionUID = -2339350643000987576L;
 
-        public void replaceSelf(final ProgramVariable oldSelf, final S newSelf, TermServices services)
-        {
+        public void replaceSelf(final ProgramVariable oldSelf,
+                                final S newSelf,
+                                TermServices services) {
             if (newSelf != null) {
                 assert newSelf.sort().extendsTrans(oldSelf.sort());
                 put(convert(oldSelf, services), newSelf);
@@ -719,8 +751,9 @@ public abstract class AbstractBlockSpecificationElement
             }
         }
 
-        public void replaceVariable(final ProgramVariable oldVariable, final S newVariable, TermServices services)
-        {
+        public void replaceVariable(final ProgramVariable oldVariable,
+                                    final S newVariable,
+                                    TermServices services) {
             if (newVariable != null) {
                 assert oldVariable.sort().equals(newVariable.sort());
                 put(convert(oldVariable, services), newVariable);
@@ -733,9 +766,11 @@ public abstract class AbstractBlockSpecificationElement
                                                       ? extends S> newRemembranceHeaps,
                                             final Services services) {
             if (newRemembranceHeaps != null) {
-                for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                for (LocationVariable heap
+                        : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                     if (newRemembranceHeaps.get(heap) != null) {
-                        final LocationVariable oldRemembranceHeap = oldRemembranceHeaps.get(heap);
+                        final LocationVariable oldRemembranceHeap =
+                            oldRemembranceHeaps.get(heap);
                         final S newRemembranceHeap = newRemembranceHeaps.get(heap);
                         assert oldRemembranceHeap.sort().equals(newRemembranceHeap.sort());
                         put(convert(oldRemembranceHeap, services), newRemembranceHeap);
@@ -747,9 +782,8 @@ public abstract class AbstractBlockSpecificationElement
         public void replaceRemembranceLocalVariables(final Map<LocationVariable, LocationVariable>
                                                                       oldRemembranceLocalVariables,
                                                      final Map<LocationVariable, ? extends S>
-                                                                      newRemembranceLocalVariables, 
-                                                     final TermServices services)
-        {
+                                                                      newRemembranceLocalVariables,
+                                                     final TermServices services) {
             if (newRemembranceLocalVariables != null) {
                 for (LocationVariable localVariable : oldRemembranceLocalVariables.keySet()) {
                     if (newRemembranceLocalVariables.get(localVariable) != null) {
@@ -759,7 +793,8 @@ public abstract class AbstractBlockSpecificationElement
                                 newRemembranceLocalVariables.get(localVariable);
                         assert oldRemembranceLocalVariable.sort().equals(
                                 newRemembranceLocalVariable.sort());
-                        put(convert(oldRemembranceLocalVariable, services), newRemembranceLocalVariable);
+                        put(convert(oldRemembranceLocalVariable, services),
+                            newRemembranceLocalVariable);
                     }
                 }
             }
@@ -773,8 +808,7 @@ public abstract class AbstractBlockSpecificationElement
 
         private static final long serialVersionUID = 8964634070766482218L;
 
-        protected ProgramVariable convert(ProgramVariable variable, TermServices services)
-        {
+        protected ProgramVariable convert(ProgramVariable variable, TermServices services) {
             return variable;
         }
 
@@ -784,21 +818,19 @@ public abstract class AbstractBlockSpecificationElement
 
         private static final long serialVersionUID = 5465241780257247301L;
 
-        public void replaceHeap(final Term newHeap, final Services services)
-        {
+        public void replaceHeap(final Term newHeap, final Services services) {
             assert newHeap != null;
             assert newHeap.sort().equals(services.getTypeConverter().getHeapLDT().targetSort());
             put(services.getTermBuilder().getBaseHeap(), newHeap);
         }
 
         @Override
-        protected Term convert(ProgramVariable variable, TermServices services)
-        {
+        protected Term convert(ProgramVariable variable, TermServices services) {
             return services.getTermBuilder().var(variable);
         }
 
     }
-    
+
 
 
     /**
@@ -828,7 +860,7 @@ public abstract class AbstractBlockSpecificationElement
         private final Term diverges;
         private final Map<LocationVariable, Term> assignables;
         private final ImmutableList<LocationVariable> heaps;
-        private final Map<LocationVariable,Boolean> hasMod;
+        private final Map<LocationVariable, Boolean> hasMod;
 
         public Creator(final String baseName,
                        final StatementBlock block,
@@ -847,7 +879,7 @@ public abstract class AbstractBlockSpecificationElement
                        final Term signalsOnly,
                        final Term diverges,
                        final Map<LocationVariable, Term> assignables,
-                       final Map<LocationVariable,Boolean> hasMod,
+                       final Map<LocationVariable, Boolean> hasMod,
                        final Services services) {
             super(services.getTermFactory(), services);
             this.baseName = baseName;
@@ -878,19 +910,19 @@ public abstract class AbstractBlockSpecificationElement
 
         protected Map<LocationVariable, Term> buildPreconditions() {
             final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
-            for (LocationVariable heap : heaps) {     
+            for (LocationVariable heap : heaps) {
                 // Add JML precondition to precondition
                 if (requires.get(heap) != null) {
                     result.put(heap, convertToFormula(requires.get(heap)));
                 }
-                
+
                 // Add measured by term to precondition
                 Term old = result.get(heap);
                 Term mbyTerm;
-                
+
                 if (measuredBy != null && !measuredBy.equals(measuredByEmpty())) {
                     Map<Term, Term> replacementMap = new LinkedHashMap<Term, Term>();
-                    
+
                     for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable
                             : variables.outerRemembranceVariables.entrySet()) {
                         if (remembranceVariable.getValue() != null) {
@@ -898,7 +930,7 @@ public abstract class AbstractBlockSpecificationElement
                                                var(remembranceVariable.getValue()));
                         }
                     }
-                    
+
                     for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable
                             : variables.outerRemembranceHeaps.entrySet()) {
                         if (remembranceVariable.getValue() != null) {
@@ -906,13 +938,15 @@ public abstract class AbstractBlockSpecificationElement
                                                var(remembranceVariable.getValue()));
                         }
                     }
-                    
-                    mbyTerm = measuredBy(
-                            new OpReplacer(replacementMap, services.getTermFactory()).replace(measuredBy));
+                    mbyTerm =
+                        measuredBy(
+                            new OpReplacer(replacementMap,
+                                           services.getTermFactory())
+                                .replace(measuredBy));
                 } else {
                     mbyTerm = measuredByEmpty();
                 }
-                
+
 
                 if (old == null) {
                     result.put(heap, mbyTerm);
@@ -924,8 +958,8 @@ public abstract class AbstractBlockSpecificationElement
         }
 
         protected Map<LocationVariable, Term> buildPostconditions() {
-            final Map<LocationVariable,Term> postconditions =
-                    new LinkedHashMap<LocationVariable,Term>();
+            final Map<LocationVariable, Term> postconditions =
+                    new LinkedHashMap<LocationVariable, Term>();
             for (LocationVariable heap : heaps) {
                 if (ensures.get(heap) != null) {
                     postconditions.put(heap, buildPostcondition(heap));
@@ -942,40 +976,35 @@ public abstract class AbstractBlockSpecificationElement
             final Term returnPostcondition =
                     conditionPostcondition(variables.returnFlag, returns);
             final Term throwPostcondition = buildThrowPostcondition();
-            // TODO Why do we handle the two cases differently? Surely has something to do with transactions.
+            // TODO Why do we handle the two cases differently?
+            // Surely has something to do with transactions.
             if (heap == services.getTypeConverter().getHeapLDT().getHeap()) {
                 if (behavior == Behavior.NORMAL_BEHAVIOR) {
                     return and(buildNormalTerminationCondition(),
                                convertToFormula(ensures.get(heap)));
-                }
-                else if (behavior == Behavior.BREAK_BEHAVIOR) {
+                } else if (behavior == Behavior.BREAK_BEHAVIOR) {
                     return and(buildBreakTerminationCondition(), breakPostcondition);
-                }
-                else if (behavior == Behavior.CONTINUE_BEHAVIOR) {
+                } else if (behavior == Behavior.CONTINUE_BEHAVIOR) {
                     return and(buildContinueTerminationCondition(), continuePostcondition);
-                }
-                else if (behavior == Behavior.RETURN_BEHAVIOR) {
+                } else if (behavior == Behavior.RETURN_BEHAVIOR) {
                     return and(buildReturnTerminationCondition(), returnPostcondition);
-                }
-                else if (behavior == Behavior.EXCEPTIONAL_BEHAVIOR) {
+                } else if (behavior == Behavior.EXCEPTIONAL_BEHAVIOR) {
                     return and(buildThrowTerminationCondition(), throwPostcondition);
-                }
-                else {
+                } else {
                     return and(
-                        imp(buildNormalTerminationCondition(), convertToFormula(ensures.get(heap))),
+                        imp(buildNormalTerminationCondition(),
+                            convertToFormula(ensures.get(heap))),
                         breakPostcondition,
                         continuePostcondition,
                         returnPostcondition,
                         throwPostcondition
                     );
                 }
-            }
-            else {
+            } else {
                 if (behavior == Behavior.NORMAL_BEHAVIOR) {
                     return and(buildNormalTerminationCondition(),
                                convertToFormula(ensures.get(heap)));
-                }
-                else {
+                } else {
                     return imp(buildNormalTerminationCondition(),
                                convertToFormula(ensures.get(heap)));
                 }
@@ -1004,16 +1033,14 @@ public abstract class AbstractBlockSpecificationElement
             return result;
         }
 
-        private Term buildThrowPostcondition()
-        {
+        private Term buildThrowPostcondition() {
             return imp(
                 not(equals(var(variables.exception), NULL())),
                 and(convertToFormula(signals), convertToFormula(signalsOnly))
             );
         }
 
-        private Term buildNormalTerminationCondition()
-        {
+        private Term buildNormalTerminationCondition() {
             return and(
                 buildNormalTerminationCondition(variables.breakFlags),
                 buildNormalTerminationCondition(variables.continueFlags),
@@ -1022,8 +1049,7 @@ public abstract class AbstractBlockSpecificationElement
             );
         }
 
-        private Term buildBreakTerminationCondition()
-        {
+        private Term buildBreakTerminationCondition() {
             return and(
                 buildAbruptTerminationCondition(variables.breakFlags),
                 buildNormalTerminationCondition(variables.continueFlags),
@@ -1032,8 +1058,7 @@ public abstract class AbstractBlockSpecificationElement
             );
         }
 
-        private Term buildContinueTerminationCondition()
-        {
+        private Term buildContinueTerminationCondition() {
             return and(
                 buildNormalTerminationCondition(variables.breakFlags),
                 buildAbruptTerminationCondition(variables.continueFlags),
@@ -1042,8 +1067,7 @@ public abstract class AbstractBlockSpecificationElement
             );
         }
 
-        private Term buildReturnTerminationCondition()
-        {
+        private Term buildReturnTerminationCondition() {
             return and(
                 buildNormalTerminationCondition(variables.breakFlags),
                 buildNormalTerminationCondition(variables.continueFlags),
@@ -1052,8 +1076,7 @@ public abstract class AbstractBlockSpecificationElement
             );
         }
 
-        private Term buildThrowTerminationCondition()
-        {
+        private Term buildThrowTerminationCondition() {
             return and(
                 buildNormalTerminationCondition(variables.breakFlags),
                 buildNormalTerminationCondition(variables.continueFlags),
@@ -1062,8 +1085,7 @@ public abstract class AbstractBlockSpecificationElement
             );
         }
 
-        private Term buildNormalTerminationCondition(final Map<Label, ProgramVariable> flags)
-        {
+        private Term buildNormalTerminationCondition(final Map<Label, ProgramVariable> flags) {
             Term result = tt();
             for (Label label : flags.keySet()) {
                 result = and(result, buildFlagIsCondition(flags.get(label), FALSE()));
@@ -1071,8 +1093,7 @@ public abstract class AbstractBlockSpecificationElement
             return result;
         }
 
-        private Term buildAbruptTerminationCondition(final Map<Label, ProgramVariable> flags)
-        {
+        private Term buildAbruptTerminationCondition(final Map<Label, ProgramVariable> flags) {
             Term result = ff();
             for (Label label : flags.keySet()) {
                 result = or(result, buildFlagIsCondition(flags.get(label), TRUE()));
@@ -1080,8 +1101,7 @@ public abstract class AbstractBlockSpecificationElement
             return result;
         }
 
-        private Term buildFlagIsCondition(final ProgramVariable flag, final Term truth)
-        {
+        private Term buildFlagIsCondition(final ProgramVariable flag, final Term truth) {
             Term result = tt();
             if (flag != null) {
                 result = equals(var(flag), truth);
@@ -1089,13 +1109,11 @@ public abstract class AbstractBlockSpecificationElement
             return result;
         }
 
-        private Term buildExceptionIsNullCondition()
-        {
+        private Term buildExceptionIsNullCondition() {
             return equals(var(variables.exception), NULL());
         }
 
-        private Map<LocationVariable, Term> buildModifiesClauses()
-        {
+        private Map<LocationVariable, Term> buildModifiesClauses() {
             return assignables;
         }
 
@@ -1109,14 +1127,14 @@ public abstract class AbstractBlockSpecificationElement
                     modifiesClauses.get(
                             services.getTypeConverter().getHeapLDT().getSavedHeap()) != null;
             result = result.add(
-                build(baseName, 
+                build(baseName,
                     block, labels, method, diverges.equals(ff()) ? Modality.DIA : Modality.BOX,
                     preconditions, measuredBy, postconditions, modifiesClauses,
                     infFlowSpecs, variables, transactionApplicable, hasMod)
                 );
             if (divergesConditionCannotBeExpressedByAModality()) {
                 result = result.add(
-                   build(baseName, 
+                   build(baseName,
                         block, labels, method, Modality.DIA,
                         addNegatedDivergesConditionToPreconditions(preconditions), measuredBy,
                         postconditions, modifiesClauses, infFlowSpecs, variables,
@@ -1127,7 +1145,7 @@ public abstract class AbstractBlockSpecificationElement
         }
 
         /**
-         * 
+         *
          * @param baseName
          * @param block
          * @param labels
@@ -1158,10 +1176,12 @@ public abstract class AbstractBlockSpecificationElement
 
         private Map<LocationVariable, Term> addNegatedDivergesConditionToPreconditions(
                 final Map<LocationVariable, Term> preconditions) {
-            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> result =
+                new LinkedHashMap<LocationVariable, Term>();
             for (LocationVariable heap : heaps) {
                 if (preconditions.get(heap) != null) {
-                    result.put(heap, and(preconditions.get(heap), not(convertToFormula(diverges))));
+                    result.put(heap, and(preconditions.get(heap),
+                                         not(convertToFormula(diverges))));
                 }
             }
             return result;
@@ -1175,7 +1195,8 @@ public abstract class AbstractBlockSpecificationElement
      *
      * @param <T> the type of the subclass.
      */
-    protected static abstract class Combinator<T extends BlockSpecificationElement> extends TermBuilder {
+    protected static abstract class
+            Combinator<T extends BlockSpecificationElement> extends TermBuilder {
 
         protected final T[] contracts;
 
@@ -1194,8 +1215,7 @@ public abstract class AbstractBlockSpecificationElement
             modifiesClauses = new LinkedHashMap<LocationVariable, Term>();
         }
 
-        private T[] sort(final T[] contracts)
-        {
+        private T[] sort(final T[] contracts) {
             //sort contracts alphabetically (for determinism)
             Arrays.sort(contracts, new Comparator<T>() {
                 public int compare(T firstContract, T secondContract) {
@@ -1208,7 +1228,8 @@ public abstract class AbstractBlockSpecificationElement
         protected abstract T combine();
 
         protected void addConditionsFrom(final T contract) {
-            for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for (LocationVariable heap
+                  : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 final Term precondition = addPreconditionFrom(contract, heap);
                 addPostconditionFrom(precondition, contract, heap);
                 addModifiesClauseFrom(contract, heap);
@@ -1249,33 +1270,31 @@ public abstract class AbstractBlockSpecificationElement
             }
         }
 
-        private Term orPossiblyNull(final Term currentCondition, final Term additionalCondition) {
+        private Term orPossiblyNull(final Term currentCondition,
+                                    final Term additionalCondition) {
             if (currentCondition == null) {
                 return additionalCondition;
-            }
-            else {
+            } else {
                 return or(currentCondition, additionalCondition);
             }
         }
 
-        private Term andPossiblyNull(final Term currentCondition, final Term additionalCondition) {
+        private Term andPossiblyNull(final Term currentCondition,
+                                     final Term additionalCondition) {
             if (currentCondition == null) {
                 return additionalCondition;
-            }
-            else {
+            } else {
                 return and(currentCondition, additionalCondition);
             }
         }
 
         private Term unionPossiblyNull(final Term currentLocationSet,
                                        final Term additionalLocationSet) {
-            if (currentLocationSet == null){
+            if (currentLocationSet == null) {
                 return additionalLocationSet;
-            }
-            else if (additionalLocationSet == null) {
+            } else if (additionalLocationSet == null) {
                 return currentLocationSet;
-            }
-            else {
+            } else {
                 return union(currentLocationSet, additionalLocationSet);
             }
         }
@@ -1284,10 +1303,9 @@ public abstract class AbstractBlockSpecificationElement
         private Term preify(final Term formula) {
             if (formula == null) {
                 return tt();
-            }
-            else {
+            } else {
                 final Map<Term, Term> replacementMap = new LinkedHashMap<Term, Term>();
-                
+
                 for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable
                         : remembranceVariables.entrySet()) {
                     if (remembranceVariable.getValue() != null) {
@@ -1295,8 +1313,9 @@ public abstract class AbstractBlockSpecificationElement
                                            var(remembranceVariable.getValue()));
                     }
                 }
-                
-                return new OpReplacer(replacementMap, services.getTermFactory()).replace(formula);
+                return new OpReplacer(replacementMap,
+                                      services.getTermFactory())
+                           .replace(formula);
             }
         }
 

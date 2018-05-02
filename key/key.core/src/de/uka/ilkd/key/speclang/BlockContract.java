@@ -28,31 +28,31 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
  * <p> A block contract. </p>
- * 
+ *
  * <p>
- * 	When a block contract is encountered in an existing proof, a {@code BlockContract} is used.
- * 	To generate a new proof obligation for a block contract, use {@link FunctionalBlockContract}
+ *  When a block contract is encountered in an existing proof, a {@code BlockContract} is used.
+ *  To generate a new proof obligation for a block contract, use {@link FunctionalBlockContract}
  *  instead.
  * </p>
- * 
+ *
  */
 public interface BlockContract extends BlockSpecificationElement {
 
-	/**
-	 * 
-	 * @return all {@link FunctionalBlockContract}s with a valid id that correspond to this
-	 * 	{@code BlockContract}. Unless this contract is a combination of other contracts
-	 * 	(see {@link SimpleBlockContract#combine(ImmutableSet, Services)}, the resulting set
-	 * 	will only contain one element.
-	 */
-	public ImmutableSet<FunctionalBlockContract> getFunctionalContracts();
-	
-	/**
-	 * 
-	 * @param contract
-	 * @see #getFunctionalContracts()
-	 */
-	public void setFunctionalBlockContract(FunctionalBlockContract contract);
+    /**
+     *
+     * @return all {@link FunctionalBlockContract}s with a valid id that correspond to this
+     *         {@code BlockContract}. Unless this contract is a combination of other contracts
+     *         (see {@link SimpleBlockContract#combine(ImmutableSet, Services)}, the resulting
+     *         set will only contain one element.
+     */
+    public ImmutableSet<FunctionalBlockContract> getFunctionalContracts();
+
+    /**
+     *
+     * @param contract
+     * @see #getFunctionalContracts()
+     */
+    public void setFunctionalBlockContract(FunctionalBlockContract contract);
 
     public BlockContract update(StatementBlock newBlock,
                                 Map<LocationVariable,Term> newPreconditions,

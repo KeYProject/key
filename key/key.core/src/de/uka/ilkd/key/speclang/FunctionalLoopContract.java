@@ -28,45 +28,45 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 /**
  * This class is only used to generate a proof obligation for a block that starts with a loop
  * (see {@link FunctionalLoopContractPO}.
- * 
+ *
  * If a block is encountered during a proof, {@link LoopContract} is used instead.
  */
 public class FunctionalLoopContract implements Contract {
-    
+
     private final LoopContract contract;
     private final int id;
     private final String name;
     private final String displayName;
     private final String typeName;
-    
+
     FunctionalLoopContract(LoopContract contract) {
         this(contract, Contract.INVALID_ID);
     }
-    
+
     FunctionalLoopContract(LoopContract contract, int id) {
         this.contract = contract;
         this.id = id;
-        
+
         if (id != Contract.INVALID_ID) {
             contract.setFunctionalLoopContract(this);
         }
-        
+
         name = generateName(contract.getBaseName(), str
-                -> ContractFactory.generateContractName(str, getKJT(), getTarget(), getKJT(), id));
+            -> ContractFactory.generateContractName(str, getKJT(), getTarget(), getKJT(), id));
         displayName = generateName(contract.getBaseName(), str
-                -> ContractFactory.generateDisplayName(str, getKJT(), getTarget(), getKJT(), id));
+            -> ContractFactory.generateDisplayName(str, getKJT(), getTarget(), getKJT(), id));
         typeName = generateName(contract.getBaseName(), str
-                -> ContractFactory.generateContractTypeName(str, getKJT(), getTarget(), getKJT()));
+            -> ContractFactory.generateContractTypeName(str, getKJT(), getTarget(), getKJT()));
     }
-    
+
     private String generateName(String baseName, UnaryOperator<String> generator) {
         return Arrays.stream(baseName.split(SpecificationRepository.CONTRACT_COMBINATION_MARKER))
                 .map(generator)
                 .reduce((acc, curr)
-                        -> acc + SpecificationRepository.CONTRACT_COMBINATION_MARKER + curr)
+                    -> acc + SpecificationRepository.CONTRACT_COMBINATION_MARKER + curr)
                 .get();
     }
-    
+
     @Override
     public boolean isAuxiliary() {
         return true;
@@ -142,11 +142,11 @@ public class FunctionalLoopContract implements Contract {
                 heap,
                 selfVar,
                 atPreVars0.entrySet().stream().collect(Collectors
-                        .<Map.Entry<LocationVariable, ProgramVariable>,
-                            LocationVariable, LocationVariable>toMap(
-                                    Map.Entry::getKey,
-                                    entry -> (LocationVariable) entry.getValue()
-                    )),
+                    .<Map.Entry<LocationVariable, ProgramVariable>,
+                        LocationVariable, LocationVariable>toMap(
+                            Map.Entry::getKey,
+                        entry -> (LocationVariable) entry.getValue()
+                )),
                 services);
     }
 
@@ -157,17 +157,17 @@ public class FunctionalLoopContract implements Contract {
             Services services) {
         TermBuilder tb = services.getTermBuilder();
         Term result = null;
-        
+
         for (LocationVariable heap : heapContext) {
             final Term p = getPre(heap, selfVar, paramVars, atPreVars, services);
-            
+
             if (result == null) {
                 result = p;
             } else {
                 result = tb.and(result, p);
             }
         }
-        
+
         return result;
     }
 
@@ -185,9 +185,11 @@ public class FunctionalLoopContract implements Contract {
             Services services) {
         TermBuilder tb = services.getTermBuilder();
         Term result = null;
-        
+
         for (LocationVariable heap : heapContext) {
-            final Term p = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
+            final Term p =
+                getPre(heap, heapTerms.get(heap), selfTerm,
+                       paramTerms, atPres, services);
 
             if (result == null) {
                 result = p;
@@ -195,7 +197,7 @@ public class FunctionalLoopContract implements Contract {
                 result = tb.and(result, p);
             }
         }
-        
+
         return result;
     }
 
@@ -267,7 +269,7 @@ public class FunctionalLoopContract implements Contract {
 
     @Override
     public ContractPO createProofObl(InitConfig initConfig) {
-       return new FunctionalLoopContractPO(initConfig, this);
+        return new FunctionalLoopContractPO(initConfig, this);
     }
 
     @Override

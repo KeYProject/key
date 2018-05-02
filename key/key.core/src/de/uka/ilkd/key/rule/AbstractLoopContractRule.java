@@ -27,14 +27,15 @@ import de.uka.ilkd.key.speclang.LoopContract;
 
 /**
  * <p>Rule for the application of {@link LoopContract}s.</p>
- * 
+ *
  * @see AbstractLoopContractBuiltInRuleApp
  */
 public abstract class AbstractLoopContractRule extends AbstractBlockSpecificationElementRule {
 
-    public static ImmutableSet<LoopContract> getApplicableContracts(final Instantiation instantiation,
-                                                                     final Goal goal,
-                                                                     final Services services) {
+    public static ImmutableSet<LoopContract>
+                getApplicableContracts(final Instantiation instantiation,
+                                       final Goal goal,
+                                       final Services services) {
         if (instantiation == null) {
             return DefaultImmutableSet.nil();
         }
@@ -53,8 +54,7 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
         if (modality == Modality.BOX) {
             collectedContracts = collectedContracts.union(
                     specifications.getLoopContracts(block, Modality.DIA));
-        }
-        else if (modality == Modality.BOX_TRANSACTION) {
+        } else if (modality == Modality.BOX_TRANSACTION) {
             collectedContracts = collectedContracts.union(
                     specifications.getLoopContracts(block, Modality.DIA_TRANSACTION));
         }
@@ -83,11 +83,11 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
             if (app instanceof LoopContractInternalBuiltInRuleApp) {
                 LoopContractInternalBuiltInRuleApp blockRuleApp =
                         (LoopContractInternalBuiltInRuleApp)app;
-                if (blockRuleApp.getBlock().equals(contract.getBlock()) && 
+                if (blockRuleApp.getBlock().equals(contract.getBlock()) &&
                         selfOrParentNode.getChildNr(previousNode) == 0) {
                     // prevent application of contract in its own check validity branch
-                    // but not in other branches, e.g., do-while 
-                    // loops might need to apply the same contract 
+                    // but not in other branches, e.g., do-while
+                    // loops might need to apply the same contract
                     // twice in its usage branch
                     return true;
                 }
@@ -112,32 +112,31 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
         if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
-        
+
         // abort if inside of transformer
         if (Transformer.inTransformer(occurrence)) {
             return false;
         }
-        
+
         final Instantiation instantiation =
                 instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
-        
+
         if (instantiation == null) {
             return false;
         }
-        
+
         final ImmutableSet<LoopContract> contracts =
                 getApplicableContracts(instantiation, goal, goal.proof().getServices());
-        
+
         for (LoopContract contract : contracts) {
-        	// The rule is only applicable if
+            // The rule is only applicable if
             // (a) the block starts with a while loop or
             // (b) the block starts with a for loop whose head has already been applied
             //     via the rule LoopContractApplyHead.
-        	if (contract.getHead() == null) {
-        		return true;
-        	}
+            if (contract.getHead() == null) {
+                return true;
+            }
         }
-        
         return false;
     }
 
@@ -154,7 +153,7 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
             return result;
         }
     }
-    
+
     protected Map<LocationVariable, Function>
                 createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables,
                                                         final LoopContract contract,

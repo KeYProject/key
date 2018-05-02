@@ -12,7 +12,7 @@ import de.uka.ilkd.key.speclang.LoopContract;
  * @see LoopContractApplyHeadRule
  */
 public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
-    
+
     protected LoopContractApplyHeadRule rule;
     protected ImmutableSet<LoopContract> contracts;
     protected AbstractLoopContractRule.Instantiation instantiation;
@@ -60,9 +60,9 @@ public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp 
                 new AbstractLoopContractRule.Instantiator(
                         pio.subTerm(), goal, goal.proof().getServices())
                 .instantiate();
-        
+
         Services services = goal.proof().getServices();
-        
+
         contracts =
                 AbstractLoopContractRule.getApplicableContracts(instantiation, goal, services);
         rule = LoopContractApplyHeadRule.INSTANCE;

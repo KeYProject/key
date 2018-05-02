@@ -47,7 +47,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
      * collects all program variables occurring in the AST <tt>root</tt> using
      * this constructor is equivalent to
      * <tt>ProggramVariableCollector(root, false)</tt>
-     * 
+     *
      * @param root
      *            the ProgramElement which is the root of the AST
      * @param services
@@ -92,13 +92,14 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     @Override
     public void performActionOnMergeContract(MergeContract x) {
         assert (x instanceof UnparameterizedMergeContract)
-                || (x instanceof PredicateAbstractionMergeContract) : "Unexpected type of merge contract: "
+                    || (x instanceof PredicateAbstractionMergeContract)
+                : "Unexpected type of merge contract: "
                         + x.getClass().getSimpleName();
-                
+
         if (x instanceof UnparameterizedMergeContract) {
             return;
         }
-        
+
         PredicateAbstractionMergeContract pamc = (PredicateAbstractionMergeContract) x;
 
         TermProgramVariableCollector tpvc = services.getFactory()
@@ -106,7 +107,8 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
         Map<LocationVariable, Term> atPres = pamc.getAtPres();
 
-        final ArrayList<AbstractionPredicate> preds = pamc.getAbstractionPredicates(atPres, services);
+        final ArrayList<AbstractionPredicate> preds =
+                pamc.getAbstractionPredicates(atPres, services);
         preds.forEach(pred -> {
             pred.getPredicateFormWithPlaceholder().second.execPostOrder(tpvc);
         });

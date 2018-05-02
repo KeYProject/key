@@ -66,11 +66,14 @@ public class StaticFeatureCollection {
     protected static Feature loopInvFeature(Feature costStdInv, Feature costLoopScopeInv) {
         SetRuleFilter filterLoopInv = new SetRuleFilter();
         filterLoopInv.addRuleToSet(WhileInvariantRule.INSTANCE);
-        
+
         SetRuleFilter filterLoopScopeInv = new SetRuleFilter();
         filterLoopScopeInv.addRuleToSet(LoopScopeInvariantRule.INSTANCE);
-                
-        return ConditionalFeature.createConditional(filterLoopInv, costStdInv, ConditionalFeature.createConditional(filterLoopScopeInv, costLoopScopeInv));
+
+        return ConditionalFeature.createConditional(
+                filterLoopInv, costStdInv,
+                ConditionalFeature.createConditional(filterLoopScopeInv,
+                                                     costLoopScopeInv));
     }
 
     protected static Feature blockContractInternalFeature(Feature cost) {
@@ -320,13 +323,13 @@ public class StaticFeatureCollection {
     }
 
     protected static ProjectionToTerm opTerm(Operator op, ProjectionToTerm subTerm) {
-        return opTerm(op, new ProjectionToTerm[]{subTerm});
+        return opTerm(op, new ProjectionToTerm[] { subTerm });
     }
 
     protected static ProjectionToTerm opTerm(Operator op,
             ProjectionToTerm subTerm0,
             ProjectionToTerm subTerm1) {
-        return opTerm(op, new ProjectionToTerm[]{subTerm0, subTerm1});
+        return opTerm(op, new ProjectionToTerm[] { subTerm0, subTerm1 });
     }
 
     protected static Feature isInstantiated(String schemaVar) {
@@ -346,11 +349,11 @@ public class StaticFeatureCollection {
     }
 
     protected static TermFeature sub(TermFeature sub0) {
-        return SubTermFeature.create(new TermFeature[]{sub0});
+        return SubTermFeature.create(new TermFeature[] { sub0 });
     }
 
     protected static TermFeature sub(TermFeature sub0, TermFeature sub1) {
-        return SubTermFeature.create(new TermFeature[]{sub0, sub1});
+        return SubTermFeature.create(new TermFeature[] { sub0, sub1 });
     }
 
     protected static TermFeature opSub(Operator op, TermFeature sub0) {

@@ -37,23 +37,16 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
  * Default implementation of {@link BlockContract}.
- * 
+ *
  * @see SimpleBlockContract.Creator
  */
 public final class SimpleBlockContract
         extends AbstractBlockSpecificationElement implements BlockContract {
 
-    public static BlockContract combine(ImmutableSet<BlockContract> contracts, Services services) {
-        return new Combinator(
-                contracts.toArray(new BlockContract[contracts.size()]),
-                services)
-                .combine();
-    }
-	
-	private ImmutableSet<FunctionalBlockContract> functionalContracts;
+    private ImmutableSet<FunctionalBlockContract> functionalContracts;
 
     public SimpleBlockContract(final String baseName,
-    		                   final StatementBlock block,
+                               final StatementBlock block,
                                final List<Label> labels,
                                final IProgramMethod method,
                                final Modality modality,
@@ -64,7 +57,7 @@ public final class SimpleBlockContract
                                final ImmutableList<InfFlowSpec> infFlowSpecs,
                                final Variables variables,
                                final boolean transactionApplicable,
-                               final Map<LocationVariable,Boolean> hasMod,
+                               final Map<LocationVariable, Boolean> hasMod,
                                ImmutableSet<FunctionalBlockContract> functionalContracts) {
         super(baseName,
                 block,
@@ -79,21 +72,28 @@ public final class SimpleBlockContract
                 variables,
                 transactionApplicable,
                 hasMod);
-        
+
         this.functionalContracts = functionalContracts;
     }
-    
-    @Override
-	public ImmutableSet<FunctionalBlockContract> getFunctionalContracts() {
-    	return functionalContracts;
+
+    public static BlockContract combine(ImmutableSet<BlockContract> contracts, Services services) {
+        return new Combinator(
+                contracts.toArray(new BlockContract[contracts.size()]),
+                services)
+                .combine();
     }
 
     @Override
-	public void setFunctionalBlockContract(FunctionalBlockContract contract) {
-    	assert contract.id() != Contract.INVALID_ID;
-    	assert contract.getBlockContract().equals(this);
-    	
-    	functionalContracts = DefaultImmutableSet.<FunctionalBlockContract>nil().add(contract);
+    public ImmutableSet<FunctionalBlockContract> getFunctionalContracts() {
+        return functionalContracts;
+    }
+
+    @Override
+    public void setFunctionalBlockContract(FunctionalBlockContract contract) {
+        assert contract.id() != Contract.INVALID_ID;
+        assert contract.getBlockContract().equals(this);
+
+        functionalContracts = DefaultImmutableSet.<FunctionalBlockContract>nil().add(contract);
     }
 
     @Override
@@ -137,7 +137,7 @@ public final class SimpleBlockContract
                                        transactionApplicable, hasMod, functionalContracts);
     }
 
-    @Override 
+    @Override
     public BlockContract setBlock(StatementBlock newBlock) {
         return update(newBlock, preconditions, postconditions, modifiesClauses,
                       infFlowSpecs, variables, measuredBy);
@@ -164,10 +164,10 @@ public final class SimpleBlockContract
                 + ", transactionApplicable=" + transactionApplicable
                 + ", hasMod=" + hasMod + "]";
     }
-    
+
     /**
      * This class is used to build {@link SimpleBlockContract}s.
-     * 
+     *
      * @see Creator#create()
      */
     public static class Creator
@@ -201,7 +201,7 @@ public final class SimpleBlockContract
                     transactionApplicable, hasMod, null);
         }
     }
-    
+
     protected static class Combinator
             extends AbstractBlockSpecificationElement.Combinator<BlockContract> {
 
@@ -215,39 +215,39 @@ public final class SimpleBlockContract
             if (contracts.length == 1) {
                 return contracts[0];
             }
-            
+
             final BlockContract head = contracts[0];
             String baseName = head.getBaseName();
-            
+
             for (int i = 1; i < contracts.length; i++) {
                 assert contracts[i].getBlock().equals(head.getBlock());
-                
+
                 baseName += SpecificationRepository.CONTRACT_COMBINATION_MARKER
                         + contracts[i].getBaseName();
             }
-            
+
             placeholderVariables = head.getPlaceholderVariables();
             remembranceVariables = placeholderVariables.combineRemembranceVariables();
-            
-            ImmutableSet<FunctionalBlockContract> functionalContracts = 
+
+            ImmutableSet<FunctionalBlockContract> functionalContracts =
                     DefaultImmutableSet.nil();
-            
+
             for (BlockContract contract : contracts) {
                 addConditionsFrom(contract);
                 functionalContracts = functionalContracts.union(contract.getFunctionalContracts());
             }
-            
+
             Map<LocationVariable,Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
             for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 boolean hm = false;
-                
+
                 for (int i = 1; i < contracts.length && !hm; i++) {
                     hm = contracts[i].hasModifiesClause(heap);
                 }
                 hasMod.put(heap, hm);
             }
-            
-            SimpleBlockContract result = new SimpleBlockContract(baseName, 
+
+            SimpleBlockContract result = new SimpleBlockContract(baseName,
                                            head.getBlock(), head.getLabels(),
                                            head.getMethod(), head.getModality(), preconditions,
                                            contracts[0].getMby(),
@@ -255,7 +255,7 @@ public final class SimpleBlockContract
                                            placeholderVariables,
                                            head.isTransactionApplicable(), hasMod,
                                            functionalContracts);
-            
+
             return result;
         }
     }

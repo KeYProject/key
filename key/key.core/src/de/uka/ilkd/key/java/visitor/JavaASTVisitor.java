@@ -101,8 +101,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     protected abstract void doDefaultAction(SourceElement node);
 
     @Override
-    public void performActionOnAbstractProgramElement
-    (AbstractProgramElement x) {
+    public void performActionOnAbstractProgramElement(AbstractProgramElement x) {
         doDefaultAction(x);
     }
 
@@ -303,8 +302,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
-    public void performActionOnConstructorDeclaration
-    (ConstructorDeclaration x) {
+    public void performActionOnConstructorDeclaration(ConstructorDeclaration x) {
         doDefaultAction(x);
     }
 
@@ -444,8 +442,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
-    public void performActionOnImplicitFieldSpecification
-    (ImplicitFieldSpecification x) {
+    public void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x) {
         doDefaultAction(x);
     }
 
@@ -485,8 +482,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
-    public void performActionOnLocalVariableDeclaration
-    (LocalVariableDeclaration x) {
+    public void performActionOnLocalVariableDeclaration(LocalVariableDeclaration x) {
         doDefaultAction(x);
     }
 
@@ -619,8 +615,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
-    public void performActionOnParenthesizedExpression
-    (ParenthesizedExpression x) {
+    public void performActionOnParenthesizedExpression(ParenthesizedExpression x) {
         doDefaultAction(x);
     }
 
@@ -703,8 +698,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
-    public void performActionOnSchematicFieldReference
-    (SchematicFieldReference x) {
+    public void performActionOnSchematicFieldReference(SchematicFieldReference x) {
         doDefaultAction(x);
     }
 
@@ -749,8 +743,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
-    public void performActionOnSuperConstructorReference
-    (SuperConstructorReference x) {
+    public void performActionOnSuperConstructorReference(SuperConstructorReference x) {
         doDefaultAction(x);
     }
 
@@ -780,8 +773,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
-    public void performActionOnThisConstructorReference
-    (ThisConstructorReference x) {
+    public void performActionOnThisConstructorReference(ThisConstructorReference x) {
         doDefaultAction(x);
     }
 
@@ -831,8 +823,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
-    public void performActionOnUnsignedShiftRightAssignment
-    (UnsignedShiftRightAssignment x) {
+    public void performActionOnUnsignedShiftRightAssignment(UnsignedShiftRightAssignment x) {
         doDefaultAction(x);
     }
 

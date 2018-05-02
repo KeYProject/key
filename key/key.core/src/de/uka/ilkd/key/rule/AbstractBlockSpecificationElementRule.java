@@ -32,11 +32,11 @@ import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * <p>Rule for the application of {@link BlockSpecificationElement}s.</p>
- * 
+ *
  * @see AbstractBlockSpecificationElementBuiltInRuleApp
  */
 public abstract class AbstractBlockSpecificationElementRule implements BuiltInRule {
-    
+
     public static final String FULL_PRECONDITION_TERM_HINT = "fullPrecondition";
     public static final String NEW_POSTCONDITION_TERM_HINT = "newPostcondition";
 
@@ -46,7 +46,7 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
 
     /**
      * Adds {@code pv} to the {@code sevices}' program variable namespace.
-     * 
+     *
      * @param pv
      * @param services
      */
@@ -73,14 +73,14 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
     public String toString() {
         return name().toString();
     }
-    
+
     @Override
     public boolean isApplicableOnSubTerms() {
-       return false;
+        return false;
     }
 
     protected static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
-                                              Services services) {
+                                                Services services) {
         Term anonUpdate = null;
         final TermBuilder tb = services.getTermBuilder();
         for(ProgramVariable pv : localOuts) {
@@ -94,7 +94,7 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
                 anonUpdate = tb.parallel(anonUpdate, elemUpd);
             }
         }
-        
+
         return anonUpdate == null
                 ? services.getTermBuilder().skip()
                 : anonUpdate;
@@ -169,7 +169,8 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
             if (block == null) {
                 return null;
             }
-            final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
+            final MethodFrame frame =
+                    JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
             final Term self = extractSelf(frame);
             final ExecutionContext context = extractExecutionContext(frame);
             return new Instantiation(update, target, modality, self, block, context);
@@ -178,8 +179,7 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
         private Term extractUpdate() {
             if (formula.op() instanceof UpdateApplication) {
                 return UpdateApplication.getUpdate(formula);
-            }
-            else {
+            } else {
                 return services.getTermBuilder().skip();
             }
         }
@@ -187,8 +187,7 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
         private Term extractUpdateTarget() {
             if (formula.op() instanceof UpdateApplication) {
                 return UpdateApplication.getTarget(formula);
-            }
-            else {
+            } else {
                 return formula;
             }
         }
@@ -219,11 +218,9 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
                         && hasApplicableContracts(
                                 services, (StatementBlock) element, modality, goal)) {
                     return (StatementBlock) element;
-                }
-                else if (element instanceof StatementContainer) {
+                } else if (element instanceof StatementContainer) {
                     element = ((StatementContainer) element).getStatementAt(0);
-                }
-                else {
+                } else {
                     element = element.getFirstElement();
                 }
             }

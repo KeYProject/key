@@ -30,42 +30,44 @@ import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * <p>Rule for the application of {@link BlockContract}s.</p>
- * 
+ *
  * <p> This splits the goal into two branches:
  *    <ol>
  *      <li> Precondition </li>
  *      <li> Usage </li>
  *    </ol>
  * </p>
- * 
- * <p> The validity of all {@link BlockContract}s that were used in the application of this rule must
- * be proven in a {@link FunctionalBlockContractPO} before the current proof is considered closed.
+ *
+ * <p> The validity of all {@link BlockContract}s that were used in the
+ * application of this rule must be proven in a
+ * {@link FunctionalBlockContractPO} before the current proof is
+ * considered closed.
  * </p>
- * 
+ *
  * @see BlockContractExternalBuiltInRuleApp
  */
 public class BlockContractExternalRule extends AbstractBlockContractRule {
-    
+
     public static final BlockContractExternalRule INSTANCE = new BlockContractExternalRule();
 
     private static final Name NAME = new Name("Block Contract (External)");
 
     private Term lastFocusTerm;
-    
+
     private Instantiation lastInstantiation;
 
     private BlockContractExternalRule() { }
-    
+
     public Term getLastFocusTerm() {
         return lastFocusTerm;
     }
 
-    
+
     protected void setLastFocusTerm(Term lastFocusTerm) {
         this.lastFocusTerm = lastFocusTerm;
     }
 
-    
+
     public Instantiation getLastInstantiation() {
         return lastInstantiation;
     }
@@ -75,7 +77,7 @@ public class BlockContractExternalRule extends AbstractBlockContractRule {
         return NAME;
     }
 
-    
+
     protected void setLastInstantiation(Instantiation lastInstantiation) {
         this.lastInstantiation = lastInstantiation;
     }
@@ -105,7 +107,7 @@ public class BlockContractExternalRule extends AbstractBlockContractRule {
             throw new RuleAbortException(
                     "BlockContractRuleSeparate does not support information flow goals!");
         }
-        
+
         final TermLabelState termLabelState = new TermLabelState();
         final Instantiation instantiation =
                 instantiate(application.posInOccurrence().subTerm(), goal, services);
@@ -136,7 +138,8 @@ public class BlockContractExternalRule extends AbstractBlockContractRule {
                 conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
         final Term selfConditions =
                 conditionsAndClausesBuilder.buildSelfConditions(
-                        heaps, contract.getMethod(), contract.getKJT(), instantiation.self, services);
+                        heaps, contract.getMethod(), contract.getKJT(),
+                        instantiation.self, services);
         final Map<LocationVariable, Term> modifiesClauses =
                 conditionsAndClausesBuilder.buildModifiesClauses();
 
@@ -154,34 +157,35 @@ public class BlockContractExternalRule extends AbstractBlockContractRule {
         final Term anonymisationUpdate =
                 updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiesClauses);
         final ImmutableList<Goal> result;
-        final GoalsConfigurator configurator = new GoalsConfigurator(application,
-                                                                     termLabelState,
-                                                                     instantiation,
-                                                                     contract.getLabels(),
-                                                                     variables,
-                                                                     application.posInOccurrence(),
-                                                                     services,
-                                                                     this);
+        final GoalsConfigurator configurator =
+            new GoalsConfigurator(application, termLabelState, instantiation,
+                                  contract.getLabels(), variables,
+                                  application.posInOccurrence(),
+                                  services, this);
         result = goal.split(2);
 
         configurator.setUpPreconditionGoal(result.tail().head(),
-                contextUpdate,
-                new Term[] {precondition, wellFormedHeapsCondition,
-                        reachableInCondition, selfConditions});
+                                           contextUpdate,
+                                           new Term[] {precondition,
+                                                       wellFormedHeapsCondition,
+                                                       reachableInCondition,
+                                                       selfConditions});
         configurator.setUpUsageGoal(result.head(),
                                     new Term[] {contextUpdate, remembranceUpdate,
                                                 anonymisationUpdate},
-                                    new Term[] {postcondition, wellFormedAnonymisationHeapsCondition,
-                                                reachableOutCondition, atMostOneFlagSetCondition});
+                                    new Term[] {postcondition,
+                                                wellFormedAnonymisationHeapsCondition,
+                                                reachableOutCondition,
+                                                atMostOneFlagSetCondition});
 
-        final ComplexRuleJustificationBySpec cjust
-            	= (ComplexRuleJustificationBySpec)
-            		goal.proof().getInitConfig().getJustifInfo().getJustification(this);
+        final ComplexRuleJustificationBySpec cjust =
+            (ComplexRuleJustificationBySpec)
+                goal.proof().getInitConfig().getJustifInfo().getJustification(this);
 
         for (Contract c : contract.getFunctionalContracts()) {
-        	cjust.add(application, new RuleJustificationBySpec(c));
+            cjust.add(application, new RuleJustificationBySpec(c));
         }
-        
+
         return result;
     }
 }

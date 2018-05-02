@@ -30,7 +30,7 @@ import de.uka.ilkd.key.util.Triple;
  * textual form. Is also used for block contracts.
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
-	
+
     private final Behavior behavior;
     private PositionedString workingSpace = null;
     private ImmutableList<PositionedString> measuredBy =
@@ -200,7 +200,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public void addDecreases(ImmutableList<PositionedString> l) {
-    	decreases = decreases.append(l);
+        decreases = decreases.append(l);
     }
 
 

@@ -1735,16 +1735,16 @@ public final class JMLTranslator {
             }
         });
     }
-    
+
     public static <T> T translate(PositionedString expr,
-            KeYJavaType specInClass,
-            ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            ProgramVariable resultVar,
-            ProgramVariable excVar,
-            Map<LocationVariable,Term> atPres,
-            Class<T> resultClass,
-            Services services)
+                                  KeYJavaType specInClass,
+                                  ProgramVariable selfVar,
+                                  ImmutableList<ProgramVariable> paramVars,
+                                  ProgramVariable resultVar,
+                                  ProgramVariable excVar,
+                                  Map<LocationVariable, Term> atPres,
+                                  Class<T> resultClass,
+                                  Services services)
                     throws SLTranslationException {
 
         final KeYJMLParser parser = new KeYJMLParser(expr, services,
@@ -1755,7 +1755,7 @@ public final class JMLTranslator {
         try {
             result = parser.top();
             // maybe return pair<T, Warnings>?
-            //List<PositionedString> warnings = parser.getWarnings();            
+            // List<PositionedString> warnings = parser.getWarnings();
         } catch (RecognitionException e) {
             throw parser.getExceptionManager().convertException(e);
         }
@@ -1764,21 +1764,23 @@ public final class JMLTranslator {
                 T o = castToReturnType(result, resultClass);
                 assert o instanceof Term;
                 Term t = (Term)o;
-                t = services.getTermBuilder().label((Term)castToReturnType(result, resultClass), expr.getLabels());
+                t = services.getTermBuilder().label(
+                        (Term)castToReturnType(result, resultClass),
+                        expr.getLabels());
                 return castToReturnType(t, resultClass);
             }
         }
         return castToReturnType(result, resultClass);
     }
-    
+
     public static <T> T translate(PositionedString expr,
                                   KeYJavaType specInClass,
                                   ProgramVariable selfVar,
                                   ImmutableList<ProgramVariable> paramVars,
                                   ProgramVariable resultVar,
                                   ProgramVariable excVar,
-                                  Map<LocationVariable,Term> atPres,
-                                  Map<LocationVariable,Term> atBefores,
+                                  Map<LocationVariable, Term> atPres,
+                                  Map<LocationVariable, Term> atBefores,
                                   Class<T> resultClass,
                                   Services services)
             throws SLTranslationException {

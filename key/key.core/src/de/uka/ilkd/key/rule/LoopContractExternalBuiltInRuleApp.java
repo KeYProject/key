@@ -39,7 +39,7 @@ public class LoopContractExternalBuiltInRuleApp
     @Override
     public LoopContractExternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
         return new LoopContractExternalBuiltInRuleApp(
-                builtInRule, newOccurrence, ifInsts,block, contract, heaps);
+                builtInRule, newOccurrence, ifInsts, block, contract, heaps);
     }
 
     @Override

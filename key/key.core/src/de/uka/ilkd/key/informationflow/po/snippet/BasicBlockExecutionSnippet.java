@@ -60,7 +60,8 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
                                   TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException("Tried to produce a " +
-                                                    "program-term for a contract without modality.");
+                                                    "program-term for a " +
+                                                    "contract without modality.");
         }
 
         //create java block

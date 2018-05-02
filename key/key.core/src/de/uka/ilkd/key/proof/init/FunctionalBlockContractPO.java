@@ -41,6 +41,18 @@ import de.uka.ilkd.key.util.MiscTools;
  */
 public class FunctionalBlockContractPO extends AbstractPO implements ContractPO {
 
+    public static Map<Boolean, String> TRANSACTION_TAGS =
+            new LinkedHashMap<Boolean, String>();
+
+    private FunctionalBlockContract contract;
+    private InitConfig proofConfig;
+
+    public FunctionalBlockContractPO(InitConfig initConfig,
+            FunctionalBlockContract contract) {
+        super(initConfig, contract.getName());
+        this.contract = contract;
+    }
+
     /**
      * Instantiates a new proof obligation with the given settings.
      * @param initConfig The already load {@link InitConfig}.
@@ -50,77 +62,64 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      */
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
             throws IOException {
-       String contractName = properties.getProperty("contract");
-       int proofNum = 0;
-       String baseContractName = null;
-       int ind = -1;
-       for (String tag : FunctionalBlockContractPO.TRANSACTION_TAGS.values()) {
-           ind = contractName.indexOf("." + tag);
-          if (ind > 0) {
-              break;
-          }
-          proofNum++;
-       }
-       if (ind == -1) {
-           baseContractName = contractName;
-           proofNum = 0;
-       }
-       else {
-           baseContractName = contractName.substring(0, ind);
-       }
-       final Contract contract =
-               initConfig.getServices().getSpecificationRepository()
-                                .getContractByName(baseContractName);
-       if (contract == null) {
-           throw new RuntimeException("Contract not found: " + baseContractName);
-       }
-       else {
-           ProofOblInput po = contract.createProofObl(initConfig);
-           return new LoadedPOContainer(po, proofNum);
-       }
+        String contractName = properties.getProperty("contract");
+        int proofNum = 0;
+        String baseContractName = null;
+        int ind = -1;
+        for (String tag : FunctionalBlockContractPO.TRANSACTION_TAGS.values()) {
+            ind = contractName.indexOf("." + tag);
+            if (ind > 0) {
+                break;
+            }
+            proofNum++;
+        }
+        if (ind == -1) {
+            baseContractName = contractName;
+            proofNum = 0;
+        } else {
+            baseContractName = contractName.substring(0, ind);
+        }
+        final Contract contract =
+                initConfig.getServices().getSpecificationRepository()
+                .getContractByName(baseContractName);
+        if (contract == null) {
+            throw new RuntimeException("Contract not found: " + baseContractName);
+        } else {
+            ProofOblInput po = contract.createProofObl(initConfig);
+            return new LoadedPOContainer(po, proofNum);
+        }
     }
-    
+
+    static {
+        TRANSACTION_TAGS.put(false, "transaction_inactive");
+        TRANSACTION_TAGS.put(true, "transaction_active");
+    }
+
     @Override
     public void fillSaveProperties(Properties properties) throws IOException {
         super.fillSaveProperties(properties);
         properties.setProperty("contract", contract.getName());
     }
 
-    public static Map<Boolean,String> TRANSACTION_TAGS = new LinkedHashMap<Boolean,String>();
-    
-    private FunctionalBlockContract contract;
-    private InitConfig proofConfig;
-
-    static {
-      TRANSACTION_TAGS.put(false, "transaction_inactive");
-      TRANSACTION_TAGS.put(true, "transaction_active");
-    }
-
-    public FunctionalBlockContractPO(InitConfig initConfig,
-            FunctionalBlockContract contract) {
-        super(initConfig, contract.getName());
-        this.contract = contract;
-    }
-    
     @Override
     public boolean implies(ProofOblInput po) {
-    	if (!(po instanceof FunctionalBlockContractPO)) {
-    		return false;
-    	}
-    	
-    	FunctionalBlockContractPO other = (FunctionalBlockContractPO) po;
-    	return contract.equals(other.contract);
+        if (!(po instanceof FunctionalBlockContractPO)) {
+            return false;
+        }
+
+        FunctionalBlockContractPO other = (FunctionalBlockContractPO) po;
+        return contract.equals(other.contract);
     }
-    
+
     @Override
     public boolean equals(Object obj) {
-    	if (!(obj instanceof FunctionalBlockContractPO)) {
-    		return false;
-    	}
-    	
-    	FunctionalBlockContractPO other = (FunctionalBlockContractPO) obj;
-    	return contract.equals(other.contract)
-    			&& environmentConfig.equals(other.environmentConfig);
+        if (!(obj instanceof FunctionalBlockContractPO)) {
+            return false;
+        }
+
+        FunctionalBlockContractPO other = (FunctionalBlockContractPO) obj;
+        return contract.equals(other.contract)
+                && environmentConfig.equals(other.environmentConfig);
     }
 
     @Override
@@ -129,9 +128,10 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         final boolean makeNamesUnique = true;
         final Services services = postInit();
         final IProgramMethod pm = getProgramMethod();
-        
+
         final StatementBlock block = getBlock();
-        final ProgramVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
+        final ProgramVariable selfVar =
+                tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
         register(selfVar, services);
         final Term selfTerm = selfVar == null ? null : tb.var(selfVar);
 
@@ -142,8 +142,9 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                 MiscTools.getLocalIns(block, services);
         final ImmutableSet<ProgramVariable> localOutVariables =
                 MiscTools.getLocalOuts(block, services);
-        
-        Map<LocationVariable, Function> anonOutHeaps = new LinkedHashMap<LocationVariable, Function>(40);
+
+        Map<LocationVariable, Function> anonOutHeaps =
+                new LinkedHashMap<LocationVariable, Function>(40);
         for (LocationVariable heap : heaps) {
             if(contract.hasModifiesClause(heap)) {
                 final String anonymisationName =
@@ -158,14 +159,14 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(
                 null, contract.getPlaceholderVariables(), services
                 ).createAndRegister(selfTerm, false);
-        
+
         final ProgramVariable exceptionParameter =
                 KeYJavaASTFactory.localVariable(services.getVariableNamer()
                         .getTemporaryNameProposal("e"), variables.exception.getKeYJavaType());
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
                 new ConditionsAndClausesBuilder(contract.getBlockContract(), heaps, variables,
-                                                selfTerm, services);
+                        selfTerm, services);
         final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
         final Term wellFormedHeapsCondition =
                 conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
@@ -175,15 +176,17 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                 conditionsAndClausesBuilder.buildModifiesClauses();
 
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
-        final Term frameCondition = conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
+        final Term frameCondition =
+                conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term outerRemembranceUpdate = updatesBuilder.buildOuterRemembranceUpdate();
-        
-        Map<LocationVariable, Function> anonHeaps = new LinkedHashMap<LocationVariable, Function>(40);
+
+        Map<LocationVariable, Function> anonHeaps =
+                new LinkedHashMap<LocationVariable, Function>(40);
         final TermBuilder tb = services.getTermBuilder();
-        
+
         for (LocationVariable heap : heaps) {
             final String anonymisationName =
                     tb.newName(BlockContractBuilders.ANON_IN_PREFIX + heap.name());
@@ -192,30 +195,31 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             services.getNamespaces().functions().addSafely(anonymisationFunction);
             anonHeaps.put(heap, anonymisationFunction);
         }
-        
+
         final Term anonInUpdate = updatesBuilder.buildAnonInUpdate(anonHeaps);
-        
+
         final KeYJavaType kjt = getCalleeKeYJavaType();
-        
+
         final GoalsConfigurator configurator = new GoalsConfigurator(null,
                 termLabelState,
                 new Instantiation(
                         tb.skip(),
-                        tb.tt(), 
+                        tb.tt(),
                         contract.getModality(),
                         selfTerm,
                         block,
                         new ExecutionContext(
-                                new TypeRef(new ProgramElementName(kjt.getName()), 0, selfVar, kjt),
+                                new TypeRef(new ProgramElementName(kjt.getName()),
+                                            0, selfVar, kjt),
                                 getProgramMethod(),
                                 selfVar)
-                ),
+                        ),
                 contract.getBlockContract().getLabels(),
                 variables,
                 null,
                 services,
                 null);
-        
+
         Term validity = configurator.setUpValidityGoal(null,
                 new Term[] { outerRemembranceUpdate, anonInUpdate, remembranceUpdate },
                 new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition,
@@ -225,16 +229,17 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                 new Term[] { postcondition, frameCondition },
                 exceptionParameter,
                 conditionsAndClausesBuilder.getTerms());
-        
+
         Term wellFormedAnonymisationHeapsCondition =
                 conditionsAndClausesBuilder.buildWellFormedAnonymisationHeapsCondition(anonHeaps);
         validity = tb.imp(
                 tb.and(wellFormedHeapsCondition, wellFormedAnonymisationHeapsCondition),
                 validity);
-        
+
         if (WellDefinednessCheck.isOn()) {
-            final Term wdUpdate = services.getTermBuilder().parallel(anonInUpdate, remembranceUpdate);
-            
+            final Term wdUpdate =
+                    services.getTermBuilder().parallel(anonInUpdate, remembranceUpdate);
+
             Term localAnonUpdate = null;
             for(ProgramVariable pv : localOutVariables) {
                 final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
@@ -248,22 +253,22 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                     localAnonUpdate = tb.parallel(localAnonUpdate, elemUpd);
                 }
             }
-            
+
             if (localAnonUpdate == null) {
                 localAnonUpdate = tb.skip();
             }
-            
+
             Term wellDefinedness = configurator.setUpWdGoal(null,
                     contract.getBlockContract(), wdUpdate,
                     localAnonUpdate, heaps.get(0),
                     anonOutHeaps.get(heaps.get(0)),
                     localInVariables);
-            
+
             assignPOTerms(tb.and(wellDefinedness, validity));
         } else {
             assignPOTerms(validity);
         }
-        
+
         collectClassAxioms(getCalleeKeYJavaType(), proofConfig);
         generateWdTaclets(proofConfig);
     }
@@ -280,18 +285,6 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         return contract.getMethod();
     }
 
-    protected Services postInit() {
-       proofConfig = environmentConfig.deepCopy();
-       final Services proofServices = proofConfig.getServices();
-       tb = proofServices.getTermBuilder();
-       return proofServices;
-    }
-
-    @Override
-    protected InitConfig getCreatedInitConfigForSingleProof() {
-        return proofConfig;
-    }
-
     @Override
     public Contract getContract() {
         return contract;
@@ -300,5 +293,17 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     @Override
     public Term getMbyAtPre() {
         throw new UnsupportedOperationException();
+    }
+
+    protected Services postInit() {
+        proofConfig = environmentConfig.deepCopy();
+        final Services proofServices = proofConfig.getServices();
+        tb = proofServices.getTermBuilder();
+        return proofServices;
+    }
+
+    @Override
+    protected InitConfig getCreatedInitConfigForSingleProof() {
+        return proofConfig;
     }
 }

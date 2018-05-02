@@ -12,7 +12,7 @@
 //
 
 /**
- * 
+ *
  */
 package de.uka.ilkd.key.speclang.jml.translation;
 
@@ -29,24 +29,26 @@ public class ProgramVariableCollection {
     public ImmutableList<ProgramVariable> paramVars;
     public ProgramVariable resultVar;
     public ProgramVariable excVar;
-    public Map<LocationVariable,LocationVariable> atPreVars;
-    public Map<LocationVariable,Term> atPres;
-    public Map<LocationVariable,LocationVariable> atBeforeVars;
-    public Map<LocationVariable,Term> atBefores;
-    
+    public Map<LocationVariable, LocationVariable> atPreVars;
+    public Map<LocationVariable, Term> atPres;
+    public Map<LocationVariable, LocationVariable> atBeforeVars;
+    public Map<LocationVariable, Term> atBefores;
+
     public ProgramVariableCollection(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            ProgramVariable resultVar, ProgramVariable excVar,
-            Map<LocationVariable,LocationVariable> atPreVars, Map<LocationVariable,Term> atPres) {
+                                     ImmutableList<ProgramVariable> paramVars,
+                                     ProgramVariable resultVar, ProgramVariable excVar,
+                                     Map<LocationVariable, LocationVariable> atPreVars,
+                                     Map<LocationVariable, Term> atPres) {
         this (selfVar, paramVars, resultVar, excVar, atPreVars, atPres, null, null);
     }
-    
+
     public ProgramVariableCollection(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            ProgramVariable resultVar, ProgramVariable excVar,
-            Map<LocationVariable,LocationVariable> atPreVars, Map<LocationVariable,Term> atPres,
-            Map<LocationVariable,LocationVariable> atBeforeVars,
-                Map<LocationVariable,Term> atBefores) {
+                                     ImmutableList<ProgramVariable> paramVars,
+                                     ProgramVariable resultVar, ProgramVariable excVar,
+                                     Map<LocationVariable, LocationVariable> atPreVars,
+                                     Map<LocationVariable, Term> atPres,
+                                     Map<LocationVariable, LocationVariable> atBeforeVars,
+                                     Map<LocationVariable, Term> atBefores) {
         super();
         this.selfVar = selfVar;
         this.paramVars = paramVars;

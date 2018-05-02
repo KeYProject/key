@@ -39,7 +39,7 @@ public class BlockContractExternalBuiltInRuleApp
     @Override
     public BlockContractExternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
         return new BlockContractExternalBuiltInRuleApp(
-                builtInRule, newOccurrence, ifInsts,block, contract, heaps);
+                builtInRule, newOccurrence, ifInsts, block, contract, heaps);
     }
 
     @Override

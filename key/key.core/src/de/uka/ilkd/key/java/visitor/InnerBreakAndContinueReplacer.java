@@ -42,7 +42,7 @@ import de.uka.ilkd.key.speclang.SimpleLoopContract;
 /**
  * This replaces all breaks and continues in a loop with {@code break l}, where {@code l} is a
  * specified label. It is used in the transformation of a for loop to a while loop.
- * 
+ *
  * @see LoopContractApplyHeadRule
  * @see SimpleLoopContract
  */
@@ -64,25 +64,22 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
                                                final Iterable<Label> loopLabels,
                                                final Label breakLabel,
                                                final Label continueLabel,
-                                               final Services services)
-    {
+                                               final Services services) {
         super(block, services);
         for (Label label : loopLabels) {
             this.loopLabels.add(label);
         }
-        
+
         this.breakOuter = new Break(breakLabel);
         this.breakInner = new Break(continueLabel);
     }
 
-    public StatementBlock replace()
-    {
+    public StatementBlock replace() {
         start();
         return result;
     }
 
-    public void start()
-    {
+    public void start() {
         loopAndSwitchCascadeDepth = 0;
         stack.push(new ExtList());
         super.start();
@@ -91,18 +88,15 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         result = (StatementBlock) el.get(i);
     }
 
-    public StatementBlock getResult()
-    {
+    public StatementBlock getResult() {
         return result;
     }
 
-    protected void walk(final ProgramElement node)
-    {
+    protected void walk(final ProgramElement node) {
         if (node.getPositionInfo() != PositionInfo.UNDEFINED) {
-           stack.push(new ExtList(new Object[] {node.getPositionInfo()}));
-        }
-        else {
-           stack.push(new ExtList());
+            stack.push(new ExtList(new Object[] {node.getPositionInfo()}));
+        } else {
+            stack.push(new ExtList());
         }
         if (node instanceof LoopStatement || node instanceof Switch) {
             loopAndSwitchCascadeDepth++;
@@ -119,43 +113,36 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         }
     }
 
-    public String toString()
-    {
+    public String toString() {
         return stack.peek().toString();
     }
 
-    protected void doDefaultAction(final SourceElement x)
-    {
+    protected void doDefaultAction(final SourceElement x) {
         addChild(x);
     }
 
-    public void performActionOnContinue(final Continue x)
-    {
+    public void performActionOnContinue(final Continue x) {
         if (loopAndSwitchCascadeDepth == 0 && x.getProgramElementName() == null
                 || x.getLabel() != null && loopLabels.contains(x.getLabel())) {
             addChild(breakInner);
             changed();
-        }
-        else {
+        } else {
             doDefaultAction(x);
         }
     }
 
-    public void performActionOnBreak(final Break x)
-    {
+    public void performActionOnBreak(final Break x) {
         if (loopAndSwitchCascadeDepth == 0 && x.getProgramElementName() == null
                 || x.getLabel() != null && loopLabels.contains(x.getLabel())) {
             addChild(breakOuter);
             changed();
-        }
-        else {
+        } else {
             doDefaultAction(x);
         }
     }
 
 
-    public void performActionOnLocalVariableDeclaration(final LocalVariableDeclaration x)
-    {
+    public void performActionOnLocalVariableDeclaration(final LocalVariableDeclaration x) {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
                 return new LocalVariableDeclaration(changeList);
@@ -164,8 +151,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    public void performActionOnStatementBlock(final StatementBlock x)
-    {
+    public void performActionOnStatementBlock(final StatementBlock x) {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
                 return new StatementBlock(changeList);
@@ -174,8 +160,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    public void performActionOnWhile(final While x)
-    {
+    public void performActionOnWhile(final While x) {
         final ExtList changeList = stack.peek();
         if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
@@ -185,14 +170,12 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
             services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
             addChild(newLoop);
             changed();
-        }
-        else {
+        } else {
             doDefaultAction(x);
         }
     }
 
-    public void performActionOnFor(final For x)
-    {
+    public void performActionOnFor(final For x) {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
                 For newLoop = new For(changeList);
@@ -203,8 +186,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    public void performActionOnEnhancedFor(final EnhancedFor x)
-    {
+    public void performActionOnEnhancedFor(final EnhancedFor x) {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
                 EnhancedFor newLoop = new EnhancedFor(changeList);
@@ -215,8 +197,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    public void performActionOnDo(final Do x)
-    {
+    public void performActionOnDo(final Do x) {
         final ExtList changeList = stack.peek();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
@@ -227,14 +208,12 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
             services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
             addChild(newLoop);
             changed();
-        }
-        else {
+        } else {
             doDefaultAction(x);
         }
     }
 
-    public void performActionOnIf(final If x)
-    {
+    public void performActionOnIf(final If x) {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
                 return new If(changeList);
@@ -243,8 +222,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    public void performActionOnSwitch(final Switch x)
-    {
+    public void performActionOnSwitch(final Switch x) {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
                 return new Switch(changeList);
@@ -253,8 +231,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    public void performActionOnTry(final Try x)
-    {
+    public void performActionOnTry(final Try x) {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
                 return new Try(changeList);
@@ -263,8 +240,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    public void performActionOnLabeledStatement(final LabeledStatement x)
-    {
+    public void performActionOnLabeledStatement(final LabeledStatement x) {
         Label l = null;
         final ExtList changeList = stack.peek();
         if (changeList.getFirst() == CHANGED) {
@@ -274,14 +250,12 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
             }
             addChild(new LabeledStatement(changeList, l, x.getPositionInfo()));
             changed();
-        }
-        else {
+        } else {
             doDefaultAction(x);
         }
     }
 
-    public void performActionOnMethodFrame(final MethodFrame x)
-    {
+    public void performActionOnMethodFrame(final MethodFrame x) {
         final ExtList changeList = stack.peek();
         if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
@@ -290,26 +264,21 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
                                 (IExecutionContext) changeList.get(1),
                                 (StatementBlock) changeList.get(2),
                                 PositionInfo.UNDEFINED));
-
-            }
-            else if (x.getChildCount() == 2) {
+            } else if (x.getChildCount() == 2) {
                 addChild(new MethodFrame(null,
                                 (IExecutionContext) changeList.get(0),
                                 (StatementBlock) changeList.get(1),
                                 PositionInfo.UNDEFINED));
-            }
-            else {
+            } else {
                 throw new IllegalStateException("Method-frame has wrong number of children.");
             }
             changed();
-        }
-        else {
+        } else {
             doDefaultAction(x);
         }
     }
 
-    public void performActionOnSynchronizedBlock(final SynchronizedBlock x)
-    {
+    public void performActionOnSynchronizedBlock(final SynchronizedBlock x) {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
                 return new SynchronizedBlock(changeList);
@@ -318,8 +287,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    public void performActionOnCopyAssignment(final CopyAssignment x)
-    {
+    public void performActionOnCopyAssignment(final CopyAssignment x) {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
                 return new CopyAssignment(changeList);
@@ -328,8 +296,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    public void performActionOnThen(final Then x)
-    {
+    public void performActionOnThen(final Then x) {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
                 return new Then(changeList);
@@ -338,8 +305,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    public void performActionOnElse(final Else x)
-    {
+    public void performActionOnElse(final Else x) {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
                 return new Else(changeList);
@@ -348,8 +314,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    public void performActionOnCase(final Case x)
-    {
+    public void performActionOnCase(final Case x) {
         Expression e = null;
         final ExtList changeList = stack.peek();
         if (changeList.getFirst() == CHANGED) {
@@ -359,14 +324,12 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
             }
             addChild(new Case(changeList, e, x.getPositionInfo()));
             changed();
-        }
-        else {
+        } else {
             doDefaultAction(x);
         }
     }
 
-    public void performActionOnCatch(final Catch x)
-    {
+    public void performActionOnCatch(final Catch x) {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
                 return new Catch(changeList);
@@ -375,8 +338,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    public void performActionOnDefault(final Default x)
-    {
+    public void performActionOnDefault(final Default x) {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
                 return new Default(changeList);
@@ -385,8 +347,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    public void performActionOnFinally(final Finally x)
-    {
+    public void performActionOnFinally(final Finally x) {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
                 return new Finally(changeList);
@@ -395,16 +356,14 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    private void changed()
-    {
+    private void changed() {
         ExtList list = stack.peek();
         if (list.getFirst() != CHANGED) {
             list.addFirst(CHANGED);
         }
     }
 
-    private void addChild(final SourceElement x)
-    {
+    private void addChild(final SourceElement x) {
         stack.pop();
         ExtList list = stack.peek();
         list.add(x);
@@ -414,20 +373,17 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
         abstract ProgramElement createNewElement(ExtList changeList);
 
-        private void addNewChild(final ExtList changeList)
-        {
+        private void addNewChild(final ExtList changeList) {
             addChild(createNewElement(changeList));
             changed();
         }
 
-        public void doAction(final ProgramElement x)
-        {
+        public void doAction(final ProgramElement x) {
             final ExtList changeList = stack.peek();
             if (changeList.size() > 0 && changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
                 addNewChild(changeList);
-            }
-            else {
+            } else {
                 doDefaultAction(x);
             }
         }

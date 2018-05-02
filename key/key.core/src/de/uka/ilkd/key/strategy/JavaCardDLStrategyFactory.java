@@ -19,7 +19,7 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
     /**
      * The unique {@link Name} of this {@link StrategyFactory}.
      */
-    public static final Name NAME = new Name(JavaCardDLStrategy.JavaCardDLStrategy);
+    public static final Name NAME = new Name(JavaCardDLStrategy.JAVA_CARD_DL_STRATEGY);
 
     public static final String TOOL_TIP_STOP_AT_DEFAULT
             = "<html>Stop when (i) the maximum number of rule<br>"
@@ -128,15 +128,16 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "whenever all branches with a given merge point statement<br>"
             + "have reached it, the strategies will eventually merge<br>"
             + "the branches together using the merge point specification.</html>";
-public static final String TOOL_TIP_MPS_SKIP
+    public static final String TOOL_TIP_MPS_SKIP
             = "<html>Simply removes (skips) the merge point statment;<br>"
             + "no state merging is applied.</html>";
-public static final String TOOL_TIP_MPS_NONE = "<html>"
+    public static final String TOOL_TIP_MPS_NONE = "<html>"
             + "Stop when encountering a merge point statement" + "</html>";
     public static final String TOOL_TIP_CLASSAXIOM_FREE
             = "<html>Expand class axioms (such as invariants) freely.</html>";
     public static final String TOOL_TIP_CLASSAXIOM_DELAYED
-            = "<html>Expand class axioms (such as invariants) only after symbolic execution.</html>";
+            = "<html>Expand class axioms (such as invariants) only after "
+            + "symbolic execution.</html>";
     public static final String TOOL_TIP_CLASSAXIOM_OFF
             = "<html>Do not expand class axioms (such as invariants).</html>";
     public static final String TOOL_TIP_DEPENDENCY_ON
@@ -149,9 +150,11 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
     public static final String TOOL_TIP_DEPENDENCY_OFF
             = "<html>Does <i>not</i> use the framing information contained in JML's <br>"
             + "<tt>accessible</tt> clauses automatically in order to simplify heap terms.<br>"
-            + "This prevents the automatic proof search to find proofs for a number of problems.<br>"
+            + "This prevents the automatic proof search to find proofs for a "
+            + "number of problems.<br>"
             + "On the other hand, the automatic proof search does not use a particular order in<br>"
-            + "which <tt>accessible</tt> clauses are used. Since the usage of an <tt>accessible</tt><br>"
+            + "which <tt>accessible</tt> clauses are used. Since the usage of "
+            + "an <tt>accessible</tt><br>"
             + "clause is splitting, this might result in huge (or even infeasible) proofs.</html>";
     public static final String TOOL_TIP_QUERY_ON
             = "<html>Rewrite query to a method call so that contracts or inlining<br>"
@@ -160,9 +163,12 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
             + "Whether contracts or inlining are used depends on the <br>"
             + "Method Treatment settings.</html>";
     public static final String TOOL_TIP_QUERY_RESTRICTED
-            = "<html>Rewrite query to a method call (expanded) so that contracts or inlining can be used.<br>"
-            + "<ul><li> Priority of expanding queries occuring earlier on a branch is higher than<br>"
-            + " for queries introduced more recently. This approximates in a breath-first search<br>"
+            = "<html>Rewrite query to a method call (expanded) so that "
+            + "contracts or inlining can be used.<br>"
+            + "<ul><li> Priority of expanding queries occuring earlier on a "
+            + "branch is higher than<br>"
+            + " for queries introduced more recently. This approximates in a "
+            + "breath-first search<br>"
             + " with respect to query expansion.</li>"
             + "<li> Reexpansion of identical query terms is suppressed.</li>"
             + "<li> A query is not expanded if one of its arguments contains a literal greater<br>"
@@ -182,7 +188,8 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
             = "<html>Replaces queries by their method body in certain safe cases.<br>"
             + "Safe cases are:"
             + "<ul><li>the return type of the expanded method is known</li>"
-            + "<li>the object on which the methodcall is invoked, is self or a parent of self</li></ul>"
+            + "<li>the object on which the methodcall is invoked, is self or "
+            + "a parent of self</li></ul>"
             + "This mechanism works independently of the query treatment <br>"
             + "and method treatment settings above.<br>"
             + "<i>The internal rule name is Query Axiom</i></html>";
@@ -275,6 +282,9 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
             + "is not applied on Skolemized formulas in order to<br>"
             + "limit the number of inductive proofs." + "</html>";
 
+    public JavaCardDLStrategyFactory() {
+    }
+
     public static String TOOL_TIP_USER_OFF(int i) {
         return "Taclets of the rule set \"userTaclets" + i
                 + "\" are not applied automatically";
@@ -290,12 +300,9 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
                 + "\" are applied automatically with high priority";
     }
 
-    public JavaCardDLStrategyFactory() {
-    }
-
-    public Strategy create(Proof p_proof,
+    public Strategy create(Proof proof,
             StrategyProperties strategyProperties) {
-        return new JavaCardDLStrategy(p_proof, strategyProperties);
+        return new JavaCardDLStrategy(proof, strategyProperties);
     }
 
     @Override
@@ -417,7 +424,7 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
                 = new OneOfStrategyPropertyDefinition(
                         StrategyProperties.QUERY_OPTIONS_KEY,
                         "Query treatment",
-                        new AbstractStrategyPropertyDefinition[]{expandLocalQueries},
+                        new AbstractStrategyPropertyDefinition[] { expandLocalQueries },
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.QUERY_ON, "On",
                                 TOOL_TIP_QUERY_ON),
@@ -457,7 +464,8 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
                                 StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS,
                                 "No Splits with Progs",
                                 TOOL_TIP_QUANTIFIER_NO_SPLITS_WITH_PROGS,
-                                2, 4), new StrategyPropertyValueDefinition(
+                                2, 4),
+                        new StrategyPropertyValueDefinition(
                                 StrategyProperties.QUANTIFIERS_INSTANTIATE,
                                 "Free", TOOL_TIP_QUANTIFIER_FREE, 6, 2));
         OneOfStrategyPropertyDefinition classAxiom
@@ -488,13 +496,13 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
                                 StrategyProperties.AUTO_INDUCTION_OFF,
                                 "Off", TOOL_TIP_AUTO_INDUCTION_OFF));
         // User properties
-        List<AbstractStrategyPropertyDefinition> props
-                = new LinkedList<>();
+        List<AbstractStrategyPropertyDefinition> props = new LinkedList<>();
         for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
             OneOfStrategyPropertyDefinition user
                     = new OneOfStrategyPropertyDefinition(
                             StrategyProperties.USER_TACLETS_OPTIONS_KEY(i),
-                            i + ":  ", new StrategyPropertyValueDefinition(
+                            i + ":  ",
+                            new StrategyPropertyValueDefinition(
                                     StrategyProperties.USER_TACLETS_OFF,
                                     "Off", TOOL_TIP_USER_OFF(i), 3, 1),
                             new StrategyPropertyValueDefinition(
@@ -520,8 +528,8 @@ public static final String TOOL_TIP_MPS_NONE = "<html>"
                         + "\\heuristics(userTaclets1), \\heuristics(userTaclets2), etc."
                         + "</html>",
                         -1,
-                        props.toArray(new AbstractStrategyPropertyDefinition[props
-                                .size()]));
+                        props.toArray(
+                            new AbstractStrategyPropertyDefinition[props.size()]));
         // Model
         return new StrategySettingsDefinition("Java DL Options", stopAt, ossUsage,
                 proofSplitting, loopTreatment, blockTreatment, methodTreatment,

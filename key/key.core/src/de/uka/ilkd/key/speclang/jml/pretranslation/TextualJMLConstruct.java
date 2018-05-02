@@ -35,36 +35,36 @@ public abstract class TextualJMLConstruct {
     protected final ImmutableList<String> mods;
     private Position approxPos = Position.UNDEFINED;
     private String sourceFile = null;
-	private boolean loopContract;
-    
+    private boolean loopContract;
+
     /** A user-provided identifier to keep an overview over large specification collections */
     protected String name;
-    
-    
+
+
     public TextualJMLConstruct(ImmutableList<String> mods) {
         assert mods != null;
         this.mods = mods;
     }
-    
-    public TextualJMLConstruct(ImmutableList<String> mods, String name){
+
+    public TextualJMLConstruct(ImmutableList<String> mods, String name) {
         this(mods);
         this.name = name;
     }
-    
+
     public final boolean isLoopContract() {
-    	return loopContract;
+        return loopContract;
     }
-    
+
     final void setLoopContract(boolean loopContract) {
-    	this.loopContract = loopContract;
+        this.loopContract = loopContract;
     }
-    
-    
+
+
     public final ImmutableList<String> getMods() {
         return mods;
     }
-    
-    
+
+
     /**
      * Return the approximate position of this construct.
      * This is usually the position of the specification line parsed first.
@@ -73,14 +73,14 @@ public abstract class TextualJMLConstruct {
     public Position getApproxPosition() {
         return approxPos;
     }
-    
+
     /**
      * Return the source file name where this construct appears.
      */
     public String getSourceFileName() {
         return sourceFile;
     }
-    
+
     /**
      * Sets the approximate position of this construct
      * when first called with a valid position.
@@ -95,39 +95,40 @@ public abstract class TextualJMLConstruct {
         }
     }
 
-    protected void addGeneric(Map<String, ImmutableList<PositionedString>> item, PositionedString ps) {
+    protected void addGeneric(Map<String, ImmutableList<PositionedString>> item,
+                              PositionedString ps) {
         String t = ps.text;
-        if(!t.startsWith("<") || t.startsWith("<inv>")) {
-           ImmutableList<PositionedString> l = item.get(HeapLDT.BASE_HEAP_NAME.toString());
-           l = l.append(ps);
-           item.put(HeapLDT.BASE_HEAP_NAME.toString(), l);
-           return; 
+        if (!t.startsWith("<") || t.startsWith("<inv>")) {
+            ImmutableList<PositionedString> l = item.get(HeapLDT.BASE_HEAP_NAME.toString());
+            l = l.append(ps);
+            item.put(HeapLDT.BASE_HEAP_NAME.toString(), l);
+            return;
         }
         List<String> hs = new ArrayList<String>();
-        while(t.startsWith("<") && !t.startsWith("<inv>")) {
-          for(Name heapName : HeapLDT.VALID_HEAP_NAMES) {
-            //final String hName = heapName.toString();
-            for(String hName : new String[]{ heapName.toString(), heapName.toString() +"AtPre"}) {
-              String h = "<" + hName + ">";
-              if(t.startsWith(h)) {
-                hs.add(hName);
-                t = t.substring(h.length());
-              }
+        while (t.startsWith("<") && !t.startsWith("<inv>")) {
+            for (Name heapName : HeapLDT.VALID_HEAP_NAMES) {
+                //final String hName = heapName.toString();
+                for (String hName
+                       : new String[] { heapName.toString(),
+                                        heapName.toString() + "AtPre"}) {
+                    String h = "<" + hName + ">";
+                    if (t.startsWith(h)) {
+                        hs.add(hName);
+                        t = t.substring(h.length());
+                    }
+                }
             }
-          }
         }
         if (ps.hasLabels()) {
             ps = new PositionedString(t, ps.fileName, ps.pos).label(ps.getLabels());
         } else {
             ps = new PositionedString(t, ps.fileName, ps.pos);
         }
-        for(String h : hs) {
-           ImmutableList<PositionedString> l = item.get(h);
-           l = l.append(ps);
-           item.put(h, l); 
+        for (String h : hs) {
+            ImmutableList<PositionedString> l = item.get(h);
+            l = l.append(ps);
+            item.put(h, l);
         }
         setPosition(ps);
     }
-
-
 }

@@ -305,7 +305,7 @@ public interface Visitor {
     void performActionOnFieldSpecification(FieldSpecification x);
 
     void performActionOnImplicitFieldSpecification
-    (ImplicitFieldSpecification x);
+        (ImplicitFieldSpecification x);
 
     void performActionOnBinaryAnd(BinaryAnd x);
 

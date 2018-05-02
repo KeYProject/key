@@ -38,7 +38,7 @@ public class LoopContractInternalBuiltInRuleApp extends AbstractLoopContractBuil
     @Override
     public LoopContractInternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
         return new LoopContractInternalBuiltInRuleApp(
-                builtInRule, newOccurrence, ifInsts,block, contract, heaps);
+                builtInRule, newOccurrence, ifInsts, block, contract, heaps);
     }
 
     @Override

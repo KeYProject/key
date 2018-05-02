@@ -34,7 +34,9 @@ public abstract class AbstractLoopContractBuiltInRuleApp
         return contract;
     }
 
-    public AbstractLoopContractBuiltInRuleApp tryToInstantiate(final Goal goal, final AbstractLoopContractRule rule) {
+    public AbstractLoopContractBuiltInRuleApp
+                tryToInstantiate(final Goal goal,
+                                 final AbstractLoopContractRule rule) {
         if (complete() || cannotComplete(goal)) {
             return this;
         }
@@ -42,11 +44,13 @@ public abstract class AbstractLoopContractBuiltInRuleApp
         final AbstractLoopContractRule.Instantiation instantiation =
                 rule.instantiate(posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<LoopContract> contracts =
-                AbstractLoopContractRule.getApplicableContracts(instantiation, goal, services);
+                AbstractLoopContractRule.getApplicableContracts(instantiation, goal,
+                                                                services);
         block = instantiation.block;
         ImmutableSet<LoopContract> cons = DefaultImmutableSet.<LoopContract>nil();
         for (LoopContract cont : contracts) {
-            if (cont.getBlock().getStartPosition().getLine() == block.getStartPosition().getLine()) {
+            if (cont.getBlock().getStartPosition().getLine()
+                  == block.getStartPosition().getLine()) {
                 cons = cons.add(cont);
             }
         }
