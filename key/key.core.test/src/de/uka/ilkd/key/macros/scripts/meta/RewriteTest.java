@@ -26,39 +26,13 @@ import java.io.IOException;
 public class RewriteTest {
 
     @Test
-    public void testRewrite() throws IOException, ScriptException, InterruptedException {
-
-        //File
-        KeYEnvironment<DefaultUserInterfaceControl> env = null;
-        try {
-            env = KeYEnvironment.load(new File("../key.ui/examples/standard_key/prop_log/contraposition.key"));
-        } catch (ProblemLoaderException e) {
-            e.printStackTrace();
-        }
-        Proof proof = env.getLoadedProof();
-        System.out.println("TestStart:" + proof.openGoals().head().sequent());
-
-        File f =  new File("../key.core.test/src/de/uka/ilkd/key/macros/scripts/meta/rewrite.script");
-        //KeY Script
-        ProofScriptEngine engine = new ProofScriptEngine(f);
-
-        engine.execute(env.getUi(), proof);
-        System.out.println("TestEnd_head:" + proof.openGoals().take(1).head().sequent());
-
-
-
-
-    }
-
-
-    @Test
-    public void testRewrite2() throws IOException, ScriptException, InterruptedException {
+    public void testTransitive() throws IOException, ScriptException, InterruptedException {
 
         //File
         KeYEnvironment<DefaultUserInterfaceControl> env = null;
         try {
             File f = new File("../key.core.test/resources/testcase/scriptCommands/transitive.key");
-           // env = KeYEnvironment.load(new File("../key.ui/examples/heap/vstte10_01_SumAndMax/SumAndMax_sumAndMax.key"));
+            // env = KeYEnvironment.load(new File("../key.ui/examples/heap/vstte10_01_SumAndMax/SumAndMax_sumAndMax.key"));
             env = KeYEnvironment.load(f);
         } catch (ProblemLoaderException e) {
             e.printStackTrace();
@@ -71,11 +45,64 @@ public class RewriteTest {
         ProofScriptEngine engine = new ProofScriptEngine(new File("../key.core.test/src/de/uka/ilkd/key/macros/scripts/meta/rewrite.script"));
 
         engine.execute(env.getUi(), proof);
+        System.out.println("TestEnd_head:" + proof.openGoals().take(0).head().sequent());
+        assert proof.openGoals().take(0).head().sequent().toString().equals("[equals(f,x),equals(x,z)]==>[equals(z,f)]");
+
+
+
+
+    }
+
+    @Test
+    public void testLessTransitive() throws IOException, ScriptException, InterruptedException {
+
+        //File
+        KeYEnvironment<DefaultUserInterfaceControl> env = null;
+        try {
+            File f = new File("../key.core.test/resources/testcase/scriptCommands/less_trans.key");
+            env = KeYEnvironment.load(f);
+        } catch (ProblemLoaderException e) {
+            e.printStackTrace();
+        }
+        Proof proof = env.getLoadedProof();
+        System.out.println("TestStart:" + proof.openGoals().head().sequent());
+
+
+        //KeY Script
+        ProofScriptEngine engine = new ProofScriptEngine(new File("../key.core.test/src/de/uka/ilkd/key/macros/scripts/meta/lesstrans.script"));
+
+        engine.execute(env.getUi(), proof);
 
         System.out.println("TestEnd_head:" + proof.openGoals().take(0).head().sequent());
+        assert proof.openGoals().take(0).head().sequent().toString().equals("[imp(and(gt(x,f),lt(x,z)),lt(f,z))]");
+
+    }
+
+    /*
+        Test wil fail, rewrite command not yet applicable on subterms
+     */
+    @Test
+    public void equality() throws IOException, ScriptException, InterruptedException {
+
+        //File
+        KeYEnvironment<DefaultUserInterfaceControl> env = null;
+        try {
+            File f = new File("../key.core.test/resources/testcase/scriptCommands/eq.key");
+            env = KeYEnvironment.load(f);
+        } catch (ProblemLoaderException e) {
+            e.printStackTrace();
+        }
+        Proof proof = env.getLoadedProof();
+        System.out.println("TestStart:" + proof.openGoals().head().sequent());
 
 
+        //KeY Script
+        ProofScriptEngine engine = new ProofScriptEngine(new File("../key.core.test/src/de/uka/ilkd/key/macros/scripts/meta/eq.script"));
 
+        engine.execute(env.getUi(), proof);
+
+        System.out.println("TestEnd_head:" + proof.openGoals().take(0).head().sequent());
+        assert proof.openGoals().take(0).head().sequent().toString().equals("[imp(equals(c,c),lt(a,c))]");
 
     }
 }
