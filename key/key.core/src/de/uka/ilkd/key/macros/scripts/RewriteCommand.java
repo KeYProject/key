@@ -2,10 +2,7 @@ package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.Varargs;
@@ -162,13 +159,15 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
                                 //for top level formulas -> TODO what about subterm replacements
                                 SequentFormula rewriteResult = rw.getExecutor().getRewriteResult(goalold, null, goalold.proof().getServices(), pta);
                                 System.out.println("Rewrite Result =" + rewriteResult.toString());
-                                if(rewriteResult.formula().equals(p.replace)){
+                                if(rewriteResult.formula().equals(p.replace) ||
+                                        getTermAtPos(rewriteResult, pta.posInOccurrence()).equals(p.replace)){
                                     failposInOccs.remove(pta.posInOccurrence());
                                     succposInOccs.add(pta.posInOccurrence());
                                     System.out.println("Sucessful Replacement, applying rule app");
                                     goalold.apply(pta);
                                     break;
                                 } else {
+
                                     System.out.println("Unsucessful Replacement & already in failed list");
                                 }
                             }
@@ -207,6 +206,28 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
         System.out.println("[End of findExec] Size = ? :" + failposInOccs.size());
         return failposInOccs;
     }
+
+    public Term getTermAtPos(SequentFormula sf, PosInOccurrence pio){
+        if(pio.isTopLevel()){
+            return sf.formula();
+
+        } else {
+            PosInTerm pit = pio.posInTerm();
+            Term t =getSubTerm(sf.formula(), pit.iterator());
+            return t;
+        }
+
+    }
+
+    public Term getSubTerm(Term t, IntIterator pit){
+        if(pit.hasNext()) {
+            int i = pit.next();
+            return getSubTerm(t.sub(i), pit);
+        } else {
+            return t;
+        }
+    }
+
 
 
 

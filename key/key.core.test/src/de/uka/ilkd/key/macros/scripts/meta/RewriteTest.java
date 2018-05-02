@@ -74,7 +74,7 @@ public class RewriteTest {
         engine.execute(env.getUi(), proof);
 
         System.out.println("TestEnd_head:" + proof.openGoals().take(0).head().sequent());
-        assert proof.openGoals().take(0).head().sequent().toString().equals("[imp(and(gt(x,f),lt(x,z)),lt(f,z))]");
+        assert proof.openGoals().take(0).head().sequent().toString().equals("[]==>[imp(and(gt(x,f),lt(x,z)),lt(f,z))]");
 
     }
 
