@@ -56,6 +56,63 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
 
     private LoopContractExternalRule() { }
 
+
+    private static Term[] createUpdates(final Term contextUpdate,
+                                        final List<LocationVariable> heaps,
+                                        final Map<LocationVariable, Function>
+                                                anonymisationHeaps,
+                                        final LoopContract.Variables variables,
+                                        final Map<LocationVariable, Term>
+                                                modifiesClauses,
+                                        final Services services) {
+        final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
+        final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
+        final Term anonymisationUpdate =
+                updatesBuilder.buildAnonOutUpdate(anonymisationHeaps,
+                                                        modifiesClauses);
+        return new Term[] {contextUpdate, remembranceUpdate, anonymisationUpdate};
+    }
+
+    private static Term[]
+            createPreconditions(final Term selfTerm,
+                                final LoopContract contract,
+                                final List<LocationVariable> heaps,
+                                final ImmutableSet<ProgramVariable>
+                                        localInVariables,
+                                final ConditionsAndClausesBuilder
+                                        conditionsAndClausesBuilder,
+                                final Services services) {
+        final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
+        final Term wellFormedHeapsCondition =
+                conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
+        final Term reachableInCondition =
+                conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
+        final Term selfConditions =
+                conditionsAndClausesBuilder.buildSelfConditions(
+                        heaps, contract.getMethod(), contract.getKJT(),
+                        selfTerm, services);
+        return new Term[] {precondition, wellFormedHeapsCondition,
+                           reachableInCondition, selfConditions};
+    }
+
+    private static Term[] createAssumptions(final ImmutableSet<ProgramVariable>
+                                                    localOutVariables,
+                                            final Map<LocationVariable, Function>
+                                                    anonymisationHeaps,
+                                            final ConditionsAndClausesBuilder
+                                                    conditionsAndClausesBuilder) {
+        final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
+        final Term wellFormedAnonymisationHeapsCondition =
+                conditionsAndClausesBuilder
+                .buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
+        final Term reachableOutCondition =
+                conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
+        final Term atMostOneFlagSetCondition =
+                conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
+        return new Term[] {postcondition, wellFormedAnonymisationHeapsCondition,
+                           reachableOutCondition, atMostOneFlagSetCondition};
+    }
+
     public Term getLastFocusTerm() {
         return lastFocusTerm;
     }
@@ -101,13 +158,11 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
     private ImmutableList<Goal> apply(final Goal goal, final Services services,
                                       final LoopContractExternalBuiltInRuleApp application)
                                               throws RuleAbortException {
-        final TermLabelState termLabelState = new TermLabelState();
         final Instantiation instantiation =
                 instantiate(application.posInOccurrence().subTerm(), goal, services);
         final LoopContract contract = application.getContract();
         contract.setInstantiationSelf(instantiation.self);
         assert contract.getBlock().equals(instantiation.block);
-        final Term contextUpdate = instantiation.update;
 
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables =
@@ -116,46 +171,31 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
                 MiscTools.getLocalOuts(instantiation.block, services);
         final Map<LocationVariable, Function> anonymisationHeaps =
                 createAndRegisterAnonymisationVariables(heaps, contract, services);
-
         final LoopContract.Variables variables = new VariablesCreatorAndRegistrar(
             goal, contract.getPlaceholderVariables(), services
         ).createAndRegister(instantiation.self, true);
 
-
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
                 new ConditionsAndClausesBuilder(contract, heaps, variables,
                                                 instantiation.self, services);
-        final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
-        final Term wellFormedHeapsCondition =
-                conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
-        final Term reachableInCondition =
-                conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
         final Map<LocationVariable, Term> modifiesClauses =
                 conditionsAndClausesBuilder.buildModifiesClauses();
-        final Term selfConditions =
-                conditionsAndClausesBuilder.buildSelfConditions(
-                        heaps, contract.getMethod(), contract.getKJT(),
-                        instantiation.self, services);
 
-        final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
-        final Term wellFormedAnonymisationHeapsCondition =
-                conditionsAndClausesBuilder
-                .buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
-        final Term reachableOutCondition =
-                conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
-        final Term atMostOneFlagSetCondition =
-                conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
-
-        final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
-        final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
-        final Term anonymisationUpdate =
-                updatesBuilder.buildAnonOutUpdate(anonymisationHeaps,
-                                                        modifiesClauses);
-
+        final Term[] preconditions =
+                createPreconditions(instantiation.self, contract, heaps,
+                                    localInVariables,
+                                    conditionsAndClausesBuilder,
+                                    services);
+        final Term[] assumptions =
+                createAssumptions(localOutVariables, anonymisationHeaps,
+                                  conditionsAndClausesBuilder);
+        final Term[] updates =
+                createUpdates(instantiation.update, heaps, anonymisationHeaps,
+                              variables, modifiesClauses, services);
 
         final ImmutableList<Goal> result;
         final GoalsConfigurator configurator = new GoalsConfigurator(application,
-                                                                     termLabelState,
+                                                                     new TermLabelState(),
                                                                      instantiation,
                                                                      contract.getLabels(),
                                                                      variables,
@@ -166,14 +206,8 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
         result = goal.split(2);
 
         configurator.setUpPreconditionGoal(result.tail().head(),
-                contextUpdate,
-                new Term[] {precondition, wellFormedHeapsCondition,
-                            reachableInCondition, selfConditions});
-        configurator.setUpUsageGoal(result.head(),
-                new Term[] {contextUpdate, remembranceUpdate,
-                            anonymisationUpdate},
-                new Term[] {postcondition, wellFormedAnonymisationHeapsCondition,
-                            reachableOutCondition, atMostOneFlagSetCondition});
+                                           updates[0], preconditions);
+        configurator.setUpUsageGoal(result.head(), updates, assumptions);
 
         final ComplexRuleJustificationBySpec cjust
                 = (ComplexRuleJustificationBySpec)

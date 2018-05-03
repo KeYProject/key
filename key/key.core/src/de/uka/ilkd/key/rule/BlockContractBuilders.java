@@ -788,6 +788,190 @@ public final class BlockContractBuilders {
             this.rule = rule;
         }
 
+        private static void addInfFlow(final Goal goal) {
+            final boolean oldInfFlowCheckInfoValue =
+                    goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null
+                      && goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY);
+            StrategyInfoUndoMethod undo =
+                new StrategyInfoUndoMethod() {
+                    @Override
+                    public void undo(
+                        de.uka.ilkd.key.util.properties.Properties
+                            strategyInfos) {
+                        strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY,
+                                          oldInfFlowCheckInfoValue);
+                    }
+                };
+            goal.addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, false, undo);
+        }
+
+        private static ProgramVariable[] createLoopVariables(final Services services) {
+            ProgramVariable conditionVariable = AbstractBlockSpecificationElementRule
+                    .createLocalVariable("cond",
+                            services.getJavaInfo().getKeYJavaType("boolean"),
+                            services);
+
+            ProgramVariable brokeLoopVariable = AbstractBlockSpecificationElementRule
+                    .createLocalVariable("brokeLoop",
+                            services.getJavaInfo().getKeYJavaType("boolean"),
+                            services);
+
+            ProgramVariable continuedLoopVariable = AbstractBlockSpecificationElementRule
+                    .createLocalVariable("continuedLoop",
+                            services.getJavaInfo().getKeYJavaType("boolean"),
+                            services);
+            final ProgramVariable[] loopVariables =
+                    new ProgramVariable[] {conditionVariable, brokeLoopVariable,
+                                           continuedLoopVariable};
+            return loopVariables;
+        }
+
+        private static Term addGoalTerm(final LoopContract contract, JavaBlock unfold,
+                                        JavaBlock body, JavaBlock tail,
+                                        final Modality modality,
+                                        boolean bodyBreakFound, final Term context,
+                                        final Term remember,
+                                        final Term rememberNext,
+                                        final Term decreasesCheck,
+                                        Term anonOut, Term post,
+                                        Term postNext, Term postAfterTail, Term pre,
+                                        Term brokeLoop, Term notBrokeLoop,
+                                        Term exceptionEqNull, Term exceptionNeqNull,
+                                        Term cond, Term notCond, Term abrupt,
+                                        Term notAbrupt, final TermBuilder tb) {
+            // Add a simplified version of the formula if tail is empty.
+            Term term;
+            if (contract.getTail().isEmpty()) {
+                Term postBody =
+                        buildSimplifiedPostBody(bodyBreakFound, rememberNext,
+                                                decreasesCheck, anonOut, post,
+                                                postNext, pre, brokeLoop,
+                                                notBrokeLoop, abrupt, notAbrupt, tb);
+
+                term = tb.apply(context,
+                    tb.imp(pre,
+                        tb.apply(remember, tb.prog(modality, unfold, tb.and(
+                            tb.imp(tb.or(exceptionNeqNull, notCond), post),
+                            tb.imp(tb.and(exceptionEqNull, cond),
+                                tb.prog(modality, body, postBody))
+                            )
+                        ))
+                    )
+                );
+            } else {
+                Term postBody =
+                        buildFullPostBody(bodyBreakFound, tail, modality,
+                                          rememberNext, decreasesCheck, anonOut,
+                                          post, postNext, postAfterTail, pre,
+                                          brokeLoop, notBrokeLoop, abrupt,
+                                          notAbrupt, tb);
+
+                term = tb.apply(context,
+                    tb.imp(pre,
+                        tb.apply(remember, tb.prog(modality, unfold, tb.and(
+                            tb.imp(exceptionNeqNull, post),
+                            tb.imp(tb.and(exceptionEqNull, notCond), postAfterTail),
+                            tb.imp(tb.and(exceptionEqNull, cond),
+                                tb.prog(modality, body, postBody)
+                            )
+                        )
+                    )))
+                );
+            }
+            return term;
+        }
+
+        private static Term
+            buildSimplifiedPostBody(boolean bodyBreakFound,
+                                    final Term rememberNext, final Term decreasesCheck,
+                                    Term anonOut, Term post, Term postNext, Term pre,
+                                    Term brokeLoop, Term notBrokeLoop, Term abrupt,
+                                    Term notAbrupt, final TermBuilder tb) {
+            final Term postBody;
+            if (bodyBreakFound) {
+                postBody = tb.and(
+                    tb.imp(tb.or(brokeLoop, abrupt), post),
+                    tb.imp(tb.and(notBrokeLoop, notAbrupt),
+                           tb.and(pre, decreasesCheck,
+                                  tb.apply(rememberNext,
+                                           tb.apply(anonOut,
+                                                    tb.imp(postNext, post)
+                    )))));
+            } else {
+                postBody =
+                    tb.and(tb.imp(abrupt, post),
+                           tb.imp(notAbrupt,
+                                  tb.and(pre, decreasesCheck,
+                                         tb.apply(rememberNext,
+                                                  tb.apply(anonOut,
+                                                           tb.imp(postNext, post)
+                    )))));
+            }
+            return postBody;
+        }
+
+        private static Term
+            buildFullPostBody(boolean bodyBreakFound,
+                              JavaBlock tail, final Modality modality,
+                              final Term rememberNext, final Term decreasesCheck,
+                              Term anonOut, Term post, Term postNext,
+                              Term postAfterTail, Term pre, Term brokeLoop,
+                              Term notBrokeLoop, Term abrupt, Term notAbrupt,
+                              final TermBuilder tb) {
+            final Term postBody;
+            if (bodyBreakFound) {
+                postBody =
+                    tb.and(tb.imp(brokeLoop, postAfterTail),
+                           tb.imp(abrupt, post),
+                           tb.imp(tb.and(notBrokeLoop, notAbrupt),
+                               tb.and(pre, decreasesCheck,
+                                      tb.apply(rememberNext,
+                                          tb.apply(anonOut,
+                                              tb.and(tb.imp(abrupt,
+                                                         tb.imp(postNext,
+                                                             post)),
+                                                     tb.imp(notAbrupt,
+                                                         tb.prog(modality, tail,
+                                                             tb.imp(postNext, post)))
+                        )
+                    ))))
+                );
+            } else {
+                postBody =
+                    tb.and(tb.imp(abrupt, post),
+                           tb.imp(notAbrupt,
+                               tb.and(pre, decreasesCheck,
+                                      tb.apply(rememberNext,
+                                          tb.apply(anonOut,
+                                              tb.and(tb.imp(abrupt,
+                                                         tb.imp(postNext, post)),
+                                                     tb.imp(notAbrupt,
+                                                         tb.prog(modality, tail,
+                                                             tb.imp(postNext, post)))
+                        )
+                    ))))
+                );
+            }
+            return postBody;
+        }
+
+        private static Term
+            createAbruptTerms(final BlockSpecificationElement.Terms terms,
+                              Term exceptionNeqNull, final TermBuilder tb) {
+            Set<Term> abruptTerms = new LinkedHashSet<>();
+            abruptTerms.add(exceptionNeqNull);
+            if (terms.returnFlag != null) {
+                abruptTerms.add(tb.equals(terms.returnFlag, tb.TRUE()));
+            }
+            for (Term term : terms.continueFlags.values()) {
+                abruptTerms.add(tb.equals(term, tb.TRUE()));
+            }
+            for (Term term : terms.breakFlags.values()) {
+                abruptTerms.add(tb.equals(term, tb.TRUE()));
+            }
+            return tb.or(abruptTerms);
+        }
+
         /**
          *
          * @param goal If this is not {@code null}, the returned formula is added to this goal.
@@ -841,14 +1025,7 @@ public final class BlockContractBuilders {
                                       final ProgramVariable exceptionParameter,
                                       final BlockSpecificationElement.Terms terms) {
             final TermBuilder tb = services.getTermBuilder();
-            final StatementBlock block =
-                    new ValidityProgramConstructor(labels, instantiation.block,
-                                                   variables, exceptionParameter,
-                                                   services).construct();
-            Statement wrappedBlock = wrapInMethodFrameIfContextIsAvailable(block);
-            StatementBlock finishedBlock =
-                finishTransactionIfModalityIsTransactional(wrappedBlock);
-            JavaBlock newJavaBlock = JavaBlock.createJavaBlock(finishedBlock);
+            JavaBlock newJavaBlock = getJavaBlock(exceptionParameter);
             Term newPost = tb.and(postconditions);
             newPost = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(
                     services,
@@ -866,9 +1043,7 @@ public final class BlockContractBuilders {
                     AbstractBlockSpecificationElementRule.NEW_POSTCONDITION_TERM_HINT,
                     null);
 
-
             Term term;
-
             if (goal != null) {
                 goal.setBranchLabel("Validity");
                 goal.addFormula(new SequentFormula(
@@ -893,20 +1068,7 @@ public final class BlockContractBuilders {
                 goal.changeFormula(new SequentFormula(term), occurrence);
                 TermLabelManager.refactorGoal(termLabelState, services, occurrence,
                                               application.rule(), goal, null, null);
-                final boolean oldInfFlowCheckInfoValue =
-                        goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null
-                          && goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY);
-                StrategyInfoUndoMethod undo =
-                    new StrategyInfoUndoMethod() {
-                        @Override
-                        public void undo(
-                            de.uka.ilkd.key.util.properties.Properties
-                                strategyInfos) {
-                            strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY,
-                                              oldInfFlowCheckInfoValue);
-                        }
-                    };
-                goal.addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, false, undo);
+                addInfFlow(goal);
             } else {
                 Term pre = tb.and(assumptions);
                 Term prog =
@@ -919,37 +1081,26 @@ public final class BlockContractBuilders {
         }
 
         public Term setUpLoopValidityGoal(final Goal goal,
-                final LoopContract contract,
-                final Term context,
-                final Term remember,
-                final Term rememberNext,
-                final Map<LocationVariable, Function> anonOutHeaps,
-                final Map<LocationVariable, Term> modifiesClauses,
-                final Term[] assumptions,
-                final Term decreasesCheck,
-                final Term[] postconditions,
-                final Term[] postconditionsNext,
-                final ProgramVariable exceptionParameter,
-                final BlockSpecificationElement.Terms terms,
-                final BlockSpecificationElement.Variables nextVars) {
+                                          final LoopContract contract,
+                                          final Term context,
+                                          final Term remember,
+                                          final Term rememberNext,
+                                          final Map<LocationVariable, Function>
+                                                    anonOutHeaps,
+                                          final Map<LocationVariable, Term>
+                                                    modifiesClauses,
+                                          final Term[] assumptions,
+                                          final Term decreasesCheck,
+                                          final Term[] postconditions,
+                                          final Term[] postconditionsNext,
+                                          final ProgramVariable exceptionParameter,
+                                          final BlockSpecificationElement.Terms terms,
+                                          final BlockSpecificationElement.Variables
+                                                    nextVars) {
             final TermBuilder tb = services.getTermBuilder();
             final Modality modality = instantiation.modality;
 
-            ProgramVariable conditionVariable = AbstractBlockSpecificationElementRule
-                    .createLocalVariable("cond",
-                            services.getJavaInfo().getKeYJavaType("boolean"),
-                            services);
-
-            ProgramVariable brokeLoopVariable = AbstractBlockSpecificationElementRule
-                    .createLocalVariable("brokeLoop",
-                            services.getJavaInfo().getKeYJavaType("boolean"),
-                            services);
-
-            ProgramVariable continuedLoopVariable = AbstractBlockSpecificationElementRule
-                    .createLocalVariable("continuedLoop",
-                            services.getJavaInfo().getKeYJavaType("boolean"),
-                            services);
-
+            final ProgramVariable[] loopVariables = createLoopVariables(services);
             OuterBreakContinueAndReturnCollector collector =
                     new OuterBreakContinueAndReturnCollector(contract.getBody(),
                             new LinkedList<>(), services);
@@ -959,27 +1110,97 @@ public final class BlockContractBuilders {
             collector.collect();
 
             boolean bodyBreakFound = false;
-
             Map<Label, ProgramVariable> breakFlags =
                 new LinkedHashMap<>(variables.breakFlags);
             for (Break br : bodyBreaks) {
                 Label label = br.getLabel();
                 if (label == null || contract.getLoopLabels().contains(label)) {
-                    breakFlags.put(label, brokeLoopVariable);
+                    breakFlags.put(label, loopVariables[1]);
                     bodyBreakFound = true;
                 }
             }
-
             Map<Label, ProgramVariable> continueFlags =
-                    new LinkedHashMap<>(variables.continueFlags);
-            continueFlags.remove(null);
-            for (Continue cont : bodyContinues) {
-                Label label = cont.getLabel();
-                if (label == null || contract.getLoopLabels().contains(label)) {
-                    continueFlags.put(label, continuedLoopVariable);
-                }
-            }
+                    collectContinueFlags(contract, loopVariables[2], bodyContinues);
+            final JavaBlock[] javaBlocks =
+                    createJavaBlocks(contract, loopVariables[0],
+                                     exceptionParameter, breakFlags,
+                                     continueFlags);
+            Term anonOut = new UpdatesBuilder(variables, services)
+                    .buildAnonOutUpdate(contract.getLoop(), anonOutHeaps, modifiesClauses);
+            final Term[] posts =
+                    createPosts(goal, postconditions, postconditionsNext, terms, tb);
 
+            Term postAfterTail = tb.prog(modality, javaBlocks[2], posts[0]);
+            Term pre = tb.and(assumptions);
+            Term brokeLoop = tb.equals(tb.var(loopVariables[1]), tb.TRUE());
+            Term notBrokeLoop = tb.not(brokeLoop);
+            Term exceptionEqNull = tb.equals(tb.var(variables.exception), tb.NULL());
+            Term exceptionNeqNull = tb.not(exceptionEqNull);
+            Term cond = tb.equals(tb.var(loopVariables[0]), tb.TRUE());
+            Term notCond = tb.not(cond);
+            Term abrupt = createAbruptTerms(terms, exceptionNeqNull, tb);
+            Term notAbrupt = tb.not(abrupt);
+
+            final Term term = addGoalTerm(contract, javaBlocks[0], javaBlocks[1],
+                                          javaBlocks[2], modality,
+                                          bodyBreakFound, context, remember,
+                                          rememberNext, decreasesCheck, anonOut,
+                                          posts[0], posts[1], postAfterTail, pre,
+                                          brokeLoop, notBrokeLoop,
+                                          exceptionEqNull, exceptionNeqNull,
+                                          cond, notCond, abrupt, notAbrupt,
+                                          tb);
+            if (goal != null) {
+                goal.setBranchLabel("Validity");
+                addInfFlow(goal);
+                goal.changeFormula(new SequentFormula(term), occurrence);
+            }
+            return term;
+        }
+
+        public void setUpPreconditionGoal(final Goal goal, final Term update,
+                                          final Term[] preconditions) {
+            final TermBuilder tb = services.getTermBuilder();
+            goal.setBranchLabel("Precondition");
+            Term fullPrecondition = tb.apply(update, tb.and(preconditions), null);
+            fullPrecondition =
+                TermLabelManager
+                    .refactorTerm(termLabelState, services, null,
+                                  fullPrecondition, rule, goal,
+                                  BlockContractInternalRule.FULL_PRECONDITION_TERM_HINT,
+                                  null);
+            goal.changeFormula(new SequentFormula(fullPrecondition),
+                               occurrence);
+            TermLabelManager.refactorGoal(termLabelState, services, occurrence,
+                                          application.rule(), goal, null, null);
+        }
+
+        public void setUpUsageGoal(final Goal goal, final Term[] updates,
+                                   final Term[] assumptions) {
+            final TermBuilder tb = services.getTermBuilder();
+            goal.setBranchLabel("Usage");
+            Term uAssumptions = tb.applySequential(updates, tb.and(assumptions));
+            goal.addFormula(new SequentFormula(uAssumptions), true, false);
+            goal.changeFormula(new SequentFormula(tb.applySequential(updates,
+                                                      buildUsageFormula(goal))),
+                                                  occurrence);
+            TermLabelManager.refactorGoal(termLabelState, services, occurrence,
+                                          application.rule(), goal, null, null);
+        }
+
+        private Statement wrapInMethodFrameIfContextIsAvailable(final StatementBlock block) {
+            if (instantiation.context == null) {
+                return block;
+            }
+            return new MethodFrame(null, instantiation.context, block);
+        }
+
+
+        private JavaBlock[] createJavaBlocks(final LoopContract contract,
+                                             ProgramVariable conditionVariable,
+                                             final ProgramVariable exceptionParameter,
+                                             Map<Label, ProgramVariable> breakFlags,
+                                             Map<Label, ProgramVariable> continueFlags) {
             BlockSpecificationElement.Variables bodyVariables = new Variables(
                     variables.self,
                     breakFlags,
@@ -992,7 +1213,6 @@ public final class BlockContractBuilders {
                     variables.outerRemembranceHeaps,
                     variables.outerRemembranceVariables,
                     services);
-
 
             JavaBlock unfold =
                     JavaBlock.createJavaBlock(new StatementBlock(
@@ -1032,180 +1252,7 @@ public final class BlockContractBuilders {
                                             services,
                                             variables)
                                     .construct()))));
-
-            Term anonOut = new UpdatesBuilder(variables, services)
-                    .buildAnonOutUpdate(contract.getLoop(), anonOutHeaps, modifiesClauses);
-
-            Term post = tb.and(postconditions);
-            post = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(
-                    services,
-                    post,
-                    ImmutableSLList.<LocationVariable>nil()
-                        .prepend(terms.remembranceLocalVariables.keySet()),
-                    terms.exception);
-            post = TermLabelManager.refactorTerm(
-                    termLabelState,
-                    services,
-                    null,
-                    post,
-                    rule,
-                    goal,
-                    AbstractBlockSpecificationElementRule.NEW_POSTCONDITION_TERM_HINT,
-                    null);
-
-            Term postNext = tb.and(postconditionsNext);
-            postNext = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(
-                    services,
-                    postNext,
-                    ImmutableSLList.<LocationVariable>nil()
-                        .prepend(terms.remembranceLocalVariables.keySet()),
-                    terms.exception);
-            postNext = TermLabelManager.refactorTerm(
-                    termLabelState,
-                    services,
-                    null,
-                    postNext,
-                    rule,
-                    goal,
-                    AbstractBlockSpecificationElementRule.NEW_POSTCONDITION_TERM_HINT,
-                    null);
-
-            Term postAfterTail = tb.prog(modality, tail, post);
-            Term pre = tb.and(assumptions);
-            Term brokeLoop = tb.equals(tb.var(brokeLoopVariable), tb.TRUE());
-            Term notBrokeLoop = tb.not(brokeLoop);
-            Term exceptionEqNull = tb.equals(tb.var(variables.exception), tb.NULL());
-            Term exceptionNeqNull = tb.not(exceptionEqNull);
-            Term cond = tb.equals(tb.var(conditionVariable), tb.TRUE());
-            Term notCond = tb.not(cond);
-
-            Set<Term> abruptTerms = new LinkedHashSet<>();
-            abruptTerms.add(exceptionNeqNull);
-            if (terms.returnFlag != null) {
-                abruptTerms.add(tb.equals(terms.returnFlag, tb.TRUE()));
-            }
-            for (Term term : terms.continueFlags.values()) {
-                abruptTerms.add(tb.equals(term, tb.TRUE()));
-            }
-            for (Term term : terms.breakFlags.values()) {
-                abruptTerms.add(tb.equals(term, tb.TRUE()));
-            }
-
-            Term abrupt = tb.or(abruptTerms);
-            Term notAbrupt = tb.not(abrupt);
-
-            // Add a simplified version of the formula if tail is empty.
-            Term term;
-            if (contract.getTail().isEmpty()) {
-                Term postBody;
-                if (bodyBreakFound) {
-                    postBody = tb.and(
-                        tb.imp(tb.or(brokeLoop, abrupt), post),
-                        tb.imp(tb.and(notBrokeLoop, notAbrupt),
-                               tb.and(pre, decreasesCheck,
-                                      tb.apply(rememberNext,
-                                               tb.apply(anonOut,
-                                                        tb.imp(postNext, post)
-                        )))));
-                } else {
-                    postBody =
-                        tb.and(tb.imp(abrupt, post),
-                               tb.imp(notAbrupt,
-                                      tb.and(pre, decreasesCheck,
-                                             tb.apply(rememberNext,
-                                                      tb.apply(anonOut,
-                                                               tb.imp(postNext, post)
-                        )))));
-                }
-
-                term = tb.apply(context,
-                    tb.imp(pre,
-                        tb.apply(remember, tb.prog(modality, unfold, tb.and(
-                            tb.imp(tb.or(exceptionNeqNull, notCond), post),
-                            tb.imp(tb.and(exceptionEqNull, cond),
-                                tb.prog(modality, body, postBody))
-                            )
-                        ))
-                    )
-                );
-            } else {
-                Term postBody;
-                if (bodyBreakFound) {
-                    postBody =
-                        tb.and(tb.imp(brokeLoop, postAfterTail),
-                               tb.imp(abrupt, post),
-                               tb.imp(tb.and(notBrokeLoop, notAbrupt),
-                                   tb.and(pre, decreasesCheck,
-                                          tb.apply(rememberNext,
-                                              tb.apply(anonOut,
-                                                  tb.and(tb.imp(abrupt,
-                                                             tb.imp(postNext,
-                                                                 post)),
-                                                         tb.imp(notAbrupt,
-                                                             tb.prog(modality, tail,
-                                                                 tb.imp(postNext, post)))
-                            )
-                        ))))
-                    );
-                } else {
-                    postBody =
-                        tb.and(tb.imp(abrupt, post),
-                               tb.imp(notAbrupt,
-                                   tb.and(pre, decreasesCheck,
-                                          tb.apply(rememberNext,
-                                              tb.apply(anonOut,
-                                                  tb.and(tb.imp(abrupt,
-                                                             tb.imp(postNext, post)),
-                                                         tb.imp(notAbrupt,
-                                                             tb.prog(modality, tail,
-                                                                 tb.imp(postNext, post)))
-                            )
-                        ))))
-                    );
-                }
-
-                term = tb.apply(context,
-                    tb.imp(pre,
-                        tb.apply(remember, tb.prog(modality, unfold, tb.and(
-                            tb.imp(exceptionNeqNull, post),
-                            tb.imp(tb.and(exceptionEqNull, notCond), postAfterTail),
-                            tb.imp(tb.and(exceptionEqNull, cond),
-                                tb.prog(modality, body, postBody)
-                            )
-                        )
-                    )))
-                );
-            }
-
-            if (goal != null) {
-                goal.setBranchLabel("Validity");
-
-                final boolean oldInfFlowCheckInfoValue =
-                        goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null
-                          && goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY);
-                StrategyInfoUndoMethod undo =
-                    new StrategyInfoUndoMethod() {
-                        @Override
-                        public void undo(
-                            de.uka.ilkd.key.util.properties.Properties
-                                strategyInfos) {
-                            strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY,
-                                              oldInfFlowCheckInfoValue);
-                        }
-                    };
-                goal.addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, false, undo);
-
-                goal.changeFormula(new SequentFormula(term), occurrence);
-            }
-
-            return term;
-        }
-
-        private Statement wrapInMethodFrameIfContextIsAvailable(final StatementBlock block) {
-            if (instantiation.context == null) {
-                return block;
-            }
-            return new MethodFrame(null, instantiation.context, block);
+            return new JavaBlock[] {unfold, body, tail};
         }
 
         private StatementBlock
@@ -1220,36 +1267,6 @@ public final class BlockContractBuilders {
                     return new StatementBlock(statement);
                 }
             }
-        }
-
-        public void setUpPreconditionGoal(final Goal goal, final Term update,
-                                          final Term[] preconditions) {
-            final TermBuilder tb = services.getTermBuilder();
-            goal.setBranchLabel("Precondition");
-            Term fullPrecondition = tb.apply(update, tb.and(preconditions), null);
-            fullPrecondition =
-                TermLabelManager
-                    .refactorTerm(termLabelState, services, null,
-                                  fullPrecondition, rule, goal,
-                                  BlockContractInternalRule.FULL_PRECONDITION_TERM_HINT,
-                                  null);
-            goal.changeFormula(new SequentFormula(fullPrecondition),
-                               occurrence);
-            TermLabelManager.refactorGoal(termLabelState, services, occurrence,
-                                          application.rule(), goal, null, null);
-        }
-
-        public void setUpUsageGoal(final Goal goal, final Term[] updates,
-                                   final Term[] assumptions) {
-            final TermBuilder tb = services.getTermBuilder();
-            goal.setBranchLabel("Usage");
-            Term uAssumptions = tb.applySequential(updates, tb.and(assumptions));
-            goal.addFormula(new SequentFormula(uAssumptions), true, false);
-            goal.changeFormula(new SequentFormula(tb.applySequential(updates,
-                                                      buildUsageFormula(goal))),
-                                                  occurrence);
-            TermLabelManager.refactorGoal(termLabelState, services, occurrence,
-                                          application.rule(), goal, null, null);
         }
 
         private Term buildUsageFormula(Goal goal) {
@@ -1301,5 +1318,65 @@ public final class BlockContractBuilders {
             return new StatementBlock(ifCascade.toArray(new Statement[ifCascade.size()]));
         }
 
+        private JavaBlock getJavaBlock(final ProgramVariable exceptionParameter) {
+            final StatementBlock block =
+                    new ValidityProgramConstructor(labels, instantiation.block,
+                                                   variables, exceptionParameter,
+                                                   services).construct();
+            Statement wrappedBlock = wrapInMethodFrameIfContextIsAvailable(block);
+            StatementBlock finishedBlock =
+                finishTransactionIfModalityIsTransactional(wrappedBlock);
+            return JavaBlock.createJavaBlock(finishedBlock);
+        }
+
+
+        private final Map<Label, ProgramVariable>
+                    collectContinueFlags(final LoopContract contract,
+                                         ProgramVariable continuedLoopVariable,
+                                         List<Continue> bodyContinues) {
+            Map<Label, ProgramVariable> continueFlags =
+                    new LinkedHashMap<>(variables.continueFlags);
+            continueFlags.remove(null);
+            for (Continue cont : bodyContinues) {
+                Label label = cont.getLabel();
+                if (label == null || contract.getLoopLabels().contains(label)) {
+                    continueFlags.put(label, continuedLoopVariable);
+                }
+            }
+            return continueFlags;
+        }
+
+        private Term[] createPosts(final Goal goal, final Term[] postconditions,
+                                   final Term[] postconditionsNext,
+                                   final BlockSpecificationElement.Terms terms,
+                                   final TermBuilder tb) {
+            Term post = tb.and(postconditions);
+            post = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(
+                    services,
+                    post,
+                    ImmutableSLList.<LocationVariable>nil()
+                        .prepend(terms.remembranceLocalVariables.keySet()),
+                    terms.exception);
+            post = TermLabelManager.refactorTerm(termLabelState, services,
+                                                 null, post, rule, goal,
+                    AbstractBlockSpecificationElementRule.NEW_POSTCONDITION_TERM_HINT,
+                    null);
+
+            Term postNext = tb.and(postconditionsNext);
+            postNext = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(
+                    services,
+                    postNext,
+                    ImmutableSLList.<LocationVariable>nil()
+                        .prepend(terms.remembranceLocalVariables.keySet()),
+                    terms.exception);
+            postNext = TermLabelManager.refactorTerm(termLabelState, services,
+                                                     null, postNext, rule,
+                                                     goal,
+                                                     AbstractBlockSpecificationElementRule
+                                                         .NEW_POSTCONDITION_TERM_HINT,
+                                                     null);
+            final Term[] posts = new Term[] {post, postNext};
+            return posts;
+        }
     }
 }

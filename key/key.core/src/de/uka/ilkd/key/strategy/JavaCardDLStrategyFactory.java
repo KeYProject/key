@@ -300,21 +300,8 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                 + "\" are applied automatically with high priority";
     }
 
-    public Strategy create(Proof proof,
-                           StrategyProperties strategyProperties) {
-        return new JavaCardDLStrategy(proof, strategyProperties);
-    }
-
-    @Override
-    public Name name() {
-        return NAME;
-    }
-
-    @Override
-    public StrategySettingsDefinition getSettingsDefinition() {
-        // Properties
-        OneOfStrategyPropertyDefinition stopAt
-                = new OneOfStrategyPropertyDefinition(
+    private static OneOfStrategyPropertyDefinition getStopAt() {
+        return new OneOfStrategyPropertyDefinition(
                         StrategyProperties.STOPMODE_OPTIONS_KEY, "Stop at",
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.STOPMODE_DEFAULT,
@@ -322,8 +309,10 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.STOPMODE_NONCLOSE,
                                 "Unclosable", TOOL_TIP_STOP_AT_UNCLOSABLE));
-        OneOfStrategyPropertyDefinition ossUsage
-            = new OneOfStrategyPropertyDefinition(
+    }
+
+    private static OneOfStrategyPropertyDefinition getOssUsage() {
+        return new OneOfStrategyPropertyDefinition(
                     StrategyProperties.OSS_OPTIONS_KEY, "One Step Simplification",
                     new StrategyPropertyValueDefinition(
                             StrategyProperties.OSS_ON, "Enabled",
@@ -331,8 +320,10 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                     new StrategyPropertyValueDefinition(
                             StrategyProperties.OSS_OFF, "Disabled",
                             TOOL_TIP_OSS_OFF));
-        OneOfStrategyPropertyDefinition proofSplitting
-                = new OneOfStrategyPropertyDefinition(
+    }
+
+    private static OneOfStrategyPropertyDefinition getProofSplitting() {
+        return new OneOfStrategyPropertyDefinition(
                         StrategyProperties.SPLITTING_OPTIONS_KEY,
                         "Proof splitting",
                         new StrategyPropertyValueDefinition(
@@ -344,8 +335,10 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.SPLITTING_OFF, "Off",
                                 TOOL_TIP_PROOF_SPLITTING_OFF));
-        OneOfStrategyPropertyDefinition loopTreatment
-                = new OneOfStrategyPropertyDefinition(
+    }
+
+    private static OneOfStrategyPropertyDefinition getLoopTreatment() {
+        return new OneOfStrategyPropertyDefinition(
                         StrategyProperties.LOOP_OPTIONS_KEY,
                         "Loop treatment",
                         2,
@@ -361,8 +354,10 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.LOOP_NONE, "None",
                                 TOOL_TIP_LOOP_NONE));
-        OneOfStrategyPropertyDefinition blockTreatment
-                = new OneOfStrategyPropertyDefinition(
+    }
+
+    private static OneOfStrategyPropertyDefinition getBlockTreatment() {
+        return new OneOfStrategyPropertyDefinition(
                         StrategyProperties.BLOCK_OPTIONS_KEY,
                         "Block treatment",
                         1,
@@ -375,8 +370,10 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.BLOCK_EXPAND, "Expand",
                                 TOOL_TIP_BLOCK_EXPAND));
-        OneOfStrategyPropertyDefinition methodTreatment
-                = new OneOfStrategyPropertyDefinition(
+    }
+
+    private static OneOfStrategyPropertyDefinition getMethodTreatment() {
+        return new OneOfStrategyPropertyDefinition(
                         StrategyProperties.METHOD_OPTIONS_KEY,
                         "Method treatment",
                         new StrategyPropertyValueDefinition(
@@ -388,8 +385,10 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.METHOD_NONE, "None",
                                 TOOL_TIP_METHOD_NONE));
-        OneOfStrategyPropertyDefinition mergePointStatementTreatment
-                = new OneOfStrategyPropertyDefinition(
+    }
+
+    private static OneOfStrategyPropertyDefinition getMergePointStatementTreatment() {
+        return new OneOfStrategyPropertyDefinition(
                         StrategyProperties.MPS_OPTIONS_KEY, "Merge point statements",
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.MPS_MERGE, "Merge",
@@ -400,8 +399,10 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.MPS_NONE, "None",
                                 TOOL_TIP_MPS_NONE));
-        OneOfStrategyPropertyDefinition dependencyContracts
-                = new OneOfStrategyPropertyDefinition(
+    }
+
+    private static OneOfStrategyPropertyDefinition getDependencyContracts() {
+        return new OneOfStrategyPropertyDefinition(
                         StrategyProperties.DEP_OPTIONS_KEY,
                         "Dependency contracts",
                         new StrategyPropertyValueDefinition(
@@ -410,7 +411,10 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.DEP_OFF, "Off",
                                 TOOL_TIP_DEPENDENCY_OFF));
-        OneOfStrategyPropertyDefinition expandLocalQueries
+    }
+
+    private static OneOfStrategyPropertyDefinition getQueryTreatment() {
+        final OneOfStrategyPropertyDefinition expandLocalQueries
                 = new OneOfStrategyPropertyDefinition(
                         StrategyProperties.QUERYAXIOM_OPTIONS_KEY,
                         "Expand local queries:",
@@ -420,8 +424,7 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.QUERYAXIOM_OFF, "Off",
                                 TOOL_TIP_EXPAND_LOCAL_QUERIES_OFF));
-        OneOfStrategyPropertyDefinition queryTreatment
-                = new OneOfStrategyPropertyDefinition(
+        return new OneOfStrategyPropertyDefinition(
                         StrategyProperties.QUERY_OPTIONS_KEY,
                         "Query treatment",
                         new AbstractStrategyPropertyDefinition[] { expandLocalQueries },
@@ -434,8 +437,10 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.QUERY_OFF, "Off",
                                 TOOL_TIP_QUERY_OFF));
-        OneOfStrategyPropertyDefinition arithmeticTreatment
-                = new OneOfStrategyPropertyDefinition(
+    }
+
+    private static OneOfStrategyPropertyDefinition getArithmeticTreatment() {
+        return new OneOfStrategyPropertyDefinition(
                         StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
                         "Arithmetic treatment",
                         new StrategyPropertyValueDefinition(
@@ -448,8 +453,10 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                                 StrategyProperties.NON_LIN_ARITH_COMPLETION,
                                 "Model Search",
                                 TOOL_TIP_ARITHMETIC_MODEL_SEARCH));
-        OneOfStrategyPropertyDefinition quantifierTreatment
-                = new OneOfStrategyPropertyDefinition(
+    }
+
+    private static OneOfStrategyPropertyDefinition getQuantifierTreatment() {
+        return new OneOfStrategyPropertyDefinition(
                         StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
                         "Quantifier treatment",
                         2,
@@ -468,8 +475,10 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.QUANTIFIERS_INSTANTIATE,
                                 "Free", TOOL_TIP_QUANTIFIER_FREE, 6, 2));
-        OneOfStrategyPropertyDefinition classAxiom
-                = new OneOfStrategyPropertyDefinition(
+    }
+
+    private static OneOfStrategyPropertyDefinition getClassAxiom() {
+        return new OneOfStrategyPropertyDefinition(
                         StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
                         "Class axiom rule",
                         new StrategyPropertyValueDefinition(
@@ -481,8 +490,10 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.CLASS_AXIOM_OFF, "Off",
                                 TOOL_TIP_CLASSAXIOM_OFF));
-        OneOfStrategyPropertyDefinition autoInduction
-                = new OneOfStrategyPropertyDefinition(
+    }
+
+    private static OneOfStrategyPropertyDefinition getAutoInduction() {
+        return new OneOfStrategyPropertyDefinition(
                         StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY,
                         "Auto Induction",
                         new StrategyPropertyValueDefinition(
@@ -495,6 +506,9 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.AUTO_INDUCTION_OFF,
                                 "Off", TOOL_TIP_AUTO_INDUCTION_OFF));
+    }
+
+    private static OneOfStrategyPropertyDefinition getUserOptions() {
         // User properties
         List<AbstractStrategyPropertyDefinition> props = new LinkedList<>();
         for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
@@ -516,8 +530,7 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             props.add(user);
         }
 
-        OneOfStrategyPropertyDefinition userOptions
-                = new OneOfStrategyPropertyDefinition(
+        return new OneOfStrategyPropertyDefinition(
                         null,
                         "User-specific taclet sets",
                         "<html>"
@@ -530,6 +543,36 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         -1,
                         props.toArray(
                             new AbstractStrategyPropertyDefinition[props.size()]));
+    }
+
+    public Strategy create(Proof proof,
+                           StrategyProperties strategyProperties) {
+        return new JavaCardDLStrategy(proof, strategyProperties);
+    }
+
+    @Override
+    public Name name() {
+        return NAME;
+    }
+
+    @Override
+    public StrategySettingsDefinition getSettingsDefinition() {
+        // Properties
+        final OneOfStrategyPropertyDefinition stopAt = getStopAt();
+        final OneOfStrategyPropertyDefinition ossUsage = getOssUsage();
+        final OneOfStrategyPropertyDefinition proofSplitting = getProofSplitting();
+        final OneOfStrategyPropertyDefinition loopTreatment = getLoopTreatment();
+        final OneOfStrategyPropertyDefinition blockTreatment = getBlockTreatment();
+        final OneOfStrategyPropertyDefinition methodTreatment = getMethodTreatment();
+        final OneOfStrategyPropertyDefinition mergePointStatementTreatment =
+                getMergePointStatementTreatment();
+        final OneOfStrategyPropertyDefinition dependencyContracts = getDependencyContracts();
+        final OneOfStrategyPropertyDefinition queryTreatment = getQueryTreatment();
+        final OneOfStrategyPropertyDefinition arithmeticTreatment = getArithmeticTreatment();
+        final OneOfStrategyPropertyDefinition quantifierTreatment = getQuantifierTreatment();
+        final OneOfStrategyPropertyDefinition classAxiom = getClassAxiom();
+        final OneOfStrategyPropertyDefinition autoInduction = getAutoInduction();
+        final OneOfStrategyPropertyDefinition userOptions = getUserOptions();
         // Model
         return new StrategySettingsDefinition("Java DL Options", stopAt, ossUsage,
                 proofSplitting, loopTreatment, blockTreatment, methodTreatment,
