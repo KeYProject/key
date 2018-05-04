@@ -100,37 +100,16 @@ public class Statistics {
         int tmpInv = 0; // loop invariants
 
         for (final Node node = it.next(); it.hasNext(); tmpNodes++) {
-            final int c = node.childrenCount();
-            if (c > 1) {
-                tmpBranches += c - 1;
-            }
-
-            if (node.getNodeInfo().getInteractiveRuleApplication()) {
-                tmpInteractive++;
-                final String ruleAppName =
-                        node.getAppliedRuleApp().rule().name().toString();
-                if (!interactiveAppsDetails.containsKey(ruleAppName)) {
-                    interactiveAppsDetails.put(ruleAppName, 1);
-                } else {
-                    interactiveAppsDetails.put(ruleAppName,
-                            interactiveAppsDetails.get(ruleAppName) + 1);
-                }
-            }
-
-            if (NodeInfo.isSymbolicExecutionRuleApplied(node)) {
-                tmpSymbExApps++;
-            }
+            tmpBranches = addTmpBranches(node, tmpBranches);
+            tmpInteractive =
+                    addInteractiveRuleApps(node, interactiveAppsDetails, tmpInteractive);
+            tmpSymbExApps += NodeInfo.isSymbolicExecutionRuleApplied(node) ? 1 : 0;
 
             final RuleApp ruleApp = node.getAppliedRuleApp();
             if (ruleApp != null) {
                 if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
                     tmpOss++;
-                    final Protocol protocol =
-                            ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp)
-                                    ruleApp).getProtocol();
-                    if (protocol != null) {
-                        tmpOssCaptured += protocol.size() - 1;
-                    }
+                    tmpOssCaptured += adddTmpOssCaptured(ruleApp);
                 } else if (ruleApp instanceof de.uka.ilkd.key.smt.RuleAppSMT) {
                     tmpSmt++;
                 } else if (ruleApp instanceof UseDependencyContractApp) {
@@ -144,13 +123,7 @@ public class Statistics {
                 } else if (ruleApp instanceof MergeRuleBuiltInRuleApp) {
                     tmpMergeApps++;
                 } else if (ruleApp instanceof TacletApp) {
-                    final String tName =
-                            ((TacletApp)ruleApp).taclet().name().toString();
-                    if (tName.startsWith("allLeft")
-                            || tName.startsWith("exRight")
-                            || tName.startsWith("inst")) {
-                        tmpQuant++;
-                    }
+                    tmpQuant = addTmpQuant(ruleApp, tmpQuant);
                 }
             }
         }
@@ -196,6 +169,52 @@ public class Statistics {
                               side.autoModeTimeInMillis,
                               System.currentTimeMillis() - creationTime,
                               side.timePerStepInMillis);
+    }
+
+    private static int addTmpBranches(final Node node, int tmpBranches) {
+        final int c = node.childrenCount();
+        if (c > 1) {
+            tmpBranches += c - 1;
+        }
+        return tmpBranches;
+    }
+
+    private static int addInteractiveRuleApps(final Node node,
+                                              final HashMap<String, Integer>
+                                                        intAppsDetails,
+                                              int tmpInteractive) {
+        if (node.getNodeInfo().getInteractiveRuleApplication()) {
+            tmpInteractive++;
+            final String ruleAppName =
+                    node.getAppliedRuleApp().rule().name().toString();
+            if (!intAppsDetails.containsKey(ruleAppName)) {
+                intAppsDetails.put(ruleAppName, 1);
+            } else {
+                intAppsDetails.put(ruleAppName, intAppsDetails.get(ruleAppName) + 1);
+            }
+        }
+        return tmpInteractive;
+    }
+
+    private static int adddTmpOssCaptured(final RuleApp ruleApp) {
+        int tmpOssCaptured = 0;
+        final Protocol protocol =
+                ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
+        if (protocol != null) {
+            tmpOssCaptured = protocol.size() - 1;
+        }
+        return tmpOssCaptured;
+    }
+
+    private static int addTmpQuant(final RuleApp ruleApp, int tmpQuant) {
+        final String tName =
+                ((TacletApp)ruleApp).taclet().name().toString();
+        if (tName.startsWith("allLeft")
+                || tName.startsWith("exRight")
+                || tName.startsWith("inst")) {
+            tmpQuant++;
+        }
+        return tmpQuant;
     }
 
     private void generateSummary(Proof proof) {

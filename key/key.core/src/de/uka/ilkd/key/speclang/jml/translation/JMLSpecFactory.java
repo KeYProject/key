@@ -51,6 +51,7 @@ import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -131,6 +132,91 @@ public class JMLSpecFactory {
         this.tb = services.getTermBuilder();
         cf = new ContractFactory(services);
         modelFields = new LinkedHashSet<Pair<KeYJavaType, IObserverFunction>>();
+    }
+
+    private static Map<LocationVariable, Term>
+                    createAtPres(final ImmutableList<LocationVariable> paramVars,
+                                 final ImmutableList<LocationVariable> allHeaps,
+                                 final TermBuilder tb) {
+        Map<LocationVariable, Term> atPres = new LinkedHashMap<LocationVariable, Term>();
+        for (LocationVariable heap : allHeaps) {
+            atPres.put(heap, tb
+                    .var(tb.heapAtPreVar(heap + "AtPre", heap.sort(), false)));
+        }
+        for (LocationVariable param : paramVars) {
+            // TODO rename heapAtPreVar
+            atPres.put(param, tb.var(
+                    tb.heapAtPreVar(param + "AtPre", param.sort(), false)));
+        }
+        return atPres;
+    }
+
+    private static Map<LocationVariable, Term>
+        translateToTermInvariants(IProgramMethod pm,
+                                  Map<String, ImmutableList<PositionedString>>
+                                        originalInvariants,
+                                  ProgramVariable selfVar,
+                                  ImmutableList<ProgramVariable> allVars,
+                                  final ImmutableList<LocationVariable> allHeaps,
+                                  final Map<LocationVariable, Term> atPres,
+                                  final Services services,
+                                  final TermBuilder tb)
+                                          throws SLTranslationException {
+        Map<LocationVariable, Term> invariants =
+                new LinkedHashMap<LocationVariable, Term>();
+        for (LocationVariable heap : allHeaps) {
+            Term invariant;
+            ImmutableList<PositionedString> originalInvariant =
+                    originalInvariants.get(heap.name().toString());
+            if (originalInvariant.isEmpty()) {
+                invariant = null;
+            } else {
+                invariant = tb.tt();
+                for (PositionedString expr : originalInvariant) {
+                    Term translated = JMLTranslator.translate(expr,
+                            pm.getContainerType(), selfVar, allVars, null, null,
+                            atPres, atPres, Term.class, services);
+                    invariant = tb.andSC(invariant,
+                            tb.convertToFormula(translated));
+                }
+            }
+            invariants.put(heap, invariant);
+        }
+        return invariants;
+    }
+
+    private static Map<LocationVariable, Term>
+        translateToTermFreeInvariants(IProgramMethod pm,
+                                      Map<String, ImmutableList<PositionedString>>
+                                            originalFreeInvariants,
+                                      ProgramVariable selfVar,
+                                      ImmutableList<ProgramVariable> allVars,
+                                      final ImmutableList<LocationVariable> allHeaps,
+                                      final Map<LocationVariable, Term> atPres,
+                                      final Services services,
+                                      final TermBuilder tb)
+                                              throws SLTranslationException {
+        Map<LocationVariable, Term> freeInvariants =
+                new LinkedHashMap<LocationVariable, Term>();
+        for (LocationVariable heap : allHeaps) {
+            Term freeInvariant;
+            ImmutableList<PositionedString> originalFreeInvariant =
+                    originalFreeInvariants.get(heap.name().toString());
+            if (originalFreeInvariant.isEmpty()) {
+                freeInvariant = null;
+            } else {
+                freeInvariant = tb.tt();
+                for (PositionedString expr : originalFreeInvariant) {
+                    Term translated = JMLTranslator.translate(expr,
+                            pm.getContainerType(), selfVar, allVars, null, null,
+                            atPres, atPres, Term.class, services);
+                    freeInvariant = tb.andSC(freeInvariant,
+                            tb.convertToFormula(translated));
+                }
+            }
+            freeInvariants.put(heap, freeInvariant);
+        }
+        return freeInvariants;
     }
 
     private ImmutableSet<Contract> createInformationFlowContracts(
@@ -337,12 +423,13 @@ public class JMLSpecFactory {
     }
 
     private ContractClauses translateJMLClauses(IProgramMethod pm,
-            TextualJMLSpecCase textualSpecCase,
-            ProgramVariableCollection progVars, Behavior originalBehavior)
+                                                TextualJMLSpecCase textualSpecCase,
+                                                ProgramVariableCollection progVars,
+                                                Behavior originalBehavior)
                     throws SLTranslationException {
         ContractClauses clauses = new ContractClauses();
-        final LocationVariable savedHeap = services.getTypeConverter()
-                .getHeapLDT().getSavedHeap();
+        final LocationVariable savedHeap =
+                services.getTypeConverter().getHeapLDT().getSavedHeap();
 
         clauses.abbreviations = registerAbbreviationVariables(textualSpecCase,
                 pm.getContainerType(), progVars, clauses);
@@ -353,94 +440,26 @@ public class JMLSpecFactory {
         clauses.decreases = translateDecreases(pm, progVars.selfVar, progVars.paramVars,
                 progVars.atPres, progVars.atBefores, textualSpecCase.getDecreases());
 
-        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
-                .getAllHeaps()) {
-            clauses.hasMod.put(heap, !translateStrictlyPure(pm,
-                    progVars.selfVar, progVars.paramVars,
-                    textualSpecCase.getAssignable(heap.name().toString())));
-            if (heap == savedHeap && textualSpecCase
-                    .getAssignable(heap.name().toString()).isEmpty()) {
-                clauses.assignables.put(heap, null);
-            } else if (!clauses.hasMod.get(heap)) {
-                final ImmutableList<PositionedString> assignableNothing = ImmutableSLList
-                        .<PositionedString> nil()
-                        .append(new PositionedString("assignable \\nothing;"));
-                clauses.assignables.put(heap,
-                        translateAssignable(pm, progVars.selfVar, progVars.paramVars,
-                                progVars.atPres, progVars.atBefores,
-                                assignableNothing));
-            } else {
-                clauses.assignables.put(heap, translateAssignable(pm,
-                        progVars.selfVar, progVars.paramVars, progVars.atPres, progVars.atBefores,
-                        textualSpecCase.getAssignable(heap.name().toString())));
-            }
-
-            if (heap == savedHeap && textualSpecCase
-                    .getRequires(heap.name().toString()).isEmpty()) {
-                clauses.requires.put(heap, null);
-            } else {
-                clauses.requires.put(heap, translateAndClauses(pm,
-                        progVars.selfVar, progVars.paramVars, null, null,
-                        progVars.atPres, progVars.atBefores,
-                        textualSpecCase.getRequires(heap.name().toString())));
-            }
-
-            if (heap == savedHeap && textualSpecCase
-                    .getRequiresFree(heap.name().toString()).isEmpty()) {
-                clauses.requiresFree.put(heap, null);
-            } else {
-                clauses.requiresFree.put(heap,
-                        translateAndClauses(pm, progVars.selfVar,
-                                progVars.paramVars, null, null, progVars.atPres, progVars.atBefores,
-                                textualSpecCase.getRequiresFree(
-                                        heap.name().toString())));
-            }
-
-            if (heap == savedHeap && textualSpecCase
-                    .getEnsures(heap.name().toString()).isEmpty()) {
-                clauses.ensures.put(heap, null);
-            } else {
-                clauses.ensures.put(heap, translateEnsures(pm, progVars.selfVar,
-                        progVars.paramVars, progVars.resultVar, progVars.excVar,
-                        progVars.atPres, progVars.atBefores, originalBehavior,
-                        textualSpecCase.getEnsures(heap.name().toString())));
-            }
-
-            if (heap == savedHeap && textualSpecCase
-                    .getEnsuresFree(heap.name().toString()).isEmpty()) {
-                clauses.ensuresFree.put(heap, null);
-            } else {
-                clauses.ensuresFree.put(heap,
-                        translateAndClauses(pm, progVars.selfVar,
-                                progVars.paramVars, progVars.resultVar,
-                                progVars.excVar, progVars.atPres, progVars.atBefores,
-                                textualSpecCase.getEnsuresFree(
-                                        heap.name().toString())));
-            }
-
-            if (textualSpecCase.getAxioms(heap.name().toString()).isEmpty()) {
-                clauses.axioms.put(heap, null);
-            } else {
-                clauses.axioms.put(heap, translateEnsures(pm, progVars.selfVar,
-                        progVars.paramVars, progVars.resultVar, progVars.excVar,
-                        progVars.atPres, progVars.atBefores, originalBehavior,
-                        textualSpecCase.getAxioms(heap.name().toString())));
-            }
-            ProgramVariable heapAtPre = progVars.atPreVars.get(heap);
-            if (heap == savedHeap && textualSpecCase
-                    .getAccessible(heap.name().toString()).isEmpty()) {
-                clauses.accessibles.put(heap, null);
-                clauses.accessibles.put(heapAtPre, null);
-            } else {
-                clauses.accessibles.put(heap, translateAssignable(pm,
-                        progVars.selfVar, progVars.paramVars, progVars.atPres, progVars.atBefores,
-                        textualSpecCase.getAccessible(heap.name().toString())));
-                clauses.accessibles.put(heapAtPre,
-                        translateAssignable(pm, progVars.selfVar,
-                                progVars.paramVars, progVars.atPres, progVars.atBefores,
-                                textualSpecCase.getAccessible(
-                                        heap.name().toString() + "AtPre")));
-            }
+        for (LocationVariable heap
+                : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            translateAssignable(pm, progVars, heap, savedHeap,
+                                textualSpecCase.getAssignable(heap.name().toString()),
+                                clauses);
+            translateRequires(pm, progVars, heap, savedHeap,
+                              textualSpecCase.getRequires(heap.name().toString()),
+                              textualSpecCase.getRequiresFree(heap.name().toString()),
+                              clauses);
+            translateEnsures(pm, progVars, heap, savedHeap,
+                             textualSpecCase.getEnsures(heap.name().toString()),
+                             textualSpecCase.getEnsuresFree(heap.name().toString()),
+                             clauses, originalBehavior);
+            translateAxioms(pm, progVars, heap,
+                            textualSpecCase.getAxioms(heap.name().toString()),
+                            clauses, originalBehavior);
+            translateAccessible(pm, progVars, heap, progVars.atPreVars.get(heap), savedHeap,
+                                textualSpecCase.getAccessible(heap.name().toString()),
+                                textualSpecCase.getAccessible(heap.name().toString() + "AtPre"),
+                                clauses);
         }
         clauses.signals = translateSignals(pm, progVars.selfVar,
                 progVars.paramVars, progVars.resultVar, progVars.excVar,
@@ -465,6 +484,128 @@ public class JMLSpecFactory {
                 progVars.paramVars, progVars.resultVar, progVars.excVar,
                 textualSpecCase.getInfFlowSpecs());
         return clauses;
+    }
+
+    private void translateAccessible(IProgramMethod pm,
+                                     ProgramVariableCollection progVars,
+                                     LocationVariable heap,
+                                     ProgramVariable heapAtPre,
+                                     final LocationVariable savedHeap,
+                                     ImmutableList<PositionedString> accessible,
+                                     ImmutableList<PositionedString> accessiblePre,
+                                     ContractClauses clauses) throws SLTranslationException {
+        if (heap == savedHeap && accessible.isEmpty()) {
+            clauses.accessibles.put(heap, null);
+            clauses.accessibles.put(heapAtPre, null);
+        } else {
+            clauses.accessibles.put(heap, translateAssignable(pm,
+                    progVars.selfVar, progVars.paramVars, progVars.atPres, progVars.atBefores,
+                    accessible));
+            clauses.accessibles.put(heapAtPre,
+                    translateAssignable(pm, progVars.selfVar,
+                            progVars.paramVars, progVars.atPres, progVars.atBefores,
+                            accessiblePre));
+        }
+    }
+
+    private void translateAxioms(IProgramMethod pm,
+                                 ProgramVariableCollection progVars,
+                                 LocationVariable heap,
+                                 ImmutableList<PositionedString> axioms,
+                                 ContractClauses clauses,
+                                 Behavior originalBehavior)
+                                         throws SLTranslationException {
+        if (axioms.isEmpty()) {
+            clauses.axioms.put(heap, null);
+        } else {
+            clauses.axioms.put(heap, translateEnsures(pm, progVars.selfVar,
+                    progVars.paramVars, progVars.resultVar, progVars.excVar,
+                    progVars.atPres, progVars.atBefores, originalBehavior,
+                    axioms));
+        }
+    }
+
+    private void translateEnsures(IProgramMethod pm,
+                                  ProgramVariableCollection progVars,
+                                  LocationVariable heap,
+                                  final LocationVariable savedHeap,
+                                  ImmutableList<PositionedString> ensures,
+                                  ImmutableList<PositionedString> ensuresFree,
+                                  ContractClauses clauses,
+                                  Behavior originalBehavior)
+                                          throws SLTranslationException {
+        if (heap == savedHeap && ensures.isEmpty()) {
+            clauses.ensures.put(heap, null);
+        } else {
+            clauses.ensures.put(heap, translateEnsures(pm, progVars.selfVar,
+                    progVars.paramVars, progVars.resultVar, progVars.excVar,
+                    progVars.atPres, progVars.atBefores, originalBehavior,
+                    ensures));
+        }
+
+        if (heap == savedHeap && ensuresFree.isEmpty()) {
+            clauses.ensuresFree.put(heap, null);
+        } else {
+            clauses.ensuresFree.put(heap,
+                    translateAndClauses(pm, progVars.selfVar,
+                            progVars.paramVars, progVars.resultVar,
+                            progVars.excVar, progVars.atPres, progVars.atBefores,
+                            ensuresFree));
+        }
+    }
+
+    private void translateRequires(IProgramMethod pm,
+                                   ProgramVariableCollection progVars,
+                                   LocationVariable heap,
+                                   final LocationVariable savedHeap,
+                                   final ImmutableList<PositionedString> requires,
+                                   final ImmutableList<PositionedString> requiresFree,
+                                   ContractClauses clauses)
+                                           throws SLTranslationException {
+        if (heap == savedHeap && requires.isEmpty()) {
+            clauses.requires.put(heap, null);
+        } else {
+            clauses.requires.put(heap, translateAndClauses(pm,
+                    progVars.selfVar, progVars.paramVars, null, null,
+                    progVars.atPres, progVars.atBefores, requires));
+        }
+        if (heap == savedHeap && requiresFree.isEmpty()) {
+            clauses.requiresFree.put(heap, null);
+        } else {
+            clauses.requiresFree.put(heap,
+                    translateAndClauses(pm, progVars.selfVar,
+                            progVars.paramVars, null, null,
+                            progVars.atPres, progVars.atBefores,
+                            requiresFree));
+        }
+    }
+
+    private void translateAssignable(IProgramMethod pm,
+                                     ProgramVariableCollection progVars,
+                                     LocationVariable heap,
+                                     final LocationVariable savedHeap,
+                                     final ImmutableList<PositionedString> mod,
+                                     ContractClauses clauses)
+                                             throws SLTranslationException {
+        clauses.hasMod.put(heap, !translateStrictlyPure(pm,
+                           progVars.selfVar, progVars.paramVars, mod));
+        if (heap == savedHeap && mod.isEmpty()) {
+            clauses.assignables.put(heap, null);
+        } else if (!clauses.hasMod.get(heap)) {
+            final ImmutableList<PositionedString> assignableNothing =
+                    ImmutableSLList.<PositionedString> nil()
+                        .append(new PositionedString("assignable \\nothing;"));
+            clauses.assignables.put(heap,
+                                    translateAssignable(pm, progVars.selfVar,
+                                                        progVars.paramVars,
+                                                        progVars.atPres,
+                                                        progVars.atBefores,
+                                                        assignableNothing));
+        } else {
+            clauses.assignables.put(heap, translateAssignable(pm,
+                    progVars.selfVar, progVars.paramVars, progVars.atPres,
+                    progVars.atBefores, mod));
+        }
     }
 
     /**
@@ -1477,14 +1618,19 @@ public class JMLSpecFactory {
         return null;
     }
 
-    private LoopSpecification createJMLLoopInvariant(
-            IProgramMethod pm,
-            LoopStatement loop,
-            Map<String, ImmutableList<PositionedString>> originalInvariants,
-            Map<String, ImmutableList<PositionedString>> originalFreeInvariants,
-            Map<String, ImmutableList<PositionedString>> originalAssignables,
-            ImmutableList<PositionedString> originalInfFlowSpecs,
-            PositionedString originalVariant) throws SLTranslationException {
+    private LoopSpecification
+                createJMLLoopInvariant(IProgramMethod pm,
+                                       LoopStatement loop,
+                                       Map<String, ImmutableList<PositionedString>>
+                                            originalInvariants,
+                                       Map<String, ImmutableList<PositionedString>>
+                                            originalFreeInvariants,
+                                       Map<String, ImmutableList<PositionedString>>
+                                            originalAssignables,
+                                       ImmutableList<PositionedString>
+                                            originalInfFlowSpecs,
+                                       PositionedString originalVariant)
+                                               throws SLTranslationException {
         assert pm != null;
         assert loop != null;
         assert originalInvariants != null;
@@ -1495,73 +1641,111 @@ public class JMLSpecFactory {
         // (disguised as parameters to the translator) and the map for
         // atPre-Functions
         ProgramVariable selfVar = tb.selfVar(pm, pm.getContainerType(), false);
-        final ImmutableList<LocationVariable> paramVars = pm
-                .collectParameters();
+        final ImmutableList<LocationVariable> paramVars = pm.collectParameters();
         ProgramVariable resultVar = tb.resultVar(pm, false);
         ProgramVariable excVar = tb.excVar(pm, false); // only for information
         // flow
 
-        final ImmutableList<LocationVariable> allHeaps = services
-                .getTypeConverter().getHeapLDT().getAllHeaps();
+        final ImmutableList<LocationVariable> allHeaps =
+                services.getTypeConverter().getHeapLDT().getAllHeaps();
 
-        Map<LocationVariable, Term> atPres = new LinkedHashMap<LocationVariable, Term>();
-        for (LocationVariable heap : allHeaps) {
-            atPres.put(heap, tb
-                    .var(tb.heapAtPreVar(heap + "AtPre", heap.sort(), false)));
-        }
-
-        for (LocationVariable param : paramVars) {
-            // TODO rename heapAtPreVar
-            atPres.put(param, tb.var(
-                    tb.heapAtPreVar(param + "AtPre", param.sort(), false)));
-        }
+        final Map<LocationVariable, Term> atPres = createAtPres(paramVars, allHeaps, tb);
 
         ImmutableList<ProgramVariable> localVars = collectLocalVariables(
                 pm.getBody(), loop);
         ImmutableList<ProgramVariable> allVars = append(localVars, paramVars);
 
         // translateToTerm invariant
-        Map<LocationVariable, Term> invariants = new LinkedHashMap<LocationVariable, Term>();
-        for (LocationVariable heap : allHeaps) {
-            Term invariant;
-            ImmutableList<PositionedString> originalInvariant = originalInvariants
-                    .get(heap.name().toString());
-            if (originalInvariant.isEmpty()) {
-                invariant = null;
-            } else {
-                invariant = tb.tt();
-                for (PositionedString expr : originalInvariant) {
-                    Term translated = JMLTranslator.translate(expr,
-                            pm.getContainerType(), selfVar, allVars, null, null,
-                            atPres, atPres, Term.class, services);
-                    invariant = tb.andSC(invariant,
-                            tb.convertToFormula(translated));
-                }
-            }
-            invariants.put(heap, invariant);
-        }
+        final Map<LocationVariable, Term> invariants =
+                translateToTermInvariants(pm, originalInvariants, selfVar,
+                                          allVars, allHeaps, atPres,
+                                          services, tb);
 
-        Map<LocationVariable, Term> freeInvariants = new LinkedHashMap<LocationVariable, Term>();
-        for (LocationVariable heap : allHeaps) {
-            Term freeInvariant;
-            ImmutableList<PositionedString> originalFreeInvariant = originalFreeInvariants
-                    .get(heap.name().toString());
-            if (originalFreeInvariant.isEmpty()) {
-                freeInvariant = null;
-            } else {
-                freeInvariant = tb.tt();
-                for (PositionedString expr : originalFreeInvariant) {
-                    Term translated = JMLTranslator.translate(expr,
-                            pm.getContainerType(), selfVar, allVars, null, null,
-                            atPres, atPres, Term.class, services);
-                    freeInvariant = tb.andSC(freeInvariant,
-                            tb.convertToFormula(translated));
-                }
-            }
-            freeInvariants.put(heap, freeInvariant);
-        }
+        Map<LocationVariable, Term> freeInvariants =
+                translateToTermFreeInvariants(pm, originalFreeInvariants, selfVar,
+                                              allVars, allHeaps, atPres,
+                                              services, tb);
 
         // translateToTerm assignable
+        Map<LocationVariable, Term> mods =
+                translateToTermAsssignable(pm, selfVar, atPres, allVars,
+                                           originalAssignables);
+
+        // translateToTerm infFlowSpecs
+        Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs =
+                translateToTermInfFlowSpecs(pm, selfVar, resultVar, excVar,
+                                            allVars, allHeaps, originalInfFlowSpecs);
+
+        // translateToTerm variant
+        Term variant =
+                translateToTermVariant(pm, selfVar, atPres, allVars, originalVariant);
+
+        ImmutableList<Term> localIns = tb
+                .var(MiscTools.getLocalIns(loop, services));
+        ImmutableList<Term> localOuts = tb
+                .var(MiscTools.getLocalOuts(loop, services));
+
+        // create loop invariant annotation
+        Term selfTerm = selfVar == null ? null : tb.var(selfVar);
+
+        return new LoopSpecImpl(loop, pm, pm.getContainerType(), invariants,
+                freeInvariants, mods, infFlowSpecs, variant, selfTerm, localIns,
+                localOuts, atPres);
+    }
+
+    private Term translateToTermVariant(IProgramMethod pm,
+                                        ProgramVariable selfVar,
+                                        Map<LocationVariable, Term> atPres,
+                                        ImmutableList<ProgramVariable> allVars,
+                                        PositionedString originalVariant)
+                                                throws SLTranslationException {
+        final Term variant;
+        if (originalVariant == null) {
+            variant = null;
+        } else {
+            Term translated = JMLTranslator.translate(originalVariant,
+                    pm.getContainerType(), selfVar, allVars, null, null, atPres, atPres,
+                    Term.class, services);
+            variant = translated;
+        }
+        return variant;
+    }
+
+    private Map<LocationVariable, ImmutableList<InfFlowSpec>>
+                translateToTermInfFlowSpecs(IProgramMethod pm,
+                                            ProgramVariable selfVar,
+                                            ProgramVariable resultVar,
+                                            ProgramVariable excVar,
+                                            ImmutableList<ProgramVariable> allVars,
+                                            final ImmutableList<LocationVariable> allHeaps,
+                                            ImmutableList<PositionedString>
+                                                originalInfFlowSpecs)
+                                                        throws SLTranslationException {
+        Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs =
+                new LinkedHashMap<LocationVariable, ImmutableList<InfFlowSpec>>();
+        ImmutableList<InfFlowSpec> infFlowSpecTermList;
+        final LocationVariable baseHeap = services.getTypeConverter()
+                .getHeapLDT().getHeap();
+        for (LocationVariable heap : allHeaps) {
+            if (!originalInfFlowSpecs.isEmpty() && heap.equals(baseHeap)) {
+                infFlowSpecTermList = translateInfFlowSpecClauses(pm, selfVar,
+                        allVars, resultVar, excVar, originalInfFlowSpecs);
+            } else {
+                infFlowSpecTermList = ImmutableSLList.<InfFlowSpec> nil();
+            }
+            infFlowSpecs.put(heap, infFlowSpecTermList);
+        }
+        return infFlowSpecs;
+    }
+
+    private Map<LocationVariable, Term>
+        translateToTermAsssignable(IProgramMethod pm,
+                                   ProgramVariable selfVar,
+                                   Map<LocationVariable, Term> atPres,
+                                   ImmutableList<ProgramVariable> allVars,
+                                   Map<String, ImmutableList<PositionedString>>
+                                        originalAssignables)
+                                                throws SLTranslationException {
         Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
         for (String h : originalAssignables.keySet()) {
             LocationVariable heap = services.getTypeConverter().getHeapLDT()
@@ -1582,48 +1766,9 @@ public class JMLSpecFactory {
                     a = tb.union(a, translated);
                 }
             }
-
             mods.put(heap, a);
         }
-
-        // translateToTerm infFlowSpecs
-        Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs =
-                new LinkedHashMap<LocationVariable, ImmutableList<InfFlowSpec>>();
-        ImmutableList<InfFlowSpec> infFlowSpecTermList;
-        final LocationVariable baseHeap = services.getTypeConverter()
-                .getHeapLDT().getHeap();
-        for (LocationVariable heap : allHeaps) {
-            if (!originalInfFlowSpecs.isEmpty() && heap.equals(baseHeap)) {
-                infFlowSpecTermList = translateInfFlowSpecClauses(pm, selfVar,
-                        allVars, resultVar, excVar, originalInfFlowSpecs);
-            } else {
-                infFlowSpecTermList = ImmutableSLList.<InfFlowSpec> nil();
-            }
-            infFlowSpecs.put(heap, infFlowSpecTermList);
-        }
-
-        // translateToTerm variant
-        Term variant;
-        if (originalVariant == null) {
-            variant = null;
-        } else {
-            Term translated = JMLTranslator.translate(originalVariant,
-                    pm.getContainerType(), selfVar, allVars, null, null, atPres, atPres,
-                    Term.class, services);
-            variant = translated;
-        }
-
-        ImmutableList<Term> localIns = tb
-                .var(MiscTools.getLocalIns(loop, services));
-        ImmutableList<Term> localOuts = tb
-                .var(MiscTools.getLocalOuts(loop, services));
-
-        // create loop invariant annotation
-        Term selfTerm = selfVar == null ? null : tb.var(selfVar);
-
-        return new LoopSpecImpl(loop, pm, pm.getContainerType(), invariants,
-                freeInvariants, mods, infFlowSpecs, variant, selfTerm, localIns,
-                localOuts, atPres);
+        return mods;
     }
 
     // ImmutableList does not accept lists of subclasses to #append and cannot
@@ -1640,8 +1785,9 @@ public class JMLSpecFactory {
     }
 
     public LoopSpecification createJMLLoopInvariant(IProgramMethod pm,
-            LoopStatement loop, TextualJMLLoopSpec textualLoopSpec)
-                    throws SLTranslationException {
+                                                    LoopStatement loop,
+                                                    TextualJMLLoopSpec textualLoopSpec)
+                                                            throws SLTranslationException {
         return createJMLLoopInvariant(pm, loop, textualLoopSpec.getInvariants(),
                 textualLoopSpec.getFreeInvariants(),
                 textualLoopSpec.getAssignables(),

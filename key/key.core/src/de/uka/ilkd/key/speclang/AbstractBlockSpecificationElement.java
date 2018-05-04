@@ -494,36 +494,9 @@ public abstract class AbstractBlockSpecificationElement
         stringBuilder.append(" catch(");
         stringBuilder.append(variables.exception);
         stringBuilder.append(")");
-        String mods = "";
-        for (LocationVariable heap : heapLDT.getAllHeaps()) {
-            if (modifiesClauses.get(heap) != null) {
-                mods = mods + "<br><b>mod" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
-                        + LogicPrinter.escapeHTML(
-                                LogicPrinter.quickPrintTerm(modifiesClauses.get(heap), services),
-                                false);
-                /*if (heap == baseHeap && !hasRealModifiesClause) {
-                    mods = mods + "<b>, creates no new objects</b>";
-                }*/
-            }
-        }
-        String pres = "";
-        for (LocationVariable heap : heapLDT.getAllHeaps()) {
-            if (preconditions.get(heap) != null) {
-                pres = pres + "<br><b>pre" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
-                        + LogicPrinter.escapeHTML(
-                                LogicPrinter.quickPrintTerm(preconditions.get(heap), services),
-                                false);
-            }
-        }
-        String posts = "";
-        for (LocationVariable heap : heapLDT.getAllHeaps()) {
-            if (postconditions.get(heap) != null) {
-                posts = posts + "<br><b>post" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
-                         + LogicPrinter.escapeHTML(
-                                 LogicPrinter.quickPrintTerm(postconditions.get(heap), services),
-                                 false);
-            }
-        }
+        String mods = getHtmlMods(baseHeap, heapLDT, services);
+        String pres = getHtmlPres(baseHeap, heapLDT, services);
+        String posts = getHtmlPosts(baseHeap, heapLDT, services);
         return "<html>"
                 + "<i>" + LogicPrinter.escapeHTML(stringBuilder.toString(), false) + "</i>"
                 + pres
@@ -566,46 +539,9 @@ public abstract class AbstractBlockSpecificationElement
         stringBuilder.append(" catch(");
         stringBuilder.append(terms.exception);
         stringBuilder.append(")");
-        String mods = "";
-        Term baseHeapTerm = services.getTermBuilder().var(baseHeap);
-        for (LocationVariable heap : heapLDT.getAllHeaps()) {
-            Term modifiesClause =
-                getModifiesClause(heap, services.getTermBuilder().var(heap),
-                                  terms.self, services);
-            if (modifiesClause != null) {
-                mods = mods + "\nmod" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                        + StringUtil.trim(
-                            LogicPrinter.quickPrintTerm(modifiesClause, services)
-                          );
-                /*if (heap == baseHeap && !hasRealModifiesClause) {
-                    mods = mods + "<b>, creates no new objects</b>";
-                }*/
-            }
-        }
-        String pres = "";
-        for (LocationVariable heap : heapLDT.getAllHeaps()) {
-            Term precondition =
-                getPrecondition(heap, baseHeapTerm, terms.self,
-                                terms.remembranceHeaps, services);
-            if (precondition != null) {
-                pres = pres + "\npre" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                        + StringUtil.trim(
-                            LogicPrinter.quickPrintTerm(precondition, services)
-                          );
-            }
-        }
-        String posts = "";
-        for (LocationVariable heap : heapLDT.getAllHeaps()) {
-            Term postcondition =
-                getPostcondition(heap, baseHeapTerm,
-                                 terms, services);
-            if (postcondition != null) {
-                posts = posts + "\npost" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                         + StringUtil.trim(
-                             LogicPrinter.quickPrintTerm(postcondition, services)
-                           );
-            }
-        }
+        String mods = getPlainMods(terms.self, baseHeap, heapLDT, services);
+        String pres = getPlainPres(terms, baseHeap, heapLDT, services);
+        String posts = getPlainPosts(terms, baseHeap, heapLDT, services);
         return stringBuilder.toString()
                 + pres
                 + posts
@@ -627,94 +563,49 @@ public abstract class AbstractBlockSpecificationElement
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
+        } else if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
         AbstractBlockSpecificationElement other =
             (AbstractBlockSpecificationElement) obj;
-        if (block == null) {
-            if (other.block != null) {
-                return false;
-            }
-        } else if (!block.equals(other.block)) {
+        if ((block == null && other.block != null)
+                || (block != null && !block.equals(other.block))) {
             return false;
-        }
-        if (hasMod == null) {
-            if (other.hasMod != null) {
-                return false;
-            }
-        } else if (!hasMod.equals(other.hasMod)) {
+        } else if ((hasMod == null && other.hasMod != null)
+                || (hasMod != null && !hasMod.equals(other.hasMod))) {
             return false;
-        }
-        if (infFlowSpecs == null) {
-            if (other.infFlowSpecs != null) {
-                return false;
-            }
-        } else if (!infFlowSpecs.equals(other.infFlowSpecs)) {
+        } else if ((infFlowSpecs == null && other.infFlowSpecs != null)
+                || (infFlowSpecs != null && !infFlowSpecs.equals(other.infFlowSpecs))) {
             return false;
-        }
-        if (instantiationSelf == null) {
-            if (other.instantiationSelf != null) {
-                return false;
-            }
-        } else if (!instantiationSelf.equals(other.instantiationSelf)) {
+        } else if ((instantiationSelf == null && other.instantiationSelf != null)
+                || (instantiationSelf != null
+                    && !instantiationSelf.equals(other.instantiationSelf))) {
             return false;
-        }
-
-        if (labels == null) {
-            if (other.labels != null) {
-                return false;
-            }
-        } else if (!labels.equals(other.labels)) {
+        } else if ((labels == null && other.labels != null)
+                || (labels != null && !labels.equals(other.labels))) {
             return false;
-        }
-        if (method == null) {
-            if (other.method != null) {
-                return false;
-            }
-        } else if (!method.equals(other.method)) {
+        } else if ((method == null && other.method != null)
+                || (method != null && !method.equals(other.method))) {
             return false;
-        }
-        if (modality == null) {
-            if (other.modality != null) {
-                return false;
-            }
-        } else if (!modality.equals(other.modality)) {
+        } else if ((modality == null && other.modality != null)
+                || (modality != null && !modality.equals(other.modality))) {
             return false;
-        }
-        if (modifiesClauses == null) {
-            if (other.modifiesClauses != null) {
-                return false;
-            }
-        } else if (!modifiesClauses.equals(other.modifiesClauses)) {
+        } else if ((modifiesClauses == null && other.modifiesClauses != null)
+                || (modifiesClauses != null
+                    && !modifiesClauses.equals(other.modifiesClauses))) {
             return false;
-        }
-        if (postconditions == null) {
-            if (other.postconditions != null) {
-                return false;
-            }
-        } else if (!postconditions.equals(other.postconditions)) {
+        } else if ((postconditions == null && other.postconditions != null)
+                || (postconditions != null
+                    && !postconditions.equals(other.postconditions))) {
             return false;
-        }
-        if (preconditions == null) {
-            if (other.preconditions != null) {
-                return false;
-            }
-        } else if (!preconditions.equals(other.preconditions)) {
+        } else if ((preconditions == null && other.preconditions != null)
+                || (preconditions != null
+                    && !preconditions.equals(other.preconditions))) {
             return false;
-        }
-        if (transactionApplicable != other.transactionApplicable) {
+        } else if (transactionApplicable != other.transactionApplicable) {
             return false;
-        }
-        if (variables == null) {
-            if (other.variables != null) {
-                return false;
-            }
-        } else if (!variables.equals(other.variables)) {
+        } else if ((variables == null && other.variables != null)
+                || (variables != null && !variables.equals(other.variables))) {
             return false;
         }
         return true;
@@ -814,6 +705,110 @@ public abstract class AbstractBlockSpecificationElement
         return result;
     }
 
+    private String getHtmlMods(final LocationVariable baseHeap,
+                               final HeapLDT heapLDT,
+                               final Services services) {
+        String mods = "";
+        for (LocationVariable heap : heapLDT.getAllHeaps()) {
+            if (modifiesClauses.get(heap) != null) {
+                mods = mods + "<br><b>mod"
+                        + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
+                        + LogicPrinter.escapeHTML(
+                                LogicPrinter.quickPrintTerm(modifiesClauses.get(heap), services),
+                                false);
+                /*if (heap == baseHeap && !hasRealModifiesClause) {
+                    mods = mods + "<b>, creates no new objects</b>";
+                }*/
+            }
+        }
+        return mods;
+    }
+
+    private String getHtmlPres(final LocationVariable baseHeap,
+                               final HeapLDT heapLDT,
+                               final Services services) {
+        String pres = "";
+        for (LocationVariable heap : heapLDT.getAllHeaps()) {
+            if (preconditions.get(heap) != null) {
+                pres = pres + "<br><b>pre"
+                        + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
+                        + LogicPrinter.escapeHTML(
+                                LogicPrinter.quickPrintTerm(preconditions.get(heap), services),
+                                false);
+            }
+        }
+        return pres;
+    }
+
+    private String getHtmlPosts(final LocationVariable baseHeap,
+                                final HeapLDT heapLDT,
+                                final Services services) {
+        String posts = "";
+        for (LocationVariable heap : heapLDT.getAllHeaps()) {
+            if (postconditions.get(heap) != null) {
+                posts = posts + "<br><b>post"
+                         + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
+                         + LogicPrinter.escapeHTML(
+                                 LogicPrinter.quickPrintTerm(postconditions.get(heap), services),
+                                 false);
+            }
+        }
+        return posts;
+    }
+
+    private String getPlainMods(Term self, final LocationVariable baseHeap,
+                                final HeapLDT heapLDT, final Services services) {
+        String mods = "";
+        for (LocationVariable heap : heapLDT.getAllHeaps()) {
+            Term modifiesClause =
+                getModifiesClause(heap, services.getTermBuilder().var(heap),
+                                  self, services);
+            if (modifiesClause != null) {
+                mods = mods + "\nmod" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
+                        + StringUtil.trim(
+                            LogicPrinter.quickPrintTerm(modifiesClause, services)
+                          );
+                /*if (heap == baseHeap && !hasRealModifiesClause) {
+                    mods = mods + "<b>, creates no new objects</b>";
+                }*/
+            }
+        }
+        return mods;
+    }
+
+    private String getPlainPres(Terms terms, final LocationVariable baseHeap,
+                                final HeapLDT heapLDT, final Services services) {
+        String pres = "";
+        for (LocationVariable heap : heapLDT.getAllHeaps()) {
+            Term precondition =
+                    getPrecondition(heap, services.getTermBuilder().var(baseHeap),
+                            terms.self, terms.remembranceHeaps, services);
+            if (precondition != null) {
+                pres = pres + "\npre" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
+                        + StringUtil.trim(
+                                LogicPrinter.quickPrintTerm(precondition, services)
+                                );
+            }
+        }
+        return pres;
+    }
+
+    private String getPlainPosts(Terms terms, final LocationVariable baseHeap,
+                                 final HeapLDT heapLDT, final Services services) {
+        String posts = "";
+        for (LocationVariable heap : heapLDT.getAllHeaps()) {
+            Term postcondition =
+                getPostcondition(heap, services.getTermBuilder().var(baseHeap),
+                                 terms, services);
+            if (postcondition != null) {
+                posts = posts + "\npost" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
+                         + StringUtil.trim(
+                             LogicPrinter.quickPrintTerm(postcondition, services)
+                           );
+            }
+        }
+        return posts;
+    }
 
     /**
      * A map from some type to the same type.

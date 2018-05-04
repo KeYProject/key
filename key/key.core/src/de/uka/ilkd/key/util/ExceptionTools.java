@@ -13,7 +13,6 @@ import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import recoder.java.CompilationUnit;
-import recoder.java.ProgramElement;
 import recoder.kit.UnitKit;
 import recoder.service.UnresolvedReferenceException;
 

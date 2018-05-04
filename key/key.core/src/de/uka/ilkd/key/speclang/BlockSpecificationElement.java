@@ -663,70 +663,46 @@ public interface BlockSpecificationElement extends SpecificationElement {
                 return false;
             }
             Variables other = (Variables) obj;
-            if (breakFlags == null) {
-                if (other.breakFlags != null) {
-                    return false;
-                }
-            } else if (!breakFlags.equals(other.breakFlags)) {
+            if (breakFlags == null && other.breakFlags != null) {
                 return false;
-            }
-            if (continueFlags == null) {
-                if (other.continueFlags != null) {
-                    return false;
-                }
-            } else if (!continueFlags.equals(other.continueFlags)) {
+            } else if (breakFlags != null && !breakFlags.equals(other.breakFlags)) {
                 return false;
-            }
-            if (exception == null) {
-                if (other.exception != null) {
-                    return false;
-                }
-            } else if (!exception.equals(other.exception)) {
+            } else if (continueFlags == null && other.continueFlags != null) {
                 return false;
-            }
-            if (remembranceHeaps == null) {
-                if (other.remembranceHeaps != null) {
-                    return false;
-                }
-            } else if (!remembranceHeaps.equals(other.remembranceHeaps)) {
+            } else if (continueFlags != null && !continueFlags.equals(other.continueFlags)) {
                 return false;
-            }
-            if (remembranceLocalVariables == null) {
-                if (other.remembranceLocalVariables != null) {
-                    return false;
-                }
-            } else if (!remembranceLocalVariables
-                    .equals(other.remembranceLocalVariables)) {
+            } else if (exception == null && other.exception != null) {
                 return false;
-            }
-            if (outerRemembranceVariables == null) {
-                if (other.outerRemembranceVariables != null) {
-                    return false;
-                }
-            } else if (!outerRemembranceVariables
-                    .equals(other.outerRemembranceVariables)) {
+            } else if (exception != null && !exception.equals(other.exception)) {
                 return false;
-            }
-
-            if (result == null) {
-                if (other.result != null) {
-                    return false;
-                }
-            } else if (!result.equals(other.result)) {
+            } else if (remembranceHeaps == null && other.remembranceHeaps != null) {
                 return false;
-            }
-            if (returnFlag == null) {
-                if (other.returnFlag != null) {
-                    return false;
-                }
-            } else if (!returnFlag.equals(other.returnFlag)) {
+            } else if (remembranceHeaps != null
+                         && !remembranceHeaps.equals(other.remembranceHeaps)) {
                 return false;
-            }
-            if (self == null) {
-                if (other.self != null) {
-                    return false;
-                }
-            } else if (!self.equals(other.self)) {
+            } else if (remembranceLocalVariables == null
+                         && other.remembranceLocalVariables != null) {
+                return false;
+            } else if (remembranceLocalVariables != null
+                         && !remembranceLocalVariables.equals(other.remembranceLocalVariables)) {
+                return false;
+            } else if (outerRemembranceVariables == null
+                         && other.outerRemembranceVariables != null) {
+                return false;
+            } else if (outerRemembranceVariables != null
+                         && !outerRemembranceVariables.equals(other.outerRemembranceVariables)) {
+                return false;
+            } else if (result == null && other.result != null) {
+                return false;
+            } else if (result != null && !result.equals(other.result)) {
+                return false;
+            } else if (returnFlag == null && other.returnFlag != null) {
+                return false;
+            } else if (returnFlag != null && !returnFlag.equals(other.returnFlag)) {
+                return false;
+            } else if (self == null && other.self != null) {
+                return false;
+            } else if (self != null && !self.equals(other.self)) {
                 return false;
             }
             return true;

@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.io.File;
-
 import de.uka.ilkd.key.parser.Location;
 
 @SuppressWarnings("serial")

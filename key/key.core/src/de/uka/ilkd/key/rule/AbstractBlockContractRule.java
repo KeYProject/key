@@ -22,6 +22,7 @@ import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowBlockContractTa
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -140,40 +141,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         }
     }
 
-    @Override
-    public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
-        if (occursNotAtTopLevelInSuccedent(occurrence)) {
-            return false;
-        }
-        // abort if inside of transformer
-        if (Transformer.inTransformer(occurrence)) {
-            return false;
-        }
-        final Instantiation instantiation =
-                instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
-        if (instantiation == null) {
-            return false;
-        }
-        final ImmutableSet<BlockContract> contracts =
-                getApplicableContracts(instantiation, goal, goal.proof().getServices());
-        return !contracts.isEmpty();
-    }
-
-    public Instantiation instantiate(final Term formula,
-                                     final Goal goal,
-                                     final Services services) {
-        if (formula == getLastFocusTerm()) {
-            return getLastInstantiation();
-        } else {
-            final Instantiation result =
-                    new Instantiator(formula, goal, services).instantiate();
-            setLastFocusTerm(formula);
-            setLastInstantiation(result);
-            return result;
-        }
-    }
-
-    protected Map<LocationVariable, Function>
+    protected static Map<LocationVariable, Function>
                 createAndRegisterAnonymisationVariables(final Iterable<LocationVariable>
                                                             variables,
                                                         final BlockContract contract,
@@ -320,6 +288,108 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         return new SequentFormula(finalTerm);
     }
 
+
+    private static
+        ProofObligationVars generateProofObligationVariables(
+                final BlockSpecificationElement.Variables variables,
+                final ProgramVariable exceptionParameter,
+                final LocationVariable baseHeap,
+                final ImmutableList<Term> localVarsAtPre,
+                final ImmutableList<Term> localVarsAtPost,
+                final Services services,
+                final TermBuilder tb) {
+        final boolean hasSelf = variables.self != null;
+        final boolean hasRes = variables.result != null;
+        final boolean hasExc = variables.exception != null;
+
+        final Term heapAtPre = tb.var(variables.remembranceHeaps.get(baseHeap));
+        final Name heapAtPostName =
+                new Name(tb.newName("heap_After_BLOCK"));
+        final Term heapAtPost =
+                tb.func(new Function(heapAtPostName, heapAtPre.sort(), true));
+        final Term selfAtPre = hasSelf ? tb.var(variables.self) : tb.NULL();
+        final Term selfAtPost =
+                hasSelf ? buildAfterVar(selfAtPre, "BLOCK", services) : tb.NULL();
+
+        Term resultAtPre = hasRes ? tb.var(variables.result) : tb.NULL();
+        final Term resultAtPost =
+                hasRes ? buildAfterVar(resultAtPre, "BLOCK", services) : tb.NULL();
+        final Term exceptionAtPre = hasExc ? tb.var(variables.exception) : tb.NULL();
+        final Term exceptionAtPost =
+                hasExc ? buildAfterVar(exceptionAtPre, "BLOCK", services) : tb.NULL();
+
+        // generate proof obligation variables
+        final StateVars instantiationPreVars =
+                new StateVars(hasSelf ? selfAtPre : null,
+                              localVarsAtPre,
+                              hasRes ? resultAtPre : null,
+                              hasExc ? exceptionAtPre : null,
+                              heapAtPre);
+        final StateVars instantiationPostVars =
+                new StateVars(hasSelf ? selfAtPost : null,
+                              localVarsAtPost,
+                              hasRes ? resultAtPost : null,
+                              hasExc ? exceptionAtPost : null,
+                              heapAtPost);
+        final ProofObligationVars instantiationVars =
+                new ProofObligationVars(instantiationPreVars,
+                                        instantiationPostVars,
+                                        tb.var(exceptionParameter),
+                                        null, tb);
+        return instantiationVars;
+    }
+
+    private static void addProofObligation(final Goal infFlowGoal,
+                                           final InfFlowProof proof,
+                                           final BlockContract contract,
+                                           final IFProofObligationVars ifVars,
+                                           final ExecutionContext ec,
+                                           final Services services) {
+        // create proof obligation
+        InfFlowPOSnippetFactory infFlowFactory =
+            POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2,
+                                               ec, services);
+
+        final SequentFormula poFormula = buildBodyPreservesSequent(infFlowFactory, proof);
+
+        // add proof obligation to goal
+        infFlowGoal.addFormula(poFormula, false, true);
+    }
+
+    @Override
+    public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
+        if (occursNotAtTopLevelInSuccedent(occurrence)) {
+            return false;
+        }
+        // abort if inside of transformer
+        if (Transformer.inTransformer(occurrence)) {
+            return false;
+        }
+        final Instantiation instantiation =
+                instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
+        if (instantiation == null) {
+            return false;
+        }
+        final ImmutableSet<BlockContract> contracts =
+                getApplicableContracts(instantiation, goal, goal.proof().getServices());
+        return !contracts.isEmpty();
+    }
+
+    public Instantiation instantiate(final Term formula,
+                                     final Goal goal,
+                                     final Services services) {
+        if (formula == getLastFocusTerm()) {
+            return getLastInstantiation();
+        } else {
+            final Instantiation result =
+                    new Instantiator(formula, goal, services).instantiate();
+            setLastFocusTerm(formula);
+            setLastInstantiation(result);
+            return result;
+        }
+    }
+
+
     protected void setUpInfFlowPartOfUsageGoal(final Goal usageGoal,
                                              InfFlowValidityData infFlowValitidyData,
                                              final Term contextUpdate,
@@ -349,33 +419,17 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
                                          final ImmutableSet<ProgramVariable> localOutVariables,
                                          final BlockContractInternalBuiltInRuleApp application,
                                          final Instantiation instantiation) {
-        assert heaps.size() == 1 &&
-               anonymisationHeaps.size() <= 1 : "information flow " +
-                                                "extension is at the " +
-                                                "moment not compatible " +
-                                                "with the non-base-heap " +
-                                                "setting";
-
+        assert heaps.size() == 1
+                && anonymisationHeaps.size() <= 1
+                : "information flow extension is at the moment not "
+                   + "compatible with the non-base-heap setting";
         // prepare information flow analysis
         final LocationVariable baseHeap =
                 services.getTypeConverter().getHeapLDT().getHeap();
         final TermBuilder tb = services.getTermBuilder();
-
         assert infFlowGoal.proof() instanceof InfFlowProof;
         final InfFlowProof proof = (InfFlowProof) infFlowGoal.proof();
 
-        final boolean hasSelf = variables.self != null;
-        final boolean hasRes = variables.result != null;
-        final boolean hasExc = variables.exception != null;
-
-        final Term heapAtPre = tb.var(variables.remembranceHeaps.get(baseHeap));
-        final Name heapAtPostName =
-                new Name(tb.newName("heap_After_BLOCK"));
-        final Term heapAtPost =
-                tb.func(new Function(heapAtPostName, heapAtPre.sort(), true));
-        final Term selfAtPre = hasSelf ? tb.var(variables.self) : tb.NULL();
-        final Term selfAtPost =
-                hasSelf ? buildAfterVar(selfAtPre, "BLOCK", services) : tb.NULL();
         final ImmutableList<Term> localIns = MiscTools.toTermList(localInVariables, tb);
         final ImmutableList<Term> localOuts = MiscTools.toTermList(localOutVariables, tb);
         final ImmutableList<Term> localOutsAtPre = buildLocalOutsAtPre(localOuts, services);
@@ -386,31 +440,10 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
                 localInsWithoutOutDuplicates.append(localOutsAtPre);
         final ImmutableList<Term> localVarsAtPost =
                 localInsWithoutOutDuplicates.append(localOutsAtPost);
-        Term resultAtPre = hasRes ? tb.var(variables.result) : tb.NULL();
-        final Term resultAtPost =
-                hasRes ? buildAfterVar(resultAtPre, "BLOCK", services) : tb.NULL();
-        final Term exceptionAtPre = hasExc ? tb.var(variables.exception) : tb.NULL();
-        final Term exceptionAtPost =
-                hasExc ? buildAfterVar(exceptionAtPre, "BLOCK", services) : tb.NULL();
-
-        // generate proof obligation variables
-        final StateVars instantiationPreVars =
-                new StateVars(hasSelf ? selfAtPre : null,
-                              localVarsAtPre,
-                              hasRes ? resultAtPre : null,
-                              hasExc ? exceptionAtPre : null,
-                              heapAtPre);
-        final StateVars instantiationPostVars =
-                new StateVars(hasSelf ? selfAtPost : null,
-                              localVarsAtPost,
-                              hasRes ? resultAtPost : null,
-                              hasExc ? exceptionAtPost : null,
-                              heapAtPost);
         final ProofObligationVars instantiationVars =
-                new ProofObligationVars(instantiationPreVars,
-                                        instantiationPostVars,
-                                        tb.var(exceptionParameter),
-                                        null, tb);
+                generateProofObligationVariables(variables, exceptionParameter,
+                                                 baseHeap, localVarsAtPre,
+                                                 localVarsAtPost, services, tb);
         final IFProofObligationVars ifVars =
                 new IFProofObligationVars(instantiationVars, services);
         application.update(ifVars, instantiation.context);
@@ -423,35 +456,22 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         ifContractBuilder.setExecutionContext(instantiation.context);
         ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
         ifContractBuilder.setProofObligationVars(instantiationVars);
-
-        final Term contractApplTerm =
-                ifContractBuilder.buildContractApplPredTerm();
+        final Term contractApplTerm = ifContractBuilder.buildContractApplPredTerm();
         Taclet informationFlowContractApp = ifContractBuilder.buildTaclet();
 
         // get infFlowAssumptions
         final Term infFlowPreAssumption =
                 buildInfFlowPreAssumption(instantiationVars, localOuts,
-                                        localOutsAtPre,
-                                        tb.var(baseHeap),
-                                        tb);
+                                          localOutsAtPre, tb.var(baseHeap), tb);
         final Term infFlowPostAssumption =
                 buildInfFlowPostAssumption(instantiationVars, localOuts, localOutsAtPost,
                                            tb.var(baseHeap), contractApplTerm, tb);
-
-        // create proof obligation
-        InfFlowPOSnippetFactory infFlowFactory =
-            POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2,
-                                               instantiation.context, services);
-
-        final SequentFormula poFormula = buildBodyPreservesSequent(infFlowFactory, proof);
-
-        // add proof obligation to goal
-        infFlowGoal.addFormula(poFormula, false, true);
+        addProofObligation(infFlowGoal, proof, contract, ifVars,
+                           instantiation.context, services);
 
         proof.addIFSymbol(contractApplTerm);
         proof.addIFSymbol(informationFlowContractApp);
         proof.addGoalTemplates(informationFlowContractApp);
-
         return new InfFlowValidityData(infFlowPreAssumption,
                                        infFlowPostAssumption,
                                        informationFlowContractApp);

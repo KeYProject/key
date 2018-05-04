@@ -159,6 +159,35 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         runMode = CHECK;
     }
 
+    private static Guard getForGuard(For x, ExtList changeList) {
+        Guard guard;
+        if (x.getGuard() != null) {
+            guard = (Guard) changeList.removeFirst();
+            if (guard.getExpression() == null) {
+                guard = KeYJavaASTFactory.trueGuard();
+            }
+        } else {
+            guard = KeYJavaASTFactory.trueGuard();
+        }
+        return guard;
+    }
+
+
+    private static Statement[] getInnerBlockStatements(IForUpdates updates,
+                                                       Statement body, For remainder,
+                                                       final int updateSize) {
+        Statement innerBlockStatements[] = new Statement[updateSize + 2];
+        innerBlockStatements[0] = body;
+        if (updates != null) {
+            for (int copyStatements = 0; copyStatements < updateSize; copyStatements++) {
+                innerBlockStatements[copyStatements + 1] =
+                    (ExpressionStatement)updates.getExpressionAt(copyStatements);
+            }
+        }
+        innerBlockStatements[updateSize + 1] = remainder;
+        return innerBlockStatements;
+    }
+
     /** returns true if an inner label is needed */
     public boolean innerLabelNeeded() {
         return needInnerLabel;
@@ -537,20 +566,11 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             //the unchanged updates need to be extracted to initialize the
             //remaining 'for' statement
             IForUpdates unchangedUpdates = x.getIForUpdates();
-
-            Guard guard;
             Statement body = null;
             if (changeList.get(0) instanceof ILoopInit) {
                 inits = (ILoopInit) changeList.removeFirst();
             }
-            if (x.getGuard() != null) {
-                guard = (Guard) changeList.removeFirst();
-                if (guard.getExpression() == null) {
-                    guard = KeYJavaASTFactory.trueGuard();
-                }
-            } else {
-                guard = KeYJavaASTFactory.trueGuard();
-            }
+            Guard guard = getForGuard(x, changeList);
             if (changeList.get(0) instanceof IForUpdates) {
                 updates = (IForUpdates) changeList.removeFirst();
             }
@@ -562,27 +582,16 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 body = KeYJavaASTFactory.labeledStatement(
                 breakInnerLabel.getLabel(), body, PositionInfo.UNDEFINED);
             }
-
             final int updateSize = updates == null ? 0 : updates.size();
-            Statement innerBlockStatements[] = new Statement[updateSize + 2];
-            innerBlockStatements[0] = body;
-            if (updates != null) {
-                for (int copyStatements = 0; copyStatements < updateSize; copyStatements++) {
-                    innerBlockStatements[copyStatements + 1] =
-                        (ExpressionStatement)updates.getExpressionAt(copyStatements);
-                }
-            }
-            innerBlockStatements[updateSize + 1] = remainder;
-
+            Statement[] innerBlockStatements =
+                    getInnerBlockStatements(updates, body, remainder, updateSize);
             final int initSize = inits == null ? 0 : inits.size();
             final Statement outerBlockStatements[] = new Statement[initSize + 1];
-
             if (inits != null) {
                 for (int copyStatements = 0; copyStatements < initSize; copyStatements++) {
                     outerBlockStatements[copyStatements] = inits.getInits().get(copyStatements);
                 }
             }
-
             outerBlockStatements[initSize] =
                 KeYJavaASTFactory.ifThen(guard.getExpression(), innerBlockStatements);
             if (outerLabelNeeded() && breakOuterLabel != null) {
@@ -592,16 +601,14 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 addChild(KeYJavaASTFactory.block(outerBlockStatements));
             }
             changed();
+        } else if (changeList.getFirst() == CHANGED) {
+            changeList.removeFirst();
+            For newLoop = KeYJavaASTFactory.forLoop(changeList);
+            services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+            addChild(newLoop);
+            changed();
         } else {
-            if (changeList.getFirst() == CHANGED) {
-                changeList.removeFirst();
-                For newLoop = KeYJavaASTFactory.forLoop(changeList);
-                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
-                addChild(newLoop);
-                changed();
-            } else {
-                doDefaultAction(x);
-            }
+            doDefaultAction(x);
         }
     }
 

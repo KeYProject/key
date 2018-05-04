@@ -36,8 +36,6 @@ import recoder.java.reference.FieldReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.java.PosConvertException;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.Debug;
 
 /**
