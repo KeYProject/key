@@ -43,6 +43,7 @@ import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule.Instantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockSpecificationElement;
@@ -52,9 +53,18 @@ import de.uka.ilkd.key.util.MiscTools;
  * <p>Rule for the application of {@link BlockContract}s.</p>
  *
  * @see AbstractBlockContractBuiltInRuleApp
+ * 
+ * @author wacker, lanzinger
  */
 public abstract class AbstractBlockContractRule extends AbstractBlockSpecificationElementRule {
 
+	/**
+	 * 
+	 * @param instantiation an instantiation.
+	 * @param goal the current goal.
+	 * @param services services.
+	 * @return all applicable block contracts for the instantiation.
+	 */
     public static ImmutableSet<BlockContract>
                 getApplicableContracts(final Instantiation instantiation,
                                        final Goal goal,
@@ -67,6 +77,14 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
                                       instantiation.modality, goal);
     }
 
+    /**
+     * 
+     * @param specifications a specification repository.
+     * @param block a block.
+     * @param modality the current goal's modality.
+     * @param goal the current goal.
+     * @return all applicable block contracts for the block from the repository.
+     */
     public static ImmutableSet<BlockContract>
                         getApplicableContracts(final SpecificationRepository specifications,
                                                final StatementBlock block,
@@ -84,6 +102,12 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         return filterAppliedContracts(collectedContracts, goal);
     }
 
+    /**
+     * 
+     * @param collectedContracts a set of block contracts.
+     * @param goal the current goal.
+     * @return the set with all non-applicable contracts filtered out.
+     */
     protected static ImmutableSet<BlockContract>
                         filterAppliedContracts(final ImmutableSet<BlockContract>
                                                    collectedContracts,
@@ -98,7 +122,12 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         return result;
     }
 
-    // This seems to be inefficient...
+    /**
+     * 
+     * @param contract a block contract.
+     * @param goal the current goal.
+     * @return {@code true} if the contract has already been applied.
+     */
     protected static boolean contractApplied(final BlockContract contract,
                                            final Goal goal) {
         Node selfOrParentNode = goal.node();
@@ -141,6 +170,14 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         }
     }
 
+    /**
+     * 
+     * @param variables variables.
+     * @param contract a block contract.
+     * @param services services.
+     * @return a map from every variable that is changed in the block to its
+     * 		anonymization constant.
+     */
     protected static Map<LocationVariable, Function>
                 createAndRegisterAnonymisationVariables(final Iterable<LocationVariable>
                                                             variables,
@@ -375,6 +412,13 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         return !contracts.isEmpty();
     }
 
+    /**
+     * 
+     * @param formula the formula on which the rule is to be applied.
+     * @param goal the current goal.
+     * @param services services.
+     * @return a new instantiation.
+     */
     public Instantiation instantiate(final Term formula,
                                      final Goal goal,
                                      final Services services) {
@@ -491,9 +535,18 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         }
     }
 
+    /**
+     * A builder for {@link Instantiation}s.
+     */
     protected static final class Instantiator
             extends AbstractBlockSpecificationElementRule.Instantiator {
 
+    	/**
+         * 
+         * @param formula the formula on which the rule is to be applied.
+         * @param goal the current goal.
+         * @param services services.
+         */
         public Instantiator(final Term formula,
                             final Goal goal,
                             final Services services) {

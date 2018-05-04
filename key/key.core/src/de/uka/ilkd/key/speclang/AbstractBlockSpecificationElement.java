@@ -705,6 +705,13 @@ public abstract class AbstractBlockSpecificationElement
         return result;
     }
 
+    /**
+     * 
+     * @param baseHeap base heap.
+     * @param heapLDT heap LDT.
+     * @param services services.
+     * @return a HTML representation of this contract's modifies clauses.
+     */
     private String getHtmlMods(final LocationVariable baseHeap,
                                final HeapLDT heapLDT,
                                final Services services) {
@@ -724,6 +731,13 @@ public abstract class AbstractBlockSpecificationElement
         return mods;
     }
 
+    /**
+     * 
+     * @param baseHeap base heap.
+     * @param heapLDT heap LDT.
+     * @param services services.
+     * @return a HTML representation of this contract's preconditions.
+     */
     private String getHtmlPres(final LocationVariable baseHeap,
                                final HeapLDT heapLDT,
                                final Services services) {
@@ -740,6 +754,13 @@ public abstract class AbstractBlockSpecificationElement
         return pres;
     }
 
+    /**
+     * 
+     * @param baseHeap base heap.
+     * @param heapLDT heap LDT.
+     * @param services services.
+     * @return a HTML representation of this contract's postconditions.
+     */
     private String getHtmlPosts(final LocationVariable baseHeap,
                                 final HeapLDT heapLDT,
                                 final Services services) {
@@ -755,7 +776,15 @@ public abstract class AbstractBlockSpecificationElement
         }
         return posts;
     }
-
+    
+    /**
+     * 
+     * @param self the self term
+     * @param baseHeap base heap.
+     * @param heapLDT heap LDT.
+     * @param services services.
+     * @return a plain text representation of this contract's modifies clauses.
+     */
     private String getPlainMods(Term self, final LocationVariable baseHeap,
                                 final HeapLDT heapLDT, final Services services) {
         String mods = "";
@@ -776,6 +805,14 @@ public abstract class AbstractBlockSpecificationElement
         return mods;
     }
 
+    /**
+     * 
+     * @param terms the terms to use.
+     * @param baseHeap base heap.
+     * @param heapLDT heap LDT.
+     * @param services services.
+     * @return a plain text representation of this contract's preconditions.
+     */
     private String getPlainPres(Terms terms, final LocationVariable baseHeap,
                                 final HeapLDT heapLDT, final Services services) {
         String pres = "";
@@ -793,6 +830,14 @@ public abstract class AbstractBlockSpecificationElement
         return pres;
     }
 
+    /**
+     * 
+     * @param terms the terms to use.
+     * @param baseHeap base heap.
+     * @param heapLDT heap LDT.
+     * @param services services.
+     * @return a plain text representation of this contract's postconditions.
+     */
     private String getPlainPosts(Terms terms, final LocationVariable baseHeap,
                                  final HeapLDT heapLDT, final Services services) {
         String posts = "";

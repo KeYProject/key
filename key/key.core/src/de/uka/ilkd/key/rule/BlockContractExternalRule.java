@@ -45,20 +45,43 @@ import de.uka.ilkd.key.util.MiscTools;
  * </p>
  *
  * @see BlockContractExternalBuiltInRuleApp
+ * 
+ * @author lanzinger
  */
 public final class BlockContractExternalRule extends AbstractBlockContractRule {
 
+	/**
+	 * The only instance of this class.
+	 */
     public static final BlockContractExternalRule INSTANCE = new BlockContractExternalRule();
 
+    /**
+     * This rule's name.
+     */
     private static final Name NAME = new Name("Block Contract (External)");
 
+    /**
+     * @see #getLastFocusTerm()
+     */
     private Term lastFocusTerm;
 
+    /**
+     * @see #getLastInstantiation()
+     */
     private Instantiation lastInstantiation;
 
     private BlockContractExternalRule() { }
 
-
+    /**
+     * 
+     * @param contract the contract being applied.
+     * @param self the self term.
+     * @param heaps the heaps.
+     * @param localInVariables all free program variables in the block.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
+     * @param services services.
+     * @return the preconditions.
+     */
     private static Term[]
             createPreconditions(final Instantiation instantiation,
                                 final BlockContract contract,
@@ -83,6 +106,13 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
                            selfConditions};
     }
 
+    /**
+     * 
+     * @param localOutVariables all free program variables modified by the block.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
+     * @return the postconditions.
+     */
     private static Term[]
             createAssumptions(final ImmutableSet<ProgramVariable>
                                       localOutVariables,
@@ -104,6 +134,16 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
                            atMostOneFlagSetCondition};
     }
 
+    /**
+     * 
+     * @param contextUpdate the context update.
+     * @param heaps the heaps.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param variables the variables.
+     * @param modifiesClauses the modified clauses.
+     * @param services services.
+     * @return the updates.
+     */
     private static Term[]
             createUpdates(final Term contextUpdate,
                           final List<LocationVariable> heaps,
@@ -124,16 +164,17 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         return updates;
     }
 
+    @Override
     public Term getLastFocusTerm() {
         return lastFocusTerm;
     }
 
-
+    @Override
     protected void setLastFocusTerm(Term lastFocusTerm) {
         this.lastFocusTerm = lastFocusTerm;
     }
 
-
+    @Override
     public Instantiation getLastInstantiation() {
         return lastInstantiation;
     }
@@ -143,7 +184,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         return NAME;
     }
 
-
+    @Override
     protected void setLastInstantiation(Instantiation lastInstantiation) {
         this.lastInstantiation = lastInstantiation;
     }
@@ -161,14 +202,11 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
 
     @Override
     public ImmutableList<Goal> apply(final Goal goal, final Services services,
-                                     final RuleApp application) throws RuleAbortException {
-        assert application instanceof BlockContractExternalBuiltInRuleApp;
-        return apply(goal, services, (BlockContractExternalBuiltInRuleApp) application);
-    }
-
-    private ImmutableList<Goal> apply(final Goal goal, final Services services,
-                                      final BlockContractExternalBuiltInRuleApp application)
-                                              throws RuleAbortException {
+                                     final RuleApp ruleApp) throws RuleAbortException {
+        assert ruleApp instanceof BlockContractExternalBuiltInRuleApp;
+        BlockContractExternalBuiltInRuleApp application =
+        		(BlockContractExternalBuiltInRuleApp) ruleApp;
+        
         if (InfFlowCheckInfo.isInfFlow(goal)) {
             throw new RuleAbortException(
                     "BlockContractExternalRule does not support information flow goals!");

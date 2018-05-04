@@ -52,7 +52,14 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
     protected static final Boolean CHANGED = Boolean.TRUE;
 
+    /**
+     * The break statement used to replace break statements.
+     */
     private final Break breakOuter;
+    
+    /**
+     * The break statement used to replace continue statements.
+     */
     private final Break breakInner;
 
     private final Stack<ExtList> stack = new Stack<ExtList>();
@@ -62,6 +69,14 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
     private StatementBlock result;
 
+    /**
+     * 
+     * @param block a block that begins with a loop.
+     * @param loopLabels all labels belonging to the loop.
+     * @param breakLabel the label used for break statements.
+     * @param continueLabel the label used for continue statements.
+     * @param services services.
+     */
     public InnerBreakAndContinueReplacer(final StatementBlock block,
                                                final Iterable<Label> loopLabels,
                                                final Label breakLabel,
@@ -76,11 +91,22 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         this.breakInner = new Break(continueLabel);
     }
 
+    /**
+     * Does the replacement and returns the result.
+     * 
+     * @return the block with all labels in the loop replaced.
+     * @see #start()
+     */
     public StatementBlock replace() {
         start();
         return result;
     }
 
+    /**
+     * Does the replacement.
+     * 
+     * @see #replace()
+     */
     public void start() {
         loopAndSwitchCascadeDepth = 0;
         stack.push(new ExtList());

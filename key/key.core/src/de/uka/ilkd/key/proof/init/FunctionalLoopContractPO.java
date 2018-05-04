@@ -30,6 +30,7 @@ import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.BlockContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.VariablesCreatorAndRegistrar;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalLoopContract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -38,9 +39,14 @@ import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * A proof obligation for a {@link FunctionalLoopContract}.
+ * 
+ * @author lanzinger
  */
 public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
+	/**
+	 * Transaction tags.
+	 */
     private static final Map<Boolean, String> TRANSACTION_TAGS =
             new LinkedHashMap<Boolean, String>();
 
@@ -49,9 +55,21 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         TRANSACTION_TAGS.put(true, "transaction_active");
     }
 
+    /**
+     * The contract from which this PO is generated.
+     */
     private FunctionalLoopContract contract;
+    
+    /**
+     * The initial proof configuration.
+     */
     private InitConfig proofConfig;
 
+    /**
+     * 
+     * @param initConfig the initial proof configuration.
+     * @param contract the contract from which this PO is generated.
+     */
     public FunctionalLoopContractPO(InitConfig initConfig,
                                     FunctionalLoopContract contract) {
         super(initConfig, contract.getName());
@@ -93,24 +111,6 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             ProofOblInput po = contract.createProofObl(initConfig);
             return new LoadedPOContainer(po, proofNum);
         }
-    }
-
-    private static Map<LocationVariable, Function>
-                createAnonHeaps(final List<LocationVariable> heaps,
-                                final Services services,
-                                final TermBuilder tb) {
-        Map<LocationVariable, Function> anonInHeaps =
-                new LinkedHashMap<LocationVariable, Function>(40);
-
-        for (LocationVariable heap : heaps) {
-            final String anonymisationName =
-                    tb.newName(BlockContractBuilders.ANON_IN_PREFIX + heap.name());
-            final Function anonymisationFunction =
-                    new Function(new Name(anonymisationName), heap.sort(), true);
-            services.getNamespaces().functions().addSafely(anonymisationFunction);
-            anonInHeaps.put(heap, anonymisationFunction);
-        }
-        return anonInHeaps;
     }
 
     @Override
@@ -229,14 +229,29 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         generateWdTaclets(proofConfig);
     }
 
+    /**
+     * 
+     * @return the contract's block.
+     * @see BlockSpecificationElement#getBlock()
+     */
     public StatementBlock getBlock() {
         return contract.getBlock();
     }
 
+    /**
+     * 
+     * @return the type containing this contract.
+     * @see SpecificationElement#getKJT()
+     */
     public KeYJavaType getCalleeKeYJavaType() {
         return contract.getKJT();
     }
 
+    /**
+     * 
+     * @return the method containing this contract.
+     * @see BlockSpecificationElement#getMethod()
+     */
     public IProgramMethod getProgramMethod() {
         return contract.getMethod();
     }
@@ -251,6 +266,11 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Initializes the proof configuration.
+     * 
+     * @return the services from the proof configuration.
+     */
     protected Services postInit() {
         proofConfig = environmentConfig.deepCopy();
         final Services proofServices = proofConfig.getServices();
@@ -263,7 +283,12 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         return proofConfig;
     }
 
-
+    /**
+     * 
+     * @param modifiesClauses the contract's modifies clauses.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder
+     * @return the contract's postconditions.
+     */
     private Term[] createPostconditions(final Map<LocationVariable, Term>
                                                 modifiesClauses,
                                         final ConditionsAndClausesBuilder
@@ -292,6 +317,15 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         return new Term[] { nextPostcondition, nextFrameCondition };
     }
 
+    /**
+     * 
+     * @param selfVar the self variable.
+     * @param heaps the heaps.
+     * @param wellFormedHeapsCondition the condition that all heaps are well-formed.
+     * @param services services.
+     * @param conditionsAndClausesBuilder a conditions and clauses builder.
+     * @return the preconditions.
+     */
     private Term[] createAssumptions(final ProgramVariable selfVar,
                                      final List<LocationVariable> heaps,
                                      final Term wellFormedHeapsCondition,
@@ -314,6 +348,38 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
                                                   getCalleeKeYJavaType()) };
     }
 
+    /**
+     * 
+     * @param heaps heaps.
+     * @param services services.
+     * @param tb a term builder.
+     * @return a map from every heap to an anonymization heap.
+     */
+    private static Map<LocationVariable, Function>
+                createAnonInHeaps(final List<LocationVariable> heaps,
+                                final Services services,
+                                final TermBuilder tb) {
+        Map<LocationVariable, Function> anonInHeaps =
+                new LinkedHashMap<LocationVariable, Function>(40);
+
+        for (LocationVariable heap : heaps) {
+            final String anonymisationName =
+                    tb.newName(BlockContractBuilders.ANON_IN_PREFIX + heap.name());
+            final Function anonymisationFunction =
+                    new Function(new Name(anonymisationName), heap.sort(), true);
+            services.getNamespaces().functions().addSafely(anonymisationFunction);
+            anonInHeaps.put(heap, anonymisationFunction);
+        }
+        return anonInHeaps;
+    }
+
+    /**
+     * 
+     * @param heaps heaps.
+     * @param services services.
+     * @param tb a term builder.
+     * @return a map from every heap to an anonymization heap.
+     */
     private Map<LocationVariable, Function>
                 createAnonOutHeaps(final List<LocationVariable> heaps,
                                    final Services services,
@@ -333,6 +399,15 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         return anonOutHeaps;
     }
 
+    /**
+     * 
+     * @param selfVar the self variable.
+     * @param selfTerm the self term.
+     * @param variables the contract's variables.
+     * @param services services.
+     * @param tb a term builder.
+     * @return a goal configurator.
+     */
     private GoalsConfigurator
                 createGoalConfigurator(final ProgramVariable selfVar,
                                        final Term selfTerm,
@@ -355,6 +430,25 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
                                      variables, null, services, null);
     }
 
+    /**
+     * 
+     * @param selfTerm the self term
+     * @param heaps the heaps.
+     * @param anonOutHeaps the heaps used in the anonOut update.
+     * @param variables the contract's variables.
+     * @param nextVariables the variables for the next loop iteration.
+     * @param modifiesClauses the modified clauses.
+     * @param assumptions the preconditions.
+     * @param decreasesCheck the decreases check.
+     * @param postconditions the postconditions for the current loop iteration.
+     * @param postconditionsNext the postconditions for the next loop iteration.
+     * @param wellFormedHeapsCondition the condition that all heaps are well-formed.
+     * @param configurator a goal configurator.
+     * @param conditionsAndClausesBuilder a conditions and clauses builder.
+     * @param services services.
+     * @param tb a term builder.
+     * @return the validity formula for the contract.
+     */
     private Term setUpValidityGoal(final Term selfTerm,
                                    final List<LocationVariable> heaps,
                                    final Map<LocationVariable, Function> anonOutHeaps,
@@ -381,7 +475,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         final Term nextRemembranceUpdate =
                 new UpdatesBuilder(nextVariables, services).buildRemembranceUpdate(heaps);
 
-        Map<LocationVariable, Function> anonInHeaps = createAnonHeaps(heaps, services, tb);
+        Map<LocationVariable, Function> anonInHeaps = createAnonInHeaps(heaps, services, tb);
 
         final Term anonInUpdate = updatesBuilder.buildAnonInUpdate(anonInHeaps);
         final Term context = tb.sequential(outerRemembranceUpdate, anonInUpdate);

@@ -30,6 +30,7 @@ import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.BlockContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.VariablesCreatorAndRegistrar;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalBlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -38,9 +39,14 @@ import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * A proof obligation for a {@link FunctionalBlockContract}.
+ * 
+ * @author lanzinger
  */
 public class FunctionalBlockContractPO extends AbstractPO implements ContractPO {
 
+	/**
+	 * Transaction tags.
+	 */
     private static final Map<Boolean, String> TRANSACTION_TAGS =
             new LinkedHashMap<Boolean, String>();
 
@@ -49,9 +55,21 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         TRANSACTION_TAGS.put(true, "transaction_active");
     }
 
+    /**
+     * The contract from which this PO is generated.
+     */
     private FunctionalBlockContract contract;
+    
+    /**
+     * The initial proof configuration.
+     */
     private InitConfig proofConfig;
 
+    /**
+     * 
+     * @param initConfig the initial proof configuration.
+     * @param contract the contract from which this PO is generated.
+     */
     public FunctionalBlockContractPO(InitConfig initConfig,
             FunctionalBlockContract contract) {
         super(initConfig, contract.getName());
@@ -95,6 +113,12 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         }
     }
 
+    /**
+     * 
+     * @param localOuts a set of variables.
+     * @param services services.
+     * @return an anonymizing update for the specified variables.
+     */
     private static Term
         createLocalAnonUpdate(final ImmutableSet<ProgramVariable> localOutVariables,
                               final Services services, final TermBuilder tb) {
@@ -113,8 +137,15 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         return localAnonUpdate;
     }
 
+    /**
+     * 
+     * @param heaps heaps.
+     * @param services services.
+     * @param tb a term builder.
+     * @return a map from every heap to an anonymization heap.
+     */
     private static Map<LocationVariable, Function>
-        createAnonHeaps(final List<LocationVariable> heaps,
+        createAnonInHeaps(final List<LocationVariable> heaps,
                         final Services services,
                         final TermBuilder tb) {
         Map<LocationVariable, Function> anonHeaps =
@@ -130,7 +161,13 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         return anonHeaps;
     }
 
-
+    /**
+     * 
+     * @param heaps heaps.
+     * @param services services.
+     * @param tb a term builder.
+     * @return a map from every heap to an anonymization heap.
+     */
     private static Map<LocationVariable, Function>
                 createAnonOutHeaps(final List<LocationVariable> heaps,
                                    final FunctionalBlockContract contract,
@@ -151,6 +188,14 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         return anonOutHeaps;
     }
 
+    /**
+     * 
+     * @param variables the contract's variables.
+     * @param heaps the heaps.
+     * @param anonHeaps the anonymization heaps.
+     * @param services services.
+     * @return the updates.
+     */
     private static Term[] createUpdates(final BlockContract.Variables variables,
                                         final List<LocationVariable> heaps,
                                         Map<LocationVariable, Function> anonHeaps,
@@ -162,6 +207,11 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         return new Term[] { outerRemembranceUpdate, anonInUpdate, remembranceUpdate };
     }
 
+    /**
+     * 
+     * @param conditionsAndClausesBuilder a conditions and clauses builder.
+     * @return the postconditions.
+     */
     private static Term[]
                 createPostconditions(final ConditionsAndClausesBuilder
                                                 conditionsAndClausesBuilder) {
@@ -173,6 +223,24 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         return new Term[] { postcondition, frameCondition };
     }
 
+    /**
+     * 
+     * @param heaps the heaps.
+     * @param anonHeaps the heaps used in the anonIn update.
+     * @param anonOutHeaps the heaps used in the anonOut update.
+     * @param localInVariables the free local variables in the block.
+     * @param localOutVariables the free local variables modified by the block.
+     * @param exceptionParameter the exception variable.
+     * @param assumptions the preconditions.
+     * @param postconditions the postconditions.
+     * @param updates the update.
+     * @param bc the contract being applied.
+     * @param conditionsAndClausesBuilder a conditions and clauses builder.
+     * @param configurator a goal configurator.
+     * @param services services.
+     * @param tb a term builder.
+     * @return the validity formula for the contract.
+     */
     private static Term setUpValidityTerm(final List<LocationVariable> heaps,
                                           Map<LocationVariable, Function> anonHeaps,
                                           Map<LocationVariable, Function> anonOutHeaps,
@@ -202,6 +270,20 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                                    configurator, services, tb);
     }
 
+    /**
+     * 
+     * @param validity the validity formula.
+     * @param updates the updates.
+     * @param heaps the heaps.
+     * @param anonOutHeaps the heaps used in the anonOut update.
+     * @param localInVariables the free local variables in the block.
+     * @param localOutVariables the free local variables modified by the block.
+     * @param bc the contract being applied.
+     * @param configurator a goal configurator
+     * @param services services.
+     * @param tb a term builder.
+     * @return the conjunction of the well-definedness formula and the validity formula.
+     */
     private static Term addWdToValidityTerm(Term validity, final Term[] updates,
                                             final List<LocationVariable> heaps,
                                             Map<LocationVariable, Function> anonOutHeaps,
@@ -327,7 +409,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
         final Term[] postconditions = createPostconditions(conditionsAndClausesBuilder);
 
-        Map<LocationVariable, Function> anonHeaps = createAnonHeaps(heaps, services, tb);
+        Map<LocationVariable, Function> anonHeaps = createAnonInHeaps(heaps, services, tb);
 
         final Term[] updates =
                 createUpdates(variables, heaps, anonHeaps, services);
@@ -348,14 +430,29 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         generateWdTaclets(proofConfig);
     }
 
+    /**
+     * 
+     * @return the contract's block.
+     * @see BlockSpecificationElement#getBlock()
+     */
     public StatementBlock getBlock() {
         return contract.getBlock();
     }
 
+    /**
+     * 
+     * @return the type containing this contract.
+     * @see SpecificationElement#getKJT()
+     */
     public KeYJavaType getCalleeKeYJavaType() {
         return contract.getKJT();
     }
 
+    /**
+     * 
+     * @return the method containing this contract.
+     * @see BlockSpecificationElement#getMethod()
+     */
     public IProgramMethod getProgramMethod() {
         return contract.getMethod();
     }
@@ -382,6 +479,16 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         return proofConfig;
     }
 
+    /**
+     * 
+     * @param block the block this contract belongs to.
+     * @param selfVar the self variable.
+     * @param selfTerm the self term.
+     * @param variables the contract's variables.
+     * @param services services.
+     * @param tb a term builder.
+     * @return a goal configurator.
+     */
     private GoalsConfigurator
                 setUpGoalConfigurator(final StatementBlock block,
                                       final ProgramVariable selfVar,
@@ -402,6 +509,16 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                                      variables, null, services, null);
     }
 
+    /**
+     * 
+     * @param pm the method this contract belongs to.
+     * @param selfVar the self variable.
+     * @param heaps the heaps.
+     * @param localInVariables the free local variables in the block.
+     * @param conditionsAndClausesBuilder a conditions and clauses builder.
+     * @param services services.
+     * @return the preconditions.
+     */
     private Term[] createAssumptions(final IProgramMethod pm,
                                      final ProgramVariable selfVar,
                                      final List<LocationVariable> heaps,

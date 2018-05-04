@@ -24,25 +24,56 @@ import de.uka.ilkd.key.proof.init.FunctionalLoopContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.BlockContractBuilders;
 
 /**
  * This class is only used to generate a proof obligation for a block that starts with a loop
  * (see {@link FunctionalLoopContractPO}.
  *
  * If a block is encountered during a proof, {@link LoopContract} is used instead.
+ * 
+ * @author lanzinger
  */
 public class FunctionalLoopContract implements Contract {
 
+	/**
+	 * @see #getLoopContract()
+	 */
     private final LoopContract contract;
+    
+    /**
+     * This contract's ID.
+     */
     private final int id;
+    
+    /**
+     * This contract's name.
+     */
     private final String name;
+    
+    /**
+     * This contract's display name.
+     */
     private final String displayName;
+    
+    /**
+     * This contract's type name.
+     */
     private final String typeName;
 
+    /**
+     * 
+     * @param contract a loop contract.
+     */
     FunctionalLoopContract(LoopContract contract) {
         this(contract, Contract.INVALID_ID);
     }
 
+    /**
+     * 
+     * @param contract a loop contract.
+     * @param id an ID.
+     */
     FunctionalLoopContract(LoopContract contract, int id) {
         this.contract = contract;
         this.id = id;
@@ -59,6 +90,12 @@ public class FunctionalLoopContract implements Contract {
             -> ContractFactory.generateContractTypeName(str, getKJT(), getTarget(), getKJT()));
     }
 
+    /**
+     * 
+     * @param baseName a base name.
+     * @param generator a name generator.
+     * @return the generated name.
+     */
     private String generateName(String baseName, UnaryOperator<String> generator) {
         return Arrays.stream(baseName.split(SpecificationRepository.CONTRACT_COMBINATION_MARKER))
                 .map(generator)
@@ -310,26 +347,60 @@ public class FunctionalLoopContract implements Contract {
         return contract.getVariables().self != null;
     }
 
+    /**
+     * Returns <code>true</code> iff the method (according to the contract) does
+     * not modify the heap at all, i.e., iff it is "strictly pure."
+     *
+     * @return whether this contract is strictly pure.
+     * @see BlockSpecificationElement#hasModifiesClause(LocationVariable)
+     */
     public boolean hasModifiesClause(LocationVariable heap) {
         return contract.hasModifiesClause(heap);
     }
 
+    /**
+     * 
+     * @return the corresponding loop contract.
+     */
     public LoopContract getLoopContract() {
         return contract;
     }
 
+    /**
+     * 
+     * @return the block this contract belongs to.
+     * @see BlockSpecificationElement#getBlock()
+     */
     public StatementBlock getBlock() {
         return contract.getBlock();
     }
 
+    /**
+	 * 
+	 * @return the method containing {@link #getBlock()}
+	 * @see BlockSpecificationElement#getMethod()
+	 */
     public IProgramMethod getMethod() {
         return contract.getMethod();
     }
 
+    /**
+     * Returns the set of placeholder variables created during this contract's instantiation.
+     * These are replaced by the real variables with the same names when the contract is applied.
+     * 
+     * @return the placeholder variables used created during this contracts instantiation.
+     * @see BlockContractBuilders.VariablesCreatorAndRegistrar
+     * @see BlockSpecificationElement#getPlaceholderVariables()
+     */
     public BlockSpecificationElement.Variables getPlaceholderVariables() {
         return contract.getPlaceholderVariables();
     }
-
+    
+    /**
+     * 
+     * @return this contract's modality.
+     * @see BlockSpecificationElement#getModality()
+     */
     public Modality getModality() {
         return contract.getModality();
     }

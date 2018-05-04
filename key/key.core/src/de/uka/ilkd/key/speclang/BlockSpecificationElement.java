@@ -66,7 +66,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
     
     /**
      * 
-     * @return the contract's modality.
+     * @return this contract's modality.
      */
     public Modality getModality();
     

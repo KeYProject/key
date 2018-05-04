@@ -37,20 +37,44 @@ import de.uka.ilkd.key.util.MiscTools;
  * </p>
  *
  * @see LoopContractInternalBuiltInRuleApp
+ * 
+ * @author lanzinger
  */
 public final class LoopContractInternalRule extends AbstractLoopContractRule {
 
+	/**
+	 * The only instance of this class.
+	 */
     public static final LoopContractInternalRule INSTANCE = new LoopContractInternalRule();
 
+    /**
+     * This rule's name.
+     */
     private static final Name NAME = new Name("Loop Contract (Internal)");
 
+    /**
+     * @see #getLastFocusTerm()
+     */
     private Term lastFocusTerm;
 
+    /**
+     * @see #getLastInstantiation()
+     */
     private Instantiation lastInstantiation;
 
     private LoopContractInternalRule() {  }
 
-    private static Term[] createAssumptions(final Term selfTerm,
+    /**
+     * 
+     * @param selfTerm the self term.
+     * @param contract the loop contract being applied.
+     * @param heaps the heaps. 
+     * @param localInVariables all free program variables in the block.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
+     * @param services services.
+     * @return the preconditions.
+     */
+    private static Term[] createPreconditions(final Term selfTerm,
                                             final LoopContract contract,
                                             final List<LocationVariable> heaps,
                                             final ImmutableSet<ProgramVariable>
@@ -72,6 +96,13 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
     }
 
 
+    /**
+     * 
+     * @param localOutVariables all free program variables modified by the block.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
+     * @return the postconditions for the current loop iteration.
+     */
     private static Term[]
             createPostconditions(final Map<LocationVariable, Term>
                                          modifiesClauses,
@@ -82,7 +113,17 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
             conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
         return new Term[] { postcondition, frameCondition };
     }
-
+    
+    /**
+     * 
+     * @param selfTerm the self term.
+     * @param contract the loop contract being applied.
+     * @param heaps the heaps. 
+     * @param nextVariables the variables for the next loop iteration.
+     * @param modifiesClauses the modified clauses
+     * @param services services.
+     * @return the postconditions for the next loop iteration.
+     */
     private static Term[] createPostconditionsNext(final Term selfTerm,
                                                    final LoopContract contract,
                                                    final List<LocationVariable> heaps,
@@ -102,6 +143,13 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         return new Term[] { nextPostcondition, nextFrameCondition };
     }
 
+    /**
+     * 
+     * @param heaps the heaps.
+     * @param updatesBuilder an update builder.
+     * @param services services.
+     * @return the update for the validity branch.
+     */
     private static Term createContext(final List<LocationVariable> heaps,
                                       final UpdatesBuilder updatesBuilder,
                                       final Services services) {
@@ -122,7 +170,14 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         return tb.sequential(outerRemembranceUpdate, anonInUpdate);
     }
 
-
+    /**
+     * 
+     * @param postconditions the postconditions.
+     * @param anonOutHeaps the heaps used in the anonOut update.
+     * @param localOutVariables all free program variables modified by the block.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
+     * @return preconditions for the usage branch.
+     */
     private static Term[]
             createUsageAssumptions(final Term[] postconditions,
                                    final Map<LocationVariable, Function>
@@ -142,6 +197,15 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
                            reachableOutCondition, atMostOneFlagSetCondition};
     }
 
+    /**
+     * 
+     * @param instantiation the instantiation.
+     * @param heaps the heaps.
+     * @param anonOutHeaps the heaps used in the anonOut update.
+     * @param modifiesClauses the modifies clauses.
+     * @param updatesBuilder an update builder
+     * @return the updates for the usage branch.
+     */
     private static Term[]
             createUpdates(final Instantiation instantiation,
                           final List<LocationVariable> heaps,
@@ -155,6 +219,14 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         return new Term[] {contextUpdate, remembranceUpdate, anonymisationUpdate};
     }
 
+    /**
+     * 
+     * @param goal the current goal.
+     * @param selfTerm the self term.
+     * @param contract the contract being applied.
+     * @param services services.
+     * @return the variables for both the current and the next loop iteration.
+     */
     private static LoopContract.Variables[] createVars(final Goal goal,
                                                        final Term selfTerm,
                                                        final LoopContract contract,
@@ -169,6 +241,26 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
     }
 
 
+    /**
+     * 
+     * @param goal the current goal.
+     * @param result the next goals.
+     * @param contract the contract being applied.
+     * @param instantiation the instantiation.
+     * @param anonOutHeaps the heaps used in the anonOut update.
+     * @param vars  the variables for both the current and the next loop iteration.
+     * @param modifiesClauses the modifies clauses.
+     * @param assumptions the preconditions for the validity branch.
+     * @param usageAssumptions the preconditions for the usage branch.
+     * @param decreasesCheck the decreases check.
+     * @param postconditions the postconditions for the current loop iteration.
+     * @param postconditionsNext the postconditions for the next loop iteration.
+     * @param updates the updates for the usage branch.
+     * @param nextRemembranceUpdate the remembrance update for the next loop iteration.
+     * @param context the update for the validity branch.
+     * @param configurator a configurator.
+     * @param services services.
+     */
     private static void setUpGoals(final Goal goal,
                                    final ImmutableList<Goal> result,
                                    final LoopContract contract,
@@ -200,16 +292,17 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
                                            vars[1]);
     }
 
+    @Override
     public Term getLastFocusTerm() {
         return lastFocusTerm;
     }
 
-
+    @Override
     protected void setLastFocusTerm(Term lastFocusTerm) {
         this.lastFocusTerm = lastFocusTerm;
     }
 
-
+    @Override
     public Instantiation getLastInstantiation() {
         return lastInstantiation;
     }
@@ -219,7 +312,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         return NAME;
     }
 
-
+    @Override
     protected void setLastInstantiation(Instantiation lastInstantiation) {
         this.lastInstantiation = lastInstantiation;
     }
@@ -232,14 +325,11 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
 
     @Override
     public ImmutableList<Goal> apply(final Goal goal, final Services services,
-                                     final RuleApp application) throws RuleAbortException {
-        assert application instanceof LoopContractInternalBuiltInRuleApp;
-        return apply(goal, services, (LoopContractInternalBuiltInRuleApp) application);
-    }
-
-    private ImmutableList<Goal> apply(final Goal goal, final Services services,
-                                      final LoopContractInternalBuiltInRuleApp application)
-                                              throws RuleAbortException {
+                                     final RuleApp ruleApp) throws RuleAbortException {
+        assert ruleApp instanceof LoopContractInternalBuiltInRuleApp;
+        LoopContractInternalBuiltInRuleApp application = 
+        		(LoopContractInternalBuiltInRuleApp) ruleApp;
+        
         final Instantiation instantiation =
                 instantiate(application.posInOccurrence().subTerm(), goal, services);
         final LoopContract contract = application.getContract();
@@ -262,7 +352,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         final Map<LocationVariable, Term> modifiesClauses =
                 conditionsAndClausesBuilder.buildModifiesClauses();
         final Term[] assumptions =
-                createAssumptions(instantiation.self, contract, heaps,
+                createPreconditions(instantiation.self, contract, heaps,
                                   localInVariables, conditionsAndClausesBuilder,
                                   services);
         final Term[] postconditions =

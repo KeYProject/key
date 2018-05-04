@@ -17,12 +17,23 @@ import de.uka.ilkd.key.speclang.SimpleLoopContract;
 
 /**
  * Application of {@link AbstractLoopContractRule}.
+ * 
+ * @author lanzinger
  */
 public abstract class AbstractLoopContractBuiltInRuleApp
         extends AbstractBlockSpecificationElementBuiltInRuleApp {
 
+	/**
+	 * @see #getContract()
+	 */
     protected LoopContract contract;
 
+    /**
+     * 
+     * @param rule the rule being applied.
+     * @param occurrence the position at which the rule is applied.
+     * @param ifInstantiations if instantiations.
+     */
     public AbstractLoopContractBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence occurrence,
             ImmutableList<PosInOccurrence> ifInstantiations) {
@@ -34,6 +45,12 @@ public abstract class AbstractLoopContractBuiltInRuleApp
         return contract;
     }
 
+    /**
+     * 
+     * @param goal the current goal.
+     * @param rule the rule being applied.
+     * @return this.
+     */
     public AbstractLoopContractBuiltInRuleApp
                 tryToInstantiate(final Goal goal,
                                  final AbstractLoopContractRule rule) {
@@ -59,6 +76,12 @@ public abstract class AbstractLoopContractBuiltInRuleApp
         return this;
     }
 
+    /**
+     * 
+     * @param block the new block.
+     * @param contract the new contract.
+     * @param heaps the new heap context.
+     */
     public void update(final StatementBlock block, final LoopContract contract,
             final List<LocationVariable> heaps) {
         this.block = block;

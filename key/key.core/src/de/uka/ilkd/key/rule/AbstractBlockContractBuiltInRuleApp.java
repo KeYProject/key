@@ -17,12 +17,23 @@ import de.uka.ilkd.key.speclang.SimpleBlockContract;
 
 /**
  * Application of {@link AbstractBlockContractRule}.
+ * 
+ * @author wacker, lanzinger
  */
 public abstract class AbstractBlockContractBuiltInRuleApp
         extends AbstractBlockSpecificationElementBuiltInRuleApp {
 
+	/**
+	 * @see #getContract()
+	 */
     protected BlockContract contract;
 
+    /**
+     * 
+     * @param rule the rule being applied.
+     * @param occurrence the position at which the rule is applied.
+     * @param ifInstantiations if instantiations.
+     */
     public AbstractBlockContractBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence occurrence,
             ImmutableList<PosInOccurrence> ifInstantiations) {
@@ -34,6 +45,12 @@ public abstract class AbstractBlockContractBuiltInRuleApp
         return contract;
     }
 
+    /**
+     * 
+     * @param goal the current goal.
+     * @param rule the rule being applied.
+     * @return this.
+     */
     public AbstractBlockContractBuiltInRuleApp
             tryToInstantiate(final Goal goal,
                              final AbstractBlockContractRule rule) {
@@ -59,6 +76,12 @@ public abstract class AbstractBlockContractBuiltInRuleApp
         return this;
     }
 
+    /**
+     * 
+     * @param block the new block.
+     * @param contract the new contract.
+     * @param heaps the new heap context.
+     */
     public void update(final StatementBlock block, final BlockContract contract,
                        final List<LocationVariable> heaps) {
         this.block = block;

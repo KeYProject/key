@@ -53,20 +53,44 @@ import de.uka.ilkd.key.util.MiscTools;
  * </p>
  *
  * @see BlockContractInternalBuiltInRuleApp
+ * 
+ * @author wacker, lanzinger
  */
 public final class BlockContractInternalRule extends AbstractBlockContractRule {
 
+	/**
+	 * The only instance of this class.
+	 */
     public static final BlockContractInternalRule INSTANCE = new BlockContractInternalRule();
 
+    /**
+     * This rule's name.
+     */
     private static final Name NAME = new Name("Block Contract (Internal)");
 
+    /**
+     * @see #getLastFocusTerm()
+     */
     private Term lastFocusTerm;
 
+    /**
+     * @see #getLastInstantiation()
+     */
     private Instantiation lastInstantiation;
 
     private BlockContractInternalRule() {
     }
 
+    /**
+     * 
+     * @param contract the contract being applied.
+     * @param self the self term.
+     * @param heaps the heaps.
+     * @param localInVariables all free program variables in the block.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
+     * @param services services.
+     * @return the preconditions.
+     */
     private static Term[]
             createPreconditions(final BlockContract contract,
                                 final Term self,
@@ -89,7 +113,13 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
                            reachableInCondition, selfConditions};
     }
 
-
+    /**
+     * 
+     * @param localOutVariables all free program variables modified by the block.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
+     * @return the postconditions.
+     */
     private static Term[]
         createAssumptions(final ImmutableSet<ProgramVariable> localOutVariables,
                           final Map<LocationVariable, Function> anonymisationHeaps,
@@ -108,6 +138,16 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
                            atMostOneFlagSetCondition};
     }
 
+    /**
+     * 
+     * @param contextUpdate the context update.
+     * @param heaps the heaps.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param variables the variables.
+     * @param modifiesClauses the modified clauses.
+     * @param services services.
+     * @return the updates.
+     */
     private static Term[] createUpdates(final Term contextUpdate,
                                         final List<LocationVariable> heaps,
                                         final Map<LocationVariable, Function>
@@ -124,6 +164,20 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         return new Term[] {contextUpdate, remembranceUpdate, anonymisationUpdate};
     }
 
+    /**
+     * 
+     * @param goal the current goal.
+     * @param contract the contract being applied.
+     * @param heaps the heaps.
+     * @param localInVariables all free program variables in the block.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param contextUpdate the context update.
+     * @param remembranceUpdate the remembrance update.
+     * @param localOutVariables all free program variables modified by the block.
+     * @param configurator a configurator.
+     * @param services services.
+     * @return a list containing the new goals.
+     */
     private static ImmutableList<Goal>
         splitIntoGoals(final Goal goal,
                        final BlockContract contract,
@@ -154,16 +208,17 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         return result;
     }
 
+    @Override
     public Term getLastFocusTerm() {
         return lastFocusTerm;
     }
 
-
+    @Override
     protected void setLastFocusTerm(Term lastFocusTerm) {
         this.lastFocusTerm = lastFocusTerm;
     }
 
-
+    @Override
     public Instantiation getLastInstantiation() {
         return lastInstantiation;
     }
@@ -173,7 +228,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         return NAME;
     }
 
-
+    @Override
     protected void setLastInstantiation(Instantiation lastInstantiation) {
         this.lastInstantiation = lastInstantiation;
     }
@@ -186,14 +241,11 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
 
     @Override
     public ImmutableList<Goal> apply(final Goal goal, final Services services,
-                                     final RuleApp application) throws RuleAbortException {
-        assert application instanceof BlockContractInternalBuiltInRuleApp;
-        return apply(goal, services, (BlockContractInternalBuiltInRuleApp) application);
-    }
+                                     final RuleApp ruleApp) throws RuleAbortException {
+        assert ruleApp instanceof BlockContractInternalBuiltInRuleApp;
+        BlockContractInternalBuiltInRuleApp application = 
+        		(BlockContractInternalBuiltInRuleApp) ruleApp;
 
-    private ImmutableList<Goal> apply(final Goal goal, final Services services,
-                                      final BlockContractInternalBuiltInRuleApp application)
-                                              throws RuleAbortException {
         final Instantiation instantiation =
                 instantiate(application.posInOccurrence().subTerm(), goal, services);
         final BlockContract contract = application.getContract();
@@ -253,6 +305,27 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         return result;
     }
 
+    /**
+     * Sets up the validity goal as the first goal in the list.
+     * 
+     * @param result the new goals.
+     * @param isInfFlow whether or not this is an information flow proof.
+     * @param contract the block contract being applied.
+     * @param application the rule application.
+     * @param instantiation the instantiation.
+     * @param heaps the heaps.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param localInVariables all free program variables in the block.
+     * @param localOutVariables all free program variables modified by the block.
+     * @param variables the variables.
+     * @param preconditions the preconditions.
+     * @param assumptions the postconditions.
+     * @param frameCondition the framing condition.
+     * @param updates the updates.
+     * @param configurator a Configurator.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder
+     * @param services services.
+     */
     private void setUpValidityGoal(final ImmutableList<Goal> result,
                                    final boolean isInfFlow,
                                    final BlockContract contract,

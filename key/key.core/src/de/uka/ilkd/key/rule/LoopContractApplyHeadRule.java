@@ -36,22 +36,29 @@ import de.uka.ilkd.key.speclang.LoopContract;
  *
  * <p> Note that the actual transformation is performed in the constructor of
  * {@link SimpleLoopContract}. </p>
+ * 
+ * @author lanzinger
  */
 public class LoopContractApplyHeadRule implements BuiltInRule {
 
+	/**
+	 * The only instance of this class.
+	 */
     public static final LoopContractApplyHeadRule INSTANCE = new LoopContractApplyHeadRule();
+    
+    /**
+     * The rule name.
+     */
     public static final Name NAME = new Name("Loop Contract Apply Head");
 
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services,
-            RuleApp ruleApp) throws RuleAbortException {
-        assert ruleApp instanceof LoopContractApplyHeadBuiltInRuleApp;
-        return apply(goal, services, (LoopContractApplyHeadBuiltInRuleApp) ruleApp);
-    }
-
-    public ImmutableList<Goal> apply(Goal goal, Services services,
-            LoopContractApplyHeadBuiltInRuleApp ruleApp) throws RuleAbortException {
+            RuleApp application) throws RuleAbortException {
+        assert application instanceof LoopContractApplyHeadBuiltInRuleApp;
+        LoopContractApplyHeadBuiltInRuleApp ruleApp =
+        		(LoopContractApplyHeadBuiltInRuleApp) application;
+        
         ImmutableSet<LoopContract> contracts = ruleApp.contracts;
         LoopContract someContract = contracts.iterator().next();
 
@@ -81,7 +88,6 @@ public class LoopContractApplyHeadRule implements BuiltInRule {
                              ruleApp.pio);
         return ImmutableSLList.<Goal>nil().append(goal);
     }
-
 
     @Override
     public Name name() {

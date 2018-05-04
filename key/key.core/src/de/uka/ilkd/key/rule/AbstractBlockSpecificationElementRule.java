@@ -34,12 +34,26 @@ import de.uka.ilkd.key.util.MiscTools;
  * <p>Rule for the application of {@link BlockSpecificationElement}s.</p>
  *
  * @see AbstractBlockSpecificationElementBuiltInRuleApp
+ * 
+ * @author wacker, lanzinger
  */
 public abstract class AbstractBlockSpecificationElementRule implements BuiltInRule {
 
+	/**
+	 * 
+	 */
     public static final String FULL_PRECONDITION_TERM_HINT = "fullPrecondition";
+    
+    /**
+     * 
+     */
     public static final String NEW_POSTCONDITION_TERM_HINT = "newPostcondition";
 
+    /**
+     * 
+     * @param occurrence an occurrence.
+     * @return {@code true} iff the occurrence is not at the top level in the succedent.
+     */
     protected static boolean occursNotAtTopLevelInSuccedent(final PosInOccurrence occurrence) {
         return occurrence == null || !occurrence.isTopLevel() || occurrence.isInAntec();
     }
@@ -47,8 +61,8 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
     /**
      * Adds {@code pv} to the {@code sevices}' program variable namespace.
      *
-     * @param pv
-     * @param services
+     * @param pv a variable. 
+     * @param services services.
      */
     protected static void register(ProgramVariable pv,
                          Services services) {
@@ -58,10 +72,30 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
         }
     }
 
+    /**
+     * 
+     * @return the instantiation from the last time this rule was applied.
+     */
     public abstract Instantiation getLastInstantiation();
+    
+    /**
+     * 
+     * @return the term on which the rule was last applied.
+     */
     public abstract Term getLastFocusTerm();
 
-    protected abstract void setLastInstantiation(Instantiation result);
+    /**
+     * 
+     * @param inst the last instantiation.
+     * @see #getLastInstantiation()
+     */
+    protected abstract void setLastInstantiation(Instantiation inst);
+    
+    /**
+     * 
+     * @param formula the last focus term.
+     * @see #getLastFocusTerm()
+     */
     protected abstract void setLastFocusTerm(Term formula);
 
     @Override
@@ -79,6 +113,12 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
         return false;
     }
 
+    /**
+     * 
+     * @param localOuts a set of variables.
+     * @param services services.
+     * @return an anonymizing update for the specified variables.
+     */
     protected static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
                                                 Services services) {
         Term anonUpdate = null;
@@ -100,6 +140,13 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
                 : anonUpdate;
     }
 
+    /**
+     * 
+     * @param nameBase a base name.
+     * @param type a type.
+     * @param services services.
+     * @return a new local variable with the specified base name of the specified type.
+     */
     protected static ProgramVariable createLocalVariable(final String nameBase,
                                                 final KeYJavaType type,
                                                 final Services services) {
@@ -107,15 +154,52 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
                                 .getTemporaryNameProposal(nameBase), type);
     }
 
+    /**
+     * This encapsulates all information from the rule application that is needed to apply the rule.
+     * 
+     * @see AbstractBlockSpecificationElementBuiltInRuleApp
+     */
     public static final class Instantiation {
 
+    	/**
+    	 * The context update.
+    	 */
         public final Term update;
+        
+        /**
+         * The update target.
+         */
         public final Term formula;
+        
+        /**
+         * The contract's modality.
+         */
         public final Modality modality;
+        
+        /**
+         * The self variable.
+         */
         public final Term self;
+        
+        /**
+         * The block the contract belongs to.
+         */
         public final StatementBlock block;
+        
+        /**
+         * The execution context in which the block occurs.
+         */
         public final ExecutionContext context;
 
+        /**
+         * 
+         * @param update the context update.
+         * @param formula the update target.
+         * @param modality the modality.
+         * @param self the self variable.
+         * @param block the block the contract belongs to.
+         * @param context the execution context in which the block occurs.
+         */
         public Instantiation(final Term update, final Term formula,
                              final Modality modality, final Term self,
                              final StatementBlock block, final ExecutionContext context) {
@@ -133,6 +217,10 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
             this.context = context;
         }
 
+        /**
+         * 
+         * @return {@code true} iff the modality is transactional.
+         */
         public boolean isTransactional() {
             return modality.transaction();
         }
@@ -143,10 +231,27 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
      */
     protected static abstract class Instantiator {
 
+    	/**
+         * The formula on which the rule is to be applied.
+         */
         private final Term formula;
+        
+        /**
+         * The current goal.
+         */
         private final Goal goal;
+        
+        /**
+         * Services.
+         */
         private final Services services;
 
+        /**
+         * 
+         * @param formula the formula on which the rule is to be applied.
+         * @param goal the current goal.
+         * @param services services.
+         */
         public Instantiator(final Term formula,
                             final Goal goal,
                             final Services services) {
@@ -155,6 +260,10 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
             this.services = services;
         }
 
+        /**
+         * 
+         * @return a new instantiation.
+         */
         public Instantiation instantiate() {
             final Term update = extractUpdate();
             final Term target = extractUpdateTarget();
@@ -176,6 +285,10 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
             return new Instantiation(update, target, modality, self, block, context);
         }
 
+        /**
+         * 
+         * @return the update if {@link #formula} is an update application, {@code null} otherwise.
+         */
         private Term extractUpdate() {
             if (formula.op() instanceof UpdateApplication) {
                 return UpdateApplication.getUpdate(formula);
@@ -184,6 +297,11 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
             }
         }
 
+        /**
+         * 
+         * @return the update target if {@link #formula} is an update application,
+         * 		{@code formula} otherwise.
+         */
         private Term extractUpdateTarget() {
             if (formula.op() instanceof UpdateApplication) {
                 return UpdateApplication.getTarget(formula);
@@ -192,6 +310,11 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
             }
         }
 
+        /**
+         * 
+         * @param frame the outermost method-frame used in the formula.
+         * @return the self term.
+         */
         private Term extractSelf(final MethodFrame frame) {
             if (frame == null) {
                 return null;
@@ -199,6 +322,11 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
             return MiscTools.getSelfTerm(frame, services);
         }
 
+        /**
+         * 
+         * @param frame the outermost method-frame used in the formula.
+         * @return the execution context.
+         */
         private static ExecutionContext extractExecutionContext(final MethodFrame frame) {
             if (frame == null) {
                 return null;
@@ -206,6 +334,13 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
             return (ExecutionContext) frame.getExecutionContext();
         }
 
+        /**
+         * 
+         * @param modality the contract's modality.
+         * @param java the java block.
+         * @param goal the current goal.
+         * @return the first block in the java block's prefix with at least one applicable contract.
+         */
         private StatementBlock
                     getFirstBlockInPrefixWithAtLeastOneApplicableContract(final Modality modality,
                                                                           final JavaBlock java,
@@ -227,6 +362,14 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
             return null;
         }
 
+        /**
+         * 
+         * @param services services.
+         * @param block a block.
+         * @param modality the current goal's modality.
+         * @param goal the current goal.
+         * @return {@code true} iff the block has applicable contracts.
+         */
         protected abstract boolean hasApplicableContracts(
                                                final Services services,
                                                final StatementBlock block,

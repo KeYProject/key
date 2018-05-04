@@ -9,19 +9,43 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopContract;
 
 /**
- * @see LoopContractApplyHeadRule
+ * Rule application for {@link LoopContractApplyHeadRule}.
+ * 
+ * @author lanzinger
  */
 public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
+	/**
+	 * The rule being applied.
+	 */
     protected LoopContractApplyHeadRule rule;
+    
+    /**
+     * The loop contracts on which the rule is applied.
+     */
     protected ImmutableSet<LoopContract> contracts;
+    
+    /**
+     * The instantiation.
+     */
     protected AbstractLoopContractRule.Instantiation instantiation;
 
+    /**
+     * 
+     * @param rule the rule being applied.
+     * @param pio the position at which the rule is applied.
+     */
     public LoopContractApplyHeadBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio) {
         this(rule, pio, null);
     }
 
+    /**
+     * 
+     * @param rule the rule being applied.
+     * @param pio the position at which the rule is applied.
+     * @param contracts the contracts on which the rule is applied.
+     */
     public LoopContractApplyHeadBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio, ImmutableSet<LoopContract> contracts) {
         super(rule, pio);
