@@ -29,7 +29,6 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
-
 /**
  * A contractual agreement about an ObserverFunction.
  */
@@ -39,10 +38,10 @@ public interface Contract extends SpecificationElement {
 
     /**
      *
-     * @return {@code true} if any only if this contract does not necessarily need to be proven in
-     *  its own proof obligation.
-     *  E.g., this is true for
-     *  {@link FunctionalBlockContract}s and {@link FunctionalLoopContract}s.
+     * @return {@code true} if any only if this contract does not necessarily
+     *         need to be proven in its own proof obligation. E.g., this is true
+     *         for {@link FunctionalBlockContract}s and
+     *         {@link FunctionalLoopContract}s.
      */
     default boolean isAuxiliary() {
         return false;
@@ -50,8 +49,8 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Returns the id number of the contract. If a contract has instances for
-     * several methods (inheritance!), all instances have the same id.
-     * The id is either non-negative or equal to INVALID_ID.
+     * several methods (inheritance!), all instances have the same id. The id is
+     * either non-negative or equal to INVALID_ID.
      */
     public int id();
 
@@ -66,67 +65,56 @@ public interface Contract extends SpecificationElement {
     public boolean hasMby();
 
     /**
-     * Returns the original ProgramVariables to replace them easier.
-     * The second list consists of the parameters.
+     * Returns the original ProgramVariables to replace them easier. The second
+     * list consists of the parameters.
      */
     public OriginalVariables getOrigVars();
 
     /**
      * Returns the precondition of the contract.
      */
-    public Term getPre(LocationVariable heap,
-                       ProgramVariable selfVar,
-	    	       ImmutableList<ProgramVariable> paramVars,
-                       Map<LocationVariable,? extends ProgramVariable> atPreVars,
-	    	       Services services);
+    public Term getPre(LocationVariable heap, ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+            Services services);
 
     /**
      * Returns the precondition of the contract.
      */
     public Term getPre(List<LocationVariable> heapContext,
-                       ProgramVariable selfVar,
-	    	       ImmutableList<ProgramVariable> paramVars,
-                       Map<LocationVariable,? extends ProgramVariable> atPreVars,
-	    	       Services services);
+            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+            Services services);
 
     /**
      * Returns the precondition of the contract.
      */
-    public Term getPre(LocationVariable heap,
-                       Term heapTerm,
-	               Term selfTerm,
-	    	       ImmutableList<Term> paramTerms,
-                       Map<LocationVariable,Term> atPres,
-	    	       Services services);
+    public Term getPre(LocationVariable heap, Term heapTerm, Term selfTerm,
+            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
+            Services services);
 
     /**
      * Returns the precondition of the contract.
      */
     public Term getPre(List<LocationVariable> heapContext,
-                       Map<LocationVariable,Term> heapTerms,
-	               Term selfTerm,
-	    	       ImmutableList<Term> paramTerms,
-                       Map<LocationVariable,Term> atPres,
-	    	       Services services);    
+            Map<LocationVariable, Term> heapTerms, Term selfTerm,
+            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
+            Services services);
 
     /**
      * Returns the dependency set of the contract.
      */
     public Term getDep(LocationVariable heap, boolean atPre,
-                       ProgramVariable selfVar,
-                       ImmutableList<ProgramVariable> paramVars,
-                       Map<LocationVariable,? extends ProgramVariable> atPreVars,
-                       Services services);
+            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+            Services services);
 
     /**
      * Returns the dependency set of the contract.
      */
-    public Term getDep(LocationVariable heap, boolean atPre,
-                       Term heapTerm,
-                       Term selfTerm,
-                       ImmutableList<Term> paramTerms,
-                       Map<LocationVariable, Term> atPres,
-                       Services services);
+    public Term getDep(LocationVariable heap, boolean atPre, Term heapTerm,
+            Term selfTerm, ImmutableList<Term> paramTerms,
+            Map<LocationVariable, Term> atPres, Services services);
 
     public Term getRequires(LocationVariable heap);
 
@@ -136,8 +124,8 @@ public interface Contract extends SpecificationElement {
 
     public Term getGlobalDefs();
 
-    public Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-                              ImmutableList<Term> paramTerms, Services services);
+    public Term getGlobalDefs(LocationVariable heap, Term heapTerm,
+            Term selfTerm, ImmutableList<Term> paramTerms, Services services);
 
     public Term getMby();
 
@@ -145,17 +133,14 @@ public interface Contract extends SpecificationElement {
      * Returns the measured_by clause of the contract.
      */
     public Term getMby(ProgramVariable selfVar,
-	               ImmutableList<ProgramVariable> paramVars,
-	               Services services);
+            ImmutableList<ProgramVariable> paramVars, Services services);
 
     /**
      * Returns the measured_by clause of the contract.
      */
-    public Term getMby(Map<LocationVariable,Term> heapTerms,
-	               Term selfTerm,
-	               ImmutableList<Term> paramTerms,
-	               Map<LocationVariable, Term> atPres,
-	               Services services);
+    public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
+            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
+            Services services);
 
     /**
      * Returns the contract in pretty HTML format.
@@ -177,17 +162,15 @@ public interface Contract extends SpecificationElement {
     public boolean transactionApplicableContract();
 
     /**
-     * Returns a parseable String representation of the contract.
-     * Precondition: toBeSaved() must be true.
+     * Returns a parseable String representation of the contract. Precondition:
+     * toBeSaved() must be true.
      */
     public String proofToString(Services services);
-
 
     /**
      * Returns a proof obligation to the passed contract and initConfig.
      */
     public ContractPO createProofObl(InitConfig initConfig);
-
 
     /**
      * Lookup the proof obligation belonging to the contract in the
@@ -199,28 +182,25 @@ public interface Contract extends SpecificationElement {
      * Returns a proof obligation to the passed contract and initConfig.
      */
     public ProofOblInput createProofObl(InitConfig initConfig,
-                                        Contract contract);
+            Contract contract);
 
     /**
      * Returns a proof obligation to the passed contract and initConfig.
      */
     public ProofOblInput createProofObl(InitConfig initConfig,
-                                        Contract contract,
-                                        boolean supportSymbolicExecutionAPI);
+            Contract contract, boolean supportSymbolicExecutionAPI);
 
     /**
-     * Returns a contract which is identical this contract except that
-     * the id is set to the new id.
+     * Returns a contract which is identical this contract except that the id is
+     * set to the new id.
      */
     public Contract setID(int newId);
 
-
     /**
-     * Returns a contract which is identical to this contract except that
-     * the KeYJavaType and IObserverFunction are set to the new values.
+     * Returns a contract which is identical to this contract except that the
+     * KeYJavaType and IObserverFunction are set to the new values.
      */
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
-
 
     /**
      * Returns technical name for the contract type.
@@ -229,8 +209,9 @@ public interface Contract extends SpecificationElement {
 
     /**
      * Checks if a self variable is originally provided.
-     * @return {@code true} self variable is originally provided,
-     *         {@code false} no self variable available.
+     * 
+     * @return {@code true} self variable is originally provided, {@code false}
+     *         no self variable available.
      */
     public boolean hasSelfVar();
 
@@ -252,29 +233,30 @@ public interface Contract extends SpecificationElement {
 
         @SuppressWarnings("unchecked")
         public OriginalVariables(ProgramVariable selfVar,
-                                 ProgramVariable resVar,
-                                 ProgramVariable excVar,
-                                 Map<? extends LocationVariable, ? extends ProgramVariable>
-                                        atPreVars,
-                                 ImmutableList<? extends ProgramVariable> paramVars) {
+                ProgramVariable resVar, ProgramVariable excVar,
+                Map<? extends LocationVariable, ? extends ProgramVariable> atPreVars,
+                ImmutableList<? extends ProgramVariable> paramVars) {
             this.self = selfVar;
             this.result = resVar;
             this.exception = excVar;
             this.atPres = (Map<LocationVariable, ProgramVariable>) atPreVars;
             if (paramVars == null) {
-                this.params = ImmutableSLList.<ProgramVariable>nil();
-            } else {
+                this.params = ImmutableSLList.<ProgramVariable> nil();
+            }
+            else {
                 this.params = (ImmutableList<ProgramVariable>) paramVars;
             }
         }
 
         /**
          * Adds a list of parameters and deletes the prior ones (if any).
+         * 
          * @param newParams
          * @return the changed original variables
          */
         public OriginalVariables add(ImmutableList<ProgramVariable> newParams) {
-            return new OriginalVariables(self, result, exception, atPres, newParams);
+            return new OriginalVariables(self, result, exception, atPres,
+                    newParams);
         }
     }
 }

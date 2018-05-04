@@ -28,12 +28,15 @@ import de.uka.ilkd.key.speclang.BlockContract;
  * 
  * @author wacker, lanzinger
  */
-public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBuiltInRuleApp {
+public class BlockContractInternalBuiltInRuleApp
+        extends AbstractBlockContractBuiltInRuleApp {
 
-	/**
+    /**
      * 
-     * @param rule the rule being applied.
-     * @param occurrence the position at which the rule is applied.
+     * @param rule
+     *            the rule being applied.
+     * @param occurrence
+     *            the position at which the rule is applied.
      */
     public BlockContractInternalBuiltInRuleApp(final BuiltInRule rule,
             final PosInOccurrence occurrence) {
@@ -42,19 +45,24 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
 
     /**
      * 
-     * @param rule the rule being applied.
-     * @param occurrence the position at which the rule is applied.
-     * @param ifInstantiations if instantiations.
-     * @param block the block which the applied contract belongs to.
-     * @param contract the contract being applied.
-     * @param heaps the heap context.
+     * @param rule
+     *            the rule being applied.
+     * @param occurrence
+     *            the position at which the rule is applied.
+     * @param ifInstantiations
+     *            if instantiations.
+     * @param block
+     *            the block which the applied contract belongs to.
+     * @param contract
+     *            the contract being applied.
+     * @param heaps
+     *            the heap context.
      */
     public BlockContractInternalBuiltInRuleApp(final BuiltInRule rule,
-                                       final PosInOccurrence occurrence,
-                                       final ImmutableList<PosInOccurrence> ifInstantiations,
-                                       final StatementBlock block,
-                                       final BlockContract contract,
-                                       final List<LocationVariable> heaps) {
+            final PosInOccurrence occurrence,
+            final ImmutableList<PosInOccurrence> ifInstantiations,
+            final StatementBlock block, final BlockContract contract,
+            final List<LocationVariable> heaps) {
         super(rule, occurrence, ifInstantiations);
         assert rule != null;
         assert rule instanceof BlockContractInternalRule;
@@ -65,9 +73,10 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
     }
 
     @Override
-    public BlockContractInternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
-        return new BlockContractInternalBuiltInRuleApp(
-                builtInRule, newOccurrence, ifInsts, block, contract, heaps);
+    public BlockContractInternalBuiltInRuleApp replacePos(
+            final PosInOccurrence newOccurrence) {
+        return new BlockContractInternalBuiltInRuleApp(builtInRule,
+                newOccurrence, ifInsts, block, contract, heaps);
     }
 
     @Override
@@ -78,9 +87,10 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
     }
 
     @Override
-    public BlockContractInternalBuiltInRuleApp tryToInstantiate(final Goal goal) {
+    public BlockContractInternalBuiltInRuleApp tryToInstantiate(
+            final Goal goal) {
 
-        return (BlockContractInternalBuiltInRuleApp)
-                super.tryToInstantiate(goal, BlockContractInternalRule.INSTANCE);
+        return (BlockContractInternalBuiltInRuleApp) super.tryToInstantiate(
+                goal, BlockContractInternalRule.INSTANCE);
     }
 }

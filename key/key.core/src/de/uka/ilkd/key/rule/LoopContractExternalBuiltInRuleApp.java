@@ -18,10 +18,12 @@ import de.uka.ilkd.key.speclang.LoopContract;
 public class LoopContractExternalBuiltInRuleApp
         extends AbstractLoopContractBuiltInRuleApp {
 
-	/**
+    /**
      * 
-     * @param rule the rule being applied.
-     * @param occurrence the position at which the rule is applied.
+     * @param rule
+     *            the rule being applied.
+     * @param occurrence
+     *            the position at which the rule is applied.
      */
     public LoopContractExternalBuiltInRuleApp(final BuiltInRule rule,
             final PosInOccurrence occurrence) {
@@ -30,18 +32,23 @@ public class LoopContractExternalBuiltInRuleApp
 
     /**
      * 
-     * @param rule the rule being applied.
-     * @param occurrence the position at which the rule is applied.
-     * @param ifInstantiations if instantiations.
-     * @param block the block which the applied contract belongs to.
-     * @param contract the contract being applied.
-     * @param heaps the heap context.
+     * @param rule
+     *            the rule being applied.
+     * @param occurrence
+     *            the position at which the rule is applied.
+     * @param ifInstantiations
+     *            if instantiations.
+     * @param block
+     *            the block which the applied contract belongs to.
+     * @param contract
+     *            the contract being applied.
+     * @param heaps
+     *            the heap context.
      */
     public LoopContractExternalBuiltInRuleApp(final BuiltInRule rule,
             final PosInOccurrence occurrence,
             final ImmutableList<PosInOccurrence> ifInstantiations,
-            final StatementBlock block,
-            final LoopContract contract,
+            final StatementBlock block, final LoopContract contract,
             final List<LocationVariable> heaps) {
         super(rule, occurrence, ifInstantiations);
         assert rule != null;
@@ -53,9 +60,10 @@ public class LoopContractExternalBuiltInRuleApp
     }
 
     @Override
-    public LoopContractExternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
-        return new LoopContractExternalBuiltInRuleApp(
-                builtInRule, newOccurrence, ifInsts, block, contract, heaps);
+    public LoopContractExternalBuiltInRuleApp replacePos(
+            final PosInOccurrence newOccurrence) {
+        return new LoopContractExternalBuiltInRuleApp(builtInRule,
+                newOccurrence, ifInsts, block, contract, heaps);
     }
 
     @Override
@@ -66,8 +74,9 @@ public class LoopContractExternalBuiltInRuleApp
     }
 
     @Override
-    public LoopContractExternalBuiltInRuleApp tryToInstantiate(final Goal goal) {
-        return (LoopContractExternalBuiltInRuleApp)
-                super.tryToInstantiate(goal, LoopContractExternalRule.INSTANCE);
+    public LoopContractExternalBuiltInRuleApp tryToInstantiate(
+            final Goal goal) {
+        return (LoopContractExternalBuiltInRuleApp) super.tryToInstantiate(goal,
+                LoopContractExternalRule.INSTANCE);
     }
 }

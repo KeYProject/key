@@ -25,22 +25,22 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.PositionedString;
 
-
 /**
- * Objects of this type represent the various JML specification constructs
- * in textual, unprocessed form.
+ * Objects of this type represent the various JML specification constructs in
+ * textual, unprocessed form.
  */
 public abstract class TextualJMLConstruct {
-
 
     protected final ImmutableList<String> mods;
     private Position approxPos = Position.UNDEFINED;
     private String sourceFile = null;
     private boolean loopContract;
 
-    /** A user-provided identifier to keep an overview over large specification collections */
+    /**
+     * A user-provided identifier to keep an overview over large specification
+     * collections
+     */
     protected String name;
-
 
     public TextualJMLConstruct(ImmutableList<String> mods) {
         assert mods != null;
@@ -68,16 +68,14 @@ public abstract class TextualJMLConstruct {
         this.loopContract = loopContract;
     }
 
-
     public final ImmutableList<String> getMods() {
         return mods;
     }
 
-
     /**
-     * Return the approximate position of this construct.
-     * This is usually the position of the specification line parsed first.
-     * Implementations can set it using <code>setPosition</code> or <code>addGeneric</code>.
+     * Return the approximate position of this construct. This is usually the
+     * position of the specification line parsed first. Implementations can set
+     * it using <code>setPosition</code> or <code>addGeneric</code>.
      */
     public Position getApproxPosition() {
         return approxPos;
@@ -91,13 +89,11 @@ public abstract class TextualJMLConstruct {
     }
 
     /**
-     * Sets the approximate position of this construct
-     * when first called with a valid position.
-     * The approximate position can still be changed
-     * while it is undefined.
-     * Also set source file name if known.
+     * Sets the approximate position of this construct when first called with a
+     * valid position. The approximate position can still be changed while it is
+     * undefined. Also set source file name if known.
      */
-    protected void setPosition (PositionedString ps) {
+    protected void setPosition(PositionedString ps) {
         if (sourceFile == null) {
             approxPos = ps.pos;
             sourceFile = ps.fileName;
@@ -105,10 +101,11 @@ public abstract class TextualJMLConstruct {
     }
 
     protected void addGeneric(Map<String, ImmutableList<PositionedString>> item,
-                              PositionedString ps) {
+            PositionedString ps) {
         String t = ps.text;
         if (!t.startsWith("<") || t.startsWith("<inv>")) {
-            ImmutableList<PositionedString> l = item.get(HeapLDT.BASE_HEAP_NAME.toString());
+            ImmutableList<PositionedString> l = item
+                    .get(HeapLDT.BASE_HEAP_NAME.toString());
             l = l.append(ps);
             item.put(HeapLDT.BASE_HEAP_NAME.toString(), l);
             return;
@@ -116,10 +113,9 @@ public abstract class TextualJMLConstruct {
         List<String> hs = new ArrayList<String>();
         while (t.startsWith("<") && !t.startsWith("<inv>")) {
             for (Name heapName : HeapLDT.VALID_HEAP_NAMES) {
-                //final String hName = heapName.toString();
-                for (String hName
-                       : new String[] { heapName.toString(),
-                                        heapName.toString() + "AtPre"}) {
+                // final String hName = heapName.toString();
+                for (String hName : new String[] { heapName.toString(),
+                        heapName.toString() + "AtPre" }) {
                     String h = "<" + hName + ">";
                     if (t.startsWith(h)) {
                         hs.add(hName);
@@ -129,8 +125,10 @@ public abstract class TextualJMLConstruct {
             }
         }
         if (ps.hasLabels()) {
-            ps = new PositionedString(t, ps.fileName, ps.pos).label(ps.getLabels());
-        } else {
+            ps = new PositionedString(t, ps.fileName, ps.pos)
+                    .label(ps.getLabels());
+        }
+        else {
             ps = new PositionedString(t, ps.fileName, ps.pos);
         }
         for (String h : hs) {

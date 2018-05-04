@@ -63,22 +63,23 @@ import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
  */
 public abstract class StaticFeatureCollection {
 
-    protected static Feature loopInvFeature(Feature costStdInv, Feature costLoopScopeInv) {
+    protected static Feature loopInvFeature(Feature costStdInv,
+            Feature costLoopScopeInv) {
         SetRuleFilter filterLoopInv = new SetRuleFilter();
         filterLoopInv.addRuleToSet(WhileInvariantRule.INSTANCE);
 
         SetRuleFilter filterLoopScopeInv = new SetRuleFilter();
         filterLoopScopeInv.addRuleToSet(LoopScopeInvariantRule.INSTANCE);
 
-        return ConditionalFeature.createConditional(
-                filterLoopInv, costStdInv,
+        return ConditionalFeature.createConditional(filterLoopInv, costStdInv,
                 ConditionalFeature.createConditional(filterLoopScopeInv,
-                                                     costLoopScopeInv));
+                        costLoopScopeInv));
     }
 
     /**
      * @param cost
-     * @return a feature for {@link BlockContractInternalRule} with the specified cost.
+     * @return a feature for {@link BlockContractInternalRule} with the
+     *         specified cost.
      */
     protected static Feature blockContractInternalFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
@@ -88,7 +89,8 @@ public abstract class StaticFeatureCollection {
 
     /**
      * @param cost
-     * @return a feature for {@link BlockContractExternalRule} with the specified cost.
+     * @return a feature for {@link BlockContractExternalRule} with the
+     *         specified cost.
      */
     protected static Feature blockContractExternalFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
@@ -98,17 +100,19 @@ public abstract class StaticFeatureCollection {
 
     /**
      * @param cost
-     * @return a feature for {@link LoopContractInternalRule} with the specified cost.
+     * @return a feature for {@link LoopContractInternalRule} with the specified
+     *         cost.
      */
     protected static Feature loopContractInternalFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(LoopContractInternalRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
-    
+
     /**
      * @param cost
-     * @return a feature for {@link LoopContractExternalRule} with the specified cost.
+     * @return a feature for {@link LoopContractExternalRule} with the specified
+     *         cost.
      */
     protected static Feature loopContractExternalFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
@@ -118,7 +122,8 @@ public abstract class StaticFeatureCollection {
 
     /**
      * @param cost
-     * @return a feature for {@link LoopContractApplyHeadRule} with the specified cost.
+     * @return a feature for {@link LoopContractApplyHeadRule} with the
+     *         specified cost.
      */
     protected static Feature loopContractApplyHead(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
@@ -221,7 +226,8 @@ public abstract class StaticFeatureCollection {
         return BinarySumTermFeature.createSum(a, b);
     }
 
-    protected static TermFeature add(TermFeature a, TermFeature b, TermFeature c) {
+    protected static TermFeature add(TermFeature a, TermFeature b,
+            TermFeature c) {
         // could be done more efficiently
         return add(a, add(b, c));
     }
@@ -230,7 +236,8 @@ public abstract class StaticFeatureCollection {
         return ifZero(a, longTermConst(0), b);
     }
 
-    protected static TermFeature or(TermFeature a, TermFeature b, TermFeature c) {
+    protected static TermFeature or(TermFeature a, TermFeature b,
+            TermFeature c) {
         return or(a, or(b, c));
     }
 
@@ -254,21 +261,20 @@ public abstract class StaticFeatureCollection {
         return ShannonFeature.createConditionalBinary(cond, thenFeature);
     }
 
-    protected static Feature ifZero(Feature cond, Feature thenFeature, Feature elseFeature) {
-        return ShannonFeature.createConditionalBinary(cond,
-                thenFeature,
+    protected static Feature ifZero(Feature cond, Feature thenFeature,
+            Feature elseFeature) {
+        return ShannonFeature.createConditionalBinary(cond, thenFeature,
                 elseFeature);
     }
 
-    protected static TermFeature ifZero(TermFeature cond, TermFeature thenFeature) {
+    protected static TermFeature ifZero(TermFeature cond,
+            TermFeature thenFeature) {
         return ShannonTermFeature.createConditionalBinary(cond, thenFeature);
     }
 
     protected static TermFeature ifZero(TermFeature cond,
-            TermFeature thenFeature,
-            TermFeature elseFeature) {
-        return ShannonTermFeature.createConditionalBinary(cond,
-                thenFeature,
+            TermFeature thenFeature, TermFeature elseFeature) {
+        return ShannonTermFeature.createConditionalBinary(cond, thenFeature,
                 elseFeature);
     }
 
@@ -277,8 +283,7 @@ public abstract class StaticFeatureCollection {
     }
 
     protected static TermFeature not(TermFeature f) {
-        return ifZero(f,
-                ConstTermFeature.createConst(TopRuleAppCost.INSTANCE),
+        return ifZero(f, ConstTermFeature.createConst(TopRuleAppCost.INSTANCE),
                 longTermConst(0));
     }
 
@@ -338,17 +343,18 @@ public abstract class StaticFeatureCollection {
         return SubtermProjection.create(t, PosInTerm.getTopLevel().down(index));
     }
 
-    protected static ProjectionToTerm opTerm(Operator op, ProjectionToTerm[] subTerms) {
+    protected static ProjectionToTerm opTerm(Operator op,
+            ProjectionToTerm[] subTerms) {
         return TermConstructionProjection.create(op, subTerms);
     }
 
-    protected static ProjectionToTerm opTerm(Operator op, ProjectionToTerm subTerm) {
+    protected static ProjectionToTerm opTerm(Operator op,
+            ProjectionToTerm subTerm) {
         return opTerm(op, new ProjectionToTerm[] { subTerm });
     }
 
     protected static ProjectionToTerm opTerm(Operator op,
-            ProjectionToTerm subTerm0,
-            ProjectionToTerm subTerm1) {
+            ProjectionToTerm subTerm0, ProjectionToTerm subTerm1) {
         return opTerm(op, new ProjectionToTerm[] { subTerm0, subTerm1 });
     }
 
@@ -380,8 +386,8 @@ public abstract class StaticFeatureCollection {
         return add(op(op), sub(sub0));
     }
 
-    protected static TermFeature opSub(Operator op,
-            TermFeature sub0, TermFeature sub1) {
+    protected static TermFeature opSub(Operator op, TermFeature sub0,
+            TermFeature sub1) {
         return add(op(op), sub(sub0, sub1));
     }
 
@@ -398,8 +404,7 @@ public abstract class StaticFeatureCollection {
             ProjectionToTerm searchedTerm) {
         final TermBuffer buf = new TermBuffer();
         return let(buf, searchedTerm,
-                applyTF(bigTerm,
-                        not(rec(any(), not(eq(buf))))));
+                applyTF(bigTerm, not(rec(any(), not(eq(buf))))));
     }
 
     protected static Feature println(ProjectionToTerm t) {
@@ -426,7 +431,8 @@ public abstract class StaticFeatureCollection {
      * returns zero if <code>schemaVar</code> is not instantiated for a
      * particular taclet app
      */
-    protected static Feature applyTFNonStrict(String schemaVar, TermFeature tf) {
+    protected static Feature applyTFNonStrict(String schemaVar,
+            TermFeature tf) {
         return applyTFNonStrict(instOfNonStrict(schemaVar), tf);
     }
 
@@ -444,20 +450,26 @@ public abstract class StaticFeatureCollection {
      * projection <code>term</code>. If <code>term</code> is undefined for a
      * particular rule app, zero is returned
      */
-    protected static Feature applyTFNonStrict(ProjectionToTerm term, TermFeature tf) {
-        return ApplyTFFeature.createNonStrict(term, tf, NumberRuleAppCost.getZeroCost());
+    protected static Feature applyTFNonStrict(ProjectionToTerm term,
+            TermFeature tf) {
+        return ApplyTFFeature.createNonStrict(term, tf,
+                NumberRuleAppCost.getZeroCost());
     }
 
-    protected static Feature sum(TermBuffer x, TermGenerator gen, Feature body) {
+    protected static Feature sum(TermBuffer x, TermGenerator gen,
+            Feature body) {
         return ComprehendedSumFeature.create(x, gen, body);
     }
 
-    protected static Feature let(TermBuffer x, ProjectionToTerm value, Feature body) {
+    protected static Feature let(TermBuffer x, ProjectionToTerm value,
+            Feature body) {
         return LetFeature.create(x, value, body);
     }
 
-    protected static Feature isSubSortFeature(ProjectionToTerm s1, ProjectionToTerm s2) {
-        return SortComparisonFeature.create(s1, s2, SortComparisonFeature.SUBSORT);
+    protected static Feature isSubSortFeature(ProjectionToTerm s1,
+            ProjectionToTerm s2) {
+        return SortComparisonFeature.create(s1, s2,
+                SortComparisonFeature.SUBSORT);
     }
 
     protected static Feature implicitCastNecessary(ProjectionToTerm s1) {

@@ -13,18 +13,19 @@ import de.uka.ilkd.key.speclang.LoopContract;
  * 
  * @author lanzinger
  */
-public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
+public class LoopContractApplyHeadBuiltInRuleApp
+        extends AbstractBuiltInRuleApp {
 
-	/**
-	 * The rule being applied.
-	 */
+    /**
+     * The rule being applied.
+     */
     protected LoopContractApplyHeadRule rule;
-    
+
     /**
      * The loop contracts on which the rule is applied.
      */
     protected ImmutableSet<LoopContract> contracts;
-    
+
     /**
      * The instantiation.
      */
@@ -32,8 +33,10 @@ public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp 
 
     /**
      * 
-     * @param rule the rule being applied.
-     * @param pio the position at which the rule is applied.
+     * @param rule
+     *            the rule being applied.
+     * @param pio
+     *            the position at which the rule is applied.
      */
     public LoopContractApplyHeadBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio) {
@@ -42,9 +45,12 @@ public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp 
 
     /**
      * 
-     * @param rule the rule being applied.
-     * @param pio the position at which the rule is applied.
-     * @param contracts the contracts on which the rule is applied.
+     * @param rule
+     *            the rule being applied.
+     * @param pio
+     *            the position at which the rule is applied.
+     * @param contracts
+     *            the contracts on which the rule is applied.
      */
     public LoopContractApplyHeadBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio, ImmutableSet<LoopContract> contracts) {
@@ -55,7 +61,8 @@ public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp 
 
     @Override
     public boolean complete() {
-        return pio != null && contracts != null && !contracts.isEmpty() && instantiation != null;
+        return pio != null && contracts != null && !contracts.isEmpty()
+                && instantiation != null;
     }
 
     public boolean cannotComplete(final Goal goal) {
@@ -80,15 +87,13 @@ public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp 
 
     @Override
     public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
-        instantiation =
-                new AbstractLoopContractRule.Instantiator(
-                        pio.subTerm(), goal, goal.proof().getServices())
-                .instantiate();
+        instantiation = new AbstractLoopContractRule.Instantiator(pio.subTerm(),
+                goal, goal.proof().getServices()).instantiate();
 
         Services services = goal.proof().getServices();
 
-        contracts =
-                AbstractLoopContractRule.getApplicableContracts(instantiation, goal, services);
+        contracts = AbstractLoopContractRule
+                .getApplicableContracts(instantiation, goal, services);
         rule = LoopContractApplyHeadRule.INSTANCE;
         return this;
     }

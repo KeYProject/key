@@ -20,21 +20,21 @@ import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 public abstract class AbstractBlockSpecificationElementBuiltInRuleApp
         extends AbstractBuiltInRuleApp {
 
-	/**
-	 * @see #getBlock()
-	 */
+    /**
+     * @see #getBlock()
+     */
     protected StatementBlock block;
-    
+
     /**
      * @see #getHeapContext()
      */
     protected List<LocationVariable> heaps;
-    
+
     /**
      * @see #getInformationFlowProofObligationVars()
      */
     protected IFProofObligationVars infFlowVars;
-    
+
     /**
      * @see #getExecutionContext()
      */
@@ -42,9 +42,12 @@ public abstract class AbstractBlockSpecificationElementBuiltInRuleApp
 
     /**
      * 
-     * @param rule the rule being applied.
-     * @param occurrence the position at which the rule is applied.
-     * @param ifInstantiations if instantiations.
+     * @param rule
+     *            the rule being applied.
+     * @param occurrence
+     *            the position at which the rule is applied.
+     * @param ifInstantiations
+     *            if instantiations.
      */
     public AbstractBlockSpecificationElementBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence occurrence,
@@ -68,7 +71,8 @@ public abstract class AbstractBlockSpecificationElementBuiltInRuleApp
 
     /**
      * 
-     * @return set of four sets of ProofObligationVars necessary for information flow proofs.
+     * @return set of four sets of ProofObligationVars necessary for information
+     *         flow proofs.
      */
     public IFProofObligationVars getInformationFlowProofObligationVars() {
         return infFlowVars;
@@ -89,7 +93,8 @@ public abstract class AbstractBlockSpecificationElementBuiltInRuleApp
 
     @Override
     public boolean complete() {
-        return pio != null && block != null && getContract() != null && heaps != null;
+        return pio != null && block != null && getContract() != null
+                && heaps != null;
     }
 
     @Override
@@ -104,8 +109,10 @@ public abstract class AbstractBlockSpecificationElementBuiltInRuleApp
     /**
      * Sets the proof obligation variables and execution context to new values.
      * 
-     * @param vars new proof obligation variables.
-     * @param context new execution context.
+     * @param vars
+     *            new proof obligation variables.
+     * @param context
+     *            new execution context.
      */
     public void update(IFProofObligationVars vars, ExecutionContext context) {
         this.infFlowVars = vars;
