@@ -76,30 +76,50 @@ public abstract class StaticFeatureCollection {
                                                      costLoopScopeInv));
     }
 
+    /**
+     * @param cost
+     * @return a feature for {@link BlockContractInternalRule} with the specified cost.
+     */
     protected static Feature blockContractInternalFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(BlockContractInternalRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 
+    /**
+     * @param cost
+     * @return a feature for {@link BlockContractExternalRule} with the specified cost.
+     */
     protected static Feature blockContractExternalFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(BlockContractExternalRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 
+    /**
+     * @param cost
+     * @return a feature for {@link LoopContractInternalRule} with the specified cost.
+     */
     protected static Feature loopContractInternalFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(LoopContractInternalRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
-
+    
+    /**
+     * @param cost
+     * @return a feature for {@link LoopContractExternalRule} with the specified cost.
+     */
     protected static Feature loopContractExternalFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(LoopContractExternalRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 
+    /**
+     * @param cost
+     * @return a feature for {@link LoopContractApplyHeadRule} with the specified cost.
+     */
     protected static Feature loopContractApplyHead(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(LoopContractApplyHeadRule.INSTANCE);

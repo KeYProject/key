@@ -63,6 +63,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.ParametricMergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.UnparametricMergeProcedure;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassAxiomImpl;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -1302,6 +1303,16 @@ public class JMLSpecFactory {
         return result;
     }
 
+    /**
+     * Creates a set of block contracts for a block from a textual specification case.
+     * 
+     * @param method the method containing the block.
+     * @param labels all labels belonging to the block.
+     * @param block the block which the block contracts belong to.
+     * @param specificationCase the textual specification case.
+     * @return a set of block contracts for a block from a textual specification case.
+     * @throws SLTranslationException
+     */
     public ImmutableSet<BlockContract> createJMLBlockContracts(
             final IProgramMethod method, final List<Label> labels,
             final StatementBlock block,
@@ -1327,6 +1338,16 @@ public class JMLSpecFactory {
                 .create();
     }
 
+    /**
+     * Creates a set of loop contracts for a block from a textual specification case.
+     * 
+     * @param method the method containing the block.
+     * @param labels all labels belonging to the block.
+     * @param block the block which the loop contracts belong to.
+     * @param specificationCase the textual specification case.
+     * @return a set of loop contracts for a block from a textual specification case.
+     * @throws SLTranslationException
+     */
     public ImmutableSet<LoopContract> createJMLLoopContracts(
             final IProgramMethod method, final List<Label> labels,
             final StatementBlock block,
@@ -1352,6 +1373,16 @@ public class JMLSpecFactory {
                 .create();
     }
 
+    /**
+     * Creates a program variable collection for a specified block.
+     * This collection contains all program variables that occur freely in the block as parameters
+     * (i.e., in {@link ProgramVariableCollection#paramVars}).
+     * 
+     * @param method the method containing the block.
+     * @param block the block.
+     * @param variables an instance of {@link BlockSpecificationElement.Variables} for the block.
+     * @return
+     */
     private ProgramVariableCollection createProgramVariables(
             final IProgramMethod method, final StatementBlock block,
             final BlockContract.Variables variables) {

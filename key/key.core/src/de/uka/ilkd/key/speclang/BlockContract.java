@@ -35,6 +35,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
  *  instead.
  * </p>
  *
+ * @author wacker, lanzinger
  */
 public interface BlockContract extends BlockSpecificationElement {
 
@@ -49,11 +50,22 @@ public interface BlockContract extends BlockSpecificationElement {
 
     /**
      *
-     * @param contract
+     * @param contract 
      * @see #getFunctionalContracts()
      */
     public void setFunctionalBlockContract(FunctionalBlockContract contract);
 
+    /**
+     * 
+     * @param newBlock 
+     * @param newPreconditions 
+     * @param newPostconditions 
+     * @param newModifiesClauses 
+     * @param newInfFlowSpecs 
+     * @param newVariables 
+     * @param newMeasuredBy 
+     * @return a new block contract with the specified attributes.
+     */
     public BlockContract update(StatementBlock newBlock,
                                 Map<LocationVariable,Term> newPreconditions,
                                 Map<LocationVariable,Term> newPostconditions,
@@ -61,6 +73,17 @@ public interface BlockContract extends BlockSpecificationElement {
                                 final ImmutableList<InfFlowSpec> newInfFlowSpecs,
                                 Variables newVariables,
                                 Term newMeasuredBy);
+    
+    /**
+     * @param newKJT the type containing the new target method.
+     * @param newPM the new target method.
+     * @return a new block contract equal to this one except that it belongs to a different target.
+     */
     public BlockContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
+    
+    /**
+     * @param newBlock the new block.
+     * @return a new block contract equal to this one except that it belongs to a different block.
+     */
     public BlockContract setBlock(StatementBlock newBlock);
 }

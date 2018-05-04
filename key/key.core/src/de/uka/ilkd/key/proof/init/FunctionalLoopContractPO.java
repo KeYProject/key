@@ -44,6 +44,11 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     private static final Map<Boolean, String> TRANSACTION_TAGS =
             new LinkedHashMap<Boolean, String>();
 
+    static {
+        TRANSACTION_TAGS.put(false, "transaction_inactive");
+        TRANSACTION_TAGS.put(true, "transaction_active");
+    }
+
     private FunctionalLoopContract contract;
     private InitConfig proofConfig;
 
@@ -106,11 +111,6 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             anonInHeaps.put(heap, anonymisationFunction);
         }
         return anonInHeaps;
-    }
-
-    static {
-        TRANSACTION_TAGS.put(false, "transaction_inactive");
-        TRANSACTION_TAGS.put(true, "transaction_active");
     }
 
     @Override

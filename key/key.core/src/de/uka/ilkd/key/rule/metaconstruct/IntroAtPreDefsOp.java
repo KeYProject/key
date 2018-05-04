@@ -119,7 +119,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         // update merge contracts
         updateMergeContracts(mpss, atPres, services);
         //update block contracts
-        updateBlockContracts(blocks, atPreVars, atPreHeapVars, services);
+        updateBlockAndLoopContracts(blocks, atPreVars, atPreHeapVars, services);
 
         return tb.apply(atPreUpdate, target, null);
     }
@@ -512,7 +512,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         }
     }
 
-    private void updateBlockContracts(final ImmutableSet<StatementBlock> blocks,
+    private void updateBlockAndLoopContracts(final ImmutableSet<StatementBlock> blocks,
                                       Map<LocationVariable, LocationVariable> atPreVars,
                                       Map<LocationVariable, LocationVariable> atPreHeapVars,
                                       Services services) {

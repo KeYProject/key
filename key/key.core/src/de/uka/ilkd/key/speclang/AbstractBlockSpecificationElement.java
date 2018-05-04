@@ -33,28 +33,98 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
  * Abstract base class for all default implementations of {@link BlockSpecificationElement}.
+ * 
+ * @author wacker, lanzinger
  */
 public abstract class AbstractBlockSpecificationElement
         implements BlockSpecificationElement {
 
     /**
-     * The statement block inside the {@link BlockSpecificationElement}.
+     * @see #getBlock()
      */
     protected final StatementBlock block;
+    
+    /**
+     * @see #getLabels()
+     */
     protected final List<Label> labels;
+    
+    /**
+     * @see #getMethod()
+     */
     protected final IProgramMethod method;
+    
+    /**
+     * @see #getModality()
+     */
     protected final Modality modality;
+    
+    /**
+     * @see #getInstantiationSelfTerm()
+     */
     protected Term instantiationSelf;
+    
+    /**
+     * @see #getPrecondition(LocationVariable, Services)
+     */
     protected final Map<LocationVariable, Term> preconditions;
+    
+    /**
+     * @see #getMby()
+     */
     protected final Term measuredBy;
+    
+    /**
+     * @see #getPostcondition(LocationVariable, Services)
+     */
     protected final Map<LocationVariable, Term> postconditions;
+    
+    /**
+     * @see #getModifiesClause(LocationVariable, Services)
+     */
     protected final Map<LocationVariable, Term> modifiesClauses;
+    
+    /**
+     * @see #getInfFlowSpecs()
+     */
     protected ImmutableList<InfFlowSpec> infFlowSpecs;
+    
+    /**
+     * @see #getVariables()
+     */
     protected final Variables variables;
+    
+    /**
+     * @see #isTransactionApplicable()
+     */
     protected final boolean transactionApplicable;
+    
+    /**
+     * @see #hasModifiesClause(LocationVariable)
+     */
     protected final Map<LocationVariable, Boolean> hasMod;
+    
+    /**
+     * @see #getBaseName()
+     */
     protected final String baseName;
 
+    /**
+     * 
+     * @param baseName the base name.
+     * @param block the block this contract belongs to.
+     * @param labels all labels belonging to the block.
+     * @param method the method containing the block.
+     * @param modality this contract's modality.
+     * @param preconditions this contract's preconditions on every heap.
+     * @param measuredBy this contract's measured-by term.
+     * @param postconditions this contract's postconditions on every heap.
+     * @param modifiesClauses this contract's modifies clauses on every heap.
+     * @param infFlowSpecs this contract's information flow specifications.
+     * @param variables this contract's variables.
+     * @param transactionApplicable whether or not this contract is applicable for transactions.
+     * @param hasMod a map specifying on which heaps this contract has a modified clause.
+     */
     public AbstractBlockSpecificationElement(final String baseName,
                                              final StatementBlock block,
                                              final List<Label> labels,
@@ -548,6 +618,7 @@ public abstract class AbstractBlockSpecificationElement
                 ;
     }
 
+    @Override
     public OriginalVariables getOrigVars() {
         return variables.toOrigVars();
     }
@@ -677,6 +748,13 @@ public abstract class AbstractBlockSpecificationElement
         return result;
     }
 
+    /**
+     * 
+     * @param newVariables new variables.
+     * @param services services.
+     * @return a map from every variable in {@link #getVariables()}
+     * 		to its counterpart in {@code newVariables}.
+     */
     protected Map<ProgramVariable, ProgramVariable>
                 createReplacementMap(final Variables newVariables,
                                      final Services services) {
@@ -702,6 +780,14 @@ public abstract class AbstractBlockSpecificationElement
         return result;
     }
 
+    /**
+     * 
+     * @param newHeap new base heap.
+     * @param newTerms new terms.
+     * @param services services.
+     * @return a map from every term in {@code getVariables().termify()}
+     * 		to its counterpart in {@code newTerms}, and from the base heap to {@code heap}.
+     */
     protected Map<Term, Term> createReplacementMap(final Term newHeap,
                                                  final Terms newTerms,
                                                  final Services services) {
@@ -729,11 +815,26 @@ public abstract class AbstractBlockSpecificationElement
     }
 
 
+    /**
+     * A map from some type to the same type.
+     *
+     * @param <S> the key and value type.
+     */
     private abstract static class ReplacementMap<S extends Sorted>
                 extends LinkedHashMap<S, S> {
 
+    	/**
+    	 * 
+    	 */
         private static final long serialVersionUID = -2339350643000987576L;
 
+        /**
+         * Adds a mapping for the self variable.
+         * 
+         * @param oldSelf the old self variable.
+         * @param newSelf the new self variable.
+         * @param services services.
+         */
         public void replaceSelf(final ProgramVariable oldSelf,
                                 final S newSelf,
                                 TermServices services) {
@@ -743,6 +844,13 @@ public abstract class AbstractBlockSpecificationElement
             }
         }
 
+        /**
+         * Adds a mapping for every flag.
+         * 
+         * @param oldFlags old flags.
+         * @param newFlags new flags.
+         * @param services services.
+         */
         public void replaceFlags(final Map<Label, ProgramVariable> oldFlags,
                                  final Map<Label, S> newFlags,
                                  TermServices services) {
@@ -754,6 +862,13 @@ public abstract class AbstractBlockSpecificationElement
             }
         }
 
+        /**
+         * Adds a mapping for a variable.
+         * 
+         * @param oldVariable old variable.
+         * @param newVariable new variable.
+         * @param services services.
+         */
         public void replaceVariable(final ProgramVariable oldVariable,
                                     final S newVariable,
                                     TermServices services) {
@@ -763,6 +878,13 @@ public abstract class AbstractBlockSpecificationElement
             }
         }
 
+        /**
+         * Adds mappings for the remembrance heaps.
+         * 
+         * @param oldRemembranceHeaps old remembrance heaps.
+         * @param newRemembranceHeaps new remembrance heaps.
+         * @param services services.
+         */
         public void replaceRemembranceHeaps(final Map<LocationVariable,
                                                       LocationVariable> oldRemembranceHeaps,
                                             final Map<LocationVariable,
@@ -782,6 +904,13 @@ public abstract class AbstractBlockSpecificationElement
             }
         }
 
+        /**
+         * Adds mappings for the remembrance variables.
+         *  
+         * @param oldRemembranceLocalVariables old remembrance variables.
+         * @param newRemembranceLocalVariables new remembrance variables.
+         * @param services services
+         */
         public void replaceRemembranceLocalVariables(final Map<LocationVariable, LocationVariable>
                                                                       oldRemembranceLocalVariables,
                                                      final Map<LocationVariable, ? extends S>
@@ -803,10 +932,19 @@ public abstract class AbstractBlockSpecificationElement
             }
         }
 
+        /**
+         * 
+         * @param variable a variable.
+         * @param services services.
+         * @return a conversion of the specified variable to the type {@code S}.
+         */
         protected abstract S convert(ProgramVariable variable, TermServices services);
 
     }
 
+    /**
+     * A replacement map for variables.
+     */
     private static class VariableReplacementMap extends ReplacementMap<ProgramVariable> {
 
         private static final long serialVersionUID = 8964634070766482218L;
@@ -817,6 +955,9 @@ public abstract class AbstractBlockSpecificationElement
 
     }
 
+    /**
+     * A replacement map for terms.
+     */
     private static class TermReplacementMap extends ReplacementMap<Term> {
 
         private static final long serialVersionUID = 5465241780257247301L;
@@ -845,26 +986,127 @@ public abstract class AbstractBlockSpecificationElement
     protected static abstract class Creator<T extends BlockSpecificationElement>
             extends TermBuilder {
 
+    	/**
+    	 * @see BlockSpecificationElement#getBaseName()
+    	 */
         private final String baseName;
+        
+        /**
+         * @see BlockSpecificationElement#getBlock()
+         */
         private final StatementBlock block;
+        
+        /**
+         * @see BlockSpecificationElement#getLabels()
+         */
         private final List<Label> labels;
+        
+        /**
+         * @see BlockSpecificationElement#getMethod()
+         */
         private final IProgramMethod method;
+        
+        /**
+         * This contract's behavior.
+         */
         private final Behavior behavior;
+        
+        /**
+         * @see BlockSpecificationElement#getVariables()
+         */
         private final Variables variables;
+        
+        /**
+         * @see BlockSpecificationElement#getMby()
+         */
         private final Term measuredBy;
+        
+        /**
+         * @see BlockSpecificationElement#getRequires(LocationVariable)
+         */
         private final Map<LocationVariable, Term> requires;
+        
+        /**
+         * Postcondition for normal termination.
+         */
         private final Map<LocationVariable, Term> ensures;
+        
+        /**
+         * @see BlockSpecificationElement#getInfFlowSpecs()
+         */
         private final ImmutableList<InfFlowSpec> infFlowSpecs;
+        
+        /**
+         * Postconditions for abrupt termination with {@code break} statements.
+         */
         private final Map<Label, Term> breaks;
+        
+        /**
+         * Postconditions for abrupt termination with {@code continue} statements.
+         */
         private final Map<Label, Term> continues;
+        
+        /**
+         * Postcondition for abrupt termination with {@code return} statements.
+         */
         private final Term returns;
+        
+        /**
+         * Postcondition for abrupt termination due to an uncaught exception.
+         */
         private final Term signals;
+        
+        /**
+         * A term specifying which uncaught exceptions may occur.
+         */
         private final Term signalsOnly;
+        
+        /**
+         * A diverges term.
+         */
         private final Term diverges;
+        
+        /**
+         * A map from every heap to an assignable term.
+         */
         private final Map<LocationVariable, Term> assignables;
+        
+        /**
+         * A list of heaps used in this contract.
+         */
         private final ImmutableList<LocationVariable> heaps;
+        
+        /**
+         * A map specifying on which heaps this contract has a modifies clause.
+         */
         private final Map<LocationVariable, Boolean> hasMod;
 
+        /**
+         * 
+         * @param baseName the contract's base name.
+         * @param block the block the contract belongs to.
+         * @param labels all labels belonging to the block.
+         * @param method the method containing the block.
+         * @param behavior the contract's behavior.
+         * @param variables the variables.
+         * @param requires the contract's precondition.
+         * @param measuredBy the contract's measured-by clause.
+         * @param ensures the contracts postcondition due to normal termination.
+         * @param infFlowSpecs the contract's information flow specifications.
+         * @param breaks the contract's postconditions for abrupt termination
+         * 		with {@code break} statements.
+         * @param continues the contract's postconditions for abrupt termination
+         * 		with {@code continue} statements.
+         * @param returns the contract's postcondition for abrupt termination
+         * 		with {@code return} statements.
+         * @param signals the contract's postcondition for abrupt termination
+         * 		due to abrupt termintation.
+         * @param signalsOnly a term specifying which uncaught exceptions may occur.
+         * @param diverges a diverges clause.
+         * @param assignables map from every heap to an assignable term.
+         * @param hasMod map specifying on which heaps this contract has a modifies clause.
+         * @param services services.
+         */
         public Creator(final String baseName,
                        final StatementBlock block,
                        final List<Label> labels,
@@ -906,11 +1148,19 @@ public abstract class AbstractBlockSpecificationElement
             this.hasMod = hasMod;
         }
 
+        /**
+         * 
+         * @return a new contract.
+         */
         public ImmutableSet<T> create() {
             return create(buildPreconditions(), buildPostconditions(),
                           buildModifiesClauses(), infFlowSpecs);
         }
 
+        /**
+         * 
+         * @return the contract's preconditions.
+         */
         protected Map<LocationVariable, Term> buildPreconditions() {
             final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
             for (LocationVariable heap : heaps) {
@@ -960,6 +1210,10 @@ public abstract class AbstractBlockSpecificationElement
             return result;
         }
 
+        /**
+         * 
+         * @return the contract's postconditions.
+         */
         protected Map<LocationVariable, Term> buildPostconditions() {
             final Map<LocationVariable, Term> postconditions =
                     new LinkedHashMap<LocationVariable, Term>();
@@ -971,6 +1225,11 @@ public abstract class AbstractBlockSpecificationElement
             return postconditions;
         }
 
+        /**
+         * 
+         * @param heap the heap to use.
+         * @return the contract's postcondition on the specified heap.
+         */
         private Term buildPostcondition(final LocationVariable heap) {
             final Term breakPostcondition =
                     conditionPostconditions(variables.breakFlags, breaks);
@@ -1014,6 +1273,12 @@ public abstract class AbstractBlockSpecificationElement
             }
         }
 
+        /**
+         * 
+         * @param flags abrupt termination flags.
+         * @param postconditions postconditions for abrupt termination.
+         * @return a postcondition created conjunctively from the specified postconditions.
+         */
         private Term conditionPostconditions(final Map<Label, ProgramVariable> flags,
                                              final Map<Label, Term> postconditions) {
             Term result = tt();
@@ -1025,6 +1290,12 @@ public abstract class AbstractBlockSpecificationElement
             return result;
         }
 
+        /**
+         * 
+         * @param flag an abrupt termination flag.
+         * @param postcondition a postcondition for abrupt termination with the specifed flag.
+         * @return a part of the postcondition.
+         */
         private Term conditionPostcondition(final ProgramVariable flag, final Term postcondition) {
             Term result = tt();
             if (flag != null) {
@@ -1035,7 +1306,11 @@ public abstract class AbstractBlockSpecificationElement
             }
             return result;
         }
-
+        
+        /**
+         * 
+         * @return the postcondition for abrupt termination due to an uncaught exception.
+         */
         private Term buildThrowPostcondition() {
             return imp(
                 not(equals(var(variables.exception), NULL())),
@@ -1043,6 +1318,10 @@ public abstract class AbstractBlockSpecificationElement
             );
         }
 
+        /**
+         * 
+         * @return a term corresponding to {@link Behavior#NORMAL_BEHAVIOR}
+         */
         private Term buildNormalTerminationCondition() {
             return and(
                 buildNormalTerminationCondition(variables.breakFlags),
@@ -1052,6 +1331,10 @@ public abstract class AbstractBlockSpecificationElement
             );
         }
 
+        /**
+         * 
+         * @return a term corresponding to {@link Behavior#BREAK_BEHAVIOR}
+         */
         private Term buildBreakTerminationCondition() {
             return and(
                 buildAbruptTerminationCondition(variables.breakFlags),
@@ -1061,6 +1344,10 @@ public abstract class AbstractBlockSpecificationElement
             );
         }
 
+        /**
+         * 
+         * @return a term corresponding to {@link Behavior#CONTINUE_BEHAVIOR}
+         */
         private Term buildContinueTerminationCondition() {
             return and(
                 buildNormalTerminationCondition(variables.breakFlags),
@@ -1070,6 +1357,10 @@ public abstract class AbstractBlockSpecificationElement
             );
         }
 
+        /**
+         * 
+         * @return a term corresponding to {@link Behavior#RETURN_BEHAVIOR}
+         */
         private Term buildReturnTerminationCondition() {
             return and(
                 buildNormalTerminationCondition(variables.breakFlags),
@@ -1079,6 +1370,10 @@ public abstract class AbstractBlockSpecificationElement
             );
         }
 
+        /**
+         * 
+         * @return a term corresponding to {@link Behavior#EXCEPTIONAL_BEHAVIOR}
+         */
         private Term buildThrowTerminationCondition() {
             return and(
                 buildNormalTerminationCondition(variables.breakFlags),
@@ -1088,6 +1383,11 @@ public abstract class AbstractBlockSpecificationElement
             );
         }
 
+        /**
+         * 
+         * @param flags a map containing all abrupt termination flags.
+         * @return a term corresponding to {@link Behavior#NORMAL_BEHAVIOR}
+         */
         private Term buildNormalTerminationCondition(final Map<Label, ProgramVariable> flags) {
             Term result = tt();
             for (Label label : flags.keySet()) {
@@ -1096,6 +1396,11 @@ public abstract class AbstractBlockSpecificationElement
             return result;
         }
 
+        /**
+         * 
+         * @param flags a map containing all abrupt termination flags.
+         * @return a term equivalent to the negation of {@link #buildNormalTerminationCondition()}
+         */
         private Term buildAbruptTerminationCondition(final Map<Label, ProgramVariable> flags) {
             Term result = ff();
             for (Label label : flags.keySet()) {
@@ -1104,6 +1409,12 @@ public abstract class AbstractBlockSpecificationElement
             return result;
         }
 
+        /**
+         * 
+         * @param flag a boolean variable.
+         * @param truth a boolean term.
+         * @return a term which is true iff the flag is equal to the term.
+         */
         private Term buildFlagIsCondition(final ProgramVariable flag, final Term truth) {
             Term result = tt();
             if (flag != null) {
@@ -1112,14 +1423,31 @@ public abstract class AbstractBlockSpecificationElement
             return result;
         }
 
+        /**
+         * 
+         * @return a term which is true iff {@code variables.exception == null}.
+         */
         private Term buildExceptionIsNullCondition() {
             return equals(var(variables.exception), NULL());
         }
 
+        /**
+         * 
+         * @return the contract's modifies clauses.
+         */
         private Map<LocationVariable, Term> buildModifiesClauses() {
             return assignables;
         }
 
+        /**
+         * 
+         * @param preconditions the contracts' preconditions.
+         * @param postconditions the contracts' postconditions.
+         * @param modifiesClauses the contracts' modifies clauses.
+         * @param infFlowSpecs the contracts' information flow specifications.
+         * @return a set of one or two contracts (depending on whether the
+         * {@code diverges} clause is trivial (i.e., {@code true} or {@code false}) or not.
+         */
         private ImmutableSet<T>
                     create(final Map<LocationVariable, Term> preconditions,
                            final Map<LocationVariable, Term> postconditions,
@@ -1146,22 +1474,22 @@ public abstract class AbstractBlockSpecificationElement
             }
             return result;
         }
-
+        
         /**
          *
-         * @param baseName
-         * @param block
-         * @param labels
-         * @param method
-         * @param modality
-         * @param preconditions
-         * @param measuredBy
-         * @param postconditions
-         * @param modifiesClauses
-         * @param infFlowSpecs
-         * @param variables
-         * @param transactionApplicable
-         * @param hasMod
+         * @param baseName the base name.
+         * @param block the block this contract belongs to.
+         * @param labels all labels belonging to the block.
+         * @param method the method containing the block.
+         * @param modality this contract's modality.
+         * @param preconditions this contract's preconditions on every heap.
+         * @param measuredBy this contract's measured-by term.
+         * @param postconditions this contract's postconditions on every heap.
+         * @param modifiesClauses this contract's modifies clauses on every heap.
+         * @param infFlowSpecs this contract's information flow specifications.
+         * @param variables this contract's variables.
+         * @param transactionApplicable whether or not this contract is applicable for transactions.
+         * @param hasMod a map specifying on which heaps this contract has a modified clause.
          * @return an instance of {@code T} with the specified attributes.
          */
         protected abstract T build(String baseName, StatementBlock block,
@@ -1173,10 +1501,19 @@ public abstract class AbstractBlockSpecificationElement
                 boolean transactionApplicable,
                 Map<LocationVariable, Boolean> hasMod);
 
+        /**
+         * 
+         * @return {@code true} iff the diverges condition can be expressed by a modality.
+         */
         private boolean divergesConditionCannotBeExpressedByAModality() {
             return !diverges.equals(ff()) && !diverges.equals(tt());
         }
 
+        /**
+         * 
+         * @param preconditions a map containing the contract's preconditions.
+         * @return a map with the negated diverges condition added to every precondition.
+         */
         private Map<LocationVariable, Term> addNegatedDivergesConditionToPreconditions(
                 final Map<LocationVariable, Term> preconditions) {
             final Map<LocationVariable, Term> result =
@@ -1201,15 +1538,41 @@ public abstract class AbstractBlockSpecificationElement
     protected static abstract class
             Combinator<T extends BlockSpecificationElement> extends TermBuilder {
 
+    	/**
+    	 * The contracts to combine.
+    	 */
         protected final T[] contracts;
 
+        /**
+         * @see BlockSpecificationElement#getPlaceholderVariables()
+         */
         protected Variables placeholderVariables;
+        
+        /**
+         * @see Variables#remembranceLocalVariables
+         */
         protected Map<LocationVariable, LocationVariable> remembranceVariables;
 
+        /**
+         * @see BlockSpecificationElement#getPrecondition(LocationVariable, Services)
+         */
         protected final Map<LocationVariable, Term> preconditions;
+        
+        /**
+         * @see BlockSpecificationElement#getPostcondition(LocationVariable, Services)
+         */
         protected final Map<LocationVariable, Term> postconditions;
+        
+        /**
+         * @see BlockSpecificationElement#getModifiesClause(LocationVariable, Services)
+         */
         protected final Map<LocationVariable, Term> modifiesClauses;
 
+        /**
+         * 
+         * @param contracts the contracts to combine.
+         * @param services services.
+         */
         public Combinator(final T[] contracts, final Services services) {
             super(services.getTermFactory(), services);
             this.contracts = sort(contracts);
@@ -1218,6 +1581,11 @@ public abstract class AbstractBlockSpecificationElement
             modifiesClauses = new LinkedHashMap<LocationVariable, Term>();
         }
 
+        /**
+         * 
+         * @param contracts the contract's to sort.
+         * @return an array containg the specified contracts sorted alphabetically by name.
+         */
         private T[] sort(final T[] contracts) {
             //sort contracts alphabetically (for determinism)
             Arrays.sort(contracts, new Comparator<T>() {
@@ -1228,8 +1596,16 @@ public abstract class AbstractBlockSpecificationElement
             return contracts;
         }
 
+        /**
+         * 
+         * @return the combined contract.
+         */
         protected abstract T combine();
 
+        /**
+         * 
+         * @param contract the contract whose conditions to add.
+         */
         protected void addConditionsFrom(final T contract) {
             for (LocationVariable heap
                   : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -1239,6 +1615,12 @@ public abstract class AbstractBlockSpecificationElement
             }
         }
 
+        /**
+         * 
+         * @param contract  the contract whose precondition to add.
+         * @param heap the heap to use.
+         * @return the precondition.
+         */
         private Term addPreconditionFrom(final T contract, final LocationVariable heap) {
             final Term precondition =
                     contract.getPrecondition(heap, placeholderVariables.self,
@@ -1249,19 +1631,30 @@ public abstract class AbstractBlockSpecificationElement
             return precondition;
         }
 
-        private void addPostconditionFrom(final Term precondition, final T contract,
+        /**
+         * 
+         * @param postcondition the postcondition to add.
+         * @param contract the contract the postcondition belongs to.
+         * @param heap the heap to use.
+         */
+        private void addPostconditionFrom(final Term postcondition, final T contract,
                                           final LocationVariable heap) {
             final Term unconditionalPostcondition =
                     contract.getPostcondition(heap, placeholderVariables, services);
             if (unconditionalPostcondition != null) {
                 final Term conditionalPostcondition =
-                        imp(preify(precondition), unconditionalPostcondition);
+                        imp(preify(postcondition), unconditionalPostcondition);
                 postconditions.put(heap,
                                    andPossiblyNull(postconditions.get(heap),
                                                    conditionalPostcondition));
             }
         }
 
+        /**
+         * 
+         * @param contract the contract whose modified clause to add.
+         * @param heap the heap to use.
+         */
         private void addModifiesClauseFrom(final T contract,
                                            final LocationVariable heap) {
             final Term additionalModifiesClause =
@@ -1273,6 +1666,12 @@ public abstract class AbstractBlockSpecificationElement
             }
         }
 
+        /**
+         * 
+         * @param currentCondition a condition or {@code null}.
+         * @param additionalCondition a condition.
+         * @return the disjunction of the conditions.
+         */
         private Term orPossiblyNull(final Term currentCondition,
                                     final Term additionalCondition) {
             if (currentCondition == null) {
@@ -1282,6 +1681,12 @@ public abstract class AbstractBlockSpecificationElement
             }
         }
 
+        /**
+         * 
+         * @param currentCondition a condition or {@code null}.
+         * @param additionalCondition a condition.
+         * @return the conjunction of the conditions.
+         */
         private Term andPossiblyNull(final Term currentCondition,
                                      final Term additionalCondition) {
             if (currentCondition == null) {
@@ -1291,6 +1696,12 @@ public abstract class AbstractBlockSpecificationElement
             }
         }
 
+        /**
+         * 
+         * @param currentLocationSet a location set or {@code null}.
+         * @param additionalLocationSet a location set.
+         * @return the union of the location sets.
+         */
         private Term unionPossiblyNull(final Term currentLocationSet,
                                        final Term additionalLocationSet) {
             if (currentLocationSet == null) {
@@ -1302,7 +1713,11 @@ public abstract class AbstractBlockSpecificationElement
             }
         }
 
-        // Replaces variables in formula by remembrance variables.
+        /**
+         * 
+         * @param formula a formula.
+         * @return the formula with all variables replaced by the remembrance variables.
+         */
         private Term preify(final Term formula) {
             if (formula == null) {
                 return tt();

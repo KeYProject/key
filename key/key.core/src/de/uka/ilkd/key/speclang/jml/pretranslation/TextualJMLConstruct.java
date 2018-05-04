@@ -22,6 +22,7 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
@@ -51,10 +52,18 @@ public abstract class TextualJMLConstruct {
         this.name = name;
     }
 
+    /**
+     * @return {@code true} if and only if this is a loop contract.
+     * @see LoopContract
+     */
     public final boolean isLoopContract() {
         return loopContract;
     }
 
+    /**
+     * @param loopContract
+     * @see #isLoopContract()
+     */
     final void setLoopContract(boolean loopContract) {
         this.loopContract = loopContract;
     }

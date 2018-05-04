@@ -41,7 +41,8 @@ public interface Contract extends SpecificationElement {
      *
      * @return {@code true} if any only if this contract does not necessarily need to be proven in
      *  its own proof obligation.
-     *  E.g., this is true for {@link FunctionalBlockContract}s.
+     *  E.g., this is true for
+     *  {@link FunctionalBlockContract}s and {@link FunctionalLoopContract}s.
      */
     default boolean isAuxiliary() {
         return false;
@@ -79,6 +80,9 @@ public interface Contract extends SpecificationElement {
                        Map<LocationVariable,? extends ProgramVariable> atPreVars,
 	    	       Services services);
 
+    /**
+     * Returns the precondition of the contract.
+     */
     public Term getPre(List<LocationVariable> heapContext,
                        ProgramVariable selfVar,
 	    	       ImmutableList<ProgramVariable> paramVars,
@@ -95,6 +99,9 @@ public interface Contract extends SpecificationElement {
                        Map<LocationVariable,Term> atPres,
 	    	       Services services);
 
+    /**
+     * Returns the precondition of the contract.
+     */
     public Term getPre(List<LocationVariable> heapContext,
                        Map<LocationVariable,Term> heapTerms,
 	               Term selfTerm,

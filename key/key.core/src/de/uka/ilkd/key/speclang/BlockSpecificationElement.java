@@ -34,23 +34,75 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.rule.BlockContractBuilders;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Super-interface for {@link BlockContract} and {@link LoopContract}.
+ * 
+ * @author wacker, lanzinger
  */
 public interface BlockSpecificationElement extends SpecificationElement {
 
+	/**
+	 * 
+	 * @return the block this contract belongs to.
+	 */
     public StatementBlock getBlock();
+    
+	/**
+	 * 
+	 * @return all labels belonging to {@link #getBlock()}
+	 */
     public List<Label> getLabels();
+    
+	/**
+	 * 
+	 * @return the method containing {@link #getBlock()}
+	 */
     public IProgramMethod getMethod();
+    
+    /**
+     * 
+     * @return the contract's modality.
+     */
     public Modality getModality();
+    
+    /**
+     * Returns the set of placeholder variables created during this contract's instantiation.
+     * These are replaced by the real variables with the same names when the contract is applied.
+     * 
+     * @return the placeholder variables used created during this contracts instantiation.
+     * @see BlockContractBuilders.VariablesCreatorAndRegistrar
+     */
     public Variables getPlaceholderVariables();
+    
+    /**
+     * 
+     * @return {@code true} if and only if this contract is applicable for transactions.
+     */
     public boolean isTransactionApplicable();
+    
+    /**
+     * 
+     * @param services 
+     * @return {@code true} if and only if this contract is read-only.
+     */
     public boolean isReadOnly(Services services);
+    
+    /**
+     * 
+     * @return this contract's base name.
+     */
     public String getBaseName();
+    
+    /**
+     * 
+     * @return this contract's unique name.
+     */
+    public String getUniqueName();
 
     /**
      * Returns <code>true</code> iff the method (according to the contract) does
@@ -60,46 +112,179 @@ public interface BlockSpecificationElement extends SpecificationElement {
      */
     public boolean hasModifiesClause(LocationVariable heap);
 
+    /**
+     * 
+     * @return the {@code self} variable as a term.
+     */
     Term getInstantiationSelfTerm();
+    
+    /**
+     * 
+     * @param heap the heap to use.
+     * @param services services.
+     * @return this contract's precondition on the specified heap.
+     */
+    public Term getPrecondition(LocationVariable heap, Services services);
+    
+    /**
+     * 
+     * @param heap the heap to use.
+     * @param variables the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services services.
+     * @return this contract's precondition on the specified heap with all free program variables
+     * 		replaced by those in {@code variables}.
+     */
+    public Term getPrecondition(LocationVariable heap, Variables variables, Services services);
 
+    /**
+     * 
+     * @param heap the heap to use.
+     * @param self the {@code self} variable to use
+     * 		instead of {@link #getPlaceholderVariables()}.
+     * @param atPres a map from every variable {@code var} to {@code \old(var)}
+     * 		to use instead of {@link #getPlaceholderVariables()}.
+     * @param services services.
+     * @return this contract's precondition on the specified heap.
+     */
     public Term getPrecondition(LocationVariable heap,
                                 ProgramVariable self,
                                 Map<LocationVariable, LocationVariable> atPres,
                                 Services services);
+    
+    /**
+     * 
+     * @param heapVariable the heap to use.
+     * @param heap the heap to use.
+     * @param self the {@code self} variable to use
+     * 		to use instead of {@link #getPlaceholderVariables()}.
+     * @param atPres a map from every variable {@code var} to {@code \old(var)}
+     * 		to use instead of {@link #getPlaceholderVariables()}.
+     * @param services services.
+     * @return this contract's precondition on the specified heap.
+     */
     public Term getPrecondition(LocationVariable heapVariable,
                                 Term heap,
                                 Term self,
                                 Map<LocationVariable, Term> atPres,
                                 Services services);
-    public Term getPrecondition(LocationVariable heap, Services services);
-    public Term getPrecondition(LocationVariable heap, Variables variables, Services services);
+    
+    /**
+     * 
+     * @param heapVariable the heap to use.
+     * @param heap the heap to use.
+     * @param terms the terms to use instead of {@link #getPlaceholderVariables()}.
+     * @param services services.
+     * @return this contract's precondition on the specified heap.
+     */
     public Term getPrecondition(LocationVariable heapVariable, Term heap,
             Terms terms, Services services);
 
+    /**
+     * 
+     * @param heap the heap to use.
+     * @param variables the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services services.
+     * @return this contract's postcondition on the specified heap.
+     */
     public Term getPostcondition(LocationVariable heap, Variables variables, Services services);
+    
+    /**
+     * 
+     * @param heapVariable the heap to use.
+     * @param heap the heap to use.
+     * @param terms the terms to use instead of {@link #getPlaceholderVariables()}.
+     * @param services services.
+     * @return this contract's precondition on the specified heap.
+     */
     public Term getPostcondition(LocationVariable heapVariable, Term heap,
                                  Terms terms, Services services);
+    
+    /**
+     * 
+     * @param heap the heap to use.
+     * @param services services.
+     * @return this contract's precondition on the specified heap.
+     */
     public Term getPostcondition(LocationVariable heap, Services services);
 
+    /**
+     * 
+     * @param heap the heap to use.
+     * @param self the {@code self} variable to use
+     * 		instead of {@link #getPlaceholderVariables()}.
+     * @param services services.
+     * @return this contract's modifies clause on the specified heap.
+     */
     public Term getModifiesClause(LocationVariable heap, ProgramVariable self, Services services);
+    
+    /**
+     * 
+     * @param heapVariable the heap to use.
+     * @param heap the heap to use.
+     * @param self the {@code self} variable to use
+     * 		instead of {@link #getPlaceholderVariables()}.
+     * @param services services.
+     * @return this contract's modifies clause on the specified heap.
+     */
     public Term getModifiesClause(LocationVariable heapVariable, Term heap,
                                   Term self, Services services);
+    
+    /**
+     * 
+     * @param heap the heap to use.
+     * @param services services.
+     * @return this contract's modifies clause on the specified heap.
+     */
     public Term getModifiesClause(LocationVariable heap, Services services);
 
+    /**
+     * 
+     * @param heap the heap to use.
+     * @return this contract's precondition on the specified heap.
+     */
     public Term getRequires(LocationVariable heap);
 
+    /**
+     * 
+     * @param heap the heap to use.
+     * @return this contract's postcondition on the specified heap.
+     */
     public Term getEnsures(LocationVariable heap);
 
+    /**
+     * 
+     * @param heap the heap to use.
+     * @return this contract's assignable term on the specified heap.
+     */
     public Term getAssignable(LocationVariable heap);
 
+    /**
+     * Accepts a visitor.
+     * 
+     * @param visitor the visitor to accept.
+     */
     public void visit(Visitor visitor);
 
-    public String getUniqueName();
-
+    /**
+     * 
+     * @param services services.
+     * @return a HTML representation of this contract.
+     */
     public String getHtmlText(Services services);
 
+    /**
+     * 
+     * @param services services.
+     * @return a plain text representation of this contract.
+     */
     public String getPlainText(Services services);
 
+    /**
+     * 
+     * @param services services.
+     * @param terms the terms to use instead of {@link #getPlaceholderVariables()}.
+     * @return a plain text representation of this contract.
+     */
     public String getPlainText(Services services, Terms terms);
 
     /**
@@ -108,21 +293,60 @@ public interface BlockSpecificationElement extends SpecificationElement {
     public IProgramMethod getTarget();
 
     /**
-     * Tells whether the contract contains a measured_by clause.
+     * 
+     * @return {@code true} if and only if this contract has a measured-by clause.
+     * @see #getMby()
      */
     public boolean hasMby();
 
+    /**
+     * 
+     * @return this contract's measured-by clause if it has one, {@code null} otherwise.
+     */
     public Term getMby();
 
+    /**
+     * 
+     * @param variables variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services services.
+     * @return this contract's measured-by clause if it has one, {@code null} otherwise.
+     */
     Term getMby(Variables variables, Services services);
 
+    /**
+     * 
+     * @param selfVar the {@code self} variable to use
+     * 		instead of {@link #getPlaceholderVariables()}.
+     * @param services services.
+     * @return this contract's measured-by clause if it has one, {@code null} otherwise.
+     */
     public Term getMby(ProgramVariable selfVar, Services services);
 
+    /**
+     * 
+     * @param heapTerms the heaps to use.
+     * @param selfTerm  the {@code self} variable to use
+     * 		instead of {@link #getPlaceholderVariables()}.
+     * @param atPres a map from every variable {@code var} to {@code \old(var)}
+     * 		to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     * @return this contract's measured-by clause if it has one, {@code null} otherwise.
+     */
     public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
             Map<LocationVariable, Term> atPres, Services services);
 
+    /**
+     * 
+     * @return {@code true} if and only if this contract has information flow specs.
+     * @see #getInfFlowSpecs()
+     */
     public boolean hasInfFlowSpecs();
 
+    /**
+     * 
+     * @param selfInstantiation the new instantiation self term.
+     * @see #getInstantiationSelfTerm()
+     */
     public void setInstantiationSelf(Term selfInstantiation);
 
     /**
@@ -132,30 +356,44 @@ public interface BlockSpecificationElement extends SpecificationElement {
     public Term getInstantiationSelfTerm(TermServices services);
 
     /**
-     * Returns the original precondition of the contract.
+     * @return the original precondition of the contract.
      */
     Term getPre(Services services);
 
     /**
-     * Returns the original postcondition of the contract.
+     * @return the original postcondition of the contract.
      */
     Term getPost(Services services);
 
     /**
-     * Returns the original modifies clause of the contract.
+     * @return the original modifies clause of the contract.
      */
     Term getMod(Services services);
 
     /**
-     * Returns the original information flow specification clause of the contract.
+     * @return the original information flow specification clause of the contract.
      */
     public ImmutableList<InfFlowSpec> getInfFlowSpecs();
 
     /**
-     * Returns the original used variables like self, result etc..
+     * @return the original used variables like self, result etc..
      */
     public Variables getVariables();
+    
+    /**
+     * 
+     * @param newKJT the type containing the new target method.
+     * @param newPM the new target method.
+     * @return a contract equal to this one except that it belongs to a different target.
+     */
+    
     public BlockSpecificationElement setTarget(KeYJavaType newKJT, IObserverFunction newPM);
+    
+    /**
+     * 
+     * @param newBlock the new block.
+     * @return a contract equal to this one except that it belongs to a different block.
+     */
     public BlockSpecificationElement setBlock(StatementBlock newBlock);
 
     /**
@@ -163,6 +401,11 @@ public interface BlockSpecificationElement extends SpecificationElement {
      */
     public Terms getVariablesAsTerms(Services services);
 
+    /**
+     * 
+     * @return the contract's variabels converted to {@code OriginalVariables}.
+     * @see #getVariables()
+     */
     public OriginalVariables getOrigVars();
 
     /**
@@ -170,11 +413,40 @@ public interface BlockSpecificationElement extends SpecificationElement {
      * {@link BlockSpecificationElement}'s instantiation.
      */
     public static class Variables {
+    	
+    	/**
+    	 * {@code self}
+    	 */
         public final ProgramVariable self;
+        
+        /**
+         * Boolean flags that are set to {@code true} when the block terminates by a
+         * {@code break label;} statement with the specified label.
+         */
         public final Map<Label, ProgramVariable> breakFlags;
+        
+        /**
+         * Boolean flags that are set to {@code true} when the block terminates by a
+         * {@code continue label;} statement with the specified label.
+         */
         public final Map<Label, ProgramVariable> continueFlags;
+        
+        /**
+         * Boolean flag that is set to {@code true} when the block terminates by a
+         * {@code return} statement.
+         */
         public final ProgramVariable returnFlag;
+        
+        /**
+         * Result variable to set when the block terminates by a
+         * {@code return} statement.
+         */
         public final ProgramVariable result;
+        
+        /**
+         * Exception variable to set when the block terminates by an uncaught
+         * {@code throw} statement.
+         */
         public final ProgramVariable exception;
 
         /**
@@ -200,8 +472,34 @@ public interface BlockSpecificationElement extends SpecificationElement {
          */
         public final Map<LocationVariable, LocationVariable> outerRemembranceVariables;
 
+        /**
+         * Services.
+         */
         private final TermServices services;
 
+        /**
+         * You should use {@link #create()} instead of this constructor.
+         * 
+         * @param self {@code self}
+         * @param breakFlags boolean flags that are set to {@code true} when the block terminates
+         * 		by a {@code break label;} statement with the specified label.
+         * @param continueFlags boolean flags that are set to {@code true} when the block terminates
+         * 		by a {@code continue label;} statement with the specified label.
+         * @param returnFlag boolean flag that is set to {@code true} when the block terminates by a
+         * 		{@code return} statement.
+         * @param result result variable to set when the block terminates by a
+         * 		{@code return} statement.
+         * @param exception exception variable to set when the block terminates by an uncaught
+         * 		{@code throw} statement.
+         * @param remembranceHeaps a map from every heap {@code heap} to {@code heap_Before_BLOCK}.
+         * @param remembranceLocalVariables a map from every variable {@code var} that is assignable
+         * 		inside the block to {@code var_Before_BLOCK}.
+         * @param outerRemembranceHeaps a map from every heap {@code heap} that is accessible
+         * 		inside the block to {@code heap_Before_METHOD}.
+         * @param outerRemembranceVariables a map from every variable {@code var} that is accessible
+         * 		inside the block to {@code var_Before_METHOD}.
+         * @param services services.
+         */
         public Variables(final ProgramVariable self,
                          final Map<Label, ProgramVariable> breakFlags,
                          final Map<Label, ProgramVariable> continueFlags,
@@ -228,6 +526,15 @@ public interface BlockSpecificationElement extends SpecificationElement {
             this.outerRemembranceVariables = outerRemembranceVariables;
         }
 
+        /**
+         * Creates a new instance.
+         * 
+         * @param block the block for which this insteance is created.
+         * @param labels all labels that belong to the block.
+         * @param method the method containing the block.
+         * @param services services.
+         * @return a new instance.
+         */
         public static Variables create(final StatementBlock block,
                                        final List<Label> labels,
                                        final IProgramMethod method,
@@ -235,6 +542,10 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return new VariablesCreator(block, labels, method, services).create();
         }
 
+        /**
+         * 
+         * @return the union of {@link #remembranceHeaps} and {@link #remembranceLocalVariables}.
+         */
         public Map<LocationVariable, LocationVariable> combineRemembranceVariables() {
             final Map<LocationVariable, LocationVariable> result =
                     new LinkedHashMap<LocationVariable, LocationVariable>();
@@ -243,6 +554,11 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return result;
         }
 
+        /**
+         * 
+         * @return the union of {@link #outerRemembranceHeaps}
+         * and {@link #outerRemembranceVariables}.
+         */
         public Map<LocationVariable, LocationVariable> combineOuterRemembranceVariables() {
             final Map<LocationVariable, LocationVariable> result =
                     new LinkedHashMap<LocationVariable, LocationVariable>();
@@ -251,6 +567,11 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return result;
         }
 
+        /**
+         * 
+         * @param self the {@code self} term to use.
+         * @return a {@code Terms} object containing these variables in term form.
+         */
         public Terms termify(Term self) {
             return new Terms(
                 self,
@@ -266,6 +587,11 @@ public interface BlockSpecificationElement extends SpecificationElement {
             );
         }
 
+        /**
+         * 
+         * @param flags a map containing the variables to termify.
+         * @return a map with all the same keys with termified values.
+         */
         private Map<Label, Term> termifyFlags(final Map<Label, ProgramVariable> flags) {
             final Map<Label, Term> result = new LinkedHashMap<Label, Term>();
             for (Map.Entry<Label, ProgramVariable> flag : flags.entrySet()) {
@@ -274,6 +600,11 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return result;
         }
 
+        /**
+         * 
+         * @param remembranceVariables a map containing the variables to termify.
+         * @return a map with all the same keys with termified values.
+         */
         private Map<LocationVariable, Term> termifyRemembranceVariables(
                     final Map<LocationVariable, LocationVariable> remembranceVariables) {
             final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
@@ -285,6 +616,11 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return result;
         }
 
+        /**
+         * 
+         * @param variable a variable.
+         * @return a term containing the specified variable.
+         */
         private Term termifyVariable(final ProgramVariable variable) {
             if (variable != null) {
                 return services.getTermBuilder().var(variable);
@@ -292,10 +628,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
                 return null;
             }
         }
-
-        /* (non-Javadoc)
-         * @see java.lang.Object#hashCode()
-         */
+        
         @Override
         public int hashCode() {
             final int prime = 31;
@@ -322,9 +655,6 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return result;
         }
 
-        /* (non-Javadoc)
-         * @see java.lang.Object#equals(java.lang.Object)
-         */
         @Override
         public boolean equals(Object obj) {
             if (this == obj) {
@@ -420,20 +750,83 @@ public interface BlockSpecificationElement extends SpecificationElement {
      */
     public static class VariablesCreator extends TermBuilder {
 
+    	/**
+    	 * Base name for all break flags.
+    	 * @see Variables#breakFlags
+    	 */
         private static final String BREAK_FLAG_BASE_NAME = "broke";
+        
+        /**
+    	 * Base name for all continue flags.
+    	 * @see Variables#continueFlags
+    	 */
         private static final String CONTINUE_FLAG_BASE_NAME = "continued";
+        
+        /**
+         * Name for the return flag.
+         * @see Variables#returnFlag
+         */
         private static final String RETURN_FLAG_NAME = "returned";
+        
+        /**
+         * Infix used between a flag's base name and the label name.
+    	 * @see Variables#breakFlags
+    	 * @see Variables#continueFlags
+         */
         private static final String FLAG_INFIX = "To";
+        
+        /**
+         * Suffix for all remembrance variables.
+         * @see Variables#remembranceHeaps
+         * @see Variables#remembranceLocalVariables
+         */
         private static final String REMEMBRANCE_SUFFIX = "_Before_BLOCK";
+        
+        /**
+         * Suffix for all outer remembrance variables.
+         * @see Variables#outerRemembranceHeaps
+         * @see Variables#outerRemembranceVariables
+         */
         private static final String OUTER_REMEMBRANCE_SUFFIX = "_Before_METHOD";
 
+        /**
+         * @see BlockSpecificationElement#getBlock()
+         */
         private final StatementBlock block;
+        
+        /**
+         * @see BlockSpecificationElement#getLabels()
+         */
         private final List<Label> labels;
+        
+        /**
+         * @see BlockSpecificationElement#getMethod()
+         */
         private final IProgramMethod method;
+        
+        /**
+         * @see Variables#breakFlags
+         */
         private Map<Label, ProgramVariable> breakFlags;
+        
+        /**
+         * @see Variables#continueFlags
+         */
         private Map<Label, ProgramVariable> continueFlags;
+        
+        /**
+         * @see Variables#returnFlag
+         */
         private ProgramVariable returnFlag;
 
+        /**
+         * Constructor.
+         * 
+         * @param block the block the contract belongs to.
+         * @param labels all labels belonging to the block.
+         * @param method the method containing the block.
+         * @param services services.
+         */
         public VariablesCreator(final StatementBlock block, final List<Label> labels,
                                 final IProgramMethod method, final Services services) {
             super(services.getTermFactory(), services);
@@ -442,6 +835,10 @@ public interface BlockSpecificationElement extends SpecificationElement {
             this.method = method;
         }
 
+        /**
+         * 
+         * @return a new {@code Variables} object.
+         */
         public Variables create() {
             createAndStoreFlags();
 
@@ -462,6 +859,13 @@ public interface BlockSpecificationElement extends SpecificationElement {
             );
         }
 
+        /**
+         * Creates all flags.
+         * 
+         * @see #breakFlags
+         * @see #continueFlags
+         * @see #returnFlag
+         */
         private void createAndStoreFlags() {
             final OuterBreakContinueAndReturnCollector collector =
                     new OuterBreakContinueAndReturnCollector(block, labels, services);
@@ -479,6 +883,11 @@ public interface BlockSpecificationElement extends SpecificationElement {
             returnFlag = returnOccurred ? createFlag(RETURN_FLAG_NAME) : null;
         }
 
+        /**
+         * 
+         * @param jumps a list of jump statements.
+         * @return the label of every labeled jump statement contained in the specified list.
+         */
         private Set<Label> collectLabels(final List<? extends LabelJumpStatement> jumps) {
             final Set<Label> result = new LinkedHashSet<Label>();
             for (LabelJumpStatement jump : jumps) {
@@ -487,6 +896,13 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return result;
         }
 
+        /**
+         * Creates flags for the specified labels
+         * 
+         * @param labels the labels.
+         * @param baseName the base name for the flags.
+         * @return
+         */
         private Map<Label, ProgramVariable> createFlags(final Set<Label> labels,
                                                         final String baseName) {
             final Map<Label, ProgramVariable> result = new LinkedHashMap<Label, ProgramVariable>();
@@ -497,14 +913,31 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return result;
         }
 
+        /**
+         * 
+         * @param name a name.
+         * @return a boolean variable with the specified name.
+         */
         private ProgramVariable createFlag(final String name) {
             return createVariable(name, services.getJavaInfo().getKeYJavaType("boolean"));
         }
 
+        /**
+         * 
+         * @return a map from every heap to its remembrance heap.
+         * @see Variables#remembranceHeaps
+         */
         private Map<LocationVariable, LocationVariable> createRemembranceHeaps() {
             return createRemembranceHeaps(REMEMBRANCE_SUFFIX);
         }
 
+        /**
+         * 
+         * @param suffix the suffix to use for the remembrance heaps.
+         * @return a map from every heap to a remembrance heap.
+         * @see Variables#remembranceHeaps
+         * @see Variables#outerRemembranceHeaps
+         */
         private Map<LocationVariable, LocationVariable> createRemembranceHeaps(String suffix) {
             final Map<LocationVariable, LocationVariable> result =
                     new LinkedHashMap<LocationVariable, LocationVariable>();
@@ -514,6 +947,11 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return result;
         }
 
+        /**
+         * 
+         * @return a map from every variable to its remembrance variable.
+         * @see Variables#remembranceLocalVariables
+         */
         private Map<LocationVariable, LocationVariable> createRemembranceLocalVariables() {
             ImmutableSet<ProgramVariable> localOutVariables =
                 MiscTools.getLocalOuts(block, services);
@@ -551,10 +989,20 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return result;
         }
 
+        /**
+         * 
+         * @return a map from every heap to its outer remembrance heap.
+         * @see Variables#outerRemembranceHeaps
+         */
         private Map<LocationVariable, LocationVariable> createOuterRemembranceHeaps() {
             return createRemembranceHeaps(OUTER_REMEMBRANCE_SUFFIX);
         }
 
+        /**
+         * 
+         * @return a map from every variable to its outer remembrance variable.
+         * @see Variables#outerRemembranceVariables
+         */
         private Map<LocationVariable, LocationVariable> createOuterRemembranceLocalVariables() {
             ImmutableSet<ProgramVariable> localInVariables =
                 MiscTools.getLocalIns(block, services);
@@ -592,6 +1040,12 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return result;
         }
 
+        /**
+         * 
+         * @param name a base name.
+         * @param type a type.
+         * @return a variable with a name based on the specified base name of the specified type.
+         */
         private LocationVariable createVariable(final String name, final KeYJavaType type) {
             return new LocationVariable(services.getVariableNamer()
                     .getTemporaryNameProposal(name), type);
@@ -603,17 +1057,79 @@ public interface BlockSpecificationElement extends SpecificationElement {
      */
     public static class Terms {
 
+    	/**
+    	 * @see Variables#self
+    	 */
         public final Term self;
+        
+        /**
+         * @see Variables#breakFlags
+         */
         public final Map<Label, Term> breakFlags;
+        
+        /**
+         * @see Variables#continueFlags
+         */
         public final Map<Label, Term> continueFlags;
+        
+        /**
+         * @see Variables#returnFlag
+         */
         public final Term returnFlag;
+        
+        /**
+         * @see Variables#result
+         */
         public final Term result;
+        
+        /**
+         * @see Variables#exception
+         */
         public final Term exception;
+        
+        /**
+         * @see Variables#remembranceHeaps
+         */
         public final Map<LocationVariable, Term> remembranceHeaps;
+        
+        /**
+         * @see Variables#remembranceLocalVariables
+         */
         public final Map<LocationVariable, Term> remembranceLocalVariables;
+        
+        /**
+         * @see Variables#outerRemembranceHeaps
+         */
         public final Map<LocationVariable, Term> outerRemembranceHeaps;
+        
+        /**
+         * @see Variables#outerRemembranceVariables
+         */
         public final Map<LocationVariable, Term> outerRemembranceVariables;
 
+        /**
+         * Creates a new instance. In most cases, {@link Variables#termify(Term)}
+         * or {@link Terms#Terms(Variables, TermBuilder)} should be used instead of this.
+         * 
+         * @param self {@code self}
+         * @param breakFlags boolean flags that are set to {@code true} when the block terminates
+         * 		by a {@code break label;} statement with the specified label.
+         * @param continueFlags boolean flags that are set to {@code true} when the block terminates
+         * 		by a {@code continue label;} statement with the specified label.
+         * @param returnFlag boolean flag that is set to {@code true} when the block terminates by a
+         * 		{@code return} statement.
+         * @param result result variable to set when the block terminates by a
+         * 		{@code return} statement.
+         * @param exception exception variable to set when the block terminates by an uncaught
+         * 		{@code throw} statement.
+         * @param remembranceHeaps a map from every heap {@code heap} to {@code heap_Before_BLOCK}.
+         * @param remembranceLocalVariables a map from every variable {@code var} that is assignable
+         * 		inside the block to {@code var_Before_BLOCK}.
+         * @param outerRemembranceHeaps a map from every heap {@code heap} that is accessible
+         * 		inside the block to {@code heap_Before_METHOD}.
+         * @param outerRemembranceVariables a map from every variable {@code var} that is accessible
+         * 		inside the block to {@code var_Before_METHOD}.
+         */
         public Terms(final Term self,
                      final Map<Label, Term> breakFlags,
                      final Map<Label, Term> continueFlags,
@@ -636,6 +1152,11 @@ public interface BlockSpecificationElement extends SpecificationElement {
             this.outerRemembranceVariables = outerRemembranceVariables;
         }
 
+        /**
+         * 
+         * @param variables the variables to termify.
+         * @param tb the term builder to use.
+         */
         public Terms(Variables variables, TermBuilder tb) {
             this(tb.var(variables.self),
                  convertFlagMap(variables.breakFlags, tb),
@@ -649,6 +1170,12 @@ public interface BlockSpecificationElement extends SpecificationElement {
                  convertHeapMap(variables.outerRemembranceVariables, tb));
         }
 
+        /**
+         * 
+         * @param map a map containing heaps as values.
+         * @param tb a term builder.
+         * @return a map with all values termified.
+         */
         private static Map<LocationVariable, Term> convertHeapMap(
                 Map<LocationVariable, LocationVariable> map, TermBuilder tb) {
             return map.entrySet().stream().collect(
@@ -660,6 +1187,12 @@ public interface BlockSpecificationElement extends SpecificationElement {
            );
         }
 
+        /**
+         * 
+         * @param map a map containing boolean variables as values.
+         * @param tb a term builder.
+         * @return a map with all values termified.
+         */
         private static Map<Label, Term> convertFlagMap(
                 Map<Label, ProgramVariable> map, TermBuilder tb) {
             return map.entrySet().stream().collect(

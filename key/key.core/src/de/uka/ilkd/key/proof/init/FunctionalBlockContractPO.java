@@ -44,6 +44,11 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     private static final Map<Boolean, String> TRANSACTION_TAGS =
             new LinkedHashMap<Boolean, String>();
 
+    static {
+        TRANSACTION_TAGS.put(false, "transaction_inactive");
+        TRANSACTION_TAGS.put(true, "transaction_active");
+    }
+
     private FunctionalBlockContract contract;
     private InitConfig proofConfig;
 
@@ -88,11 +93,6 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             ProofOblInput po = contract.createProofObl(initConfig);
             return new LoadedPOContainer(po, proofNum);
         }
-    }
-
-    static {
-        TRANSACTION_TAGS.put(false, "transaction_inactive");
-        TRANSACTION_TAGS.put(true, "transaction_active");
     }
 
     @Override

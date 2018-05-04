@@ -41,23 +41,76 @@ import de.uka.ilkd.key.util.InfFlowSpec;
  * Default implementation for {@link LoopContract}.
  *
  * @see SimpleLoopContract.Creator
+ * 
+ * @author lanzinger
  */
 public final class SimpleLoopContract
         extends AbstractBlockSpecificationElement implements LoopContract {
 
+	/**
+	 * @see LoopContract#getDecreases()
+	 */
     private final Term decreases;
 
+    /**
+     * @see LoopContract#getHead()
+     */
     private final StatementBlock head;
+    
+    /**
+     * @see LoopContract#getGuard()
+     */
     private final Expression guard;
+    
+    /**
+     * @see LoopContract#getBody()
+     */
     private final StatementBlock body;
+    
+    /**
+     * @see LoopContract#getTail()
+     */
     private final StatementBlock tail;
+    
+    /**
+     * @see LoopContract#getLoop()
+     */
     private final While loop;
+    
+    /**
+     * Services.
+     */
     private final Services services;
 
+    /**
+     * @see LoopContract#getLoopLabels()
+     */
     private final List<Label> loopLabels;
 
+    /**
+     * @see LoopContract#getFunctionalContracts()
+     */
     private ImmutableSet<FunctionalLoopContract> functionalContracts;
 
+    /**
+     * 
+     * @param baseName the base name.
+     * @param block the block this contract belongs to.
+     * @param labels all labels belonging to the block.
+     * @param method the method containing the block.
+     * @param modality this contract's modality.
+     * @param preconditions this contract's preconditions on every heap.
+     * @param measuredBy this contract's measured-by term.
+     * @param postconditions this contract's postconditions on every heap.
+     * @param modifiesClauses this contract's modifies clauses on every heap.
+     * @param infFlowSpecs this contract's information flow specifications.
+     * @param variables this contract's variables.
+     * @param transactionApplicable whether or not this contract is applicable for transactions.
+     * @param hasMod a map specifying on which heaps this contract has a modified clause.
+     * @param decreases the contract's decreases clause.
+     * @param functionalContracts the functional loop contracts corresponding to this contract.
+     * @param services services.
+     */
     public SimpleLoopContract(final String baseName,
                                final StatementBlock block,
                                final List<Label> labels,
@@ -125,7 +178,12 @@ public final class SimpleLoopContract
         tail = getTailStatement(loop, block);
     }
 
-
+    /**
+     * 
+     * @param contracts a set of loop contracts to combine.
+     * @param services services.
+     * @return the combination of the specified loop contracts.
+     */
     public static LoopContract combine(ImmutableSet<LoopContract> contracts,
                                        Services services) {
         return new Combinator(
@@ -134,6 +192,12 @@ public final class SimpleLoopContract
                 .combine();
     }
 
+    /**
+     * 
+     * @param loop a loop.
+     * @param block the block containing the loop.
+     * @return the initializers if the loop is a for-loop, {@code null} otherwise.
+     */
     private static StatementBlock getHeadStatement(LoopStatement loop,
                                                    StatementBlock block) {
         final StatementBlock sb;
@@ -154,6 +218,17 @@ public final class SimpleLoopContract
         return sb;
     }
 
+    /**
+     * 
+     * @param loop a loop.
+     * @param block the block containing the loop.
+     * @param outerLabel the label to use for break statements.
+     * @param innerLabel the label to use for continue statements.
+     * @param loopLabels all labels belonging to the loop.
+     * @param services services.
+     * @return the loop's body. If the loop is a for-loop, it is transformed to a while-loop.
+     * @see InnerBreakAndContinueReplacer
+     */
     private static StatementBlock getBodyStatement(LoopStatement loop,
                                                    StatementBlock block,
                                                    Label outerLabel,
@@ -197,6 +272,12 @@ public final class SimpleLoopContract
         return sb;
     }
 
+    /**
+     * 
+     * @param loop a loop.
+     * @param block the block containing the loop.
+     * @return all statements in the block after the loop.
+     */
     private static StatementBlock getTailStatement(LoopStatement loop,
                                                    StatementBlock block) {
         final StatementBlock sb;
@@ -351,8 +432,38 @@ public final class SimpleLoopContract
     public static class Creator
             extends AbstractBlockSpecificationElement.Creator<LoopContract> {
 
+    	/**
+    	 * @see LoopContract#getDecreases()
+    	 */
         private Term decreases;
-
+        
+        /**
+         * 
+         * @param baseName the contract's base name.
+         * @param block the block the contract belongs to.
+         * @param labels all labels belonging to the block.
+         * @param method the method containing the block.
+         * @param behavior the contract's behavior.
+         * @param variables the variables.
+         * @param requires the contract's precondition.
+         * @param measuredBy the contract's measured-by clause.
+         * @param ensures the contracts postcondition due to normal termination.
+         * @param infFlowSpecs the contract's information flow specifications.
+         * @param breaks the contract's postconditions for abrupt termination
+         * 		with {@code break} statements.
+         * @param continues the contract's postconditions for abrupt termination
+         * 		with {@code continue} statements.
+         * @param returns the contract's postcondition for abrupt termination
+         * 		with {@code return} statements.
+         * @param signals the contract's postcondition for abrupt termination
+         * 		due to abrupt termination.
+         * @param signalsOnly a term specifying which uncaught exceptions may occur.
+         * @param diverges a diverges clause.
+         * @param assignables map from every heap to an assignable term.
+         * @param hasMod map specifying on which heaps this contract has a modifies clause.
+         * @param decreases the decreases term.
+         * @param services services.
+         */
         public Creator(String baseName, StatementBlock block,
                        List<Label> labels, IProgramMethod method, Behavior behavior,
                        Variables variables, Map<LocationVariable, Term> requires,
@@ -403,9 +514,18 @@ public final class SimpleLoopContract
         }
     }
 
+    /**
+     * This class is used to to combine multiple contracts for the same block and apply them
+     * simultaneously.
+     */
     protected static class Combinator
             extends AbstractBlockSpecificationElement.Combinator<LoopContract> {
 
+    	/**
+    	 * 
+    	 * @param contracts the contracts to combine.
+    	 * @param services services.
+    	 */
         public Combinator(LoopContract[] contracts, Services services) {
             super(contracts, services);
         }

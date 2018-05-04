@@ -45,6 +45,8 @@ import de.uka.ilkd.key.speclang.SimpleLoopContract;
  *
  * @see LoopContractApplyHeadRule
  * @see SimpleLoopContract
+ * 
+ * @author lanzinger
  */
 public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 

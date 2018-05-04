@@ -26,6 +26,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
  *  instead.
  * </p>
  *
+ * @author wacker, lanzinger
  */
 public interface LoopContract extends BlockSpecificationElement {
 
@@ -45,11 +46,19 @@ public interface LoopContract extends BlockSpecificationElement {
      */
     public void setFunctionalLoopContract(FunctionalLoopContract contract);
 
+    /**
+     * 
+     * @return this loop contract's decreases clause.
+     */
     public Term getDecreases();
+    
+    /**
+     * 
+     * @param variables the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services 
+     * @return this loop contract's decreases clause.
+     */
     public Term getDecreases(Variables variables, Services services);
-
-    public LoopContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
-    public LoopContract setBlock(StatementBlock newBlock);
 
 
     /**
@@ -87,11 +96,37 @@ public interface LoopContract extends BlockSpecificationElement {
      *  statement.
      */
     public List<Label> getLoopLabels();
-
+    
+    /**
+     * 
+     * @param newBlock 
+     * @param newPreconditions 
+     * @param newPostconditions 
+     * @param newModifiesClauses 
+     * @param newInfFlowSpecs 
+     * @param newVariables 
+     * @param newMeasuredBy 
+     * @return a new loop contract with the specified attributes.
+     */
     LoopContract update(StatementBlock newBlock,
             Map<LocationVariable, Term> newPreconditions,
             Map<LocationVariable, Term> newPostconditions,
             Map<LocationVariable, Term> newModifiesClauses,
             ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables,
             Term newMeasuredBy, Term newDecreases);
+
+    
+    /**
+     * @param newKJT the type containing the new target method.
+     * @param newPM the new target method.
+     * @return a new loop contract equal to this one except that it belongs to a different target.
+     */
+    public LoopContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
+
+    
+    /**
+     * @param newBlock the new block.
+     * @return a new loop contract equal to this one except that it belongs to a different block.
+     */
+    public LoopContract setBlock(StatementBlock newBlock);
 }
