@@ -31,22 +31,19 @@ import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
- * <p>
- * Rule for the application of {@link BlockSpecificationElement}s.
- * </p>
+ * <p>Rule for the application of {@link BlockSpecificationElement}s.</p>
  *
  * @see AbstractBlockSpecificationElementBuiltInRuleApp
  * 
  * @author wacker, lanzinger
  */
-public abstract class AbstractBlockSpecificationElementRule
-        implements BuiltInRule {
+public abstract class AbstractBlockSpecificationElementRule implements BuiltInRule {
 
-    /**
-     * 
-     */
+	/**
+	 * 
+	 */
     public static final String FULL_PRECONDITION_TERM_HINT = "fullPrecondition";
-
+    
     /**
      * 
      */
@@ -54,28 +51,22 @@ public abstract class AbstractBlockSpecificationElementRule
 
     /**
      * 
-     * @param occurrence
-     *            an occurrence.
-     * @return {@code true} iff the occurrence is not at the top level in the
-     *         succedent.
+     * @param occurrence an occurrence.
+     * @return {@code true} iff the occurrence is not at the top level in the succedent.
      */
-    protected static boolean occursNotAtTopLevelInSuccedent(
-            final PosInOccurrence occurrence) {
-        return occurrence == null || !occurrence.isTopLevel()
-                || occurrence.isInAntec();
+    protected static boolean occursNotAtTopLevelInSuccedent(final PosInOccurrence occurrence) {
+        return occurrence == null || !occurrence.isTopLevel() || occurrence.isInAntec();
     }
 
     /**
      * Adds {@code pv} to the {@code sevices}' program variable namespace.
      *
-     * @param pv
-     *            a variable.
-     * @param services
-     *            services.
+     * @param pv a variable. 
+     * @param services services.
      */
-    protected static void register(ProgramVariable pv, Services services) {
-        Namespace<IProgramVariable> progVarNames = services.getNamespaces()
-                .programVariables();
+    protected static void register(ProgramVariable pv,
+                         Services services) {
+        Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
         }
@@ -86,7 +77,7 @@ public abstract class AbstractBlockSpecificationElementRule
      * @return the instantiation from the last time this rule was applied.
      */
     public abstract Instantiation getLastInstantiation();
-
+    
     /**
      * 
      * @return the term on which the rule was last applied.
@@ -95,16 +86,14 @@ public abstract class AbstractBlockSpecificationElementRule
 
     /**
      * 
-     * @param inst
-     *            the last instantiation.
+     * @param inst the last instantiation.
      * @see #getLastInstantiation()
      */
     protected abstract void setLastInstantiation(Instantiation inst);
-
+    
     /**
      * 
-     * @param formula
-     *            the last focus term.
+     * @param formula the last focus term.
      * @see #getLastFocusTerm()
      */
     protected abstract void setLastFocusTerm(Term formula);
@@ -126,87 +115,77 @@ public abstract class AbstractBlockSpecificationElementRule
 
     /**
      * 
-     * @param localOuts
-     *            a set of variables.
-     * @param services
-     *            services.
+     * @param localOuts a set of variables.
+     * @param services services.
      * @return an anonymizing update for the specified variables.
      */
-    protected static Term createLocalAnonUpdate(
-            ImmutableSet<ProgramVariable> localOuts, Services services) {
+    protected static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
+                                                Services services) {
         Term anonUpdate = null;
         final TermBuilder tb = services.getTermBuilder();
-        for (ProgramVariable pv : localOuts) {
-            final Name anonFuncName = new Name(
-                    tb.newName(pv.name().toString()));
-            final Function anonFunc = new Function(anonFuncName, pv.sort(),
-                    true);
+        for(ProgramVariable pv : localOuts) {
+            final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
+            final Function anonFunc = new Function(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
-            final Term elemUpd = tb.elementary((LocationVariable) pv,
-                    tb.func(anonFunc));
-            if (anonUpdate == null) {
+            final Term elemUpd = tb.elementary((LocationVariable)pv, tb.func(anonFunc));
+            if(anonUpdate == null) {
                 anonUpdate = elemUpd;
-            }
-            else {
+            } else {
                 anonUpdate = tb.parallel(anonUpdate, elemUpd);
             }
         }
 
-        return anonUpdate == null ? services.getTermBuilder().skip()
+        return anonUpdate == null
+                ? services.getTermBuilder().skip()
                 : anonUpdate;
     }
 
     /**
      * 
-     * @param nameBase
-     *            a base name.
-     * @param type
-     *            a type.
-     * @param services
-     *            services.
-     * @return a new local variable with the specified base name of the
-     *         specified type.
+     * @param nameBase a base name.
+     * @param type a type.
+     * @param services services.
+     * @return a new local variable with the specified base name of the specified type.
      */
     protected static ProgramVariable createLocalVariable(final String nameBase,
-            final KeYJavaType type, final Services services) {
-        return KeYJavaASTFactory.localVariable(
-                services.getVariableNamer().getTemporaryNameProposal(nameBase),
-                type);
+                                                final KeYJavaType type,
+                                                final Services services) {
+        return KeYJavaASTFactory.localVariable(services.getVariableNamer()
+                                .getTemporaryNameProposal(nameBase), type);
     }
 
     /**
-     * This encapsulates all information from the rule application that is
-     * needed to apply the rule.
+     * This encapsulates all information from the rule application that is needed to apply the rule.
      * 
      * @see AbstractBlockSpecificationElementBuiltInRuleApp
      */
     public static final class Instantiation {
 
-        /**
-         * The context update.
-         */
+    	/**
+    	 * The context update.
+    	 */
         public final Term update;
-
+        
         /**
          * The update target.
          */
         public final Term formula;
-
+        
         /**
          * The contract's modality.
          */
         public final Modality modality;
-
+        
         /**
          * The self variable.
          */
         public final Term self;
-
+        
         /**
          * The block the contract belongs to.
          */
         public final StatementBlock block;
-
+        
         /**
          * The execution context in which the block occurs.
          */
@@ -214,22 +193,16 @@ public abstract class AbstractBlockSpecificationElementRule
 
         /**
          * 
-         * @param update
-         *            the context update.
-         * @param formula
-         *            the update target.
-         * @param modality
-         *            the modality.
-         * @param self
-         *            the self variable.
-         * @param block
-         *            the block the contract belongs to.
-         * @param context
-         *            the execution context in which the block occurs.
+         * @param update the context update.
+         * @param formula the update target.
+         * @param modality the modality.
+         * @param self the self variable.
+         * @param block the block the contract belongs to.
+         * @param context the execution context in which the block occurs.
          */
         public Instantiation(final Term update, final Term formula,
-                final Modality modality, final Term self,
-                final StatementBlock block, final ExecutionContext context) {
+                             final Modality modality, final Term self,
+                             final StatementBlock block, final ExecutionContext context) {
             assert update != null;
             assert update.sort() == Sort.UPDATE;
             assert formula != null;
@@ -258,16 +231,16 @@ public abstract class AbstractBlockSpecificationElementRule
      */
     protected static abstract class Instantiator {
 
-        /**
+    	/**
          * The formula on which the rule is to be applied.
          */
         private final Term formula;
-
+        
         /**
          * The current goal.
          */
         private final Goal goal;
-
+        
         /**
          * Services.
          */
@@ -275,15 +248,13 @@ public abstract class AbstractBlockSpecificationElementRule
 
         /**
          * 
-         * @param formula
-         *            the formula on which the rule is to be applied.
-         * @param goal
-         *            the current goal.
-         * @param services
-         *            services.
+         * @param formula the formula on which the rule is to be applied.
+         * @param goal the current goal.
+         * @param services services.
          */
-        public Instantiator(final Term formula, final Goal goal,
-                final Services services) {
+        public Instantiator(final Term formula,
+                            final Goal goal,
+                            final Services services) {
             this.formula = formula;
             this.goal = goal;
             this.services = services;
@@ -300,51 +271,48 @@ public abstract class AbstractBlockSpecificationElementRule
                 return null;
             }
             final Modality modality = (Modality) target.op();
-            final StatementBlock block = getFirstBlockInPrefixWithAtLeastOneApplicableContract(
-                    modality, target.javaBlock(), goal);
+            final StatementBlock block =
+                    getFirstBlockInPrefixWithAtLeastOneApplicableContract(modality,
+                                                                          target.javaBlock(),
+                                                                          goal);
             if (block == null) {
                 return null;
             }
-            final MethodFrame frame = JavaTools
-                    .getInnermostMethodFrame(target.javaBlock(), services);
+            final MethodFrame frame =
+                    JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
             final Term self = extractSelf(frame);
             final ExecutionContext context = extractExecutionContext(frame);
-            return new Instantiation(update, target, modality, self, block,
-                    context);
+            return new Instantiation(update, target, modality, self, block, context);
         }
 
         /**
          * 
-         * @return the update if {@link #formula} is an update application,
-         *         {@code null} otherwise.
+         * @return the update if {@link #formula} is an update application, {@code null} otherwise.
          */
         private Term extractUpdate() {
             if (formula.op() instanceof UpdateApplication) {
                 return UpdateApplication.getUpdate(formula);
-            }
-            else {
+            } else {
                 return services.getTermBuilder().skip();
             }
         }
 
         /**
          * 
-         * @return the update target if {@link #formula} is an update
-         *         application, {@code formula} otherwise.
+         * @return the update target if {@link #formula} is an update application,
+         * 		{@code formula} otherwise.
          */
         private Term extractUpdateTarget() {
             if (formula.op() instanceof UpdateApplication) {
                 return UpdateApplication.getTarget(formula);
-            }
-            else {
+            } else {
                 return formula;
             }
         }
 
         /**
          * 
-         * @param frame
-         *            the outermost method-frame used in the formula.
+         * @param frame the outermost method-frame used in the formula.
          * @return the self term.
          */
         private Term extractSelf(final MethodFrame frame) {
@@ -356,12 +324,10 @@ public abstract class AbstractBlockSpecificationElementRule
 
         /**
          * 
-         * @param frame
-         *            the outermost method-frame used in the formula.
+         * @param frame the outermost method-frame used in the formula.
          * @return the execution context.
          */
-        private static ExecutionContext extractExecutionContext(
-                final MethodFrame frame) {
+        private static ExecutionContext extractExecutionContext(final MethodFrame frame) {
             if (frame == null) {
                 return null;
             }
@@ -370,31 +336,26 @@ public abstract class AbstractBlockSpecificationElementRule
 
         /**
          * 
-         * @param modality
-         *            the contract's modality.
-         * @param java
-         *            the java block.
-         * @param goal
-         *            the current goal.
-         * @return the first block in the java block's prefix with at least one
-         *         applicable contract.
+         * @param modality the contract's modality.
+         * @param java the java block.
+         * @param goal the current goal.
+         * @return the first block in the java block's prefix with at least one applicable contract.
          */
-        private StatementBlock getFirstBlockInPrefixWithAtLeastOneApplicableContract(
-                final Modality modality, final JavaBlock java,
-                final Goal goal) {
+        private StatementBlock
+                    getFirstBlockInPrefixWithAtLeastOneApplicableContract(final Modality modality,
+                                                                          final JavaBlock java,
+                                                                          final Goal goal) {
             SourceElement element = java.program().getFirstElement();
-            while ((element instanceof ProgramPrefix
-                    || element instanceof CatchAllStatement)
+            while ((element instanceof ProgramPrefix || element instanceof CatchAllStatement)
                     && !(element instanceof StatementBlock
                             && ((StatementBlock) element).isEmpty())) {
-                if (element instanceof StatementBlock && hasApplicableContracts(
-                        services, (StatementBlock) element, modality, goal)) {
+                if (element instanceof StatementBlock
+                        && hasApplicableContracts(
+                                services, (StatementBlock) element, modality, goal)) {
                     return (StatementBlock) element;
-                }
-                else if (element instanceof StatementContainer) {
+                } else if (element instanceof StatementContainer) {
                     element = ((StatementContainer) element).getStatementAt(0);
-                }
-                else {
+                } else {
                     element = element.getFirstElement();
                 }
             }
@@ -403,19 +364,17 @@ public abstract class AbstractBlockSpecificationElementRule
 
         /**
          * 
-         * @param services
-         *            services.
-         * @param block
-         *            a block.
-         * @param modality
-         *            the current goal's modality.
-         * @param goal
-         *            the current goal.
+         * @param services services.
+         * @param block a block.
+         * @param modality the current goal's modality.
+         * @param goal the current goal.
          * @return {@code true} iff the block has applicable contracts.
          */
         protected abstract boolean hasApplicableContracts(
-                final Services services, final StatementBlock block,
-                final Modality modality, Goal goal);
+                                               final Services services,
+                                               final StatementBlock block,
+                                               final Modality modality,
+                                               Goal goal);
     }
 
 }

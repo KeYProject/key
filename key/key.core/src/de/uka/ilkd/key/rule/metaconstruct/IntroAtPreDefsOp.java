@@ -573,7 +573,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 }
                 updateBlockOrLoopContract(block, contract, newVariables,
                                           newPreconditions, newPostconditions,
-                        newModifiesClauses, services);
+                                          newModifiesClauses, services);
             }
         }
     }

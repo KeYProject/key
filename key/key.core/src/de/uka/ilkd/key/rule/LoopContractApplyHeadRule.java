@@ -21,57 +21,49 @@ import de.uka.ilkd.key.rule.metaconstruct.ForToWhileTransformation;
 import de.uka.ilkd.key.speclang.LoopContract;
 
 /**
- * <p>
- * This rule transforms a block that starts with a for loop into one that starts
- * with a while loop.
- * </p>
+ * <p>This rule transforms a block that starts with a for loop
+ *    into one that starts with a while loop.</p>
  *
- * <p>
- * This is necessary because the rules for loop contracts (subclasses of
- * {@link AbstractLoopContractRule}) can only be applied on blocks that start
- * with a while loop.
- * </p>
+ * <p>This is necessary because the rules for loop contracts
+ * (subclasses of {@link AbstractLoopContractRule}) can only be applied on blocks that start
+ * with a while loop.</p>
  *
- * <p>
- * The transformation is equivalent to the {@link ForToWhileTransformation}, the
- * only difference being that we transform the whole block containing the loop
- * instead of just the loop itself. This is implemented as a built-in rule
+ * <p> The transformation is equivalent to the {@link ForToWhileTransformation},
+ * the only difference being that we transform the whole block containing the
+ * loop instead of just the loop itself. This is implemented as a built-in rule
  * because the opening brace of the block on which it is applied belongs to the
- * non-active prefix and thus cannot be matched by the taclet language.
- * </p>
+ * non-active prefix and thus cannot be matched by the taclet language. </p>
  *
- * <p>
- * Note that the actual transformation is performed in the constructor of
- * {@link SimpleLoopContract}.
- * </p>
+ * <p> Note that the actual transformation is performed in the constructor of
+ * {@link SimpleLoopContract}. </p>
  * 
  * @author lanzinger
  */
 public class LoopContractApplyHeadRule implements BuiltInRule {
 
-    /**
-     * The only instance of this class.
-     */
+	/**
+	 * The only instance of this class.
+	 */
     public static final LoopContractApplyHeadRule INSTANCE = new LoopContractApplyHeadRule();
-
+    
     /**
      * The rule name.
      */
     public static final Name NAME = new Name("Loop Contract Apply Head");
 
+
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services,
             RuleApp application) throws RuleAbortException {
         assert application instanceof LoopContractApplyHeadBuiltInRuleApp;
-        LoopContractApplyHeadBuiltInRuleApp ruleApp = (LoopContractApplyHeadBuiltInRuleApp) application;
-
+        LoopContractApplyHeadBuiltInRuleApp ruleApp =
+        		(LoopContractApplyHeadBuiltInRuleApp) application;
+        
         ImmutableSet<LoopContract> contracts = ruleApp.contracts;
         LoopContract someContract = contracts.iterator().next();
 
-        StatementBlock block = new StatementBlock(someContract.getLoop(),
-                someContract.getTail());
-        StatementBlock headAndBlock = new StatementBlock(someContract.getHead(),
-                block);
+        StatementBlock block = new StatementBlock(someContract.getLoop(), someContract.getTail());
+        StatementBlock headAndBlock = new StatementBlock(someContract.getHead(), block);
 
         TermBuilder tb = services.getTermBuilder();
         AbstractLoopContractRule.Instantiation instantiation = ruleApp.instantiation;
@@ -79,23 +71,22 @@ public class LoopContractApplyHeadRule implements BuiltInRule {
         Term update = instantiation.update;
         Term target = instantiation.formula;
 
-        JavaBlock newJavaBlock = JavaBlock
-                .createJavaBlock((StatementBlock) new ProgramElementReplacer(
-                        target.javaBlock().program(), services)
-                                .replace(instantiation.block, headAndBlock));
+        JavaBlock newJavaBlock = JavaBlock.createJavaBlock(
+                (StatementBlock) new ProgramElementReplacer(target.javaBlock().program(), services)
+                .replace(instantiation.block, headAndBlock));
 
         for (LoopContract c : contracts) {
             services.getSpecificationRepository().removeLoopContract(c);
-            services.getSpecificationRepository()
-                    .addLoopContract(c.setBlock(block), false);
+            services.getSpecificationRepository().addLoopContract(c.setBlock(block), false);
         }
 
         Goal result = goal.split(1).head();
-        result.changeFormula(
-                new SequentFormula(tb.apply(update,
-                        tb.prog(modality, newJavaBlock, target.sub(0)))),
-                ruleApp.pio);
-        return ImmutableSLList.<Goal> nil().append(goal);
+        result.changeFormula(new SequentFormula(tb.apply(update,
+                                                         tb.prog(modality, newJavaBlock,
+                                                                 target.sub(0)))
+                             ),
+                             ruleApp.pio);
+        return ImmutableSLList.<Goal>nil().append(goal);
     }
 
     @Override
@@ -130,16 +121,18 @@ public class LoopContractApplyHeadRule implements BuiltInRule {
             return false;
         }
 
-        final AbstractLoopContractRule.Instantiation instantiation = new AbstractLoopContractRule.Instantiator(
-                pio.subTerm(), goal, goal.proof().getServices()).instantiate();
+        final AbstractLoopContractRule.Instantiation instantiation =
+                new AbstractLoopContractRule.Instantiator(
+                        pio.subTerm(), goal, goal.proof().getServices())
+                .instantiate();
 
         if (instantiation == null) {
             return false;
         }
 
-        final ImmutableSet<LoopContract> contracts = AbstractLoopContractRule
-                .getApplicableContracts(instantiation, goal,
-                        goal.proof().getServices());
+        final ImmutableSet<LoopContract> contracts =
+                AbstractLoopContractRule
+                .getApplicableContracts(instantiation, goal, goal.proof().getServices());
 
         for (LoopContract contract : contracts) {
             if (contract.getHead() != null) {

@@ -30,7 +30,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  * Used in {@link JMLSpecFactory}.
  */
 public class ProgramVariableCollection {
-    /**
+	/**
 	 * {@code self}
 	 */
     public ProgramVariable selfVar;
