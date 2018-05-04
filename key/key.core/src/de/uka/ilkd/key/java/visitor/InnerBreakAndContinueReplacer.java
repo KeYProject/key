@@ -45,7 +45,7 @@ import de.uka.ilkd.key.speclang.SimpleLoopContract;
  *
  * @see LoopContractApplyHeadRule
  * @see SimpleLoopContract
- * 
+ *
  * @author lanzinger
  */
 public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
@@ -56,7 +56,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
      * The break statement used to replace break statements.
      */
     private final Break breakOuter;
-    
+
     /**
      * The break statement used to replace continue statements.
      */
@@ -70,18 +70,21 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
     private StatementBlock result;
 
     /**
-     * 
-     * @param block a block that begins with a loop.
-     * @param loopLabels all labels belonging to the loop.
-     * @param breakLabel the label used for break statements.
-     * @param continueLabel the label used for continue statements.
-     * @param services services.
+     *
+     * @param block
+     *            a block that begins with a loop.
+     * @param loopLabels
+     *            all labels belonging to the loop.
+     * @param breakLabel
+     *            the label used for break statements.
+     * @param continueLabel
+     *            the label used for continue statements.
+     * @param services
+     *            services.
      */
     public InnerBreakAndContinueReplacer(final StatementBlock block,
-                                               final Iterable<Label> loopLabels,
-                                               final Label breakLabel,
-                                               final Label continueLabel,
-                                               final Services services) {
+            final Iterable<Label> loopLabels, final Label breakLabel, final Label continueLabel,
+            final Services services) {
         super(block, services);
         for (Label label : loopLabels) {
             this.loopLabels.add(label);
@@ -93,7 +96,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
     /**
      * Does the replacement and returns the result.
-     * 
+     *
      * @return the block with all labels in the loop replaced.
      * @see #start()
      */
@@ -104,9 +107,10 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
     /**
      * Does the replacement.
-     * 
+     *
      * @see #replace()
      */
+    @Override
     public void start() {
         loopAndSwitchCascadeDepth = 0;
         stack.push(new ExtList());
@@ -120,9 +124,10 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         return result;
     }
 
+    @Override
     protected void walk(final ProgramElement node) {
         if (node.getPositionInfo() != PositionInfo.UNDEFINED) {
-            stack.push(new ExtList(new Object[] {node.getPositionInfo()}));
+            stack.push(new ExtList(new Object[] { node.getPositionInfo() }));
         } else {
             stack.push(new ExtList());
         }
@@ -141,14 +146,17 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         }
     }
 
+    @Override
     public String toString() {
         return stack.peek().toString();
     }
 
+    @Override
     protected void doDefaultAction(final SourceElement x) {
         addChild(x);
     }
 
+    @Override
     public void performActionOnContinue(final Continue x) {
         if (loopAndSwitchCascadeDepth == 0 && x.getProgramElementName() == null
                 || x.getLabel() != null && loopLabels.contains(x.getLabel())) {
@@ -159,6 +167,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         }
     }
 
+    @Override
     public void performActionOnBreak(final Break x) {
         if (loopAndSwitchCascadeDepth == 0 && x.getProgramElementName() == null
                 || x.getLabel() != null && loopLabels.contains(x.getLabel())) {
@@ -169,9 +178,10 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         }
     }
 
-
+    @Override
     public void performActionOnLocalVariableDeclaration(final LocalVariableDeclaration x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 return new LocalVariableDeclaration(changeList);
             }
@@ -179,8 +189,10 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnStatementBlock(final StatementBlock x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 return new StatementBlock(changeList);
             }
@@ -188,6 +200,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnWhile(final While x) {
         final ExtList changeList = stack.peek();
         if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
@@ -203,8 +216,10 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         }
     }
 
+    @Override
     public void performActionOnFor(final For x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 For newLoop = new For(changeList);
                 services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
@@ -214,8 +229,10 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnEnhancedFor(final EnhancedFor x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 EnhancedFor newLoop = new EnhancedFor(changeList);
                 services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
@@ -225,6 +242,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnDo(final Do x) {
         final ExtList changeList = stack.peek();
         if (changeList.getFirst() == CHANGED) {
@@ -241,8 +259,10 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         }
     }
 
+    @Override
     public void performActionOnIf(final If x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 return new If(changeList);
             }
@@ -250,8 +270,10 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnSwitch(final Switch x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 return new Switch(changeList);
             }
@@ -259,8 +281,10 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnTry(final Try x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 return new Try(changeList);
             }
@@ -268,6 +292,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnLabeledStatement(final LabeledStatement x) {
         Label l = null;
         final ExtList changeList = stack.peek();
@@ -283,20 +308,18 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         }
     }
 
+    @Override
     public void performActionOnMethodFrame(final MethodFrame x) {
         final ExtList changeList = stack.peek();
         if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             if (x.getChildCount() == 3) {
                 addChild(new MethodFrame((IProgramVariable) changeList.get(0),
-                                (IExecutionContext) changeList.get(1),
-                                (StatementBlock) changeList.get(2),
-                                PositionInfo.UNDEFINED));
+                        (IExecutionContext) changeList.get(1), (StatementBlock) changeList.get(2),
+                        PositionInfo.UNDEFINED));
             } else if (x.getChildCount() == 2) {
-                addChild(new MethodFrame(null,
-                                (IExecutionContext) changeList.get(0),
-                                (StatementBlock) changeList.get(1),
-                                PositionInfo.UNDEFINED));
+                addChild(new MethodFrame(null, (IExecutionContext) changeList.get(0),
+                        (StatementBlock) changeList.get(1), PositionInfo.UNDEFINED));
             } else {
                 throw new IllegalStateException("Method-frame has wrong number of children.");
             }
@@ -306,8 +329,10 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         }
     }
 
+    @Override
     public void performActionOnSynchronizedBlock(final SynchronizedBlock x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 return new SynchronizedBlock(changeList);
             }
@@ -315,8 +340,10 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnCopyAssignment(final CopyAssignment x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 return new CopyAssignment(changeList);
             }
@@ -324,8 +351,10 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnThen(final Then x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 return new Then(changeList);
             }
@@ -333,8 +362,10 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnElse(final Else x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 return new Else(changeList);
             }
@@ -342,6 +373,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnCase(final Case x) {
         Expression e = null;
         final ExtList changeList = stack.peek();
@@ -357,8 +389,10 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         }
     }
 
+    @Override
     public void performActionOnCatch(final Catch x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 return new Catch(changeList);
             }
@@ -366,8 +400,10 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnDefault(final Default x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 return new Default(changeList);
             }
@@ -375,8 +411,10 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnFinally(final Finally x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 return new Finally(changeList);
             }

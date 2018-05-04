@@ -18,12 +18,13 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
- * <p> A contract for a block that begins with a loop. </p>
+ * <p>
+ * A contract for a block that begins with a loop.
+ * </p>
  *
  * <p>
- *  When a loop contract is encountered in an existing proof, a {@code LoopContract} is used.
- *  To generate a new proof obligation for a block contract, use {@link FunctionalLoopContract}
- *  instead.
+ * When a loop contract is encountered in an existing proof, a {@code LoopContract} is used. To
+ * generate a new proof obligation for a block contract, use {@link FunctionalLoopContract} instead.
  * </p>
  *
  * @author wacker, lanzinger
@@ -33,39 +34,43 @@ public interface LoopContract extends BlockSpecificationElement {
     /**
      *
      * @return all {@link FunctionalLoopContract}s with a valid id that correspond to this
-     *  {@code LoopContract}. Unless this contract is a combination of other contracts
-     *  (see {@link SimpleLoopContract#combine(ImmutableSet, Services)}, the resulting set
-     *  will only contain one element.
+     *         {@code LoopContract}. Unless this contract is a combination of other contracts (see
+     *         {@link SimpleLoopContract#combine(ImmutableSet, Services)}, the resulting set will
+     *         only contain one element.
      */
     public ImmutableSet<FunctionalLoopContract> getFunctionalContracts();
 
     /**
      *
-     * @param contract the {@code LoopContract}.
+     * @param contract
+     *            the {@code LoopContract}.
      * @see #getFunctionalContracts()
      */
     public void setFunctionalLoopContract(FunctionalLoopContract contract);
 
     /**
-     * 
+     *
      * @return this loop contract's decreases clause.
      */
     public Term getDecreases();
-    
+
     /**
-     * 
-     * @param variables the variables to use instead of {@link #getPlaceholderVariables()}.
-     * @param services 
+     *
+     * @param variables
+     *            the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
      * @return this loop contract's decreases clause.
      */
     public Term getDecreases(Variables variables, Services services);
 
-
     /**
-     * <p> This contains any statements that are executed before the loop. </p>
+     * <p>
+     * This contains any statements that are executed before the loop.
+     * </p>
      *
-     * <p> It is only used if the loop is a for loop, in which case it contains the loop
-     * initializers </p>
+     * <p>
+     * It is only used if the loop is a for loop, in which case it contains the loop initializers
+     * </p>
      *
      * @return statements to execute before the loop.
      */
@@ -93,40 +98,42 @@ public interface LoopContract extends BlockSpecificationElement {
 
     /**
      * @return all labels that belong to the loop, or an empty list if the loop is not a labeled
-     *  statement.
+     *         statement.
      */
     public List<Label> getLoopLabels();
-    
+
     /**
-     * 
-     * @param newBlock 
-     * @param newPreconditions 
-     * @param newPostconditions 
-     * @param newModifiesClauses 
-     * @param newInfFlowSpecs 
-     * @param newVariables 
-     * @param newMeasuredBy 
+     *
+     * @param newBlock
+     * @param newPreconditions
+     * @param newPostconditions
+     * @param newModifiesClauses
+     * @param newInfFlowSpecs
+     * @param newVariables
+     * @param newMeasuredBy
      * @return a new loop contract with the specified attributes.
      */
-    LoopContract update(StatementBlock newBlock,
-            Map<LocationVariable, Term> newPreconditions,
+    LoopContract update(StatementBlock newBlock, Map<LocationVariable, Term> newPreconditions,
             Map<LocationVariable, Term> newPostconditions,
             Map<LocationVariable, Term> newModifiesClauses,
-            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables,
-            Term newMeasuredBy, Term newDecreases);
+            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, Term newMeasuredBy,
+            Term newDecreases);
 
-    
     /**
-     * @param newKJT the type containing the new target method.
-     * @param newPM the new target method.
+     * @param newKJT
+     *            the type containing the new target method.
+     * @param newPM
+     *            the new target method.
      * @return a new loop contract equal to this one except that it belongs to a different target.
      */
+    @Override
     public LoopContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
 
-    
     /**
-     * @param newBlock the new block.
+     * @param newBlock
+     *            the new block.
      * @return a new loop contract equal to this one except that it belongs to a different block.
      */
+    @Override
     public LoopContract setBlock(StatementBlock newBlock);
 }

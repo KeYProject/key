@@ -26,91 +26,101 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * A collection of all program variables needed to translate a textual JML specification case.
- * 
+ *
  * Used in {@link JMLSpecFactory}.
  */
 public class ProgramVariableCollection {
-	/**
-	 * {@code self}
-	 */
+    /**
+     * {@code self}
+     */
     public ProgramVariable selfVar;
-    
-	/**
-	 * The list of method parameters if the textual specification case is a method contract.
-	 */
+
+    /**
+     * The list of method parameters if the textual specification case is a method contract.
+     */
     public ImmutableList<ProgramVariable> paramVars;
-    
-	/**
-	 * {@code result}
-	 */
+
+    /**
+     * {@code result}
+     */
     public ProgramVariable resultVar;
-    
-	/**
-	 * {@code exception}
-	 */
+
+    /**
+     * {@code exception}
+     */
     public ProgramVariable excVar;
-    
-	/**
-	 * A map from every variable {@code var} to {@code \old(var)}.
-	 */
+
+    /**
+     * A map from every variable {@code var} to {@code \old(var)}.
+     */
     public Map<LocationVariable, LocationVariable> atPreVars;
-    
-	/**
-	 * A map from every variable {@code var} to {@code \old(var)}.
-	 */
+
+    /**
+     * A map from every variable {@code var} to {@code \old(var)}.
+     */
     public Map<LocationVariable, Term> atPres;
-    
-	/**
-	 * A map from every variable {@code var} to {@code \before(var)} (if applicable).
-	 */
+
+    /**
+     * A map from every variable {@code var} to {@code \before(var)} (if applicable).
+     */
     public Map<LocationVariable, LocationVariable> atBeforeVars;
-    
-	/**
-	 * A map from every variable {@code var} to {@code \before(var)} (if applicable).
-	 */
+
+    /**
+     * A map from every variable {@code var} to {@code \before(var)} (if applicable).
+     */
     public Map<LocationVariable, Term> atBefores;
 
     /**
      * Create a collection containing the specified variables.
-     * 
-     * @param selfVar {@code self}
-     * @param paramVars the list of method parameters if the textual specification case is a
-     * 		method contract.
-     * @param resultVar {@code result}
-     * @param excVar {@code exception}
-     * @param atPreVars a map from every variable {@code var} to {@code \old(var)}.
-     * @param atPres a map from every variable {@code var} to {@code \old(var)}.
+     *
+     * @param selfVar
+     *            {@code self}
+     * @param paramVars
+     *            the list of method parameters if the textual specification case is a method
+     *            contract.
+     * @param resultVar
+     *            {@code result}
+     * @param excVar
+     *            {@code exception}
+     * @param atPreVars
+     *            a map from every variable {@code var} to {@code \old(var)}.
+     * @param atPres
+     *            a map from every variable {@code var} to {@code \old(var)}.
      */
     public ProgramVariableCollection(ProgramVariable selfVar,
-                                     ImmutableList<ProgramVariable> paramVars,
-                                     ProgramVariable resultVar, ProgramVariable excVar,
-                                     Map<LocationVariable, LocationVariable> atPreVars,
-                                     Map<LocationVariable, Term> atPres) {
-        this (selfVar, paramVars, resultVar, excVar, atPreVars, atPres, null, null);
+            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
+            ProgramVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            Map<LocationVariable, Term> atPres) {
+        this(selfVar, paramVars, resultVar, excVar, atPreVars, atPres, null, null);
     }
 
     /**
      * Create a collection containing the specified variables.
-     * 
-     * @param selfVar {@code self}
-     * @param paramVars the list of method parameters if the textual specification case is a
-     * 		method contract.
-     * @param resultVar {@code result}
-     * @param excVar {@code exception}
-     * @param atPreVars a map from every variable {@code var} to {@code \old(var)}.
-     * @param atPres a map from every variable {@code var} to {@code \old(var)}.
-     * @param atBeforeVars a map from every variable {@code var} to {@code \before(var)}
-     * 		(if applicable).
-     * @param atBefores a map from every variable {@code var} to {@code \before(var)}
-     * 		(if applicable).
+     *
+     * @param selfVar
+     *            {@code self}
+     * @param paramVars
+     *            the list of method parameters if the textual specification case is a method
+     *            contract.
+     * @param resultVar
+     *            {@code result}
+     * @param excVar
+     *            {@code exception}
+     * @param atPreVars
+     *            a map from every variable {@code var} to {@code \old(var)}.
+     * @param atPres
+     *            a map from every variable {@code var} to {@code \old(var)}.
+     * @param atBeforeVars
+     *            a map from every variable {@code var} to {@code \before(var)} (if applicable).
+     * @param atBefores
+     *            a map from every variable {@code var} to {@code \before(var)} (if applicable).
      */
     public ProgramVariableCollection(ProgramVariable selfVar,
-                                     ImmutableList<ProgramVariable> paramVars,
-                                     ProgramVariable resultVar, ProgramVariable excVar,
-                                     Map<LocationVariable, LocationVariable> atPreVars,
-                                     Map<LocationVariable, Term> atPres,
-                                     Map<LocationVariable, LocationVariable> atBeforeVars,
-                                     Map<LocationVariable, Term> atBefores) {
+            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
+            ProgramVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            Map<LocationVariable, Term> atPres,
+            Map<LocationVariable, LocationVariable> atBeforeVars,
+            Map<LocationVariable, Term> atBefores) {
         super();
         this.selfVar = selfVar;
         this.paramVars = paramVars;

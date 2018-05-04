@@ -10,44 +10,48 @@ import de.uka.ilkd.key.speclang.LoopContract;
 
 /**
  * Rule application for {@link LoopContractApplyHeadRule}.
- * 
+ *
  * @author lanzinger
  */
 public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
-	/**
-	 * The rule being applied.
-	 */
+    /**
+     * The rule being applied.
+     */
     protected LoopContractApplyHeadRule rule;
-    
+
     /**
      * The loop contracts on which the rule is applied.
      */
     protected ImmutableSet<LoopContract> contracts;
-    
+
     /**
      * The instantiation.
      */
     protected AbstractLoopContractRule.Instantiation instantiation;
 
     /**
-     * 
-     * @param rule the rule being applied.
-     * @param pio the position at which the rule is applied.
+     *
+     * @param rule
+     *            the rule being applied.
+     * @param pio
+     *            the position at which the rule is applied.
      */
-    public LoopContractApplyHeadBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence pio) {
+    public LoopContractApplyHeadBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio) {
         this(rule, pio, null);
     }
 
     /**
-     * 
-     * @param rule the rule being applied.
-     * @param pio the position at which the rule is applied.
-     * @param contracts the contracts on which the rule is applied.
+     *
+     * @param rule
+     *            the rule being applied.
+     * @param pio
+     *            the position at which the rule is applied.
+     * @param contracts
+     *            the contracts on which the rule is applied.
      */
-    public LoopContractApplyHeadBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence pio, ImmutableSet<LoopContract> contracts) {
+    public LoopContractApplyHeadBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
+            ImmutableSet<LoopContract> contracts) {
         super(rule, pio);
         this.rule = (LoopContractApplyHeadRule) rule;
         this.contracts = contracts;
@@ -80,15 +84,12 @@ public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp 
 
     @Override
     public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
-        instantiation =
-                new AbstractLoopContractRule.Instantiator(
-                        pio.subTerm(), goal, goal.proof().getServices())
-                .instantiate();
+        instantiation = new AbstractLoopContractRule.Instantiator(pio.subTerm(), goal,
+                goal.proof().getServices()).instantiate();
 
         Services services = goal.proof().getServices();
 
-        contracts =
-                AbstractLoopContractRule.getApplicableContracts(instantiation, goal, services);
+        contracts = AbstractLoopContractRule.getApplicableContracts(instantiation, goal, services);
         rule = LoopContractApplyHeadRule.INSTANCE;
         return this;
     }

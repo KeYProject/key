@@ -27,52 +27,55 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.BlockContractBuilders;
 
 /**
- * This class is only used to generate a proof obligation for a block that starts with a loop
- * (see {@link FunctionalLoopContractPO}.
+ * This class is only used to generate a proof obligation for a block that starts with a loop (see
+ * {@link FunctionalLoopContractPO}.
  *
  * If a block is encountered during a proof, {@link LoopContract} is used instead.
- * 
+ *
  * @author lanzinger
  */
 public class FunctionalLoopContract implements Contract {
 
-	/**
-	 * @see #getLoopContract()
-	 */
+    /**
+     * @see #getLoopContract()
+     */
     private final LoopContract contract;
-    
+
     /**
      * This contract's ID.
      */
     private final int id;
-    
+
     /**
      * This contract's name.
      */
     private final String name;
-    
+
     /**
      * This contract's display name.
      */
     private final String displayName;
-    
+
     /**
      * This contract's type name.
      */
     private final String typeName;
 
     /**
-     * 
-     * @param contract a loop contract.
+     *
+     * @param contract
+     *            a loop contract.
      */
     FunctionalLoopContract(LoopContract contract) {
         this(contract, Contract.INVALID_ID);
     }
 
     /**
-     * 
-     * @param contract a loop contract.
-     * @param id an ID.
+     *
+     * @param contract
+     *            a loop contract.
+     * @param id
+     *            an ID.
      */
     FunctionalLoopContract(LoopContract contract, int id) {
         this.contract = contract;
@@ -82,25 +85,26 @@ public class FunctionalLoopContract implements Contract {
             contract.setFunctionalLoopContract(this);
         }
 
-        name = generateName(contract.getBaseName(), str
-            -> ContractFactory.generateContractName(str, getKJT(), getTarget(), getKJT(), id));
-        displayName = generateName(contract.getBaseName(), str
-            -> ContractFactory.generateDisplayName(str, getKJT(), getTarget(), getKJT(), id));
-        typeName = generateName(contract.getBaseName(), str
-            -> ContractFactory.generateContractTypeName(str, getKJT(), getTarget(), getKJT()));
+        name = generateName(contract.getBaseName(), str -> ContractFactory.generateContractName(str,
+                getKJT(), getTarget(), getKJT(), id));
+        displayName = generateName(contract.getBaseName(), str -> ContractFactory
+                .generateDisplayName(str, getKJT(), getTarget(), getKJT(), id));
+        typeName = generateName(contract.getBaseName(), str -> ContractFactory
+                .generateContractTypeName(str, getKJT(), getTarget(), getKJT()));
     }
 
     /**
-     * 
-     * @param baseName a base name.
-     * @param generator a name generator.
+     *
+     * @param baseName
+     *            a base name.
+     * @param generator
+     *            a name generator.
      * @return the generated name.
      */
     private String generateName(String baseName, UnaryOperator<String> generator) {
         return Arrays.stream(baseName.split(SpecificationRepository.CONTRACT_COMBINATION_MARKER))
-                .map(generator)
-                .reduce((acc, curr)
-                    -> acc + SpecificationRepository.CONTRACT_COMBINATION_MARKER + curr)
+                .map(generator).reduce((acc, curr) -> acc
+                        + SpecificationRepository.CONTRACT_COMBINATION_MARKER + curr)
                 .get();
     }
 
@@ -150,15 +154,14 @@ public class FunctionalLoopContract implements Contract {
     }
 
     @Override
-    public Term getMby(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Services services) {
+    public Term getMby(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+            Services services) {
         return contract.getMby(selfVar, services);
     }
 
     @Override
     public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
-            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
-            Services services) {
+            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services) {
         return contract.getMby(heapTerms, selfTerm, atPres, services);
     }
 
@@ -170,28 +173,19 @@ public class FunctionalLoopContract implements Contract {
     @Override
     public Term getPre(LocationVariable heap, ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
-            Services services) {
+            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
         @SuppressWarnings("unchecked")
-        Map<LocationVariable, ProgramVariable> atPreVars0 =
-            (Map<LocationVariable, ProgramVariable>) atPreVars;
-        return contract.getPrecondition(
-                heap,
-                selfVar,
-                atPreVars0.entrySet().stream().collect(Collectors
-                    .<Map.Entry<LocationVariable, ProgramVariable>,
-                        LocationVariable, LocationVariable>toMap(
-                            Map.Entry::getKey,
-                        entry -> (LocationVariable) entry.getValue()
-                )),
+        Map<LocationVariable, ProgramVariable> atPreVars0 = (Map<LocationVariable, ProgramVariable>) atPreVars;
+        return contract.getPrecondition(heap, selfVar, atPreVars0.entrySet().stream().collect(
+                Collectors.<Map.Entry<LocationVariable, ProgramVariable>, LocationVariable, LocationVariable> toMap(
+                        Map.Entry::getKey, entry -> (LocationVariable) entry.getValue())),
                 services);
     }
 
     @Override
-    public Term getPre(List<LocationVariable> heapContext,
-            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
-            Services services) {
+    public Term getPre(List<LocationVariable> heapContext, ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
         TermBuilder tb = services.getTermBuilder();
         Term result = null;
 
@@ -210,23 +204,20 @@ public class FunctionalLoopContract implements Contract {
 
     @Override
     public Term getPre(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
-            Services services) {
+            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services) {
         return contract.getPrecondition(heap, heapTerm, selfTerm, atPres, services);
     }
 
     @Override
-    public Term getPre(List<LocationVariable> heapContext,
-            Map<LocationVariable, Term> heapTerms, Term selfTerm,
-            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
+    public Term getPre(List<LocationVariable> heapContext, Map<LocationVariable, Term> heapTerms,
+            Term selfTerm, ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
             Services services) {
         TermBuilder tb = services.getTermBuilder();
         Term result = null;
 
         for (LocationVariable heap : heapContext) {
-            final Term p =
-                getPre(heap, heapTerms.get(heap), selfTerm,
-                       paramTerms, atPres, services);
+            final Term p = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres,
+                    services);
 
             if (result == null) {
                 result = p;
@@ -239,17 +230,15 @@ public class FunctionalLoopContract implements Contract {
     }
 
     @Override
-    public Term getDep(LocationVariable heap, boolean atPre,
-            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
-            Services services) {
+    public Term getDep(LocationVariable heap, boolean atPre, ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
         return services.getTermBuilder().allLocs();
     }
 
     @Override
-    public Term getDep(LocationVariable heap, boolean atPre, Term heapTerm,
-            Term selfTerm, ImmutableList<Term> paramTerms,
-            Map<LocationVariable, Term> atPres, Services services) {
+    public Term getDep(LocationVariable heap, boolean atPre, Term heapTerm, Term selfTerm,
+            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services) {
         return services.getTermBuilder().allLocs();
     }
 
@@ -274,8 +263,8 @@ public class FunctionalLoopContract implements Contract {
     }
 
     @Override
-    public Term getGlobalDefs(LocationVariable heap, Term heapTerm,
-            Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
+    public Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
+            ImmutableList<Term> paramTerms, Services services) {
         throw new UnsupportedOperationException();
     }
 
@@ -315,15 +304,14 @@ public class FunctionalLoopContract implements Contract {
     }
 
     @Override
-    public ProofOblInput createProofObl(InitConfig initConfig,
-            Contract contract) {
+    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
         assert contract instanceof FunctionalLoopContract;
         return new FunctionalLoopContractPO(initConfig, (FunctionalLoopContract) contract);
     }
 
     @Override
-    public ProofOblInput createProofObl(InitConfig initConfig,
-            Contract contract, boolean supportSymbolicExecutionAPI) {
+    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract,
+            boolean supportSymbolicExecutionAPI) {
         return createProofObl(initConfig, contract);
     }
 
@@ -348,8 +336,8 @@ public class FunctionalLoopContract implements Contract {
     }
 
     /**
-     * Returns <code>true</code> iff the method (according to the contract) does
-     * not modify the heap at all, i.e., iff it is "strictly pure."
+     * Returns <code>true</code> iff the method (according to the contract) does not modify the heap
+     * at all, i.e., iff it is "strictly pure."
      *
      * @return whether this contract is strictly pure.
      * @see BlockSpecificationElement#hasModifiesClause(LocationVariable)
@@ -359,7 +347,7 @@ public class FunctionalLoopContract implements Contract {
     }
 
     /**
-     * 
+     *
      * @return the corresponding loop contract.
      */
     public LoopContract getLoopContract() {
@@ -367,7 +355,7 @@ public class FunctionalLoopContract implements Contract {
     }
 
     /**
-     * 
+     *
      * @return the block this contract belongs to.
      * @see BlockSpecificationElement#getBlock()
      */
@@ -376,18 +364,18 @@ public class FunctionalLoopContract implements Contract {
     }
 
     /**
-	 * 
-	 * @return the method containing {@link #getBlock()}
-	 * @see BlockSpecificationElement#getMethod()
-	 */
+     *
+     * @return the method containing {@link #getBlock()}
+     * @see BlockSpecificationElement#getMethod()
+     */
     public IProgramMethod getMethod() {
         return contract.getMethod();
     }
 
     /**
-     * Returns the set of placeholder variables created during this contract's instantiation.
-     * These are replaced by the real variables with the same names when the contract is applied.
-     * 
+     * Returns the set of placeholder variables created during this contract's instantiation. These
+     * are replaced by the real variables with the same names when the contract is applied.
+     *
      * @return the placeholder variables used created during this contracts instantiation.
      * @see BlockContractBuilders.VariablesCreatorAndRegistrar
      * @see BlockSpecificationElement#getPlaceholderVariables()
@@ -395,9 +383,9 @@ public class FunctionalLoopContract implements Contract {
     public BlockSpecificationElement.Variables getPlaceholderVariables() {
         return contract.getPlaceholderVariables();
     }
-    
+
     /**
-     * 
+     *
      * @return this contract's modality.
      * @see BlockSpecificationElement#getModality()
      */

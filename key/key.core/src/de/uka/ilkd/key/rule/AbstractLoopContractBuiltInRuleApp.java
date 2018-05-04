@@ -17,25 +17,27 @@ import de.uka.ilkd.key.speclang.SimpleLoopContract;
 
 /**
  * Application of {@link AbstractLoopContractRule}.
- * 
+ *
  * @author lanzinger
  */
 public abstract class AbstractLoopContractBuiltInRuleApp
         extends AbstractBlockSpecificationElementBuiltInRuleApp {
 
-	/**
-	 * @see #getContract()
-	 */
+    /**
+     * @see #getContract()
+     */
     protected LoopContract contract;
 
     /**
-     * 
-     * @param rule the rule being applied.
-     * @param occurrence the position at which the rule is applied.
-     * @param ifInstantiations if instantiations.
+     *
+     * @param rule
+     *            the rule being applied.
+     * @param occurrence
+     *            the position at which the rule is applied.
+     * @param ifInstantiations
+     *            if instantiations.
      */
-    public AbstractLoopContractBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence occurrence,
+    public AbstractLoopContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
             ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
     }
@@ -46,28 +48,28 @@ public abstract class AbstractLoopContractBuiltInRuleApp
     }
 
     /**
-     * 
-     * @param goal the current goal.
-     * @param rule the rule being applied.
+     *
+     * @param goal
+     *            the current goal.
+     * @param rule
+     *            the rule being applied.
      * @return this.
      */
-    public AbstractLoopContractBuiltInRuleApp
-                tryToInstantiate(final Goal goal,
-                                 final AbstractLoopContractRule rule) {
+    public AbstractLoopContractBuiltInRuleApp tryToInstantiate(final Goal goal,
+            final AbstractLoopContractRule rule) {
         if (complete() || cannotComplete(goal)) {
             return this;
         }
         final Services services = goal.proof().getServices();
-        final AbstractLoopContractRule.Instantiation instantiation =
-                rule.instantiate(posInOccurrence().subTerm(), goal, services);
-        final ImmutableSet<LoopContract> contracts =
-                AbstractLoopContractRule.getApplicableContracts(instantiation, goal,
-                                                                services);
+        final AbstractLoopContractRule.Instantiation instantiation = rule
+                .instantiate(posInOccurrence().subTerm(), goal, services);
+        final ImmutableSet<LoopContract> contracts = AbstractLoopContractRule
+                .getApplicableContracts(instantiation, goal, services);
         block = instantiation.block;
-        ImmutableSet<LoopContract> cons = DefaultImmutableSet.<LoopContract>nil();
+        ImmutableSet<LoopContract> cons = DefaultImmutableSet.<LoopContract> nil();
         for (LoopContract cont : contracts) {
-            if (cont.getBlock().getStartPosition().getLine()
-                  == block.getStartPosition().getLine()) {
+            if (cont.getBlock().getStartPosition().getLine() == block.getStartPosition()
+                    .getLine()) {
                 cons = cons.add(cont);
             }
         }
@@ -77,10 +79,13 @@ public abstract class AbstractLoopContractBuiltInRuleApp
     }
 
     /**
-     * 
-     * @param block the new block.
-     * @param contract the new contract.
-     * @param heaps the new heap context.
+     *
+     * @param block
+     *            the new block.
+     * @param contract
+     *            the new contract.
+     * @param heaps
+     *            the new heap context.
      */
     public void update(final StatementBlock block, final LoopContract contract,
             final List<LocationVariable> heaps) {
