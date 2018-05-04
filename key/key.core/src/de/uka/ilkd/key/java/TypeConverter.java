@@ -30,8 +30,6 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.literal.LongLiteral;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
 import de.uka.ilkd.key.java.expression.operator.BinaryNot;
