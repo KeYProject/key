@@ -87,7 +87,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
 
     /**
      *
-     * @param services
+     * @param services services.
      * @return {@code true} if and only if this contract is read-only.
      */
     public boolean isReadOnly(Services services);
@@ -108,6 +108,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
      * Returns <code>true</code> iff the method (according to the contract) does not modify the heap
      * at all, i.e., iff it is "strictly pure."
      *
+     * @param heap
+     *            the heap to use.
      * @return whether this contract is strictly pure.
      */
     public boolean hasModifiesClause(LocationVariable heap);
@@ -324,7 +326,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
     public String getPlainText(Services services, Terms terms);
 
     /**
-     * Returns the method in which the block is located.
+     * @return the method in which the block is located.
      */
     public IProgramMethod getTarget();
 
@@ -371,6 +373,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
      *            a map from every variable {@code var} to {@code \old(var)} to use instead of
      *            {@link #getPlaceholderVariables()}.
      * @param services
+     *            services.
      * @return this contract's measured-by clause if it has one, {@code null} otherwise.
      */
     public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
@@ -392,22 +395,29 @@ public interface BlockSpecificationElement extends SpecificationElement {
     public void setInstantiationSelf(Term selfInstantiation);
 
     /**
-     * Returns the term internally used for self or a newly instantiated one. Use with care - it is
-     * likely that this is *not* the right "self" for you.
+     * @param services services.
+     * @return the term internally used for self or a newly instantiated one. Use with care - it is
+     *         likely that this is *not* the right "self" for you.
      */
     public Term getInstantiationSelfTerm(TermServices services);
 
     /**
+     * @param services
+     *            services.
      * @return the original precondition of the contract.
      */
     Term getPre(Services services);
 
     /**
+     * @param services
+     *            services.
      * @return the original postcondition of the contract.
      */
     Term getPost(Services services);
 
     /**
+     * @param services
+     *            services.
      * @return the original modifies clause of the contract.
      */
     Term getMod(Services services);
@@ -442,7 +452,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
     public BlockSpecificationElement setBlock(StatementBlock newBlock);
 
     /**
-     * Returns the original used variables like self, result etc. as terms.
+     * @param services services.
+     * @return the original used variables like self, result etc. as terms.
      */
     public Terms getVariablesAsTerms(Services services);
 
@@ -599,7 +610,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
          * @return the union of {@link #remembranceHeaps} and {@link #remembranceLocalVariables}.
          */
         public Map<LocationVariable, LocationVariable> combineRemembranceVariables() {
-            final Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
+            final Map<LocationVariable, LocationVariable> result
+                    = new LinkedHashMap<LocationVariable, LocationVariable>();
             result.putAll(remembranceHeaps);
             result.putAll(remembranceLocalVariables);
             return result;
@@ -611,7 +623,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
          *         {@link #outerRemembranceVariables}.
          */
         public Map<LocationVariable, LocationVariable> combineOuterRemembranceVariables() {
-            final Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
+            final Map<LocationVariable, LocationVariable> result
+                    = new LinkedHashMap<LocationVariable, LocationVariable>();
             result.putAll(outerRemembranceHeaps);
             result.putAll(outerRemembranceVariables);
             return result;
@@ -655,8 +668,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
         private Map<LocationVariable, Term> termifyRemembranceVariables(
                 final Map<LocationVariable, LocationVariable> remembranceVariables) {
             final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
-            for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables
-                    .entrySet()) {
+            for (Map.Entry<LocationVariable,
+                    LocationVariable> remembranceVariable : remembranceVariables.entrySet()) {
                 result.put(remembranceVariable.getKey(),
                         termifyVariable(remembranceVariable.getValue()));
             }
@@ -747,13 +760,18 @@ public interface BlockSpecificationElement extends SpecificationElement {
             return true;
         }
 
+        /**
+         *
+         * @return a conversion of this object to {@code OriginalVariables}.
+         */
         public OriginalVariables toOrigVars() {
-            Map<LocationVariable, ProgramVariable> atPreVars = new LinkedHashMap<LocationVariable, ProgramVariable>();
+            Map<LocationVariable, ProgramVariable> atPreVars
+                    = new LinkedHashMap<LocationVariable, ProgramVariable>();
             for (LocationVariable h : remembranceLocalVariables.keySet()) {
                 atPreVars.put(h, remembranceLocalVariables.get(h));
             }
             return new OriginalVariables(self, result, exception, atPreVars,
-                    ImmutableSLList.<ProgramVariable> nil());
+                    ImmutableSLList.<ProgramVariable>nil());
         }
 
     }
@@ -884,8 +902,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
          * @see #returnFlag
          */
         private void createAndStoreFlags() {
-            final OuterBreakContinueAndReturnCollector collector = new OuterBreakContinueAndReturnCollector(
-                    block, labels, services);
+            final OuterBreakContinueAndReturnCollector collector
+                    = new OuterBreakContinueAndReturnCollector(block, labels, services);
             collector.collect();
 
             final List<Break> breaks = collector.getBreaks();
@@ -961,7 +979,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
          * @see Variables#outerRemembranceHeaps
          */
         private Map<LocationVariable, LocationVariable> createRemembranceHeaps(String suffix) {
-            final Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
+            final Map<LocationVariable, LocationVariable> result
+                    = new LinkedHashMap<LocationVariable, LocationVariable>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 result.put(heap, heapAtPreVar(heap + suffix, heap.sort(), false));
             }
@@ -974,8 +993,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
          * @see Variables#remembranceLocalVariables
          */
         private Map<LocationVariable, LocationVariable> createRemembranceLocalVariables() {
-            ImmutableSet<ProgramVariable> localOutVariables = MiscTools.getLocalOuts(block,
-                    services);
+            ImmutableSet<ProgramVariable> localOutVariables
+                    = MiscTools.getLocalOuts(block, services);
 
             SourceElement first = block.getFirstElement();
             while (first instanceof LabeledStatement) {
@@ -985,8 +1004,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
 
             if (first instanceof For) {
                 ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
-                ProgramVariableCollector collector = new ProgramVariableCollector(
-                        new StatementBlock(inits), services);
+                ProgramVariableCollector collector
+                        = new ProgramVariableCollector(new StatementBlock(inits), services);
                 collector.start();
 
                 for (LocationVariable var : collector.result()) {
@@ -997,7 +1016,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
                 }
             }
 
-            Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
+            Map<LocationVariable, LocationVariable> result
+                    = new LinkedHashMap<LocationVariable, LocationVariable>();
 
             for (ProgramVariable var : localOutVariables) {
                 result.put((LocationVariable) var,
@@ -1031,8 +1051,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
 
             if (first instanceof For) {
                 ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
-                ProgramVariableCollector collector = new ProgramVariableCollector(
-                        new StatementBlock(inits), services);
+                ProgramVariableCollector collector
+                        = new ProgramVariableCollector(new StatementBlock(inits), services);
                 collector.start();
 
                 for (LocationVariable var : collector.result()) {
@@ -1043,7 +1063,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
                 }
             }
 
-            Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
+            Map<LocationVariable, LocationVariable> result
+                    = new LinkedHashMap<LocationVariable, LocationVariable>();
 
             for (ProgramVariable var : localInVariables) {
                 result.put((LocationVariable) var, createVariable(
@@ -1197,11 +1218,12 @@ public interface BlockSpecificationElement extends SpecificationElement {
          *            a term builder.
          * @return a map with all values termified.
          */
-        private static Map<LocationVariable, Term> convertHeapMap(
-                Map<LocationVariable, LocationVariable> map, TermBuilder tb) {
-            return map.entrySet().stream().collect(
-                    Collectors.<Map.Entry<LocationVariable, LocationVariable>, LocationVariable, Term> toMap(
-                            Map.Entry::getKey, entry -> tb.var(entry.getValue())));
+        private static Map<LocationVariable, Term>
+                convertHeapMap(Map<LocationVariable, LocationVariable> map, TermBuilder tb) {
+            return map.entrySet().stream()
+                    .collect(Collectors.<Map.Entry<LocationVariable, LocationVariable>,
+                            LocationVariable,
+                            Term>toMap(Map.Entry::getKey, entry -> tb.var(entry.getValue())));
         }
 
         /**
@@ -1214,9 +1236,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
          */
         private static Map<Label, Term> convertFlagMap(Map<Label, ProgramVariable> map,
                 TermBuilder tb) {
-            return map.entrySet().stream()
-                    .collect(Collectors.<Map.Entry<Label, ProgramVariable>, Label, Term> toMap(
-                            Map.Entry::getKey, entry -> tb.var(entry.getValue())));
+            return map.entrySet().stream().collect(Collectors.<Map.Entry<Label, ProgramVariable>,
+                    Label, Term>toMap(Map.Entry::getKey, entry -> tb.var(entry.getValue())));
         }
     }
 }

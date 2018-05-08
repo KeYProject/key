@@ -234,9 +234,9 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
 
     @Override
     public Terms getVariablesAsTerms(Services services) {
-        Term selfTerm = (this.variables.self != null
-                ? services.getTermBuilder().var(this.variables.self)
-                : null);
+        Term selfTerm
+                = (this.variables.self != null ? services.getTermBuilder().var(this.variables.self)
+                        : null);
         return variables.termify(selfTerm);
     }
 
@@ -253,10 +253,9 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
 
     @Override
     public Term getMby(ProgramVariable selfVar, Services services) {
-        final Map<ProgramVariable, ProgramVariable> replacementMap = createReplacementMap(
-                new Variables(selfVar, null, null, null, null, null, null, null, null, null,
-                        services),
-                services);
+        final Map<ProgramVariable, ProgramVariable> replacementMap
+                = createReplacementMap(new Variables(selfVar, null, null, null, null, null, null,
+                        null, null, null, services), services);
         final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(measuredBy);
     }
@@ -264,9 +263,10 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
     @Override
     public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
             Map<LocationVariable, Term> atPres, Services services) {
-        final Map<Term, Term> replacementMap = createReplacementMap(null,
-                new Terms(selfTerm, null, null, null, null, null, null, null, null, atPres),
-                services);
+        final Map<Term,
+                Term> replacementMap = createReplacementMap(null,
+                        new Terms(selfTerm, null, null, null, null, null, null, null, null, atPres),
+                        services);
         final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(measuredBy);
     }
@@ -278,10 +278,9 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         assert (self == null) == (variables.self == null);
         assert atPres != null;
         assert services != null;
-        final Map<ProgramVariable, ProgramVariable> replacementMap = createReplacementMap(
-                new Variables(self, null, null, null, null, null, null, null, null, atPres,
-                        services),
-                services);
+        final Map<ProgramVariable, ProgramVariable> replacementMap
+                = createReplacementMap(new Variables(self, null, null, null, null, null, null, null,
+                        null, atPres, services), services);
         final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(preconditions.get(heap));
     }
@@ -529,11 +528,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         String mods = getPlainMods(terms.self, baseHeap, heapLDT, services);
         String pres = getPlainPres(terms, baseHeap, heapLDT, services);
         String posts = getPlainPosts(terms, baseHeap, heapLDT, services);
-        return stringBuilder.toString() + pres + posts + mods + "termination " + getModality()
-        /*
-         * + (transactionApplicableContract() ? "<br><b>transactionApplicable applicable</b>" : "")
-         */
-        ;
+        return stringBuilder.toString() + pres + posts + mods + "termination " + getModality();
     }
 
     @Override
@@ -617,8 +612,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
      * @return a map from every variable in {@link #getVariables()} to its counterpart in
      *         {@code newVariables}.
      */
-    protected Map<ProgramVariable, ProgramVariable> createReplacementMap(
-            final Variables newVariables, final Services services) {
+    protected Map<ProgramVariable, ProgramVariable>
+            createReplacementMap(final Variables newVariables, final Services services) {
         final VariableReplacementMap result = new VariableReplacementMap();
         result.replaceSelf(variables.self, newVariables.self, services);
         result.replaceFlags(variables.breakFlags, newVariables.breakFlags, services);
@@ -761,8 +756,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
             final Services services) {
         String mods = "";
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
-            Term modifiesClause = getModifiesClause(heap, services.getTermBuilder().var(heap), self,
-                    services);
+            Term modifiesClause
+                    = getModifiesClause(heap, services.getTermBuilder().var(heap), self, services);
             if (modifiesClause != null) {
                 mods = mods + "\nmod" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
                         + StringUtil.trim(LogicPrinter.quickPrintTerm(modifiesClause, services));
@@ -940,10 +935,10 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
             if (newRemembranceLocalVariables != null) {
                 for (LocationVariable localVariable : oldRemembranceLocalVariables.keySet()) {
                     if (newRemembranceLocalVariables.get(localVariable) != null) {
-                        LocationVariable oldRemembranceLocalVariable = oldRemembranceLocalVariables
-                                .get(localVariable);
-                        S newRemembranceLocalVariable = newRemembranceLocalVariables
-                                .get(localVariable);
+                        LocationVariable oldRemembranceLocalVariable
+                                = oldRemembranceLocalVariables.get(localVariable);
+                        S newRemembranceLocalVariable
+                                = newRemembranceLocalVariables.get(localVariable);
                         assert oldRemembranceLocalVariable.sort()
                                 .equals(newRemembranceLocalVariable.sort());
                         put(convert(oldRemembranceLocalVariable, services),
@@ -1208,16 +1203,17 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
                 if (measuredBy != null && !measuredBy.equals(measuredByEmpty())) {
                     Map<Term, Term> replacementMap = new LinkedHashMap<Term, Term>();
 
-                    for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : variables.outerRemembranceVariables
-                            .entrySet()) {
+                    for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable
+                            :variables.outerRemembranceVariables.entrySet()) {
                         if (remembranceVariable.getValue() != null) {
                             replacementMap.put(var(remembranceVariable.getKey()),
                                     var(remembranceVariable.getValue()));
                         }
                     }
 
-                    for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : variables.outerRemembranceHeaps
-                            .entrySet()) {
+                    for (Map.Entry<LocationVariable,
+                            LocationVariable> remembranceVariable : variables.outerRemembranceHeaps
+                                    .entrySet()) {
                         if (remembranceVariable.getValue() != null) {
                             replacementMap.put(var(remembranceVariable.getKey()),
                                     var(remembranceVariable.getValue()));
@@ -1243,7 +1239,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
          * @return the contract's postconditions.
          */
         protected Map<LocationVariable, Term> buildPostconditions() {
-            final Map<LocationVariable, Term> postconditions = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> postconditions
+                    = new LinkedHashMap<LocationVariable, Term>();
             for (LocationVariable heap : heaps) {
                 if (ensures.get(heap) != null) {
                     postconditions.put(heap, buildPostcondition(heap));
@@ -1260,8 +1257,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
          */
         private Term buildPostcondition(final LocationVariable heap) {
             final Term breakPostcondition = conditionPostconditions(variables.breakFlags, breaks);
-            final Term continuePostcondition = conditionPostconditions(variables.continueFlags,
-                    continues);
+            final Term continuePostcondition
+                    = conditionPostconditions(variables.continueFlags, continues);
             final Term returnPostcondition = conditionPostcondition(variables.returnFlag, returns);
             final Term throwPostcondition = buildThrowPostcondition();
             // TODO Why do we handle the two cases differently?
@@ -1672,11 +1669,11 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
          */
         private void addPostconditionFrom(final Term postcondition, final T contract,
                 final LocationVariable heap) {
-            final Term unconditionalPostcondition = contract.getPostcondition(heap,
-                    placeholderVariables, services);
+            final Term unconditionalPostcondition
+                    = contract.getPostcondition(heap, placeholderVariables, services);
             if (unconditionalPostcondition != null) {
-                final Term conditionalPostcondition = imp(preify(postcondition),
-                        unconditionalPostcondition);
+                final Term conditionalPostcondition
+                        = imp(preify(postcondition), unconditionalPostcondition);
                 postconditions.put(heap,
                         andPossiblyNull(postconditions.get(heap), conditionalPostcondition));
             }
@@ -1690,8 +1687,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
          *            the heap to use.
          */
         private void addModifiesClauseFrom(final T contract, final LocationVariable heap) {
-            final Term additionalModifiesClause = contract.getModifiesClause(heap,
-                    placeholderVariables.self, services);
+            final Term additionalModifiesClause
+                    = contract.getModifiesClause(heap, placeholderVariables.self, services);
             if (additionalModifiesClause != null) {
                 modifiesClauses.put(heap,
                         unionPossiblyNull(modifiesClauses.get(heap), additionalModifiesClause));
@@ -1761,8 +1758,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
             } else {
                 final Map<Term, Term> replacementMap = new LinkedHashMap<Term, Term>();
 
-                for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables
-                        .entrySet()) {
+                for (Map.Entry<LocationVariable,
+                        LocationVariable> remembranceVariable : remembranceVariables.entrySet()) {
                     if (remembranceVariable.getValue() != null) {
                         replacementMap.put(var(remembranceVariable.getKey()),
                                 var(remembranceVariable.getValue()));

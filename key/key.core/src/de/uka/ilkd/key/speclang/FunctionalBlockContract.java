@@ -175,10 +175,13 @@ public class FunctionalBlockContract implements Contract {
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
         @SuppressWarnings("unchecked")
-        Map<LocationVariable, ProgramVariable> atPreVars0 = (Map<LocationVariable, ProgramVariable>) atPreVars;
-        return contract.getPrecondition(heap, selfVar, atPreVars0.entrySet().stream().collect(
-                Collectors.<Map.Entry<LocationVariable, ProgramVariable>, LocationVariable, LocationVariable> toMap(
-                        Map.Entry::getKey, entry -> (LocationVariable) entry.getValue())),
+        Map<LocationVariable, ProgramVariable> atPreVars0
+                = (Map<LocationVariable, ProgramVariable>) atPreVars;
+        return contract.getPrecondition(heap, selfVar,
+                atPreVars0.entrySet().stream().collect(
+                        Collectors.<Map.Entry<LocationVariable, ProgramVariable>,
+                        LocationVariable, LocationVariable>toMap(
+                                Map.Entry::getKey, entry -> (LocationVariable) entry.getValue())),
                 services);
     }
 
@@ -216,8 +219,8 @@ public class FunctionalBlockContract implements Contract {
         Term result = null;
 
         for (LocationVariable heap : heapContext) {
-            final Term p = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres,
-                    services);
+            final Term p
+                    = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
 
             if (result == null) {
                 result = p;
@@ -339,7 +342,9 @@ public class FunctionalBlockContract implements Contract {
      * Returns <code>true</code> iff the method (according to the contract) does not modify the heap
      * at all, i.e., iff it is "strictly pure."
      *
-     * @return whether this contract is strictly pure.
+     * @param heap
+     *            the heap to use.
+     * @return <code>true</code> iff this contract is strictly pure.
      * @see BlockSpecificationElement#hasModifiesClause(LocationVariable)
      */
     public boolean hasModifiesClause(LocationVariable heap) {

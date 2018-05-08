@@ -70,8 +70,8 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
     public static ImmutableSet<LoopContract> getApplicableContracts(
             final SpecificationRepository specifications, final StatementBlock block,
             final Modality modality, final Goal goal) {
-        ImmutableSet<LoopContract> collectedContracts = specifications.getLoopContracts(block,
-                modality);
+        ImmutableSet<LoopContract> collectedContracts
+                = specifications.getLoopContracts(block, modality);
         if (modality == Modality.BOX) {
             collectedContracts = collectedContracts
                     .union(specifications.getLoopContracts(block, Modality.DIA));
@@ -92,7 +92,7 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
      */
     protected static ImmutableSet<LoopContract> filterAppliedContracts(
             final ImmutableSet<LoopContract> collectedContracts, final Goal goal) {
-        ImmutableSet<LoopContract> result = DefaultImmutableSet.<LoopContract> nil();
+        ImmutableSet<LoopContract> result = DefaultImmutableSet.<LoopContract>nil();
         for (LoopContract contract : collectedContracts) {
             if (!contractApplied(contract, goal)) {
                 result = result.add(contract);
@@ -115,7 +115,8 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
         while (selfOrParentNode != null) {
             RuleApp app = selfOrParentNode.getAppliedRuleApp();
             if (app instanceof LoopContractInternalBuiltInRuleApp) {
-                LoopContractInternalBuiltInRuleApp blockRuleApp = (LoopContractInternalBuiltInRuleApp) app;
+                LoopContractInternalBuiltInRuleApp blockRuleApp
+                        = (LoopContractInternalBuiltInRuleApp) app;
                 if (blockRuleApp.getBlock().equals(contract.getBlock())
                         && selfOrParentNode.getChildNr(previousNode) == 0) {
                     // prevent application of contract in its own check validity branch
@@ -151,15 +152,15 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
             return false;
         }
 
-        final Instantiation instantiation = instantiate(occurrence.subTerm(), goal,
-                goal.proof().getServices());
+        final Instantiation instantiation
+                = instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
 
         if (instantiation == null) {
             return false;
         }
 
-        final ImmutableSet<LoopContract> contracts = getApplicableContracts(instantiation, goal,
-                goal.proof().getServices());
+        final ImmutableSet<LoopContract> contracts
+                = getApplicableContracts(instantiation, goal, goal.proof().getServices());
 
         for (LoopContract contract : contracts) {
             // The rule is only applicable if
@@ -211,10 +212,10 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
             if (contract.hasModifiesClause(variable)) {
-                final String anonymisationName = tb
-                        .newName(BlockContractBuilders.ANON_OUT_PREFIX + variable.name());
-                final Function anonymisationFunction = new Function(new Name(anonymisationName),
-                        variable.sort(), true);
+                final String anonymisationName
+                        = tb.newName(BlockContractBuilders.ANON_OUT_PREFIX + variable.name());
+                final Function anonymisationFunction
+                        = new Function(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 result.put(variable, anonymisationFunction);
             }

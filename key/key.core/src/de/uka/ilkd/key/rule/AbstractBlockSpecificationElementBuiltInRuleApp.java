@@ -99,6 +99,10 @@ public abstract class AbstractBlockSpecificationElementBuiltInRuleApp
         return pio != null;
     }
 
+    /**
+     * @param goal the current goal.
+     * @return {@code true} iff the rule application cannot be completed for the current goal.
+     */
     public boolean cannotComplete(final Goal goal) {
         return !builtInRule.isApplicable(goal, pio);
     }

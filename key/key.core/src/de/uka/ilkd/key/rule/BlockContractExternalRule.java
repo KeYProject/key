@@ -97,14 +97,14 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
         final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
-        final Term wellFormedHeapsCondition = conditionsAndClausesBuilder
-                .buildWellFormedHeapsCondition();
-        final Term reachableInCondition = conditionsAndClausesBuilder
-                .buildReachableInCondition(localInVariables);
+        final Term wellFormedHeapsCondition
+                = conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
+        final Term reachableInCondition
+                = conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
         final Term selfConditions = conditionsAndClausesBuilder.buildSelfConditions(heaps,
                 contract.getMethod(), contract.getKJT(), instantiation.self, services);
         return new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition,
-                selfConditions };
+            selfConditions };
     }
 
     /**
@@ -123,12 +123,12 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
                 .buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
-        final Term reachableOutCondition = conditionsAndClausesBuilder
-                .buildReachableOutCondition(localOutVariables);
-        final Term atMostOneFlagSetCondition = conditionsAndClausesBuilder
-                .buildAtMostOneFlagSetCondition();
+        final Term reachableOutCondition
+                = conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
+        final Term atMostOneFlagSetCondition
+                = conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
         return new Term[] { postcondition, wellFormedAnonymisationHeapsCondition,
-                reachableOutCondition, atMostOneFlagSetCondition };
+            reachableOutCondition, atMostOneFlagSetCondition };
     }
 
     /**
@@ -153,12 +153,12 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
             final BlockContract.Variables variables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
-        final Map<LocationVariable, Term> modifiesClauses = conditionsAndClausesBuilder
-                .buildModifiesClauses();
+        final Map<LocationVariable, Term> modifiesClauses
+                = conditionsAndClausesBuilder.buildModifiesClauses();
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
-        final Term anonymisationUpdate = updatesBuilder.buildAnonOutUpdate(anonymisationHeaps,
-                modifiesClauses);
+        final Term anonymisationUpdate
+                = updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiesClauses);
         final Term[] updates = new Term[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
         return updates;
     }
@@ -202,32 +202,34 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
     public ImmutableList<Goal> apply(final Goal goal, final Services services,
             final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof BlockContractExternalBuiltInRuleApp;
-        BlockContractExternalBuiltInRuleApp application = (BlockContractExternalBuiltInRuleApp) ruleApp;
+        BlockContractExternalBuiltInRuleApp application
+                = (BlockContractExternalBuiltInRuleApp) ruleApp;
 
         if (InfFlowCheckInfo.isInfFlow(goal)) {
             throw new RuleAbortException(
                     "BlockContractExternalRule does not support information flow goals!");
         }
 
-        final Instantiation instantiation = instantiate(application.posInOccurrence().subTerm(),
-                goal, services);
+        final Instantiation instantiation
+                = instantiate(application.posInOccurrence().subTerm(), goal, services);
         final BlockContract contract = application.getContract();
         contract.setInstantiationSelf(instantiation.self);
         assert contract.getBlock().equals(instantiation.block);
 
         final List<LocationVariable> heaps = application.getHeapContext();
-        final ImmutableSet<ProgramVariable> localInVariables = MiscTools
-                .getLocalIns(instantiation.block, services);
-        final ImmutableSet<ProgramVariable> localOutVariables = MiscTools
-                .getLocalOuts(instantiation.block, services);
-        final Map<LocationVariable, Function> anonymisationHeaps = createAndRegisterAnonymisationVariables(
-                heaps, contract, services);
-        final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(goal,
-                contract.getPlaceholderVariables(), services).createAndRegister(instantiation.self,
-                        true);
+        final ImmutableSet<ProgramVariable> localInVariables
+                = MiscTools.getLocalIns(instantiation.block, services);
+        final ImmutableSet<ProgramVariable> localOutVariables
+                = MiscTools.getLocalOuts(instantiation.block, services);
+        final Map<LocationVariable, Function> anonymisationHeaps
+                = createAndRegisterAnonymisationVariables(heaps, contract, services);
+        final BlockContract.Variables variables
+                = new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(),
+                        services).createAndRegister(instantiation.self, true);
 
-        final ConditionsAndClausesBuilder conditionsAndClausesBuilder = new ConditionsAndClausesBuilder(
-                contract, heaps, variables, instantiation.self, services);
+        final ConditionsAndClausesBuilder conditionsAndClausesBuilder
+                = new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self,
+                        services);
         final Term[] preconditions = createPreconditions(instantiation, contract, heaps,
                 localInVariables, conditionsAndClausesBuilder, services);
         final Term[] assumptions = createAssumptions(localOutVariables, anonymisationHeaps,

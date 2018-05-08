@@ -80,8 +80,6 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
      *            a map specifying on which heaps this contract has a modified clause.
      * @param functionalContracts
      *            the functional loop contracts corresponding to this contract.
-     * @param services
-     *            services.
      */
     public SimpleBlockContract(final String baseName, final StatementBlock block,
             final List<Label> labels, final IProgramMethod method, final Modality modality,

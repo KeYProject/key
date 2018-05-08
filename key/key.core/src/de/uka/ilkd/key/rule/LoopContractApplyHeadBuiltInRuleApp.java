@@ -62,6 +62,10 @@ public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp 
         return pio != null && contracts != null && !contracts.isEmpty() && instantiation != null;
     }
 
+    /**
+     * @param goal the current goal.
+     * @return {@code true} iff the rule application cannot be completed for the current goal.
+     */
     public boolean cannotComplete(final Goal goal) {
         return !rule.isApplicable(goal, pio);
     }

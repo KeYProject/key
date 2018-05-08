@@ -42,8 +42,7 @@ public interface LoopContract extends BlockSpecificationElement {
 
     /**
      *
-     * @param contract
-     *            the {@code LoopContract}.
+     * @param contract the new functional contract.
      * @see #getFunctionalContracts()
      */
     public void setFunctionalLoopContract(FunctionalLoopContract contract);
@@ -104,13 +103,14 @@ public interface LoopContract extends BlockSpecificationElement {
 
     /**
      *
-     * @param newBlock
-     * @param newPreconditions
-     * @param newPostconditions
-     * @param newModifiesClauses
-     * @param newInfFlowSpecs
-     * @param newVariables
-     * @param newMeasuredBy
+     * @param newBlock the new block.
+     * @param newPreconditions the new preconditions.
+     * @param newPostconditions the new postconditions.
+     * @param newModifiesClauses the new modifies clauses.
+     * @param newinfFlowSpecs the new information flow specifications.
+     * @param newVariables the new variables.
+     * @param newMeasuredBy the new measured-by clause.
+     * @param newDecreases the new decreases clause.
      * @return a new loop contract with the specified attributes.
      */
     LoopContract update(StatementBlock newBlock, Map<LocationVariable, Term> newPreconditions,

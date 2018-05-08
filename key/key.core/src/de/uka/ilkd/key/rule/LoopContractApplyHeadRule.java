@@ -61,7 +61,8 @@ public class LoopContractApplyHeadRule implements BuiltInRule {
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp application)
             throws RuleAbortException {
         assert application instanceof LoopContractApplyHeadBuiltInRuleApp;
-        LoopContractApplyHeadBuiltInRuleApp ruleApp = (LoopContractApplyHeadBuiltInRuleApp) application;
+        LoopContractApplyHeadBuiltInRuleApp ruleApp
+                = (LoopContractApplyHeadBuiltInRuleApp) application;
 
         ImmutableSet<LoopContract> contracts = ruleApp.contracts;
         LoopContract someContract = contracts.iterator().next();
@@ -89,7 +90,7 @@ public class LoopContractApplyHeadRule implements BuiltInRule {
                 new SequentFormula(
                         tb.apply(update, tb.prog(modality, newJavaBlock, target.sub(0)))),
                 ruleApp.pio);
-        return ImmutableSLList.<Goal> nil().append(goal);
+        return ImmutableSLList.<Goal>nil().append(goal);
     }
 
     @Override
@@ -123,8 +124,9 @@ public class LoopContractApplyHeadRule implements BuiltInRule {
             return false;
         }
 
-        final AbstractLoopContractRule.Instantiation instantiation = new AbstractLoopContractRule.Instantiator(
-                pio.subTerm(), goal, goal.proof().getServices()).instantiate();
+        final AbstractLoopContractRule.Instantiation instantiation
+                = new AbstractLoopContractRule.Instantiator(pio.subTerm(), goal,
+                        goal.proof().getServices()).instantiate();
 
         if (instantiation == null) {
             return false;

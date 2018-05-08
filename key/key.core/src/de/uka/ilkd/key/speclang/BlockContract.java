@@ -52,22 +52,22 @@ public interface BlockContract extends BlockSpecificationElement {
 
     /**
      *
-     * @param contract
+     * @param contract the new functional contract.
      * @see #getFunctionalContracts()
      */
     public void setFunctionalBlockContract(FunctionalBlockContract contract);
 
     /**
-     *
-     * @param newBlock
-     * @param newPreconditions
-     * @param newPostconditions
-     * @param newModifiesClauses
-     * @param newInfFlowSpecs
-     * @param newVariables
-     * @param newMeasuredBy
-     * @return a new block contract with the specified attributes.
-     */
+    *
+    * @param newBlock the new block.
+    * @param newPreconditions the new preconditions.
+    * @param newPostconditions the new postconditions.
+    * @param newModifiesClauses the new modifies clauses.
+    * @param newInfFlowSpecs the new information flow specifications.
+    * @param newVariables the new variables.
+    * @param newMeasuredBy the new measured-by clause.
+    * @return a new block contract with the specified attributes.
+    */
     public BlockContract update(StatementBlock newBlock,
             Map<LocationVariable, Term> newPreconditions,
             Map<LocationVariable, Term> newPostconditions,
