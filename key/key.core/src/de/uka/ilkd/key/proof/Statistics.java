@@ -11,10 +11,10 @@ import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementBuiltInRuleApp;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
-import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
 import de.uka.ilkd.key.util.Pair;
 
@@ -99,7 +99,11 @@ public class Statistics {
         int tmpBlock = 0; // block and loop contract apps
         int tmpInv = 0; // loop invariants
 
-        for (final Node node = it.next(); it.hasNext(); tmpNodes++) {
+        Node node;
+        while (it.hasNext()) {
+            node = it.next();
+            tmpNodes++;
+
             tmpBranches = addTmpBranches(node, tmpBranches);
             tmpInteractive =
                     addInteractiveRuleApps(node, interactiveAppsDetails, tmpInteractive);
