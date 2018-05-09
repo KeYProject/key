@@ -1574,7 +1574,7 @@ block_loop_specification[ImmutableList<String> mods]
 }
 @after { r = result; }
 :
-    ((also_keyword)*
+    (
     loop_contract_keyword result=spec_case[mods]
     (
 	options { greedy = true; }

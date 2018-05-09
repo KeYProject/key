@@ -27,7 +27,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
  * generate a new proof obligation for a block contract, use {@link FunctionalLoopContract} instead.
  * </p>
  *
- * @author wacker, lanzinger
+ * @author lanzinger
  */
 public interface LoopContract extends BlockSpecificationElement {
 
@@ -57,7 +57,7 @@ public interface LoopContract extends BlockSpecificationElement {
      *
      * @param variables
      *            the variables to use instead of {@link #getPlaceholderVariables()}.
-     * @param services
+     * @param services services.
      * @return this loop contract's decreases clause.
      */
     public Term getDecreases(Variables variables, Services services);
