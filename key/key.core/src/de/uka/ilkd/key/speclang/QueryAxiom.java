@@ -263,7 +263,8 @@ public final class QueryAxiom extends ClassAxiom {
 	final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);
 	
 	//build taclet
-	final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+	final RewriteTacletBuilder<RewriteTaclet> tacletBuilder =
+	        new RewriteTacletBuilder<RewriteTaclet>();
 	tacletBuilder.setFind(find);
 	for(SchemaVariable heapSV : heapSVs) {
   	    tacletBuilder.addVarsNewDependingOn(skolemSV, heapSV);

@@ -353,7 +353,7 @@ public abstract class TacletBuilder<T extends Taclet> {
             this.errorMessage = errorMessage;
         }
         
-        public TacletBuilderException(TacletBuilder tb,  String errorMessage) {
+        public TacletBuilderException(TacletBuilder<?> tb,  String errorMessage) {
            this(tb.getName(), errorMessage);
         }
         

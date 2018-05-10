@@ -33,7 +33,7 @@ else
 	JAVA=$JRE/bin/java
 # other OS
     else
-	JRE=$JAVA_HOME/jre
+	JRE=$JAVA_HOME
 	JAVA=$JRE/bin/java
     fi
 fi

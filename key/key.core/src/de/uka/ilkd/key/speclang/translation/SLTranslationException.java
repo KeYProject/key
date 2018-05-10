@@ -18,8 +18,10 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 
 public class SLTranslationException extends ProofInputException {
 
-   private final String fileName;
-   private final Position pos;
+    private static final long serialVersionUID = 1L;
+
+    private final String fileName;
+    private final Position pos;
 
    public SLTranslationException(String message, Throwable cause,
          String fileName, Position pos) {
