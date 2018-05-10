@@ -215,7 +215,7 @@ class BasicSnippetData {
     BasicSnippetData(BlockContract contract,
                      ExecutionContext context,
                      Services services) {
-        this.hasMby = contract.hasMby();
+        this.hasMby = false; // Mby of block contracts is not further considered
         this.services = services;
         this.tb = services.getTermBuilder();
 

@@ -112,7 +112,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro impl
                                      ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(),
                                      goals.head(), blockRuleApp.getExecutionContext(),
                                      proof.getServices());
-        
+
         final InfFlowProof p;
         synchronized (blockExecPO) {
             p = (InfFlowProof) uic.createProof(initConfig, blockExecPO);

@@ -166,7 +166,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         }
 
         if (hasMby) {
-            // if the contract has a mesured by clause, then mbyAtPre is also
+            // if the contract has a measured by clause, then mbyAtPre is also
             // relevant
             relevantPreVars = relevantPreVars.append(poVars.pre.mbyAtPre);
         }

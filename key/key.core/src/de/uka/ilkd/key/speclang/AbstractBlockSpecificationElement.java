@@ -1225,9 +1225,10 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
                     mbyTerm = measuredByEmpty();
                 }
 
-                if (old == null) {
+                // InfFlow preconditions are without Mby term (a bit hacky for now)
+                if (old == null && (infFlowSpecs == null || infFlowSpecs.size() <= 0)) {
                     result.put(heap, mbyTerm);
-                } else {
+                } else if (infFlowSpecs == null || infFlowSpecs.size() <= 0) {
                     result.put(heap, and(mbyTerm, old));
                 }
             }
