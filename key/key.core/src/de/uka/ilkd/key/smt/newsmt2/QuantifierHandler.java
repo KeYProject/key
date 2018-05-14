@@ -31,7 +31,7 @@ public class QuantifierHandler implements SMTHandler {
         SExpr matrix = trans.translate(term.sub(0), Type.BOOL);
         List<SExpr> vars = new ArrayList<>();
         for(QuantifiableVariable bv : term.boundVars()) {
-            vars.add(new SExpr(LogicalVariableHandler.VAR_PREFIX + bv.name(), Type.NONE, "u"));
+            vars.add(new SExpr(LogicalVariableHandler.VAR_PREFIX + bv.name(), Type.NONE, "U"));
         }
 
         String smtOp;

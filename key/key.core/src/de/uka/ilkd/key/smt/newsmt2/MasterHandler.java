@@ -60,7 +60,7 @@ public class MasterHandler {
         String pr = "KeY_"+problem.toString();
         if(!isKnownSymbol(pr)) {
             addKnownSymbol(pr);
-            addDeclaration(new SExpr("declare-const", pr, "u"));
+            addDeclaration(new SExpr("declare-const", pr, "U"));
         }
         return new SExpr(pr, Type.UNIVERSE);
     }

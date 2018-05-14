@@ -44,7 +44,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
             trans.addKnownSymbol(name);
 
             if (op.arity() > 0 && op instanceof SortedOperator) {
-                SExpr axiom = funTypeAxiomFromTerm(term);
+                SExpr axiom = funTypeAxiomFromTerm(term, name);
                 trans.addAxiom(axiom);
             }
         }
@@ -53,7 +53,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
         return new SExpr(name, Type.UNIVERSE, children);
     }
 
-    public static SExpr funTypeAxiomFromTerm(Term term) {
+    public static SExpr funTypeAxiomFromTerm(Term term, String name) {
         SortedOperator op = (SortedOperator) term.op();
         List<SExpr> vars_U = new ArrayList<>();
         List<SExpr> vars = new ArrayList<>();
@@ -76,17 +76,11 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
         } else {
             ante = new SExpr("and", tos);
         }
-        SExpr cons = new SExpr("typeof", new SExpr(op.toString(), new SExpr(vars)),
+        SExpr cons = new SExpr("=", new SExpr("typeof", new SExpr(name, vars)),
                 SExpr.sortExpr(op.sort()));
         SExpr matrix = new SExpr("=>", ante, cons);
-        SExpr axiom = new SExpr("forall", Type.BOOL, new SExpr(vars_U),
-                SExpr.patternSExpr(matrix, vars_U.toArray(new SExpr[vars_U.size()]))); // TODO
-                                                                                       // nur
-                                                                                       // zum
-                                                                                       // ausprobieren.
-                                                                                       // kein
-                                                                                       // sinnvoller
-                                                                                       // trigger
+        SExpr pattern = SExpr.patternSExpr(matrix, new SExpr(name, vars));
+        SExpr axiom = new SExpr("forall", Type.BOOL, new SExpr(vars_U), pattern);
         return new SExpr("assert", axiom);
     }
 

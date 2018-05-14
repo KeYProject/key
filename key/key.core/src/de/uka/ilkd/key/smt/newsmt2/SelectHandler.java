@@ -30,7 +30,7 @@ public class SelectHandler implements SMTHandler {
         SExpr se3 = trans.translate(term.sub(2));
 
         if (!trans.isKnownSymbol(funName)) {
-            trans.addAxiom(UninterpretedSymbolsHandler.funTypeAxiomFromTerm(term));
+            trans.addAxiom(UninterpretedSymbolsHandler.funTypeAxiomFromTerm(term, funName));
             trans.addKnownSymbol(funName);
         }
 

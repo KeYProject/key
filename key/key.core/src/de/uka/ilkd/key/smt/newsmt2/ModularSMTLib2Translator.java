@@ -95,7 +95,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         for (Sort s : sorts) {
             Set<Sort> children = directChildSorts(s, sorts);
             for (Sort child : children) {
-                master.addAxiom(new SExpr("subtype", SExpr.sortExpr(child), SExpr.sortExpr(s)));
+                master.addAxiom(new SExpr("assert", new SExpr("subtype", SExpr.sortExpr(child), SExpr.sortExpr(s))));
                 for (Sort otherChild : children) {
                     if (!(child.equals(otherChild))) {
                         SExpr st = new SExpr("subtype", SExpr.sortExpr(child), SExpr.sortExpr(otherChild));
@@ -108,7 +108,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         for (Sort s : sorts) {
             if (!(s instanceof NullSort) && !(s.equals(Sort.ANY))) {
                 if (s.extendsSorts().isEmpty()) {
-                    master.addAxiom(new SExpr("subtype", SExpr.sortExpr(s), SExpr.sortExpr(Sort.ANY)));
+                    master.addAxiom(new SExpr("assert", new SExpr("subtype", SExpr.sortExpr(s), SExpr.sortExpr(Sort.ANY))));
                 }
             }
         }
@@ -116,9 +116,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     private void addAllSorts(Term problem) {
         Sort s = problem.sort();
-        if (!s.equals(Sort.FORMULA)) {
-            sorts.add(s);
-        }
+        sorts.add(s);
         for (Term t : problem.subs()) {
             addAllSorts(t);
         }
