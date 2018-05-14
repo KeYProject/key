@@ -17,7 +17,7 @@ import java.util.Map;
 
 /**
  * Rewrite Command
- * gets an ``find term and replace term
+ * gets an find term and replace term
  * and replaces find terms on sequent with the
  *
  * Example:
