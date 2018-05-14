@@ -382,7 +382,8 @@ public final class BlockContractBuilders {
             if (existingPO) {
                 // In an existing PO, the outer remembrance vars already exist and refer to the
                 // current method's prestate.
-                return new BlockContract.Variables(self != null ? self.op(ProgramVariable.class) : null,
+                return new BlockContract.Variables(
+                        self != null ? self.op(ProgramVariable.class) : null,
                         createAndRegisterFlags(placeholderVariables.breakFlags),
                         createAndRegisterFlags(placeholderVariables.continueFlags),
                         createAndRegisterVariable(placeholderVariables.returnFlag),
