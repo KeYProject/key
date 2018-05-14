@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -23,6 +26,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     private static final String PREAMBLE = readPreamble();
 
     private List<Throwable> exceptions = Collections.emptyList();
+
+    private HashSet<Sort> sorts = new HashSet<>();
 
     @Override
     public StringBuffer translateProblem(Term problem, Services services, SMTSettings settings)
@@ -42,18 +47,24 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         sb.append("; --- Declarations\n\n");
 
-        StringBuffer sortsb = new StringBuffer();
-        sortsb.append("(assert (distinct ");
-        Collection<Sort> sorts = services.getNamespaces().sorts().elements();
+        if (problem.arity() != 0) {
+            sorts.add(Sort.ANY);
+            addAllSorts(problem);
+        }
+
+        StringBuffer distinctSortSB = new StringBuffer();
+        distinctSortSB.append("(assert (distinct ");
         for (Sort s : sorts) {
             sb.append("(declare-const " + SExpr.sortExpr(s) + " T)\n");
-            sortsb.append(SExpr.sortExpr(s) + " ");
+            distinctSortSB.append(SExpr.sortExpr(s) + " ");
         }
-        sortsb.append("))\n");
-        sb.append(sortsb);
+        distinctSortSB.append("))\n");
+        if (sorts.size() > 1) {
+            sb.append(distinctSortSB);
+        }
         sb.append("\n");
 
-        createSortTypeHierarchy(sorts, services, master);
+        createSortTypeHierarchy(problem, services, master);
 
         for(SExpr decl : master.getDeclarations()) {
             decl.appendTo(sb);
@@ -76,29 +87,69 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     }
 
 
-    private void createSortTypeHierarchy(Collection<Sort> sorts, Services services,
+    private void createSortTypeHierarchy(Term problem, Services services,
         MasterHandler master) {
+
         for (Sort s : sorts) {
-            for (Sort t : sorts) {
-                if (s.extendsTrans(t) && !s.equals(t)) { // subtype relation
-                    // TODO this does not make any sense as long as interfaces
-                    // are present in the sort list
-                    SExpr axiom = new SExpr("subtype", SORT_PREFIX + s.toString(),
-                        SORT_PREFIX + t.toString());
-                    //                    master.addAxiom(axiom); //TODO uncomment; too cluttering now
+            Set<Sort> children = directChildSorts(s, sorts);
+            for (Sort child : children) {
+                master.addAxiom(new SExpr("subtype", SExpr.sortExpr(child), SExpr.sortExpr(s)));
+                for (Sort otherChild : children) {
+                    if (!(child.equals(otherChild))) {
+                        SExpr st = new SExpr("subtype", SExpr.sortExpr(child), SExpr.sortExpr(otherChild));
+                        master.addAxiom(new SExpr("not", st));
+                    }
                 }
-                // forbid diamond inheritance. TODO remove interfaces from list
-                if (!(s instanceof NullSort) && !(t instanceof NullSort)
-                    && s.extendsSorts().equals(t.extendsSorts())) {
-                    SExpr axiom = new SExpr("forall", new SExpr("x", "T"),
-                        new SExpr("=>", Type.BOOL,
-                            new SExpr("subtype", "x", SORT_PREFIX + s.toString()), new SExpr("not",
-                                new SExpr("subtype", "x", SORT_PREFIX + t.toString()))));
-                    //                    master.addAxiom(axiom); //TODO uncomment; too cluttering now
+            }
+        }
+        // if sort has no direct parents, make it a child of any
+        for (Sort s : sorts) {
+            if (!(s instanceof NullSort) && !(s.equals(Sort.ANY))) {
+                if (s.extendsSorts().isEmpty()) {
+                    master.addAxiom(new SExpr("subtype", SExpr.sortExpr(s), SExpr.sortExpr(Sort.ANY)));
                 }
             }
         }
     }
+
+    private void addAllSorts(Term problem) {
+        Sort s = problem.sort();
+        if (!s.equals(Sort.FORMULA)) {
+            sorts.add(s);
+        }
+        for (Term t : problem.subs()) {
+            addAllSorts(t);
+        }
+    }
+
+    /*
+     * @param parent the (possible) parent sort
+     * @param child the (possible) child sort
+     * @return true if parent is a direct parent sort of child
+     *
+     * TODO js maybe this should be in the sort class
+     */
+    private boolean isDirectParentOf(Sort parent, Sort child) {
+        if (!(child instanceof NullSort)) {
+            return child.extendsSorts().contains(parent);
+        } else {
+            return true;
+        }
+    }
+
+    /*
+     * TODO js maybe this should go in the Sort class as well
+     */
+    private Set<Sort> directChildSorts(Sort s, Set<Sort> sorts) {
+        Set<Sort> res = new HashSet<>();
+        for (Sort child : sorts) {
+            if (isDirectParentOf(s, child)) {
+                res.add(child);
+            }
+        }
+        return res;
+    }
+
 
     // Is there functionality to do this in KeY ?!
     private static String readPreamble() {
