@@ -3,28 +3,28 @@ package de.uka.ilkd.key.macros.scripts;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
-import de.uka.ilkd.key.macros.scripts.meta.Varargs;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
+ * Rewrite Command
+ * gets an ``find term and replace term
+ * and replaces find terms on sequent with the
+ *
+ * Example:
  * rewrite find="t1" replace="t2"; (mulbrich script syntax)
- * rewrite find=`t1` replace=`t2`; (psdbg)
+ * rewrite find=`t1` replace=`t2`; (psdbg syntax)
  */
+
 public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
     public RewriteCommand() {
         super(Parameters.class);
@@ -49,22 +49,18 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
         Proof proof = state.getProof();
         assert proof != null;
 
-        //get all Taclets
         ImmutableList<TacletApp> allApps = findAllTacletApps(args, state);
 
-        //filter only taclets on find, also sets allReplSucc to false if one replacement isn't successful
-        //TODO: failPosInOcc only needed for different cut structures
         List<PosInOccurrence> failposInOccs = findAndExecReplacement(args, allApps, state);
 
+        //not all find terms successfully replaced -> apply cut
         if (failposInOccs.size() >= 1) {
 
-            System.out.println("Cut needed");
            CutCommand cut = new CutCommand();
            CutCommand.Parameters param = new CutCommand.Parameters();
            param.formula = args.replace;
 
            cut.execute(uiControl, param, state);
-           System.out.println("After final cut:"+ state.getFirstOpenGoal().sequent());
 
 
         }
@@ -81,7 +77,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
     }
 
     /**
-     * get aLl TacletApps
+     * get all TacletApps
      */
     private ImmutableList<TacletApp> findAllTacletApps(Parameters p,
                                                        EngineState state) throws ScriptException {
@@ -92,6 +88,8 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
         index.autoModeStopped();
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
+
+        //filter
         for (SequentFormula sf : g.node().sequent().antecedent()) {
 
             if (p.formula != null && !sf.formula()
@@ -119,16 +117,16 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
  /**
  * Filter tacletapps: term = find && result = replace
  **/
- //TODO: probably void, except if we want the failed PosInOccs
-    private List<PosInOccurrence> findAndExecReplacement(Parameters p,
+ private List<PosInOccurrence> findAndExecReplacement(Parameters p,
                                        ImmutableList<TacletApp> list, EngineState state) {
-        //List of PosInOcc that haven't been  succ replaced
-        List<PosInOccurrence> failposInOccs = new ArrayList<PosInOccurrence>();
-        System.out.println("Size = 0:" + failposInOccs.size());
 
-        //List of PosInOcc that succ replaced
+        //List of PosInOccurrences of find terms that haven't been successfully replaced
+        List<PosInOccurrence> failposInOccs = new ArrayList<PosInOccurrence>();
+
+        //List ofPosInOccurrences of find terms that successfully replaced
         List<PosInOccurrence> succposInOccs = new ArrayList<PosInOccurrence>();
 
+        //Find taclet that transforms find term to replace term, when applied on find term
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;
@@ -137,63 +135,33 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
                         continue;
                     }
                     if (pta.posInOccurrence().subTerm().equals(p.find) && pta.complete()) {
-                        System.out.println("________________________________________");
-                        System.out.println("Tacletapp an der Stelle: " + tacletApp.posInOccurrence());
-                        System.out.println("Tacletname an der Stelle: " + pta.taclet().displayName());
-                        //if Term already succ replaced, the skip
+
+                        //If term already succposInOccs , then skip
                         if (succposInOccs.contains(pta.posInOccurrence())) {
-                            System.out.println("Term already successfully replaced.");
                             continue;
                         }
 
-                        // TODO: if taclet transforms find to replace then execute and add to list, else null
-
                         try {
-                            System.out.println("Term NOT already successfully replaced.");
-
-                            Goal goalold = state.getFirstOpenGoal();
-
-                            //check the rewritten term
+                            Goal goal = state.getFirstOpenGoal();
                             RewriteTaclet rw = (RewriteTaclet) pta.taclet();
                             if(pta.complete()) {
-                                //for top level formulas -> TODO what about subterm replacements
-                                SequentFormula rewriteResult = rw.getExecutor().getRewriteResult(goalold, null, goalold.proof().getServices(), pta);
-                                System.out.println("Rewrite Result =" + rewriteResult.toString());
+                                SequentFormula rewriteResult = rw.getExecutor().getRewriteResult(goal, null, goal.proof().getServices(), pta);
+
+                                //Transformed find term = replace term -> apply taclet
                                 if(rewriteResult.formula().equals(p.replace) ||
                                         getTermAtPos(rewriteResult, pta.posInOccurrence()).equals(p.replace)){
                                     failposInOccs.remove(pta.posInOccurrence());
                                     succposInOccs.add(pta.posInOccurrence());
-                                    System.out.println("Sucessful Replacement, applying rule app");
-                                    goalold.apply(pta);
+                                    goal.apply(pta);
                                     break;
-                                } else {
-
-                                    System.out.println("Unsucessful Replacement & already in failed list");
                                 }
                             }
-                            /*//TODO: nicht immer an der gleichen pio
-                            if (pta.posInOccurrence().subTerm()
-                                    .equals(p.replace)) {
 
-                                failposInOccs.remove(pta.posInOccurrence());
-                                succposInOccs.add(pta.posInOccurrence());
-                                System.out.println("Sucessful Replacement");
-                            } else {
-                                if (!failposInOccs.contains(pta.posInOccurrence())) {
-                                    System.out.println("Unsucessful Replacement & add to failed list:");
-                                    failposInOccs.add(pta.posInOccurrence());
-                                    state.setGoal(goalold);
-                                } else {
-                                    //prune
-                                    System.out.println("Unsucessful Replacement & already in failed list");
-                                    state.setGoal(goalold);
-                                }
-                            }*/
                         } catch (Exception e) {
                             if (!failposInOccs.contains(pta.posInOccurrence())) {
                                 failposInOccs.add(pta.posInOccurrence());
                             }
-                            System.out.println("TacletApp not applicable");
+
                             e.printStackTrace();
                             continue;
                         }
@@ -203,22 +171,33 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
                 }
             }
         }
-        System.out.println("[End of findExec] Size = ? :" + failposInOccs.size());
         return failposInOccs;
     }
 
+    /**
+     * Calculates term at the PosInOccurrence pio
+     * @param sf top-level formula
+     * @param pio PosInOccurrence of the to be returned term
+     * @return term at pio
+     */
     public Term getTermAtPos(SequentFormula sf, PosInOccurrence pio){
         if(pio.isTopLevel()){
             return sf.formula();
 
         } else {
             PosInTerm pit = pio.posInTerm();
-            Term t =getSubTerm(sf.formula(), pit.iterator());
+            Term t = getSubTerm(sf.formula(), pit.iterator());
             return t;
         }
 
     }
 
+    /**
+     * Calculates subterm of term t according to the given IntIterator
+     * @param t Term
+     * @param pit contains information of the position of subterm in t
+     * @return subterm of t
+     */
     public Term getSubTerm(Term t, IntIterator pit){
         if(pit.hasNext()) {
             int i = pit.next();
