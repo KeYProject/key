@@ -98,16 +98,16 @@ public class SMTSettingsModel extends DefaultTreeModel {
 
 		optionsNode.add(generalOptionsNode);
 		optionsNode.add(translationOptionsNode);
-		
+
 		tacletTranslationOptionsNode.add(new OptionContentNode("Selection",
 				new JScrollPane((new TacletTranslationSelection(smtSettings)).getSelectionTree())));
 		optionsNode.add(tacletTranslationOptionsNode);
 
 		for(SolverOptions options : solverOptions){
 			optionsNode.add(new OptionContentNode(options.getName(),
-					new JScrollPane(options)));  
+					new JScrollPane(options)));
 		}
-		
+
 
 		return optionsNode;
 
@@ -130,7 +130,7 @@ class GeneralOptions extends TablePanel{
 	private JTextField seqBoundField;
 	private JTextField objectBoundField;
 	private JTextField locsetBoundField;
-	
+
 	private JCheckBox  solverSupportCheck;
 	private final ProofIndependentSMTSettings settings;
 
@@ -140,8 +140,8 @@ class GeneralOptions extends TablePanel{
 	public final int minWidthOfTitle;
 
 	private final static String infoBound = "Bitvector size for this type. Use a value larger than 0.";
-	
-	
+
+
 	private final static String infoSaveToFilePanel = "Activate this option to store the translations "
 			+ "that are handed over to the externals solvers:\n"
 			+ "1. Choose the folder.\n"
@@ -203,7 +203,7 @@ class GeneralOptions extends TablePanel{
 										value = settings.maxConcurrentProcesses;
 									}
 									settings.maxConcurrentProcesses = value;
-								}                                
+								}
 							});
 						}
 						return maxProcesses;
@@ -224,12 +224,12 @@ class GeneralOptions extends TablePanel{
 										value = settings.timeout;
 									}
 									settings.timeout = value;
-								}                                
+								}
 							});
 						}
 						return timeoutField;
 					}
-					
+
 					public void getBoundFields() {
 						if(intBoundField == null){
 							intBoundField = addTextField("Integer Bound:",minWidthOfTitle,Long.toString(settings.intBound),infoBound,
@@ -245,10 +245,10 @@ class GeneralOptions extends TablePanel{
 										value = settings.intBound;
 									}
 									settings.intBound = value;
-								}                                
+								}
 							});
 						}
-						
+
 						if(seqBoundField == null){
 							seqBoundField = addTextField("Seq Bound:",minWidthOfTitle,Long.toString(settings.seqBound),infoBound,
 									new ActionListener(){
@@ -263,7 +263,7 @@ class GeneralOptions extends TablePanel{
 										value = settings.seqBound;
 									}
 									settings.seqBound = value;
-								}                                
+								}
 							});
 						}
 						if(objectBoundField == null){
@@ -280,7 +280,7 @@ class GeneralOptions extends TablePanel{
 										value = settings.objectBound;
 									}
 									settings.objectBound = value;
-								}                                
+								}
 							});
 						}
 						if(locsetBoundField == null){
@@ -297,13 +297,13 @@ class GeneralOptions extends TablePanel{
 										value = settings.locsetBound;
 									}
 									settings.locsetBound = value;
-								}                                
+								}
 							});
 						}
-						
+
 					}
-					
-					 
+
+
 
 
 
@@ -315,7 +315,7 @@ class GeneralOptions extends TablePanel{
 								public void actionPerformed(ActionEvent e) {
 									settings.modeOfProgressDialog = progressModeBox.getSelectedIndex();
 								}
-							}, 
+							},
 							getProgressMode(ProofIndependentSMTSettings.PROGRESS_MODE_USER),
 							getProgressMode(ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE));
 						}
@@ -330,10 +330,10 @@ class GeneralOptions extends TablePanel{
 									, new ActionListener() {
 								@Override
 								public void actionPerformed(ActionEvent e) {
-									settings.checkForSupport = solverSupportCheck.isSelected(); 
+									settings.checkForSupport = solverSupportCheck.isSelected();
 								}
 							});
-						}    
+						}
 
 						return solverSupportCheck;
 					}
@@ -342,7 +342,7 @@ class GeneralOptions extends TablePanel{
 					public FileChooserPanel getSaveToFilePanel() {
 						if(saveToFilePanel == null){
 							saveToFilePanel = addFileChooserPanel("Store translation to file:",
-									settings.pathForSMTTranslation, infoSaveToFilePanel, 
+									settings.pathForSMTTranslation, infoSaveToFilePanel,
                                         true,settings.storeSMTTranslationToFile,new ActionListener() {
 
 								@Override
@@ -386,7 +386,7 @@ class SolverOptions extends TablePanel{
 
 	//private JButton    checkForSupportButton;
 
-	private final SolverType solverType; 
+	private final SolverType solverType;
 	private final ProofIndependentSMTSettings settings;
 
 	private final int minWidthOfTitle;
@@ -466,7 +466,7 @@ class SolverOptions extends TablePanel{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				getSolverParameters().setText(solverType.getDefaultSolverParameters());
-				settings.setParameters(solverType, solverParameters.getText());  
+				settings.setParameters(solverType, solverParameters.getText());
 
 			}
 		});
@@ -480,7 +480,7 @@ class SolverOptions extends TablePanel{
 //				solverType.checkForSupport();
 //				getSolverSupported().setText(getSolverSupportText());
 //			}
-//		}); 
+//		});
 //		checkForSupportButton.setEnabled(solverType.isInstalled(false));
 
 //		Box box  = addComponent(null,toDefaultButton,checkForSupportButton);
@@ -494,7 +494,7 @@ class SolverOptions extends TablePanel{
 
 	private String createSupportedVersionText(){
 		String [] versions =solverType.getSupportedVersions();
-		String result = versions.length>1 ? "The following versions are supported: " :	
+		String result = versions.length>1 ? "The following versions are supported: " :
 			"The following version is supported: ";
 		for(int i=0; i < versions.length; i++){
 			result += versions[i];
@@ -528,7 +528,7 @@ class SolverOptions extends TablePanel{
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					settings.setParameters(solverType, solverParameters.getText());                                      
+					settings.setParameters(solverType, solverParameters.getText());
 				}
 			});
 		}
@@ -542,7 +542,7 @@ class SolverOptions extends TablePanel{
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					settings.setCommand(solverType, solverCommand.getText());                                      
+					settings.setCommand(solverType, solverCommand.getText());
 				}
 			});
 		}
@@ -597,7 +597,7 @@ class TacletTranslationOptions extends TablePanel{
 			+ "Note: After every restart of KeY this option"
 			+ " is deactivated.";
 
-	private static final String infoMaxNumberOfGenerics =      
+	private static final String infoMaxNumberOfGenerics =
 
 			"This option specifies how many different generic sorts are allowed"
 					+ " within a taclet.\n\n"
@@ -677,6 +677,7 @@ class TranslationOptions extends TablePanel{
 	private JCheckBox useBuiltInUniqueness;
 	private JCheckBox useUIMultiplication;
 	private JCheckBox useConstantsForIntegers;
+	private JCheckBox useLegacyTranslation;
 	private JTextField minField;
 	private JTextField maxField;
 	private final int minWidthOfTitle;
@@ -691,7 +692,7 @@ class TranslationOptions extends TablePanel{
 			+ "If the option is selected, the following assumption is additionally added to the assumptions above:\n"
 			+ "\\forall x; (type_of_C(x)->type_of_A(x))\n";
 
-	private static final String infoUseNullInstantiation =  
+	private static final String infoUseNullInstantiation =
 			"At the moment this option has only effect on hierarchy assumptions regarding the null object.\n"
 					+ "Example: Let A and B be classes.\n"
 					+ "If the option is not selected, the type null is treated as a normal class. "
@@ -705,7 +706,7 @@ class TranslationOptions extends TablePanel{
 			"Some solvers support the uniqueness of functions by built-in mechanisms. If this option is selected "
 					+ "those mechanisms are used, otherwise some assumptions are added by using normal FOL.\n"
 					+ "Note: The uniqueness of functions is needed for translating attributes and arrays.";
-	private static final String infoUseUIMultiplication = 
+	private static final String infoUseUIMultiplication =
 			"Some solvers support only simple multiplications. For example Yices supports only multiplications of type a*b"
 					+ " where a or b must be a number.\n"
 					+ "In order to support more complex multiplications, this option can be activated: If the solver does not support a"
@@ -740,16 +741,18 @@ class TranslationOptions extends TablePanel{
 	public TranslationOptions(ProofDependentSMTSettings settings) {
 		super();
 		this.minWidthOfTitle = SwingUtilities.computeStringWidth(this.getFontMetrics(getFont()),"MaximumBLANK");
-		this.settings = settings;      
+		this.settings = settings;
 		createTable();
 
 	}
 
-	protected void createComponents(){
+	@Override
+    protected void createComponents(){
 		createUseExplicitTypeHierachy();
 		createNullInstantiation();
 		createBuiltInUniqueness();
 		createUIMultiplication();
+		createLegacyTranslation();
 		createConstantsForIntegers();
 	}
 
@@ -761,7 +764,7 @@ class TranslationOptions extends TablePanel{
 					, new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					settings.useExplicitTypeHierarchy = useExplicitTypeHierachy.isSelected(); 
+					settings.useExplicitTypeHierarchy = useExplicitTypeHierachy.isSelected();
 				}
 			});
 		}
@@ -776,7 +779,7 @@ class TranslationOptions extends TablePanel{
 					, new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					settings.useNullInstantiation = useNullInstantiation.isSelected(); 
+					settings.useNullInstantiation = useNullInstantiation.isSelected();
 				}
 			});
 		}
@@ -791,7 +794,7 @@ class TranslationOptions extends TablePanel{
 					, new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					settings.useBuiltInUniqueness = useBuiltInUniqueness.isSelected(); 
+					settings.useBuiltInUniqueness = useBuiltInUniqueness.isSelected();
 				}
 			});
 		}
@@ -801,13 +804,13 @@ class TranslationOptions extends TablePanel{
 	public JCheckBox createUIMultiplication() {
 
 		if(useUIMultiplication == null){
-			useUIMultiplication = addCheckBox( "Use uninterpreted multiplication if necessary.", 
+			useUIMultiplication = addCheckBox( "Use uninterpreted multiplication if necessary.",
 					infoUseUIMultiplication
 					,settings.useUIMultiplication
 					, new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					settings.useUIMultiplication = useUIMultiplication.isSelected(); 
+					settings.useUIMultiplication = useUIMultiplication.isSelected();
 				}
 			});
 		}
@@ -864,7 +867,7 @@ class TranslationOptions extends TablePanel{
 					, new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							settings.useConstantsForIntegers = useConstantsForIntegers.isSelected(); 
+							settings.useConstantsForIntegers = useConstantsForIntegers.isSelected();
 							maxField.setEnabled(useConstantsForIntegers.isSelected());
 							minField.setEnabled(useConstantsForIntegers.isSelected());
 						}
@@ -882,4 +885,20 @@ class TranslationOptions extends TablePanel{
 		}
 		return useConstantsForIntegers;
 	}
+
+	public JCheckBox createLegacyTranslation() {
+
+        if(useLegacyTranslation == null){
+            useLegacyTranslation = addCheckBox( "Use legacy SMT Translation.",
+                    ""
+                    ,settings.useLegacyTranslation
+                    , new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    settings.useLegacyTranslation = useLegacyTranslation.isSelected();
+                }
+            });
+        }
+        return useLegacyTranslation;
+    }
 }

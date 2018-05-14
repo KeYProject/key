@@ -185,9 +185,12 @@ public interface SolverType  {
 
             @Override
             public SMTTranslator createTranslator(Services services) {
-                return new ModularSMTLib2Translator(); //TODO jonas: revert or adapt this. only for testing the output in KeY
-//                    return new SmtLib2Translator(services,
-//                                    new Configuration(false,false));
+                if (services.getProof().getSettings().getSMTSettings().useLegacyTranslation) {
+                    return new SmtLib2Translator(services,
+                                    new Configuration(false,false));
+                } else {
+                    return new ModularSMTLib2Translator();
+                }
             }
 
 
