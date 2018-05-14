@@ -1391,12 +1391,14 @@ public final class BlockContractBuilders {
                     newPost, ImmutableSLList.<LocationVariable>nil()
                             .prepend(terms.remembranceLocalVariables.keySet()),
                     terms.exception);
+            if (goal != null) {
+                goal.setBranchLabel("Validity");
+            }
             newPost = TermLabelManager.refactorTerm(termLabelState, services, null, newPost, rule,
                     goal, AbstractBlockSpecificationElementRule.NEW_POSTCONDITION_TERM_HINT, null);
 
             Term term;
             if (goal != null) {
-                goal.setBranchLabel("Validity");
                 goal.addFormula(
                         new SequentFormula(tb.applySequential(updates, tb.and(assumptions))), true,
                         false);
