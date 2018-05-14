@@ -40,12 +40,12 @@ interface SolverListener {
 }
 
 final class SMTSolverImplementation implements SMTSolver, Runnable{
- 
+
         private static int IDCounter = 0;
         private final int ID = IDCounter++;
-        
+
         private AbstractSolverSocket socket;
-        
+
         private ModelExtractor query;
 
 
@@ -64,7 +64,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
         /** starts a external process and returns the result */
         private ExternalProcessLauncher<SolverCommunication> processLauncher;
-   
+
         /**
          * The services object is stored in order to have the possibility to
          * access it in every method
@@ -75,7 +75,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
          * it also contains the final result.
          */
         private SolverCommunication solverCommunication = SolverCommunication.EMPTY;
-        
+
         /**
          * This holds information relevant for retrieving information on a model
          * from an SMT instance.
@@ -121,10 +121,10 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
          * this attribute
          */
         private Throwable exception;
-        
+
         private Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<Throwable>();
 
- 
+
 
 
         SMTSolverImplementation(SMTProblem problem, SolverListener listener,
@@ -142,7 +142,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
          * Starts a solver process. This method should be accessed only by an
          * instance of <code>SolverLauncher</code>. If you want to start a
          * solver please have a look at <code>SolverLauncher</code>.
-         * 
+         *
          * @param timeout
          * @param settings
          */
@@ -159,10 +159,12 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                                 : reasonOfInterruption;
         }
 
+        @Override
         public Throwable getException() {
                 return isRunning() ? null : exception;
         }
 
+        @Override
         public SMTProblem getProblem() {
                 return isRunning() ? null : problem;
         }
@@ -242,11 +244,11 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
         @Override
         public void run() {
-        		
+
                 // Firstly: Set the state to running and inform the listener.
                 setSolverState(SolverState.Running);
                 listener.processStarted(this, problem);
-                                
+
                 // Secondly: Translate the given problem
                 String commands[];
                 try {
@@ -258,20 +260,20 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                         solverTimeout.cancel();
                         return;
                 }
-     
+
 
                 // start the external process.
                 try {
                         processLauncher.launch(commands,type.modifyProblem(problemString),socket);
-                 
+
                         solverCommunication = processLauncher.getCommunication();
-                        if(solverCommunication.exceptionHasOccurred() && 
-                          !solverCommunication.resultHasBeenSet()){ 
-                        	// if the result has already been set, the exceptions 
+                        if(solverCommunication.exceptionHasOccurred() &&
+                          !solverCommunication.resultHasBeenSet()){
+                        	// if the result has already been set, the exceptions
                         	// must have occurred while doing the remaining communication, which is not that important.
                         	throw new AccumulatedException(solverCommunication.getExceptions());
                         }
-                                      
+
                         // uncomment for testing
                       //  Thread.sleep(3000);
                         // uncomment for testing
@@ -313,7 +315,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         }
 
 
-        
+
         private static String indent(String string) {
 
             StringBuilder sb = new StringBuilder();
@@ -324,8 +326,9 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 switch (c) {
                 case '(':
                     sb.append("\n");
-                    for (int j = 0; j < indention; j++)
+                    for (int j = 0; j < indention; j++) {
                         sb.append(" ");
+                    }
                     sb.append("(");
                     indention++;
                     break;
@@ -348,30 +351,30 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         	if(getType() == SolverType.Z3_CE_SOLVER){
         	   Proof proof = problem.getGoal().proof();
         	   SpecificationRepository specrep = proof.getServices().getSpecificationRepository();
-        	   
-        	   
+
+
         	   Proof originalProof = null;
         	   for(Proof pr : specrep.getAllProofs()){
         		   if(proof.name().toString().endsWith(pr.name().toString())){
         			   originalProof = pr;
         			   break;
         		   }
-        		   
-        		   
+
+
         	   }
         	   //System.out.println(originalProof.name());
-        	   
-        	   
-        	   
+
+
+
         	   KeYJavaType typeOfClassUnderTest = specrep.getProofOblInput(originalProof).getContainerType();
-        	   
+
         		SMTObjTranslator objTrans = new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
         		problemString = objTrans.translateProblem(term, services, smtSettings).toString();
         		problemTypeInformation = objTrans.getTypes();
         		ModelExtractor query = objTrans.getQuery();
         		getSocket().setQuery(query);
         		tacletTranslation = null;
-        		
+
         		exceptionsForTacletTranslation.addAll(objTrans.getExceptionsOfTacletTranslation());
 
         	}
@@ -379,11 +382,13 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         		SMTTranslator trans = getType().createTranslator(services);
             	//instantiateTaclets(trans);
             	problemString = indent(trans.translateProblem(term, services, smtSettings).toString());
-            	tacletTranslation = ((AbstractSMTTranslator) trans).getTacletSetTranslation();
+            	if (services.getProof().getSettings().getSMTSettings().useLegacyTranslation) {
+            	    tacletTranslation = ((AbstractSMTTranslator)trans).getTacletSetTranslation();
+            	}
             	exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
         	}
-        	
-        	String parameters [] = this.type.getSolverParameters().split(" "); 
+
+        	String parameters [] = this.type.getSolverParameters().split(" ");
         	String result [] = new String[parameters.length+1];
         	for(int i=0; i < result.length; i++){
         		result[i] = i==0? type.getSolverCommand() : parameters[i-1];
@@ -429,21 +434,21 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         }
 
         @Override
-        public String getSolverOutput() {       	
-        	
+        public String getSolverOutput() {
+
          		String output = "";
         		output+= "Result: "+ solverCommunication.getFinalResult().toString()+"\n\n";
-        		
+
         		for(String s : solverCommunication.getMessages()){
-        			
+
         			if(s.equals("endmodel")){
         				break;
         			}
-        			
-        			output += s+"\n";	
-        			
+
+        			output += s+"\n";
+
         		}
-        		
+
         		if(getSocket().getQuery()!=null){
         			ModelExtractor mq = getSocket().getQuery();
         			Model m = mq.getModel();
@@ -451,23 +456,23 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         				output += "\n\n";
         				output += m.toString();
         			}
-        			
-        			
-        			
-        		}		
-        		
+
+
+
+        		}
+
                 return output;
         }
 
         @Override
         public Collection<Throwable> getExceptionsOfTacletTranslation() {
-                
+
                 return exceptionsForTacletTranslation;
         }
 
 		@Override
         public AbstractSolverSocket getSocket() {
-	        
+
 	        return socket;
         }
 

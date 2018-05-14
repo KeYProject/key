@@ -27,6 +27,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     private List<Throwable> exceptions = Collections.emptyList();
 
+    private List<Throwable> tacletExceptions = Collections.emptyList();
+
     private HashSet<Sort> sorts = new HashSet<>();
 
     @Override
@@ -175,9 +177,11 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         // TODO: remove (u2i (i2u x)) --->  x
     }
 
+
+
     @Override
     public Collection<Throwable> getExceptionsOfTacletTranslation() {
-        return exceptions;
+        return tacletExceptions;
     }
 
 }
