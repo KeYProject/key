@@ -4,6 +4,7 @@ import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_CO
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -24,6 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
+import javax.swing.JViewport;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -785,10 +787,15 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             // activate the tab with the most recent file
             PositionInfo p = lines.isEmpty() ? null : lines.getFirst().pos;
             if (p != null) {
-                String s = files.get(p.getFileName()).getName();
+                File f = files.get(p.getFileName());
+                String s = f.getName();
                 for (int i = 0; i < tabs.getTabCount(); i++) {
                     if (tabs.getTitleAt(i).equals(s)) {
                         tabs.setSelectedIndex(i);
+
+                        // scroll to most recent highlight
+                        int line = lines.getFirst().pos.getEndPosition().getLine();
+                        scrollNestedTextPaneToLine(tabs.getComponent(i), line, f);
                     }
                 }
             }
@@ -797,6 +804,43 @@ public class ShowSymbExLinesAction extends MainWindowAction {
         }
         // set the path information in the status bar
         sourceStatusBar.setText(collectPathInformation(symbExNode));
+    }
+
+    /**
+     * Looks for a nested JTextPane in the component of the JTabbedPane.
+     * If it exists, JTextPane is scrolled to the given line.
+     * @param comp the component of a JTabbedPane
+     * @param line the line to scroll to
+     * @param f the file of the JTextPane
+     */
+    private void scrollNestedTextPaneToLine(Component comp, int line, File f) {
+        if (comp instanceof JScrollPane) {
+            JScrollPane sp = (JScrollPane)comp;
+            if (sp.getComponent(0) instanceof JViewport) {
+                JViewport vp = (JViewport)sp.getComponent(0);
+                if (vp.getComponent(0) instanceof JPanel) {
+                    JPanel panel = (JPanel)vp.getComponent(0);
+                    if (panel.getComponent(0) instanceof JTextPane) {
+                        JTextPane tp = (JTextPane)panel.getComponent(0);
+                        try {
+                            String original = IOUtil.readFrom(f);
+                            String source = replaceTabs(original);  // replace all tabs by spaces
+
+                            /* use input stream here to compute line information of the string with
+                             * replaced tabs
+                             */
+                            InputStream inStream = new ByteArrayInputStream(source.getBytes());
+                            LineInformation[] li = IOUtil.computeLineInformation(inStream);
+                            int offs = li[line].getOffset();
+                            tp.setCaretPosition(offs);
+                        }
+                        catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
