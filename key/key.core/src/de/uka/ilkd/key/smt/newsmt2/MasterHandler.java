@@ -10,6 +10,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
@@ -24,6 +25,8 @@ public class MasterHandler {
     private List<SExpr> axioms = new ArrayList<>();
 
     private Set<String> knownSymbols  = new HashSet<>();
+
+    private HashSet<Sort> sorts = new HashSet<>();
 
     public MasterHandler(Services services) {
 
@@ -147,5 +150,13 @@ public class MasterHandler {
 
     public List<SExpr> getAxioms() {
         return axioms;
+    }
+
+    public void addSort(Sort s) {
+        sorts.add(s);
+    }
+
+    public HashSet<Sort> getSorts() {
+        return sorts;
     }
 }

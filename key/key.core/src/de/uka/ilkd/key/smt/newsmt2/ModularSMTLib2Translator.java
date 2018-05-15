@@ -29,8 +29,6 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     private List<Throwable> tacletExceptions = Collections.emptyList();
 
-    private HashSet<Sort> sorts = new HashSet<>();
-
     @Override
     public StringBuffer translateProblem(Term problem, Services services, SMTSettings settings)
         throws IllegalFormulaException {
@@ -50,18 +48,18 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         sb.append("; --- Declarations\n\n");
 
         if (problem.arity() != 0) {
-            sorts.add(Sort.ANY);
-            addAllSorts(problem);
+            master.addSort(Sort.ANY);
+            addAllSorts(problem, master);
         }
 
         StringBuffer distinctSortSB = new StringBuffer();
         distinctSortSB.append("(assert (distinct ");
-        for (Sort s : sorts) {
+        for (Sort s : master.getSorts()) {
             sb.append("(declare-const " + SExpr.sortExpr(s) + " T)\n");
             distinctSortSB.append(SExpr.sortExpr(s) + " ");
         }
         distinctSortSB.append("))\n");
-        if (sorts.size() > 1) {
+        if (master.getSorts().size() > 1) {
             sb.append(distinctSortSB);
         }
         sb.append("\n");
@@ -92,8 +90,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     private void createSortTypeHierarchy(Term problem, Services services,
         MasterHandler master) {
 
-        for (Sort s : sorts) {
-            Set<Sort> children = directChildSorts(s, sorts);
+        for (Sort s : master.getSorts()) {
+            Set<Sort> children = directChildSorts(s, master.getSorts());
             for (Sort child : children) {
                 master.addAxiom(new SExpr("assert", new SExpr("subtype", SExpr.sortExpr(child), SExpr.sortExpr(s))));
                 for (Sort otherChild : children) {
@@ -105,7 +103,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             }
         }
         // if sort has no direct parents, make it a child of any
-        for (Sort s : sorts) {
+        for (Sort s : master.getSorts()) {
             if (!(s instanceof NullSort) && !(s.equals(Sort.ANY))) {
                 if (s.extendsSorts().isEmpty()) {
                     master.addAxiom(new SExpr("assert", new SExpr("subtype", SExpr.sortExpr(s), SExpr.sortExpr(Sort.ANY))));
@@ -114,11 +112,11 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
     }
 
-    private void addAllSorts(Term problem) {
+    private void addAllSorts(Term problem, MasterHandler master) {
         Sort s = problem.sort();
-        sorts.add(s);
+        master.addSort(s);
         for (Term t : problem.subs()) {
-            addAllSorts(t);
+            addAllSorts(t, master);
         }
     }
 
