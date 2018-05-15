@@ -2,20 +2,24 @@ package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 public class CastHandler implements SMTHandler {
 
+    private Services services;
+
     @Override
     public void init(Services services) {
-        // nothing to do here
+        this.services = services;
     }
 
     @Override
     public boolean canHandle(Term term) {
-        return term.op().toString().contains("cast"); //TODO igitt
+        SortDependingFunction dep = term.sort().getCastSymbol(services);
+        return term.op() instanceof SortDependingFunction && ((SortDependingFunction) (term.op())).isSimilar(dep);
     }
 
     @Override
