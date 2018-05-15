@@ -296,6 +296,14 @@ public interface Contract extends SpecificationElement {
         public final Map<LocationVariable, ProgramVariable> atPres;
         public final ImmutableList<ProgramVariable> params;
 
+        /**
+         * Create new instance of original variables
+         * @param selfVar the original self variable
+         * @param resVar the original result variable
+         * @param excVar the original exception variable
+         * @param atPreVars the original atPreVars
+         * @param paramVars the original parameter variables
+         */
         @SuppressWarnings("unchecked")
         public OriginalVariables(ProgramVariable selfVar, ProgramVariable resVar,
                 ProgramVariable excVar,
