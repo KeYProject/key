@@ -1102,6 +1102,9 @@ public class JMLSpecFactory {
      * @param textual
      *            textual representation
      * @throws SLTranslationException
+     *            translation exception
+     * @return
+     *            created {@link ClassAxiom}
      */
     public ClassAxiom createJMLClassAxiom(KeYJavaType kjt, TextualJMLClassAxiom textual)
             throws SLTranslationException {
@@ -1156,6 +1159,10 @@ public class JMLSpecFactory {
 
     /**
      * Creates operation contracts out of the passed JML specification.
+     * @param pm corresponding program method
+     * @param textualSpecCase textual representation of spec
+     * @throws SLTranslationException a translation exception
+     * @return created JML operation contracts
      */
     public ImmutableSet<Contract> createJMLOperationContracts(IProgramMethod pm,
             TextualJMLSpecCase textualSpecCase) throws SLTranslationException {
@@ -1250,7 +1257,7 @@ public class JMLSpecFactory {
             result = result.add(new PredicateAbstractionMergeContract(mps, atPres, kjt,
                     specs.getLatticeType(),
                     StreamSupport.stream(specs.getPredicates().spliterator(), true).map(
-                            t -> AbstractionPredicate.create(t, specs.getPlaceholder(), services))
+                        t -> AbstractionPredicate.create(t, specs.getPlaceholder(), services))
                             .collect(Collectors
                                     .toCollection(() -> new ArrayList<AbstractionPredicate>()))));
         } else {
@@ -1274,6 +1281,7 @@ public class JMLSpecFactory {
      *            the textual specification case.
      * @return a set of block contracts for a block from a textual specification case.
      * @throws SLTranslationException
+     *            translation exception
      */
     public ImmutableSet<BlockContract> createJMLBlockContracts(final IProgramMethod method,
             final List<Label> labels, final StatementBlock block,
@@ -1308,7 +1316,7 @@ public class JMLSpecFactory {
      * @param specificationCase
      *            the textual specification case.
      * @return a set of loop contracts for a block from a textual specification case.
-     * @throws SLTranslationException
+     * @throws SLTranslationException a translation exception
      */
     public ImmutableSet<LoopContract> createJMLLoopContracts(final IProgramMethod method,
             final List<Label> labels, final StatementBlock block,
@@ -1579,9 +1587,14 @@ public class JMLSpecFactory {
      * the methods passed is not a constructor. For an initially clause <tt>ini</tt> the resulting
      * contract looks like:<br>
      * <tt>requires true;<br>ensures ini;<br>signals (Exception) ini;<br>diverges true;</tt>
-     *
+     * @param ini
+     *            initially clause
      * @param pm
      *            constructor
+     * @return
+     *            the translated (functional operation) contract
+     * @throws SLTranslationException
+     *            a translation exception
      */
     public FunctionalOperationContract initiallyClauseToContract(InitiallyClause ini,
             IProgramMethod pm) throws SLTranslationException {

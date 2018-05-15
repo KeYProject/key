@@ -117,6 +117,7 @@ public abstract class AbstractPO implements IPersistablePO {
     /**
      * Generate well-definedness taclets to resolve formulas as
      * WD(pv.<inv>) or WD(pv.m(...)).
+     * @param proofConfig the proof configuration
      */
     void generateWdTaclets(InitConfig proofConfig) {
         if (!WellDefinednessCheck.isOn()) {
@@ -229,8 +230,10 @@ public abstract class AbstractPO implements IPersistablePO {
 
     /**
      * Generates the general assumption that self is created.
+     * @param heaps The heap context
      * @param pm The {@link IProgramMethod} to execute.
      * @param selfVar The self variable.
+     * @param services The services instance.
      * @return The term representing the general assumption.
      */
     protected Term generateSelfCreated(List<LocationVariable> heaps, IProgramMethod pm,
@@ -503,6 +506,10 @@ public abstract class AbstractPO implements IPersistablePO {
 
     /**
      * Creates a Proof (helper for getPO()).
+     * @param proofName name of the proof
+     * @param poTerm term of the proof obligation
+     * @param proofConfig the proof configuration
+     * @return the created proof
      */
     protected Proof createProof(String proofName,
             Term poTerm,

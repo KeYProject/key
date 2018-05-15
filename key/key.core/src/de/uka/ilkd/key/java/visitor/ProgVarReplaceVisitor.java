@@ -82,6 +82,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      *            the statement where the prog vars are replaced
      * @param map
      *            the HashMap with the replacements
+     * @param services
+     *            the services instance
      */
     public ProgVarReplaceVisitor(ProgramElement st,
             Map<ProgramVariable, ProgramVariable> map, Services services) {
@@ -100,6 +102,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      *            the HashMap with the replacements
      * @param replaceall
      *            decides if all variables are to be replaced
+     * @param services
+     *            the services instance
      */
     public ProgVarReplaceVisitor(ProgramElement st,
             Map<ProgramVariable, ProgramVariable> map, boolean replaceall,
@@ -150,6 +154,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     /**
      * the action that is performed just before leaving the node the last time
+     * @param node the node described above
      */
     protected void doAction(ProgramElement node) {
         node.visit(this);

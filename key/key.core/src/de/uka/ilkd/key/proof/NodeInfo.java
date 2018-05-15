@@ -203,6 +203,7 @@ public class NodeInfo {
      * returns the active statement of the JavaBlock the applied
      * rule has been matched against or null if no rule has been applied yet
      * or the applied rule was no taclet or program transformation rule
+     * @return active statement as described above
      */
     public SourceElement getActiveStatement() {
         determineFirstAndActiveStatement();
@@ -211,6 +212,7 @@ public class NodeInfo {
 
     /**
      * returns the branch label
+     * @return branch label
      */
     public String getBranchLabel() {
         return branchLabel;
@@ -221,6 +223,7 @@ public class NodeInfo {
      * occurs or the string <tt>NONE</tt> if the statement does not originate from a
      * source file (e.g. created by a taclet application or part of a
      * generated implicit method)
+     * @return name of source file as described above
      */
     public String getExecStatementParentClass() {
         determineFirstAndActiveStatement();
@@ -233,6 +236,7 @@ public class NodeInfo {
     /**
      * returns the position of the executed statement in its source code
      * or Position.UNDEFINED
+     * @return statement position as described above
      */
     public Position getExecStatementPosition() {
         determineFirstAndActiveStatement();
@@ -244,6 +248,7 @@ public class NodeInfo {
     /**
      * returns a string representation of the first statement or null if no such
      * exists
+     * @return string representation of first statement as described above
      */
     public String getFirstStatementString() {
         determineFirstAndActiveStatement();
@@ -319,12 +324,15 @@ public class NodeInfo {
     /**
      * returns true if the rule applied on this node has been performed
      * manually by the user
+     * @return boolean for interactive rule application as described above
      */
     public boolean getInteractiveRuleApplication() {
         return interactiveApplication;
     }
 
-    /** Add user-provided plain-text annotations. */
+    /** Add user-provided plain-text annotations.
+     * @param newNotes annotations as described above
+     */
     public void setNotes(String newNotes) {
         String oldNotes = notes;
         notes = newNotes;
@@ -333,7 +341,9 @@ public class NodeInfo {
         }
     }
 
-    /** Get user-provided plain-text annotations. */
+    /** Get user-provided plain-text annotations.
+     * @return annotations as described above
+     */
     public String getNotes() {
         return notes;
     }

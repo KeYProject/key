@@ -85,66 +85,27 @@ public class Statistics {
     Statistics(Node startNode) {
         final Iterator<Node> it = startNode.subtreeIterator();
 
-        int tmpNodes = 0; // proof nodes
-        int tmpBranches = 1; // proof branches
-        int tmpInteractive = 0; // interactive steps
-        int tmpSymbExApps = 0; // symbolic execution steps
-        int tmpQuant = 0; // quantifier instantiations
-        int tmpOss = 0; // OSS applications
-        int tmpMergeApps = 0; // merge rule applications
-        int tmpOssCaptured = 0; // rules apps in OSS protocol
-        int tmpSmt = 0; // SMT rule apps
-        int tmpDep = 0; // dependency contract apps
-        int tmpContr = 0; // functional contract apps
-        int tmpBlock = 0; // block and loop contract apps
-        int tmpInv = 0; // loop invariants
+        TemporaryStatistics tmp = new TemporaryStatistics();
 
         Node node;
         while (it.hasNext()) {
             node = it.next();
-            tmpNodes++;
-
-            tmpBranches = addTmpBranches(node, tmpBranches);
-            tmpInteractive =
-                    addInteractiveRuleApps(node, interactiveAppsDetails, tmpInteractive);
-            tmpSymbExApps += NodeInfo.isSymbolicExecutionRuleApplied(node) ? 1 : 0;
-
-            final RuleApp ruleApp = node.getAppliedRuleApp();
-            if (ruleApp != null) {
-                if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
-                    tmpOss++;
-                    tmpOssCaptured += adddTmpOssCaptured(ruleApp);
-                } else if (ruleApp instanceof de.uka.ilkd.key.smt.RuleAppSMT) {
-                    tmpSmt++;
-                } else if (ruleApp instanceof UseDependencyContractApp) {
-                    tmpDep++;
-                } else if (ruleApp instanceof ContractRuleApp) {
-                    tmpContr++;
-                } else if (ruleApp instanceof AbstractBlockSpecificationElementBuiltInRuleApp) {
-                    tmpBlock++;
-                } else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
-                    tmpInv++;
-                } else if (ruleApp instanceof MergeRuleBuiltInRuleApp) {
-                    tmpMergeApps++;
-                } else if (ruleApp instanceof TacletApp) {
-                    tmpQuant = addTmpQuant(ruleApp, tmpQuant);
-                }
-            }
+            tmp.changeOnNode(node, interactiveAppsDetails);
         }
 
-        this.nodes = tmpNodes;
-        this.branches = tmpBranches;
-        this.interactiveSteps = tmpInteractive;
-        this.symbExApps = tmpSymbExApps;
-        this.quantifierInstantiations = tmpQuant;
-        this.ossApps = tmpOss;
-        this.mergeRuleApps = tmpMergeApps;
-        this.totalRuleApps = tmpNodes + tmpOssCaptured - 1;
-        this.smtSolverApps = tmpSmt;
-        this.dependencyContractApps = tmpDep;
-        this.operationContractApps = tmpContr;
-        this.blockLoopContractApps = tmpBlock;
-        this.loopInvApps = tmpInv;
+        this.nodes = tmp.nodes;
+        this.branches = tmp.branches;
+        this.interactiveSteps = tmp.interactive;
+        this.symbExApps = tmp.symbExApps;
+        this.quantifierInstantiations = tmp.quant;
+        this.ossApps = tmp.oss;
+        this.mergeRuleApps = tmp.mergeApps;
+        this.totalRuleApps = tmp.nodes + tmp.ossCaptured - 1;
+        this.smtSolverApps = tmp.smt;
+        this.dependencyContractApps = tmp.dep;
+        this.operationContractApps = tmp.contr;
+        this.blockLoopContractApps = tmp.block;
+        this.loopInvApps = tmp.inv;
         this.autoModeTimeInMillis = startNode.proof().getAutoModeTime();
         this.timeInMillis = (System.currentTimeMillis() - startNode.proof().creationTime);
         timePerStepInMillis = nodes <= 1 ? .0f : (autoModeTimeInMillis / (float)(nodes - 1));
@@ -173,52 +134,6 @@ public class Statistics {
                               side.autoModeTimeInMillis,
                               System.currentTimeMillis() - creationTime,
                               side.timePerStepInMillis);
-    }
-
-    private static int addTmpBranches(final Node node, int tmpBranches) {
-        final int c = node.childrenCount();
-        if (c > 1) {
-            tmpBranches += c - 1;
-        }
-        return tmpBranches;
-    }
-
-    private static int addInteractiveRuleApps(final Node node,
-                                              final HashMap<String, Integer>
-                                                        intAppsDetails,
-                                              int tmpInteractive) {
-        if (node.getNodeInfo().getInteractiveRuleApplication()) {
-            tmpInteractive++;
-            final String ruleAppName =
-                    node.getAppliedRuleApp().rule().name().toString();
-            if (!intAppsDetails.containsKey(ruleAppName)) {
-                intAppsDetails.put(ruleAppName, 1);
-            } else {
-                intAppsDetails.put(ruleAppName, intAppsDetails.get(ruleAppName) + 1);
-            }
-        }
-        return tmpInteractive;
-    }
-
-    private static int adddTmpOssCaptured(final RuleApp ruleApp) {
-        int tmpOssCaptured = 0;
-        final Protocol protocol =
-                ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
-        if (protocol != null) {
-            tmpOssCaptured = protocol.size() - 1;
-        }
-        return tmpOssCaptured;
-    }
-
-    private static int addTmpQuant(final RuleApp ruleApp, int tmpQuant) {
-        final String tName =
-                ((TacletApp)ruleApp).taclet().name().toString();
-        if (tName.startsWith("allLeft")
-                || tName.startsWith("exRight")
-                || tName.startsWith("inst")) {
-            tmpQuant++;
-        }
-        return tmpQuant;
     }
 
     private void generateSummary(Proof proof) {
@@ -312,4 +227,132 @@ public class Statistics {
         return sb.toString();
     }
 
+    /**
+     * Helper class to add up all rule applications for some nodes
+     * @author Michael Kirsten
+     */
+    private class TemporaryStatistics {
+        int nodes = 0; // proof nodes
+        int branches = 1; // proof branches
+        int interactive = 0; // interactive steps
+        int symbExApps = 0; // symbolic execution steps
+        int quant = 0; // quantifier instantiations
+        int oss = 0; // OSS applications
+        int mergeApps = 0; // merge rule applications
+        int ossCaptured = 0; // rules apps in OSS protocol
+        int smt = 0; // SMT rule apps
+        int dep = 0; // dependency contract apps
+        int contr = 0; // functional contract apps
+        int block = 0; // block and loop contract apps
+        int inv = 0; // loop invariants
+
+        /**
+         * Increment numbers of rule applications according to given node
+         * and (already collected) interactive rule applications
+         * @param node the given node
+         * @param interactiveAppsDetails already collected interactive rule applications
+         */
+        private void changeOnNode(final Node node,
+                                  final HashMap<String, Integer> interactiveAppsDetails) {
+            nodes++;
+
+            branches += childBranches(node);
+            interactive += interactiveRuleApps(node, interactiveAppsDetails);
+            symbExApps += NodeInfo.isSymbolicExecutionRuleApplied(node) ? 1 : 0;
+
+            final RuleApp ruleApp = node.getAppliedRuleApp();
+            if (ruleApp != null) {
+                if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
+                    oss++;
+                    ossCaptured += tmpOssCaptured(ruleApp);
+                } else if (ruleApp instanceof de.uka.ilkd.key.smt.RuleAppSMT) {
+                    smt++;
+                } else if (ruleApp instanceof UseDependencyContractApp) {
+                    dep++;
+                } else if (ruleApp instanceof ContractRuleApp) {
+                    contr++;
+                } else if (ruleApp instanceof AbstractBlockSpecificationElementBuiltInRuleApp) {
+                    block++;
+                } else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
+                    inv++;
+                } else if (ruleApp instanceof MergeRuleBuiltInRuleApp) {
+                    mergeApps++;
+                } else if (ruleApp instanceof TacletApp) {
+                    quant += tmpQuantificationRuleApps(ruleApp);
+                }
+            }
+        }
+
+        /**
+         * Add the node's children's branches (minus one) to current number of branches
+         * @param node the node of which we compute its children's branches
+         * @return the children's branches minus one
+         */
+        private int childBranches(final Node node) {
+            final int c = node.childrenCount();
+            if (c > 1) {
+                return c - 1;
+            }
+            return 0;
+        }
+
+        /**
+         * Compute number of interactive rule applications and collect their names.
+         * @param node the considered node
+         * @param intAppsDetails the already collected interactive rule applications
+         * @return the number of interactive rule apllications
+         */
+        private int interactiveRuleApps(final Node node,
+                                        final HashMap<String, Integer>
+                                                  intAppsDetails) {
+            final int res;
+            if (node.getNodeInfo().getInteractiveRuleApplication()) {
+                res = 1;
+                final String ruleAppName =
+                        node.getAppliedRuleApp().rule().name().toString();
+                if (!intAppsDetails.containsKey(ruleAppName)) {
+                    intAppsDetails.put(ruleAppName, 1);
+                } else {
+                    intAppsDetails.put(ruleAppName, intAppsDetails.get(ruleAppName) + 1);
+                }
+            } else {
+                res = 0;
+            }
+            return res;
+        }
+
+        /**
+         * Compute number of available one-step-simplification rules
+         * @param ruleApp the rule application considered
+         * @return the number of captured oss rule applications
+         */
+        private int tmpOssCaptured(final RuleApp ruleApp) {
+            int tmpOssCaptured = 0;
+            final Protocol protocol =
+                    ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
+            if (protocol != null) {
+                tmpOssCaptured = protocol.size() - 1;
+            }
+            return tmpOssCaptured;
+        }
+
+        /**
+         * Compute all rule applications regarding quantifiers
+         * @param ruleApp the considered rule application
+         * @return the number of quantifier rules
+         */
+        private int tmpQuantificationRuleApps(final RuleApp ruleApp) {
+            final int res;
+            final String tName =
+                    ((TacletApp)ruleApp).taclet().name().toString();
+            if (tName.startsWith("allLeft")
+                    || tName.startsWith("exRight")
+                    || tName.startsWith("inst")) {
+                res = 1;
+            } else {
+                res = 0;
+            }
+            return res;
+        }
+    }
 }

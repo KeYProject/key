@@ -131,6 +131,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * @param root the ProgramElement where to begin
      * @param outerLabel the ProgramElementName of the outer label
      * @param innerLabel the ProgramElementName of the inner label
+     * @param services services instance
      */
     public WhileLoopTransformation(ProgramElement root,
                                    ProgramElementName outerLabel,
@@ -148,6 +149,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     /** creates the  WhileLoopTransformation for the check mode
      * @param root the ProgramElement where to begin
      * @param inst the SVInstantiations if available
+     * @param services services instance
      */
     public WhileLoopTransformation(ProgramElement root,
                                    SVInstantiations inst,
@@ -188,12 +190,16 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         return innerBlockStatements;
     }
 
-    /** returns true if an inner label is needed */
+    /** returns true if an inner label is needed
+     * @return boolean as described above
+     */
     public boolean innerLabelNeeded() {
         return needInnerLabel;
     }
 
-    /** returns true if an outer label is needed */
+    /** returns true if an outer label is needed
+     * @return boolean as described above
+     */
     public boolean outerLabelNeeded() {
         return needOuterLabel;
     }
@@ -201,6 +207,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
     /** the action that is performed just before leaving the node the
      * last time
+     * @param node respective node as program element
      */
     protected void doAction(ProgramElement node) {
         if (runMode == CHECK) {
@@ -270,6 +277,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
     /** the implemented default action is called if a program element is,
      * and if it has children all its children too are left unchanged
+     * @param x source element
      */
     protected void doDefaultAction(SourceElement x) {
         addChild(x);
@@ -553,6 +561,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     *     }
     *  }
     *
+    * @param x For loop statement
     */
     public void performActionOnFor(For x) {
         ExtList changeList = stack.peek();
@@ -622,6 +631,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * If it is a loop deeper in the AST a new object is created if
      * needed or the original loop returned.
      *
+     * @param x EnhancedFor loop statement
      * @author mulbrich
      */
     public void performActionOnEnhancedFor(EnhancedFor x) {

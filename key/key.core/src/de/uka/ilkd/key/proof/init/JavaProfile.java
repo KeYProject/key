@@ -194,6 +194,7 @@ public class JavaProfile extends AbstractProfile {
      * returns a new instance of a {@link ComplexRuleJustification} otherwise the rule
      * justification determined by the super class is returned
      *
+     * @param r the rule described above
      * @return justification for the given rule
      */
     public RuleJustification getJustification(Rule r) {
@@ -208,6 +209,7 @@ public class JavaProfile extends AbstractProfile {
 
     /**
      * the name of the profile
+     * @return the name
      */
     public String name() {
         return permissions ? NAME_WITH_PERMISSIONS : NAME;
@@ -215,6 +217,7 @@ public class JavaProfile extends AbstractProfile {
 
     /**
      * the default strategy factory to be used
+     * @return the default strategy factory
      */
     public StrategyFactory getDefaultStrategyFactory() {
         return DEFAULT;
@@ -229,6 +232,7 @@ public class JavaProfile extends AbstractProfile {
      * Other instances of this class are typically only required to
      * use them in different {@link Thread}s (not the UI {@link Thread}).
      * </p>
+     * @param perms boolean to decide whether we use permissions
      * @return The default instance for usage in the {@link Thread} of the user interface.
      */
     public static synchronized JavaProfile getDefaultInstance(boolean perms) {

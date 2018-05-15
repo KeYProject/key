@@ -76,7 +76,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
 (builtin "One Step Simplification" (formula "4"))
 (rule "methodBodyExpand" (formula "4") (term "1") (newnames "heapBefore_magic,savedHeapBefore_magic"))
 (builtin "One Step Simplification" (formula "4"))
-(builtin "Block Contract" (formula "4") (newnames "anon_heap,result_0,exc_0,heap_Before_BLOCK,savedHeap_Before_BLOCK,o,f"))
+(builtin "Block Contract (Internal)" (formula "4") (newnames "anon_heap,result_0,exc_0,heap_Before_BLOCK,savedHeap_Before_BLOCK,o,f"))
 (branch "Validity"
    (builtin "One Step Simplification" (formula "5"))
    (builtin "One Step Simplification" (formula "4") (ifInst ""  (formula "1")))

@@ -641,7 +641,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param formalParVars Arguments from formal parameters for method call.
      * @param selfVar The self variable.
      * @param resultVar The result variable.
-     * @param services TODO
+     * @param services services instance
+     * @return operation blocks as statement blocks
      */
     protected abstract ImmutableList<StatementBlock> buildOperationBlocks(
             ImmutableList<LocationVariable> formalParVars,
@@ -655,6 +656,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param selfKJT The {@link KeYJavaType} of the self variable.
      * @param paramVars The parameters {@link ProgramVariable}s.
      * @param heaps The heaps.
+     * @param services The services instance.
      * @return The {@link Term} containing the general assumptions.
      */
     protected Term buildFreePre(ProgramVariable selfVar,
@@ -784,6 +786,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param formalParamVars The formal parameters {@link LocationVariable}s.
      * @param exceptionVar The exception variable.
      * @param name The name of the uninterpreted predicate.
+     * @param services services instance.
      * @return The created uninterpreted predicate.
      */
     protected Term ensureUninterpretedPredicateExists(ImmutableList<ProgramVariable> paramVars,
@@ -807,6 +810,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param formalParamVars The formal parameters {@link LocationVariable}s.
      * @param exceptionVar The exception variable.
      * @param name The name of the uninterpreted predicate.
+     * @param services services instance.
      * @return The created uninterpreted predicate.
      */
     protected Term newAdditionalUninterpretedPredicate(
@@ -825,6 +829,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param formalParamVars The formal parameters {@link LocationVariable}s.
      * @param exceptionVar The exception variable.
      * @param name The name of the uninterpreted predicate.
+     * @param services services instance.
      * @return The created uninterpreted predicate.
      */
     protected Term createUninterpretedPredicate(ImmutableList<LocationVariable> formalParamVars,
@@ -859,7 +864,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param heapToAtPre The previous heap before execution.
      * @param selfVar The self variable.
      * @param paramVars The parameters {@link ProgramVariable}s.
-     * @param services TODO
+     * @param services services instance
      * @return The created {@link Term} representing the frame clause.
      */
     protected abstract Term buildFrameClause(List<LocationVariable> modHeaps,
@@ -871,7 +876,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * Creates the {@link Term} which contains the modality including
      * the complete program to execute.
      * @param paramVars Formal parameters of method call.
-     * @param formalParVars Arguments from formal parameters for method call.
+     * @param formalParamVars Arguments from formal parameters for method call.
      * @param selfVar The self variable.
      * @param resultVar The result variable.
      * @param exceptionVar The {@link ProgramVariable} used to store caught exceptions.
@@ -879,6 +884,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      *        {@link LocationVariable} which contains the initial value.
      * @param postTerm The post condition.
      * @param sb The {@link StatementBlock} to execute in try block.
+     * @param services services instance.
      * @return The created {@link Term}.
      */
     protected Term buildProgramTerm(ImmutableList<ProgramVariable> paramVars,
@@ -914,6 +920,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
     /**
      * Returns the base heap.
+     * @param services services instance.
      * @return The {@link LocationVariable} of the base heap.
      */
     protected LocationVariable getBaseHeap(Services services) {
@@ -922,6 +929,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
     /**
      * Returns the saved heap.
+     * @param services services instance.
      * @return The {@link LocationVariable} of the saved heap.
      */
     protected LocationVariable getSavedHeap(Services services) {
@@ -1010,17 +1018,17 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
     /**
      * Returns the {@link Modality} to use as termination marker.
-     * @returnT he {@link Modality} to use as termination marker.
+     * @return The {@link Modality} to use as termination marker.
      */
     protected abstract Modality getTerminationMarker();
 
     /**
      * Builds the initial updates.
      * @param paramVars Formal parameters of method call.
+     * @param formalParamVars Arguments from formal parameters for method call.
      * @param atPreVars Mapping of {@link LocationVariable} to the
      *        {@link LocationVariable} which contains the initial value.
-     * @param services TODO
-     * @param formalParVars Arguments from formal parameters for method call.
+     * @param services The services instance.
      * @return The {@link Term} representing the initial updates.
      */
     protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,

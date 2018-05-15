@@ -48,6 +48,13 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
         this.block = block;
     }
 
+    /**
+     * Creates a contract to check well-definedness of a block contract
+     * @param block the block belonging to the block contract
+     * @param variables the variables of the block contract
+     * @param params the parameters of the block
+     * @param services the services instance
+     */
     public BlockWellDefinedness(BlockContract block, BlockContract.Variables variables,
                                 ImmutableSet<ProgramVariable> params,
                                 Services services) {

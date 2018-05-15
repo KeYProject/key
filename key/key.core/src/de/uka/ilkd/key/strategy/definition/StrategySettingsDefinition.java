@@ -249,6 +249,9 @@ public class StrategySettingsDefinition {
      * @param defaultPropertiesFactory
      *            The {@link IDefaultStrategyPropertiesFactory} used to create
      *            default {@link StrategyProperties}.
+     * @param furtherDefaults
+     *            further defaults used to create
+     *            default {@link StrategyProperties}.
      * @param properties
      *            Defines the controls to edit {@link StrategyProperties}.
      */

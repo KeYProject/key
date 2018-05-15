@@ -1045,17 +1045,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final ProjectionToTerm splitCondition = sub(FocusProjection.INSTANCE, 0);
         bindRuleSet(d,
                     "split_cond",
-                    add(// do not split over formulas containing auxiliary
-                        // variables
+                    add(// do not split over formulas containing auxiliary variables
                         applyTF(FocusProjection.INSTANCE,
-                                rec(any(),
-                                    not(IsSelectSkolemConstantTermFeature.INSTANCE))),
+                                rec(any(), not(IsSelectSkolemConstantTermFeature.INSTANCE))),
                         // prefer splits when condition has quantifiers (less
                         // likely to be simplified away)
                         applyTF(splitCondition,
                                 rec(ff.quantifiedFor,
-                                        ifZero(ff.quantifiedFor,
-                                                longTermConst(-10)))),
+                                        ifZero(ff.quantifiedFor, longTermConst(-10)))),
                         FindDepthFeature.INSTANCE, // prefer top level splits
                         ScaleFeature.createAffine(countOccurrences(splitCondition), -10, 10),
                         sum(superF, SuperTermGenerator.upwards(any(), getServices()),
@@ -1077,37 +1074,28 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                         ifZero(NotBelowQuantifierFeature.INSTANCE,
                                add(applyTF(cutFormula,
                                        add(ff.cutAllowed,
-                                           // do not cut over
-                                           // formulas containing
+                                           // do not cut over formulas containing
                                            // auxiliary variables
                                            rec(any(),
                                                not(IsSelectSkolemConstantTermFeature.INSTANCE)))),
-                                   // prefer cuts over
-                                   // "something = null"
+                                   // prefer cuts over "something = null"
                                    ifZero(applyTF(FocusProjection.INSTANCE,
                                               opSub(tf.eq, any(), vf.nullTerm)),
-                                          longConst(-5),
-                                          longConst(0)),
-                                   // punish cuts over formulas
-                                   // containing anon heap
-                                   // functions
+                                          longConst(-5), longConst(0)),
+                                   // punish cuts over formulas containing anon heap functions
                                    ifZero(applyTF(cutFormula,
-                                              rec(any(),
-                                                  not(AnonHeapTermFeature.INSTANCE))),
-                                          longConst(0),
-                                          longConst(1000)),
+                                              rec(any(), not(AnonHeapTermFeature.INSTANCE))),
+                                          longConst(0), longConst(1000)),
                                    countOccurrencesInSeq, // standard costs
                                    longConst(100)),
                                SumFeature // check for cuts below quantifiers
                                    .createSum(
                                        new Feature[] {
-                                           applyTF(cutFormula,
-                                               ff.cutAllowedBelowQuantifier),
+                                           applyTF(cutFormula, ff.cutAllowedBelowQuantifier),
                                            applyTF(FocusFormulaProjection.INSTANCE,
                                                ff.quantifiedClauseSet),
                                            ifZero(allowQuantifierSplitting(),
-                                                  longConst(0),
-                                                  longConst(100))}))}));
+                                                  longConst(0), longConst(100))}))}));
     }
 
     private void setupSplittingApproval(RuleSetDispatchFeature d) {
@@ -2610,8 +2598,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private RuleSetDispatchFeature setupApprovalDispatcher() {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-        final IntegerLDT numbers =
-                getServices().getTypeConverter().getIntegerLDT();
+        final IntegerLDT numbers = getServices().getTypeConverter().getIntegerLDT();
 
         if (arithNonLinInferences()) {
             setupMultiplyInequations(d, inftyConst());
@@ -2639,8 +2626,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupNewSymApproval(d, numbers);
 
         bindRuleSet(d, "defOps_div", NonDuplicateAppModPositionFeature.INSTANCE);
-        bindRuleSet(d, "defOps_jdiv",
-                NonDuplicateAppModPositionFeature.INSTANCE);
+        bindRuleSet(d, "defOps_jdiv", NonDuplicateAppModPositionFeature.INSTANCE);
 
         if (arithNonLinInferences()) {
             setupInEqCaseDistinctionsApproval(d);
@@ -2679,8 +2665,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                         add(SimplifiedSelectTermFeature
                                                 .create(heapLDT),
                                                 not(ff.ifThenElse)))),
-                        not(ContainsTermFeature.create(instOf("s"),
-                                instOf("t1")))));
+                        not(ContainsTermFeature.create(instOf("s"), instOf("t1")))));
 
         return d;
     }
@@ -2808,7 +2793,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     /**
      * Evaluate the cost of a <code>RuleApp</code>.
-     *
+     * @param app rule application
+     * @param pio corresponding {@link PosInOccurrence}
+     * @param goal corresponding goal
      * @return the cost of the rule application expressed as a
      *         <code>RuleAppCost</code> object.
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule
@@ -2822,7 +2809,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     /**
      * Re-Evaluate a <code>RuleApp</code>. This method is called immediately
      * before a rule is really applied
-     *
+     * @param app the rule application
+     * @param pio the position in occurrence
+     * @param goal the goal
      * @return true iff the rule should be applied, false otherwise
      */
     public final boolean isApprovedApp(RuleApp app, PosInOccurrence pio,

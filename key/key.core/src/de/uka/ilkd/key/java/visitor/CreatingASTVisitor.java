@@ -157,6 +157,10 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
      *
      * @param root
      *            the ProgramElement where to begin
+     * @param preservesPos
+     *            whether the position should be preserved
+     * @param services
+     *            the services instance
      */
     public CreatingASTVisitor(ProgramElement root, boolean preservesPos,
             Services services) {
@@ -181,6 +185,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     /**
      * called if the program element x is unchanged
+     * @param x The {@link SourceElement}.
      */
     protected void doDefaultAction(SourceElement x) {
         addChild(x);
@@ -1405,6 +1410,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     /**
      * returns the position of pe2 in the virtual child array of pe1
+     * @param pe1 A {@link NonTerminalProgramElement}
+     * @param pe2 A {@link ProgramElement}
+     * @return pe2's position in pe1
      */
     protected static int getPosition(NonTerminalProgramElement pe1,
             ProgramElement pe2) {

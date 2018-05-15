@@ -97,6 +97,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 
     /** the action that is performed just before leaving the node the
      * last time
+     * @param node the node described above
      */
     protected abstract void doDefaultAction(SourceElement node);
 
