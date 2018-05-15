@@ -10,7 +10,7 @@
                <statement name="int y = 3;" pathCondition="true" pathConditionChanged="false">
                   <callStackEntry path="/0"/>
                   <blockContract name="main()) catch(exc_0)
-pre x_2 = 2
+pre measuredByEmpty &amp; x_2 = 2
 post exc_0 = null &amp; x_2 = -2
 mod {}termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true">
                      <callStackEntry path="/0"/>

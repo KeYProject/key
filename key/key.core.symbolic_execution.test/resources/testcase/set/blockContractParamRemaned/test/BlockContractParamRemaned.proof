@@ -83,7 +83,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
 (builtin "One Step Simplification" (formula "3"))
 (rule "assignment" (formula "3") (term "1"))
 (builtin "One Step Simplification" (formula "3"))
-(builtin "Block Contract (Internal)" (formula "3") (newnames "anon_heap,result_0,exc_0,heap_Before_BLOCK,savedHeap_Before_BLOCK,x_Before_BLOCK,o,f,x_3_0,anon_x_3"))
+(builtin "Block Contract (Internal)" (formula "3") (newnames "anon_heap,result_0,exc_0,heap_Before_BLOCK,savedHeap_Before_BLOCK,x_Before_BLOCK,o,f,anon_x_3"))
 (branch "Validity"
    (builtin "One Step Simplification" (formula "4"))
    (builtin "One Step Simplification" (formula "3") (ifInst ""  (formula "1")))
