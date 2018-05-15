@@ -28,9 +28,12 @@ public class SelectHandler implements SMTHandler {
         SExpr se1 = trans.translate(term.sub(0));
         SExpr se2 = trans.translate(term.sub(1));
         SExpr se3 = trans.translate(term.sub(2));
+        trans.addSort(term.sub(0).sort());
+        trans.addSort(term.sub(1).sort());
+        trans.addSort(term.sub(2).sort());
 
         if (!trans.isKnownSymbol(funName)) {
-            trans.addAxiom(UninterpretedSymbolsHandler.funTypeAxiomFromTerm(term, funName));
+            trans.addAxiom(UninterpretedSymbolsHandler.funTypeAxiomFromTerm(term, funName, trans));
             trans.addKnownSymbol(funName);
         }
 
