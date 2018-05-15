@@ -61,14 +61,14 @@ import de.uka.ilkd.key.util.Debug;
  * standards. Formulas are translated in a correct, but not always complete
  * representation of the target standard. Non-first-order elements in a formula
  * are translated as uninterpreted predicates.
- * 
+ *
  * The translation for standards supporting multiple sorts is oriented on the
  * paper
  * "The Boogie 2 Type System: Design and Verification Condition Generation" by
  * Leino and Ruemmer.
- * 
+ *
  * @author Simon Greiner
- * 
+ *
  */
 public abstract class AbstractSMTTranslator implements SMTTranslator {
 
@@ -81,19 +81,19 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                  */
                 private final boolean supportsOnlySimpleMultiplication;
                 private final boolean hasNumberLimit;
-                
+
                 /**
                  * Used for SMT2 format: if true the (set-logic AUFLIA) command is used otherwise
-                 * the logic is not set. For instance Z3 then uses automatically the appropriate 
-                 * logic. 
+                 * the logic is not set. For instance Z3 then uses automatically the appropriate
+                 * logic.
                  */
                 private final boolean mentionLogic;
 
 
                 public Configuration(boolean supportsOnlySimpleMultiplication, boolean mentionLogic) {
-                        this(supportsOnlySimpleMultiplication,false,mentionLogic);                       
+                        this(supportsOnlySimpleMultiplication,false,mentionLogic);
                 }
-                
+
                 public Configuration(boolean supportsOnlySimpleMultiplication,boolean hasNumberLimit,
                 					 boolean mentionLogic) {
                         super();
@@ -104,7 +104,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 public boolean hasNumberLimit(){
                         return hasNumberLimit;
                 }
-                
+
                 public boolean mentionLogic() {
 					return mentionLogic;
 				}
@@ -112,7 +112,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
 
         private final TermBuilder tb; // TODO: Rename
-        
+
         private int nameCounter =0;
 
         private Sort integerSort;
@@ -169,19 +169,19 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
 
         }
-        
+
         //key is the term to identify the bsum, value is the name used for that function.
         private final HashMap<Term, StringBuffer> usedBsumTerms = new LinkedHashMap<Term, StringBuffer>();
 
         //key is the term to identify the bprod, value is the name used for that function.
         private final HashMap<Term, StringBuffer> usedBprodTerms = new LinkedHashMap<Term, StringBuffer>();
-        
+
         //key is the term to identify the function binding vars, value is the name used for the function
         private HashMap<Term, StringBuffer> uninterpretedBindingFunctionNames = new LinkedHashMap<Term, StringBuffer>();
-        
+
         //key is the term to identify the predicate binding vars, value is the name used for the predicate
         private HashMap<Term, StringBuffer> uninterpretedBindingPredicateNames = new LinkedHashMap<Term, StringBuffer>();
-        
+
         private HashMap<Operator, ArrayList<Sort>> functionDecls = new LinkedHashMap<Operator, ArrayList<Sort>>();
 
         private HashSet<Function> specialFunctions = new LinkedHashSet<Function>();
@@ -245,9 +245,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         private Function multiplicationFunction = null;
 
         private static final String BSUM_STRING = "bsum";
-        
+
         private static final String BPROD_STRING = "bprod";
-        
+
         public TacletSetTranslation getTacletSetTranslation() {
                 return tacletSetTranslation;
         }
@@ -255,7 +255,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /**
          * Just a constructor which starts the conversion to Simplify syntax.
          * The result can be fetched with
-         * 
+         *
          * @param sequent
          *                The sequent which shall be translated.
          * @param services
@@ -273,14 +273,15 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /**
          * For translating only terms and not complete sequents. The service
          * object to be used.
-         * 
+         *
          * @param s
-         * 
+         *
          */
         public AbstractSMTTranslator(Services s, Configuration config) {
                 this(null, s, config);
         }
 
+        @Override
         public final StringBuffer translateProblem(Term problem,
                         Services services, SMTSettings settings)
                         throws IllegalFormulaException {
@@ -289,7 +290,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 new Vector<QuantifiableVariable>(), services);
 
                 // add one variable for each sort
-                for (Sort s : this.usedRealSort.keySet()) {                 
+                for (Sort s : this.usedRealSort.keySet()) {
                    if(!s.equals(Sort.FORMULA)){
                         LogicVariable l = new LogicVariable(new Name("dummy_"
                                         + s.name().toString()), s);
@@ -312,7 +313,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         protected final SMTSettings getSettings() {
                 return smtSettings;
         }
-        
+
         public Configuration getConfig() {
 			return config;
 		}
@@ -335,7 +336,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * get the assumptions made by the logic.
-         * 
+         *
          * @param services
          *                the services object to be used.
          * @param assumptionTypes
@@ -420,13 +421,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 assumptionTypes.add(new ContextualBlock(start,
                                 toReturn.size() - 1,
                                 ContextualBlock.ASSUMPTION_MULTIPLICATION));
-     
+
                 return toReturn;
         }
 
         /**
          * build the formulas, that make sure, special functions keep typing
-         * 
+         *
          * @return ArrayList of formulas, assuring the assumption.
          */
         private ArrayList<StringBuffer> getSpecialSortPredicates(
@@ -518,7 +519,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /**
          * Build the sorthierarchy for the sorts If null was used, add
          * typepredicates for all types.
-         * 
+         *
          * @return a sort hierarchy for the sorts
          */
         private SortHierarchy buildSortHierarchy(Services services,
@@ -534,7 +535,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /**
          * Get the expression for that defines the typepredicates for sort
          * hierarchy. Also the null type is added to the formula if used before.
-         * 
+         *
          * @return The well defined formula.
          */
         private ArrayList<StringBuffer> getSortHierarchyPredicates(
@@ -602,7 +603,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * Returns a set of formula s, that defines the resulttypes of
          * functions, all constants and other elements (i.e. constant number
          * symbols).
-         * 
+         *
          * @return see above
          */
         private ArrayList<StringBuffer> getTypeDefinitions() {
@@ -620,7 +621,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 toReturn.add(currentForm);
                         }
                 }
-                
+
                 // add the type predicates for constant values like number
                 // symbols
                 if (!this.isMultiSorted()) {
@@ -635,7 +636,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /**
          * Get the type predicate definition for a given function. If the result
          * type is of some int type, empty StringBuffer is returned.
-         * 
+         *
          * @param funName
          *                the name of the function.
          * @param sorts
@@ -649,13 +650,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 /*
                  * given: the name of a function and its sorts.
-                 * 
+                 *
                  * in case of MultiSort-mode: if the functions result is of some
                  * non-integer type returned: for all
                  * tvar1:displaysort1,...,tvarn:displaysortn :
                  * [type_of_sort1(tvar1) AND ... type_of_sortn(tvarn)] implies
                  * type_of_n+1(funcName(tvar1, ..., tvarn))
-                 * 
+                 *
                  * if one of the arguments are of sort int, skip their type
                  * atrribute. if all of them are, skip lefthandside of the
                  * implication
@@ -758,7 +759,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * Build the translated function declarations. Each element in the
          * ArrayList represents (functionname | argType1 | ... | argTypen|
          * resultType)
-         * 
+         *
          * @return structured List of declaration.
          */
         private ArrayList<ArrayList<StringBuffer>> buildTranslatedFuncDecls(TermServices services) {
@@ -778,7 +779,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         toReturn.add(element);
                 }
 
-                
+
                 // add the type definitions for the bsum function symbols
                 for (StringBuffer sb: usedBsumTerms.values()) {
                     ArrayList<StringBuffer> element = new ArrayList<StringBuffer>();
@@ -788,7 +789,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     element.add(usedDisplaySort.get(integerSort));
                     toReturn.add(element);
                 }
-                
+
                  // add the type definitions for the bprod function symbols
                 for (StringBuffer sb: usedBprodTerms.values()) {
                     ArrayList<StringBuffer> element = new ArrayList<StringBuffer>();
@@ -798,7 +799,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     element.add(usedDisplaySort.get(integerSort));
                     toReturn.add(element);
                 }
-                
+
                 // add the type definition for uninterpreted binding functions
                 for (Term t: uninterpretedBindingFunctionNames.keySet()) {
                     ArrayList<StringBuffer> element = new ArrayList<StringBuffer>();
@@ -827,11 +828,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                             }
                         }
                     }
-                    
+
                     element.add(usedDisplaySort.get(f.sort()));
                     toReturn.add(element);
                 }
-                
+
                 /*
                  * if (this.nullUsed) { //add the null constant to the
                  * declarations ArrayList<StringBuffer> a = new
@@ -856,7 +857,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /**
          * Build the translated predicate declarations. Each element in the
          * ArrayList represents (predicatename | argType1 | ... | argTypen)
-         * 
+         *
          * @return structured List of declaration.
          */
         private ArrayList<ArrayList<StringBuffer>> buildTranslatedPredDecls(
@@ -884,7 +885,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                             element.add(usedDisplaySort.get(t.sub(i).sort()));
                         }
                     }
-                    
+
                     //add the sort definitions for the free variables of the bound terms
                     for (int j = 0; j < t.op().arity(); j++) {
                         if (t.op().bindVarsAt(j)) {
@@ -903,15 +904,15 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                             }
                         }
                     }
-                    
-                    
+
+
                     toReturn.add(element);
                 }
-                
+
                 predicateTypes.add(new ContextualBlock(start,
                                 toReturn.size() - 1,
                                 ContextualBlock.PREDICATE_FORMULA));
-                
+
                 // add the typePredicates
 
                 start = toReturn.size();
@@ -939,7 +940,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /**
          * ArrayList of all sorts, that were used as sorts. Including the
          * integer sort.
-         * 
+         *
          * @return ArrayList of the names of sorts.
          */
         private ArrayList<StringBuffer> buildTranslatedSorts() {
@@ -986,8 +987,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
                 return distinct;
         }
-        
-     
+
+
 
         private Term createLogicalVar(TermServices services, String baseName,
                         Sort sort) {
@@ -1059,12 +1060,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
                 return result;
         }
-        
+
         private ArrayList<StringBuffer> buildAssumptionsForSorts(TermServices services){
         	ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
         	if(this.isMultiSorted()){
          		for(Sort sort : usedRealSort.keySet()){
-         	
+
          		//Do not add Assumptions for Boolean or integer sorts
              		if(!isSomeIntegerSort(sort) && sort != Sort.FORMULA ){
              			Term var = createLogicalVar(services, "x", sort);
@@ -1074,9 +1075,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
              			StringBuffer assumption = translateLogicalExist(sVar, this.standardSort, typePredicate);
              			result.add(assumption);
              		}
-        		}	
+        		}
         	}
-        	return result;        	
+        	return result;
         }
 
         private HashMap<Long, StringBuffer> getRightConstantContainer(
@@ -1126,7 +1127,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * Build the text, that can be read by the final decider. If the
          * assumptions should be added to the formula, add them like assumtions
          * impliy formula.
-         * 
+         *
          * @param formula
          *                The formula, that was built out of the internal
          *                representation. It is built by ante implies succ.
@@ -1170,7 +1171,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * Returns, whether the Structure, this translator creates should be a
          * Structure, that is multi sorted. If false, a single sorted structure
          * is created. Then all sorts are translated as integers.
-         * 
+         *
          * @return true, if multi sorted logic is supported.
          */
         protected abstract boolean isMultiSorted();
@@ -1178,7 +1179,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /**
          * The String used for integer values. This sort is also used in single
          * sorted logics.
-         * 
+         *
          * @return The String used for integers.
          */
         protected abstract StringBuffer getIntegerSort();
@@ -1188,10 +1189,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * @return The string used for boolean values.
          */
         protected abstract StringBuffer getBoolSort();
-        
+
         /**
          * Build the Stringbuffer for a logical NOT.
-         * 
+         *
          * @param arg
          *                The Formula to be negated.
          * @return The StringBuffer representing the resulting Formular
@@ -1200,7 +1201,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Build the logical konjunction.
-         * 
+         *
          * @param arg1
          *                The first formula.
          * @param arg2
@@ -1212,7 +1213,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Build the logical disjunction.
-         * 
+         *
          * @param arg1
          *                The first formula.
          * @param arg2
@@ -1224,7 +1225,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Build the logical implication.
-         * 
+         *
          * @param arg1
          *                The first formula.
          * @param arg2
@@ -1236,7 +1237,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Build the logical equivalence.
-         * 
+         *
          * @param arg1
          *                The first formula.
          * @param arg2
@@ -1248,7 +1249,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Build the logical forall formula.
-         * 
+         *
          * @param var
          *                the bounded variable.
          * @param type
@@ -1262,7 +1263,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Build the logical exists formula.
-         * 
+         *
          * @param var
          *                the bounded variable.
          * @param type
@@ -1276,21 +1277,21 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Translate the logical true.
-         * 
+         *
          * @return The StringBuffer the logical true value.
          */
         protected abstract StringBuffer translateLogicalTrue();
 
         /**
          * Translate the logical false.
-         * 
+         *
          * @return The StringBuffer the logical false value.
          */
         protected abstract StringBuffer translateLogicalFalse();
 
         /**
          * Build the Stringbuffer for an object equivalence.
-         * 
+         *
          * @param arg1
          *                The first formula of the equivalence.
          * @param arg2
@@ -1302,14 +1303,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Build the Stringbuffer for an variable.
-         * 
+         *
          * @return The StringBuffer representing the resulting Formular
          */
         protected abstract StringBuffer translateLogicalVar(StringBuffer name);
 
         /**
          * Build the Stringbuffer for an constant.
-         * 
+         *
          * @return The StringBuffer representing the resulting Formular
          */
         protected abstract StringBuffer translateLogicalConstant(
@@ -1317,7 +1318,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Translate a predicate.
-         * 
+         *
          * @param name
          *                The Symbol of the predicate.
          * @param args
@@ -1329,7 +1330,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Get the name for a predicate symbol.
-         * 
+         *
          * @param name
          *                The name that can be used to create the symbol.
          * @return The unique predicate symbol.
@@ -1338,7 +1339,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Translate a function.
-         * 
+         *
          * @param name
          *                The Symbol of the function.
          * @param args
@@ -1350,7 +1351,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Get the name for a function symbol.
-         * 
+         *
          * @param name
          *                The name that can be used to create the symbol.
          * @return The unique function symbol.
@@ -1359,7 +1360,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Translate the integer plus.
-         * 
+         *
          * @param arg1
          *                first val of the sum.
          * @param arg2
@@ -1376,7 +1377,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Translate the integer minus.
-         * 
+         *
          * @param arg1
          *                The first val of the substraction.
          * @param arg2
@@ -1393,7 +1394,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Translate a unary minus.
-         * 
+         *
          * @param arg
          *                the argument of the unary minus.
          * @return the formula representing tha unary minus function.
@@ -1408,7 +1409,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Translate the integer multiplication.
-         * 
+         *
          * @param arg1
          *                The first val of the multiplication.
          * @param arg2
@@ -1426,7 +1427,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /**
          * Translate the integer division. Override this, if integer division is
          * supported.
-         * 
+         *
          * @param arg1
          *                The first val of the division.
          * @param arg2
@@ -1444,7 +1445,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /**
          * Translate the integer modulo. Override this, if integer modulo is
          * supported.
-         * 
+         *
          * @param arg1
          *                The first val of the modulo.
          * @param arg2
@@ -1462,7 +1463,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /**
          * Translate the greater than. Override this, if integer greater is
          * supported.
-         * 
+         *
          * @param arg1
          *                The first val of the greater than.
          * @param arg2
@@ -1479,7 +1480,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Translate the less than. Override this, if integer less is supported.
-         * 
+         *
          * @param arg1
          *                The first val of the less than.
          * @param arg2
@@ -1497,7 +1498,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /**
          * Translate the greater or equal. Override this, if integer greater or
          * equal is supported.
-         * 
+         *
          * @param arg1
          *                The first val of the greater or equal.
          * @param arg2
@@ -1515,7 +1516,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /**
          * Translate the less or equal. Override this, if integer less or equal
          * is supported.
-         * 
+         *
          * @param arg1
          *                The first val of the less or equal.
          * @param arg2
@@ -1529,37 +1530,37 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 "Integer less or equal is not supported by this translator.");
 
         }
-        
-        
+
+
         /**
          * Translate the NULL element
-         * 
+         *
          * @return the Stringbuffer used for nullelement
          */
         protected abstract StringBuffer translateNull();
 
         /**
-         * 
+         *
          * @return Returns the name of the NULL element.
          */
         protected abstract StringBuffer getNullName();
 
         /**
          * Translate the NULL element's Sort.
-         * 
+         *
          * @return the StringBuffer used for Null.
          */
         protected abstract StringBuffer translateNullSort();
 
         /**
          * Translate a sort.
-         * 
+         *
          * @param name
          *                the sorts name
          * @param isIntVal
          *                true, if the sort should represent some kind of
          *                integer
-         * 
+         *
          * @return The String used for this sort. If Multisorted, used in
          *         declarations, else for the typepredicates.
          */
@@ -1570,7 +1571,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * Translate a sort. Return the StringBuffer, that should be displayed
          * at definitionpart. i.e. the name used for typepredicates an similair.
          * Override this, if integers are supported.
-         * 
+         *
          * @return the sorts name
          */
         protected StringBuffer translateIntegerValue(long val)
@@ -1586,7 +1587,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * logical formulas. If the underlying language does not support this
          * contruct, it is equivalent with (cond IMPLIES ifterm) AND (NOT(cond)
          * IMPLIES thenterm) and can be reduced to this.
-         * 
+         *
          * @param cond
          *                the condition term.
          * @param ifterm
@@ -1605,7 +1606,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * default implementation is used. This might me less effective than a
          * language supported translation. So, if allowed by the target
          * language, override this.
-         * 
+         *
          * @param cond
          *                the condition formula
          * @param ifterm
@@ -1627,7 +1628,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Translates the unique-property of a function.
-         * 
+         *
          * @param function
          *                the function itself
          * @param distinct
@@ -1819,10 +1820,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
 
         /**
-         * 
+         *
          * Translates the given term into input syntax and adds the resulting
          * string to the StringBuffer sb.
-         * 
+         *
          * @param term
          *                the Term which should be written in Simplify syntax
          * @param quantifiedVars
@@ -1835,7 +1836,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         Vector<QuantifiableVariable> quantifiedVars,
                         Services services) throws IllegalFormulaException {
 
-       
+
                 Operator op = term.op();
                 if (op == Junctor.NOT) {
                         StringBuffer arg = translateTerm(term.sub(0),
@@ -2105,7 +2106,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                         return translatePred(op, subterms);
                                     }
                                 }
-                        } else {                          
+                        } else {
                                 // this Function is a function, so translate it
                                 // as such
                                 if (fun == services.getTypeConverter()
@@ -2232,14 +2233,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                         addConstantTypePredicate(term, numVal);
 
                                         return numVal;
-                                } else if (fun == services.getTypeConverter().getIntegerLDT().getBsum()) {                                   
+                                } else if (fun == services.getTypeConverter().getIntegerLDT().getBsum()) {
                                     //the bsum has to be translated in a special fashion in order to ensure soundness.
                                     StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
                                     StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
                                     ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
                                     subterms.add(arg1);
                                     subterms.add(arg2);
-                                    
+
                                     return translateBsumFunction(term, subterms);
                                 } else if (fun == services.getTypeConverter().getIntegerLDT().getBprod()) {
                                     //the bprod has to be translated in a special fashion in order to ensure soundness.
@@ -2248,7 +2249,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                     ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
                                     subterms.add(arg1);
                                     subterms.add(arg2);
-                                    
+
                                     return translateBprodFunction(term, subterms);
                                 }  else {
                                     boolean bindsVars = false;
@@ -2276,11 +2277,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         return translateUnknown(term, quantifiedVars, services);
                 }
         }
-        
+
         private StringBuffer translateAsBindingUninterpretedPredicate(Term term, Function fun,
                 Vector<QuantifiableVariable> quantifiedVars,
                 ImmutableArray<Term> subs, Services services) throws IllegalFormulaException {
-            
+
             ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
             for (int i = 0; i < term.arity(); i++) {
                 if (!fun.bindVarsAt(i)) {
@@ -2295,7 +2296,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     subterms.add(subterm);
                 }
             }
-            
+
             //check whether an equal term was already used.
             Term used = null;
             for (Term t: uninterpretedBindingPredicateNames.keySet()) {
@@ -2306,17 +2307,17 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         termsMatch = termsMatch && t.sub(i).equalsModRenaming(term.sub(i));
                     }
                 }
-                
+
                 //the terms also match, if the entire sequence matches
                 termsMatch = (termsMatch || t.equalsModRenaming(term));
-                
+
                 if (termsMatch) {
                     used = t;
                 }
             }
             if (used != null) {
                 //The term was aready used. reuse the function name.
-                
+
                 //add the free variables in the term to the bound functions as parameter
                 for (int i = 0; i < term.arity(); i++) {
                     if (fun.bindVarsAt(i)) {
@@ -2334,8 +2335,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                             }
                         }
                     }
-                }                
-                
+                }
+
                 return translateFunction(uninterpretedBindingPredicateNames.get(used), subterms);
             } else {
                 // create a new functionname
@@ -2350,7 +2351,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         alreadyContains = alreadyContains || s.toString().equals(newName.toString());
                     }
                 }
-                
+
                 //add the free variables in the term to the bound functions as parameter
                 for (int j = 0; j < term.arity(); j++) {
                     if (fun.bindVarsAt(j)) {
@@ -2369,14 +2370,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         }
                     }
                 }
-                
+
                 // add the function
                 uninterpretedBindingPredicateNames.put(term, newName);
                 //translate the new function
                 return translatePredicate(newName, subterms);
             }
         }
-        
+
         /**
          * Translate an uninterpreted function, which binds variables
          * @param term The term with the binding function on top level
@@ -2390,7 +2391,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         private StringBuffer translateAsBindingUninterpretedFunction(Term term, Function fun,
                 Vector<QuantifiableVariable> quantifiedVars,
                 ImmutableArray<Term> subs, Services services) throws IllegalFormulaException {
-            
+
             ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
             for (int i = 0; i < term.arity(); i++) {
                 if (!fun.bindVarsAt(i)) {
@@ -2405,7 +2406,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     subterms.add(subterm);
                 }
             }
-            
+
             //check whether an equal term was already used.
             Term used = null;
             for (Term t: uninterpretedBindingFunctionNames.keySet()) {
@@ -2416,10 +2417,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         termsMatch = termsMatch && t.sub(i).equalsModRenaming(term.sub(i));
                     }
                 }
-                
+
                 //the terms also match, if the entire terms match
                 termsMatch = (termsMatch || t.equalsModRenaming(term));
-                
+
                 if (termsMatch) {
                     used = t;
                 }
@@ -2444,8 +2445,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         }
                     }
                 }
-                
-                
+
+
                 return translateFunction(uninterpretedBindingFunctionNames.get(used), subterms);
             } else {
                 // create a new functionname
@@ -2478,7 +2479,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         }
                     }
                 }
-                
+
                 // add the function
                 uninterpretedBindingFunctionNames.put(term, newName);
                 //translate the new function
@@ -2493,7 +2494,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             // an uninterpreted function. just
             // translate it as such
             // it has to be made a difference between binding functions and those not binding
-            
+
                 ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
                 int i = 0;
                 for (Term sub : subs) {
@@ -2535,14 +2536,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * This method adds a type cast to a translated formula, if neccessary.
          * It is neccesary, if the formula is of some int sort, but some not-int
          * sort is expected. In this case add the type cast.
-         * 
+         *
          * In general, it is also neccesary to add a type cast, if the formula
          * has some non-int sort and some int sort is expected. But this should
          * never happen, as ever possible translation is made with int-sort.
-         * 
+         *
          * A type-cast is never neccessary, if the translation can make use of
          * multisort.
-         * 
+         *
          * @param formula
          *                The formula, that was translated.
          * @param formulaSort
@@ -2582,7 +2583,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /**
          * Cast a formula of type int to type u. This cast is only performed, if
          * multisort is not suppoerted
-         * 
+         *
          * @param formula
          *                the formula to cast.
          * @return the casted formula.
@@ -2601,7 +2602,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /**
          * Get a predicate representing a modality. Make sure that equal
          * modalities return the same predicate.
-         * 
+         *
          * @param t
          *                The term representing the modality.
          * @param quantifiedVars
@@ -2664,7 +2665,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * Add an interpreted function to the set of special functions. Caution:
          * If added here, make sure to handle the function in
          * getSpecialSortPredicates()
-         * 
+         *
          * @param fun
          *                the interpreted function to be added.
          */
@@ -2676,7 +2677,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Get the type predicate for the given sort and the given expression.
-         * 
+         *
          * @param s
          *                The sort, the type predicate is wanted for.
          * @param arg
@@ -2696,7 +2697,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * Takes care of sequent tree parts that were not matched in
          * translate(term, skolemization). In this class it just produces a
          * warning, nothing more. It is provided as a hook for subclasses.
-         * 
+         *
          * @param term
          *                The Term given to translate
          * @throws IllegalFormulaException
@@ -2764,7 +2765,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * translate a function.
-         * 
+         *
          * @param o
          *                the Operator used for this function.
          * @param sub
@@ -2788,7 +2789,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
                 return translateFunction(name, sub);
         }
-        
+
         /**
          * translate a bsum function. Alos add the created functionsymbol created depending on the term.
          * @param iterterm The term used as third argument of the bsum function.
@@ -2797,21 +2798,21 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          */
         protected final StringBuffer translateBsumFunction(Term bsumterm, ArrayList<StringBuffer> sub) {
             StringBuffer name = null;
-            for (Term t: usedBsumTerms.keySet()) {                          
-                if (t.equalsModRenaming(bsumterm)) {                  
+            for (Term t: usedBsumTerms.keySet()) {
+                if (t.equalsModRenaming(bsumterm)) {
                     name = usedBsumTerms.get(t);
                     continue;
                 }
             }
             if (name == null) {
-                //the term wasnt used yet. Create a new functionsymbol               
+                //the term wasnt used yet. Create a new functionsymbol
                 int i = -1;
                 boolean alreadyContains = true;
                 while (alreadyContains) {
                     i++;
                     alreadyContains = false;
                     for (StringBuffer s: usedBsumTerms.values()) {
-                        if (s.toString().equals(BSUM_STRING + i)) {                           
+                        if (s.toString().equals(BSUM_STRING + i)) {
                             alreadyContains = true;
                         }
                     }
@@ -2819,11 +2820,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 name = new StringBuffer(BSUM_STRING + i);
                 usedBsumTerms.put(bsumterm, name);
             }
-                
+
             return translateFunction(name, sub);
         }
-        
-        
+
+
         /**
          * translate a bprod function. Alos add the created functionsymbol created depending on the term.
          * @param iterterm The term used as third argument of the bsum function.
@@ -2832,21 +2833,21 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          */
         protected final StringBuffer translateBprodFunction(Term bprodterm, ArrayList<StringBuffer> sub) {
             StringBuffer name = null;
-            for (Term t: usedBprodTerms.keySet()) {               
-                if (t.equalsModRenaming(bprodterm)) {                  
+            for (Term t: usedBprodTerms.keySet()) {
+                if (t.equalsModRenaming(bprodterm)) {
                     name = usedBprodTerms.get(t);
                     continue;
                 }
             }
             if (name == null) {
-                //the term wasnt used yet. Create a new functionsymbol               
+                //the term wasnt used yet. Create a new functionsymbol
                 int i = -1;
                 boolean alreadyContains = true;
                 while (alreadyContains) {
                     i++;
                     alreadyContains = false;
                     for (StringBuffer s: usedBprodTerms.values()) {
-                        if (s.toString().equals(BPROD_STRING + i)) {                           
+                        if (s.toString().equals(BPROD_STRING + i)) {
                             alreadyContains = true;
                         }
                     }
@@ -2854,12 +2855,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 name = new StringBuffer(BPROD_STRING + i);
                 usedBprodTerms.put(bprodterm, name);
             }
-                
+
             return translateFunction(name, sub);
         }
 
         /**
-         * 
+         *
          * @param op
          *                the operator used for this function.
          * @param sorts
@@ -2889,7 +2890,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Translate a predicate.
-         * 
+         *
          * @param o
          *                the operator used for this predicate.
          * @param sub
@@ -2939,7 +2940,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * Create a type predicate for a given sort.
-         * 
+         *
          * @param sortname
          *                the name, that should be used for the sort.
          * @param s
@@ -2957,9 +2958,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         protected boolean isSomeIntegerSort(Sort s) {
                 return s == integerSort;
         }
-        
-        
-        
+
+
+
         private StringBuffer removeIllegalChars(StringBuffer template, ArrayList<String> toReplace, ArrayList<String> replacement) {
     	//replace one String
     	for (int i = 0; i < toReplace.size(); i++) {
@@ -2971,67 +2972,68 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     		index = template.indexOf(toRep);
     	    }
     	}
-    	
+
     	return template;
         }
-        
-        
+
+
         protected StringBuffer makeUnique(StringBuffer name) {
         	StringBuffer toReturn = new StringBuffer(name);
-        	
+
         	//build the replacement pairs
         	ArrayList<String> toReplace = new ArrayList<String>();
         	ArrayList<String> replacement = new ArrayList<String>();
-        	
+
         	toReplace.add("[]");
         	replacement.add("_Array");
-        	
+
         	toReplace.add("<");
         	replacement.add("_abo_");
-        	
+
         	toReplace.add(">");
         	replacement.add("_abc_");
-        	
+
         	toReplace.add("{");
         	replacement.add("_cbo_");
-        	
+
         	toReplace.add("}");
         	replacement.add("_cbc_");
-        	
+
         	toReplace.add(".");
         	replacement.add("_dot_");
-        	
+
         	toReplace.add(":");
         	replacement.add("_col_");
-        	
+
         	toReplace.add("\\");
         	replacement.add("_");
-        	
+
         	toReplace.add("$");
         	replacement.add("_dollar_");
-        	
+
         	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
         	// names are must not begin with special characters
-        	
+
         	if(!('A' <= toReturn.charAt(0) && toReturn.charAt(0) <= 'Z') &&
         	   !('a' <= toReturn.charAt(0) && toReturn.charAt(0) <= 'z')){
         	toReturn = (new StringBuffer()).append("a_").append(toReturn);
         	}
-        	
+
         	toReturn.append("_").append(nameCounter);
         	nameCounter++;
         	return toReturn;
             }
 
-        
+
 
         /**
          * Translates the list <code>tacletFormulae</code> to the given syntax.
-         * 
+         *
          * @param services
          *                used for <code>translateTerm</code>
          */
-        private ArrayList<StringBuffer> translateTaclets(Services services,
+        @Override
+        public ArrayList<StringBuffer> translateTaclets(Services services,
                         SMTSettings settings) throws IllegalFormulaException {
                 Collection<Taclet> taclets = settings.getTaclets();
 
@@ -3040,7 +3042,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 || taclets.isEmpty()) {
                         return result;
                 }
- 
+
                 tacletSetTranslation = new DefaultTacletSetTranslation(
                                 services, settings);
 
@@ -3072,7 +3074,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         //Several special sorts should not be added to the collection
                         if (ldt.getHeap().sort() != sort
                                         && ldt.getFieldSort() != sort
-                                        && services.getJavaInfo().nullSort() != sort                                      
+                                        && services.getJavaInfo().nullSort() != sort
                                         && Sort.FORMULA != sort) {
                                 sorts = sorts.add(sort);
                         }
@@ -3082,16 +3084,16 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                         for (Term subterm : tf.getInstantiations()) {
                                 try {
-                                		StringBuffer term = translateComment(1,tf.getTaclet().displayName()+":\n");		
-                                				
+                                		StringBuffer term = translateComment(1,tf.getTaclet().displayName()+":\n");
+
                                         term.append(translateTerm(
                                                         subterm, vector,
                                                         services));
-                                    
+
                                         result.add(term);
 
                                 } catch (Throwable e) {
-                                
+
                                       exceptionsForTacletTranslation.add(
                                                        new RuntimeException("Could not translate taclet "+tf.getTaclet().name()
                                                        , e));
@@ -3103,7 +3105,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 return result;
         }
-        
+
         protected StringBuffer translateComment(int newLines, String comment){
         	return new StringBuffer();
         }

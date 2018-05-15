@@ -3,6 +3,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -178,6 +179,13 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     @Override
     public Collection<Throwable> getExceptionsOfTacletTranslation() {
         return tacletExceptions;
+    }
+
+
+    @Override
+    public ArrayList<StringBuffer> translateTaclets(Services services, SMTSettings settings) throws IllegalFormulaException {
+        // not yet implemented. maybe adapt the existing method from abstractsmttranslator
+        return null;
     }
 
 }
