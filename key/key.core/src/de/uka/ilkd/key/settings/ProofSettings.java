@@ -179,7 +179,12 @@ public class ProofSettings {
                     "Warning: default proof-settings file could not be found.");
         else {
             try {
-                defaultProps.load(PROVER_CONFIG_FILE_TEMPLATE.openStream());
+                if(Boolean.getBoolean("key.disregardSettings")) {
+                    System.err.println("The settings in " +
+                            PROVER_CONFIG_FILE_TEMPLATE + " are *not* read.");
+                } else {
+                    defaultProps.load(PROVER_CONFIG_FILE_TEMPLATE.openStream());
+                }
             } catch (IOException e) {
                 System.err.println(
                         "Warning: default proof-settings could not be loaded.");
@@ -208,7 +213,12 @@ public class ProofSettings {
      */
     public void loadSettings() {
         try (FileReader in = new FileReader(PROVER_CONFIG_FILE)) {
-            loadSettingsFromStream(in);
+            if(Boolean.getBoolean("key.disregardSettings")) {
+                System.err.println("The settings in " +
+                        PROVER_CONFIG_FILE + " are *not* read.");
+            } else {
+                loadSettingsFromStream(in);
+            }
         } catch (IOException e) {
             System.err.println(
                     "Warning: no proof-settings could be loaded, using defaults");
