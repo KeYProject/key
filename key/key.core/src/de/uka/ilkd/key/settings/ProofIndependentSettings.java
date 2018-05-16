@@ -58,20 +58,20 @@ public class ProofIndependentSettings implements SettingsListener {
 
         }
 
-
-
-
-
-        public void loadSettings(){
-                try {
-                    File testFile = new File(filename);
-                    if(testFile.exists()){
+        private void loadSettings() {
+            try {
+                File testFile = new File(filename);
+                if(testFile.exists()) {
+                    if(Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
+                        System.err.println("The settings in " +
+                                filename + " are *not* read.");
+                    } else {
                         load(testFile);
                     }
-                } catch (IOException e){
-                    throw new RuntimeException(e);
                 }
-
+            } catch (IOException e){
+                throw new RuntimeException(e);
+            }
         }
 
         private void load(File file) throws IOException{

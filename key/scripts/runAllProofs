@@ -46,7 +46,8 @@ SCRIPTFOLDER=`dirname $SCRIPTLOCATION`
 # Parse command line parameters
 #
 
-JAVA_ARGS=""
+# Disable reading from the .key files (to make runs more deterministic)
+JAVA_ARGS="-Dkey.disregardSettings=true "
 
 while [ "$#" -ne 0 ]
     do
