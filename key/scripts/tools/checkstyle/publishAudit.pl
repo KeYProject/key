@@ -42,9 +42,11 @@ sub report {
 my $note = "Checkstyle has been run on this commit in [job $bid]($url/builds/$bid).  ";
 $note .= "Here is its report:\n\n";
 if(%report) {
+    $note .= "<details>";
     $note .= &report("ERROR", $report{"ERROR"});
     $note .= &report("WARNING", $report{"WARN"});
     $note .= &report("INFO", $report{"INFO"});
+    $note .= "</details>";
 } else {
     $note .= "*No issues. Good.*";
 }
