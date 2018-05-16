@@ -1,5 +1,16 @@
 #!/usr/bin/perl -w
 
+
+#
+# THIS PROGRAM IS OUTDATED.
+# 
+# Please refer to the python program publishAudit.py
+# composed by Alexander Weigl.
+#
+#
+
+
+
 # workflow:
 #  - runIncrementalCheckstyle.sh | tee report.txt
 #  - publishAudit.pl report.txt
