@@ -40,7 +40,7 @@ import de.uka.ilkd.key.util.Triple;
  * empty user interface or even bedder an error message should be shown to the
  * user.
  * </p>
- * 
+ *
  * @author Martin Hentschel
  * @see StrategyFactory
  * @see AbstractStrategyPropertyDefinition
@@ -48,6 +48,10 @@ import de.uka.ilkd.key.util.Triple;
  * @see StrategyPropertyValueDefinition
  */
 public class StrategySettingsDefinition {
+
+    private static final ArrayList<Triple<String, Integer,
+                                          IDefaultStrategyPropertiesFactory>> STD_FURTHER_DEFAULTS;
+
     /**
      * Defines if a user interface control is shown to edit
      * {@link StrategySettings#getMaxSteps()}.
@@ -86,9 +90,8 @@ public class StrategySettingsDefinition {
      * Further default settings, for example suitable for simplification.
      * Consists of triples (DEFAULT_NAME, MAX_RULE_APPS, PROPERTIES).
      */
-    private final ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>> furtherDefaults;
-
-    private static final ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>> STD_FURTHER_DEFAULTS;
+    private final ArrayList<Triple<String, Integer,
+                                   IDefaultStrategyPropertiesFactory>> furtherDefaults;
 
     static {
         STD_FURTHER_DEFAULTS =
@@ -115,7 +118,7 @@ public class StrategySettingsDefinition {
 
                                 newProps.setProperty(
                                         StrategyProperties.BLOCK_OPTIONS_KEY,
-                                        StrategyProperties.BLOCK_CONTRACT);
+                                        StrategyProperties.BLOCK_CONTRACT_INTERNAL);
 
                                 newProps.setProperty(
                                         StrategyProperties.METHOD_OPTIONS_KEY,
@@ -215,7 +218,7 @@ public class StrategySettingsDefinition {
 
     /**
      * Constructor.
-     * 
+     *
      * @param propertiesTitle
      *            The label shown in front of the controls to edit
      *            {@link StrategyProperties}.
@@ -231,7 +234,7 @@ public class StrategySettingsDefinition {
 
     /**
      * Constructor.
-     * 
+     *
      * @param showMaxRuleApplications
      *            Defines if a user interface control is shown to edit
      *            {@link StrategySettings#getMaxSteps()}.
@@ -245,6 +248,9 @@ public class StrategySettingsDefinition {
      *            {@link StrategyProperties}.
      * @param defaultPropertiesFactory
      *            The {@link IDefaultStrategyPropertiesFactory} used to create
+     *            default {@link StrategyProperties}.
+     * @param furtherDefaults
+     *            further defaults used to create
      *            default {@link StrategyProperties}.
      * @param properties
      *            Defines the controls to edit {@link StrategyProperties}.
@@ -272,7 +278,7 @@ public class StrategySettingsDefinition {
     /**
      * Checks if the user interface control to edit
      * {@link StrategySettings#getMaxSteps()} should be shown or not.
-     * 
+     *
      * @return {@code true} show control, {@code false} do not provide a
      *         control.
      */
@@ -283,7 +289,7 @@ public class StrategySettingsDefinition {
     /**
      * Returns the label shown in front of the control to edit
      * {@link StrategySettings#getMaxSteps()}.
-     * 
+     *
      * @return The label shown in front of the control to edit
      *         {@link StrategySettings#getMaxSteps()} or {@code null} if no
      *         label should be shown.
@@ -295,7 +301,7 @@ public class StrategySettingsDefinition {
     /**
      * Returns the label shown in front of the controls to edit
      * {@link StrategyProperties}.
-     * 
+     *
      * @return The label shown in front of the controls to edit
      *         {@link StrategyProperties} or {@code null} if no label should be
      *         shown.
@@ -306,7 +312,7 @@ public class StrategySettingsDefinition {
 
     /**
      * Returns the definition of controls to edit {@link StrategyProperties}.
-     * 
+     *
      * @return The definition of controls to edit {@link StrategyProperties}.
      */
     public ImmutableArray<AbstractStrategyPropertyDefinition> getProperties() {
@@ -315,7 +321,7 @@ public class StrategySettingsDefinition {
 
     /**
      * Returns the default maximal rule applications.
-     * 
+     *
      * @return The default maximal rule applications.
      */
     public int getDefaultMaxRuleApplications() {
@@ -325,7 +331,7 @@ public class StrategySettingsDefinition {
     /**
      * Returns the {@link IDefaultStrategyPropertiesFactory} used to create
      * default {@link StrategyProperties}.
-     * 
+     *
      * @return The {@link IDefaultStrategyPropertiesFactory} used to create
      *         default {@link StrategyProperties}.
      */
@@ -336,7 +342,8 @@ public class StrategySettingsDefinition {
     /**
      * @return Further default settings, e.g. for simplification.
      */
-    public ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>> getFurtherDefaults() {
+    public ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>>
+            getFurtherDefaults() {
         return furtherDefaults;
     }
 

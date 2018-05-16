@@ -6,7 +6,7 @@
          <statement name="this.y=3;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
             <blockContract name="self#magic()) catch(exc_0)
-pre self.x = 2
+pre measuredByEmpty &amp; self.x = 2
 post exc_0 = null &amp; self.x = -2
 mod {(self, BlockContractThisTest::$x)}termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true">
                <callStackEntry path="/0"/>

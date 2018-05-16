@@ -154,6 +154,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 
@@ -165,141 +166,133 @@ import de.uka.ilkd.key.speclang.MergeContract;
  */
 public interface Visitor {
 
-    void performActionOnAbstractProgramElement
-    (AbstractProgramElement x);
+    void performActionOnAbstractProgramElement(AbstractProgramElement x);
 
-    void performActionOnProgramElementName(
-	    ProgramElementName x);
+    void performActionOnProgramElementName(ProgramElementName x);
 
-    void performActionOnProgramVariable(
-	    ProgramVariable x);
+    void performActionOnProgramVariable(ProgramVariable x);
 
-    void performActionOnIProgramVariable(
-	    IProgramVariable x);
+    void performActionOnIProgramVariable(IProgramVariable x);
 
-    void performActionOnSchemaVariable(
-	    SchemaVariable x);
+    void performActionOnSchemaVariable(SchemaVariable x);
 
-    void performActionOnProgramMethod(
-	    IProgramMethod x);
+    void performActionOnProgramMethod(IProgramMethod x);
 
-    void performActionOnProgramMetaConstruct(
-	    ProgramTransformer x);
+    void performActionOnProgramMetaConstruct(ProgramTransformer x);
 
-    void performActionOnContextStatementBlock(
-	    ContextStatementBlock x);
+    void performActionOnContextStatementBlock(ContextStatementBlock x);
 
-    void performActionOnIntLiteral(IntLiteral x); 
+    void performActionOnIntLiteral(IntLiteral x);
 
     void performActionOnBooleanLiteral(BooleanLiteral x);
-    
+
     void performActionOnEmptySetLiteral(EmptySetLiteral x);
-        
-    void performActionOnSingleton(Singleton x);    
-    
+
+    void performActionOnSingleton(Singleton x);
+
     void performActionOnSetUnion(SetUnion x);
-    
+
     void performActionOnIntersect(Intersect x);
-    
+
     void performActionOnSetMinus(SetMinus x);
-    
+
     void performActionOnAllFields(AllFields x);
-    
-	void performActionOnAllObjects(AllObjects allObjects);
-    
+
+    void performActionOnAllObjects(AllObjects allObjects);
+
     void performActionOnEmptySeqLiteral(EmptySeqLiteral x);
-    
+
     void performActionOnSeqSingleton(SeqSingleton x);
-    
+
     void performActionOnSeqConcat(SeqConcat x);
-    
+
     void performActionOnSeqIndexOf(SeqIndexOf x);
-    
+
     void performActionOnSeqSub(SeqSub x);
-    
+
     void performActionOnSeqReverse(SeqReverse x);
-    
+
     void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x);
 
-    void performActionOnStringLiteral(StringLiteral x); 
+    void performActionOnStringLiteral(StringLiteral x);
 
-    void performActionOnNullLiteral(NullLiteral x); 
+    void performActionOnNullLiteral(NullLiteral x);
 
-    void performActionOnCharLiteral(CharLiteral x); 
+    void performActionOnCharLiteral(CharLiteral x);
 
-    void performActionOnDoubleLiteral(DoubleLiteral x); 
+    void performActionOnDoubleLiteral(DoubleLiteral x);
 
-    void performActionOnLongLiteral(LongLiteral x); 
+    void performActionOnLongLiteral(LongLiteral x);
 
-    void performActionOnFloatLiteral(FloatLiteral x); 
+    void performActionOnFloatLiteral(FloatLiteral x);
 
-    void performActionOnPackageSpecification(PackageSpecification x); 
+    void performActionOnPackageSpecification(PackageSpecification x);
 
-    void performActionOnTypeReference(TypeReference x); 
+    void performActionOnTypeReference(TypeReference x);
 
-    void performActionOnPackageReference(PackageReference x);     
+    void performActionOnPackageReference(PackageReference x);
 
-    void performActionOnThrows(Throws x); 
+    void performActionOnThrows(Throws x);
 
-    void performActionOnArrayInitializer(ArrayInitializer x); 
+    void performActionOnArrayInitializer(ArrayInitializer x);
 
-    void performActionOnCompilationUnit(CompilationUnit x); 
+    void performActionOnCompilationUnit(CompilationUnit x);
 
     void performActionOnArrayDeclaration(ArrayDeclaration x);
 
     void performActionOnSuperArrayDeclaration(SuperArrayDeclaration x);
 
-    void performActionOnClassDeclaration(ClassDeclaration x); 
+    void performActionOnClassDeclaration(ClassDeclaration x);
 
-    void performActionOnInterfaceDeclaration(InterfaceDeclaration x); 
+    void performActionOnInterfaceDeclaration(InterfaceDeclaration x);
 
-    void performActionOnFieldDeclaration(FieldDeclaration x); 
+    void performActionOnFieldDeclaration(FieldDeclaration x);
 
-    void performActionOnLocalVariableDeclaration(LocalVariableDeclaration x); 
+    void performActionOnLocalVariableDeclaration(LocalVariableDeclaration x);
 
-    void performActionOnVariableDeclaration(VariableDeclaration x); 
+    void performActionOnVariableDeclaration(VariableDeclaration x);
 
-    void performActionOnParameterDeclaration(ParameterDeclaration x); 
+    void performActionOnParameterDeclaration(ParameterDeclaration x);
 
-    void performActionOnMethodDeclaration(MethodDeclaration x); 
+    void performActionOnMethodDeclaration(MethodDeclaration x);
 
-    void performActionOnClassInitializer(ClassInitializer x); 
+    void performActionOnClassInitializer(ClassInitializer x);
 
-    void performActionOnStatementBlock(StatementBlock x); 
+    void performActionOnStatementBlock(StatementBlock x);
 
-    void performActionOnBreak(Break x); 
+    void performActionOnBreak(Break x);
 
-    void performActionOnContinue(Continue x); 
+    void performActionOnContinue(Continue x);
 
-    void performActionOnReturn(Return x); 
+    void performActionOnReturn(Return x);
 
     void performActionOnThrow(Throw x);
 
-    void performActionOnDo(Do x); 
+    void performActionOnDo(Do x);
 
     void performActionOnFor(For x);
 
     void performActionOnEnhancedFor(EnhancedFor x);
 
-    void performActionOnWhile(While x); 
+    void performActionOnWhile(While x);
 
-    void performActionOnIf(If x); 
+    void performActionOnIf(If x);
 
-    void performActionOnSwitch(Switch x); 
+    void performActionOnSwitch(Switch x);
 
-    void performActionOnTry(Try x); 
+    void performActionOnTry(Try x);
 
-    void performActionOnLabeledStatement(LabeledStatement x); 
+    void performActionOnLabeledStatement(LabeledStatement x);
 
-    void performActionOnMethodFrame(MethodFrame x); 
+    void performActionOnMethodFrame(MethodFrame x);
 
-    void performActionOnMethodBodyStatement(MethodBodyStatement x); 
+    void performActionOnMethodBodyStatement(MethodBodyStatement x);
 
-    void performActionOnCatchAllStatement(CatchAllStatement x); 
+    void performActionOnCatchAllStatement(CatchAllStatement x);
 
-    void performActionOnSynchronizedBlock(SynchronizedBlock x); 
+    void performActionOnSynchronizedBlock(SynchronizedBlock x);
 
-    void performActionOnLoopScopeBlock(LoopScopeBlock x); 
+    void performActionOnLoopScopeBlock(LoopScopeBlock x);
 
     void performActionOnImport(Import x);
 
@@ -307,78 +300,79 @@ public interface Visitor {
 
     void performActionOnImplements(Implements x);
 
-    void performActionOnVariableSpecification(VariableSpecification x); 
+    void performActionOnVariableSpecification(VariableSpecification x);
 
-    void performActionOnFieldSpecification(FieldSpecification x); 
+    void performActionOnFieldSpecification(FieldSpecification x);
 
-    void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x); 
+    void performActionOnImplicitFieldSpecification
+        (ImplicitFieldSpecification x);
 
-    void performActionOnBinaryAnd(BinaryAnd x); 
+    void performActionOnBinaryAnd(BinaryAnd x);
 
-    void performActionOnBinaryAndAssignment(BinaryAndAssignment x); 
+    void performActionOnBinaryAndAssignment(BinaryAndAssignment x);
 
-    void performActionOnBinaryOrAssignment(BinaryOrAssignment x); 
+    void performActionOnBinaryOrAssignment(BinaryOrAssignment x);
 
-    void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x); 
+    void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x);
 
     void performActionOnCopyAssignment(CopyAssignment x);
 
     void performActionOnDivideAssignment(DivideAssignment x);
 
-    void performActionOnMinusAssignment(MinusAssignment x); 
+    void performActionOnMinusAssignment(MinusAssignment x);
 
     void performActionOnModuloAssignment(ModuloAssignment x);
 
-    void performActionOnPlusAssignment(PlusAssignment x); 
+    void performActionOnPlusAssignment(PlusAssignment x);
 
-    void performActionOnPostDecrement(PostDecrement x); 
+    void performActionOnPostDecrement(PostDecrement x);
 
-    void performActionOnPostIncrement(PostIncrement x); 
+    void performActionOnPostIncrement(PostIncrement x);
 
-    void performActionOnPreDecrement(PreDecrement x); 
+    void performActionOnPreDecrement(PreDecrement x);
 
-    void performActionOnPreIncrement(PreIncrement x); 
+    void performActionOnPreIncrement(PreIncrement x);
 
-    void performActionOnShiftLeftAssignment(ShiftLeftAssignment x); 
+    void performActionOnShiftLeftAssignment(ShiftLeftAssignment x);
 
-    void performActionOnShiftRightAssignment(ShiftRightAssignment x); 
+    void performActionOnShiftRightAssignment(ShiftRightAssignment x);
 
     void performActionOnTimesAssignment(TimesAssignment x);
 
-    void performActionOnUnsignedShiftRightAssignment 
-    (UnsignedShiftRightAssignment x); 
+    void performActionOnUnsignedShiftRightAssignment(
+        UnsignedShiftRightAssignment x);
 
-    void performActionOnBinaryNot(BinaryNot x); 
+    void performActionOnBinaryNot(BinaryNot x);
 
-    void performActionOnBinaryOr(BinaryOr x); 
+    void performActionOnBinaryOr(BinaryOr x);
 
     void performActionOnBinaryXOr(BinaryXOr x);
-    
+
     void performActionOnConditional(Conditional x);
 
     void performActionOnDivide(Divide x);
 
-    void performActionOnEquals(Equals x); 
+    void performActionOnEquals(Equals x);
 
     void performActionOnGreaterOrEquals(GreaterOrEquals x);
 
-    void performActionOnGreaterThan(GreaterThan x); 
+    void performActionOnGreaterThan(GreaterThan x);
 
     void performActionOnLessOrEquals(LessOrEquals x);
 
-    void performActionOnLessThan(LessThan x); 
+    void performActionOnLessThan(LessThan x);
 
-    void performActionOnNotEquals(NotEquals x); 
+    void performActionOnNotEquals(NotEquals x);
 
-    void performActionOnNewArray(NewArray x); 
+    void performActionOnNewArray(NewArray x);
 
     void performActionOnInstanceof(Instanceof x);
 
     void performActionOnExactInstanceof(ExactInstanceof x);
 
-    void performActionOnNew(New x); 
+    void performActionOnNew(New x);
 
-    void performActionOnTypeCast(TypeCast x); 
+    void performActionOnTypeCast(TypeCast x);
 
     void performActionOnLogicalAnd(LogicalAnd x);
 
@@ -386,53 +380,53 @@ public interface Visitor {
 
     void performActionOnLogicalOr(LogicalOr x);
 
-    void performActionOnMinus(Minus x); 
+    void performActionOnMinus(Minus x);
 
     void performActionOnModulo(Modulo x);
 
     void performActionOnNegative(Negative x);
 
-    void performActionOnPlus(Plus x); 
+    void performActionOnPlus(Plus x);
 
-    void performActionOnPositive(Positive x); 
+    void performActionOnPositive(Positive x);
 
     void performActionOnShiftLeft(ShiftLeft x);
 
     void performActionOnShiftRight(ShiftRight x);
 
-    void performActionOnTimes(Times x); 
+    void performActionOnTimes(Times x);
 
-    void performActionOnUnsignedShiftRight(UnsignedShiftRight x); 
+    void performActionOnUnsignedShiftRight(UnsignedShiftRight x);
 
-    void performActionOnArrayReference(ArrayReference x); 
+    void performActionOnArrayReference(ArrayReference x);
 
-    void performActionOnMetaClassReference(MetaClassReference x); 
-    
+    void performActionOnMetaClassReference(MetaClassReference x);
+
     void performActionOnMergePointStatement(MergePointStatement x);
 
-    void performActionOnMethodReference(MethodReference x); 
+    void performActionOnMethodReference(MethodReference x);
 
-    void performActionOnFieldReference(FieldReference x); 
+    void performActionOnFieldReference(FieldReference x);
 
-    void performActionOnSchematicFieldReference(SchematicFieldReference x); 
+    void performActionOnSchematicFieldReference(SchematicFieldReference x);
 
-    void performActionOnVariableReference(VariableReference x); 
+    void performActionOnVariableReference(VariableReference x);
 
-    void performActionOnMethod(IProgramMethod x); 
+    void performActionOnMethod(IProgramMethod x);
 
-    void performActionOnSuperConstructorReference(SuperConstructorReference x); 
+    void performActionOnSuperConstructorReference(SuperConstructorReference x);
 
-    void performActionOnExecutionContext(ExecutionContext x); 
+    void performActionOnExecutionContext(ExecutionContext x);
 
-    void performActionOnConstructorDeclaration(ConstructorDeclaration x); 
+    void performActionOnConstructorDeclaration(ConstructorDeclaration x);
 
-    void performActionOnThisConstructorReference(ThisConstructorReference x); 
+    void performActionOnThisConstructorReference(ThisConstructorReference x);
 
-    void performActionOnSuperReference(SuperReference x); 
+    void performActionOnSuperReference(SuperReference x);
 
-    void performActionOnThisReference(ThisReference x); 
-     
-    void performActionOnArrayLengthReference(ArrayLengthReference x); 
+    void performActionOnThisReference(ThisReference x);
+
+    void performActionOnArrayLengthReference(ArrayLengthReference x);
 
     void performActionOnThen(Then x);
 
@@ -446,38 +440,40 @@ public interface Visitor {
 
     void performActionOnFinally(Finally x);
 
-    void performActionOnModifier(Modifier x); 
+    void performActionOnModifier(Modifier x);
 
     void performActionOnEmptyStatement(EmptyStatement x);
 
-    void performActionOnComment(Comment x); 
+    void performActionOnComment(Comment x);
 
-    void performActionOnParenthesizedExpression(ParenthesizedExpression x); 
+    void performActionOnParenthesizedExpression(ParenthesizedExpression x);
 
-    void performActionOnPassiveExpression(PassiveExpression x); 
+    void performActionOnPassiveExpression(PassiveExpression x);
 
-    void performActionOnForUpdates(ForUpdates x); 
+    void performActionOnForUpdates(ForUpdates x);
 
-    void performActionOnGuard(Guard x); 
+    void performActionOnGuard(Guard x);
 
-    void performActionOnLoopInit(LoopInit x); 
+    void performActionOnLoopInit(LoopInit x);
 
     void performActionOnAssert(Assert assert1);
 
     void performActionOnProgramConstant(ProgramConstant constant);
 
-    void performActionOnLocationVariable(LocationVariable variable); 
+    void performActionOnLocationVariable(LocationVariable variable);
 
     void performActionOnLoopInvariant(LoopSpecification x);
-    
+
     void performActionOnBlockContract(BlockContract x);
-    
+
+    void performActionOnLoopContract(LoopContract x);
+
     void performActionOnMergeContract(MergeContract x);
 
     void performActionOnSeqLength(SeqLength seqLength);
 
     void performActionOnSeqGet(SeqGet seqGet);
-    
+
     void performActionOnTransactionStatement(TransactionStatement transSt);
 
     public void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);

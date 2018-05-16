@@ -84,7 +84,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO
 
     @Override
     public void readProblem() throws ProofInputException {
-        final Services proofServices = postInit();
+        postInit();
 
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =

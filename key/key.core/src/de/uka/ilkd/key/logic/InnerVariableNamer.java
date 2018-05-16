@@ -50,39 +50,39 @@ public class InnerVariableNamer extends VariableNamer {
     public ProgramVariable rename(ProgramVariable var,
                                   Goal goal,
                                   PosInOccurrence posOfFind) {
-	ProgramElementName name = var.getProgramElementName();
-	BasenameAndIndex bai = getBasenameAndIndex(name);
+        ProgramElementName name = var.getProgramElementName();
+        BasenameAndIndex bai = getBasenameAndIndex(name);
         Iterable<ProgramElementName> globals = wrapGlobals(goal.node().getLocalProgVars());
-	map.clear();
+        map.clear();
 
-	//prepare renaming of inner var
-	final NameCreationInfo nci = MethodStackInfo.create(getProgramFromPIO(posOfFind));
-	ProgramElementName newname = null;
-	ProgramElementName branchUniqueName = null;
+        //prepare renaming of inner var
+        final NameCreationInfo nci = MethodStackInfo.create(getProgramFromPIO(posOfFind));
+        ProgramElementName newname = null;
+        // ProgramElementName branchUniqueName = null;
 
-	// Name proposal = services.getProof().getNameRecorder().getProposal();
+        // Name proposal = services.getProof().getNameRecorder().getProposal();
         Name proposal = services.getNameRecorder().getProposal();
 
-	if (proposal != null) {
-	    newname = new ProgramElementName(proposal.toString(), nci);
-	}
-	if (newname == null || !isUniqueInGlobals(newname.toString(), globals)
-	        || services.getNamespaces()
-	        .lookupLogicSymbol(newname)!=null) {
-	    newname = createName(bai.basename, bai.index, nci);
+        if (proposal != null) {
+            newname = new ProgramElementName(proposal.toString(), nci);
+        }
+        if (newname == null || !isUniqueInGlobals(newname.toString(), globals)
+            || services.getNamespaces()
+                .lookupLogicSymbol(newname) != null) {
+            newname = createName(bai.basename, bai.index, nci);
             int newcounter = getMaxCounterInGlobalsAndProgram(
                             bai.basename,
                             globals,
                             getProgramFromPIO(posOfFind),
                             null);
             final NamespaceSet namespaces = services.getNamespaces();
-            
-            while (!isUniqueInGlobals(newname.toString(), globals) ||
-                  namespaces.lookupLogicSymbol(newname)!=null) {
-	        newcounter += 1;
-	        newname = createName(bai.basename, newcounter, nci);
-	    }
-	}
+
+            while (!isUniqueInGlobals(newname.toString(), globals)
+                    || namespaces.lookupLogicSymbol(newname) != null) {
+                newcounter += 1;
+                newname = createName(bai.basename, newcounter, nci);
+            }
+        }
 
         ProgramVariable newvar = var;
         if (!newname.equals(name)) {

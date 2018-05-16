@@ -54,8 +54,22 @@ public interface SpecExtractor {
 
     /**
      * Returns the block contracts for the passed block.
+     * @param method the program method
+     * @param block the statement block
+     * @return the block contracts
      */
     public ImmutableSet<BlockContract> extractBlockContracts(
+            IProgramMethod method, StatementBlock block)
+            throws SLTranslationException;
+
+    /**
+     * Returns the loop contracts for the passed block.
+     * @param method the program method
+     * @param block the statement block
+     * @return the loop contracts
+     * @throws SLTranslationException a translation exception
+     */
+    public ImmutableSet<LoopContract> extractLoopContracts(
             IProgramMethod method, StatementBlock block)
             throws SLTranslationException;
 
@@ -74,8 +88,24 @@ public interface SpecExtractor {
     /**
      * Returns the block contracts for the passed labeled statement if it labels
      * a block.
+     * @param method the program method
+     * @param labeled the labeled statement
+     * @return the block contracts
+     * @throws SLTranslationException a translation exception
      */
     public ImmutableSet<BlockContract> extractBlockContracts(
+            IProgramMethod method, LabeledStatement labeled)
+            throws SLTranslationException;
+
+    /**
+     * Returns the loop contracts for the passed labeled statement if it labels
+     * a block.
+     * @param method the program method
+     * @param labeled the labeled statement
+     * @return the loop contracts
+     * @throws SLTranslationException a translation exception
+     */
+    public ImmutableSet<LoopContract> extractLoopContracts(
             IProgramMethod method, LabeledStatement labeled)
             throws SLTranslationException;
 

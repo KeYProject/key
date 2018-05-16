@@ -82,6 +82,7 @@ compile:openjdk10:
 checkstyle:
   stage: primary
   image: key-dev-openjdk8
+  allow_failure: true
   script:
     - echo "**** Check the commit's gitlab page for a readable checkstyle report ****"
     - (key/scripts/tools/checkstyle/runIncrementalCheckstyle.sh | tee report.txt) || true

@@ -61,9 +61,12 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.join.JoinIsApplicable;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
-import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.LoopContractExternalRule;
+import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -329,12 +332,45 @@ public class TacletMenu extends JMenu {
             item.addActionListener(control);
             add(item);
         }
-        else if (builtInRule == BlockContractRule.INSTANCE) {
+        else if (builtInRule == BlockContractInternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(
                     builtInRule.displayName(),
                     APPLY_RULE,
                     "Applies a known and complete block specification immediately.",
+                    CHOOSE_AND_APPLY_CONTRACT,
+                    "Asks to select the contract to be applied.", builtInRule);
+            item.addActionListener(control);
+            add(item);
+        }
+        else if (builtInRule == BlockContractExternalRule.INSTANCE) {
+            // we add two items in this case: one for auto one for interactive
+            item = new MenuItemForTwoModeRules(
+                    builtInRule.displayName(),
+                    APPLY_RULE,
+                    "All available contracts of the block are combined and applied.",
+                    CHOOSE_AND_APPLY_CONTRACT,
+                    "Asks to select the contract to be applied.", builtInRule);
+            item.addActionListener(control);
+            add(item);
+        }
+        else if (builtInRule == LoopContractInternalRule.INSTANCE) {
+            // we add two items in this case: one for auto one for interactive
+            item = new MenuItemForTwoModeRules(
+                    builtInRule.displayName(),
+                    APPLY_RULE,
+                    "Applies a known and complete loop block specification immediately.",
+                    CHOOSE_AND_APPLY_CONTRACT,
+                    "Asks to select the contract to be applied.", builtInRule);
+            item.addActionListener(control);
+            add(item);
+        }
+        else if (builtInRule == LoopContractExternalRule.INSTANCE) {
+            // we add two items in this case: one for auto one for interactive
+            item = new MenuItemForTwoModeRules(
+                    builtInRule.displayName(),
+                    APPLY_RULE,
+                    "All available contracts of the loop block are combined and applied.",
                     CHOOSE_AND_APPLY_CONTRACT,
                     "Asks to select the contract to be applied.", builtInRule);
             item.addActionListener(control);

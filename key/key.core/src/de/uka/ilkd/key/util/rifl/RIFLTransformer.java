@@ -17,14 +17,11 @@ import java.io.*;
 import javax.xml.parsers.*;
 
 
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.util.Debug;
 import org.xml.sax.*;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
-import recoder.java.Comment;
 import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
@@ -36,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.util.Pair;
 import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.MethodDeclaration;
 import recoder.java.declaration.ParameterDeclaration;

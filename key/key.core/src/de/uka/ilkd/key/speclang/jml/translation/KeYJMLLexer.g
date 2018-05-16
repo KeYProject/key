@@ -62,6 +62,7 @@ lexer grammar KeYJMLLexer;
     ALLFIELDS            : '\\all_fields';  //KeY extension, not official JML
     ALLOBJECTS           : '\\all_objects';  //KeY extension, not official JML
     BACKUP               : '\\backup';  //KeY extension, not official JML
+    BEFORE               : '\\before';  //KeY extension, not official JML
     BIGINT               : '\\bigint';
     BSUM                 : '\\bsum';  //KeY extension, not official JML
     BY                   : '\\by';  //KeY extension, not official JML
@@ -200,23 +201,24 @@ LT_IMPLICIT_GT_DISPATCH
     ;
 
 LPAREN
-	:
-	'('
-	;
+    :
+    '('
+    ;
 
 RPAREN
-:	')'
+    :
+    ')'
     ;
 
 LBRACKET
-	:
-	'['
-	;
+    :
+    '['
+    ;
 
 RBRACKET
-	:
-	']'
-	;
+    :
+    ']'
+    ;
 
 fragment
 LETTER
@@ -257,7 +259,7 @@ DECDIGIT
 
 fragment
 DIGIT
-	:
+    :
         '0'..'9'
 ;
 
@@ -324,7 +326,7 @@ IDENT
 ;
 
 fragment
-JML_IDENT 
+JML_IDENT
   :
   '\\' IDENT ;
 
@@ -338,7 +340,7 @@ BACKSLASH_PREFIXED:
  | JML_IDENT
  ;
 
-/* 
+/*
 HEXLITERAL
     :
         '0' ('x'|'X') (HEXDIGIT)+ ( 'l'|'L' )?
@@ -353,7 +355,7 @@ DECLITERAL
     :
         (('1'..'9') (DIGIT)* | '0') ( 'l'|'L' )?
     ;
-*/ 
+*/
 
 CHAR_LITERAL:
         '\''
@@ -373,30 +375,30 @@ STRING_LITERAL
 
 fragment
 ESC
-    :	'\\'
-    (	'n'
-	|	'r'
-	|	't'
-	|	'b'
-	|	'f'
-	|	'"'
-	|	'\''
-	|	'\\'
-	|	':'
-	|	' '
+    :   '\\'
+    (   'n'
+    |  'r'
+    |  't'
+    |  'b'
+    |  'f'
+    |  '"'
+    |  '\''
+    |  '\\'
+    |  ':'
+    |  ' '
     )
     ;
 
 WS
-	:	(' '
-	|	'\t'
-	|	'\n'
-	|	'\r'
-//	| PRAGMA (~';')* SEMI
+    :   (' '
+    |   '\t'
+    |   '\n'
+    |   '\r'
+//  | PRAGMA (~';')* SEMI
         |       '\u000C'
         |       '@')
-		{$channel=HIDDEN;}
-	;
+        {$channel=HIDDEN;}
+    ;
 
 
 INFORMAL_DESCRIPTION
@@ -416,15 +418,14 @@ SL_COMMENT
     ;
 
 DOC_COMMENT
-	:
-	'/**'
-	( options {greedy=false;} : . )*
-	'*/'
-	{$channel=HIDDEN;}
-	;
+    :
+    '/**'
+    ( options {greedy=false;} : . )*
+    '*/'
+    {$channel=HIDDEN;}
+    ;
 
 fragment PRAGMA
     :
     '\\nowarn'
     ;
-

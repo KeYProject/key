@@ -17,8 +17,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.rule.BlockContractRule;
-import de.uka.ilkd.key.speclang.BlockContract.Variables;
+import de.uka.ilkd.key.rule.BlockContractBuilders;
+import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 
 
 /**
@@ -60,7 +60,8 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
                                   TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException("Tried to produce a " +
-                                                    "program-term for a contract without modality.");
+                                                    "program-term for a " +
+                                                    "contract without modality.");
         }
 
         //create java block
@@ -106,10 +107,11 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
         //create block call
         final Label[] labelsArray = (Label[]) d.get(BasicSnippetData.Key.LABELS);
         final ImmutableArray<Label> labels = new ImmutableArray<Label>(labelsArray);
-        final Variables variables = (Variables) d.get(BasicSnippetData.Key.BLOCK_VARS);
+        final BlockSpecificationElement.Variables variables =
+                (BlockSpecificationElement.Variables) d.get(BasicSnippetData.Key.BLOCK_VARS);
         final StatementBlock block = (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
         final StatementBlock sb =
-                new BlockContractRule.ValidityProgramConstructor(labels, block,
+                new BlockContractBuilders.ValidityProgramConstructor(labels, block,
                                                                  variables,
                                                                  exceptionParameter,
                                                                  d.services).construct();

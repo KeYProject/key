@@ -12,7 +12,7 @@
                   <callStackEntry path="/0/0/0"/>
                   <callStackEntry path="/0"/>
                   <blockContract name="magic()) catch(exc_0)
-pre x_3 = 2
+pre measuredByEmpty &amp; x_3 = 2
 post exc_0 = null &amp; x_3 = -2
 mod {}termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true">
                      <callStackEntry path="/0/0/0"/>

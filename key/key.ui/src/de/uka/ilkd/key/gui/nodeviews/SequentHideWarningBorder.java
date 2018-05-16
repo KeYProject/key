@@ -5,12 +5,9 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Insets;
 import java.awt.Toolkit;
-import java.beans.PropertyChangeEvent;
 import java.util.Map;
 
-import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 

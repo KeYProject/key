@@ -1,0 +1,73 @@
+package de.uka.ilkd.key.gui;
+
+import java.util.List;
+
+import org.key_project.util.collection.ImmutableSet;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule.Instantiation;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopContractExternalBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopContractExternalRule;
+import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.LoopContract;
+
+/**
+ * Interactive completion for {@link LoopContractExternalBuiltInRuleApp}.
+ */
+public class LoopContractExternalCompletion implements InteractiveRuleApplicationCompletion {
+
+    private final MainWindow mainWindow;
+    
+    LoopContractExternalCompletion(MainWindow mainWindow){
+        this.mainWindow = mainWindow;
+    }
+
+    @Override
+    public IBuiltInRuleApp complete(final IBuiltInRuleApp application,
+            final Goal goal, final boolean force) {
+        LoopContractExternalBuiltInRuleApp result =
+                (LoopContractExternalBuiltInRuleApp) application;
+        if (!result.complete() && result.cannotComplete(goal)) {
+            return result;
+        }
+        if (force) {
+            result.tryToInstantiate(goal);
+            if (result.complete()) {
+                return result;
+            }
+        }
+        final Services services = goal.proof().getServices();
+        final Instantiation instantiation =
+                LoopContractExternalRule.INSTANCE
+                .instantiate(application.posInOccurrence().subTerm(), goal, services);
+        final ImmutableSet<LoopContract> contracts =
+                LoopContractExternalRule.getApplicableContracts(instantiation, goal, services);
+        final BlockSpecificationElementConfigurator<LoopContract> configurator
+            = new BlockSpecificationElementConfigurator<>("Loop Contract Configurator",
+                    new LoopContractSelectionPanel(services, true),
+                    mainWindow, services, contracts.toArray(new LoopContract[contracts.size()]),
+                    "Contracts for Block: " + instantiation.block);
+        if (configurator.wasSuccessful()) {
+            final List<LocationVariable> heaps =
+                    HeapContext.getModHeaps(services, instantiation.isTransactional());
+            result.update(instantiation.block, configurator.getContract(), heaps);
+        }
+        return result;
+    }
+
+    @Override
+    public boolean canComplete(final IBuiltInRuleApp app) {
+        return checkCanComplete(app);
+    }
+    
+    /**
+     * Checks if the app is supported. 
+     * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
+     */
+    public static boolean checkCanComplete(final IBuiltInRuleApp app) {
+       return app.rule() instanceof LoopContractExternalRule;
+   }
+}

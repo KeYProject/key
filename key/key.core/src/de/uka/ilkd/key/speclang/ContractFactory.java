@@ -292,6 +292,26 @@ public class ContractFactory {
         }
     }
 
+    /**
+     * Create a new {@link FunctionalBlockContract} from an existing {@link BlockContract}.
+     *
+     * @param blockContract the {@link BlockContract}.
+     * @return a new {@link FunctionalBlockContract}.
+     */
+    public FunctionalBlockContract funcBlock(BlockContract blockContract) {
+        return new FunctionalBlockContract(blockContract);
+    }
+
+    /**
+     * Create a new {@link FunctionalLoopContract} from an existing {@link LoopContract}.
+     *
+     * @param loopContract the {@link LoopContract}.
+     * @return a new {@link FunctionalLoopContract}.
+     */
+    public FunctionalLoopContract funcLoop(LoopContract loopContract) {
+        return new FunctionalLoopContract(loopContract);
+    }
+
     public FunctionalOperationContract func (IProgramMethod pm, InitiallyClause ini) throws SLTranslationException{
             return new JMLSpecFactory(services).initiallyClauseToContract(ini, pm);
     }

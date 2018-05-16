@@ -14,8 +14,6 @@
 package de.uka.ilkd.key.java;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 
 /**
  * represents a group of three Positions: relativePosition,

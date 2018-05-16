@@ -17,7 +17,7 @@
 [SMTSettings]instantiateHierarchyAssumptions=true
 [StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
 [StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
-[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_EXPAND
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT_INTERNAL
 [StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
 [StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
 [StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_RESTRICTED
@@ -79,7 +79,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
 (builtin "One Step Simplification" (formula "3"))
 (rule "assignment_write_static_attribute" (formula "3") (term "1"))
 (builtin "One Step Simplification" (formula "3"))
-(builtin "Block Contract" (formula "3") (newnames "anon_heap,result_0,exc_0,heap_Before_BLOCK,savedHeap_Before_BLOCK,o,f"))
+(builtin "Block Contract (Internal)" (formula "3") (newnames "anon_heap,result_0,exc_0,heap_Before_BLOCK,savedHeap_Before_BLOCK,o,f"))
 (branch "Validity"
    (builtin "One Step Simplification" (formula "3"))
    (builtin "One Step Simplification" (formula "4"))

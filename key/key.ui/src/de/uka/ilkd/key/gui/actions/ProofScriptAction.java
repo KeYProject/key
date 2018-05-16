@@ -17,9 +17,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 
 import javax.swing.AbstractAction;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JPanel;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ExceptionDialog;
