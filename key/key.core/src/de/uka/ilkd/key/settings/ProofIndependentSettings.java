@@ -31,16 +31,18 @@ public class ProofIndependentSettings implements SettingsListener {
             ProofIndependentSMTSettings.getDefaultSettingsData();
     private final LemmaGeneratorSettings lemmaGeneratorSettings =
             new LemmaGeneratorSettings();
-    private final GeneralSettings generalSettings= new GeneralSettings();
+    private final GeneralSettings generalSettings = new GeneralSettings();
     private final ViewSettings viewSettings = new ViewSettings();
     private final String filename;
 
     private final TestGenerationSettings testGenSettings = new TestGenerationSettings();
 
-    private final Settings[] settingsSet = { smtSettings,
-            lemmaGeneratorSettings,
-            generalSettings,
-            viewSettings,testGenSettings};
+    private final Settings[] settingsSet =
+        { smtSettings,
+          lemmaGeneratorSettings,
+          generalSettings,
+          viewSettings,
+          testGenSettings};
 
 
 
@@ -69,32 +71,32 @@ public class ProofIndependentSettings implements SettingsListener {
                     load(testFile);
                 }
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void load(File file) throws IOException{
+    private void load(File file) throws IOException {
         FileInputStream in = new FileInputStream(file);
         Properties properties = new Properties();
         properties.load(in);
-        for(Settings settings : settingsSet){
-            settings.readSettings(this,properties);
+        for(Settings settings : settingsSet) {
+            settings.readSettings(this, properties);
         }
         in.close();
     }
 
-    public void saveSettings(){
+    public void saveSettings() {
 
         try {
             File file = new File(filename);
             if (!file.exists()) {
-                new File(PathConfig.getKeyConfigDir()+File.separator).mkdirs();
+                new File(PathConfig.getKeyConfigDir() + File.separator).mkdirs();
                 file.createNewFile();
             }
             Properties result = new Properties();
             for (Settings settings : settingsSet) {
-                settings.writeSettings(this,result);
+                settings.writeSettings(this, result);
             }
             FileOutputStream out = new FileOutputStream(file);
             try {
@@ -102,7 +104,7 @@ public class ProofIndependentSettings implements SettingsListener {
             } finally {
                 out.close();
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
@@ -125,7 +127,7 @@ public class ProofIndependentSettings implements SettingsListener {
         return smtSettings;
     }
 
-    public TestGenerationSettings getTestGenerationSettings(){
+    public TestGenerationSettings getTestGenerationSettings() {
         return testGenSettings;
     }
 
@@ -142,7 +144,8 @@ public class ProofIndependentSettings implements SettingsListener {
 
     /**
      * Defines if pretty printing is enabled or not.
-     * @param usePrettyPrinting {@code true} pretty printing is enabled, {@code false} pretty printing is disabled.
+     * @param usePrettyPrinting {@code true} pretty printing is enabled,
+     *     {@code false} pretty printing is disabled.
      */
     public static void setUsePrettyPrinting(boolean usePrettyPrinting) {
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);

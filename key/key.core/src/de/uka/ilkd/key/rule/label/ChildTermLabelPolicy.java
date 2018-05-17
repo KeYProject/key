@@ -32,9 +32,12 @@ import de.uka.ilkd.key.rule.Rule;
 /**
  * <p>
  * A {@link ChildTermLabelPolicy} is used by
- * {@link TermLabelManager#instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Term, Rule, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}
- * to decide for each {@link TermLabel} on a child or grandchild of the application {@link Term} if it
- * should be re-added to the new {@link Term} or not.
+ * {@link TermLabelManager#instantiateLabels(
+ *     TermLabelState, Services, PosInOccurrence, Term, Term, Rule, Goal,
+ *     Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}
+ * to decide for each {@link TermLabel} on a child or grandchild of the
+ * application {@link Term} if it should be re-added to the new {@link Term}
+ * or not.
  * </p>
  * <p>
  * For more information about {@link TermLabel}s and how they are maintained
@@ -48,7 +51,10 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
    /**
     * Decides if the currently active {@link Rule} application is supported or not.
     * If it is not supported no iteration over children will be executed.
-    * Only if it returns {@code true} {@link #addLabel(TermServices, PosInOccurrence, Term, Rule, Goal, Object, Term, Operator, ImmutableArray<Term>, ImmutableArray<QuantifiableVariable>, JavaBlock, Term, TermLabel)}
+    * Only if it returns {@code true} {@link #addLabel(
+    *     TermServices, PosInOccurrence, Term, Rule, Goal, Object, Term,
+    *     Operator, ImmutableArray<Term>, ImmutableArray<QuantifiableVariable>,
+    *     JavaBlock, Term, TermLabel)}
     * will be called if a child {@link Term} contains a managed label.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
