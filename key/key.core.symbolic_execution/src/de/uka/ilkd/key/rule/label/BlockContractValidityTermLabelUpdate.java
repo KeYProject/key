@@ -39,7 +39,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Makes sure that {@link SymbolicExecutionUtil#BLOCK_CONTRACT_VALIDITY_LABEL} is introduced
+ * Makes sure that {@link BlockContractValidityTermLabel} is introduced
  * when a {@link BlockContractInternalRule} is applied.
  * @author Martin Hentschel
  */

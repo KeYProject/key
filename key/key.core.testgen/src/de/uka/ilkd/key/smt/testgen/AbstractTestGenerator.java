@@ -233,10 +233,11 @@ public abstract class AbstractTestGenerator {
     * proof for each node on which the emptyModality rules was applied if the
     * selected proof is closed.
     * 
-    * @param mediator
     * @param removeDuplicatePathConditions
     *            - if true no identical proofs will be created
-    * @return
+    * @param removePostCondition
+    *            - if true, remove post condition
+    * @return a list of proofs
     */
    private List<Proof> createProofsForTesting(boolean removeDuplicatePathConditions, boolean removePostCondition) {
       final List<Proof> res = new LinkedList<Proof>();
@@ -274,8 +275,8 @@ public abstract class AbstractTestGenerator {
    /**
     * Adds all nodes on which the emptyModality rule was applied to the list.
     * 
-    * @param root
-    * @param nodes
+    * @param root the root node
+    * @param nodes the nodes to be added
     */
    private void getNodesWithEmptyModalities(Node root, List<Node> nodes) {
       if (root.getAppliedRuleApp() != null) {
@@ -293,11 +294,11 @@ public abstract class AbstractTestGenerator {
     * Creates a proof with the specified node as its root. If an identical
     * proof is found in otherProofs than null will be returned instead.
     * 
-    * @param node
- * @param otherProofs
- * @param removePostCondition TODO
-    * @return
-    * @throws ProofInputException 
+    * @param node the new root node
+    * @param otherProofs a list of proofs as described above
+    * @param removePostCondition if true, then remove post condition
+    * @return the new proof with the specified root node
+    * @throws ProofInputException exception for proof input
     */
    private Proof createProofForTesting_noDuplicate(Node node, List<Proof> otherProofs, boolean removePostCondition) throws ProofInputException {
       // System.out.println("Create proof for test case from Node:"+node.serialNr());

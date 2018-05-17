@@ -154,10 +154,10 @@ public class TacletMenu extends JMenu {
     /** creates a new menu that displays all applicable rules at the given
      * position
      * @param sequentView the SequentView that is the parent of this menu
-     * @param findList IList<Taclet> with all applicable FindTaclets
-     * @param rewriteList IList<Taclet> with all applicable RewriteTaclets
-     * @param noFindList IList<Taclet> with all applicable noFindTaclets
-     * @param builtInList IList<BuiltInRule> with all applicable BuiltInRules
+     * @param findList {@link IList<Taclet>} with all applicable FindTaclets
+     * @param rewriteList {@link IList<Taclet>} with all applicable RewriteTaclets
+     * @param noFindList {@link IList<Taclet>} with all applicable noFindTaclets
+     * @param builtInList {@link IList<BuiltInRule>} with all applicable BuiltInRules
      * @param pos the PosInSequent
      */
     TacletMenu(CurrentGoalView sequentView,
@@ -176,7 +176,7 @@ public class TacletMenu extends JMenu {
 
 
     /** removes RewriteTaclet from list
-     * @param list the IList<Taclet> from where the RewriteTaclet are
+     * @param list the {@link IList<Taclet>} from where the RewriteTaclet are
      * removed
      * @return list without RewriteTaclets
      */
@@ -473,7 +473,7 @@ public class TacletMenu extends JMenu {
 
     /** adds a TacletMenuItem for each taclet in the list and sets
      * the given MenuControl as the ActionListener
-     * @param taclets IList<Taclet> with the Taclets the items represent
+     * @param taclets {@link IList<Taclet>} with the Taclets the items represent
      * @param control the ActionListener
      */
     private void createMenuItems(ImmutableList<TacletApp> taclets,
