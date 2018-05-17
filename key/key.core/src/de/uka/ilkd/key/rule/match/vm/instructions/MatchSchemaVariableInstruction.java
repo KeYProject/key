@@ -54,7 +54,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends SchemaVariable> 
      * @param instantiationCandidate the {@link ProgramElement} to be matched
      * @param mc the {@link MatchConditions} with additional constraints (e.g. previous matches of this instructions {@link SchemaVariable})
      * @param services the {@link Services}
-     * @return {@code null} if no matches have been found or the new {@link MatchConditions} with the pair {@link (sv, instantiationCandidate)} added
+     * @return {@code null} if no matches have been found or the new {@link MatchConditions} with the pair ({@link SchemaVariable}, {@param instantiationCandidate}) added
      */
     public MatchConditions match(ProgramElement instantiationCandidate, MatchConditions mc, Services services) {
         return null;

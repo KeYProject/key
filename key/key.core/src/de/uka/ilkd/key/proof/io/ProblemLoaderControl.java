@@ -36,7 +36,7 @@ public interface ProblemLoaderControl extends ProblemInitializerListener, Progre
 
    /**
     * This method is called if no {@link LoadedPOContainer} was created
-    * via {@link #createProofObligationContainer()} and can be overwritten
+    * via {@link AbstractProblemLoader#createProofObligationContainer()} and can be overwritten
     * for instance to open the proof management dialog as done by {@link ProblemLoader}.
     * @return true if the proof obligation was selected, and false if action was aborted
     */

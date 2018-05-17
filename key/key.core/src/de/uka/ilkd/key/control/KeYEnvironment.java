@@ -234,7 +234,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     * @param includes Optional includes to consider.
     * @param poPropertiesToForce Some optional PO {@link Properties} to force.
     * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
-    * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
+    * @param forceNewProfileOfNewProofs {@code} true {@link AbstractProblemLoader#profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */

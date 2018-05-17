@@ -31,7 +31,7 @@ import de.uka.ilkd.key.rule.Rule;
 /**
  * <p>
  * A {@link TermLabelRefactoring} is used by
- * {@link TermLabelManager#refactorGoal(Services, PosInOccurrence, Term, Rule, Goal, Term)}
+ * {@link TermLabelManager#refactorGoal(TermLabelState, Services, PosInOccurrence, Term, Rule, Goal, Term)}
  * to refactor the labels of each visited {@link Term}.
  * </p>
  * <p>
