@@ -15,7 +15,14 @@ public class ProofScriptArgument<T> {
     private boolean required;
     private boolean flag;
     private Field field;
-    private boolean hasVariableArguments;
+    /**
+     * is an argument ellipsis
+     */
+    private boolean variableArguments;
+    /**
+     * Holds the documentation of this argument.
+     */
+    private String documentation;
 
     public ProofScriptCommand<T> getCommand() {
         return command;
@@ -62,28 +69,36 @@ public class ProofScriptArgument<T> {
         return this;
     }
 
-    @Override public boolean equals(Object o) {
-        if (this == o)
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         ProofScriptArgument<?> that = (ProofScriptArgument<?>) o;
 
-        if (required != that.required)
+        if (required != that.required) {
             return false;
-        if (flag != that.flag)
+        }
+        if (flag != that.flag) {
             return false;
+        }
         if (command != null ?
                 !command.equals(that.command) :
-                that.command != null)
+                that.command != null) {
             return false;
-        if (name != null ? !name.equals(that.name) : that.name != null)
+        }
+        if (name != null ? !name.equals(that.name) : that.name != null) {
             return false;
+        }
         return type == that.type;
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         int result = command != null ? command.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
@@ -92,20 +107,40 @@ public class ProofScriptArgument<T> {
         return result;
     }
 
-    public void setField(Field field) {
-        this.field = field;
-    }
-
     public Field getField() {
         return field;
     }
 
+    public void setField(Field field) {
+        this.field = field;
+    }
+
+    /**
+     * Documentation for this argument.
+     *
+     * @return a non null string
+     */
+    public String getDocumentation() {
+        return documentation;
+    }
+
+    /**
+     * Documentation for this argument.
+     *
+     * @param documentation a string
+     * @return this
+     */
+    public ProofScriptArgument setDocumentation(String documentation) {
+        this.documentation = documentation;
+        return this;
+    }
+
     public ProofScriptArgument setVariableArguments(boolean hasVariableArguments) {
-        this.hasVariableArguments = hasVariableArguments;
+        this.variableArguments = hasVariableArguments;
         return this;
     }
 
     public boolean hasVariableArguments() {
-        return hasVariableArguments;
+        return variableArguments;
     }
 }

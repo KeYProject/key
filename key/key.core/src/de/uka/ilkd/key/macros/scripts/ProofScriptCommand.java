@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.util.List;
-import java.util.Map;
-
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * A {@link ProofScriptCommand} is an executable mutation on the given proof.
@@ -16,7 +16,7 @@ import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
  * <b>Version 2 (2017-03-28):</b> change of the interface support for structured arguments.
  * </p>
  *
- * @param T the arguments
+ * @param <T> the arguments
  * @author Mattias Ulbrich
  * @author Alexander Weigl
  */
@@ -35,15 +35,15 @@ public interface ProofScriptCommand<T> {
             throws Exception;
 
     /**
-     * @param uiControl
-     * @param args
-     * @param stateMap
-     * @throws ScriptException
-     * @throws InterruptedException
+     * @param uiControl the current ui controller
+     * @param args      the script arguments
+     * @param stateMap  the current state
+     * @throws ScriptException      if something bad happens
+     * @throws InterruptedException if something bad happens
      */
     //TODO downgrade AbstractUserInterfaceControl to UserInterfaceControl
     void execute(AbstractUserInterfaceControl uiControl, T args,
-            EngineState stateMap) throws ScriptException, InterruptedException;
+                 EngineState stateMap) throws ScriptException, InterruptedException;
 
     /**
      * Returns the name of this proof command.
@@ -54,4 +54,11 @@ public interface ProofScriptCommand<T> {
      * @see ProofScriptEngine
      */
     String getName();
+
+    /**
+     * A documentation for the commands.
+     *
+     * @return a non-null string
+     */
+    String getDocumentation();
 }
