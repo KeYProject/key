@@ -66,26 +66,8 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockContract;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionJoin;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLink;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
  * Provides utility methods which are used by {@link IKeYSENode}
@@ -245,8 +227,8 @@ public final class KeYModelUtil {
          else if (executionNode instanceof IExecutionOperationContract) {
             result = new KeYMethodContract(target, parent, thread, (IExecutionOperationContract)executionNode);
          }
-         else if (executionNode instanceof IExecutionBlockContract) {
-            result = new KeYBlockContract(target, parent, thread, (IExecutionBlockContract)executionNode);
+         else if (executionNode instanceof IExecutionBlockSpecificationElement) {
+            result = new KeYBlockContract(target, parent, thread, (IExecutionBlockSpecificationElement)executionNode);
          }
          else if (executionNode instanceof IExecutionLoopInvariant) {
             result = new KeYLoopInvariant(target, parent, thread, (IExecutionLoopInvariant)executionNode);

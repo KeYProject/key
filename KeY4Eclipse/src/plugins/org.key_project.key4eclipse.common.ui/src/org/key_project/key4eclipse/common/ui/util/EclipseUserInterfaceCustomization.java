@@ -3,10 +3,7 @@ package org.key_project.key4eclipse.common.ui.util;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.key_project.key4eclipse.common.ui.completion.BlockContractCompletion;
-import org.key_project.key4eclipse.common.ui.completion.DependencyContractCompletion;
-import org.key_project.key4eclipse.common.ui.completion.FunctionalOperationContractCompletion;
-import org.key_project.key4eclipse.common.ui.completion.LoopInvariantRuleCompletion;
+import org.key_project.key4eclipse.common.ui.completion.*;
 import org.key_project.key4eclipse.common.ui.wizard.CompleteAndApplyTacletMatchWizard;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
@@ -35,7 +32,9 @@ public final class EclipseUserInterfaceCustomization implements RuleCompletionHa
       completions.add(new FunctionalOperationContractCompletion());
       completions.add(new DependencyContractCompletion());
       completions.add(new LoopInvariantRuleCompletion());
-      completions.add(new BlockContractCompletion());
+      completions.add(new BlockContractInternalCompletion());
+      completions.add(new BlockContractExternalCompletion());
+
    }
    
    /**
