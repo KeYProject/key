@@ -75,6 +75,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     private static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
 
     public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
+
     // default starting color for heatmaps
     private static final Color HEATMAP_DEFAULT_START_COLOR = new Color(.8f, .7f, .5f);
 
@@ -195,7 +196,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 // something concerning highlighting does not work in the future, here could
                 // be a starting place to find the mistake.
                 range = new Range(range.start() + 1, range.end() + 1);
-
+                
                 Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR);
                 updateHighlights.add(tag);
                 paintHighlight(range, tag);
@@ -501,6 +502,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             SwingUtilities.invokeLater(sequentUpdater);
         }
     }
+
     /**
      * sets the text being printed
      */
@@ -668,4 +670,5 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     public String getTitle() {
         return "Current Goal";
     }
+
 }

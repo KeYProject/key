@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -206,7 +207,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             final ImmutableSet<ProgramVariable> localOuts,
             final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop) {
         final TermBuilder tb = services.getTermBuilder();
-        final Namespace progVarNS = services.getNamespaces().programVariables();
+        final Namespace<IProgramVariable> progVarNS =
+                services.getNamespaces().programVariables();
 
         Term beforeLoopUpdate = null;
         for (LocationVariable heap : heapContext) {

@@ -30,8 +30,6 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.literal.LongLiteral;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
 import de.uka.ilkd.key.java.expression.operator.BinaryNot;
@@ -386,59 +384,38 @@ public final class TypeConverter {
 
     public Term convertToLogicElement(ProgramElement pe,
 				      ExecutionContext ec) {
-	Debug.out("typeconverter: called for:", pe, pe.getClass());
-	if (pe instanceof ProgramVariable) {
-	    return tb.var((ProgramVariable)pe);
-	} else if (pe instanceof FieldReference) {
-	    return convertVariableReference((FieldReference)pe, ec);
-	} else if (pe instanceof MethodReference) {
-	    return convertMethodReference((MethodReference)pe, ec);
-	} else if (pe instanceof VariableReference) {
-	    return convertVariableReference((VariableReference)pe, ec);
-	} else if (pe instanceof ArrayReference){
-	    return convertArrayReference((ArrayReference)pe, ec);
-	} else if (pe instanceof Literal) {
-	    return convertLiteralExpression((Literal)pe);
-	} else if (pe instanceof Negative
-	        && ((Negative)pe).getChildAt(0) instanceof IntLiteral) {
-	    String val = ((IntLiteral)((Negative)pe).getChildAt(0)).getValue();
-	    if (val.charAt(0)=='-') {
-		return integerLDT.translateLiteral
-		    (new IntLiteral(val.substring(1)), services);
-	    } else {
-		return integerLDT.translateLiteral
-		    (new IntLiteral("-"+val), services);
-	    }
-	} else if (pe instanceof Negative
-		   && ((Negative)pe).getChildAt(0) instanceof LongLiteral ) {
-	    String val = ((LongLiteral)
-			  ((Negative)pe).getChildAt(0)).getValue();
-	    if (val.charAt(0)=='-') {
-		return integerLDT.translateLiteral
-		    (new LongLiteral(val.substring(1)), services);
-	    } else {
-		return integerLDT.translateLiteral
-		    (new LongLiteral("-"+val), services);
-	    }
-	} else if (pe instanceof ThisReference) {
-	    return convertReferencePrefix((ThisReference)pe, ec);
-	} else if (pe instanceof ParenthesizedExpression) {
+        Debug.out("typeconverter: called for:", pe, pe.getClass());
+        if (pe instanceof ProgramVariable) {
+            return tb.var((ProgramVariable)pe);
+        } else if (pe instanceof FieldReference) {
+            return convertVariableReference((FieldReference)pe, ec);
+        } else if (pe instanceof MethodReference) {
+            return convertMethodReference((MethodReference)pe, ec);
+        } else if (pe instanceof VariableReference) {
+            return convertVariableReference((VariableReference)pe, ec);
+        } else if (pe instanceof ArrayReference) {
+            return convertArrayReference((ArrayReference)pe, ec);
+        } else if (pe instanceof Literal) {
+            return convertLiteralExpression((Literal)pe);
+        } else if (pe instanceof ThisReference) {
+            return convertReferencePrefix((ThisReference)pe, ec);
+        } else if (pe instanceof ParenthesizedExpression) {
             return convertToLogicElement
                 (((ParenthesizedExpression)pe).getChildAt(0), ec);
         } else if (pe instanceof Instanceof) {
-	    return convertToInstanceofTerm((Instanceof)pe, ec);
-	} else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
-	    return translateOperator
-		((de.uka.ilkd.key.java.expression.Operator)pe, ec);
-	} else if (pe instanceof recoder.abstraction.PrimitiveType) {
-	    throw new IllegalArgumentException("TypeConverter could not handle"
-					       +" this primitive type");
-	} else if (pe instanceof MetaClassReference) {
-	    assert false : "not supported";
+            return convertToInstanceofTerm((Instanceof)pe, ec);
+        } else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
+            return translateOperator
+                    ((de.uka.ilkd.key.java.expression.Operator)pe, ec);
+        } else if (pe instanceof recoder.abstraction.PrimitiveType) {
+            throw new IllegalArgumentException("TypeConverter could not handle"
+                    + " this primitive type");
+        } else if (pe instanceof MetaClassReference) {
+            assert false : "not supported";
         }
-	throw new IllegalArgumentException
-	    ("TypeConverter: Unknown or not convertable ProgramElement " + pe+
-             " of type "+pe.getClass());
+        throw new IllegalArgumentException
+        ("TypeConverter: Unknown or not convertable ProgramElement " + pe +
+             " of type " + pe.getClass());
     }
 
 

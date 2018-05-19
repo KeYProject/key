@@ -34,7 +34,7 @@ Require-Bundle: org.eclipse.ui,
  org.key_project.core.test;bundle-version="1.0.0",
  org.key_project.ui;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.sed.key.core.test.suite,
  org.key_project.sed.key.core.test.suite.swtbot,
@@ -42,3 +42,4 @@ Export-Package: org.key_project.sed.key.core.test.suite,
  org.key_project.sed.key.core.test.testcase.swtbot,
  org.key_project.sed.key.core.test.util
 Import-Package: org.key_project.sed.ui.visualization.view
+Automatic-Module-Name: org.key_project.sed.key.core.test

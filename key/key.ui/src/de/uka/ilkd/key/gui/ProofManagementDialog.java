@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.swing.BoxLayout;
@@ -553,6 +554,10 @@ public final class ProofManagementDialog extends JDialog {
 	        final ImmutableSet<Contract> contracts 
 	        = initConfig.getServices().getSpecificationRepository().getContracts(entry.kjt, entry.target);
 	        pan.setContracts(contracts, "Contracts");
+	        
+	        pan.setGrayOutAuxiliaryContracts(
+	                Objects.equals(
+	                        targetIcons.get(new Pair<>(entry.kjt, entry.target)), keyClosedIcon));
 	    } else {
 	        pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");	        
 	    }	    	    
@@ -588,6 +593,11 @@ public final class ProofManagementDialog extends JDialog {
                 boolean allClosed = true;
                 boolean lemmasLeft = false;
                 for (Contract contract : contracts) {
+                    // Skip auxiliary contracts (like block/loop contracts).
+                    if (contract.isAuxiliary()) {
+                        continue;
+                    }
+                    
                     // TODO: why do we create a PO to check if all proofs have been closed?
                     final ProofOblInput po = contract.createProofObl(initConfig, contract);
                     Proof proof = findPreferablyClosedProof(po);

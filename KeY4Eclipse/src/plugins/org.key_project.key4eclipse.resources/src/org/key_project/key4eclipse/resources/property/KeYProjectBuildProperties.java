@@ -13,6 +13,7 @@ public class KeYProjectBuildProperties {
    private final boolean generateTestCases;
    private final boolean autoDeleteTestCases;
    private final boolean generateCounterExamples;
+   private final String[] excludedJavaTypes;
    
    public KeYProjectBuildProperties(IProject project) {
       super();
@@ -25,6 +26,7 @@ public class KeYProjectBuildProperties {
       this.generateTestCases = KeYProjectProperties.isGenerateTestCases(project);
       this.autoDeleteTestCases = KeYProjectProperties.isAutoDeleteTestCases(project);
       this.generateCounterExamples = KeYProjectProperties.isGenerateCounterExamples(project);
+      this.excludedJavaTypes = KeYProjectProperties.getExcludedJavaTypes(project);
    }
    
    public boolean isEnableKeYResourcesBuilds() {
@@ -53,5 +55,9 @@ public class KeYProjectBuildProperties {
    }
    public boolean isGenerateCounterExamples() {
        return generateCounterExamples;
-    }   
+   }   
+   public String[] getExcludedJavaTypes() {
+       return excludedJavaTypes;
+   }
+   
 }

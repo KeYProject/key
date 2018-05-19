@@ -22,7 +22,6 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
@@ -497,6 +496,7 @@ public abstract class SequentView extends JEditorPane {
      * formulas, it suffices to repaint them.
      */
     protected void updateHidingProperty() {
+        updateUI();
         if (getParent() != null) {
             getParent().repaint();
         }

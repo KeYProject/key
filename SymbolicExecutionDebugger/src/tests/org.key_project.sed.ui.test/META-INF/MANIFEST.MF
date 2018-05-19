@@ -15,8 +15,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.sed.ui;bundle-version="1.0.0",
  org.key_project.sed.core.test;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.sed.ui.test.suite,
  org.key_project.sed.ui.test.suite.swtbot,
  org.key_project.sed.ui.test.testcase.swtbot
+Automatic-Module-Name: org.key_project.sed.ui.test

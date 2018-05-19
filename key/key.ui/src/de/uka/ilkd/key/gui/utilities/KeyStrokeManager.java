@@ -20,6 +20,8 @@ import java.util.Map;
 
 import javax.swing.KeyStroke;
 
+import de.uka.ilkd.key.gui.actions.DecreaseFontSizeAction;
+import de.uka.ilkd.key.gui.actions.IncreaseFontSizeAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.macros.ProofMacro;
 
@@ -101,6 +103,8 @@ public final class KeyStrokeManager {
         mapping.put(de.uka.ilkd.key.gui.actions.EditMostRecentFileAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_E,SHORTCUT_KEY_MASK));
         mapping.put(de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_P,MULTI_KEY_MASK));
         mapping.put(de.uka.ilkd.key.gui.actions.UnicodeToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_U,MULTI_KEY_MASK));
+        mapping.put(IncreaseFontSizeAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, SHORTCUT_KEY_MASK));
+        mapping.put(DecreaseFontSizeAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, SHORTCUT_KEY_MASK));
     }
     
     public static KeyStroke get (ProofMacro macro) {

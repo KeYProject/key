@@ -27,7 +27,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jdt.debug,
  org.eclipse.debug.ui
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.key4eclipse.common.ui.breakpoints,
  org.key_project.key4eclipse.common.ui.composite,
@@ -45,3 +45,5 @@ Export-Package: org.key_project.key4eclipse.common.ui.breakpoints,
  org.key_project.key4eclipse.common.ui.util,
  org.key_project.key4eclipse.common.ui.wizard,
  org.key_project.key4eclipse.common.ui.wizard.page
+Automatic-Module-Name: org.key_project.key4eclipse.common.ui
+Import-Package: de.uka.ilkd.key.rule

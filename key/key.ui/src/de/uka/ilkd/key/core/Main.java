@@ -17,6 +17,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -414,12 +415,18 @@ public final class Main {
                 if (macro.equals(m.getClass().getSimpleName())) {
                     // memorize macro for later
                     try {
-                        autoMacro = m.getClass().newInstance();
+                        autoMacro = m.getClass().getDeclaredConstructor().newInstance();
                     } catch (InstantiationException e) {
                         System.err.println("Automatic proof macro can not be instantiated!");
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {
                         System.err.println("Automatic proof macro can not be accessed!");
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        System.err.println("Automatic proof macro can not be invoked!");
+                        e.printStackTrace();
+                    } catch (NoSuchMethodException e) {
+                        System.err.println("Automatic proof macro can not be called!");
                         e.printStackTrace();
                     }
                     break;

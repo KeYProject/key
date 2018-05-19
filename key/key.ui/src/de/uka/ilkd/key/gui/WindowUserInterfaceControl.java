@@ -25,19 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 
-import de.uka.ilkd.key.proof.io.*;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -52,20 +41,12 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.ApplyStrategy;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
-import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -94,7 +75,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         completions.add(new FunctionalOperationContractCompletion());
         completions.add(new DependencyContractCompletion());
         completions.add(new LoopInvariantRuleCompletion());
-        completions.add(new BlockContractCompletion(mainWindow));
+        completions.add(new BlockContractInternalCompletion(mainWindow));
+        completions.add(new BlockContractExternalCompletion(mainWindow));
         completions.add(MergeRuleCompletion.INSTANCE);
     }
 

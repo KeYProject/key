@@ -13,13 +13,15 @@
 
 package org.key_project.key4eclipse.resources.property;
 
+import java.util.Arrays;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 
 /**
  * Properties for the ProofManagementPropertyPage.
- * @author Stefan Käsdorf
+ * @author Stefan Kï¿½sdorf
  */
 public final class KeYProjectProperties {
    
@@ -34,7 +36,8 @@ public final class KeYProjectProperties {
    public static final QualifiedName PROP_GENERATE_TEST_CASES = new QualifiedName("org.key_project.key4eclipse.resources", "generateTestCases");
    public static final QualifiedName PROP_GENERATE_COUNTER_EXAMPLES = new QualifiedName("org.key_project.key4eclipse.resources", "counterExamples");
    public static final QualifiedName PROP_AUTO_DELETE_TEST_CASES = new QualifiedName("org.key_project.key4eclipse.resources", "autoDeleteTestCases");
-    
+   public static final QualifiedName PROP_EXCLUDED_JAVA_TYPES = new QualifiedName("org.key_project.key4eclipse.resources", "excludedJavaTypes");
+
    public static boolean isEnableKeYResourcesBuilds(IProject project) {
       if (project != null) {
          String value;
@@ -241,11 +244,37 @@ public final class KeYProjectProperties {
       }
       return false;
    }
-   
+
+   public static String[] getExcludedJavaTypes(IProject project) {
+       String[] javaTypes = new String[0];
+       if (project != null) {
+           String types;
+           try {
+               types = project.getPersistentProperties().get(PROP_EXCLUDED_JAVA_TYPES);
+           } catch (CoreException e) {
+               e.printStackTrace();
+               return javaTypes;
+           }
+           if (types != null && types.length() > 2) {
+               // types is a string of the form ["a","b","c"]
+               // remove [  ] and split at ','
+               javaTypes = types.substring(1, types.length() - 1).split(",");
+               Arrays.sort(javaTypes);
+           }        
+       }
+       return javaTypes;
+   }
+
+   public static void setExcludedJavaTypes(IProject project, String[] types) throws CoreException {
+       if (project != null) {
+           project.setPersistentProperty(PROP_EXCLUDED_JAVA_TYPES, Arrays.toString(types).replaceAll(" ", ""));
+        }
+   }
    
    public static void setAutoDeleteTestCases(IProject project,  boolean enabled) throws CoreException {
       if (project != null) {
          project.setPersistentProperty(PROP_AUTO_DELETE_TEST_CASES, enabled + "");
       }
    }
+
 }

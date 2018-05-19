@@ -25,7 +25,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.key4eclipse.starter.core;bundle-version="1.0.0",
  org.key_project.key4eclipse.common.ui;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.keyide.ui.composite,
  org.key_project.keyide.ui.editor,
@@ -41,3 +41,4 @@ Export-Package: org.key_project.keyide.ui.composite,
  org.key_project.keyide.ui.util,
  org.key_project.keyide.ui.views
 Import-Package: org.eclipse.jdt.internal.debug.core.breakpoints
+Automatic-Module-Name: org.key_project.keyide.ui

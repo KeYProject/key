@@ -48,7 +48,7 @@ public class SimpleTacletSelectionMenu extends JMenu {
     /**
      * creates an instance of this menu displaying the applications stored in
      * <tt>apps</tt>
-     * @param apps the IList<PosTacletApp> to be displayed
+     * @param apps the {@link IList<PosTacletApp>} to be displayed
      * @param info the NotationInfo used to pretty print the taclets in 
      * tooltips
      * @param listener the ActionListener which is registered at each 

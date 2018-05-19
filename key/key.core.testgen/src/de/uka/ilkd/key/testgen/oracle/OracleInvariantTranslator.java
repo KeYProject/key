@@ -68,7 +68,7 @@ public class OracleInvariantTranslator {
                     	 }
                      }
                      else if(right.op().name().equals(inv.op().name())){
-                    	 if(!left.op().equals(tb.tt())){
+                    	 if(!left.equals(tb.tt())){
                     		 result = tb.and(result, left);
                     	 }
                      }
