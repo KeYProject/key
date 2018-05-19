@@ -21,9 +21,10 @@ import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.BlockContractRule;
-import de.uka.ilkd.key.rule.BlockContractRule.Instantiation;
+import de.uka.ilkd.key.rule.AbstractBlockContractRule;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule.Instantiation;
+import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
+import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
@@ -33,13 +34,13 @@ import de.uka.ilkd.key.speclang.HeapContext;
  * The {@link InteractiveRuleApplicationCompletion} to treat {@link BlockContractRule} in the Eclipse context.
  * @author Martin Hentschel
  */
-public class BlockContractCompletion extends AbstractInteractiveRuleApplicationCompletion {
+public class BlockContractInternalCompletion extends AbstractInteractiveRuleApplicationCompletion {
    /**
     * {@inheritDoc}
     */
    @Override
    public boolean canComplete(IBuiltInRuleApp app) {
-      return de.uka.ilkd.key.gui.BlockContractCompletion.checkCanComplete(app);
+      return de.uka.ilkd.key.gui.BlockContractInternalCompletion.checkCanComplete(app);
    }
 
    /**
@@ -89,8 +90,8 @@ public class BlockContractCompletion extends AbstractInteractiveRuleApplicationC
       public Perform(IBuiltInRuleApp app, Goal goal, boolean forced) {
          super(app, goal, forced);
          services = goal.proof().getServices();
-         instantiation = BlockContractRule.instantiate(app.posInOccurrence().subTerm(), goal, getServices());
-         contracts = BlockContractRule.getApplicableContracts(instantiation, goal, getServices());
+         instantiation = BlockContractInternalRule.INSTANCE.instantiate(app.posInOccurrence().subTerm(), goal, getServices());
+         contracts = AbstractBlockContractRule.getApplicableContracts(instantiation, goal, getServices());
       }
 
       /**
@@ -154,7 +155,7 @@ public class BlockContractCompletion extends AbstractInteractiveRuleApplicationC
       public IBuiltInRuleApp finish() {
          BlockContract contract = getSelectedContract();
          if(contract != null) {
-            BlockContractBuiltInRuleApp result = (BlockContractBuiltInRuleApp) getApp();
+            BlockContractInternalBuiltInRuleApp result = (BlockContractInternalBuiltInRuleApp) getApp();
             final List<LocationVariable> heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());
             result.update(instantiation.block, contract, heaps);
             return result;
@@ -170,7 +171,7 @@ public class BlockContractCompletion extends AbstractInteractiveRuleApplicationC
       @SuppressWarnings("unchecked")
       protected BlockContract getSelectedContract() {
          final List<?> selection = SWTUtil.toList(viewer.getSelection());
-         return BlockContractSelectionPanel.computeContract(services, (List<BlockContract>) selection);
+         return BlockContractSelectionPanel.computeBlockContract(services, (List<BlockContract>) selection);
       }
 
       /**

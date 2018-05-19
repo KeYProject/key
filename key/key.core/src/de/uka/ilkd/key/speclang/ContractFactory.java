@@ -507,7 +507,7 @@ public class ContractFactory {
                 }
                 
                 // the modifies clause must be computed before the preconditions
-                if (hasMod.get(h) || other.hasModifiesClause(h)) {
+                if (hasMod.get(h) || t.hasModifiesClause(h) || other.hasModifiesClause(h)) {
                     hasMod.put(h, true);
                     Term m1 = mods.get(h);
                     Term m2 = other.getMod(h, t.originalSelfVar,

@@ -12,21 +12,61 @@ import java.util.Map;
  * @version 1 (29.03.17)
  */
 public class ValueInjector {
-    private static ValueInjector INSTANCE;
-    private Map<Class, Converter> converters = new HashMap<>();
+    /**
+     * A default instance
+     *
+     * @see #getInstance()
+     */
+    private static ValueInjector instance;
 
+    /**
+     * A mapping between desired types and suitable @{@link StringConverter}.
+     * <p>
+     * Should be <pre>T --> StringConverter<T></pre>
+     */
+    private Map<Class, StringConverter> converters = new HashMap<>();
+
+    /**
+     * Injects the given {@code arguments} in the {@code obj}.
+     * For more details see {@link #inject(ProofScriptCommand, Object, Map)}
+     *
+     * @param command   a proof script command
+     * @param obj       a paramter class with annotation
+     * @param arguments a non-null map of string pairs
+     * @param <T> an arbitrary type
+     * @return the same object as {@code obj}
+     * @throws ArgumentRequiredException     a required argument was not given in {@code arguments}
+     * @throws InjectionReflectionException  an access on some reflection methods occured
+     * @throws NoSpecifiedConverterException unknown type for the current converter map
+     * @throws ConversionException           an converter could not translage the given value in
+     *                                       {@arguments}
+     */
     public static <T> T injection(ProofScriptCommand command, T obj, Map<String, String> arguments)
-            throws ArgumentRequiredException, InjectionReflectionException, NoSpecifiedConverter, ConversionException,
-            IllegalAccessException {
+            throws ArgumentRequiredException, InjectionReflectionException,
+            NoSpecifiedConverterException, ConversionException {
         return getInstance().inject(command, obj, arguments);
     }
 
+    /**
+     * Returns the default instance of a {@link ValueInjector}
+     * Use with care. No multi-threading.
+     *
+     * @return a static reference to the default converter.
+     * @see #createDefault()
+     */
     public static ValueInjector getInstance() {
-        if (INSTANCE == null)
-            INSTANCE = createDefault();
-        return INSTANCE;
+        if (instance == null) {
+            instance = createDefault();
+        }
+        return instance;
     }
 
+    /**
+     * Returns a fresh instance of a {@link ValueInjector} with the support
+     * for basic primitive data types.
+     *
+     * @return a fresh instance
+     */
     public static ValueInjector createDefault() {
         ValueInjector vi = new ValueInjector();
         vi.addConverter(Integer.class, Integer::parseInt);
@@ -45,10 +85,27 @@ public class ValueInjector {
         return vi;
     }
 
+    /**
+     * Injects the converted version of the given {@code arguments} in the given {@code obj}.
+     *
+     * @param command   a proof script command
+     * @param obj       a non-null instance of a parameter class (with annotation)
+     * @param arguments a non-null string map
+     * @param <T>       type safety
+     * @return the same object as {@code obj}
+     * @throws ArgumentRequiredException     a required argument was not given in {@code arguments}
+     * @throws InjectionReflectionException  an access on some reflection methods occured
+     * @throws NoSpecifiedConverterException unknown type for the current converter map
+     * @throws ConversionException           an converter could not translage the given value
+     *                                       in {@arguments}
+     * @see Option
+     * @see Flag
+     */
     public <T> T inject(ProofScriptCommand command, T obj, Map<String, String> arguments)
-            throws IllegalAccessException, ConversionException, InjectionReflectionException, NoSpecifiedConverter,
+            throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
             ArgumentRequiredException {
-        List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(obj.getClass(), command);
+        List<ProofScriptArgument> meta = ArgumentsLifter
+                .inferScriptArguments(obj.getClass(), command);
         List<ProofScriptArgument> varArgs = new ArrayList<>(meta.size());
 
         List<String> usedKeys = new ArrayList<>();
@@ -78,59 +135,85 @@ public class ValueInjector {
         return obj;
     }
 
-    private Map getStringMap(Object obj, ProofScriptArgument vararg) throws IllegalAccessException {
-        Map map = (Map) vararg.getField().get(obj);
-        if (map == null) {
-            map = new HashMap();
-            vararg.getField().set(obj, map);
+    private Map getStringMap(Object obj, ProofScriptArgument vararg)
+            throws InjectionReflectionException {
+        try {
+            Map map = (Map) vararg.getField().get(obj);
+            if (map == null) {
+                map = new HashMap();
+                vararg.getField().set(obj, map);
+            }
+            return map;
+        } catch (IllegalAccessException e) {
+            throw new InjectionReflectionException(
+                    "Error on using reflection on class " + obj.getClass(), e, vararg);
         }
-        return map;
     }
 
     private void injectIntoField(ProofScriptArgument meta, Map<String, String> args, Object obj)
-            throws InjectionReflectionException, ArgumentRequiredException, ConversionException, NoSpecifiedConverter {
+            throws InjectionReflectionException, ArgumentRequiredException,
+            ConversionException, NoSpecifiedConverterException {
         final String val = args.get(meta.getName());
         if (val == null) {
-            if (meta.isRequired())
+            if (meta.isRequired()) {
                 throw new ArgumentRequiredException(
-                        String.format("Argument %s:%s is required, but %s was given. For comamnd class: '%s'",
+                        String.format("Argument %s:%s is required, but %s was given. " +
+                                        "For comamnd class: '%s'",
                                 meta.getName(), meta.getField().getType(), val,
                                 meta.getCommand().getClass()), meta);
-
+            }
         } else {
             Object value = convert(meta, val);
             try {
                 //if (meta.getType() != value.getClass())
                 //    throw new ConversionException("The typed returned '" + val.getClass()
-                //            + "' from the converter mismtached with the type of the field " + meta.getType(), meta);
+                //            + "' from the converter mismtached with the
+                // type of the field " + meta.getType(), meta);
                 meta.getField().set(obj, value);
             } catch (IllegalAccessException e) {
-                throw new InjectionReflectionException("Could not inject values via reflection", e, meta);
+                throw new InjectionReflectionException("Could not inject values via reflection",
+                        e, meta);
             }
         }
     }
 
     @SuppressWarnings("unchecked")
     private Object convert(ProofScriptArgument meta, String val)
-            throws NoSpecifiedConverter, ConversionException {
-        Converter converter = getConverter(meta.getType());
-        if (converter == null)
-            throw new NoSpecifiedConverter("No converter registered for class: " + meta.getField().getType(), meta);
-
+            throws NoSpecifiedConverterException, ConversionException {
+        StringConverter converter = getConverter(meta.getType());
+        if (converter == null) {
+            throw new NoSpecifiedConverterException("No converter registered for class: " +
+                    meta.getField().getType(), meta);
+        }
         try {
             return converter.convert(val);
         } catch (Exception e) {
             throw new ConversionException(
-                    String.format("Could not convert value %s to type %s", val, meta.getField().getType()), e, meta);
+                    String.format("Could not convert value %s to type %s",
+                            val, meta.getField().getType()), e, meta);
         }
     }
 
-    public <T> void addConverter(Class<T> clazz, Converter<T> conv) {
+    /**
+     * Registers the given converter for the specified class.
+     *
+     * @param clazz a class
+     * @param conv  a converter for the given class
+     * @param <T>   an arbitrary type
+     */
+    public <T> void addConverter(Class<T> clazz, StringConverter<T> conv) {
         converters.put(clazz, conv);
     }
 
+    /**
+     * Finds a converter for the given class.
+     *
+     * @param clazz a non-null class
+     * @param <T>   an arbitrary type
+     * @return null or a suitable converter (registered) converter for the requested class.
+     */
     @SuppressWarnings("unchecked")
-    public <T> Converter<T> getConverter(Class<T> clazz) {
-        return (Converter<T>) converters.get(clazz);
+    public <T> StringConverter<T> getConverter(Class<T> clazz) {
+        return (StringConverter<T>) converters.get(clazz);
     }
 }
