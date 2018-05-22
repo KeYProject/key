@@ -40,5 +40,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ocl.ecore;visibility:=reexport,
  org.eclipse.gef;visibility:=reexport
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8, JavaSE-10, JavaSE-9
 Automatic-Module-Name: de.hentschel.visualdbc.dbcmodel.diagram
