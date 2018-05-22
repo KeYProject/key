@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -72,10 +73,41 @@ public class NodeInfo {
     /** User-provided plain-text annotations to the node. */
     private String notes;
 
+    /** Information about changes respective to the parent of this node. */
+    private SequentChangeInfo sequentChangeInfo;
+
     public NodeInfo(Node node) {
         this.node = node;
     }
 
+    static {
+        symbolicExecNames.add(new Name("method_expand"));
+        symbolicExecNames.add(new Name("simplify_prog"));
+        symbolicExecNames.add(new Name("simplify_autoname"));
+        symbolicExecNames.add(new Name("executeIntegerAssignment"));
+        symbolicExecNames.add(new Name("simplify_object_creation"));
+        symbolicExecNames.add(new Name("split_if"));
+        symbolicExecNames.add(new Name("split_cond"));
+        symbolicExecNames.add(new Name("simplify_expression"));
+        symbolicExecNames.add(new Name("loop_expand"));
+    }
+
+
+    /**
+     * determines the first and active statement if the applied
+     * taclet worked on a modality
+     */
+    private void determineFirstAndActiveStatement() {
+        if (determinedFstAndActiveStatement)
+            return;
+        final RuleApp ruleApp = node.getAppliedRuleApp();
+        if (ruleApp instanceof PosTacletApp) {
+           firstStatement = computeFirstStatement(ruleApp);
+           firstStatementString = null;
+           activeStatement = computeActiveStatement(ruleApp);
+           determinedFstAndActiveStatement = true;
+        }
+    }
 
     /**
      * <p>
@@ -89,8 +121,8 @@ public class NodeInfo {
      * @return The active statement or {@code null} if no one is provided.
      */
     public static SourceElement computeActiveStatement(RuleApp ruleApp) {
-        SourceElement firstStatement = computeFirstStatement(ruleApp);
-        return computeActiveStatement(firstStatement);
+       SourceElement firstStatement = computeFirstStatement(ruleApp);
+       return computeActiveStatement(firstStatement);
     }
 
     /**
@@ -105,20 +137,18 @@ public class NodeInfo {
      * @return The first statement or {@code null} if no one is provided.
      */
     public static SourceElement computeFirstStatement(RuleApp ruleApp) {
-        SourceElement firstStatement = null;
-        // TODO: unify with MiscTools getActiveStatement
-        if (ruleApp instanceof PosTacletApp) {
-            PosTacletApp pta = (PosTacletApp) ruleApp;
-            if (!isSymbolicExecution(pta.taclet())) {
-                return null;
-            }
-            Term t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
-            final ProgramElement pe = t.javaBlock().program();
-            if (pe != null) {
-                firstStatement = pe.getFirstElement();
-            }
-        }
-        return firstStatement;
+       SourceElement firstStatement = null;
+       // TODO: unify with MiscTools getActiveStatement
+       if (ruleApp instanceof PosTacletApp) {
+           PosTacletApp pta = (PosTacletApp) ruleApp;
+           if (!isSymbolicExecution(pta.taclet())) return null;
+           Term t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
+           final ProgramElement pe = t.javaBlock().program();
+           if (pe != null) {
+               firstStatement = pe.getFirstElement();
+           }
+       }
+       return firstStatement;
     }
 
     /**
@@ -133,16 +163,24 @@ public class NodeInfo {
      * @return The active statement or {@code null} if no one is provided.
      */
     public static SourceElement computeActiveStatement(SourceElement firstStatement) {
-        SourceElement activeStatement = null;
-        // TODO: unify with MiscTools getActiveStatement
-        if (firstStatement != null) {
-            activeStatement = firstStatement;
-            while ((activeStatement instanceof ProgramPrefix)
-                    && !(activeStatement instanceof StatementBlock)) {
-                activeStatement = activeStatement.getFirstElement();
-            }
-        }
-        return activeStatement;
+       SourceElement activeStatement = null;
+       // TODO: unify with MiscTools getActiveStatement
+       if (firstStatement != null) {
+          activeStatement = firstStatement;
+          while ((activeStatement instanceof ProgramPrefix)
+                  && !(activeStatement instanceof StatementBlock)) {
+              activeStatement = activeStatement.getFirstElement();
+          }
+       }
+       return activeStatement;
+    }
+
+    void updateNoteInfo(){
+        determinedFstAndActiveStatement = false;
+        firstStatement = null;
+        firstStatementString = null;
+        activeStatement = null;
+        determineFirstAndActiveStatement();
     }
 
     /**
@@ -173,31 +211,15 @@ public class NodeInfo {
 
     public static boolean isSymbolicExecution(Taclet t) {
         ImmutableList<RuleSet> list = t.getRuleSets();
-        RuleSet rs;
-        while (!list.isEmpty()) {
-            rs = list.head ();
+	RuleSet       rs;
+	while (!list.isEmpty()) {
+	    rs = list.head ();
             Name name = rs.name();
-            if (symbolicExecNames.contains(name)) {
-                return true;
-            }
-            list = list.tail();
-        }
-        return false;
+	    if (symbolicExecNames.contains(name)) return true;
+	    list = list.tail();
+	}
+	return false;
     }
-
-
-    static {
-        symbolicExecNames.add(new Name("method_expand"));
-        symbolicExecNames.add(new Name("simplify_prog"));
-        symbolicExecNames.add(new Name("simplify_autoname"));
-        symbolicExecNames.add(new Name("executeIntegerAssignment"));
-        symbolicExecNames.add(new Name("simplify_object_creation"));
-        symbolicExecNames.add(new Name("split_if"));
-        symbolicExecNames.add(new Name("split_cond"));
-        symbolicExecNames.add(new Name("simplify_expression"));
-        symbolicExecNames.add(new Name("loop_expand"));
-    }
-
 
     /**
      * returns the active statement of the JavaBlock the applied
@@ -206,7 +228,7 @@ public class NodeInfo {
      * @return active statement as described above
      */
     public SourceElement getActiveStatement() {
-        determineFirstAndActiveStatement();
+	determineFirstAndActiveStatement();
         return activeStatement;
     }
 
@@ -227,9 +249,9 @@ public class NodeInfo {
      */
     public String getExecStatementParentClass() {
         determineFirstAndActiveStatement();
-        if (activeStatement instanceof JavaSourceElement) {
-            return activeStatement.getPositionInfo().getFileName();
-        }
+        if (activeStatement instanceof JavaSourceElement)
+            return activeStatement.getPositionInfo()
+                    .getFileName();
         return "<NONE>";
     }
 
@@ -270,12 +292,9 @@ public class NodeInfo {
      */
     public void setBranchLabel(String s) {
         determineFirstAndActiveStatement();
-        if (s == null) {
+        if (s == null)
             return;
-        }
-        if (node.parent() == null) {
-            return;
-        }
+        if(node.parent() == null){ return;}
         RuleApp ruleApp = node.parent().getAppliedRuleApp();
         if (ruleApp instanceof TacletApp) {
             TacletApp tacletApp = (TacletApp) ruleApp; // XXX
@@ -297,9 +316,8 @@ public class NodeInfo {
                             + ". Probably branch label not up to date in "
                             + tacletApp.rule().name());
                     res = arg; // use sv name instead
-                } else {
+                } else
                     res = ProofSaver.printAnything(val, node.proof().getServices());
-                }
                 m.appendReplacement(sb, res.replace("$", "\\$"));
             }
             m.appendTail(sb);
@@ -337,7 +355,7 @@ public class NodeInfo {
         String oldNotes = notes;
         notes = newNotes;
         if (!ObjectUtil.equals(oldNotes, newNotes)) {
-            node.proof().fireNotesChanged(node);
+           node.proof().fireNotesChanged(node);
         }
     }
 
@@ -348,30 +366,11 @@ public class NodeInfo {
         return notes;
     }
 
-
-    void updateNoteInfo() {
-        determinedFstAndActiveStatement = false;
-        firstStatement = null;
-        firstStatementString = null;
-        activeStatement = null;
-        determineFirstAndActiveStatement();
+    public SequentChangeInfo getSequentChangeInfo() {
+        return sequentChangeInfo;
     }
 
-
-    /**
-     * determines the first and active statement if the applied
-     * taclet worked on a modality
-     */
-    private void determineFirstAndActiveStatement() {
-        if (determinedFstAndActiveStatement) {
-            return;
-        }
-        final RuleApp ruleApp = node.getAppliedRuleApp();
-        if (ruleApp instanceof PosTacletApp) {
-            firstStatement = computeFirstStatement(ruleApp);
-            firstStatementString = null;
-            activeStatement = computeActiveStatement(ruleApp);
-            determinedFstAndActiveStatement = true;
-        }
+    public void setSequentChangeInfo(SequentChangeInfo sequentChangeInfo) {
+        this.sequentChangeInfo = sequentChangeInfo;
     }
 }

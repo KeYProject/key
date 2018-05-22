@@ -2,6 +2,10 @@
 # Set the default behavior, in case people don't have core.autocrlf set.
 * text=auto
 
+# Special files that need to keep their line ending encodings
+# therefore ... binary
+*_DOS.txt  binary
+
 # Line endings for text files
 # Explicitly declare text files you want to always be normalized and converted
 # to native line endings on checkout.
@@ -9,6 +13,7 @@
 *.c     text
 *.css   text
 *.csv   text
+*.dfy   text
 *.g     text
 *.h     text
 *.htm*  text
@@ -22,6 +27,8 @@
 *.md    text
 *.pl    text
 *.proof text
+*.properties text
+*.props text
 *.py    text
 *.script text
 *.sh    text
