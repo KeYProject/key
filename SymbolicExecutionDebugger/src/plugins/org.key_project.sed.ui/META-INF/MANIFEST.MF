@@ -17,7 +17,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.expressions;bundle-version="3.4.300",
  org.eclipse.ui.views.properties.tabbed;bundle-version="3.5.200"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8,
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8, JavaSE-10, JavaSE-9,
  JavaSE-9,
  JavaSE-10
 Bundle-Vendor: KeY Project

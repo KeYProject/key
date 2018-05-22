@@ -7,6 +7,6 @@ Bundle-Activator: org.key_project.sed.product.ui.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8, JavaSE-10, JavaSE-9
 Bundle-Vendor: KeY Project
 Automatic-Module-Name: org.key_project.sed.product.ui
