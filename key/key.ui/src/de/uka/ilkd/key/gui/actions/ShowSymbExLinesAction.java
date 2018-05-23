@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -34,7 +35,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Document;
-import javax.swing.text.Element;
 import javax.swing.text.Highlighter.Highlight;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.SimpleAttributeSet;
@@ -84,7 +84,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
      * The font for the JTextPane containing the source code.
      * We use the same font as in SequentView for consistency.
      */
-    private static final Font SOURCE_FONT = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
+    private static final Font SOURCE_FONT = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);    // TODO: make font scalable
 
     /**
      * Indicates how many spaces are inserted instead of one tab (used in source code window).
@@ -115,30 +115,47 @@ public class ShowSymbExLinesAction extends MainWindowAction {
      * HashMap with all files (of the current proof!).         // TODO: What if a file changes?
      */
     private HashMap<String, File> files = new HashMap<String, File>();
+    private HashMap<String, String> hashes = new HashMap<String,String>();        // TODO: make proof independent
+    private HashMap<String, String> sources = new HashMap<String,String>();
+    boolean warningShown = false;
 
     /**
      * Lines to highlight (contains all highlights of the current proof) and corresponding Nodes.
      */
     private LinkedList<NodePosPair> lines;
 
+    private enum CommentState {
+        NO,
+        MAYBE,       // "/"
+        COMMENT,     // "/*"
+        LNECOMMENT,  // "//"
+        MAYBEEND;    // "*"
+    }
+
     /**
      * This document performs syntax highlighting when strings are inserted.
      * However, when editing the document the highlighting is not updating correctly at the moment.
      *
-     * @author WP (still very much based on an example from the web, has to be adapted further)
+     * @author Wolfram Pfeifer
      */
-    public class JavaDocument extends DefaultStyledDocument {   // TODO: complete rework
+    public class JavaDocument extends DefaultStyledDocument {
         public final static int STRING_MODE = 10;
         public final static int NORMAL_MODE = 11;
         public final static int KEYWORD_MODE = 12;
         public final static int NUMBER_MODE = 13;
         public final static int COMMENT_MODE = 14;
         public final static int LINE_COMMENT_MODE = 15;
-        public final static int JAVADOC_MODE = 16;
-        public final static int ANNOTATION_MODE = 17;
-        public final static int JML_MODE = 18;
-        public final static int JML_KEYWORD_MODE = 19;
+        public final static int LINE_JML_MODE = 16;
+        public final static int JAVADOC_MODE = 17;
+        public final static int ANNOTATION_MODE = 18;
+        public final static int JML_MODE = 19;
+        public final static int JML_KEYWORD_MODE = 20;
 
+        // TODO: other delimiters?
+        // "+-*/(){}[]%!^~.;?:&|<>=\"'\\n(space)");
+        private final static String DELIM = "[ .;{}\\[\\]]";
+
+        private SimpleAttributeSet annotation = new SimpleAttributeSet();
         private SimpleAttributeSet string = new SimpleAttributeSet();
         private SimpleAttributeSet normal = new SimpleAttributeSet();
         private SimpleAttributeSet keyword = new SimpleAttributeSet();
@@ -152,17 +169,28 @@ public class ShowSymbExLinesAction extends MainWindowAction {
         private Map<String, SimpleAttributeSet> JMLkeywords = new HashMap<String, SimpleAttributeSet>();
 
         private int currentPos = 0;
+
+        // mode <-> state:
+        // mode stores the environment in which the parser is
+        // state stores information about the just recently parsed characters
         private int mode = NORMAL_MODE;
+        // stores the current comment state of the parser
+        CommentState state = CommentState.NO;
+        // true if the last processed char was a backslash
+        boolean escapeChar = false;
+        String token = "";
+        int tokenStart = 0;
 
         public JavaDocument () {
+            // set the styles (as in eclipse default settings)
             StyleConstants.setBold(keyword, true);
             StyleConstants.setForeground(keyword, new Color(127, 0, 85));
-            StyleConstants.setForeground(comment, new Color(0, 180, 0));
-            StyleConstants.setForeground(javadoc, new Color(0, 50, 255));
-            StyleConstants.setForeground(number, Color.RED);
-            StyleConstants.setForeground(string, Color.BLUE);
-            StyleConstants.setForeground(jml, Color.ORANGE);
-            StyleConstants.setForeground(jmlkeyword, Color.ORANGE);
+            StyleConstants.setForeground(comment, new Color(63, 127, 95));
+            StyleConstants.setForeground(javadoc, new Color(63, 95, 191));
+            StyleConstants.setForeground(number, Color.BLACK);
+            StyleConstants.setForeground(string, new Color(42, 0, 255));
+            StyleConstants.setForeground(jml, new Color(255, 102, 0));
+            StyleConstants.setForeground(jmlkeyword, new Color(255, 102, 0));
             StyleConstants.setBold(jmlkeyword, true);
 
             final String[] keywordArray = {"package", "class", "import", "interface", "enum",
@@ -174,202 +202,231 @@ public class ShowSymbExLinesAction extends MainWindowAction {
                 "if", "else", "for", "while", "do", "switch", "case", "break", "continue",
                 "return",
                 "try", "catch", "finally",
-                "static", "volatile", "new", "abstract", "final"  // TODO: additional keywords
+                "static", "volatile", "new", "abstract", "final"  // TODO: additional keywords?
             };
             for (String k : keywordArray) {
                 keywords.put(k, keyword);
             }
 
-            final String[] JMLkeywordArray = {
+            final String[] jmlKeywordArray = {
                 "normal_behavior", "exceptional_behavior", "model_behavior",
+                "normal_behaviour", "exceptional_behaviour", "model_behaviour",
                 "ensures", "requires", "measured_by", "signals", "signals_only",
                 "ghost", "model", "\\old", "\\result", "\\nothing",
-                "\\forall", "\\exists", "accessible", "assignable", "invariant", "helper"
+                "\\forall", "\\exists", "accessible", "assignable", "invariant", "helper",
+                "loop_invariant", "decreases"
             };
-            for (String k : JMLkeywordArray) {
+            for (String k : jmlKeywordArray) {
                 JMLkeywords.put(k, jmlkeyword);
             }
         }
 
-        private void checkForComment() {
-            int offs = this.currentPos;
-            Element element = this.getParagraphElement(offs);
-            String elementText = "";
-            try {
-                // this gets our chuck of current text for the element we're on
-                elementText = this.getText(element.getStartOffset(), element
-                        .getEndOffset()
-                        - element.getStartOffset());
-            } catch (Exception ex) {
-                // whoops!
-                System.out.println("no text");
-            }
-            int strLen = elementText.length();
-            if (strLen == 0) {
-                return;
-            }
-            int i = 0;
+        /*
+         * NORMAL_MODE:
+         * each line is a separate token that is at inserting checked for contained keywords
+         *
+         * JML:
+         * each JML block is a separate token
+         */
 
-            if (element.getStartOffset() > 0) {
-                // translates backward if necessary
-                offs = offs - element.getStartOffset();
+        private void checkAt() {
+            token = token + '@';
+            if (state == CommentState.COMMENT) {                // "/*@"
+                state = CommentState.NO;
+                mode = JML_MODE;
+            } else if (state == CommentState.LNECOMMENT) {      // "//@"
+                state = CommentState.NO;
+                mode = LINE_JML_MODE;
+            } else if (mode == NORMAL_MODE
+                    && state == CommentState.NO) {              // "@"
+                mode = ANNOTATION_MODE;
+                tokenStart = currentPos;
             }
-            if ((offs >= 1) && (offs <= strLen - 1)) {
-                i = offs;
-                char commentStartChar1 = elementText.charAt(i - 1);
-                char commentStartChar2 = elementText.charAt(i);
-                if (mode == COMMENT_MODE && commentStartChar1 == '*'
-                        && commentStartChar2 == '*') {
-                    mode = JAVADOC_MODE;
-                    this.insertJavadocString("/**", currentPos - 2);
-                } else if (commentStartChar1 == '/' && commentStartChar2 == '*') {
-                    mode = COMMENT_MODE;
-                    this.insertCommentString("/*", currentPos - 1);
-                } else if (commentStartChar1 == '/' && commentStartChar2 == '/') {
-                    mode = LINE_COMMENT_MODE;
-                    this.insertCommentString("//", currentPos - 1);
-                } else if (commentStartChar1 == '*' && commentStartChar2 == '/') {
-                    boolean javadoc = false;
-                    if (mode == JAVADOC_MODE) {
-                        javadoc = true;
-                    }
-                    mode = NORMAL_MODE;
-                    if (javadoc) {
-                        //this.insertJavadocString("*/", currentPos - 1);
+        }
+
+        private void checkLinefeed() {
+            state = CommentState.NO;
+            if (mode == LINE_COMMENT_MODE) {                    // "// ... \n"
+                insertCommentString(token, tokenStart);
+                mode = NORMAL_MODE;     // reset
+                token = "\n";             // reset token
+                tokenStart = currentPos;
+            } else if (mode == LINE_JML_MODE) {                 // "//@ ... \n"
+                insertJMLString(token, tokenStart);
+                mode = NORMAL_MODE;     // reset
+                token = "\n";             // reset token
+                tokenStart = currentPos;
+            } else if (mode == ANNOTATION_MODE) {               // "@ ... \n"
+                insertAnnotation(token, tokenStart);
+                mode = NORMAL_MODE;     // reset
+                token = "\n";             // reset token
+                tokenStart = currentPos;
+            } else if (mode == NORMAL_MODE) {                   // normal mode
+                insertNormalString(token, tokenStart);
+                token = "\n";             // reset token
+                tokenStart = currentPos;
+            } else {    // modes: JML, Comment, JavaDoc
+                token += '\n';
+            }
+        }
+
+        private void checkStar() {
+            if (state == CommentState.MAYBE) {              // "/*"
+             // insert what we have in this line so far
+                insertNormalString(token.substring(0,token.length()-1), tokenStart);
+                token = "/*";
+                tokenStart = currentPos - 1;
+                state = CommentState.COMMENT;
+                mode = COMMENT_MODE;
+            } else if (state == CommentState.COMMENT) {     // "/**"
+                // tokenStart should be already set here
+                token = token + '*';
+                state = CommentState.MAYBEEND;
+                mode = JAVADOC_MODE;
+            } else if (mode == COMMENT_MODE                 // "/* ... *"
+                    || mode == JAVADOC_MODE                 // "/*@ ... *"
+                    || mode == JML_MODE) {                  // "/** ... *"
+                // tokenStart should be already set here
+                token = token + '*';
+                state = CommentState.MAYBEEND;
+            }
+        }
+
+        private void checkSlash() {
+            if (mode == NORMAL_MODE
+                     && state == CommentState.NO) {          // "/"
+                token = token + '/';
+                state = CommentState.MAYBE;
+            } else if (state == CommentState.MAYBE) {        // "//"
+                // insert what we have in this line so far
+                insertNormalString(token.substring(0,token.length()-1), tokenStart);
+                token = "//";
+                tokenStart = currentPos - 1;
+                state = CommentState.LNECOMMENT;
+                mode = LINE_COMMENT_MODE;
+            } else if (state == CommentState.MAYBEEND) {     // "/* ... */"
+                token = token + '/';
+                if (mode == COMMENT_MODE) {
+                    insertCommentString(token, tokenStart);
+                } else if (mode == JAVADOC_MODE) {
+                    if (token.equals("/**/")) {            // "/**/" is no JavaDoc
+                        insertCommentString(token, tokenStart);
                     } else {
-                        this.insertCommentString("*/", currentPos - 1);
+                        insertJavadocString(token, tokenStart);
                     }
+                } else if (mode == JML_MODE) {
+                    insertJMLString(token, tokenStart);
                 }
-
+                state = CommentState.NO;
+                mode = NORMAL_MODE;
+                token = "";             // reset token
+                tokenStart = currentPos + 1;
+            } else {
+                // not NORMAL_MODE
+                token += '/';
             }
         }
 
-        private void checkForKeyword() {
-            if (mode != NORMAL_MODE && mode != JML_MODE) {
-                return;
-            }
-            int offs = this.currentPos;
-            Element element = this.getParagraphElement(offs);
-            String elementText = "";
-            try {
-                // this gets our chuck of current text for the element we're on
-                elementText = this.getText(element.getStartOffset(), element
-                        .getEndOffset()
-                        - element.getStartOffset());
-            } catch (Exception ex) {
-                // whoops!
-                System.out.println("no text");
-            }
-            int strLen = elementText.length();
-            if (strLen == 0) {
-                return;
-            }
-            int i = 0;
-
-            if (element.getStartOffset() > 0) {
-                // translates backward if neccessary
-                offs = offs - element.getStartOffset();
-            }
-            if ((offs >= 0) && (offs <= strLen - 1)) {
-                i = offs;
-                while (i > 0) {
-                    // the while loop walks back until we hit a delimiter
-                    i--;
-                    char charAt = elementText.charAt(i);
-                    if ((charAt == ' ') | (i == 0) | (charAt == '(')
-                            | (charAt == ')') | (charAt == '{') | (charAt == '}')) { // if i
-                        // == 0
-                        // then
-                        // we're
-                        // at
-                        // the
-                        // begininng
-                        if (i != 0) {
-                            i++;
-                        }
-                        String word = elementText.substring(i, offs); // skip the period
-
-                        String s = word.trim().toLowerCase();
-                        // this is what actually checks for a matching keyword
-                        if (mode == NORMAL_MODE && keywords.containsKey(s) ||
-                                mode == JML_MODE && JMLkeywords.containsKey(s)) {
-                            insertKeyword(word, currentPos, keywords.get(s));
-                        }
-                        break;
-                    }
-                }
-            }
+        private void checkQuote() {
+            // TODO:
+            state = CommentState.NO;
+            token += '"';
         }
 
+        private void checkOther(char c) {
+            token += c;
+            state = CommentState.NO;
+        }
+
+        private void checkDelimiter(char c) {
+            token += c;
+            state = CommentState.NO;
+        }
+
+        // TODO: bin/oct/hex literals, long literals, floats/doubles?
+        private void checkDigit(char c) {
+            token += c;
+            state = CommentState.NO;
+        }
+
+        /*
+         * special char combinations:
+         * comment/javadoc/jml start
+         * comment end
+         * line comment
+         * annotation
+         * string
+         * number
+         *
+         * check at every delimiter: keyword/jmlKeyword?
+         */
         private void processChar(String str) {
             char strChar = str.charAt(0);
-            if (mode != COMMENT_MODE && mode != LINE_COMMENT_MODE
-                    && mode != JAVADOC_MODE && mode != ANNOTATION_MODE) {
-                mode = NORMAL_MODE;
-            }
+            //System.out.println("Token: " + token);
             switch (strChar) {
             case ('@'):
-                if (mode == NORMAL_MODE) {
-                    mode = ANNOTATION_MODE;
-                }
+                checkAt();
                 break;
-            case ('{'):
-            case ('}'):
-            case (' '):
-            case ('\n'):
-            case ('('):
-            case (')'):
-            case (';'):
-            case ('.'): {
-                checkForKeyword();
-                if (mode == ANNOTATION_MODE && strChar == '(') {
-                    mode = NORMAL_MODE;
-                }
-                if ((mode == STRING_MODE || mode == LINE_COMMENT_MODE || mode == ANNOTATION_MODE)
-                        && strChar == '\n') {
-                    mode = NORMAL_MODE;
-                }
-            }
+            case '\n':  // TODO: different line endings?
+                checkLinefeed();
                 break;
-            case ('"'): {
-                //insertTextString(str, currentPos);
-                //this.checkForString();
-            }
-            break;
-            case ('0'):
-            case ('1'):
-            case ('2'):
-            case ('3'):
-            case ('4'):
-            case ('5'):
-            case ('6'):
-            case ('7'):
-            case ('8'):
-            case ('9'): {
-                //checkForNumber();
-            }
-            break;
-            case ('*'):
-            case ('/'): {
-                checkForComment();
-            }
-            break;
-            }
-            if (mode == NORMAL_MODE) {
-                //this.checkForString();
-            }
-            if (mode == STRING_MODE) {
-                //insertTextString(str, this.currentPos);
-            } else if (mode == NUMBER_MODE) {
-                //insertNumberString(str, this.currentPos);
-            } else if (mode == COMMENT_MODE) {
-                insertCommentString(str, this.currentPos);
-            } else if (mode == LINE_COMMENT_MODE) {
-                insertCommentString(str, this.currentPos);
-            } else if (mode == JAVADOC_MODE) {
-                insertJavadocString(str, this.currentPos);
-            } else if (mode == ANNOTATION_MODE) {
-                //insertAnnotationString(str, this.currentPos);
+            //case '\t':  // all tabs were replaced earlier!
+            //    break;
+            case '*':
+                checkStar();
+                break;
+            case '/':
+                checkSlash();
+                break;
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                checkDigit(strChar);
+                break;
+            case '"':
+                checkQuote();
+                break;
+            // keyword delimiters: +-*/(){}[]%!^~.;?:&|<>="'\n(space)
+            case '+':
+            case '-':
+            //case '*':
+            //case '/':
+            case '(':
+            case ')':
+            case '[':
+            case ']':
+            case '{':
+            case '}':
+            case '%':
+            case '!':
+            case '^':
+            case '~':
+            case '&':
+            case '|':
+            case '.':
+            case ':':
+            case ';':
+            case '?':
+            case '<':
+            case '>':
+            case '=':
+            case '\'':
+            case ' ':
+            //case '"':
+            //case '\'':
+            //case '\n':
+                checkDelimiter(strChar);
+                break;
+            default:
+                checkOther(strChar);
+                break;
             }
         }
 
@@ -383,16 +440,11 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             }
         }
 
-        private void insertKeyword(String str, int pos, AttributeSet as) {
+        private void insertAnnotation(String str, int pos) {
             try {
                 // remove the old word and formatting
-                this.remove(pos - str.length(), str.length());
-                /*
-                 * replace it with the same word, but new formatting we MUST call
-                 * the super class insertString method here, otherwise we would end
-                 * up in an infinite loop !!
-                 */
-                super.insertString(pos - str.length(), str, as);
+                this.remove(pos, str.length());
+                super.insertString(pos, str, annotation);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -408,13 +460,56 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             }
         }
 
+        private void insertJMLString(String str, int pos) {
+            try {
+                // remove the old word and formatting
+                this.remove(pos, str.length());
+                int offset = 0;
+                String[] tokens = str.split("((?<=" + DELIM + ")|(?=" + DELIM + "))");
+                for (String t : tokens) {
+                    System.out.println("Inserting " + t + " at " + (pos + offset));
+                    if (JMLkeywords.containsKey(t)) {
+                        super.insertString(pos + offset, t, jmlkeyword);
+                    } else {
+                        super.insertString(pos + offset, t, jml);
+                    }
+                    offset += t.length();
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        private void insertNormalString(String str, int pos) {
+            try {
+                // remove the old word and formatting
+                System.out.println("Trying to remove: pos = " + pos + ", str = " + str);
+                this.remove(pos, str.length());
+                int offset = 0;
+                String[] tokens = str.split("((?<=" + DELIM + ")|(?=" + DELIM + "))");
+                for (String t : tokens) {
+                    System.out.println("Inserting " + t + " at " + (pos + offset));
+                    if (keywords.containsKey(t)) {
+                        super.insertString(pos + offset, t, keyword);
+                    } else {
+                        super.insertString(pos + offset, t, normal);
+                    }
+                    offset += t.length();
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
         @Override
         public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+            // insert the unformatted string as a placeholder
             super.insertString(offs, str, normal);
 
             int strLen = str.length();
             int endpos = offs + strLen;
             int strpos;
+            // process char by char
             for (int i = offs; i < endpos; i++) {
                 currentPos = i;
                 strpos = i - offs;
@@ -651,7 +746,10 @@ public class ShowSymbExLinesAction extends MainWindowAction {
      * Clears cached files, lines, and existing tabs.
      */
     private void clearCaches() {
+        warningShown = false;
         files.clear();
+        hashes.clear();
+        sources.clear();
         lines = null;
         tabs.removeAll();
     }
@@ -671,23 +769,43 @@ public class ShowSymbExLinesAction extends MainWindowAction {
     }
 
     /**
-     * Initializes the given JTextPane with the source code from the file in the HashMap entry.
+     * Initializes a new JTextPane with the source code from the file in the HashMap entry.
      * In addition, listeners are added and highlights are painted.
-     * @param textPane the JTextPane to initialize
      * @param entry the HashMap entry containing the file
      */
-    private void initTextPane(JTextPane textPane, Entry<String, File> entry) {
+    private void initTextPane(Entry<String, File> entry) {
         try {
-            String original = IOUtil.readFrom(entry.getValue());
+            JTextPane textPane = new JTextPane();
+
+            textPane.setFont(SOURCE_FONT);
+            textPane.setToolTipText(TEXTPANE_TOOLTIP);
+            textPane.setEditable(false);
+
+            // compare cached hash with a newly created
+            String origHash = hashes.get(entry.getKey());
+            String curHash = IOUtil.computeMD5(entry.getValue());
+            if (!origHash.equals(curHash)) {
+                //textPane.setBackground(new Color(255, 128, 128));
+                //textPane.setToolTipText("<html><b>Attention! </b>Source code was changed since start of the proof!<br><br>"
+                //        + TEXTPANE_TOOLTIP + "</html>");
+                if (!warningShown) {        // show warning only once (TODO: per proof)
+                    JOptionPane.showMessageDialog(mainWindow,
+                            "The source code this proof was started from has changed in the background.\n"
+                            + "However, the proof refers to the old version of the source code "
+                            + "(as shown in the window on the right).",
+                            "Source code changed!", JOptionPane.INFORMATION_MESSAGE);
+                    warningShown = true;
+                }
+            }
+
+            //String original = IOUtil.readFrom(entry.getValue());
+            String original = sources.get(entry.getKey());
             String source = replaceTabs(original);  // replace all tabs by spaces
 
             // use input stream here to compute line information of the string with replaced tabs
             InputStream inStream = new ByteArrayInputStream(source.getBytes());
             LineInformation[] li = IOUtil.computeLineInformation(inStream);
 
-            textPane.setFont(SOURCE_FONT);
-            textPane.setToolTipText(TEXTPANE_TOOLTIP);
-            textPane.setEditable(false);
 
             JavaDocument doc = new JavaDocument();
             textPane.setDocument(doc);
@@ -741,7 +859,15 @@ public class ShowSymbExLinesAction extends MainWindowAction {
     private void fillMaps() {
         for (NodePosPair p : lines) {
             PositionInfo l = p.pos;
-            files.putIfAbsent(l.getFileName(), new File(l.getFileName()));
+            File f = new File(l.getFileName());
+            if (files.putIfAbsent(l.getFileName(), f) == null) {
+                try {
+                    hashes.put(l.getFileName(), IOUtil.computeMD5(f));
+                    sources.put(l.getFileName(), IOUtil.readFrom(f));
+                } catch (IOException e) {
+                    Debug.out("Unknown IOException!", e);
+                }
+            }
         }
     }
 
@@ -776,10 +902,10 @@ public class ShowSymbExLinesAction extends MainWindowAction {
         }
 
         fillMaps();
-
+        
         // create and initialize a new TextPane for every file
         for (Entry<String, File> entry : files.entrySet()) {
-            initTextPane(new JTextPane(), entry);
+            initTextPane(entry);
         }
         if (tabs.getTabCount() > 0) {
             tabs.setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -833,8 +959,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
                             LineInformation[] li = IOUtil.computeLineInformation(inStream);
                             int offs = li[line].getOffset();
                             tp.setCaretPosition(offs);
-                        }
-                        catch (IOException e) {
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
