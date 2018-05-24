@@ -35,19 +35,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import javax.swing.Icon;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JTree;
-import javax.swing.KeyStroke;
-import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.TreeUI;
@@ -98,6 +87,9 @@ public class ProofTreeView extends JPanel {
     public static final Color DARK_RED_COLOR = new Color(191,0,0);
     public static final Color PINK_COLOR = new Color(255,0,240);
     public static final Color ORANGE_COLOR = new Color(255,140,0);
+
+    public static final Color DARK_TURQOUIS_COLOR = new Color(19,110,128);
+    public static final Color DARK_PURPLE_COLOR = new Color(112,17,191);
 
     /** the mediator is stored here */
     private KeYMediator mediator;
@@ -693,20 +685,20 @@ public class ProofTreeView extends JPanel {
                     // all goals below this node are closed
                     this.setIcon(IconFactory.provedFolderIcon());
                 } else {
-                	
+
                 	// Find leaf goal for node and check whether this is a linked goal.
-                	
+
                 	// TODO (DS): This marks all "folder" nodes as linked that have
                 	//            at least one linked child. Check whether this is
                 	//            an acceptable behavior.
-                	
+
                 	class FindGoalVisitor implements ProofVisitor {
                 		private boolean isLinked = false;
-                		
+
                 		public boolean isLinked() {
                 			return this.isLinked;
                 		}
-                		
+
                 		@Override
 						public void visit(Proof proof, Node visitedNode) {
 							Goal g;
@@ -716,16 +708,16 @@ public class ProofTreeView extends JPanel {
 							}
 						}
                 	}
-                	
+
                 	FindGoalVisitor v = new FindGoalVisitor();
-					
+
                 	proof.breadthFirstSearch(((GUIBranchNode)value).getNode(), v);
                 	if (v.isLinked()) {
                 		this.setIcon(IconFactory.linkedFolderIcon());
                 	}
-                   
+
                 }
-                
+
                 return this;
             }
 
@@ -754,7 +746,10 @@ public class ProofTreeView extends JPanel {
 		(DefaultTreeCellRenderer) super.getTreeCellRendererComponent
 		(tree, nodeText, sel, expanded, leaf, row, hasFocus);
 
-
+        if(node.getNodeInfo().isExploration())
+            tree_cell.setBorder(BorderFactory.createLineBorder(DARK_PURPLE_COLOR, 1, true));
+        else
+            tree_cell.setBorder(null);
 
 	    if (node.leaf()) {
 		Goal goal = proof.getGoal(node);
@@ -972,7 +967,7 @@ public class ProofTreeView extends JPanel {
 //		bugdetection.setEnabled(true);
 //	        more.add(change);
 //	    }
-        
+
         this.add(new JSeparator());
         this.add(subtreeStatistics);
         subtreeStatistics.addActionListener(this);
@@ -1162,14 +1157,14 @@ public class ProofTreeView extends JPanel {
                             + "for a proof you have to load one first"));
         } else {
             int openGoals = 0;
-            
+
             Iterator<Node> leavesIt = invokedNode.leavesIterator();
             while (leavesIt.hasNext()) {
                 if (proof.getGoal(leavesIt.next()) != null) {
                     openGoals++;
                 }
             }
-            
+
             String stats;
             if (openGoals > 0)
                 stats = openGoals + " open goal"
@@ -1177,7 +1172,7 @@ public class ProofTreeView extends JPanel {
             else
                 stats = "Closed.";
             stats += "\n\n";
-            
+
             for (Pair<String, String> x : invokedNode.statistics().getSummary()) {
                 if ("".equals(x.second))
                     stats += "\n";
