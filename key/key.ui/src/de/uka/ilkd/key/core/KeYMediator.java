@@ -105,8 +105,11 @@ public class KeYMediator {
      * boolean flag indicating if the GUI is in auto mode
      */
     private boolean inAutoMode = false;
-    
 
+    /**
+     * boolean flag indicating whether exploration mode is turned on and special rules are shown to the user
+     */
+    private boolean isExplorationMode = false;
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
      */
@@ -557,7 +560,14 @@ public class KeYMediator {
        return inAutoMode;
    }
 
-   class KeYMediatorProofTreeListener extends ProofTreeAdapter {
+    public boolean isExplorationToggleOn() {
+       return isExplorationMode;
+    }
+    public void setExplorationModeToggle(boolean bool){
+       this.isExplorationMode = bool;
+    }
+
+    class KeYMediatorProofTreeListener extends ProofTreeAdapter {
        private boolean pruningInProcess;
 
        @Override

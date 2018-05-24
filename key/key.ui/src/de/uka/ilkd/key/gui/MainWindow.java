@@ -79,7 +79,10 @@ public final class MainWindow extends JFrame  {
 
     /** the second toolbar */
     private JToolBar fileOpToolBar;
-    
+
+    /**Eploration toolbar*/
+    private JToolBar explorationToolBar;
+
     /** JScrollPane for displaying SequentViews*/
     private final MainFrame mainFrame;
 
@@ -338,11 +341,13 @@ public final class MainWindow extends JFrame  {
 	// create tool bars
 	controlToolBar = createProofControlToolBar();
         fileOpToolBar = createFileOpsToolBar();
+        explorationToolBar = new ExplorationModeToolBar(this);
 
         JPanel toolBarPanel = new JPanel();
         toolBarPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
         toolBarPanel.add(controlToolBar);
         toolBarPanel.add(fileOpToolBar);
+        toolBarPanel.add(explorationToolBar);
 
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
 

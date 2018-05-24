@@ -430,12 +430,20 @@ public class TacletMenu extends JMenu {
     }
 
     private void addExplorationMenu() {
-        addSeparator();
-        JMenu menuExploration = new JMenu("Exploration");
-        menuExploration.add(new AddFormulaToAntecedentAction());
-        menuExploration.add(new AddFormulaToSuccedentAction());
-        menuExploration.add(new EditFormulaAction(pos));
-        add(menuExploration);
+        if(isExplorationToggleOn()) {
+            addSeparator();
+            JMenu menuExploration = new JMenu("Exploration");
+            menuExploration.add(new AddFormulaToAntecedentAction());
+            menuExploration.add(new AddFormulaToSuccedentAction());
+            menuExploration.add(new EditFormulaAction(pos));
+            add(menuExploration);
+        }
+    }
+
+    //check whether the exploration toggle was turned on
+    private boolean isExplorationToggleOn() {
+        return mediator.isExplorationToggleOn();
+
     }
 
     private void addClipboardItem(MenuControl control) {
