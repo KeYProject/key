@@ -114,6 +114,7 @@ public class TacletMenu extends JMenu {
     private KeYMediator mediator;
     private TacletAppComparator comp = new TacletAppComparator();
 
+
     /**
      * creates empty menu
      */
@@ -430,7 +431,7 @@ public class TacletMenu extends JMenu {
     }
 
     private void addExplorationMenu() {
-        if(isExplorationToggleOn()) {
+        if(mediator.isExplorationModeSelected()) {
             addSeparator();
             JMenu menuExploration = new JMenu("Exploration");
             menuExploration.add(new AddFormulaToAntecedentAction());
@@ -440,11 +441,6 @@ public class TacletMenu extends JMenu {
         }
     }
 
-    //check whether the exploration toggle was turned on
-    private boolean isExplorationToggleOn() {
-        return mediator.isExplorationToggleOn();
-
-    }
 
     private void addClipboardItem(MenuControl control) {
         addSeparator();
