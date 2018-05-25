@@ -196,7 +196,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 // something concerning highlighting does not work in the future, here could
                 // be a starting place to find the mistake.
                 range = new Range(range.start() + 1, range.end() + 1);
-                
+
                 Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR);
                 updateHighlights.add(tag);
                 paintHighlight(range, tag);
@@ -228,10 +228,17 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             Arrays.sort(sortedArray, new Comparator<SequentPrintFilterEntry>() {
                 @Override
                 public int compare(SequentPrintFilterEntry o1, SequentPrintFilterEntry o2) {
-                    return computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
-                            o1.getFilteredFormula(), 1000) >= computeSeqFormulaAge(
-                                    getMainWindow().getMediator().getSelectedNode(), o2.getFilteredFormula(), 1000) ? 1
-                                            : -1;
+                    int o1age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
+                            o1.getFilteredFormula(), 1000);
+                    int o2age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
+                            o2.getFilteredFormula(), 1000);
+                    if (o1age > o2age) {
+                        return 1;
+                    } else if (o1age < o2age) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
                 }
             });
             for (SequentPrintFilterEntry entry : entryList) {
