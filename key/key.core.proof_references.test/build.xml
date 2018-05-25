@@ -16,6 +16,7 @@
 			<jvmarg value="-Xmx2048m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
 			<jvmarg value="-ea"/>
+			<jvmarg value="-Dkey.disregardSettings=true"/>
 			<classpath>
 				<pathelement path="${build.dir}"/>
 				<pathelement location="${dist.dir}/key.core.proof_references.jar"/>

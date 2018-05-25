@@ -30,6 +30,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -170,8 +171,19 @@ public class Node  {
         cachedName = null;
     }
 
+    /**
+     * When pruning, data referring to future nodes has to be cleared;
+     * however, the sequent change info is related to the parent node,
+     * it has to be preserved.
+     */
     void clearNodeInfo() {
-        this.nodeInfo = new NodeInfo(this);
+        if (this.nodeInfo != null) {
+            SequentChangeInfo oldSeqChangeInfo = this.nodeInfo.getSequentChangeInfo();
+            this.nodeInfo = new NodeInfo(this);
+            this.nodeInfo.setSequentChangeInfo(oldSeqChangeInfo);
+        } else {
+            this.nodeInfo = new NodeInfo(this);
+        }
     }
 
     public NameRecorder getNameRecorder() {

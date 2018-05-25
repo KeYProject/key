@@ -80,7 +80,7 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
     }
 
     /**
-     * Fires the event {@link ProverTaskListener#taskStarted(String, int)} to all listener.
+     * Fires the event {@link ProverTaskListener#taskStarted(TaskStartedInfo)} to all listener.
      * @param info the {@link TaskStartedInfo} containing general information about the task that is just about to start
      */
     protected void fireTaskStarted(TaskStartedInfo info) {

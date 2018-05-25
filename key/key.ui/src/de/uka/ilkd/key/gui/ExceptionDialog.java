@@ -172,7 +172,8 @@ public class ExceptionDialog extends JDialog {
         StringBuilder message = new StringBuilder(orgMsg);
 
         Location loc = location;
-        if(loc != null && loc.getFilename() != null && !"".equals(loc.getFilename())) {
+        if(loc != null && loc.getFilename() != null && !"".equals(loc.getFilename())
+                && !"no file".equals(loc.getFilename())) {
             try {
                 List<String> lines = Files.readAllLines(
                         Paths.get(loc.getFilename()), Charset.defaultCharset());

@@ -82,7 +82,13 @@ compile:openjdk10:
 checkstyle:
   stage: primary
   image: key-dev-openjdk8
+  allow_failure: true
   script:
     - echo "**** Check the commit's gitlab page for a readable checkstyle report ****"
     - (key/scripts/tools/checkstyle/runIncrementalCheckstyle.sh | tee report.txt) || true
     - key/scripts/tools/checkstyle/publishAudit.py report.txt
+  artifacts:
+    name: "checkstyle-report-$CI_JOB_ID"
+    when: always
+    paths:
+    - report.txt

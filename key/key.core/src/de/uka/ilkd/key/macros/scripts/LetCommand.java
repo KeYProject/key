@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.pp.AbbrevMap;

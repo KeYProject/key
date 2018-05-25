@@ -1,11 +1,9 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
-import de.uka.ilkd.key.proof.runallproofs.TestResult;
 
 /**
  * A {@link ProofCollectionUnit} that is created from several {@link TestFile}s

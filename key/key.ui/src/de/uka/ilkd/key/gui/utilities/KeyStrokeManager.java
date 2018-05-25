@@ -15,9 +15,7 @@ package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
-import java.awt.im.InputContext;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.swing.KeyStroke;

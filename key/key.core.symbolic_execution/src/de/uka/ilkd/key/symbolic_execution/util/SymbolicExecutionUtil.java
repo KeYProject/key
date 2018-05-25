@@ -117,8 +117,11 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.rule.AbstractBlockContractBuiltInRuleApp;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
+import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
+import de.uka.ilkd.key.rule.BlockContractExternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
@@ -1157,13 +1160,13 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the given node should be represented as block contract.
+    * Checks if the given node should be represented as block/loop contract.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
     * @return {@code true} represent node as block contract, {@code false} represent node as something else. 
     */
-   public static boolean isBlockContract(Node node, RuleApp ruleApp) {
-      return ruleApp instanceof BlockContractBuiltInRuleApp;
+   public static boolean isBlockSpecificationElement(Node node, RuleApp ruleApp) {
+      return ruleApp instanceof AbstractBlockSpecificationElementBuiltInRuleApp;
    }
 
    /**
@@ -1578,7 +1581,7 @@ public final class SymbolicExecutionUtil {
          else if (isLoopInvariant(node, ruleApp)) {
             return true;
          }
-         else if (isBlockContract(node, ruleApp)) {
+         else if (isBlockSpecificationElement(node, ruleApp)) {
             return true;
          }
          else {
@@ -1787,7 +1790,7 @@ public final class SymbolicExecutionUtil {
       else if (parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
          return computeLoopInvariantBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability);
       }
-      else if (parent.getAppliedRuleApp() instanceof BlockContractBuiltInRuleApp) {
+      else if (parent.getAppliedRuleApp() instanceof AbstractBlockContractBuiltInRuleApp) {
          return computeBlockContractBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability);
       }
       else {
@@ -2267,7 +2270,8 @@ public final class SymbolicExecutionUtil {
 
    /**
     * <p>
-    * Computes the branch condition of the given {@link Node} which was constructed by a {@link BlockContractBuiltInRuleApp}.
+    * Computes the branch condition of the given {@link Node} which was constructed by an
+    * {@link AbstractBlockContractBuiltInRuleApp}.
     * </p>
     * <p>
     * The branch conditions are:
@@ -2283,17 +2287,25 @@ public final class SymbolicExecutionUtil {
     * @return The computed branch condition.
     * @throws ProofInputException Occurred Exception.
     */
-   private static Term computeBlockContractBuiltInRuleAppBranchCondition(Node parent, Node node, boolean simplify, boolean improveReadability) throws ProofInputException {
+   private static Term computeBlockContractBuiltInRuleAppBranchCondition(
+           Node parent, Node node, boolean simplify, boolean improveReadability)
+                   throws ProofInputException {
       // Make sure that a computation is possible
-      if (!(parent.getAppliedRuleApp() instanceof BlockContractBuiltInRuleApp)) {
-         throw new ProofInputException("Only BlockContractBuiltInRuleApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
+      if (!(parent.getAppliedRuleApp() instanceof AbstractBlockContractBuiltInRuleApp)) {
+         throw new ProofInputException("Only AbstractBlockContractBuiltInRuleApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
       }
+      
+      RuleApp app = parent.getAppliedRuleApp();
+      
       // Make sure that branch is supported
       int childIndex = CollectionUtil.indexOf(parent.childrenIterator(), node);
-      if (childIndex == 0) { // Validity branch
+      if (app instanceof BlockContractInternalBuiltInRuleApp && childIndex == 0) {
+         // Validity branch
          return parent.proof().getServices().getTermBuilder().tt();
       }
-      else if (childIndex == 2) { // Usage branch
+      else if ((app instanceof BlockContractInternalBuiltInRuleApp && childIndex == 2)
+              || (app instanceof BlockContractExternalBuiltInRuleApp && childIndex == 1)) {
+         // Usage branch
          // Compute invariant (last antecedent formula of the use branch)
          Services services = parent.proof().getServices();
          Semisequent antecedent = node.sequent().antecedent();

@@ -1,13 +1,10 @@
 package de.uka.ilkd.key.ui;
 
 import de.uka.ilkd.key.informationflow.macros.FullInformationFlowAutoPilotMacro;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.util.ProofUserManager;
 
 /**
  * weigl on 17.08.16.

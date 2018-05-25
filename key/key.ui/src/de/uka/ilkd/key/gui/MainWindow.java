@@ -214,7 +214,7 @@ public final class MainWindow extends JFrame  {
     /*
      * This class should only be instantiated once!
      */
-    private MainWindow() {        
+    private MainWindow() {
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
         applyGnomeWorkaround();
         setLaF();

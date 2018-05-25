@@ -80,7 +80,7 @@ public final class ParameterlessTermLabel implements TermLabel {
 
    /**
     * Label attached to a term which denotes an undefined value. At present it is only
-    * used for the else-part of the {@link #IfExThenElse} operator, when it is used
+    * used for the else-part of the {@link IfExThenElse} operator, when it is used
     * for the translation of JML's \min and \max operator. It is necessary to evaluate
     * this constant expression to be not well-defined.
     */
@@ -128,8 +128,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      *
      * @param name
      *            the name, not <code>null</code>
-     * @param instantiator
-     *            the fixed associated instantiator, may be <code>null</code>.
+     * The fixed associated instantiator, may be <code>null</code>.
      */
     public ParameterlessTermLabel(Name name) {
         assert name != null;

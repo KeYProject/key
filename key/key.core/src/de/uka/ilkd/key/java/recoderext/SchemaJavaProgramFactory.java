@@ -569,7 +569,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
 
 
-    public void setSVNamespace(Namespace ns) {
+    public void setSVNamespace(Namespace<SchemaVariable> ns) {
 	svns=ns;
     }
 }

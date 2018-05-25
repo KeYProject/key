@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.ldt;
 
+import java.math.BigInteger;
+
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -20,7 +22,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
+import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.LongLiteral;
@@ -45,9 +47,11 @@ import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -66,8 +70,8 @@ public final class IntegerLDT extends LDT {
     public static final String NEGATIVE_LITERAL_STRING = "neglit";
     public static final Name NUMBERS_NAME = new Name("Z");
     public static final Name CHAR_ID_NAME = new Name("C"); 
-    
-    //the following fields cache the symbols from integerHeader.key. 
+
+    //the following fields cache the symbols from integerHeader.key.
     //(explanations see there)
     private final Function sharp;
     private final Function numberSymbol[] = new Function[10];
@@ -270,11 +274,11 @@ public final class IntegerLDT extends LDT {
         inInt               = addFunction(services, "inInt");
         inLong              = addFunction(services, "inLong");
         inChar              = addFunction(services, "inChar");
-        index				= addFunction(services, "index");
+        index               = addFunction(services, "index");
 
         //cache often used constants       
-        zero = translateLiteral(new IntLiteral(0), services);
-        one = translateLiteral(new IntLiteral(1), services);        
+        zero = makeDigit(0, services.getTermBuilder());
+        one = makeDigit(1, services.getTermBuilder());
     }
     
     
@@ -289,6 +293,10 @@ public final class IntegerLDT extends LDT {
         return (c-'0'>=0) && (c-'0'<=9);
     }
 
+    private Term makeDigit(int digit, TermBuilder tb) {
+        return tb.func(getNumberSymbol(), tb.func(getNumberLiteralFor(digit),
+                tb.func(getNumberTerminator())));
+    }
     
     
     //-------------------------------------------------------------------------
@@ -532,105 +540,28 @@ public final class IntegerLDT extends LDT {
         }
         return false;
     }
-    
-
 
     @Override
     public Term translateLiteral(Literal lit, Services services) {
-        int length = 0;
-        boolean minusFlag = false;
-        Debug.assertTrue(lit instanceof IntLiteral || 
-                         lit instanceof LongLiteral ||
-                         lit instanceof BigintLiteral ||
-                         lit instanceof CharLiteral,
-                         "Literal '"+lit+"' is not an integer literal.");
+        Debug.assertTrue(lit instanceof AbstractIntegerLiteral,
+                         "Literal '" + lit + "' is not an integer literal.");
 
-        char[] int_ch=null;
-        assert sharp != null;
-        Term result = services.getTermBuilder().func(sharp);
-
-        Function identifier=numbers;
+        Term result;
         if (lit instanceof CharLiteral) {
-            lit = new IntLiteral(""+ (int)(((CharLiteral)lit)
-                                           .getCharValue()) ) ;
-            identifier = charID;
+            result = services.getTermBuilder().cTerm(((CharLiteral) lit).getValueString());
+        } else {
+            result = services.getTermBuilder().zTerm(((AbstractIntegerLiteral) lit).getValue());
         }
 
-        String literalString = null;
-        if (lit instanceof IntLiteral)
-            literalString = ((IntLiteral)lit).getValue();
-        else if (lit instanceof LongLiteral)
-            literalString = ((LongLiteral)lit).getValue();
-        else if (lit instanceof BigintLiteral)
-            literalString = ((BigintLiteral)lit).getValue();
-        else
-            assert false;
-
-        if (literalString.charAt(0) == '-') {
-            minusFlag = true;       
-            literalString = 
-                literalString.substring(1);
-        }
-        // We have to deal with literals coming both from programs and
-        // the logic. The former can have prefixes ("0" for octal,
-        // "0x" for hex) and suffixes ("L" for long literal). The latter
-        // do not have any of these but can have arbitrary length.
-        if (lit instanceof IntLiteral) {
-            if (literalString.startsWith("0") && !literalString.equals("0")) { // hex or octal literal
-                try {
-                    long l = Long.decode(literalString);
-                    //the following contortion is necessary to deal with
-                    //valid java programs like int i = 0xffffffff;
-                    //http://stackoverflow.com/questions/4355619/converting-string-to-intger-hex-value-strange-behaviour
-                    if (l>4294967295L) throw new
-                        NumberFormatException("This won't fit into an int");
-                    int i = (int) l;
-                    if (i<0) {
-                        minusFlag = true;
-                        i=-i;
-                    }
-                    int_ch=(""+i).toCharArray();
-                } catch(NumberFormatException nfe) {
-                    Debug.fail("Cannot convert int constant! "+literalString);
-                }
-            } else {
-                int_ch=literalString.toCharArray();
-            }
-            length = int_ch.length;
-        } else if (lit instanceof LongLiteral) {
-            // long constants have the letter 'l' as final character
-            // need to cut that off (fixes bug #1523)
-            assert Character.toLowerCase(literalString.charAt(literalString.length()-1)) == 'l';
-            try {
-                final long l = Long.decode(literalString.substring(0, literalString.length()-1));
-                int_ch=(""+l).toCharArray();
-            } catch (NumberFormatException nfe) {
-                Debug.fail("Cannot convert long constant! "+literalString);
-            }
-            length = int_ch.length;
-        }
-        
-        for (int i = 0; i < length; i++) {
-            result = services.getTermBuilder().func(numberSymbol[int_ch[i]-'0'], result);
-        }
-        if (minusFlag) {
-            result = services.getTermBuilder().func(neglit, result);
-        }
-        result = services.getTermBuilder().func(identifier, result);
-
-        Debug.out("integerldt: result of translating literal (lit, result):", 
-                  lit, result);
-
+        Debug.out("integerldt: result of translating literal (lit, result):", lit, result);
         return result;
     }
-    
-    
+
     @Override
     public boolean hasLiteralFunction(Function f) {
         return containsFunction(f) && (f.arity()==0 || isNumberLiteral(f));
     }
-    
-    
+
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
         if(!containsFunction((Function) t.op())) {
@@ -651,7 +582,7 @@ public final class IntegerLDT extends LDT {
             }
             // numbers must end with a sharp
             if (f == sharp) {
-                return new IntLiteral(sb.toString());
+                return new IntLiteral(sb.toString());     // TODO: what if number too large for int?
             }
         }
         throw new RuntimeException("IntegerLDT: Cannot convert term to program: "

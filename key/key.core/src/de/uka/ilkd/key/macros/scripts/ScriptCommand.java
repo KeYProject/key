@@ -1,12 +1,9 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.macros.scripts.meta.Option;
-import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 
 import java.io.File;
 import java.nio.file.NoSuchFileException;
-import java.util.Map;
-import java.util.logging.Logger;
 
 public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
     public ScriptCommand() {
