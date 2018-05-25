@@ -33,3 +33,6 @@
 (declare-fun exactinstanceof (U T) Bool)
 (assert (forall ((u U) (t T)) (=> (exactinstanceof u t) (= (typeof u) t))))
 
+(declare-fun keyselect (U U U) U)
+(assert (forall ((u1 U) (u2 U) (u3 U)) (subtype (typeof (keyselect u1 u2 u3)) 
+
