@@ -232,13 +232,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                             o1.getFilteredFormula(), 1000);
                     int o2age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
                             o2.getFilteredFormula(), 1000);
-                    if (o1age > o2age) {
-                        return 1;
-                    } else if (o1age < o2age) {
-                        return -1;
-                    } else {
-                        return 0;
-                    }
+                    return o1age - o2age;
                 }
             });
             for (SequentPrintFilterEntry entry : entryList) {
