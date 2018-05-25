@@ -26,28 +26,12 @@ import java.io.StringReader;
 /**
  * Action to handle proof exploration addition of formulas
  */
-public class AddFormulaToSequentAction extends MainWindowAction {
+public class AddFormulaToSequentAction extends ExplorationAction {
     public AddFormulaToSequentAction(MainWindow mainWindow) {
         super(mainWindow);
     }
 
-    static Term promptForTerm(MainWindow window, String initialValue) {
-        String input = JOptionPane.showInputDialog(window, "Input a formula:", initialValue);
-        if (input == null) return null;
 
-        DefaultTermParser dtp = new DefaultTermParser();
-
-        Reader reader = new StringReader(input);
-        Services services = window.getMediator().getServices();
-        NamespaceSet nss = window.getMediator().getServices().getNamespaces();
-        AbbrevMap scm = new AbbrevMap(); //TODO where to get abbrev map?
-        try {
-            return dtp.parse(reader, null, services, nss, scm);
-        } catch (ParserException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
