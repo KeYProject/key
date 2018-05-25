@@ -431,7 +431,7 @@ public class TacletMenu extends JMenu {
     }
 
     private void addExplorationMenu() {
-        if(mediator.isExplorationModeSelected()) {
+        if(mediator.getExplorationModeModel().isExplorationModeSelected()) {
             addSeparator();
             JMenu menuExploration = new JMenu("Exploration");
             menuExploration.add(new AddFormulaToAntecedentAction());

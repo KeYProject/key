@@ -90,6 +90,7 @@ public class ProofTreeView extends JPanel {
 
     public static final Color DARK_TURQOUIS_COLOR = new Color(19,110,128);
     public static final Color DARK_PURPLE_COLOR = new Color(112,17,191);
+    public static final Color LIGHT_PURPLE_COLOR = new Color(165, 146, 191);
 
     /** the mediator is stored here */
     private KeYMediator mediator;
@@ -746,11 +747,13 @@ public class ProofTreeView extends JPanel {
 		(DefaultTreeCellRenderer) super.getTreeCellRendererComponent
 		(tree, nodeText, sel, expanded, leaf, row, hasFocus);
 
-        if(node.getNodeInfo().isExploration())
+        if(node.getNodeInfo().isExploration()) {
             tree_cell.setBorder(BorderFactory.createLineBorder(DARK_PURPLE_COLOR, 1, true));
-        else
+            tree_cell.setBackgroundNonSelectionColor(LIGHT_PURPLE_COLOR);
+        }
+        else {
             tree_cell.setBorder(null);
-
+        }
 	    if (node.leaf()) {
 		Goal goal = proof.getGoal(node);
 		if ( goal == null || node.isClosed() ) {

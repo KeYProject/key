@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.gui.actions.exploration;
 
-import de.uka.ilkd.key.gui.ExplorationModeToolBar;
+import de.uka.ilkd.key.gui.proofExploration.ExplorationModeModel;
+import de.uka.ilkd.key.gui.proofExploration.ExplorationModeToolBar;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -19,14 +18,13 @@ import org.key_project.util.collection.ImmutableSLList;
 import java.awt.event.ActionEvent;
 
 import static de.uka.ilkd.key.gui.actions.exploration.AddFormulaToAntecedentAction.promptForTerm;
-import org.key_project.util.collection.ImmutableSet;
 
 /**
  * @author Alexander Weigl
  * @author Sarah Grebing
  * @version 1 (24.05.18)
  */
-public class AddFormulaToSuccedentAction extends MainWindowAction {
+public class AddFormulaToSuccedentAction extends AddFormulaToSequentAction {
 
     /**
      *
@@ -49,11 +47,11 @@ public class AddFormulaToSuccedentAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         Term t = promptForTerm(mainWindow, "");
         if (t == null) return;
-        if(mainWindow.explorationToolBar.getExplorationTacletAppState()
-                == (ExplorationModeToolBar.ExplorationState.UNSOUND_APPS)) {
-            unsoundAddition(t);
+        if(getMediator().getExplorationModeModel().getExplorationTacletAppState()
+                == ExplorationModeModel.ExplorationState.UNSOUND_APPS) {
+            super.unsoundAddition(t, false);
         } else {
-            soundAddition(t);
+            super.soundAddition(t, false);
         }
     }
 
@@ -62,7 +60,7 @@ public class AddFormulaToSuccedentAction extends MainWindowAction {
      * Create a new Tacletapp that is sound i.e. make a cut
      * @param t
      */
-    private void soundAddition(Term t){
+/*    private void soundAddition(Term t){
         Goal g = getMediator().getSelectedGoal();
         Taclet cut = getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
         Semisequent semisequent = new Semisequent(new SequentFormula(t));
@@ -73,13 +71,14 @@ public class AddFormulaToSuccedentAction extends MainWindowAction {
         ImmutableList<Goal> result = g.apply(app);
         result.forEach(goal -> goal.node().getNodeInfo().setExploration(true));
 
-    }   //TODO change the focus and hide the cutformula = true branch
+    }*/
+       //TODO change the focus and hide the cutformula = true branch
 
     /**
      * Create a new Tacletapplication that is possibly unsound
      * @param t
      */
-    private void unsoundAddition(Term t) {
+/*    private void unsoundAddition(Term t) {
         NoFindTacletBuilder builder = new NoFindTacletBuilder();
         builder.setName(new Name("add_formula_succ"));
         Semisequent semisequent = new Semisequent(new SequentFormula(t));
@@ -92,6 +91,6 @@ public class AddFormulaToSuccedentAction extends MainWindowAction {
         ImmutableList<Goal> result = g.apply(NoPosTacletApp.createNoPosTacletApp(taclet));
         result.forEach(goal -> goal.node().getNodeInfo().setExploration(true));
     }
-
+*/
 
 }

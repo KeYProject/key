@@ -18,6 +18,7 @@ import java.util.EventObject;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
+import de.uka.ilkd.key.gui.proofExploration.ExplorationModeModel;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -107,7 +108,7 @@ public class KeYMediator {
     /**
      * boolean flag whether explorationmode is turned on
      */
-    private boolean explorationModeSelected = false;
+    private ExplorationModeModel explorationModeModel;
 
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
@@ -559,12 +560,13 @@ public class KeYMediator {
        return inAutoMode;
    }
 
-    public boolean isExplorationModeSelected() {
-        return explorationModeSelected;
+
+    public void setExplorationModeModel(ExplorationModeModel explorationModeModel) {
+        this.explorationModeModel = explorationModeModel;
     }
 
-    public void setExplorationModeSelected(boolean explorationModeSelected) {
-        this.explorationModeSelected = explorationModeSelected;
+    public ExplorationModeModel getExplorationModeModel() {
+        return explorationModeModel;
     }
 
 

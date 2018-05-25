@@ -40,6 +40,8 @@ import de.uka.ilkd.key.gui.nodeviews.*;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.gui.proofExploration.ExplorationModeModel;
+import de.uka.ilkd.key.gui.proofExploration.ExplorationModeToolBar;
 import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
@@ -341,7 +343,8 @@ public final class MainWindow extends JFrame  {
 	// create tool bars
 	controlToolBar = createProofControlToolBar();
         fileOpToolBar = createFileOpsToolBar();
-        explorationToolBar = new ExplorationModeToolBar(this);
+
+        explorationToolBar = createExplorationModeToolBar();
         JPanel toolBarPanel = new JPanel();
         toolBarPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
         toolBarPanel.add(controlToolBar);
@@ -382,6 +385,12 @@ public final class MainWindow extends JFrame  {
         setSize(1000, 600);
 
         loadPreferences(this);
+    }
+
+    private ExplorationModeToolBar createExplorationModeToolBar() {
+        ExplorationModeModel model = new ExplorationModeModel();
+        getMediator().setExplorationModeModel(model);
+        return new ExplorationModeToolBar(this, model);
     }
 
     private JToolBar createFileOpsToolBar() {

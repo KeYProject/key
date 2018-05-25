@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.actions.exploration;
 
-import de.uka.ilkd.key.gui.ExplorationModeToolBar;
+import de.uka.ilkd.key.gui.proofExploration.ExplorationModeModel;
+import de.uka.ilkd.key.gui.proofExploration.ExplorationModeToolBar;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.java.Services;
@@ -28,7 +29,7 @@ import java.io.StringReader;
  * @author Sarah Grebing
  * @version 1 (24.05.18)
  */
-public class AddFormulaToAntecedentAction extends MainWindowAction {
+public class AddFormulaToAntecedentAction extends AddFormulaToSequentAction {
 
     public AddFormulaToAntecedentAction() {
         this(MainWindow.getInstance());
@@ -39,69 +40,15 @@ public class AddFormulaToAntecedentAction extends MainWindowAction {
         setName("Add formula to antecedent");
     }
 
-    static Term promptForTerm(MainWindow window, String initialValue) {
-        String input = JOptionPane.showInputDialog(window, "Input a formula:", initialValue);
-        if (input == null) return null;
-
-        DefaultTermParser dtp = new DefaultTermParser();
-
-        Reader reader = new StringReader(input);
-        Services services = window.getMediator().getServices();
-        NamespaceSet nss = window.getMediator().getServices().getNamespaces();
-        AbbrevMap scm = new AbbrevMap(); //TODO where to get abbrev map?
-        try {
-            return dtp.parse(reader, null, services, nss, scm);
-        } catch (ParserException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         Term t = promptForTerm(mainWindow, "");
         if (t == null) return;
-        if(mainWindow.explorationToolBar.getExplorationTacletAppState()
-                == (ExplorationModeToolBar.ExplorationState.UNSOUND_APPS)) {
-            unsoundAddition(t);
+        if(getMediator().getExplorationModeModel().getExplorationTacletAppState()
+                == (ExplorationModeModel.ExplorationState.UNSOUND_APPS)) {
+            super.unsoundAddition(t, true);
         } else {
-            soundAddition(t);
+            super.soundAddition(t, true);
         }
     }
-
-    /**
-     * Add a formula to the antecedent -> unsound rule
-     * @param t
-     */
-    private void unsoundAddition(Term t) {
-        NoFindTacletBuilder builder = new NoFindTacletBuilder();
-        builder.setName(new Name("add_formula_antec"));
-        Semisequent semisequent = new Semisequent(new SequentFormula(t));
-        Sequent addedFormula = Sequent.createAnteSequent(semisequent);
-        ImmutableList<TacletGoalTemplate> templates = ImmutableSLList.nil();
-        templates = templates.append(new TacletGoalTemplate(addedFormula, ImmutableSLList.nil()));
-        builder.setTacletGoalTemplates(templates);
-        Taclet taclet = builder.getTaclet();
-        Goal g = getMediator().getSelectedGoal();
-        ImmutableList<Goal> result = g.apply(NoPosTacletApp.createNoPosTacletApp(taclet));
-        result.forEach(goal -> goal.node().getNodeInfo().setExploration(true));
-    }
-
-    /**
-     * Create a new Tacletapp that is sound i.e. make a cut
-     * @param t
-     */
-    private void soundAddition(Term t){
-        Goal g = getMediator().getSelectedGoal();
-        Taclet cut = getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
-        Semisequent semisequent = new Semisequent(new SequentFormula(t));
-        Sequent addedFormula = Sequent.createSuccSequent(semisequent);
-        TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
-        SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-        app = app.addCheckedInstantiation(sv, semisequent.get(0).formula(), getMediator().getServices(), true);
-        ImmutableList<Goal> result = g.apply(app);
-        result.forEach(goal -> goal.node().getNodeInfo().setExploration(true));
-
-    }   //TODO change the focus and hide the cutformula = false branch
-
 }
