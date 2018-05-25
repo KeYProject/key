@@ -625,7 +625,13 @@ public final class MainWindow extends JFrame  {
         view.add(new ToolTipOptionsAction(this));
 
         view.add(new ProofDiffFrame.Action(this));
-                
+
+        view.addSeparator();
+
+        JMenuItem hmItem = new JMenuItem("Heatmap Options");
+        hmItem.addActionListener(new HeatmapSettingsAction(this));
+        view.add(hmItem);
+
         return view;
     }
 
