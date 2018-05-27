@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
-import de.uka.ilkd.key.macros.scripts.ScriptCommand;
 
 import java.util.Collection;
 import java.util.HashMap;

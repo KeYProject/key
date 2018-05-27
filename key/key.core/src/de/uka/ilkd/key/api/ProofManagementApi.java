@@ -26,7 +26,7 @@ public class ProofManagementApi {
     private final List<Contract> proofContracts = new ArrayList<>();
     private HashSet<String> ruleNames;
 
-    public ProofManagementApi(KeYEnvironment env) {
+    public ProofManagementApi(KeYEnvironment<?> env) {
         currentEnv = env;
     }
 
