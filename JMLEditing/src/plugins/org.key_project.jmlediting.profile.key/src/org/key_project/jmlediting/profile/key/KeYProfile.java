@@ -55,6 +55,7 @@ import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
 import org.key_project.jmlediting.profile.key.parser.KeYTargetLabelPredicateParser;
 import org.key_project.jmlediting.profile.key.primary.NewElemsFreshKeyword;
 import org.key_project.jmlediting.profile.key.primary.NonNullElementsKeyword;
+import org.key_project.jmlediting.profile.key.primary.StaticInvariantForKeyword;
 import org.key_project.jmlediting.profile.key.seq.ContainsKeyword;
 import org.key_project.jmlediting.profile.key.seq.IndexKeyword;
 import org.key_project.jmlediting.profile.key.seq.IndexOfKeyword;
@@ -90,6 +91,9 @@ public class KeYProfile extends JMLReferenceProfile {
       this.additionalPrimarySuffixes = new HashSet<ParseFunction>(
             super.getPrimarySuffixExtensions());
 
+      //add static invariant for keyword
+      supportedKeywords.add(new StaticInvariantForKeyword());
+      
       // Add strictly keywords
       supportedKeywords.add(new StrictlyPureKeyword());
       supportedKeywords.add(new StrictlyNothingKeyword());
