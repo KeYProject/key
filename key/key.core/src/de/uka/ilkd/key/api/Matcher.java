@@ -47,7 +47,6 @@ public class Matcher {
     //List of VarAssignment
     public List<VariableAssignments> matchPattern(String pattern, Sequent currentSeq, VariableAssignments assignments){
         //copy services in order to not accidently set assignments and namespace for environment
-        Services cp = api.getEnv().getServices().copy(false);
 
         Services copyServices = api.getEnv().getServices().copy(false);
         //services.copy(false);
@@ -67,7 +66,6 @@ public class Matcher {
         //Build Matcher for Matchpattern
         LegacyTacletMatcher ltm = new LegacyTacletMatcher(t);
 
-        NamespaceSet nss = copyServices.getNamespaces();
 
         //patternSequent should not be null, as we have created it
         assert t.ifSequent() != null;
@@ -78,11 +76,6 @@ public class Matcher {
 
         List<SearchNode> finalCandidates = new ArrayList<>(100);
         if(size > 0) {
-            Iterator<SequentFormula> patternIterator = patternSeq.iterator();
-
-            //Init mit leeren Matchconditions, die gefuellt werden
-            MatchConditions matchCond = MatchConditions.EMPTY_MATCHCONDITIONS;
-
             //Iteratoren durch die Sequent
             ImmutableList<IfFormulaInstantiation> antecCand =
                     IfFormulaInstSeq.createList(currentSeq, true);

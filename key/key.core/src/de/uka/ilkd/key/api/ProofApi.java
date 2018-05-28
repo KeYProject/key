@@ -3,8 +3,6 @@ package de.uka.ilkd.key.api;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.init.RuleCollection;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -13,7 +11,6 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -24,9 +21,8 @@ import java.util.stream.Collectors;
  * @version 1 (21.04.17)
  */
 public class ProofApi {
-    private final KeYEnvironment env;
+    private final KeYEnvironment<?> env;
     private final Proof proof;
-    private Object firstOpenGoal;
 
     public ProofApi(Proof proof, KeYEnvironment<?> currentEnv) {
         this.proof = proof;
@@ -44,7 +40,7 @@ public class ProofApi {
         //TODO
     }
 
-    public KeYEnvironment getEnv() {
+    public KeYEnvironment<?> getEnv() {
         return env;
     }
 
