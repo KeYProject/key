@@ -22,7 +22,8 @@ import java.util.Set;
 
 /**
  * @author Alexander Weigl
- * @version 1 (24.05.18)
+ * @author Sarah Grebing
+ * @version 2 (25.05.18)
  */
 public class EditFormulaAction extends ExplorationAction {
     private final PosInSequent posInSeq;
