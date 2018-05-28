@@ -20,7 +20,7 @@ public class ExplorationModeToolBar extends JToolBar {
 
     private ExplorationModeModel explorationModeModel;
     /**
-     * Cobobox for choosing which kind of taclets to apply
+     * Combobox for choosing which kind of taclets to apply
      */
     private JComboBox<String> soundExploration;
 
