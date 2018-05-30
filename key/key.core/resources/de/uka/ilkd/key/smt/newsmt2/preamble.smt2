@@ -6,6 +6,7 @@
 
 (declare-sort T 0)
 (declare-sort U 0)
+(define-sort Heap () (Array U U U))
 (declare-const sort_any T)
 (declare-const null U)
 
