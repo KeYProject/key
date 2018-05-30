@@ -49,7 +49,6 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         sb.append("; --- Declarations\n\n");
 
         if (problem.arity() != 0) {
-            master.addSort(Sort.ANY);
             addAllSorts(problem, master);
         }
 

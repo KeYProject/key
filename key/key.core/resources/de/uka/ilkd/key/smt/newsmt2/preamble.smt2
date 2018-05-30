@@ -6,6 +6,7 @@
 
 (declare-sort T 0)
 (declare-sort U 0)
+(declare-sort sort_any 0)
 
 (declare-fun u2i (U) Int)
 (declare-fun i2u (Int) U)
@@ -34,5 +35,4 @@
 (assert (forall ((u U) (t T)) (=> (exactinstanceof u t) (= (typeof u) t))))
 
 (declare-fun keyselect (U U U) U)
-(assert (forall ((u1 U) (u2 U) (u3 U)) (subtype (typeof (keyselect u1 u2 u3)) 
-
+(assert (forall ((u1 U) (u2 U) (u3 U)) (subtype (typeof (keyselect u1 u2 u3)) sort_any)))
