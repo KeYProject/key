@@ -1201,13 +1201,16 @@ public interface BlockSpecificationElement extends SpecificationElement {
          *            the term builder to use.
          */
         public Terms(Variables variables, TermBuilder tb) {
-            this(tb.var(variables.self), convertFlagMap(variables.breakFlags, tb),
-                    convertFlagMap(variables.continueFlags, tb), tb.var(variables.returnFlag),
-                    tb.var(variables.result), tb.var(variables.exception),
-                    convertHeapMap(variables.remembranceHeaps, tb),
-                    convertHeapMap(variables.remembranceLocalVariables, tb),
-                    convertHeapMap(variables.outerRemembranceHeaps, tb),
-                    convertHeapMap(variables.outerRemembranceVariables, tb));
+            this(variables.self != null ? tb.var(variables.self) : null,
+                 convertFlagMap(variables.breakFlags, tb),
+                 convertFlagMap(variables.continueFlags, tb),
+                 variables.returnFlag != null ? tb.var(variables.returnFlag) : null,
+                 variables.result != null ? tb.var(variables.result) : null,
+                 variables.exception != null ? tb.var(variables.exception) : null,
+                 convertHeapMap(variables.remembranceHeaps, tb),
+                 convertHeapMap(variables.remembranceLocalVariables, tb),
+                 convertHeapMap(variables.outerRemembranceHeaps, tb),
+                 convertHeapMap(variables.outerRemembranceVariables, tb));
         }
 
         /**

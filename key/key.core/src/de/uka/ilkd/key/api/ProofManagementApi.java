@@ -37,7 +37,8 @@ public class ProofManagementApi {
     /**
      * Retrieve a list of all available contracts
      *
-     * @return List<Contract>; can be null if no file was loaded before (we should throw an exception here)
+     * @return {@link List<Contract>}; can be null if no file was loaded before
+     *                                  (we should throw an exception here)
      */
     public List<Contract> getProofContracts() {
         if (proofContracts.isEmpty())
@@ -98,7 +99,7 @@ public class ProofManagementApi {
      * <p>
      * The result is cached to speed up further calls.s
      *
-     * @returns always returns a non-null hash set.
+     * @return always returns a non-null hash set.
      */
     public Set<String> getRuleNames() {
         if (ruleNames == null) {

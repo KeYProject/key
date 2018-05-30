@@ -13,9 +13,10 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
  */
 public class GroupedProofCollectionUnit extends ProofCollectionUnit {
 
-   private final String groupName;
-   private final List<TestFile> testFiles;
-   private final ProofCollectionSettings settings;
+    private static final long serialVersionUID = 1L;
+    private final String groupName;
+    private final List<TestFile> testFiles;
+    private final ProofCollectionSettings settings;
 
    public GroupedProofCollectionUnit(String groupName,
          ProofCollectionSettings settings, List<TestFile> files) {

@@ -16,7 +16,6 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.io.File;
 
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;

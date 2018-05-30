@@ -116,7 +116,7 @@ public abstract class AbstractPO implements IPersistablePO {
 
     /**
      * Generate well-definedness taclets to resolve formulas as
-     * WD(pv.<inv>) or WD(pv.m(...)).
+     * WD(pv.{@literal <inv>}) or WD(pv.m(...)).
      * @param proofConfig the proof configuration
      */
     void generateWdTaclets(InitConfig proofConfig) {

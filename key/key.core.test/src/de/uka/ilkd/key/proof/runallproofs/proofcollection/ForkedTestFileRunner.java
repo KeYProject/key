@@ -28,9 +28,11 @@ import de.uka.ilkd.key.util.IOForwarder;
  */
 public abstract class ForkedTestFileRunner implements Serializable {
 
-   private static final String FORK_TIMEOUT_KEY = "forkTimeout";
+    private static final long serialVersionUID = 1L;
 
-   private static final String FORK_DEBUG_PORT = "forkDebugPort";
+    private static final String FORK_TIMEOUT_KEY = "forkTimeout";
+
+    private static final String FORK_DEBUG_PORT = "forkDebugPort";
 
    private static Path getLocationOfSerializedTestFiles(Path tempDirectory) {
       return Paths.get(tempDirectory.toString(), "TestFiles.serialized");
