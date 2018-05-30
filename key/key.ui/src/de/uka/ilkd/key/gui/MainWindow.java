@@ -1177,7 +1177,7 @@ public final class MainWindow extends JFrame  {
             currentComponent.dispatchEvent(new MouseEvent(currentComponent,
                     e.getID(),
                     e.getWhen(),
-                    e.getModifiers(),
+                    e.getModifiersEx(),
                     componentPoint.x,
                     componentPoint.y,
                     e.getClickCount(),

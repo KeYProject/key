@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.EnumMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -84,13 +85,29 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
         try {
             for (Snippet s : Snippet.values()) {
                 InfFlowFactoryMethod fm =
-                        (InfFlowFactoryMethod) s.c.newInstance();
+                        (InfFlowFactoryMethod) s.c.getDeclaredConstructor().newInstance();
                 factoryMethods.put(s, fm);
             }
         } catch (InstantiationException ex) {
             Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).
                     log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
+            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).
+                    log(Level.SEVERE, null, ex);
+        }
+        catch (IllegalArgumentException ex) {
+            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).
+                    log(Level.SEVERE, null, ex);
+        }
+        catch (InvocationTargetException ex) {
+            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).
+                    log(Level.SEVERE, null, ex);
+        }
+        catch (NoSuchMethodException ex) {
+            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).
+                    log(Level.SEVERE, null, ex);
+        }
+        catch (SecurityException ex) {
             Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).
                     log(Level.SEVERE, null, ex);
         }
