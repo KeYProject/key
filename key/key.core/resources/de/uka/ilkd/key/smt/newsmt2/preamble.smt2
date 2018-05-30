@@ -6,7 +6,8 @@
 
 (declare-sort T 0)
 (declare-sort U 0)
-(declare-sort sort_any 0)
+(declare-const sort_any T)
+(declare-const null U)
 
 (declare-fun u2i (U) Int)
 (declare-fun i2u (Int) U)

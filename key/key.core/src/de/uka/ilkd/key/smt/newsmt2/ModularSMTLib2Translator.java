@@ -49,13 +49,16 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         sb.append("; --- Declarations\n\n");
 
         if (problem.arity() != 0) {
+            master.addSort(Sort.ANY);
             addAllSorts(problem, master);
         }
 
         StringBuffer distinctSortSB = new StringBuffer();
         distinctSortSB.append("(assert (distinct ");
         for (Sort s : master.getSorts()) {
-            sb.append("(declare-const " + SExpr.sortExpr(s) + " T)\n");
+            if (s != Sort.ANY) {
+                sb.append("(declare-const " + SExpr.sortExpr(s) + " T)\n");
+            }
             distinctSortSB.append(SExpr.sortExpr(s) + " ");
         }
         distinctSortSB.append("))\n");
@@ -90,14 +93,16 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     private void createSortTypeHierarchy(Term problem, Services services,
         MasterHandler master) {
 
+        master.addAxiom(new SExpr("assert", Type.BOOL, new SExpr("=", Type.BOOL, new SExpr("typeof", Type.UNIVERSE, "null"), new SExpr("sort_Null"))));
+
         for (Sort s : master.getSorts()) {
             Set<Sort> children = directChildSorts(s, master.getSorts());
             for (Sort child : children) {
                 master.addAxiom(new SExpr("assert", new SExpr("subtype", SExpr.sortExpr(child), SExpr.sortExpr(s))));
                 for (Sort otherChild : children) {
-                    if (!(child.equals(otherChild))) {
+                    if (!(child.equals(otherChild)) && (otherChild.name().toString() != ("Null")) && (child.name().toString() != ("Null"))) {
                         SExpr st = new SExpr("subtype", SExpr.sortExpr(child), SExpr.sortExpr(otherChild));
-                        master.addAxiom(new SExpr("not", st));
+                        master.addAxiom(new SExpr("assert", new SExpr("not", st)));
                     }
                 }
             }

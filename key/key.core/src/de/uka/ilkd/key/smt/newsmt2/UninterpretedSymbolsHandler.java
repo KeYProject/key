@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
@@ -33,8 +34,13 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
-
         Operator op = term.op();
+
+        // TODO js: should this go in a special literalHandler?
+        if (term.sort().name().toString() == "Null") {
+            return new SExpr("null", Type.UNIVERSE);
+        }
+
         String name = PREFIX + op.name().toString();
         if(!trans.isKnownSymbol(name)) {
             int a = op.arity();

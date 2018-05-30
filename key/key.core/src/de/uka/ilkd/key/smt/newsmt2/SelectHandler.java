@@ -30,9 +30,9 @@ public class SelectHandler implements SMTHandler {
         SExpr se3 = trans.translate(term.sub(2));
 
         if (dep == Sort.ANY) {
-            return new SExpr("keyselect", se1, se2, se3);
+            return new SExpr("keyselect", SExpr.Type.UNIVERSE, se1, se2, se3);
         }
 
-        return SExpr.castExpr(SExpr.sortExpr(dep), new SExpr("keyselect", se1, se2, se3));
+        return SExpr.castExpr(SExpr.sortExpr(dep), new SExpr("keyselect", SExpr.Type.UNIVERSE, se1, se2, se3));
     }
 }
