@@ -99,8 +99,8 @@ public class SExpr {
         return new SExpr(ModularSMTLib2Translator.SORT_PREFIX + sort.toString());
     }
 
-    public static SExpr castExpr(SExpr sortExpr, SExpr exp) {
-        return new SExpr("cast", Type.UNIVERSE, sortExpr, exp);
+    public static SExpr castExpr(SExpr sortExp, SExpr exp) {
+        return new SExpr("cast", Type.UNIVERSE, exp, sortExp);
     }
 
     @Override
