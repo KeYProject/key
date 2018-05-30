@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,7 +8,6 @@ import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.util.Pair;
 import junit.framework.TestCase;
 
 public class TestZipProofSaving extends TestCase {

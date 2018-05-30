@@ -174,7 +174,7 @@ public class BoundVariableTools {
     * @param subtermsBegin first subterm that is supposed to be considered
     * @param subtermsEnd subterm after the last subterm to be consider
      * 
-     * PRE: <code>subtermsEnd > subtermsBegin</code>
+     * PRE: <code>subtermsEnd {@literal >} subtermsBegin</code>
     * @param services TODO
      */
     public ImmutableArray<QuantifiableVariable>

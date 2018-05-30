@@ -34,11 +34,11 @@ import de.uka.ilkd.key.java.visitor.Visitor;
  *  <LI>Ordinary array construction
  *  <BR><tt>new XYZ[d<sub>1</sub>]...[d<sub>n</sub>]</tt>
  *  <LI>Initialized array construction
- *  <BR><tt>new XYZ[]...[] { a<sub>1</sub>, ..., a<sub>n</sub> }
+ *  <BR><tt>new XYZ[]...[] { a<sub>1</sub>, ..., a<sub>n</sub> }</tt>
  *  </OL>
  *  Contrary to an ordinary New, a NewArray is no ConstructorReference (since
  *  all ArrayType constructors are predefined) and is not used as a Statement
- *  (since there are no sideeffects in the constructor). No access path is
+ *  (since there are no side-effects in the constructor). No access path is
  *  required for new, since there is no inner class problem.
  *  <P>
  *  NewArray has either a list of dimension length expressions, or
