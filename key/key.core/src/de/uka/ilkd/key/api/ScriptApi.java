@@ -1,28 +1,20 @@
 package de.uka.ilkd.key.api;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.macros.scripts.EngineState;
-import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
-import de.uka.ilkd.key.macros.scripts.ScriptCommand;
-import de.uka.ilkd.key.macros.scripts.ScriptException;
-import de.uka.ilkd.key.parser.KeYLexerF;
-import de.uka.ilkd.key.parser.KeYParserF;
-import de.uka.ilkd.key.parser.ParserMode;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.match.legacy.LegacyTacletMatcher;
-import org.antlr.runtime.RecognitionException;
-import org.key_project.util.collection.DefaultImmutableSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+
 import org.key_project.util.collection.ImmutableList;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.*;
-import java.util.stream.Collectors;
+import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.macros.scripts.EngineState;
+import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
+import de.uka.ilkd.key.macros.scripts.ScriptException;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 
 /**
  * This API class offers methods to apply script commands and match commands
