@@ -96,20 +96,16 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
         } catch (IllegalAccessException ex) {
             Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).
                     log(Level.SEVERE, null, ex);
-        }
-        catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).
                     log(Level.SEVERE, null, ex);
-        }
-        catch (InvocationTargetException ex) {
+        } catch (InvocationTargetException ex) {
             Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).
                     log(Level.SEVERE, null, ex);
-        }
-        catch (NoSuchMethodException ex) {
+        } catch (NoSuchMethodException ex) {
             Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).
                     log(Level.SEVERE, null, ex);
-        }
-        catch (SecurityException ex) {
+        } catch (SecurityException ex) {
             Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).
                     log(Level.SEVERE, null, ex);
         }
