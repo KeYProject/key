@@ -30,6 +30,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public class SExpr {
 
+    public static final String DECLARE_CONST = "declare-const";
+
     public enum Type {
         INT, BOOL, UNIVERSE, PATTERN, NONE
     }

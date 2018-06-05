@@ -6,7 +6,7 @@
 
 (declare-sort T 0)
 (declare-sort U 0)
-(define-sort Heap () (Array U U U))
+(define-sort sort_heap () (Array U U U))
 (declare-const sort_any T)
 (declare-const null U)
 
@@ -36,5 +36,13 @@
 (declare-fun exactinstanceof (U T) Bool)
 (assert (forall ((u U) (t T)) (=> (exactinstanceof u t) (= (typeof u) t))))
 
-(declare-fun keyselect (U U U) U)
-(assert (forall ((u1 U) (u2 U) (u3 U)) (subtype (typeof (keyselect u1 u2 u3)) sort_any)))
+(declare-fun wellFormed (sort_heap) Bool)
+
+(declare-fun keyselect (sort_heap U U) U)
+(assert (forall ((h sort_heap) (u2 U) (u3 U)) (subtype (typeof (keyselect h u2 u3)) sort_any)))
+
+(declare-const field_created U)
+
+(assert (forall ((h sort_heap) (o1 U) (f1 U) (v U) (o2 U) (f2 U)) (ite (= f1 field_created)
+		(= (keyselect (store h o1 f1 v) o2 f2) f1)
+		(ite (and (= o1 o2) (= f1 f2)) (= (keyselect (store h o1 f1 v) o2 f2) v) (= (keyselect (store h o1 f1 v) o2 f2) (select h o2 f2))))))
