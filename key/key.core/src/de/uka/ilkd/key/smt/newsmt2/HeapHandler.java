@@ -7,7 +7,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
-public class SelectHandler implements SMTHandler {
+public class HeapHandler implements SMTHandler {
 
     public static final String HEAP = "Heap";
     public static final String WELL_FORMED = "wellFormed";
@@ -38,7 +38,7 @@ public class SelectHandler implements SMTHandler {
             return new SExpr(term.toString(), Type.UNIVERSE);
         }
 
-        if (term.toString().contains(WELL_FORMED)) {
+        if (term.op().toString().equals(WELL_FORMED)) {
             return new SExpr(WELL_FORMED, Type.BOOL, trans.translate(term.sub(0)));
         }
 
