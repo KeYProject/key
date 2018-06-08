@@ -34,10 +34,10 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 
 /**
- * Term generator for infering the range of values that a variable can have from
+ * Term generator for inferring the range of values that a variable can have from
  * a given non-linear (in)equation. The generator may only be called on formulas
  * of the form
- * <tt>v^n = l</code>, <tt>v^n <= l</code>, <tt>v^n >= l</code>,
+ * <tt>v^n = l</tt>, <tt>v^n <= l</tt>, <tt>v^n >= l</tt>,
  * where <tt>v</tt> is an atomic term (does not start with
  * addition or multiplication) and <tt>l</tt> is a literal. The generator will
  * then produce at most one formula that describes the solutions of the formula

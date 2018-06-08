@@ -4,9 +4,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Wrapper for a proof node with utilities methods to
  *
@@ -18,8 +15,6 @@ public class ProjectedNode {
     private final Node proofNode;
 
     private final ProjectedNode parent;
-
-    private final List<ProjectedNode> children = new ArrayList<>();
 
     /**
      * Creates the wrapper object for a proof node

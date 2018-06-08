@@ -726,7 +726,7 @@ public class TestCaseGenerator {
             Sort sort = func.sort();
             HeapLDT hLDT = services.getTypeConverter().getHeapLDT();
             if(sort==hLDT.getFieldSort()){
-                String fieldSort = HeapLDT.getClassName(func);
+                // String fieldSort = HeapLDT.getClassName(func);
                 ProgramVariable pv = getProgramVariable(t);
 
                 if(pv!=null){
