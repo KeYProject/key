@@ -24,7 +24,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     public static final String SORT_PREFIX = "sort_";
 
-    private static final String PREAMBLE = readPreamble();
+    private static final String PREAMBLE = readResource("preamble.smt2");
 
     private List<Throwable> exceptions = Collections.emptyList();
 
@@ -67,7 +67,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
         sb.append("\n");
 
-        createSortTypeHierarchy(problem, services, master);
+        createSortTypeHierarchy(problem, services, master, sb);
 
         for(SExpr decl : master.getDeclarations()) {
             decl.appendTo(sb);
@@ -91,11 +91,17 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
 
     private void createSortTypeHierarchy(Term problem, Services services,
-        MasterHandler master) {
-
-        master.addAxiom(new SExpr("assert", Type.BOOL, new SExpr("=", Type.BOOL, new SExpr("typeof", Type.UNIVERSE, "null"), new SExpr("sort_Null"))));
+        MasterHandler master, StringBuffer sb) {
 
         for (Sort s : master.getSorts()) {
+            if (s.toString().equals("Heap")) {
+                sb.append(readResource("heap-axioms.smt2"));
+                continue;
+            }
+            if (s.toString().equals("Null")) {
+                sb.append(readResource("null-axioms.smt2"));
+                continue;
+            }
             Set<Sort> children = directChildSorts(s, master.getSorts());
             for (Sort child : children) {
                 master.addAxiom(new SExpr("assert", new SExpr("subtype", SExpr.sortExpr(child), SExpr.sortExpr(s))));
@@ -153,12 +159,10 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         return res;
     }
 
-
-    // Is there functionality to do this in KeY ?!
-    private static String readPreamble() {
+    private static String readResource(String s) {
         BufferedReader r = new BufferedReader(
             new InputStreamReader(
-                ModularSMTLib2Translator.class.getResourceAsStream("preamble.smt2")));
+                ModularSMTLib2Translator.class.getResourceAsStream(s)));
 
         try {
             String line;
@@ -169,7 +173,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
             return sb.toString();
         } catch (IOException e) {
-            return ";;;; CANNOT READ PREAMBLE";
+            return ";;;; CANNOT READ " + s;
         }
     }
 
