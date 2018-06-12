@@ -31,12 +31,12 @@ public class HeapHandler implements SMTHandler {
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
 
         if (term.op().toString().contains(HEAP)) {
-            String symbol = term.toString();
-            if (!trans.isKnownSymbol(symbol)) {
-                trans.addDeclaration(new SExpr(SExpr.DECLARE_CONST, term.toString(), "sort_heap"));
-                trans.addKnownSymbol(symbol);
+            String s = term.toString();
+            if (!trans.isKnownSymbol(s)) {
+                trans.addKnownSymbol(s);
+                trans.addDeclaration(new SExpr(SExpr.DECLARE_CONST, s, "sort_Heap"));
             }
-            return new SExpr(term.toString(), Type.UNIVERSE);
+            return new SExpr(s, Type.UNIVERSE);
         }
 
         if (term.op().toString().equals(WELL_FORMED)) {
