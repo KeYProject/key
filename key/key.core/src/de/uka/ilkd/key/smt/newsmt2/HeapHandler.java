@@ -48,7 +48,7 @@ public class HeapHandler implements SMTHandler {
             SExpr st2 = trans.coerce(trans.translate(term.sub(1)), Type.UNIVERSE);
             SExpr st3 = trans.coerce(trans.translate(term.sub(2)), Type.UNIVERSE);
             SExpr st4 = trans.coerce(trans.translate(term.sub(3)), Type.UNIVERSE);
-            return new SExpr("keystore", Type.UNIVERSE, st1, st2, st3, st4);
+            return new SExpr("keystore", Type.HEAP, st1, st2, st3, st4);
         }
 
         SortDependingFunction op = (SortDependingFunction) term.op();

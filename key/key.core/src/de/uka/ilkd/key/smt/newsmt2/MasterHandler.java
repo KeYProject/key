@@ -112,6 +112,15 @@ public class MasterHandler {
             default:
                 throw new SMTTranslationException("Cannot convert to int: " + exp);
             }
+        case HEAP:
+            switch(exp.getType()) {
+            case HEAP:
+                return exp;
+            case UNIVERSE:
+                return new SExpr("u2h", Type.INT, exp);
+            default:
+                throw new SMTTranslationException("Cannot convert to heap: " + exp);
+            }
         case UNIVERSE:
             switch(exp.getType()) {
             case UNIVERSE:
@@ -120,6 +129,8 @@ public class MasterHandler {
                 return new SExpr("i2u", Type.UNIVERSE, exp);
             case BOOL:
                 return new SExpr("b2u", Type.UNIVERSE, exp);
+            case HEAP:
+                return new SExpr("h2u", Type.UNIVERSE, exp);
             default:
                 throw new SMTTranslationException("Cannot convert to universe: " + exp);
             }

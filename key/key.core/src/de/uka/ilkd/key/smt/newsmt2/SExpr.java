@@ -33,7 +33,7 @@ public class SExpr {
     public static final String DECLARE_CONST = "declare-const";
 
     public enum Type {
-        INT, BOOL, UNIVERSE, PATTERN, NONE
+        INT, BOOL, UNIVERSE, PATTERN, NONE, HEAP
     }
 
     private static final Pattern EXTRACHAR_PATTERN =

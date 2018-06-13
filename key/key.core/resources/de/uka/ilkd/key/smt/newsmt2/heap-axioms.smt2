@@ -1,5 +1,9 @@
 (define-sort sort_Heap () (Array U U U))
 
+(declare-fun u2h (U) sort_Heap)
+(declare-fun h2u (sort_Heap) U)
+(assert (forall ((h sort_Heap)) (= (u2h (h2u h)) h)))
+
 (declare-fun wellFormed (sort_Heap) Bool)
 
 (declare-const field_created U)
