@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -45,6 +46,8 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -66,25 +69,19 @@ import de.uka.ilkd.key.util.Debug;
  *
  * Editing the source code in the tabs is currently not supported.
  *
- * @author WP
+ * @author Wolfram Pfeifer
  */
 public class ShowSymbExLinesAction extends MainWindowAction {
     /**
      * ToolTip for the textPanes containing the source code.
      */
     private static final String TEXTPANE_TOOLTIP = "Click on a highlighted line to jump to the "
-            + "first occurrence of this line in symbolic execution.";
+            + "most recent occurrence of this line in symbolic execution.";
 
     /**
      * String to display in an empty source code textPane.
      */
     private static final String NO_SOURCE = "No source loaded.";
-
-    /**
-     * The font for the JTextPane containing the source code.
-     * We use the same font as in SequentView for consistency.
-     */
-    private static final Font SOURCE_FONT = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);    // TODO: make font scalable
 
     /**
      * Indicates how many spaces are inserted instead of one tab (used in source code window).
@@ -112,25 +109,18 @@ public class ShowSymbExLinesAction extends MainWindowAction {
     private final JLabel sourceStatusBar;
 
     /**
-     * HashMap with all files (of the current proof!).         // TODO: What if a file changes?
+     * HashMap with all files (of the current proof!).
      */
     private HashMap<String, File> files = new HashMap<String, File>();
     private HashMap<String, String> hashes = new HashMap<String,String>();        // TODO: make proof independent
     private HashMap<String, String> sources = new HashMap<String,String>();
-    boolean warningShown = false;
 
     /**
      * Lines to highlight (contains all highlights of the current proof) and corresponding Nodes.
      */
     private LinkedList<NodePosPair> lines;
 
-    private enum CommentState {
-        NO,
-        MAYBE,       // "/"
-        COMMENT,     // "/*"
-        LNECOMMENT,  // "//"
-        MAYBEEND;    // "*"
-    }
+    
 
     /**
      * This document performs syntax highlighting when strings are inserted.
@@ -138,48 +128,138 @@ public class ShowSymbExLinesAction extends MainWindowAction {
      *
      * @author Wolfram Pfeifer
      */
-    public class JavaDocument extends DefaultStyledDocument {
-        public final static int STRING_MODE = 10;
-        public final static int NORMAL_MODE = 11;
-        public final static int KEYWORD_MODE = 12;
-        public final static int NUMBER_MODE = 13;
-        public final static int COMMENT_MODE = 14;
-        public final static int LINE_COMMENT_MODE = 15;
-        public final static int LINE_JML_MODE = 16;
-        public final static int JAVADOC_MODE = 17;
-        public final static int ANNOTATION_MODE = 18;
-        public final static int JML_MODE = 19;
-        public final static int JML_KEYWORD_MODE = 20;
-
-        // TODO: other delimiters?
-        // "+-*/(){}[]%!^~.;?:&|<>=\"'\\n(space)");
-        private final static String DELIM = "[ .;{}\\[\\]]";
+    public static class JavaDocument extends DefaultStyledDocument {       // TODO: separate this from action?
+        private enum Mode {
+            STRING,
+            NORMAL,
+            KEYWORD,
+            COMMENT,
+            LINE_COMMENT,
+            LINE_JML,
+            JAVADOC,
+            ANNOTATION,
+            JML,
+            JML_KEYWORD;
+        }
+        
+        private enum CommentState {
+            NO,
+            MAYBE,       // "/"
+            COMMENT,     // "/*"
+            LNECOMMENT,  // "//"
+            MAYBEEND;    // "*"
+        }
+        /**
+         * Regular expression character class for all chars which are delimiters
+         * of keywords. \\Q ... \\E is used to escape all chars inside the class.
+         */
+        private static final String DELIM = "[\\Q .;{}[]\n\r()+-*/%!=<>?:~&|^@'\"\\E]";
 
         private SimpleAttributeSet annotation = new SimpleAttributeSet();
         private SimpleAttributeSet string = new SimpleAttributeSet();
         private SimpleAttributeSet normal = new SimpleAttributeSet();
         private SimpleAttributeSet keyword = new SimpleAttributeSet();
-        private SimpleAttributeSet number = new SimpleAttributeSet();
         private SimpleAttributeSet comment = new SimpleAttributeSet();
         private SimpleAttributeSet javadoc = new SimpleAttributeSet();
         private SimpleAttributeSet jml = new SimpleAttributeSet();
         private SimpleAttributeSet jmlkeyword = new SimpleAttributeSet();
 
-        private Map<String, SimpleAttributeSet> keywords = new HashMap<String, SimpleAttributeSet>();
-        private Map<String, SimpleAttributeSet> JMLkeywords = new HashMap<String, SimpleAttributeSet>();
+        // taken from https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html
+        final String[] keywordArray = {
+            "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class",
+            "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally",
+            "float", "for", "if", "implements", "import", "instanceof", "int", "interface", "long",
+            "native", "new", "package", "private", "protected", "public", "return", "short",
+            "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws",
+            "transient", "try", "void", "volatile", "while",
+            "true", "false", "null"        // literals
+            // "const", "goto" // reserved, but currently not used in Java
+        };
+        // TODO: Is there a better way to specify this (maybe in an external file)?
+        final String[] jmlKeywordArray = {
+            // other Java keywords
+            "break", "case", "catch", "class", "const", "continue", "default", "do", "else",
+            "extends", "false", "finally", "for", "goto", "if", "implements", "import",
+            "instanceof", "interface", "label", "new", "null", "package", "return", "super",
+            "switch", "this", "throw", "throws", "true", "try", "void", "while",
+            // types:
+            "boolean", "byte", "char", "double", "float", "int", "long", "short",
+            "\\bigint", "\\locset", "\\real", "\\seq", "\\TYPE",
+            // modifiers:
+            "abstract", "code", "code_bigint_math", "code_java_math", "code_safe_math",
+            "extract", "final", "ghost", "helper", "instance", "model", "native", "non_null",
+            "nullable", "nullable_by_default", "private", "protected", "peer", "\\peer", "public",
+            "pure", "rep", "\\rep", "spec_bigint_math", "spec_java_math", "spec_protected",
+            "spec_public", "spec_safe_math", "static", "strictfp", "strictly_pure", "synchronized",
+            "transient", "two_state", "uninitialized", "volatile",
 
+            "no_state", "modifies", "erases", "modifiable", "returns", "break_behavior",
+            "continue_behavior", "return_behavior",
+            // special JML expressions:
+            "\\constraint_for", "\\created", "\\disjoint", "\\duration", "\\everything",
+            "\\exception", "\\exists", "\\forall", "\\fresh", "\\index", "\\invariant_for",
+            "\\is_initialized", "\\itself", "\\lblneg", "\\lblpos", "\\lockset", "\\max",
+            "\\measured_by", "\\min", "\\new_elems_fresh", "\\nonnullelements", "\\not_accessed",
+            "\\not_assigned", "\\not_modified", "\\not_specified", "\\nothing", "\\num_of",
+            "\\old", "\\only_assigned", "\\only_called", "\\only_captured", "\\pre", "\\product",
+            "\\reach", "\\reachLocs", "\\result", "\\same", "\\seq_contains", "\\space",
+            "\\static_constraint_for", "\\static_invariant_for", "\\strictly_nothing",
+            "\\subset", "\\sum", "\\type", "\\typeof", "\\working_space", "\\values", "\\inv",
+            // clause keywords:
+            "accessible", "accessible_redundantly", "assert", "assert_redundantly", "assignable",
+            "assignable_redundantly", "assume", "assume_redudantly", "breaks", "breaks_redundantly",
+            "\\by", "callable", "callable_redundantly", "captures", "captures_redundantly",
+            "continues", "continues_redundantly", "debug", "\\declassifies", "decreases",
+            "decreases_redundantly", "decreasing", "decreasing_redundantly", "diverges",
+            "determines", "diverges_redundantly", "duration", "duration_redundantly", "ensures",
+            "ensures_redundantly", "\\erases", "forall", "for_example", "hence_by", "implies_that",
+            "in", "in_redundantly", "\\into", "loop_invariant", "loop_invariant_redundantly",
+            "measured_by", "measured_by_redundantly", "maintaining", "maintaining_redundantly",
+            "maps", "maps_redundantly", "\\new_objects", "old", "refining", "represents",
+            "requires", "set", "signals", "signals_only", "\\such_that", "unreachable", "when",
+            "working_space",
+            // "invariant-like" keywords
+            "abrupt_behavior", "abrupt_behaviour", "also", "axiom", "behavior", "behaviour",
+            "constraint", "exceptional_behavior", "exceptional_behaviour", "initially",
+            "invariant", "model_behavior", "model_behaviour", "monitors_for", "normal_behavior",
+            "normal_behaviour", "readable", "writable",
+            // ADT functions:
+            "\\seq_empty", "\\seq_def", "\\seq_singleton", "\\seq_get", "\\seq_put",
+            "\\seq_reverse", "\\seq_length", "\\index_of", "\\seq_concat", "\\empty",
+            "\\singleton", "\\set_union", "\\intersect", "\\set_minus", "\\all_fields",
+            "\\infinite_union", "\\strictly_than_nothing"
+        };
+
+        private Map<String, SimpleAttributeSet> keywords =
+                new HashMap<String, SimpleAttributeSet>(keywordArray.length);
+        private Map<String, SimpleAttributeSet> JMLkeywords =
+                new HashMap<String, SimpleAttributeSet>(jmlKeywordArray.length);
+
+        /**
+         * The current position of the parser in the inserted String.
+         */
         private int currentPos = 0;
 
-        // mode <-> state:
-        // mode stores the environment in which the parser is
-        // state stores information about the just recently parsed characters
-        private int mode = NORMAL_MODE;
-        // stores the current comment state of the parser
-        CommentState state = CommentState.NO;
-        // true if the last processed char was a backslash
-        boolean escapeChar = false;
-        String token = "";
-        int tokenStart = 0;
+        /**
+         * The start index of the current token in the inserted String.
+         */
+        private int tokenStart = 0;
+
+        /**
+         * The current token of the parser.
+         */
+        private String token = "";
+
+        /* mode <-> state:
+         * mode stores the environment in which the parser is
+         * state stores information about the just recently parsed characters */
+        //private int mode = NORMAL_MODE;
+        private Mode mode = Mode.NORMAL;
+
+        /**
+         *  Stores the current comment state of the parser to recognize comments/comment ends.
+         */
+        private CommentState state = CommentState.NO;
 
         public JavaDocument () {
             // set the styles (as in eclipse default settings)
@@ -187,35 +267,16 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             StyleConstants.setForeground(keyword, new Color(127, 0, 85));
             StyleConstants.setForeground(comment, new Color(63, 127, 95));
             StyleConstants.setForeground(javadoc, new Color(63, 95, 191));
-            StyleConstants.setForeground(number, Color.BLACK);
             StyleConstants.setForeground(string, new Color(42, 0, 255));
             StyleConstants.setForeground(jml, new Color(255, 102, 0));
             StyleConstants.setForeground(jmlkeyword, new Color(255, 102, 0));
             StyleConstants.setBold(jmlkeyword, true);
 
-            final String[] keywordArray = {"package", "class", "import", "interface", "enum",
-                "extends", "implements",
-                "public", "protected", "private",
-                "byte", "int", "long", "char", "float", "double", "boolean", "void",
-                "true", "false",
-                "this", "super", "null",
-                "if", "else", "for", "while", "do", "switch", "case", "break", "continue",
-                "return",
-                "try", "catch", "finally",
-                "static", "volatile", "new", "abstract", "final"  // TODO: additional keywords?
-            };
+            // fill the keyword hash maps
             for (String k : keywordArray) {
                 keywords.put(k, keyword);
             }
 
-            final String[] jmlKeywordArray = {
-                "normal_behavior", "exceptional_behavior", "model_behavior",
-                "normal_behaviour", "exceptional_behaviour", "model_behaviour",
-                "ensures", "requires", "measured_by", "signals", "signals_only",
-                "ghost", "model", "\\old", "\\result", "\\nothing",
-                "\\forall", "\\exists", "accessible", "assignable", "invariant", "helper",
-                "loop_invariant", "decreases"
-            };
             for (String k : jmlKeywordArray) {
                 JMLkeywords.put(k, jmlkeyword);
             }
@@ -233,35 +294,35 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             token = token + '@';
             if (state == CommentState.COMMENT) {                // "/*@"
                 state = CommentState.NO;
-                mode = JML_MODE;
+                mode = Mode.JML;
             } else if (state == CommentState.LNECOMMENT) {      // "//@"
                 state = CommentState.NO;
-                mode = LINE_JML_MODE;
-            } else if (mode == NORMAL_MODE
+                mode = Mode.LINE_JML;
+            } else if (mode == Mode.NORMAL
                     && state == CommentState.NO) {              // "@"
-                mode = ANNOTATION_MODE;
+                mode = Mode.ANNOTATION;
                 tokenStart = currentPos;
             }
         }
 
-        private void checkLinefeed() {
+        private void checkLinefeed() throws BadLocationException {
             state = CommentState.NO;
-            if (mode == LINE_COMMENT_MODE) {                    // "// ... \n"
+            if (mode == Mode.LINE_COMMENT) {                    // "// ... \n"
                 insertCommentString(token, tokenStart);
-                mode = NORMAL_MODE;     // reset
+                mode = Mode.NORMAL;     // reset
                 token = "\n";             // reset token
                 tokenStart = currentPos;
-            } else if (mode == LINE_JML_MODE) {                 // "//@ ... \n"
+            } else if (mode == Mode.LINE_JML) {                 // "//@ ... \n"
                 insertJMLString(token, tokenStart);
-                mode = NORMAL_MODE;     // reset
+                mode = Mode.NORMAL;     // reset
                 token = "\n";             // reset token
                 tokenStart = currentPos;
-            } else if (mode == ANNOTATION_MODE) {               // "@ ... \n"
+            } else if (mode == Mode.ANNOTATION) {               // "@ ... \n"
                 insertAnnotation(token, tokenStart);
-                mode = NORMAL_MODE;     // reset
+                mode = Mode.NORMAL;     // reset
                 token = "\n";             // reset token
                 tokenStart = currentPos;
-            } else if (mode == NORMAL_MODE) {                   // normal mode
+            } else if (mode == Mode.NORMAL) {                   // normal mode
                 insertNormalString(token, tokenStart);
                 token = "\n";             // reset token
                 tokenStart = currentPos;
@@ -270,55 +331,55 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             }
         }
 
-        private void checkStar() {
+        private void checkStar() throws BadLocationException {
             if (state == CommentState.MAYBE) {              // "/*"
              // insert what we have in this line so far
-                insertNormalString(token.substring(0,token.length()-1), tokenStart);
+                insertNormalString(token.substring(0, token.length() - 1), tokenStart);
                 token = "/*";
                 tokenStart = currentPos - 1;
                 state = CommentState.COMMENT;
-                mode = COMMENT_MODE;
+                mode = Mode.COMMENT;
             } else if (state == CommentState.COMMENT) {     // "/**"
                 // tokenStart should be already set here
                 token = token + '*';
                 state = CommentState.MAYBEEND;
-                mode = JAVADOC_MODE;
-            } else if (mode == COMMENT_MODE                 // "/* ... *"
-                    || mode == JAVADOC_MODE                 // "/*@ ... *"
-                    || mode == JML_MODE) {                  // "/** ... *"
+                mode = Mode.JAVADOC;
+            } else if (mode == Mode.COMMENT                 // "/* ... *"
+                    || mode == Mode.JAVADOC                 // "/*@ ... *"
+                    || mode == Mode.JML) {                  // "/** ... *"
                 // tokenStart should be already set here
                 token = token + '*';
                 state = CommentState.MAYBEEND;
             }
         }
 
-        private void checkSlash() {
-            if (mode == NORMAL_MODE
+        private void checkSlash() throws BadLocationException {
+            if (mode == Mode.NORMAL
                      && state == CommentState.NO) {          // "/"
                 token = token + '/';
                 state = CommentState.MAYBE;
             } else if (state == CommentState.MAYBE) {        // "//"
                 // insert what we have in this line so far
-                insertNormalString(token.substring(0,token.length()-1), tokenStart);
+                insertNormalString(token.substring(0, token.length() - 1), tokenStart);
                 token = "//";
                 tokenStart = currentPos - 1;
                 state = CommentState.LNECOMMENT;
-                mode = LINE_COMMENT_MODE;
+                mode = Mode.LINE_COMMENT;
             } else if (state == CommentState.MAYBEEND) {     // "/* ... */"
                 token = token + '/';
-                if (mode == COMMENT_MODE) {
+                if (mode == Mode.COMMENT) {
                     insertCommentString(token, tokenStart);
-                } else if (mode == JAVADOC_MODE) {
+                } else if (mode == Mode.JAVADOC) {
                     if (token.equals("/**/")) {            // "/**/" is no JavaDoc
                         insertCommentString(token, tokenStart);
                     } else {
                         insertJavadocString(token, tokenStart);
                     }
-                } else if (mode == JML_MODE) {
+                } else if (mode == Mode.JML) {
                     insertJMLString(token, tokenStart);
                 }
                 state = CommentState.NO;
-                mode = NORMAL_MODE;
+                mode = Mode.NORMAL;
                 token = "";             // reset token
                 tokenStart = currentPos + 1;
             } else {
@@ -343,12 +404,6 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             state = CommentState.NO;
         }
 
-        // TODO: bin/oct/hex literals, long literals, floats/doubles?
-        private void checkDigit(char c) {
-            token += c;
-            state = CommentState.NO;
-        }
-
         /*
          * special char combinations:
          * comment/javadoc/jml start
@@ -360,14 +415,14 @@ public class ShowSymbExLinesAction extends MainWindowAction {
          *
          * check at every delimiter: keyword/jmlKeyword?
          */
-        private void processChar(String str) {
+        private void processChar(String str) throws BadLocationException {
             char strChar = str.charAt(0);
-            //System.out.println("Token: " + token);
+
             switch (strChar) {
             case ('@'):
                 checkAt();
                 break;
-            case '\n':  // TODO: different line endings?
+            case '\n':  // TODO: different line endings? -> use System.lineSeparator()
                 checkLinefeed();
                 break;
             //case '\t':  // all tabs were replaced earlier!
@@ -377,18 +432,6 @@ public class ShowSymbExLinesAction extends MainWindowAction {
                 break;
             case '/':
                 checkSlash();
-                break;
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-                checkDigit(strChar);
                 break;
             case '"':
                 checkQuote();
@@ -430,74 +473,51 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             }
         }
 
-        private void insertCommentString(String str, int pos) {
-            try {
-                // remove the old word and formatting
-                this.remove(pos, str.length());
-                super.insertString(pos, str, comment);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+        private void insertCommentString(String str, int pos) throws BadLocationException {
+            // remove the old word and formatting
+            this.remove(pos, str.length());
+            super.insertString(pos, str, comment);
         }
 
-        private void insertAnnotation(String str, int pos) {
-            try {
-                // remove the old word and formatting
-                this.remove(pos, str.length());
-                super.insertString(pos, str, annotation);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+        private void insertAnnotation(String str, int pos) throws BadLocationException {
+            // remove the old word and formatting
+            this.remove(pos, str.length());
+            super.insertString(pos, str, annotation);
         }
 
-        private void insertJavadocString(String str, int pos) {
-            try {
-                // remove the old word and formatting
-                this.remove(pos, str.length());
-                super.insertString(pos, str, javadoc);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+        private void insertJavadocString(String str, int pos) throws BadLocationException {
+            // remove the old word and formatting
+            this.remove(pos, str.length());
+            super.insertString(pos, str, javadoc);
         }
 
-        private void insertJMLString(String str, int pos) {
-            try {
-                // remove the old word and formatting
-                this.remove(pos, str.length());
-                int offset = 0;
-                String[] tokens = str.split("((?<=" + DELIM + ")|(?=" + DELIM + "))");
-                for (String t : tokens) {
-                    System.out.println("Inserting " + t + " at " + (pos + offset));
-                    if (JMLkeywords.containsKey(t)) {
-                        super.insertString(pos + offset, t, jmlkeyword);
-                    } else {
-                        super.insertString(pos + offset, t, jml);
-                    }
-                    offset += t.length();
+        private void insertJMLString(String str, int pos) throws BadLocationException {
+            // remove the old word and formatting
+            this.remove(pos, str.length());
+            int offset = 0;
+            String[] tokens = str.split("((?<=" + DELIM + ")|(?=" + DELIM + "))");
+            for (String t : tokens) {
+                if (JMLkeywords.containsKey(t)) {
+                    super.insertString(pos + offset, t, jmlkeyword);
+                } else {
+                    super.insertString(pos + offset, t, jml);
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
+                offset += t.length();
             }
         }
 
-        private void insertNormalString(String str, int pos) {
-            try {
-                // remove the old word and formatting
-                System.out.println("Trying to remove: pos = " + pos + ", str = " + str);
-                this.remove(pos, str.length());
-                int offset = 0;
-                String[] tokens = str.split("((?<=" + DELIM + ")|(?=" + DELIM + "))");
-                for (String t : tokens) {
-                    System.out.println("Inserting " + t + " at " + (pos + offset));
-                    if (keywords.containsKey(t)) {
-                        super.insertString(pos + offset, t, keyword);
-                    } else {
-                        super.insertString(pos + offset, t, normal);
-                    }
-                    offset += t.length();
+        private void insertNormalString(String str, int pos) throws BadLocationException {
+            // remove the old word and formatting
+            this.remove(pos, str.length());
+            int offset = 0;
+            String[] tokens = str.split("((?<=" + DELIM + ")|(?=" + DELIM + "))");
+            for (String t : tokens) {
+                if (keywords.containsKey(t)) {
+                    super.insertString(pos + offset, t, keyword);
+                } else {
+                    super.insertString(pos + offset, t, normal);
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
+                offset += t.length();
             }
         }
 
@@ -547,7 +567,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
      * A small container for a PositionInfo and a corresponding Node (used to store the first Node
      * containing the statement at the specified position).
      *
-     * @author WP
+     * @author Wolfram Pfeifer
      */
     static class NodePosPair {
         /**
@@ -577,7 +597,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
      * <b>Note:</b> No jumping down in the proof tree is possible. Implementing this would be
      * non-trivial, because it was not unique into which branch we would want to descent.
      *
-     * @author WP
+     * @author Wolfram Pfeifer
      */
     private class TextPaneMouseAdapter extends MouseAdapter {
         /**
@@ -746,7 +766,6 @@ public class ShowSymbExLinesAction extends MainWindowAction {
      * Clears cached files, lines, and existing tabs.
      */
     private void clearCaches() {
-        warningShown = false;
         files.clear();
         hashes.clear();
         sources.clear();
@@ -777,7 +796,9 @@ public class ShowSymbExLinesAction extends MainWindowAction {
         try {
             JTextPane textPane = new JTextPane();
 
-            textPane.setFont(SOURCE_FONT);
+            // We use the same font as in SequentView for consistency.
+            textPane.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
+
             textPane.setToolTipText(TEXTPANE_TOOLTIP);
             textPane.setEditable(false);
 
@@ -785,18 +806,35 @@ public class ShowSymbExLinesAction extends MainWindowAction {
             String origHash = hashes.get(entry.getKey());
             String curHash = IOUtil.computeMD5(entry.getValue());
             if (!origHash.equals(curHash)) {
-                //textPane.setBackground(new Color(255, 128, 128));
-                //textPane.setToolTipText("<html><b>Attention! </b>Source code was changed since start of the proof!<br><br>"
-                //        + TEXTPANE_TOOLTIP + "</html>");
-                if (!warningShown) {        // show warning only once (TODO: per proof)
-                    JOptionPane.showMessageDialog(mainWindow,
-                            "The source code this proof was started from has changed in the background.\n"
-                            + "However, the proof refers to the old version of the source code "
-                            + "(as shown in the window on the right).",
+                //if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getNotifyLoadBehaviour()) {
+                    JCheckBox checkbox = new JCheckBox("Don't show this message again");
+                    Object[] message = { "The source code this proof refers to was changed. Since the proof still" +
+                                         "refers to the old source, this old source code is still present in the" +
+                                         "source view on the right.",
+                            checkbox};
+                    JOptionPane.showMessageDialog(mainWindow, message, 
                             "Source code changed!", JOptionPane.INFORMATION_MESSAGE);
-                    warningShown = true;
-                }
+                    /*ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                                .setNotifyLoadBehaviour(!checkbox.isSelected());
+                    ProofIndependentSettings.DEFAULT_INSTANCE.saveSettings();*/
+                //}
             }
+
+            // adds a listener for each textPane which reacts to font size changes
+            // TODO: how to remove unused listeners (applies to all anonymous listeners in this class)?
+            // TODO: not really working?
+            Config.DEFAULT.addConfigChangeListener(new ConfigChangeListener() {
+                @Override
+                public void configChanged(ConfigChangeEvent e) {
+                    Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
+                    if (myFont != null) {
+                        textPane.setFont(myFont);
+                    } else {
+                        Debug.out("KEY_PROOF_SEQUENT_VIEW_FONT not available, " +
+                              "use standard font.");
+                    }
+                }
+            });
 
             //String original = IOUtil.readFrom(entry.getValue());
             String original = sources.get(entry.getKey());
@@ -886,6 +924,11 @@ public class ShowSymbExLinesAction extends MainWindowAction {
      * </ul>
      */
     private void updateGUI() {
+        // get selected proof
+        // get selected node
+        // if proof changed clear tabs and refill them
+        // else update highlights
+        
         Node symbExNode = getMediator().getSelectedNode();
         tabs.removeAll();
 
@@ -902,7 +945,7 @@ public class ShowSymbExLinesAction extends MainWindowAction {
         }
 
         fillMaps();
-        
+
         // create and initialize a new TextPane for every file
         for (Entry<String, File> entry : files.entrySet()) {
             initTextPane(entry);
@@ -1010,8 +1053,8 @@ public class ShowSymbExLinesAction extends MainWindowAction {
         if (se instanceof NonTerminalProgramElement) {
             if (se instanceof If
                     || se instanceof Then
-                    || se instanceof Else
-                    || se instanceof LocalVariableDeclaration) {
+                    || se instanceof Else           // TODO: additional elements, e.g. String declaration etc.
+                    /*|| se instanceof LocalVariableDeclaration*/) {
                 return PositionInfo.UNDEFINED;
             }
 
