@@ -40,14 +40,12 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -56,16 +54,11 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
@@ -110,7 +103,6 @@ import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
 import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
 import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
-import de.uka.ilkd.key.gui.actions.ShowSymbExLinesAction;
 import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
 import de.uka.ilkd.key.gui.actions.SyntaxHighlightingToggleAction;
 import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
@@ -134,6 +126,7 @@ import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SolverListener;
+import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
@@ -177,8 +170,8 @@ public final class MainWindow extends JFrame  {
     /** JScrollPane for displaying SequentViews*/
     private final MainFrame mainFrame;
 
-    private final JTabbedPane sourceTabs;
-    private final JLabel sourceStatusBar;
+    /** the view to show source code and symbolic execution information */
+    private final JComponent sourceView;
 
     /** SequentView for the current goal */
     public final CurrentGoalView currentGoalView;
@@ -284,8 +277,7 @@ public final class MainWindow extends JFrame  {
         autoModeAction = new AutoModeAction(this);
         mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
-        sourceTabs = new JTabbedPane();
-        sourceStatusBar = new JLabel();
+        sourceView = SourceView.getSourceView(this);
         proofList = new TaskTree(mediator);
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(mediator);
@@ -452,28 +444,12 @@ public final class MainWindow extends JFrame  {
         leftPane.setName("leftPane");
         leftPane.setOneTouchExpandable(true);
 
-        sourceTabs.setBorder(new TitledBorder("No source loaded"));
-
         JPanel rightPane = new JPanel();
         rightPane.setLayout(new BorderLayout());
-	rightPane.add(mainFrame, BorderLayout.CENTER);
-	rightPane.add(sequentViewSearchBar,
-                BorderLayout.SOUTH);
+        rightPane.add(mainFrame, BorderLayout.CENTER);
+        rightPane.add(sequentViewSearchBar, BorderLayout.SOUTH);
 
-	    // set the same style as the main status line:
-	    sourceStatusBar.setBorder(new BevelBorder(BevelBorder.LOWERED));
-	    sourceStatusBar.setBackground(Color.gray);
-	    
-		// add extra height to make the status bar more noticeable
-	    sourceStatusBar.setPreferredSize(new Dimension(0, getFontMetrics(sourceStatusBar.getFont()).getHeight() + 6));
-	    sourceStatusBar.setHorizontalAlignment(SwingConstants.CENTER);
-
-		JPanel sourcePanel = new JPanel();
-		sourcePanel.setLayout(new BorderLayout());
-		sourcePanel.add(sourceTabs, BorderLayout.CENTER);
-		sourcePanel.add(sourceStatusBar,BorderLayout.SOUTH);
-
-        JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourcePanel);
+        JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourceView);
         pane.setResizeWeight(0.5);
         pane.setOneTouchExpandable(true);
         pane.setName("split2");
@@ -768,7 +744,6 @@ public final class MainWindow extends JFrame  {
         proof.add(new CounterExampleAction(this));
         proof.add(new TestGenerationAction(this));
         proof.addSeparator();
-        proof.add(new ShowSymbExLinesAction(this));
 
         return proof;
     }
@@ -904,14 +879,6 @@ public final class MainWindow extends JFrame  {
 
     public ProofTreeView getProofTreeView() {
         return mainWindowTabbedPane.getProofTreeView();
-    }
-
-    public JTabbedPane getSourceTabs() {
-        return sourceTabs;
-    }
-    
-    public JLabel getSourceStatusBar() {
-    	return sourceStatusBar;
     }
 
     /**

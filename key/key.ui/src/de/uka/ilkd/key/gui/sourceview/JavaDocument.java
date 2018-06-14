@@ -1,0 +1,429 @@
+package de.uka.ilkd.key.gui.sourceview;
+
+import java.awt.Color;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+
+/**
+ * This document performs syntax highlighting when strings are inserted.
+ * However, when editing the document the highlighting is not updating correctly at the moment.
+ *
+ * @author Wolfram Pfeifer
+ */
+public class JavaDocument extends DefaultStyledDocument {       // TODO: separate this from action?
+    private enum Mode {
+        STRING,
+        NORMAL,
+        KEYWORD,
+        COMMENT,
+        LINE_COMMENT,
+        LINE_JML,
+        JAVADOC,
+        ANNOTATION,
+        JML,
+        JML_KEYWORD;
+    }
+
+    private enum CommentState {
+        NO,
+        MAYBE,       // "/"
+        COMMENT,     // "/*"
+        LNECOMMENT,  // "//"
+        MAYBEEND;    // "*"
+    }
+
+    /**
+     * Regular expression character class for all chars which are delimiters
+     * of keywords. \\Q ... \\E is used to escape all chars inside the class.
+     */
+    private static final String DELIM = "[\\Q .;{}[]\n\r()+-*/%!=<>?:~&|^@'\"\\E]";
+
+    // taken from https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html
+    private static final String[] KEYWORDS = {
+        "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class",
+        "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally",
+        "float", "for", "if", "implements", "import", "instanceof", "int", "interface", "long",
+        "native", "new", "package", "private", "protected", "public", "return", "short",
+        "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws",
+        "transient", "try", "void", "volatile", "while",
+        "true", "false", "null"        // literals
+        // "const", "goto" // reserved, but currently not used in Java
+    };
+
+    private static final String[] JMLKEYWORDS = {
+        // other Java keywords
+        "break", "case", "catch", "class", "const", "continue", "default", "do", "else",
+        "extends", "false", "finally", "for", "goto", "if", "implements", "import",
+        "instanceof", "interface", "label", "new", "null", "package", "return", "super",
+        "switch", "this", "throw", "throws", "true", "try", "void", "while",
+        // types:
+        "boolean", "byte", "char", "double", "float", "int", "long", "short",
+        "\\bigint", "\\locset", "\\real", "\\seq", "\\TYPE",
+        // modifiers:
+        "abstract", "code", "code_bigint_math", "code_java_math", "code_safe_math",
+        "extract", "final", "ghost", "helper", "instance", "model", "native", "non_null",
+        "nullable", "nullable_by_default", "private", "protected", "peer", "\\peer", "public",
+        "pure", "rep", "\\rep", "spec_bigint_math", "spec_java_math", "spec_protected",
+        "spec_public", "spec_safe_math", "static", "strictfp", "strictly_pure", "synchronized",
+        "transient", "two_state", "uninitialized", "volatile",
+
+        "no_state", "modifies", "erases", "modifiable", "returns", "break_behavior",
+        "continue_behavior", "return_behavior",
+        // special JML expressions:
+        "\\constraint_for", "\\created", "\\disjoint", "\\duration", "\\everything",
+        "\\exception", "\\exists", "\\forall", "\\fresh", "\\index", "\\invariant_for",
+        "\\is_initialized", "\\itself", "\\lblneg", "\\lblpos", "\\lockset", "\\max",
+        "\\measured_by", "\\min", "\\new_elems_fresh", "\\nonnullelements", "\\not_accessed",
+        "\\not_assigned", "\\not_modified", "\\not_specified", "\\nothing", "\\num_of",
+        "\\old", "\\only_assigned", "\\only_called", "\\only_captured", "\\pre", "\\product",
+        "\\reach", "\\reachLocs", "\\result", "\\same", "\\seq_contains", "\\space",
+        "\\static_constraint_for", "\\static_invariant_for", "\\strictly_nothing",
+        "\\subset", "\\sum", "\\type", "\\typeof", "\\working_space", "\\values", "\\inv",
+        // clause keywords:
+        "accessible", "accessible_redundantly", "assert", "assert_redundantly", "assignable",
+        "assignable_redundantly", "assume", "assume_redudantly", "breaks", "breaks_redundantly",
+        "\\by", "callable", "callable_redundantly", "captures", "captures_redundantly",
+        "continues", "continues_redundantly", "debug", "\\declassifies", "decreases",
+        "decreases_redundantly", "decreasing", "decreasing_redundantly", "diverges",
+        "determines", "diverges_redundantly", "duration", "duration_redundantly", "ensures",
+        "ensures_redundantly", "\\erases", "forall", "for_example", "hence_by", "implies_that",
+        "in", "in_redundantly", "\\into", "loop_invariant", "loop_invariant_redundantly",
+        "measured_by", "measured_by_redundantly", "maintaining", "maintaining_redundantly",
+        "maps", "maps_redundantly", "\\new_objects", "old", "refining", "represents",
+        "requires", "set", "signals", "signals_only", "\\such_that", "unreachable", "when",
+        "working_space",
+        // "invariant-like" keywords
+        "abrupt_behavior", "abrupt_behaviour", "also", "axiom", "behavior", "behaviour",
+        "constraint", "exceptional_behavior", "exceptional_behaviour", "initially",
+        "invariant", "model_behavior", "model_behaviour", "monitors_for", "normal_behavior",
+        "normal_behaviour", "readable", "writable",
+        // ADT functions:
+        "\\seq_empty", "\\seq_def", "\\seq_singleton", "\\seq_get", "\\seq_put",
+        "\\seq_reverse", "\\seq_length", "\\index_of", "\\seq_concat", "\\empty",
+        "\\singleton", "\\set_union", "\\intersect", "\\set_minus", "\\all_fields",
+        "\\infinite_union", "\\strictly_than_nothing"
+    };
+
+    private SimpleAttributeSet annotation = new SimpleAttributeSet();
+    private SimpleAttributeSet string = new SimpleAttributeSet();
+    private SimpleAttributeSet normal = new SimpleAttributeSet();
+    private SimpleAttributeSet keyword = new SimpleAttributeSet();
+    private SimpleAttributeSet comment = new SimpleAttributeSet();
+    private SimpleAttributeSet javadoc = new SimpleAttributeSet();
+    private SimpleAttributeSet jml = new SimpleAttributeSet();
+    private SimpleAttributeSet jmlkeyword = new SimpleAttributeSet();
+
+    private Map<String, SimpleAttributeSet> keywords =
+            new HashMap<String, SimpleAttributeSet>(KEYWORDS.length);
+    private Map<String, SimpleAttributeSet> jmlkeywords =
+            new HashMap<String, SimpleAttributeSet>(JMLKEYWORDS.length);
+
+    /**
+     * The current position of the parser in the inserted String.
+     */
+    private int currentPos = 0;
+
+    /**
+     * The start index of the current token in the inserted String.
+     */
+    private int tokenStart = 0;
+
+    /**
+     * The current token of the parser.
+     */
+    private String token = "";
+
+    /* mode <-> state:
+     * mode stores the environment in which the parser is
+     * state stores information about the just recently parsed characters */
+    //private int mode = NORMAL_MODE;
+    private JavaDocument.Mode mode = Mode.NORMAL;
+
+    /**
+     *  Stores the current comment state of the parser to recognize comments/comment ends.
+     */
+    private JavaDocument.CommentState state = CommentState.NO;
+
+    public JavaDocument () {
+        // set the styles (as in eclipse default settings)
+        StyleConstants.setBold(keyword, true);
+        StyleConstants.setForeground(keyword, new Color(127, 0, 85));
+        StyleConstants.setForeground(comment, new Color(63, 127, 95));
+        StyleConstants.setForeground(javadoc, new Color(63, 95, 191));
+        StyleConstants.setForeground(string, new Color(42, 0, 255));
+        StyleConstants.setForeground(jml, new Color(255, 102, 0));
+        StyleConstants.setForeground(jmlkeyword, new Color(255, 102, 0));
+        StyleConstants.setBold(jmlkeyword, true);
+
+        // fill the keyword hash maps
+        for (String k : KEYWORDS) {
+            keywords.put(k, keyword);
+        }
+
+        for (String k : JMLKEYWORDS) {
+            jmlkeywords.put(k, jmlkeyword);
+        }
+    }
+
+    /*
+     * NORMAL_MODE:
+     * each line is a separate token that is at inserting checked for contained keywords
+     *
+     * JML:
+     * each JML block is a separate token
+     */
+
+    private void checkAt() {
+        token = token + '@';
+        if (state == CommentState.COMMENT) {                // "/*@"
+            state = CommentState.NO;
+            mode = Mode.JML;
+        } else if (state == CommentState.LNECOMMENT) {      // "//@"
+            state = CommentState.NO;
+            mode = Mode.LINE_JML;
+        } else if (mode == Mode.NORMAL
+                && state == CommentState.NO) {              // "@"
+            mode = Mode.ANNOTATION;
+            tokenStart = currentPos;
+        }
+    }
+
+    private void checkLinefeed() throws BadLocationException {
+        state = CommentState.NO;
+        if (mode == Mode.LINE_COMMENT) {                    // "// ... \n"
+            insertCommentString(token, tokenStart);
+            mode = Mode.NORMAL;     // reset
+            token = "\n";             // reset token
+            tokenStart = currentPos;
+        } else if (mode == Mode.LINE_JML) {                 // "//@ ... \n"
+            insertJMLString(token, tokenStart);
+            mode = Mode.NORMAL;     // reset
+            token = "\n";             // reset token
+            tokenStart = currentPos;
+        } else if (mode == Mode.ANNOTATION) {               // "@ ... \n"
+            insertAnnotation(token, tokenStart);
+            mode = Mode.NORMAL;     // reset
+            token = "\n";             // reset token
+            tokenStart = currentPos;
+        } else if (mode == Mode.NORMAL) {                   // normal mode
+            insertNormalString(token, tokenStart);
+            token = "\n";             // reset token
+            tokenStart = currentPos;
+        } else {    // modes: JML, Comment, JavaDoc
+            token += '\n';
+        }
+    }
+
+    private void checkStar() throws BadLocationException {
+        if (state == CommentState.MAYBE) {              // "/*"
+         // insert what we have in this line so far
+            insertNormalString(token.substring(0, token.length() - 1), tokenStart);
+            token = "/*";
+            tokenStart = currentPos - 1;
+            state = CommentState.COMMENT;
+            mode = Mode.COMMENT;
+        } else if (state == CommentState.COMMENT) {     // "/**"
+            // tokenStart should be already set here
+            token = token + '*';
+            state = CommentState.MAYBEEND;
+            mode = Mode.JAVADOC;
+        } else if (mode == Mode.COMMENT                 // "/* ... *"
+                || mode == Mode.JAVADOC                 // "/*@ ... *"
+                || mode == Mode.JML) {                  // "/** ... *"
+            // tokenStart should be already set here
+            token = token + '*';
+            state = CommentState.MAYBEEND;
+        }
+    }
+
+    private void checkSlash() throws BadLocationException {
+        if (mode == Mode.NORMAL
+                 && state == CommentState.NO) {          // "/"
+            token = token + '/';
+            state = CommentState.MAYBE;
+        } else if (state == CommentState.MAYBE) {        // "//"
+            // insert what we have in this line so far
+            insertNormalString(token.substring(0, token.length() - 1), tokenStart);
+            token = "//";
+            tokenStart = currentPos - 1;
+            state = CommentState.LNECOMMENT;
+            mode = Mode.LINE_COMMENT;
+        } else if (state == CommentState.MAYBEEND) {     // "/* ... */"
+            token = token + '/';
+            if (mode == Mode.COMMENT) {
+                insertCommentString(token, tokenStart);
+            } else if (mode == Mode.JAVADOC) {
+                if (token.equals("/**/")) {            // "/**/" is no JavaDoc
+                    insertCommentString(token, tokenStart);
+                } else {
+                    insertJavadocString(token, tokenStart);
+                }
+            } else if (mode == Mode.JML) {
+                insertJMLString(token, tokenStart);
+            }
+            state = CommentState.NO;
+            mode = Mode.NORMAL;
+            token = "";             // reset token
+            tokenStart = currentPos + 1;
+        } else {
+            // not NORMAL_MODE
+            token += '/';
+        }
+    }
+
+    private void checkQuote() {
+        // TODO:
+        state = CommentState.NO;
+        token += '"';
+    }
+
+    private void checkOther(char c) {
+        token += c;
+        state = CommentState.NO;
+    }
+
+    private void checkDelimiter(char c) {
+        token += c;
+        state = CommentState.NO;
+    }
+
+    /*
+     * special char combinations:
+     * comment/javadoc/jml start
+     * comment end
+     * line comment
+     * annotation
+     * string
+     * number
+     *
+     * check at every delimiter: keyword/jmlKeyword?
+     */
+    private void processChar(String str) throws BadLocationException {
+        char strChar = str.charAt(0);
+
+        switch (strChar) {
+        case ('@'):
+            checkAt();
+            break;
+        case '\n':  // TODO: different line endings? -> use System.lineSeparator()
+            checkLinefeed();
+            break;
+        //case '\t':  // all tabs were replaced earlier!
+        //    break;
+        case '*':
+            checkStar();
+            break;
+        case '/':
+            checkSlash();
+            break;
+        case '"':
+            checkQuote();
+            break;
+        // keyword delimiters: +-*/(){}[]%!^~.;?:&|<>="'\n(space)
+        case '+':
+        case '-':
+        //case '*':
+        //case '/':
+        case '(':
+        case ')':
+        case '[':
+        case ']':
+        case '{':
+        case '}':
+        case '%':
+        case '!':
+        case '^':
+        case '~':
+        case '&':
+        case '|':
+        case '.':
+        case ':':
+        case ';':
+        case '?':
+        case '<':
+        case '>':
+        case '=':
+        case '\'':
+        case ' ':
+        //case '"':
+        //case '\'':
+        //case '\n':
+            checkDelimiter(strChar);
+            break;
+        default:
+            checkOther(strChar);
+            break;
+        }
+    }
+
+    private void insertCommentString(String str, int pos) throws BadLocationException {
+        // remove the old word and formatting
+        this.remove(pos, str.length());
+        super.insertString(pos, str, comment);
+    }
+
+    private void insertAnnotation(String str, int pos) throws BadLocationException {
+        // remove the old word and formatting
+        this.remove(pos, str.length());
+        super.insertString(pos, str, annotation);
+    }
+
+    private void insertJavadocString(String str, int pos) throws BadLocationException {
+        // remove the old word and formatting
+        this.remove(pos, str.length());
+        super.insertString(pos, str, javadoc);
+    }
+
+    private void insertJMLString(String str, int pos) throws BadLocationException {
+        // remove the old word and formatting
+        this.remove(pos, str.length());
+        int offset = 0;
+        String[] tokens = str.split("((?<=" + DELIM + ")|(?=" + DELIM + "))");
+        for (String t : tokens) {
+            if (jmlkeywords.containsKey(t)) {
+                super.insertString(pos + offset, t, jmlkeyword);
+            } else {
+                super.insertString(pos + offset, t, jml);
+            }
+            offset += t.length();
+        }
+    }
+
+    private void insertNormalString(String str, int pos) throws BadLocationException {
+        // remove the old word and formatting
+        this.remove(pos, str.length());
+        int offset = 0;
+        String[] tokens = str.split("((?<=" + DELIM + ")|(?=" + DELIM + "))");
+        for (String t : tokens) {
+            if (keywords.containsKey(t)) {
+                super.insertString(pos + offset, t, keyword);
+            } else {
+                super.insertString(pos + offset, t, normal);
+            }
+            offset += t.length();
+        }
+    }
+
+    @Override
+    public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+        // insert the unformatted string as a placeholder
+        super.insertString(offs, str, normal);
+
+        int strLen = str.length();
+        int endpos = offs + strLen;
+        int strpos;
+        // process char by char
+        for (int i = offs; i < endpos; i++) {
+            currentPos = i;
+            strpos = i - offs;
+            processChar(Character.toString(str.charAt(strpos)));
+        }
+        currentPos = offs;
+    }
+}
