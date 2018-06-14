@@ -123,9 +123,13 @@ public class Position {
     public int compareTo(Position p) {
 	return (line == p.line) ? (column - p.column) : (line - p.line);
     }
-    
+
+    /**
+     * Helper method for validity checks.
+     * @return true iff either line or column are negative
+     */
     public boolean isNegative() {
-    	return line < 0 || column < 0;
+        return line < 0 || column < 0;
     }
 
     /**

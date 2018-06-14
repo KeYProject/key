@@ -71,19 +71,21 @@ public class IntLiteral extends Literal {
 	super(children);
 	this.value=children.get(String.class);
     }
-    
+
     /**
-	 * Constructor for Recoder2KeY transformation.
-	 * 
-	 * @param children
-	 *            the children of this AST element as KeY classes, may contain:
-	 *            Comments
-	 * @param value
-	 *            the value of the literal
-	 */
-	public IntLiteral(ExtList children, String value, PositionInfo pos) {
-		super(children, pos);
-    	this.value = value.intern();
+     * Constructor for Recoder2KeY transformation.
+     *
+     * @param children
+     *            the children of this AST element as KeY classes, may contain:
+     *            Comments
+     * @param value
+     *            the value of the literal
+     * @param pos
+     *            the position of this literal in the original source code file
+     */
+    public IntLiteral(ExtList children, String value, PositionInfo pos) {
+        super(children, pos);
+        this.value = value.intern();
     }
 
     /**

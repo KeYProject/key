@@ -81,59 +81,58 @@ public class PositionInfo {
     public String getFileName(){
 	return fileName;
     }
-    
+
     /**
      * Creates a new PositionInfo from joining the intervals of the given PositionInfos.
      * The file informations have to match, otherwise null is returned.
-     * @param p1
-     * @param p2
+     * @param p1 the first PositionInfo
+     * @param p2 the second PositionInfo
      * @return a new PositionInfo starting at the minimum of the two start positions and
      * ending at the maximum of the two end positions.
      */
     public static PositionInfo join(PositionInfo p1, PositionInfo p2) {
-    	//System.out.println("Joining " + p1 + " and " + p2 + " ...");
-    	if (p1 == null && p2 == null) {
-    		return null;
-    	} else if (p1 == null) {
-    		return p2;
-    	} else if (p2 == null) {
-    		return p1;
-    	}
-    	
-    	// -> p1 and p2 not null
-    	if (p1 == UNDEFINED) {
-    		return p2;
-    	} else if (p2 == UNDEFINED) {
-    		return p1;
-    	}
-    	
-    	// -> p1 and p2 != UNDEFINED
-    	
-    	//System.out.println("joined!");
-    	
-    	//if (p1.fileName != p2.fileName) {
-    	//	return p1;
-    	//}
-    	Position start, end;
-    	if (p1.startPos != Position.UNDEFINED && !p1.startPos.isNegative() &&  p1.startPos.compareTo(p2.startPos) < 0) {
-    		start = p1.startPos;
-    	} else {
-    		start = p2.startPos;
-    	}
-    	if (p1.endPos != Position.UNDEFINED && !p1.endPos.isNegative() && p1.endPos.compareTo(p2.endPos) > 0) {
-    		end = p1.endPos;
-    	} else {
-    		end = p2.endPos;
-    	}
-    	// TODO: relative position
-    	PositionInfo pi = new PositionInfo(Position.UNDEFINED, start, end, p1.getFileName());
-    	//System.out.println(pi);
-    	return pi;
+        if (p1 == null && p2 == null) {
+            return null;
+        } else if (p1 == null) {
+            return p2;
+        } else if (p2 == null) {
+            return p1;
+        }
+
+        // -> p1 and p2 not null
+        if (p1 == UNDEFINED) {
+            return p2;
+        } else if (p2 == UNDEFINED) {
+            return p1;
+        }
+
+        // -> p1 and p2 != UNDEFINED
+        Position start;
+        Position end;
+        if (p1.startPos != Position.UNDEFINED && !p1.startPos.isNegative()
+                &&  p1.startPos.compareTo(p2.startPos) < 0) {
+            start = p1.startPos;
+        } else {
+            start = p2.startPos;
+        }
+        if (p1.endPos != Position.UNDEFINED && !p1.endPos.isNegative()
+                && p1.endPos.compareTo(p2.endPos) > 0) {
+            end = p1.endPos;
+        } else {
+            end = p2.endPos;
+        }
+        // TODO: join relative position as well
+        PositionInfo pi = new PositionInfo(Position.UNDEFINED, start, end, p1.getFileName());
+        return pi;
     }
-    
+
+    /**
+     * Checks if start and end position are both defined and in valid range.
+     * @return true iff start and end are valid
+     */
     public boolean startEndValid() {
-    	return startPos != Position.UNDEFINED && !startPos.isNegative()
-    			&& endPos != Position.UNDEFINED && !endPos.isNegative();
+        return startPos != Position.UNDEFINED && !startPos.isNegative()
+                && endPos != Position.UNDEFINED && !endPos.isNegative();
     }
 
     /** this violates immutability, but the method is only called
