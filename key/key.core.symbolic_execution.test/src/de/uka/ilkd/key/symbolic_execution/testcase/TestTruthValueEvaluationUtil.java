@@ -20,7 +20,7 @@ import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.BranchResult;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.MultiEvaluationResult;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValueTracingResult;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockContract;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockSpecificationElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionJoin;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -1086,7 +1086,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
          else if (next instanceof IExecutionLoopInvariant) {
             nodeToEvaluate = next.getProofNode().child(0); // Initial
          }
-         else if (next instanceof IExecutionBlockContract) {
+         else if (next instanceof IExecutionBlockSpecificationElement) {
             nodeToEvaluate = next.getProofNode().child(1); // Precondition branch
          }
          else if (next instanceof IExecutionJoin) {

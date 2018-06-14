@@ -57,7 +57,7 @@ import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 import de.uka.ilkd.key.util.Debug;
 
 /**
- * This abstract class provides a stubb for translation of KeY-Formulas to other
+ * This abstract class provides a stub for translation of KeY-Formulas to other
  * standards. Formulas are translated in a correct, but not always complete
  * representation of the target standard. Non-first-order elements in a formula
  * are translated as uninterpreted predicates.
@@ -592,8 +592,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         private StringBuffer buildInstantiatedHierarchyPredicate(
                         SortWrapper child, SortWrapper parent,
                         StringBuffer constant) {
-                StringBuffer form = new StringBuffer();
-
                 ArrayList<StringBuffer> varlist = new ArrayList<StringBuffer>();
                 varlist.add(constant);
 

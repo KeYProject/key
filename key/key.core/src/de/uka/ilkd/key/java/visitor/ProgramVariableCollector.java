@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
@@ -46,7 +47,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
      * collects all program variables occurring in the AST <tt>root</tt> using
      * this constructor is equivalent to
      * <tt>ProggramVariableCollector(root, false)</tt>
-     * 
+     *
      * @param root
      *            the ProgramElement which is the root of the AST
      * @param services
@@ -91,13 +92,14 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     @Override
     public void performActionOnMergeContract(MergeContract x) {
         assert (x instanceof UnparameterizedMergeContract)
-                || (x instanceof PredicateAbstractionMergeContract) : "Unexpected type of merge contract: "
+                    || (x instanceof PredicateAbstractionMergeContract)
+                : "Unexpected type of merge contract: "
                         + x.getClass().getSimpleName();
-                
+
         if (x instanceof UnparameterizedMergeContract) {
             return;
         }
-        
+
         PredicateAbstractionMergeContract pamc = (PredicateAbstractionMergeContract) x;
 
         TermProgramVariableCollector tpvc = services.getFactory()
@@ -105,7 +107,8 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
         Map<LocationVariable, Term> atPres = pamc.getAtPres();
 
-        final ArrayList<AbstractionPredicate> preds = pamc.getAbstractionPredicates(atPres, services);
+        final ArrayList<AbstractionPredicate> preds =
+                pamc.getAbstractionPredicates(atPres, services);
         preds.forEach(pred -> {
             pred.getPredicateFormWithPlaceholder().second.execPostOrder(tpvc);
         });
@@ -178,6 +181,46 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
     @Override
     public void performActionOnBlockContract(BlockContract x) {
+        TermProgramVariableCollector collector = services.getFactory()
+                .create(services);
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
+                .getAllHeaps()) {
+            Term precondition = x.getPrecondition(heap, services);
+            if (precondition != null) {
+                precondition.execPostOrder(collector);
+            }
+        }
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
+                .getAllHeaps()) {
+            Term postcondition = x.getPostcondition(heap, services);
+            if (postcondition != null) {
+                postcondition.execPostOrder(collector);
+            }
+        }
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
+                .getAllHeaps()) {
+            Term modifiesClause = x.getModifiesClause(heap, services);
+            if (modifiesClause != null) {
+                modifiesClause.execPostOrder(collector);
+            }
+        }
+        ImmutableList<InfFlowSpec> infFlowSpecs = x.getInfFlowSpecs();
+        for (InfFlowSpec ts : infFlowSpecs) {
+            for (Term t : ts.preExpressions) {
+                t.execPostOrder(collector);
+            }
+            for (Term t : ts.postExpressions) {
+                t.execPostOrder(collector);
+            }
+            for (Term t : ts.newObjects) {
+                t.execPostOrder(collector);
+            }
+        }
+        result.addAll(collector.result());
+    }
+
+    @Override
+    public void performActionOnLoopContract(LoopContract x) {
         TermProgramVariableCollector collector = services.getFactory()
                 .create(services);
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()

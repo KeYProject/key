@@ -45,7 +45,7 @@ public class BuilderTests extends AbstractResourceTest {
    //Disables the option "buildProofs". Expects no proofs to be build at all.
    @Test
    public void testBuildDisabled() throws CoreException, InterruptedException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testBuildDisabled", false, false, false, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testBuildDisabled", false, false, false, false, 1, false, false, false, new String[0]);
       testBuildDisabled(project);
       project.close(null);
    }
@@ -54,25 +54,25 @@ public class BuilderTests extends AbstractResourceTest {
    //Runs a cleanBuild. Expects all proofs to be run again but doesn't deletes them initially.
    @Test
    public void testFullBuildSingleThreadCleanBuild() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildSingleThreadCleanBuild", true, false, false, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildSingleThreadCleanBuild", true, false, false, false, 1, false, false, false, new String[0]);
       testCleanBuild(project);
       project.close(null);
    }
    @Test
    public void testFullBuildMultipleThreadsCleanBuild() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildMultipleThreadsCleanBuild", true, false, false, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildMultipleThreadsCleanBuild", true, false, false, true, 2, false, false, false, new String[0]);
       testCleanBuild(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildSingleThreadCleanBuild() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadCleanBuild", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadCleanBuild", true, false, true, false, 1, false, false, false, new String[0]);
       testCleanBuild(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsCleanBuild() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsCleanBuild", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsCleanBuild", true, false, true, true, 2, false, false, false, new String[0]);
       testCleanBuild(project);
       project.close(null);
    }
@@ -83,25 +83,25 @@ public class BuilderTests extends AbstractResourceTest {
    //                                - Efficient Build: Just the proof associated with the changed proof file is done again
    @Test
    public void testFullBuildSingleThreadProofFileChanged() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildSingleThreadProofFileChanged", true, false, false, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildSingleThreadProofFileChanged", true, false, false, false, 1, false, false, false, new String[0]);
       testProofFileChanged(project);
       project.close(null);
    }
    @Test
    public void testFullBuildMultipleThreadsProofFileChanged() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildMultipleThreadsProofFileChanged", true, false, false, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildMultipleThreadsProofFileChanged", true, false, false, true, 2, false, false, false, new String[0]);
       testProofFileChanged(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildSingleThreadProofFileChanged() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadProofFileChanged", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadProofFileChanged", true, false, true, false, 1, false, false, false, new String[0]);
       testProofFileChanged(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsProofFileChanged() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsProofFileChanged", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsProofFileChanged", true, false, true, true, 2, false, false, false, new String[0]);
       testProofFileChanged(project);
       project.close(null);
    }
@@ -112,25 +112,25 @@ public class BuilderTests extends AbstractResourceTest {
    //                         - Efficient Build: Just the proof associated with the deleted file is done again
    @Test
    public void testFullBuildSingleThreadProofFileDeleted() throws CoreException, InterruptedException {
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildSingleThreadProofFileDeleted", true, false, false, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildSingleThreadProofFileDeleted", true, false, false, false, 1, false, false, false, new String[0]);
       testFileDeleted(project, true);
       project.close(null);
    }
    @Test
    public void testFullBuildMultipleThreadsProofFileDeleted() throws CoreException, InterruptedException {
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildMultipleThreadsProofFileDeleted", true, false, false, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildMultipleThreadsProofFileDeleted", true, false, false, true, 2, false, false, false, new String[0]);
       testFileDeleted(project, true);
       project.close(null);
    }
    @Test
    public void testEfficientBuildSingleThreadProofFileDeleted() throws CoreException, InterruptedException {
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadProofFileDeleted", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadProofFileDeleted", true, false, true, false, 1, false, false, false, new String[0]);
       testFileDeleted(project, true);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsProofFileDeleted() throws CoreException, InterruptedException {
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsProofFileDeleted", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsProofFileDeleted", true, false, true, true, 2, false, false, false, new String[0]);
       testFileDeleted(project, true);
       project.close(null);
    }
@@ -141,25 +141,25 @@ public class BuilderTests extends AbstractResourceTest {
    //                         - Efficient Build: Just the proof associated with the deleted file is done again
    @Test
    public void testFullBuildSingleThreadMetaFileDeleted() throws CoreException, InterruptedException {
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildSingleThreadMetaFileDeleted", true, false, false, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildSingleThreadMetaFileDeleted", true, false, false, false, 1, false, false, false, new String[0]);
       testFileDeleted(project, false);
       project.close(null);
    }
    @Test
    public void testFullBuildMultipleThreadsMetaFileDeleted() throws CoreException, InterruptedException {
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildMultipleThreadsMetaFileDeleted", true, false, false, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildMultipleThreadsMetaFileDeleted", true, false, false, true, 2, false, false, false, new String[0]);
       testFileDeleted(project, false);
       project.close(null);
    }
    @Test
    public void testEfficientBuildSingleThreadMetaFileDeleted() throws CoreException, InterruptedException {
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadMetaFileDeleted", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadMetaFileDeleted", true, false, true, false, 1, false, false, false, new String[0]);
       testFileDeleted(project, false);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsMetaFileDeleted() throws CoreException, InterruptedException {
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsMetaFileDeleted", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsMetaFileDeleted", true, false, true, true, 2, false, false, false, new String[0]);
       testFileDeleted(project, false);
       project.close(null);
    }
@@ -170,25 +170,25 @@ public class BuilderTests extends AbstractResourceTest {
    //                                            - Efficient Build: Proof is not done again
    @Test
    public void testFullBuildSingleThreadChangeJavaFileTriveal() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildSingleThreadChangeJavaFileTriveal", true, false, false, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildSingleThreadChangeJavaFileTriveal", true, false, false, false, 1, false, false, false, new String[0]);
       testChangeJavaFileTriveal(project);
       project.close(null);
    }
    @Test
    public void testFullBuildMultipleThreadsChangeJavaFileTriveal() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildMultipleThreadsChangeJavaFileTriveal", true, false, false, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildMultipleThreadsChangeJavaFileTriveal", true, false, false, true, 2, false, false, false, new String[0]);
       testChangeJavaFileTriveal(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildSingleThreadChangeJavaFileTriveal() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeJavaFileTriveal", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeJavaFileTriveal", true, false, true, false, 1, false, false, false, new String[0]);
       testChangeJavaFileTriveal(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsChangeJavaFileTriveal() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeJavaFileTriveal", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeJavaFileTriveal", true, false, true, true, 2, false, false, false, new String[0]);
       testChangeJavaFileTriveal(project);
       project.close(null);
    }
@@ -199,25 +199,25 @@ public class BuilderTests extends AbstractResourceTest {
    //                                            - Efficient Build: No proof is done again
    @Test
    public void testFullBuildSingleThreadChangeSecondJavaFileTriveal() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildSingleThreadChangeSecondJavaFileTriveal", true, false, false, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildSingleThreadChangeSecondJavaFileTriveal", true, false, false, false, 1, false, false, false, new String[0]);
       testChangeSecondJavaFileTrivial(project);
       project.close(null);
    }
    @Test
    public void testFullBuildMultipleThreadsChangeSecondJavaFileTriveal() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildMultipleThreadsChangeSecondJavaFileTriveal", true, false, false, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildMultipleThreadsChangeSecondJavaFileTriveal", true, false, false, true, 2, false, false, false, new String[0]);
       testChangeSecondJavaFileTrivial(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildSingleThreadChangeSecondJavaFileTriveal() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeSecondJavaFileTriveal", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeSecondJavaFileTriveal", true, false, true, false, 1, false, false, false, new String[0]);
       testChangeSecondJavaFileTrivial(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsChangeSecondJavaFileTriveal() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeSecondJavaFileTriveal", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeSecondJavaFileTriveal", true, false, true, true, 2, false, false, false, new String[0]);
       testChangeSecondJavaFileTrivial(project);
       project.close(null);
    }
@@ -227,13 +227,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: Just the new proof is done.
    @Test
    public void testEfficientBuildSingleThreadAddMethodWithContract() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadAddMethodWithContract", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadAddMethodWithContract", true, false, true, false, 1, false, false, false, new String[0]);
       testAddMethodWithContract(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsAddMethodWithContract() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsAddMethodWithContract", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsAddMethodWithContract", true, false, true, true, 2, false, false, false, new String[0]);
       testAddMethodWithContract(project);
       project.close(null);
    }
@@ -243,13 +243,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: Just the new proof is done.
    @Test
    public void testEfficientBuildSingleThreadAddSecondJavaFileWithProof() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadAddSecondJavaFileWithProof", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadAddSecondJavaFileWithProof", true, false, true, false, 1, false, false, false, new String[0]);
       testAddSecondJavaFileWithProof(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsAddSecondJavaFileWithProof() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsAddSecondJavaFileWithProof", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsAddSecondJavaFileWithProof", true, false, true, true, 2, false, false, false, new String[0]);
       testAddSecondJavaFileWithProof(project);
       project.close(null);
    }
@@ -259,13 +259,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: Just the new proof is done.
    @Test
    public void testEfficientBuildSingleThreadAddSecondContractToMethod() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadAddSecondContractToMethod", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadAddSecondContractToMethod", true, false, true, false, 1, false, false, false, new String[0]);
       testAddSecondContractToMethod(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsAddSecondContractToMethod() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsAddSecondContractToMethod", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsAddSecondContractToMethod", true, false, true, true, 2, false, false, false, new String[0]);
       testAddSecondContractToMethod(project);
       project.close(null);
    }
@@ -275,13 +275,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: Just the changed proof is done.
    @Test
    public void testEfficientBuildSingleThreadChangeContractOfMethod() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeContractOfMethod", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeContractOfMethod", true, false, true, false, 1, false, false, false, new String[0]);
       testChangeContractOfMethod(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsChangeContractOfMethod() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeContractOfMethod", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeContractOfMethod", true, false, true, true, 2, false, false, false, new String[0]);
       testChangeContractOfMethod(project);
       project.close(null);
    }
@@ -299,13 +299,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: The proof of the method is done again
    @Test
    public void testEfficientBuildSingleThreadChangeInlinedMethod() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeMethodOfProof", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeMethodOfProof", true, false, true, false, 1, false, false, false, new String[0]);
       testChangeInlinedMethod(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsChangeInlinedMethod() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeMethodOfProof", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeMethodOfProof", true, false, true, true, 2, false, false, false, new String[0]);
       testChangeInlinedMethod(project);
       project.close(null);
    }
@@ -318,13 +318,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: The proof of the method is done again
    @Test
    public void testEfficientBuildSingleThreadChangeCalledMethod() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeCalledMethod", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeCalledMethod", true, false, true, false, 1, false, false, false, new String[0]);
       testChangeCalledMethod(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsChangeCalledMethod() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeCalledMethod", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeCalledMethod", true, false, true, true, 2, false, false, false, new String[0]);
       testChangeCalledMethod(project);
       project.close(null);
    }
@@ -334,13 +334,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: The proof of the method is done again
    @Test
    public void testEfficientBuildSingleThreadChangeCalledMethodInOtherClass() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeCalledMethodInOtherClass", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeCalledMethodInOtherClass", true, false, true, false, 1, false, false, false, new String[0]);
       testChangeCalledMethodInOtherClass(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsChangeCalledMethodInOtherClass() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeCalledMethodInOtherClass", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeCalledMethodInOtherClass", true, false, true, true, 2, false, false, false, new String[0]);
       testChangeCalledMethodInOtherClass(project);
       project.close(null);
    }
@@ -350,13 +350,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: The proof of the method is done again
    @Test
    public void testEfficientBuildSingleThreadChangeCalledMethodSubImplementation() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeCalledMethodSubImplementation", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeCalledMethodSubImplementation", true, false, true, false, 1, false, false, false, new String[0]);
       testChangeCalledMethodSubImplementation(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsChangeCalledMethodSubImplementation() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeCalledMethodSubImplementation", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeCalledMethodSubImplementation", true, false, true, true, 2, false, false, false, new String[0]);
       testChangeCalledMethodSubImplementation(project);
       project.close(null);
    }
@@ -366,13 +366,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: The proof of the method is done again
    @Test
    public void testEfficientBuildSingleThreadAddCalledMethodSubImplementation() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadAddCalledMethodSubImplementation", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadAddCalledMethodSubImplementation", true, false, true, false, 1, false, false, false, new String[0]);
       testAddCalledMethodSubImplementation(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsAddCalledMethodSubImplementation() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsAddCalledMethodSubImplementation", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsAddCalledMethodSubImplementation", true, false, true, true, 2, false, false, false, new String[0]);
       testAddCalledMethodSubImplementation(project);
       project.close(null);
    }
@@ -382,13 +382,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: The proof of the method is done again
    @Test
    public void testEfficientBuildSingleThreadRemoveCalledSubMethod() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadRemoveCalledSubMethod", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadRemoveCalledSubMethod", true, false, true, false, 1, false, false, false, new String[0]);
       testRemoveCalledMethodSubImplementation(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsRemoveCalledSubMethod() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsRemoveCalledSubMethod", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsRemoveCalledSubMethod", true, false, true, true, 2, false, false, false, new String[0]);
       testRemoveCalledMethodSubImplementation(project);
       project.close(null);
    }
@@ -398,13 +398,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: The proof of the method is done again
    @Test
    public void testEfficientBuildSingleThreadRemoveCalledMethodSubImplementationClass() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadRemoveCalledMethodSubImplementationClass", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadRemoveCalledMethodSubImplementationClass", true, false, true, false, 1, false, false, false, new String[0]);
       testRemoveCalledMethodSubImplementationClass(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsRemoveCalledMethodSubImplementationClass() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsRemoveCalledMethodSubImplementationClass", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsRemoveCalledMethodSubImplementationClass", true, false, true, true, 2, false, false, false, new String[0]);
       testRemoveCalledMethodSubImplementationClass(project);
       project.close(null);
    }
@@ -417,13 +417,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: The proof using the field is done again
    @Test
    public void testEfficientBuildSingleThreadChangeFieldLocal() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeFieldLocal", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeFieldLocal", true, false, true, false, 1, false, false, false, new String[0]);
       testChangeFieldLocal(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsChangeFieldLocal() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeFieldLocal", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeFieldLocal", true, false, true, true, 2, false, false, false, new String[0]);
       testChangeFieldLocal(project);
       project.close(null);
    }
@@ -433,13 +433,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: The proof using the field is done again
    @Test
    public void testEfficientBuildSingleThreadChangeFieldInOtherClass() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeFieldInOtherClass", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeFieldInOtherClass", true, false, true, false, 1, false, false, false, new String[0]);
       testChangeFieldInOtherClass(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsChangeFieldInOtherClass() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeFieldInOtherClass", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeFieldInOtherClass", true, false, true, true, 2, false, false, false, new String[0]);
       testChangeFieldInOtherClass(project);
       project.close(null);
    }
@@ -452,13 +452,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: The proof using the contract, and the proof associated with the used contract are done again
    @Test
    public void testEfficientBuildSingleThreadChangeUsedContract() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeUsedContract", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeUsedContract", true, false, true, false, 1, false, false, false, new String[0]);
       testChangeUsedContract(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsChangeUsedContract() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeUsedContract", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeUsedContract", true, false, true, true, 2, false, false, false, new String[0]);
       testChangeUsedContract(project);
       project.close(null);
    }
@@ -471,13 +471,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: All proofs using the axiom are done again
    @Test
    public void testEfficientBuildSingleThreadChangeAxiom() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeAxiom", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeAxiom", true, false, true, false, 1, false, false, false, new String[0]);
       testChangeAxiom(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsChangeAxiom() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeAxiom", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeAxiom", true, false, true, true, 2, false, false, false, new String[0]);
       testChangeAxiom(project);
       project.close(null);
    }
@@ -487,13 +487,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: All proofs using the invariant are done again
    @Test
    public void testEfficientBuildSingleThreadChangeInvariant() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeInvariant", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeInvariant", true, false, true, false, 1, false, false, false, new String[0]);
       testChangeInvariant(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsChangeInvariant() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeInvariant", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeInvariant", true, false, true, true, 2, false, false, false, new String[0]);
       testChangeInvariant(project);
       project.close(null);
    }
@@ -502,13 +502,13 @@ public class BuilderTests extends AbstractResourceTest {
    //Expectation: Proofs using overloaded methods should be done again
    @Test
    public void testEfficientBuildSingleThreadAddOverload() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadAddOverload", true, false, true, false, 1, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadAddOverload", true, false, true, false, 1, false, false, false, new String[0]);
       testAddOverload(project);
       project.close(null);
    }
    @Test
    public void testEfficientBuildMultipleThreadsAddOverload() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsAddOverload", true, false, true, true, 2, false, false, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsAddOverload", true, false, true, true, 2, false, false, false, new String[0]);
       testAddOverload(project);
       project.close(null);
    }
@@ -520,7 +520,7 @@ public class BuilderTests extends AbstractResourceTest {
    
    @Test
    public void testFullBuildSingleThreadGenerateTestCases() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildSingleThreadGenerateTestCases", true, false, false, false, 1, false, true, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildSingleThreadGenerateTestCases", true, false, false, false, 1, false, true, false, new String[0]);
       testTestCaseGeneration(project, false);
       project.close(null);
    }
@@ -532,7 +532,7 @@ public class BuilderTests extends AbstractResourceTest {
 //   }
    @Test
    public void testEfficientBuildSingleThreadGenerateTestCases() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildSingleThreadGenerateTestCases", true, false, true, false, 1, false, true, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildSingleThreadGenerateTestCases", true, false, true, false, 1, false, true, false, new String[0]);
       testTestCaseGeneration(project, false);
       project.close(null);
    }
@@ -545,7 +545,7 @@ public class BuilderTests extends AbstractResourceTest {
    
    @Test
    public void testFullBuildSingleThreadGenerateTestCasesAutoDelete() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildSingleThreadGenerateTestCasesAutoDelete", true, false, false, false, 1, false, true, true);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildSingleThreadGenerateTestCasesAutoDelete", true, false, false, false, 1, false, true, true, new String[0]);
       testTestCaseGeneration(project, true);
       project.close(null);
    }
@@ -557,7 +557,7 @@ public class BuilderTests extends AbstractResourceTest {
 //   }
    @Test
    public void testEfficientBuildSingleThreadGenerateTestCasesAutoDelete() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildSingleThreadGenerateTestCasesAutoDelete", true, false, true, false, 1, false, true, true);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildSingleThreadGenerateTestCasesAutoDelete", true, false, true, false, 1, false, true, true, new String[0]);
       testTestCaseGeneration(project, true);
       project.close(null);
    }
@@ -573,7 +573,7 @@ public class BuilderTests extends AbstractResourceTest {
    //Just add the VM argument -Dz3SolverPath="PathToZ3Solver"
    @Test
    public void testFullBuildSingleThreadGenerateTestSuite() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildSingleThreadGenerateTestSuite", true, false, false, false, 1, false, true, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildSingleThreadGenerateTestSuite", true, false, false, false, 1, false, true, false, new String[0]);
       testTestSuiteGeneration(project, false);
       project.close(null);
    }
@@ -585,7 +585,7 @@ public class BuilderTests extends AbstractResourceTest {
 //   }
    @Test
    public void testEfficientBuildSingleThreadGenerateTestSuite() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildSingleThreadGenerateTestSuite", true, false, true, false, 1, false, true, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildSingleThreadGenerateTestSuite", true, false, true, false, 1, false, true, false, new String[0]);
       testTestSuiteGeneration(project, false);
       project.close(null);
    }
@@ -598,7 +598,7 @@ public class BuilderTests extends AbstractResourceTest {
 
    @Test
    public void testFullBuildSingleThreadGenerateTestSuiteAutoDelete() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildSingleThreadGenerateTestSuiteAutoDelete", true, false, false, false, 1, false, true, true);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildSingleThreadGenerateTestSuiteAutoDelete", true, false, false, false, 1, false, true, true, new String[0]);
       testTestSuiteGeneration(project, true);
       project.close(null);
    }
@@ -610,7 +610,7 @@ public class BuilderTests extends AbstractResourceTest {
 //   }
    @Test
    public void testEfficientBuildSingleThreadGenerateTestSuiteAutoDelete() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildSingleThreadGenerateTestSuiteAutoDelete", true, false, true, false, 1, false, true, true);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildSingleThreadGenerateTestSuiteAutoDelete", true, false, true, false, 1, false, true, true, new String[0]);
       testTestSuiteGeneration(project, true);
       project.close(null);
    }

@@ -61,9 +61,12 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.join.JoinIsApplicable;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
-import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.LoopContractExternalRule;
+import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -151,10 +154,10 @@ public class TacletMenu extends JMenu {
     /** creates a new menu that displays all applicable rules at the given
      * position
      * @param sequentView the SequentView that is the parent of this menu
-     * @param findList IList<Taclet> with all applicable FindTaclets
-     * @param rewriteList IList<Taclet> with all applicable RewriteTaclets
-     * @param noFindList IList<Taclet> with all applicable noFindTaclets
-     * @param builtInList IList<BuiltInRule> with all applicable BuiltInRules
+     * @param findList {@link IList<Taclet>} with all applicable FindTaclets
+     * @param rewriteList {@link IList<Taclet>} with all applicable RewriteTaclets
+     * @param noFindList {@link IList<Taclet>} with all applicable noFindTaclets
+     * @param builtInList {@link IList<BuiltInRule>} with all applicable BuiltInRules
      * @param pos the PosInSequent
      */
     TacletMenu(CurrentGoalView sequentView,
@@ -173,7 +176,7 @@ public class TacletMenu extends JMenu {
 
 
     /** removes RewriteTaclet from list
-     * @param list the IList<Taclet> from where the RewriteTaclet are
+     * @param list the {@link IList<Taclet>} from where the RewriteTaclet are
      * removed
      * @return list without RewriteTaclets
      */
@@ -329,12 +332,45 @@ public class TacletMenu extends JMenu {
             item.addActionListener(control);
             add(item);
         }
-        else if (builtInRule == BlockContractRule.INSTANCE) {
+        else if (builtInRule == BlockContractInternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(
                     builtInRule.displayName(),
                     APPLY_RULE,
                     "Applies a known and complete block specification immediately.",
+                    CHOOSE_AND_APPLY_CONTRACT,
+                    "Asks to select the contract to be applied.", builtInRule);
+            item.addActionListener(control);
+            add(item);
+        }
+        else if (builtInRule == BlockContractExternalRule.INSTANCE) {
+            // we add two items in this case: one for auto one for interactive
+            item = new MenuItemForTwoModeRules(
+                    builtInRule.displayName(),
+                    APPLY_RULE,
+                    "All available contracts of the block are combined and applied.",
+                    CHOOSE_AND_APPLY_CONTRACT,
+                    "Asks to select the contract to be applied.", builtInRule);
+            item.addActionListener(control);
+            add(item);
+        }
+        else if (builtInRule == LoopContractInternalRule.INSTANCE) {
+            // we add two items in this case: one for auto one for interactive
+            item = new MenuItemForTwoModeRules(
+                    builtInRule.displayName(),
+                    APPLY_RULE,
+                    "Applies a known and complete loop block specification immediately.",
+                    CHOOSE_AND_APPLY_CONTRACT,
+                    "Asks to select the contract to be applied.", builtInRule);
+            item.addActionListener(control);
+            add(item);
+        }
+        else if (builtInRule == LoopContractExternalRule.INSTANCE) {
+            // we add two items in this case: one for auto one for interactive
+            item = new MenuItemForTwoModeRules(
+                    builtInRule.displayName(),
+                    APPLY_RULE,
+                    "All available contracts of the loop block are combined and applied.",
                     CHOOSE_AND_APPLY_CONTRACT,
                     "Asks to select the contract to be applied.", builtInRule);
             item.addActionListener(control);
@@ -437,7 +473,7 @@ public class TacletMenu extends JMenu {
 
     /** adds a TacletMenuItem for each taclet in the list and sets
      * the given MenuControl as the ActionListener
-     * @param taclets IList<Taclet> with the Taclets the items represent
+     * @param taclets {@link IList<Taclet>} with the Taclets the items represent
      * @param control the ActionListener
      */
     private void createMenuItems(ImmutableList<TacletApp> taclets,

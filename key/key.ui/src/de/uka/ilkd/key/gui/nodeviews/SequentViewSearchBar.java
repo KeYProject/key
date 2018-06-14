@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -60,8 +59,8 @@ public class SequentViewSearchBar extends SearchBar {
     private final List<Pair<Integer, Object>> searchResults;
     private int resultIteratorPos;
     private SequentView sequentView;
-    JCheckBox regExpCheckBox;
-    JComboBox<SearchMode> searchModeBox;
+    private JCheckBox regExpCheckBox;
+    private JComboBox<SearchMode> searchModeBox;
 
     public SequentViewSearchBar(SequentView sequentView) {
         this.sequentView = sequentView;
@@ -69,8 +68,10 @@ public class SequentViewSearchBar extends SearchBar {
     }
 
     public void setSequentView(SequentView sequentView) {
+        if(this.sequentView != sequentView) {
+            sequentView.setFilter(this.sequentView.getFilter()); 
+        }
         this.sequentView = sequentView;
-        searchModeBox.setSelectedIndex(0);
         search();
     }
 
@@ -87,8 +88,8 @@ public class SequentViewSearchBar extends SearchBar {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 searchField.requestFocus();
-                if (sequentView.filter instanceof SearchSequentPrintFilter) {
-                    ((SearchSequentPrintFilter) sequentView.filter).setRegex(regExpCheckBox.isSelected());
+                if (sequentView.getFilter() instanceof SearchSequentPrintFilter) {
+                    ((SearchSequentPrintFilter) sequentView.getFilter()).setRegex(regExpCheckBox.isSelected());
                 }
                 search();
             }
@@ -142,7 +143,8 @@ public class SequentViewSearchBar extends SearchBar {
     public void searchPrevious() {
         if (!searchResults.isEmpty()) {
             resetExtraHighlight();
-            resultIteratorPos--;
+            // Adding the size to avoid -1 underflow (bugfix, MU)
+            resultIteratorPos += searchResults.size() - 1;
             resultIteratorPos %= searchResults.size();
             setExtraHighlight(resultIteratorPos);
         }
@@ -156,10 +158,7 @@ public class SequentViewSearchBar extends SearchBar {
                 search();
             } else {
                 clearSearchResults();
-                if (sequentView.filter instanceof SearchSequentPrintFilter) {
-                    ((SearchSequentPrintFilter) sequentView.filter).setSearchString("");
-                    sequentView.printSequent();
-                }
+                searchModeBox.setSelectedIndex(0);
             }
         }
     }
@@ -171,8 +170,8 @@ public class SequentViewSearchBar extends SearchBar {
     public boolean search(String search) {
         clearSearchResults();
 
-        if (sequentView.filter instanceof SearchSequentPrintFilter) {
-            SearchSequentPrintFilter searchSequentPrintFilter = (SearchSequentPrintFilter) sequentView.filter;
+        if (sequentView.getFilter() instanceof SearchSequentPrintFilter) {
+            SearchSequentPrintFilter searchSequentPrintFilter = (SearchSequentPrintFilter) sequentView.getFilter();
             searchSequentPrintFilter.setLogicPrinter(sequentView.getLogicPrinter());
             searchSequentPrintFilter.setSearchString(searchField.getText());
         }

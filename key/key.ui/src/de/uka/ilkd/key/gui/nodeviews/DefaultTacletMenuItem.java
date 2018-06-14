@@ -123,7 +123,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     } 
     
     /**
-     * Replaces <,>,& and new lines with their HTML masks.
+     * Replaces {@literal <},{@literal >},{@literal &} and new lines with their HTML masks.
      * @param sb The StringBuffer with forbidden HTML characters
      * @return A new StringBuffer with the masked characters.
      */

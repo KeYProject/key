@@ -1,11 +1,9 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
-import de.uka.ilkd.key.proof.runallproofs.TestResult;
 
 /**
  * A {@link ProofCollectionUnit} that is created from several {@link TestFile}s
@@ -15,9 +13,10 @@ import de.uka.ilkd.key.proof.runallproofs.TestResult;
  */
 public class GroupedProofCollectionUnit extends ProofCollectionUnit {
 
-   private final String groupName;
-   private final List<TestFile> testFiles;
-   private final ProofCollectionSettings settings;
+    private static final long serialVersionUID = 1L;
+    private final String groupName;
+    private final List<TestFile> testFiles;
+    private final ProofCollectionSettings settings;
 
    public GroupedProofCollectionUnit(String groupName,
          ProofCollectionSettings settings, List<TestFile> files) {

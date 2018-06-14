@@ -79,6 +79,7 @@ lexer grammar KeYJMLPreLexer;
     INSTANCE 			: 'instance';
     INVARIANT 			: 'invariant';
     INVARIANT_RED 		: 'invariant_redundantly';
+    LOOP_CONTRACT  		: 'loop_contract';
     LOOP_INVARIANT  		: 'loop_invariant';
     LOOP_INVARIANT_RED  	: 'loop_invariant_redundantly';
     LOOP_INVARIANT_FREE	: 'loop_invariant_free';
@@ -286,6 +287,20 @@ SEMICOLON
 STRING_LITERAL
     : '"' ( ESC | ~('"'|'\\') )* '"'
     ;
+
+CHAR_LITERAL:
+        '\''
+                (~('\''|'\\') |
+                 ('\\' ('\'' | '\\' | 'n' | 'r' | 't' | 'b' | 'f' | '"' | OCT_CHAR))
+                 // note: unicode escapes are processed earlier
+                )
+      '\''
+    ;
+
+fragment OCT_CHAR:
+        (('0'|'1'|'2'|'3') OCTDIGIT OCTDIGIT) | (OCTDIGIT OCTDIGIT) | OCTDIGIT;
+
+fragment OCTDIGIT: '0'..'7';
 
 fragment
 ESC

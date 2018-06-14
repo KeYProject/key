@@ -18,6 +18,7 @@
 		       showoutput="yes" dir="${basedir}">
 			<jvmarg value="-Xmx2048m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
+			<jvmarg value="-Dkey.disregardSettings=true"/>
 			<jvmarg value="-ea"/>
 			<classpath>
 				<pathelement location="${dist.dir}/key.core.jar"/>
@@ -59,6 +60,7 @@
 		       showoutput="yes" dir="${basedir}">
 			<jvmarg value="-Xmx2048m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
+			<jvmarg value="-Dkey.disregardSettings=true"/>
 			<jvmarg value="-ea"/>
 			<classpath>
 				<pathelement path="${basedir}/../key.core/bin"/>
@@ -83,6 +85,7 @@
 		       showoutput="yes" dir="${basedir}">
 			<jvmarg value="-Xmx2048m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
+			<jvmarg value="-Dkey.disregardSettings=true"/>
 			<jvmarg value="-ea"/>
 			<classpath>
 				<pathelement path="${basedir}/../key.core/bin"/>
@@ -107,6 +110,7 @@
 		       showoutput="yes" dir="${basedir}">
 			<jvmarg value="-Xmx2048m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
+			<jvmarg value="-Dkey.disregardSettings=true"/>
 			<jvmarg value="-ea"/>
 			<classpath>
 				<pathelement path="${basedir}/../key.core/bin"/>

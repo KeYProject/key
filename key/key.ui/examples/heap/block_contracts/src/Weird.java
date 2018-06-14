@@ -151,12 +151,12 @@ public class Weird {
         int z = 0;
         label: {
             /*@ requires x > 0 && y > 0;
-              @ ensures z == \old(z);
-              @ breaks (label) z < \old(z);
-              @ continues () z > \old(z);
-              @ returns z + \old(z) == 0 && \result == 100;
+              @ ensures z == \before(z);
+              @ breaks (label) z < \before(z);
+              @ continues () z > \before(z);
+              @ returns z + \before(z) == 0 && \result == 100;
               @ diverges x == y;
-              @ signals (Exception e) \old(z) - z == 0;
+              @ signals (Exception e) \before(z) - z == 0;
               @ assignable \nothing;
               @ assignable \nothing;
               @*/

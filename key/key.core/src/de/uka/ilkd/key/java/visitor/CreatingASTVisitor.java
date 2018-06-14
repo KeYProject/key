@@ -147,16 +147,20 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     protected static final Boolean CHANGED = Boolean.TRUE;
 
-    boolean preservesPositionInfo = true;
-
     /**  */
     protected Deque<ExtList> stack = new ArrayDeque<ExtList>();
 
+    boolean preservesPositionInfo = true;
+
     /**
      * create the CreatingASTVisitor
-     * 
+     *
      * @param root
      *            the ProgramElement where to begin
+     * @param preservesPos
+     *            whether the position should be preserved
+     * @param services
+     *            the services instance
      */
     public CreatingASTVisitor(ProgramElement root, boolean preservesPos,
             Services services) {
@@ -181,6 +185,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     /**
      * called if the program element x is unchanged
+     * @param x The {@link SourceElement}.
      */
     protected void doDefaultAction(SourceElement x) {
         addChild(x);
@@ -217,6 +222,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             ProgramElement createNewElement(ExtList changeList) {
                 StatementBlock newBlock = new StatementBlock(changeList);
                 performActionOnBlockContract(x, newBlock);
+                performActionOnLoopContract(x, newBlock);
                 return newBlock;
             }
         };
@@ -224,6 +230,11 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     protected void performActionOnBlockContract(final StatementBlock oldBlock,
+            final StatementBlock newBlock) {
+        // do nothing
+    }
+
+    protected void performActionOnLoopContract(final StatementBlock oldBlock,
             final StatementBlock newBlock) {
         // do nothing
     }
@@ -560,8 +571,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
                 l = (Label) changeList.removeFirst();
             }
             // bugfix: create an empty statement if the label body was removed
-            if (changeList.get(Statement.class) == null)
+            if (changeList.get(Statement.class) == null) {
                 changeList.add(new EmptyStatement());
+            }
             addChild(new LabeledStatement(changeList, l, pi));
             changed();
         } else {
@@ -621,7 +633,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         };
         def.doAction(x);
     }
-    
+
     @Override
     public void performActionOnLoopScopeBlock(LoopScopeBlock x) {
         DefaultAction def = new DefaultAction(x) {
@@ -1398,13 +1410,17 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     /**
      * returns the position of pe2 in the virtual child array of pe1
+     * @param pe1 A {@link NonTerminalProgramElement}
+     * @param pe2 A {@link ProgramElement}
+     * @return pe2's position in pe1
      */
     protected static int getPosition(NonTerminalProgramElement pe1,
             ProgramElement pe2) {
         int n = pe1.getChildCount();
         int i = 0;
-        while ((i < n) && (pe1.getChildAt(i) != pe2))
+        while ((i < n) && (pe1.getChildAt(i) != pe2)) {
             i++;
+        }
         return (i == n) ? -1 : i;
     }
 
@@ -1435,18 +1451,13 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     protected abstract class DefaultAction {
-        abstract ProgramElement createNewElement(ExtList changeList);
-
         protected ProgramElement pe;
 
         protected DefaultAction(ProgramElement pe) {
             this.pe = pe;
         }
 
-        protected void addNewChild(ExtList changeList) {
-            addChild(createNewElement(changeList));
-            changed();
-        }
+        abstract ProgramElement createNewElement(ExtList changeList);
 
         public void doAction(ProgramElement x) {
             ExtList changeList = stack.peek();
@@ -1463,6 +1474,11 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             } else {
                 doDefaultAction(x);
             }
+        }
+
+        protected void addNewChild(ExtList changeList) {
+            addChild(createNewElement(changeList));
+            changed();
         }
     }
 }

@@ -33,6 +33,9 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  */
 public class BlockWellDefinedness extends StatementWellDefinedness {
 
+    /**
+     * The jml block contract.
+     */
     private final BlockContract block;
 
     private BlockWellDefinedness(String name, int id, Type type, IObserverFunction target,
@@ -45,17 +48,25 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
         this.block = block;
     }
 
-    public BlockWellDefinedness(BlockContract block, ImmutableSet<ProgramVariable> params,
+    /**
+     * Creates a contract to check well-definedness of a block contract
+     * @param block the block belonging to the block contract
+     * @param variables the variables of the block contract
+     * @param params the parameters of the block
+     * @param services the services instance
+     */
+    public BlockWellDefinedness(BlockContract block, BlockContract.Variables variables,
+                                ImmutableSet<ProgramVariable> params,
                                 Services services) {
         super(block.getName(), block.getBlock().getStartPosition().getLine(), block.getMethod(),
-              block.getOrigVars().add(convertParams(params)), Type.BLOCK_CONTRACT, services);
+                variables.toOrigVars().add(convertParams(params)), Type.BLOCK_CONTRACT, services);
         assert block != null;
         final LocationVariable h = getHeap();
         this.block = block;
-        setRequires(block.getRequires(h));
+        setRequires(block.getPrecondition(h, variables, services));
         setAssignable(block.hasModifiesClause(h) ? block.getAssignable(h) : TB.strictlyNothing(),
                       services);
-        setEnsures(block.getEnsures(h));
+        setEnsures(block.getPostcondition(h, variables, services));
     }
 
     @Override

@@ -17,7 +17,6 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -341,9 +340,9 @@ public class OracleGenerator {
 			
 			//System.out.println(services.getVariableNamer().getRenamingMap());
 			
-			LocationVariable loc = (LocationVariable) var;
+			//LocationVariable loc = (LocationVariable) var;
 			//System.out.println("Term: "+loc.sort()+" "+loc.name());
-			return new OracleConstant(loc.name().toString(), loc.sort());
+			return new OracleConstant(var.name().toString(), var.sort());
 		}
 		
 		else{

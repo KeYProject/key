@@ -72,7 +72,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  * "target" has to match the "if" part.</li>
  * <li>if t's goal descriptions contain at least <em>one</em> replacewith
  * then "target" is matched against the <tt>find</tt> part and "source"
- * against the <tt>assumes</tt> part</li>*
+ * against the <tt>assumes</tt> part</li>
  * </ol>
  * or
  * <li>t must have a <tt>find</tt> part, no <tt>assumes</tt> and at least one
@@ -360,10 +360,10 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * their "find" has been matched
      * 
      * @param tacletApps
-     *            the IList<TacletApp> with taclet applications to be enriched by
+     *            the {@link IList<TacletApp>} with taclet applications to be enriched by
      *            position information
      * @param findPos
-     *            the PosInOccurrence against which the find part has been
+     *            the {@link PosInOccurrence} against which the find part has been
      *            matched
      * @return the taclet apps as given in <tt>tacletApps</tt> but with
      *         position information
@@ -394,16 +394,16 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * returned. The given apps must have either all an if part or none of them.
      * 
      * @param apps
-     *            the IList<PosTacletApp> with all apps whose if sequent has to
+     *            the {@link IList<PosTacletApp>} with all apps whose if sequent has to
      *            be matched against the formula specified by the pair
      *            <tt>seq</tt> and <tt>ifPIO</tt>
      * @param seq
-     *            the Sequent to which the position information in <tt>ifPIO<tt>
+     *            the Sequent to which the position information in <tt>ifPIO</tt>
      * is relative to
      * @param ifPIO the PosInOccurrence describing the position of the term to 
      * be matched against the if sequent of the taclets
      * @param services the Services 
-     * @return the IList<PosTacletApp> that have been matched successfully
+     * @return the {@link IList<PosTacletApp>} that have been matched successfully
      */
     private ImmutableList<PosTacletApp> completeIfInstantiations(ImmutableList<PosTacletApp> apps,
             Sequent seq, PosInOccurrence ifPIO, Services services) {
@@ -461,14 +461,14 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * returned. 
      * 
      * @param apps
-     *            the IList<PosTacletApp> with all apps whose if sequent has to
+     *            the {@link IList<PosTacletApp>} with all apps whose if sequent has to
      *            be matched against the formula specified by the pair
      *            <tt>seq</tt> and <tt>ifPIO</tt>
      * is relative to
      * @param missingSVPIO the PosInOccurrence describing the position of the term an 
      * uninstantiated SV will be matched against 
      * @param services the Services 
-     * @return the IList<PosTacletApp> that have been matched successfully
+     * @return the {@link IList<PosTacletApp>} that have been matched successfully
      */
     private ImmutableList<PosTacletApp> completeInstantiations(ImmutableList<PosTacletApp> apps,
              PosInOccurrence missingSVPIO, Services services) {
@@ -639,7 +639,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
              * tests if the goal templates contain at least one addrule section
              * 
              * @param goalDescriptions
-             *            the IList<TacletGoalTemplate> to be looked through
+             *            the {@link IList<TacletGoalTemplate>} to be looked through
              * @return true if an addrule section has been found
              */
             private boolean goalTemplatesContainAddrules(

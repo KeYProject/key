@@ -15,11 +15,9 @@ post: (exc_0 = null -&gt; result_0 = 4711)
          |   java.lang.RuntimeException::instance(exc_0)
            = TRUE))
 &amp; (x &gt;= 10 -&gt; result_0 = 10 &amp; exc_0 = null)
-&amp; (   x &lt; javaUnaryMinusInt(22)
-   -&gt; result_0 = javaUnaryMinusInt(22) &amp; exc_0 = null)
-&amp; (   x = javaUnaryMinusInt(3)
-   -&gt;   (   exc_0 = null
-         -&gt; result_0 = javaUnaryMinusInt(3))
+&amp; (x &lt; -22 -&gt; result_0 = -22 &amp; exc_0 = null)
+&amp; (   x = -3
+   -&gt;   (exc_0 = null -&gt; result_0 = -3)
       &amp; (   !exc_0 = null
          -&gt;   java.lang.Error::instance(exc_0) = TRUE
             |   java.lang.RuntimeException::instance(exc_0)
@@ -39,13 +37,11 @@ mod: \if (true)
                                          \then (allLocs)
                                          \else (allLocs))
                          \else (allLocs)
-                \cap \if (x &lt; javaUnaryMinusInt(22))
+                \cap \if (x &lt; -22)
                          \then (allLocs)
                          \else (allLocs))
          \else (allLocs)
-\cap \if (x = javaUnaryMinusInt(3))
-         \then (allLocs)
-         \else (allLocs)
+\cap \if (x = -3)  \then (allLocs)  \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="and(equals(exc_0,null),or(or(leq(x,Z(neglit(3(2(#))))),equals(x,Z(neglit(3(#))))),geq(x,Z(0(1(#))))))" pathCondition="and(equals(exc_0,null),or(or(leq(x,Z(neglit(3(2(#))))),equals(x,Z(neglit(3(#))))),geq(x,Z(0(1(#))))))" pathConditionChanged="true" branchCondition="and(equals(exc_0,null),or(or(leq(x,Z(neglit(3(2(#))))),equals(x,Z(neglit(3(#))))),geq(x,Z(0(1(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <methodReturn name="&lt;return of main&gt;" signature="&lt;return of AnotherStaticContractTest.main(x)&gt;" pathCondition="and(equals(exc_0,null),or(or(leq(x,Z(neglit(3(2(#))))),equals(x,Z(neglit(3(#))))),geq(x,Z(0(1(#))))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(equals(exc_0,null),or(or(leq(x,Z(neglit(3(2(#))))),equals(x,Z(neglit(3(#))))),geq(x,Z(0(1(#))))))">

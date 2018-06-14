@@ -14,10 +14,8 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -131,17 +129,6 @@ public abstract class TacletLoader {
             }
         }
         return proofEnvironment;
-    }
-
-    /* 
-     * turn an immutable set into an array list 
-     */
-    private static <E> List<E> toList(ImmutableSet<E> set) {
-        ArrayList<E> res = new ArrayList<E>();
-        for (E element : set) {
-            res.add(element);
-        }
-        return res;
     }
 
     public static class TacletFromFileLoader extends TacletLoader{

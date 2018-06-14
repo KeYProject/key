@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -66,8 +65,7 @@ public abstract class MetaShift extends AbstractTermTransformer {
 				&& !result.equals(BigInteger.ZERO) // if the result is zero nothing changes anymore, so we can exit the loop 
 				);
 
-		return services.getTypeConverter().convertToLogicElement(new IntLiteral(result.toString()));
-
+        return services.getTermBuilder().zTerm(result.toString());
 	}
 
 

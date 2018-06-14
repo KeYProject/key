@@ -21,13 +21,8 @@ import javax.swing.UIManager;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
-
-
-
 /** this class is used to set some default gui properties */
 public class Config {
-
-    public static final Config DEFAULT = new Config();
 
     /** name of different fonts */
     public static final String KEY_FONT_PROOF_TREE 
@@ -40,11 +35,18 @@ public class Config {
 	= "KEY_FONT_PROOF_LIST_VIEW";
 
     /** An array of font sizes for the goal view */
-    private static final int[] sizes=new int[]{10,12,14,17,20,24};
+    private static final int[] sizes = new int[]{10,12,14,17,20,24};
 
+    public static final Config DEFAULT = new Config();
+    
     /** The index of the current size */
-//    private int sizeIndex = ProofSettings.DEFAULT_SETTINGS.getViewSettings().sizeIndex();
-    private int sizeIndex = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().sizeIndex();
+    private int sizeIndex; 
+    { 
+        sizeIndex = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().sizeIndex();
+        if (sizeIndex < 0 || sizeIndex > sizes.length) {
+            sizeIndex = 0;
+        }
+    }
 
     /** cached ConfigChange event */
     private ConfigChangeEvent configChangeEvent = 
@@ -55,6 +57,7 @@ public class Config {
         new ArrayList<ConfigChangeListener>(5);
 
     private Config() {
+        setDefaultFonts();
     }
 
     public void larger() {

@@ -10,7 +10,6 @@ import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
-import static de.uka.ilkd.key.strategy.StaticFeatureCollection.extendsTrans;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;

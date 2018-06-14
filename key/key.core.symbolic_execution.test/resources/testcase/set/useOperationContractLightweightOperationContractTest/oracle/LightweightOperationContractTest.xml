@@ -11,8 +11,7 @@ post: (   x &gt;  0
             |   java.lang.RuntimeException::instance(exc_0)
               = TRUE))
 &amp; (   x &lt; 0
-   -&gt;   (   exc_0 = null
-         -&gt; result_0 = javaUnaryMinusInt(1))
+   -&gt;   (exc_0 = null -&gt; result_0 = -1)
       &amp; (   !exc_0 = null
          -&gt;   java.lang.Error::instance(exc_0) = TRUE
             |   java.lang.RuntimeException::instance(exc_0)

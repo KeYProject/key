@@ -16,7 +16,9 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
  */
 public abstract class ProofCollectionUnit implements Serializable {
 
-   /**
+    private static final long serialVersionUID = 1L;
+
+/**
     * 
     * Creates a {@link RunAllProofsTestUnit} from this
     * {@link ProofCollectionUnit}.

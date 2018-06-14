@@ -18,18 +18,14 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
 
 /**
  * Creates the layout for SequentViews.
- * 
+ *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 class SequentViewPanel extends JPanel {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = -4052156449188977483L;
 
     protected SequentViewPanel(SequentView sequentView) {
@@ -66,7 +62,8 @@ class SequentViewPanel extends JPanel {
         gbc.weighty = 1.0;
         add(javax.swing.Box.createGlue(), gbc);
 
-        setBorder(new TitledBorder(sequentView.getTitle()));
+        setBorder(new SequentHideWarningBorder(sequentView.getTitle(), sequentView));
+//        setBorder(new TitledBorder("xxx"));
 
     }
 }
