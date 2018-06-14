@@ -6,9 +6,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -20,10 +18,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -46,10 +42,7 @@ import org.key_project.util.java.IOUtil.LineInformation;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -59,7 +52,6 @@ import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 
@@ -129,18 +121,30 @@ public final class SourceView extends JComponent {
      */
     private final JLabel sourceStatusBar;
 
-    // TODO: make proof independent
+    /* TODO: make proof independent, move sources and hashes to proof.services.JavaModel or similar
+     * There is still a consistency problem here if the proof is change: In that case the code is
+     * silently reloaded from the (possibly changed) file. This will be solved in future work.
+     * Corresponding feature request:
+     */
     /**
-     * HashMap with all files (of the current proof!).
+     * HashMap mapping filenames to files (of the current proof!).
      */
     private HashMap<String, File> files = new HashMap<String, File>();
+
+    /**
+     * HashMap mapping filenames to hashes of the content (files of the current proof!).
+     */
     private HashMap<String, String> hashes = new HashMap<String, String>();
+
+    /**
+     * HashMap mapping filenames to content strings (files of the current proof!).
+     */
     private HashMap<String, String> sources = new HashMap<String, String>();
 
     /**
      * Lines to highlight (contains all highlights of the current proof) and corresponding Nodes.
      */
-    private LinkedList<NodePosPair> lines;
+    private LinkedList<Pair<Node, PositionInfo>> lines;
 
     /**
      * Creates a new JComponent with the given MainWindow and adds change listeners.
@@ -169,11 +173,12 @@ public final class SourceView extends JComponent {
 
         // add a listener for changes in the proof tree
         mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
-
+            @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
                 updateGUI();
             }
 
+            @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
                 clearCaches();
                 updateGUI();
@@ -182,36 +187,9 @@ public final class SourceView extends JComponent {
     }
 
     /**
-     * A small container for a PositionInfo and a corresponding Node (used to store the first Node
-     * containing the statement at the specified position).
-     *
-     * @author Wolfram Pfeifer
-     */
-    static class NodePosPair {
-        /**
-         * The Node.
-         */
-        public final Node node;
-
-        /**
-         * The PositionInfo.
-         */
-        public final PositionInfo pos;
-
-        /**
-         * Creates a new pair.
-         * @param node the Node corresponding to the given PositionInfo
-         * @param pos the PositionInfo
-         */
-        public NodePosPair(Node node, PositionInfo pos) {
-            this.node = node;
-            this.pos = pos;
-        }
-    }
-
-    /**
      * This listener checks if a highlighted section is clicked. If true, a jump in the proof tree
-     * to the first node containing the highlighted statement is performed.<br>
+     * to the most recently created node (in the current branch) containing the highlighted
+     * statement is performed.<br>
      * <b>Note:</b> No jumping down in the proof tree is possible. Implementing this would be
      * non-trivial, because it was not unique into which branch we would want to descent.
      *
@@ -279,10 +257,10 @@ public final class SourceView extends JComponent {
                 }
                 // jump in proof tree (get corresponding node from list)
                 Node n = null;
-                for (NodePosPair p : lines) {
-                    if (p.pos.getStartPosition().getLine() == line + 1
-                            && p.pos.getFileName().equals(filename)) {
-                        n = p.node;
+                for (Pair<Node, PositionInfo> p : lines) {
+                    if (p.second.getStartPosition().getLine() == line + 1
+                            && p.second.getFileName().equals(filename)) {
+                        n = p.first;
                         break;
                     }
                 }
@@ -305,10 +283,10 @@ public final class SourceView extends JComponent {
             HighlightPainter hp) {
         try {
             for (int i = 0; i < lines.size(); i++) {
-                NodePosPair l = lines.get(i);
-                if (filename.equals(l.pos.getFileName())) {
+                Pair<Node, PositionInfo> l = lines.get(i);
+                if (filename.equals(l.second.getFileName())) {
                     Range r = calculateLineRange(textPane,
-                            li[l.pos.getStartPosition().getLine() - 1].getOffset());
+                            li[l.second.getStartPosition().getLine() - 1].getOffset());
                     // use a different color for most recent
                     if (i == 0) {
                         textPane.getHighlighter().addHighlight(r.start(), r.end(),
@@ -416,52 +394,22 @@ public final class SourceView extends JComponent {
 
             // We use the same font as in SequentView for consistency.
             textPane.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
-
             textPane.setToolTipText(TEXTPANE_TOOLTIP);
             textPane.setEditable(false);
 
             // compare stored hash with a newly created
-            String origHash = hashes.get(entry.getKey());
-            String curHash = IOUtil.computeMD5(entry.getValue());
-            if (!origHash.equals(curHash)) {
-                //if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getNotifyLoadBehaviour()) {
-                    JCheckBox checkbox = new JCheckBox("Don't show this message again");
-                    Object[] message = {"The source code this proof refers to was changed. Since the proof still" +
-                                         "refers to the old source, this old source code is still present in the" +
-                                         "source view on the right.",
-                            checkbox};
-                    JOptionPane.showMessageDialog(mainWindow, message, 
-                            "Source code changed!", JOptionPane.INFORMATION_MESSAGE);
-                    /*ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                                .setNotifyLoadBehaviour(!checkbox.isSelected());
-                    ProofIndependentSettings.DEFAULT_INSTANCE.saveSettings();*/
-                //}
-            }
+            //String origHash = hashes.get(entry.getKey());
+            //String curHash = IOUtil.computeMD5(entry.getValue());
+            //if (!origHash.equals(curHash)) {
+                    // TODO: consistency problem, see comment in line 128
+            //}
 
-            // adds a listener for each textPane which reacts to font size changes
-            // TODO: how to remove unused listeners (applies to all anonymous listeners in this class)?
-            // TODO: not really working?
-            Config.DEFAULT.addConfigChangeListener(new ConfigChangeListener() {
-                @Override
-                public void configChanged(ConfigChangeEvent e) {
-                    Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
-                    if (myFont != null) {
-                        textPane.setFont(myFont);
-                    } else {
-                        Debug.out("KEY_PROOF_SEQUENT_VIEW_FONT not available, " +
-                              "use standard font.");
-                    }
-                }
-            });
-
-            //String original = IOUtil.readFrom(entry.getValue());
             String original = sources.get(entry.getKey());
             String source = replaceTabs(original);  // replace all tabs by spaces
 
             // use input stream here to compute line information of the string with replaced tabs
             InputStream inStream = new ByteArrayInputStream(source.getBytes());
             LineInformation[] li = IOUtil.computeLineInformation(inStream);
-
 
             JavaDocument doc = new JavaDocument();
             textPane.setDocument(doc);
@@ -485,8 +433,7 @@ public final class SourceView extends JComponent {
             HighlightPainter hp = new DefaultHighlightPainter(NORMAL_HIGHLIGHT_COLOR);
             paintSymbExHighlights(textPane, li, entry.getKey(), hp);
 
-            textPane.addMouseListener(new TextPaneMouseAdapter(textPane, li, hp,
-                    entry.getKey()));
+            textPane.addMouseListener(new TextPaneMouseAdapter(textPane, li, hp, entry.getKey()));
 
             /* for each File, create a Tab in TabbedPane
              * (additional panel is needed to prevent line wrapping) */
@@ -513,8 +460,8 @@ public final class SourceView extends JComponent {
      * corresponding nodes in proof tree.
      */
     private void fillMaps() {
-        for (NodePosPair p : lines) {
-            PositionInfo l = p.pos;
+        for (Pair<Node, PositionInfo> p : lines) {
+            PositionInfo l = p.second;
             File f = new File(l.getFileName());
             if (files.putIfAbsent(l.getFileName(), f) == null) {
                 try {
@@ -549,16 +496,16 @@ public final class SourceView extends JComponent {
      * </ul>
      */
     private void updateGUI() {
-        Node symbExNode = mainWindow.getMediator().getSelectedNode();
+        Node currentNode = mainWindow.getMediator().getSelectedNode();
         tabs.removeAll();
 
-        if (symbExNode == null) {
+        if (currentNode == null) {
             tabs.setBorder(new TitledBorder(NO_SOURCE));
             return;
         }
 
         // get PositionInfo of all symbEx nodes
-        lines = constructLinesSet(symbExNode);
+        lines = constructLinesSet(currentNode);
         if (lines == null) {
             tabs.setBorder(new TitledBorder(NO_SOURCE));
             return;
@@ -574,7 +521,7 @@ public final class SourceView extends JComponent {
             tabs.setBorder(new EmptyBorder(0, 0, 0, 0));
 
             // activate the tab with the most recent file
-            PositionInfo p = lines.isEmpty() ? null : lines.getFirst().pos;
+            PositionInfo p = lines.isEmpty() ? null : lines.getFirst().second;
             if (p != null) {
                 File f = files.get(p.getFileName());
                 String s = f.getName();
@@ -583,7 +530,7 @@ public final class SourceView extends JComponent {
                         tabs.setSelectedIndex(i);
 
                         // scroll to most recent highlight
-                        int line = lines.getFirst().pos.getEndPosition().getLine();
+                        int line = lines.getFirst().second.getEndPosition().getLine();
                         scrollNestedTextPaneToLine(tabs.getComponent(i), line, f);
                     }
                 }
@@ -592,7 +539,7 @@ public final class SourceView extends JComponent {
             tabs.setBorder(new TitledBorder(NO_SOURCE));
         }
         // set the path information in the status bar
-        sourceStatusBar.setText(collectPathInformation(symbExNode));
+        sourceStatusBar.setText(collectPathInformation(currentNode));
     }
 
     /**
@@ -602,7 +549,7 @@ public final class SourceView extends JComponent {
      * @param line the line to scroll to
      * @param f the file of the JTextPane
      */
-    private void scrollNestedTextPaneToLine(Component comp, int line, File f) {
+    private static void scrollNestedTextPaneToLine(Component comp, int line, File f) {
         if (comp instanceof JScrollPane) {
             JScrollPane sp = (JScrollPane)comp;
             if (sp.getComponent(0) instanceof JViewport) {
@@ -623,7 +570,7 @@ public final class SourceView extends JComponent {
                             int offs = li[line].getOffset();
                             tp.setCaretPosition(offs);
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            Debug.out(e);
                         }
                     }
                 }
@@ -637,8 +584,8 @@ public final class SourceView extends JComponent {
      * @return a linked list of pairs of PositionInfo objects containing the start and end
      * positions for the highlighting and Nodes.
      */
-    private static LinkedList<NodePosPair> constructLinesSet(Node cur) {
-        LinkedList<NodePosPair> list = new LinkedList<NodePosPair>();
+    private static LinkedList<Pair<Node, PositionInfo>> constructLinesSet(Node cur) {
+        LinkedList<Pair<Node, PositionInfo>> list = new LinkedList<Pair<Node, PositionInfo>>();
 
         if (cur == null) {
             return null;
@@ -653,7 +600,7 @@ public final class SourceView extends JComponent {
                     // we are only interested in well defined PositionInfo objects with a file name
                     if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
                             && pos.getFileName() != null) {
-                        list.addLast(new NodePosPair(cur, pos));
+                        list.addLast(new Pair<Node, PositionInfo>(cur, pos));
                     }
                 }
             }
@@ -673,8 +620,7 @@ public final class SourceView extends JComponent {
         if (se instanceof NonTerminalProgramElement) {
             if (se instanceof If
                     || se instanceof Then
-                    || se instanceof Else // TODO: additional elements, e.g. String declaration etc.
-                    /*|| se instanceof LocalVariableDeclaration*/) {
+                    || se instanceof Else) { // TODO: additional elements, e.g. code inside if
                 return PositionInfo.UNDEFINED;
             }
 
@@ -702,7 +648,7 @@ public final class SourceView extends JComponent {
      * @param node the current node
      * @return a String containing the path information to display
      */
-    private String collectPathInformation(Node node) {
+    private static String collectPathInformation(Node node) {
 
         while (node != null) {
             if (node.getNodeInfo() != null && node.getNodeInfo().getBranchLabel() != null) {
@@ -715,7 +661,7 @@ public final class SourceView extends JComponent {
                         || label.equals("Show Axiom Satisfiability")
                         || label.contains("Normal Execution")
                         || label.contains("Null Reference")
-                        //|| label.contains("Postcondition")  // TODO:
+                        //|| label.contains("Postcondition")  // TODO: additional cases?
                         //|| label.contains("Assignable")
                         || label.contains("Index Out of Bounds")) {
                     return label;

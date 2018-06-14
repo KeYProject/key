@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.gui.sourceview;
 
 import java.awt.Color;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -12,30 +12,57 @@ import javax.swing.text.StyleConstants;
 
 /**
  * This document performs syntax highlighting when strings are inserted.
- * However, when editing the document the highlighting is not updating correctly at the moment.
+ * However, only inserting the whole String at once is supported, otherwise the syntax highlighting
+ * will be faulty.
+ *
+ * Note that tab characters have to be replaced by spaces before inserting into the document.
  *
  * @author Wolfram Pfeifer
  */
-public class JavaDocument extends DefaultStyledDocument {       // TODO: separate this from action?
+public class JavaDocument extends DefaultStyledDocument {
+    /**
+     * Enum to indicate the current mode (environment) of the parser.
+     * Examples are STRING ("..."), COMMENT (&#47;&#42; ... &#42;&#47;),
+     * JML (&#47;&#42;&#64; ... &#42;&#47; ), ...
+     */
     private enum Mode {
+        /** parser is currently inside a String */
         STRING,
+        /** parser is currently inside normal java code */
         NORMAL,
+        /** parser is currently inside a keyword */
         KEYWORD,
+        /** parser is currently inside a comment (starting with "&#47;&#42;") */
         COMMENT,
+        /** parser is currently inside a line comment (starting with "&#47;&#47;") */
         LINE_COMMENT,
+        /** parser is currently inside a line JML annotation (starting with "&#47;&#47;&#64;")*/
         LINE_JML,
+        /** parser is currently inside JavaDoc (starting with "&#47;&#42;&#42;") */
         JAVADOC,
+        /** parser is currently inside an annotation (starting with "&#64;")*/
         ANNOTATION,
+        /** parser is currently inside a JML annotation (starting with "&#47;&#42;&#64;") */
         JML,
+        /** parser is currently inside a JML keyword */
         JML_KEYWORD;
     }
 
+    /**
+     * Enum to indicate the current comment state of the parser.
+     * It is used to store, which comment relevant chars were just recently encountered.
+     */
     private enum CommentState {
+        /** no comment char encountered */
         NO,
-        MAYBE,       // "/"
-        COMMENT,     // "/*"
-        LNECOMMENT,  // "//"
-        MAYBEEND;    // "*"
+        /** last processed char was "&#47;" */
+        MAYBE,
+        /** last processed chars were "&#47;&#42;" */
+        COMMENT,
+        /** last processed chars were "&#47;&#47;" */
+        LNECOMMENT,
+        /** last processed char was "&#42;" */
+        MAYBEEND;
     }
 
     /**
@@ -44,7 +71,16 @@ public class JavaDocument extends DefaultStyledDocument {       // TODO: separat
      */
     private static final String DELIM = "[\\Q .;{}[]\n\r()+-*/%!=<>?:~&|^@'\"\\E]";
 
-    // taken from https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html
+    /**
+     * Stores the Java keywords which have to be highlighted.
+     * The list is taken from
+     * <a href="https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html">
+     * https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html
+     * </a>.
+     *
+     * To add additional keywords, simply add them to the array.
+     * Note that the keywords must not contain any of the characters defined by the DELIM regex.
+     */
     private static final String[] KEYWORDS = {
         "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class",
         "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally",
@@ -56,6 +92,12 @@ public class JavaDocument extends DefaultStyledDocument {       // TODO: separat
         // "const", "goto" // reserved, but currently not used in Java
     };
 
+    /**
+     * Stores the JML keywords which have to be highlighted.
+     *
+     * To add additional keywords, simply add them to the array.
+     * Note that the keywords must not contain any of the characters defined by the DELIM regex.
+     */
     private static final String[] JMLKEYWORDS = {
         // other Java keywords
         "break", "case", "catch", "class", "const", "continue", "default", "do", "else",
@@ -110,19 +152,35 @@ public class JavaDocument extends DefaultStyledDocument {       // TODO: separat
         "\\infinite_union", "\\strictly_than_nothing"
     };
 
+    /** the style of annotations */
     private SimpleAttributeSet annotation = new SimpleAttributeSet();
+
+    /** the style of strings */
     private SimpleAttributeSet string = new SimpleAttributeSet();
+
+    /** default style */
     private SimpleAttributeSet normal = new SimpleAttributeSet();
+
+    /** the style of keywords */
     private SimpleAttributeSet keyword = new SimpleAttributeSet();
+
+    /** the style of comments and line comments */
     private SimpleAttributeSet comment = new SimpleAttributeSet();
+
+    /** the style of JavaDoc */
     private SimpleAttributeSet javadoc = new SimpleAttributeSet();
+
+    /** the style of JML annotations */
     private SimpleAttributeSet jml = new SimpleAttributeSet();
+
+    /** the style of JML keywords */
     private SimpleAttributeSet jmlkeyword = new SimpleAttributeSet();
 
-    private Map<String, SimpleAttributeSet> keywords =
-            new HashMap<String, SimpleAttributeSet>(KEYWORDS.length);
-    private Map<String, SimpleAttributeSet> jmlkeywords =
-            new HashMap<String, SimpleAttributeSet>(JMLKEYWORDS.length);
+    /** stores the keywords */
+    private Set<String> keywords = new HashSet<String>(KEYWORDS.length);
+
+    /** stores the JML keywords */
+    private Set<String> jmlkeywords = new HashSet<String>(JMLKEYWORDS.length);
 
     /**
      * The current position of the parser in the inserted String.
@@ -139,10 +197,9 @@ public class JavaDocument extends DefaultStyledDocument {       // TODO: separat
      */
     private String token = "";
 
-    /* mode <-> state:
-     * mode stores the environment in which the parser is
-     * state stores information about the just recently parsed characters */
-    //private int mode = NORMAL_MODE;
+    /**
+     * Stores the mode in which the parser currently is.
+     */
     private JavaDocument.Mode mode = Mode.NORMAL;
 
     /**
@@ -150,6 +207,10 @@ public class JavaDocument extends DefaultStyledDocument {       // TODO: separat
      */
     private JavaDocument.CommentState state = CommentState.NO;
 
+    /**
+     * Creates a new JavaDocument and sets the syntax highlighting styles
+     * (as in eclipse default settings).
+     */
     public JavaDocument () {
         // set the styles (as in eclipse default settings)
         StyleConstants.setBold(keyword, true);
@@ -161,23 +222,15 @@ public class JavaDocument extends DefaultStyledDocument {       // TODO: separat
         StyleConstants.setForeground(jmlkeyword, new Color(255, 102, 0));
         StyleConstants.setBold(jmlkeyword, true);
 
-        // fill the keyword hash maps
+        // fill the keyword hash sets
         for (String k : KEYWORDS) {
-            keywords.put(k, keyword);
+            keywords.add(k);
         }
 
         for (String k : JMLKEYWORDS) {
-            jmlkeywords.put(k, jmlkeyword);
+            jmlkeywords.add(k);
         }
     }
-
-    /*
-     * NORMAL_MODE:
-     * each line is a separate token that is at inserting checked for contained keywords
-     *
-     * JML:
-     * each JML block is a separate token
-     */
 
     private void checkAt() {
         token = token + '@';
@@ -277,8 +330,7 @@ public class JavaDocument extends DefaultStyledDocument {       // TODO: separat
         }
     }
 
-    private void checkQuote() {
-        // TODO:
+    private void checkQuote() {                 // TODO: separate style for Strings
         state = CommentState.NO;
         token += '"';
     }
@@ -293,17 +345,6 @@ public class JavaDocument extends DefaultStyledDocument {       // TODO: separat
         state = CommentState.NO;
     }
 
-    /*
-     * special char combinations:
-     * comment/javadoc/jml start
-     * comment end
-     * line comment
-     * annotation
-     * string
-     * number
-     *
-     * check at every delimiter: keyword/jmlKeyword?
-     */
     private void processChar(String str) throws BadLocationException {
         char strChar = str.charAt(0);
 
@@ -314,7 +355,7 @@ public class JavaDocument extends DefaultStyledDocument {       // TODO: separat
         case '\n':  // TODO: different line endings? -> use System.lineSeparator()
             checkLinefeed();
             break;
-        //case '\t':  // all tabs were replaced earlier!
+        //case '\t':  // all tabs should have been replaced earlier!
         //    break;
         case '*':
             checkStar();
@@ -386,7 +427,7 @@ public class JavaDocument extends DefaultStyledDocument {       // TODO: separat
         int offset = 0;
         String[] tokens = str.split("((?<=" + DELIM + ")|(?=" + DELIM + "))");
         for (String t : tokens) {
-            if (jmlkeywords.containsKey(t)) {
+            if (jmlkeywords.contains(t)) {
                 super.insertString(pos + offset, t, jmlkeyword);
             } else {
                 super.insertString(pos + offset, t, jml);
@@ -401,7 +442,7 @@ public class JavaDocument extends DefaultStyledDocument {       // TODO: separat
         int offset = 0;
         String[] tokens = str.split("((?<=" + DELIM + ")|(?=" + DELIM + "))");
         for (String t : tokens) {
-            if (keywords.containsKey(t)) {
+            if (keywords.contains(t)) {
                 super.insertString(pos + offset, t, keyword);
             } else {
                 super.insertString(pos + offset, t, normal);
