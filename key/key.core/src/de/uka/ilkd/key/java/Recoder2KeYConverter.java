@@ -812,13 +812,7 @@ public class Recoder2KeYConverter {
 
     /** convert a recoder IntLiteral to a KeY IntLiteral */
     public IntLiteral convert(recoder.java.expression.literal.IntLiteral intLit) {
-        try {
-        return new IntLiteral(collectComments(intLit), intLit.getValue(), positionInfo(intLit));
-        } catch (NumberFormatException e) {
-            throw new PosConvertException(e,
-                    intLit.getStartPosition().getLine(),
-                    intLit.getStartPosition().getColumn());
-        }
+        return new IntLiteral(collectComments(intLit), intLit.getValue());
     }
 
     /** convert a recoder BooleanLiteral to a KeY BooleanLiteral */
