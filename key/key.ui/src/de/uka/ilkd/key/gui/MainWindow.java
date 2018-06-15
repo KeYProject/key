@@ -663,7 +663,6 @@ public final class MainWindow extends JFrame  {
         proof.addSeparator();
         proof.add(new CounterExampleAction(this));
         proof.add(new TestGenerationAction(this));
-        proof.addSeparator();
 
         return proof;
     }
