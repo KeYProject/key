@@ -63,7 +63,7 @@ public interface LoopContract extends BlockSpecificationElement {
     *            services.
     * @return this loop contract's decreases clause on the specified heap.
     */
-   public Term getDecreases(Term heap, Term self, Services services);
+    public Term getDecreases(Term heap, Term self, Services services);
 
     /**
      *
