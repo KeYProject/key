@@ -54,6 +54,18 @@ public interface LoopContract extends BlockSpecificationElement {
     public Term getDecreases();
 
     /**
+    *
+    * @param heap
+    *            the heap to use.
+    * @param self
+    *            the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+    * @param services
+    *            services.
+    * @return this loop contract's decreases clause on the specified heap.
+    */
+   public Term getDecreases(Term heap, Term self, Services services);
+
+    /**
      *
      * @param variables
      *            the variables to use instead of {@link #getPlaceholderVariables()}.
