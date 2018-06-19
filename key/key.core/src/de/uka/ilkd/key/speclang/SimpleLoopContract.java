@@ -322,6 +322,14 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     }
 
     @Override
+    public Term getDecreases(Term heap, Term self, Services services) {
+        final Map<Term, Term> replacementMap = createReplacementMap(heap,
+                new Terms(self, null, null, null, null, null, null, null, null, null), services);
+        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
+        return replacer.replace(decreases);
+    }
+
+    @Override
     public Term getDecreases(Variables variables, Services services) {
         Map<ProgramVariable, ProgramVariable> map = createReplacementMap(variables, services);
         return new OpReplacer(map, services.getTermFactory()).replace(decreases);

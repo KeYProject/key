@@ -865,7 +865,7 @@ public final class BlockContractBuilders {
             }
 
             LoopContract lc = (LoopContract) contract;
-            Term decreases = lc.getDecreases();
+            Term decreases = lc.getDecreases(getBaseHeap(), terms.self, services);
 
             if (decreases == null) {
                 return tt();
