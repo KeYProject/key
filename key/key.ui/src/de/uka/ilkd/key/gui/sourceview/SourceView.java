@@ -463,10 +463,13 @@ public final class SourceView extends JComponent {
         for (Pair<Node, PositionInfo> p : lines) {
             PositionInfo l = p.second;
             File f = new File(l.getFileName());
-            if (files.putIfAbsent(l.getFileName(), f) == null) {
+            if (f.exists() && files.putIfAbsent(l.getFileName(), f) == null) {
                 try {
-                    hashes.put(l.getFileName(), IOUtil.computeMD5(f));
-                    sources.put(l.getFileName(), IOUtil.readFrom(f));
+                    String text = IOUtil.readFrom(f);
+                    if (text != null && !text.isEmpty()) {
+                        hashes.put(l.getFileName(), IOUtil.computeMD5(f));
+                        sources.put(l.getFileName(), text);
+                    }
                 } catch (IOException e) {
                     Debug.out("Unknown IOException!", e);
                 }
@@ -524,14 +527,16 @@ public final class SourceView extends JComponent {
             PositionInfo p = lines.isEmpty() ? null : lines.getFirst().second;
             if (p != null) {
                 File f = files.get(p.getFileName());
-                String s = f.getName();
-                for (int i = 0; i < tabs.getTabCount(); i++) {
-                    if (tabs.getTitleAt(i).equals(s)) {
-                        tabs.setSelectedIndex(i);
-
-                        // scroll to most recent highlight
-                        int line = lines.getFirst().second.getEndPosition().getLine();
-                        scrollNestedTextPaneToLine(tabs.getComponent(i), line, f);
+                if (f != null) {
+                    String s = f.getName();
+                    for (int i = 0; i < tabs.getTabCount(); i++) {
+                        if (tabs.getTitleAt(i).equals(s)) {
+                            tabs.setSelectedIndex(i);
+    
+                            // scroll to most recent highlight
+                            int line = lines.getFirst().second.getEndPosition().getLine();
+                            scrollNestedTextPaneToLine(tabs.getComponent(i), line, f);
+                        }
                     }
                 }
             }
