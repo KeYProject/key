@@ -43,7 +43,9 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -577,6 +579,12 @@ public final class BlockContractBuilders {
          */
         public Term buildOuterRemembranceUpdate() {
             Term result = skip();
+
+            for (LocationVariable var : variables.outerRemembranceHeaps.keySet()) {
+                final Term update
+                        = elementary(variables.outerRemembranceHeaps.get(var), var(var));
+                result = parallel(result, update);
+            }
 
             for (LocationVariable var : variables.outerRemembranceVariables.keySet()) {
                 final Term update
@@ -1514,6 +1522,16 @@ public final class BlockContractBuilders {
             if (goal != null) {
                 goal.setBranchLabel("Validity");
                 addInfFlow(goal);
+
+                Sequent seq = goal.sequent();
+                for (int i = 1; i <= seq.size(); ++i) {
+                    PosInOccurrence pos = PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
+
+                    if (!pos.eqEquals(occurrence)) {
+                        goal.removeFormula(pos);
+                    }
+                }
+
                 goal.changeFormula(new SequentFormula(term), occurrence);
             }
             return term;
