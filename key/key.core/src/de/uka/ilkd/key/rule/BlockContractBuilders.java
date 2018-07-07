@@ -580,13 +580,13 @@ public final class BlockContractBuilders {
         public Term buildOuterRemembranceUpdate() {
             Term result = skip();
 
-            for (LocationVariable var : variables.outerRemembranceHeaps.keySet()) {
+            for (LocationVariable var: variables.outerRemembranceHeaps.keySet()) {
                 final Term update
                         = elementary(variables.outerRemembranceHeaps.get(var), var(var));
                 result = parallel(result, update);
             }
 
-            for (LocationVariable var : variables.outerRemembranceVariables.keySet()) {
+            for (LocationVariable var: variables.outerRemembranceVariables.keySet()) {
                 final Term update
                         = elementary(variables.outerRemembranceVariables.get(var), var(var));
                 result = parallel(result, update);
@@ -1525,7 +1525,8 @@ public final class BlockContractBuilders {
 
                 Sequent seq = goal.sequent();
                 for (int i = 1; i <= seq.size(); ++i) {
-                    PosInOccurrence pos = PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
+                    PosInOccurrence pos =
+                            PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
 
                     if (!pos.eqEquals(occurrence)) {
                         goal.removeFormula(pos);

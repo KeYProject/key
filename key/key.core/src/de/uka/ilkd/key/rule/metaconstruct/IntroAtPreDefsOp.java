@@ -35,6 +35,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -482,7 +483,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
                 for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                         .getAllHeaps()) {
-                    if (heap.name().toString().equals("savedHeap")) {
+                    if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
                         continue;
                     }
 
