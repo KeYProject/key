@@ -983,10 +983,6 @@ public interface BlockSpecificationElement extends SpecificationElement {
             final Map<LocationVariable, LocationVariable> result
                     = new LinkedHashMap<LocationVariable, LocationVariable>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
-                    continue;
-                }
-
                 result.put(heap, heapAtPreVar(heap + suffix, heap.sort(), false));
             }
             return result;
