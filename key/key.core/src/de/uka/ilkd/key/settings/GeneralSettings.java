@@ -21,13 +21,6 @@ import de.uka.ilkd.key.proof.io.AutoSaver;
 
 
 public class GeneralSettings implements Settings, Cloneable {
-    private static final String TACLET_FILTER = "[General]StupidMode";
-    private static final String DND_DIRECTION_SENSITIVE_KEY
-        = "[General]DnDDirectionSensitive";
-    private static final String USE_JML_KEY = "[General]UseJML";
-    private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
-    private static final String AUTO_SAVE = "[General]AutoSavePeriod";
-
     /**
      * This parameter disables the possibility to prune in closed branches. It is meant as a
      * fallback solution if storing all closed goals needs too much memory or is not needed.
@@ -36,10 +29,17 @@ public class GeneralSettings implements Settings, Cloneable {
      */
     public static boolean noPruningClosed = true;
 
-    /** if true then JML specifications are globally disabled 
-     * in this run of KeY, regardless of the regular settings 
+    /**
+     * if true then JML specifications are globally disabled
+     * in this run of KeY, regardless of the regular settings
      */
     public static boolean disableSpecs = false;
+    private static final String TACLET_FILTER = "[General]StupidMode";
+    private static final String DND_DIRECTION_SENSITIVE_KEY
+        = "[General]DnDDirectionSensitive";
+    private static final String USE_JML_KEY = "[General]UseJML";
+    private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
+    private static final String AUTO_SAVE = "[General]AutoSavePeriod";
 
     /** minimize interaction is on by default */
     private boolean tacletFilter = true;
@@ -52,7 +52,7 @@ public class GeneralSettings implements Settings, Cloneable {
 
     /** JML is active by default */
     private boolean useJML = true;
-    
+
     /** auto save is disabled by default.
      * Positive values indicate save period.
      */
@@ -60,20 +60,20 @@ public class GeneralSettings implements Settings, Cloneable {
 
     private LinkedList<SettingsListener> listenerList = 
         new LinkedList<SettingsListener>();
-    
+
     GeneralSettings() {
         addSettingsListener(AutoSaver.settingsListener);
     }
 
     // getter
     public boolean tacletFilter() {
-	return tacletFilter;
+        return tacletFilter;
     }
 
     public boolean isDndDirectionSensitive() {        
         return dndDirectionSensitive;
     }
-    
+
     public boolean isRightClickMacro() {
         return rightClickMacros;
     }
@@ -81,11 +81,10 @@ public class GeneralSettings implements Settings, Cloneable {
     public boolean useJML() {
         return useJML && !disableSpecs;
     }
-    
+
     public int autoSavePeriod() {
         return autoSave;
     }
-    
 
     // setter
     public void setTacletFilter(boolean b) {
@@ -95,14 +94,12 @@ public class GeneralSettings implements Settings, Cloneable {
         }
     }
     
-    
     public void setDnDDirectionSensitivity(boolean b) {
         if (dndDirectionSensitive != b) {
           dndDirectionSensitive = b;
           fireSettingsChanged();
         }
     }
-
 
     public void setRightClickMacros(boolean b) {
         if(this.rightClickMacros != b) {
@@ -111,30 +108,27 @@ public class GeneralSettings implements Settings, Cloneable {
         }
     }
 
-
     public void setUseJML(boolean b) {
         if (useJML != b) {
             useJML = b;
           fireSettingsChanged();
         }
     }
-    
+
     public void setAutoSave(int period) {
         autoSave = period;
         fireSettingsChanged();
     }
-
-
 
     /** gets a Properties object and has to perform the necessary
      * steps in order to change this object in a way that it
      * represents the stored settings
      */
     public void readSettings(Object sender, Properties props) {
-	String val = props.getProperty(TACLET_FILTER);
-	if (val != null) {
-	    tacletFilter = Boolean.valueOf(val).booleanValue();
-	}
+        String val = props.getProperty(TACLET_FILTER);
+        if (val != null) {
+            tacletFilter = Boolean.valueOf(val).booleanValue();
+        }
 
         val = props.getProperty(DND_DIRECTION_SENSITIVE_KEY);
         if (val != null) {
@@ -150,7 +144,7 @@ public class GeneralSettings implements Settings, Cloneable {
         if (val != null) {
             useJML = Boolean.valueOf(val).booleanValue();
         }
-        
+
         val = props.getProperty(AUTO_SAVE);
         if (val != null) {
             try {
@@ -161,7 +155,6 @@ public class GeneralSettings implements Settings, Cloneable {
             }
         }
     }
-
 
     /** implements the method required by the Settings interface. The
      * settings are written to the given Properties object. Only entries of the form 
@@ -185,13 +178,12 @@ public class GeneralSettings implements Settings, Cloneable {
         }
     }
 
-    
     /** 
      * adds a listener to the settings object 
      * @param l the listener
      */
     public void addSettingsListener(SettingsListener l) {
-	listenerList.add(l);
+        listenerList.add(l);
     }
 
     /**
@@ -199,6 +191,6 @@ public class GeneralSettings implements Settings, Cloneable {
      * @param l the listener to remove
      */
     public void removeSettingsListener(SettingsListener l) {
-   listenerList.remove(l);
+        listenerList.remove(l);
     }
 }
