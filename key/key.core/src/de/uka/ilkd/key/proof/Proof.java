@@ -280,6 +280,7 @@ public class Proof implements Named {
         root = null;        
         env = null;
         openGoals = null;
+        closedGoals = null;
         problemHeader = null;
         abbreviations = null;
         initConfig = null;

@@ -21,20 +21,21 @@ import de.uka.ilkd.key.proof.io.AutoSaver;
 
 
 public class GeneralSettings implements Settings, Cloneable {
-
-    /**
-     * This parameter disables the possibility to prune in closed branches. It is meant as a
-     * fallback solution if storing all closed goals needs too much memory.
-     */
-    public static boolean noPruningClosed = false;
-
     private static final String TACLET_FILTER = "[General]StupidMode";
     private static final String DND_DIRECTION_SENSITIVE_KEY
         = "[General]DnDDirectionSensitive";
     private static final String USE_JML_KEY = "[General]UseJML";
     private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
     private static final String AUTO_SAVE = "[General]AutoSavePeriod";
-    
+
+    /**
+     * This parameter disables the possibility to prune in closed branches. It is meant as a
+     * fallback solution if storing all closed goals needs too much memory or is not needed.
+     * Pruning is disabled as a default (for command-line mode, tests, ...) and explicitly has
+     * to be enabled for interactive mode.
+     */
+    public static boolean noPruningClosed = true;
+
     /** if true then JML specifications are globally disabled 
      * in this run of KeY, regardless of the regular settings 
      */

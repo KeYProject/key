@@ -514,6 +514,11 @@ public final class Main {
             return new ConsoleUserInterfaceControl(verbosity, loadOnly);
         } else {
             updateSplashScreen();
+
+            /* explicitly enable pruning in closed branches for interactive mode
+             * (if not manually disabled) */
+            GeneralSettings.noPruningClosed = cl.isSet(NO_PRUNING_CLOSED) ? true : false;
+
             MainWindow mainWindow = MainWindow.getInstance();
 
             if (loadRecentFile) {
