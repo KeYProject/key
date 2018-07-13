@@ -89,7 +89,7 @@ public final class SourceView extends JComponent {
     /**
      * String to display in an empty source code textPane.
      */
-    private static final String NO_SOURCE = "No source loaded.";
+    private static final String NO_SOURCE = "No source loaded";
 
     /**
      * Indicates how many spaces are inserted instead of one tab (used in source code window).
@@ -504,6 +504,7 @@ public final class SourceView extends JComponent {
 
         if (currentNode == null) {
             tabs.setBorder(new TitledBorder(NO_SOURCE));
+            sourceStatusBar.setText(NO_SOURCE);
             return;
         }
 
@@ -511,6 +512,7 @@ public final class SourceView extends JComponent {
         lines = constructLinesSet(currentNode);
         if (lines == null) {
             tabs.setBorder(new TitledBorder(NO_SOURCE));
+            sourceStatusBar.setText(NO_SOURCE);
             return;
         }
 
@@ -540,11 +542,13 @@ public final class SourceView extends JComponent {
                     }
                 }
             }
+
+            // set the path information in the status bar
+            sourceStatusBar.setText(collectPathInformation(currentNode));
         } else {
             tabs.setBorder(new TitledBorder(NO_SOURCE));
+            sourceStatusBar.setText(NO_SOURCE);
         }
-        // set the path information in the status bar
-        sourceStatusBar.setText(collectPathInformation(currentNode));
     }
 
     /**
@@ -654,20 +658,21 @@ public final class SourceView extends JComponent {
      * @return a String containing the path information to display
      */
     private static String collectPathInformation(Node node) {
-
         while (node != null) {
             if (node.getNodeInfo() != null && node.getNodeInfo().getBranchLabel() != null) {
                 String label = node.getNodeInfo().getBranchLabel();
+                /* Are there other interesting labels?
+                 * Please feel free to add them here. */
                 if (label.equals("Invariant Initially Valid")
-                        || label.equals("Invariant Preserved and Used")
+                        || label.equals("Invariant Preserved and Used") // for loop scope invariant
                         || label.equals("Body Preserves Invariant")
                         || label.equals("Use Case")
-                        || label.equals("Use Axiom")
                         || label.equals("Show Axiom Satisfiability")
+                        || label.startsWith("Pre (")                // precondition of a method
+                        || label.startsWith("Exceptional Post (")   // exceptional postcondition
+                        || label.startsWith("Post (")               // postcondition of a method
                         || label.contains("Normal Execution")
                         || label.contains("Null Reference")
-                        //|| label.contains("Postcondition")  // TODO: additional cases?
-                        //|| label.contains("Assignable")
                         || label.contains("Index Out of Bounds")) {
                     return label;
                 }
@@ -675,6 +680,6 @@ public final class SourceView extends JComponent {
             node = node.parent();
         }
         // if no label was found we have to prove the postcondition
-        return "Show Postcondition/Assignable clause";
+        return "Show Postcondition/Assignable";
     }
 }
