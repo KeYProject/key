@@ -35,6 +35,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -439,7 +440,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     = ((LoopContract) contract).update(block, newPreconditions, newPostconditions,
                             newModifiesClauses, contract.getInfFlowSpecs(), newVariables,
                             contract.getMby(newVariables, services),
-                            ((LoopContract) contract).getDecreases());
+                            ((LoopContract) contract).getDecreases(newVariables, services));
 
             services.getSpecificationRepository().removeLoopContract((LoopContract) contract);
             services.getSpecificationRepository().addLoopContract(newLoopContract, false);
@@ -463,6 +464,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 Map<LocationVariable, LocationVariable> nonHeapVars = new LinkedHashMap<>();
                 nonHeapVars.putAll(atPreVars);
                 atPreHeapVars.forEach((key, val) -> nonHeapVars.remove(key));
+                atPreHeapVars.remove(services.getTypeConverter().getHeapLDT().getSavedHeap());
 
                 final BlockSpecificationElement.Variables variables
                         = contract.getPlaceholderVariables();
@@ -481,12 +483,12 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
                 for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                         .getAllHeaps()) {
-                    if (heap == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
+                    if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
                         continue;
                     }
 
                     newPreconditions.put(heap,
-                            contract.getPrecondition(heap, newVariables.self, atPreVars, services));
+                            contract.getPrecondition(heap, newVariables, services));
                     newPostconditions.put(heap,
                             contract.getPostcondition(heap, newVariables, services));
                     newModifiesClauses.put(heap,

@@ -908,7 +908,11 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
             if (newRemembranceHeaps != null) {
                 for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                         .getAllHeaps()) {
-                    if (newRemembranceHeaps.get(heap) != null) {
+                    if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
+                        continue;
+                    }
+
+                    if (oldRemembranceHeaps.get(heap) != null) {
                         final LocationVariable oldRemembranceHeap = oldRemembranceHeaps.get(heap);
                         final S newRemembranceHeap = newRemembranceHeaps.get(heap);
                         assert oldRemembranceHeap.sort().equals(newRemembranceHeap.sort());
