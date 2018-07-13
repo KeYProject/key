@@ -534,7 +534,7 @@ public final class SourceView extends JComponent {
                     for (int i = 0; i < tabs.getTabCount(); i++) {
                         if (tabs.getTitleAt(i).equals(s)) {
                             tabs.setSelectedIndex(i);
-    
+
                             // scroll to most recent highlight
                             int line = lines.getFirst().second.getEndPosition().getLine();
                             scrollNestedTextPaneToLine(tabs.getComponent(i), line, f);
