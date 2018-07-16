@@ -241,6 +241,7 @@ public class ObjectVal {
 	public boolean equals(Object o){		
 		if(o instanceof ObjectVal){			
 			ObjectVal ov = (ObjectVal) o;
+			if (ov.name == null) return name == null;
 			return ov.name.equals(name);			
 		}		
 		return false;		
