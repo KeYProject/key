@@ -44,6 +44,7 @@ import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SolverListener;
+import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
@@ -82,6 +83,9 @@ public final class MainWindow extends JFrame  {
     
     /** JScrollPane for displaying SequentViews*/
     private final MainFrame mainFrame;
+
+    /** the view to show source code and symbolic execution information */
+    private final JComponent sourceView;
 
     /** SequentView for the current goal */
     public final CurrentGoalView currentGoalView;
@@ -187,6 +191,7 @@ public final class MainWindow extends JFrame  {
         autoModeAction = new AutoModeAction(this);
         mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
+        sourceView = SourceView.getSourceView(this);
         proofList = new TaskTree(mediator);
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(mediator);
@@ -355,11 +360,15 @@ public final class MainWindow extends JFrame  {
 
         JPanel rightPane = new JPanel();
         rightPane.setLayout(new BorderLayout());
-	rightPane.add(mainFrame, BorderLayout.CENTER);
-	rightPane.add(sequentViewSearchBar,
-                BorderLayout.SOUTH);
+        rightPane.add(mainFrame, BorderLayout.CENTER);
+        rightPane.add(sequentViewSearchBar, BorderLayout.SOUTH);
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, rightPane);
+        JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourceView);
+        pane.setResizeWeight(0.5);
+        pane.setOneTouchExpandable(true);
+        pane.setName("split2");
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, pane);
         splitPane.setResizeWeight(0); // the right pane is more important
         splitPane.setOneTouchExpandable(true);
         splitPane.setName("splitPane");
@@ -790,7 +799,7 @@ public final class MainWindow extends JFrame  {
     public ProofTreeView getProofTreeView() {
         return mainWindowTabbedPane.getProofTreeView();
     }
-    
+
     /**
      * Returns the current goal view.
      */

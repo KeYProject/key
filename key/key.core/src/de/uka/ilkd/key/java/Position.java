@@ -125,6 +125,14 @@ public class Position {
     }
 
     /**
+     * Helper method for validity checks.
+     * @return true iff either line or column are negative
+     */
+    public boolean isNegative() {
+        return line < 0 || column < 0;
+    }
+
+    /**
        Returns a string representation of this object.
     */
     public String toString() {
