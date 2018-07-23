@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -64,6 +66,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
@@ -176,6 +179,8 @@ public class Recoder2KeY implements JavaReader {
     private Collection<? extends CompilationUnit> dynamicallyCreatedCompilationUnits;
     
     private final Services services;
+
+    //private FileRepository fileRepository = new TrivialFileRepository();      // TODO
 
     /**
      * create a new Recoder2KeY transformation object.
@@ -354,9 +359,9 @@ public class Recoder2KeY implements JavaReader {
      */
 
     public de.uka.ilkd.key.java.CompilationUnit[]
-            readCompilationUnitsAsFiles(String[] cUnitStrings) throws ParseExceptionInFile {
+            readCompilationUnitsAsFiles(String[] cUnitStrings, FileRepo fileRepo) throws ParseExceptionInFile {
 
-        List<recoder.java.CompilationUnit> cUnits = recoderCompilationUnitsAsFiles(cUnitStrings);
+        List<recoder.java.CompilationUnit> cUnits = recoderCompilationUnitsAsFiles(cUnitStrings, fileRepo);
         de.uka.ilkd.key.java.CompilationUnit[] result = new de.uka.ilkd.key.java.CompilationUnit[cUnits.size()];
         for (int i = 0, sz = cUnits.size(); i < sz; i++) {
             Debug.out("converting now " + cUnitStrings[i]);
@@ -380,7 +385,7 @@ public class Recoder2KeY implements JavaReader {
      * @return a new list containing the recoder compilation units corresponding
      *         to the given files.
      */
-    private List<recoder.java.CompilationUnit> recoderCompilationUnitsAsFiles(String[] cUnitStrings) {
+    private List<recoder.java.CompilationUnit> recoderCompilationUnitsAsFiles(String[] cUnitStrings, FileRepo fileRepo) {
         List<recoder.java.CompilationUnit> cUnits = new ArrayList<recoder.java.CompilationUnit>();
         parseSpecialClasses();
         try {
@@ -388,7 +393,13 @@ public class Recoder2KeY implements JavaReader {
                 final CompilationUnit cu;
                 Reader fr = null;
                 try {
-                    fr = new BufferedReader(new FileReader(filename));
+                    //fr = new BufferedReader(new FileReader(filename));
+                    
+                    //fr = fileRepository.getJavaSourceReader(filename);        // TODO
+                    //fr = new BufferedReader(fr);
+                    fr = new InputStreamReader(fileRepo.getFile(Paths.get(filename)), StandardCharsets.UTF_8);
+                    fr = new BufferedReader(fr);
+                    
                     cu = servConf.getProgramFactory().parseCompilationUnit(fr);
                 } catch (Exception e) {
                     throw new ParseExceptionInFile(filename, e);
@@ -545,6 +556,7 @@ public class Recoder2KeY implements JavaReader {
             walker = bootCollection.createWalker(".java");
         } else {
             bootCollection = new DirectoryFileCollection(bootClassPath);
+            //bootCollection = fileRepository.createBootClassCollection(bootClassPath);     // TODO:
             walker = bootCollection.createWalker(new String[] {".java", ".jml"} );
         }
         
@@ -605,8 +617,10 @@ public class Recoder2KeY implements JavaReader {
         if(classPath != null) {
             for(File cp : classPath) {
                 if(cp.isDirectory())
+                    //sources.add(fileRepository.classpathDirectoryCollection(cp));     // TODO
                     sources.add(new DirectoryFileCollection(cp));
                 else
+                    //sources.add(fileRepository.classpathZIPCollection(cp));
                     sources.add(new ZipFileCollection(cp));
             }
         }
@@ -620,6 +634,7 @@ public class Recoder2KeY implements JavaReader {
         	Reader f = null;
         	try {
                     currentDataLocation = walker.getCurrentDataLocation();
+                    //is = fileRepository.openJavaSource(currentDataLocation);  // TODO
                     InputStream is = walker.openCurrent();
                     f = new BufferedReader(new InputStreamReader(is));
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
@@ -1324,5 +1339,9 @@ public class Recoder2KeY implements JavaReader {
 
         throw rte;
     }
+
+//    public void setFileRepository(FileRepository fileRepository) {
+//        this.fileRepository  = fileRepository;
+//    }
 
 }

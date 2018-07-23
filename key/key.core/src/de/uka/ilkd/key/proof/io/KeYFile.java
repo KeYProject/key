@@ -35,6 +35,7 @@ import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -79,6 +80,8 @@ public class KeYFile implements EnvInput {
 
     private Includes includes;
     
+    private FileRepo fileRepo;
+
     //-------------------------------------------------------------------------
     //constructors
     //------------------------------------------------------------------------- 
@@ -132,6 +135,34 @@ public class KeYFile implements EnvInput {
                    Profile profile,
                    boolean compressed) {
         this(name, RuleSourceFactory.initRuleFile(file, compressed), monitor, profile);
+    }
+    
+    /**
+     * Creates a new representation for a given file by indicating a name and a
+     * file representing the physical source of the .key file.
+     *
+     * @param name
+     *            the name of the resource
+     * @param file
+     *            the file to find it
+     * @param monitor
+     *            a possibly null reference to a monitor for the loading
+     *            progress
+     * @param profile
+     *            the KeY profile under which the file is to be load
+     * @param compressed
+     *            <code>true</code> iff the file has compressed content
+     */
+    public KeYFile(String name,
+                   File file,
+                   FileRepo fileRepo,
+                   ProgressMonitor monitor,
+                   Profile profile,
+                   boolean compressed) {
+        this(name,
+             compressed ? RuleSourceFactory.initRuleFile(file, compressed)
+                        : fileRepo.getRuleSource(file.toPath()),
+             monitor, profile);
     }
     
 
@@ -533,5 +564,10 @@ public class KeYFile implements EnvInput {
     @Override
     public File getInitialFile() {
        return file != null ? file.file() : null;
+    }
+
+    @Override
+    public void setFileRepo(FileRepo fileRepo) {
+        this.fileRepo = fileRepo;
     }
 }

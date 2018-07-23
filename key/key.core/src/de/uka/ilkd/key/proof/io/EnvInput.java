@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
@@ -56,6 +57,7 @@ public interface EnvInput {
     
     /** 
      * Reads the Java path.
+     * @param fileRepo 
      */
     String readJavaPath() throws ProofInputException;
 
@@ -89,4 +91,8 @@ public interface EnvInput {
      * @return The initial {@link File} which is loaded or {@code null} otherwise.
      */
     File getInitialFile();
+
+    void setFileRepo(FileRepo fileRepo);
+
+    // FileRepository getFileRepository();
 }

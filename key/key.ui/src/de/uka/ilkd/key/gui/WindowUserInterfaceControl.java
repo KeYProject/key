@@ -483,13 +483,13 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
-   public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(File location,
-                                                                             List<File> classPaths,
-                                                                             File bootClassPath,
-                                                                             List<File> includes,
-                                                                             boolean makeMainWindowVisible) throws ProblemLoaderException {
-      return loadInMainWindow(null, location, classPaths, bootClassPath, includes, false, makeMainWindowVisible);
-   }
+//   public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(File location,
+//                                                                             List<File> classPaths,
+//                                                                             File bootClassPath,
+//                                                                             List<File> includes,
+//                                                                             boolean makeMainWindowVisible) throws ProblemLoaderException {
+//      return loadInMainWindow(null, location, classPaths, bootClassPath, includes, false, makeMainWindowVisible);
+//   }
    
    /**
     * Loads the given location and returns all required references as {@link KeYEnvironment}

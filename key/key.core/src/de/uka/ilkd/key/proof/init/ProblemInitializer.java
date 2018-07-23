@@ -15,6 +15,7 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -61,6 +62,7 @@ import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.LDTInput;
 import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
 import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
@@ -91,6 +93,8 @@ public final class ProblemInitializer {
     private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
     private final ProblemInitializerListener listener;
 
+    private FileRepo fileRepo;
+    
     private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
 
     //-------------------------------------------------------------------------
@@ -192,7 +196,12 @@ public final class ProblemInitializer {
         int i = 0;
         reportStatus("Read LDT Includes", in.getIncludes().size());
         for (String name : in.getLDTIncludes()) {
-            keyFile[i++] = new KeYFile(name, in.get(name), progMon, initConfig.getProfile());
+            
+            System.out.println("LDT -----------------------------------------------------------------------------------------");
+            RuleSource rs = fileRepo.getRuleSource(in.get(name).file().toPath());           // TODO:
+            keyFile[i++] = new KeYFile(name, rs, progMon, initConfig.getProfile());
+
+            //keyFile[i++] = new KeYFile(name, in.get(name), progMon, initConfig.getProfile());
             setProgress(i);
         }
 
@@ -226,7 +235,19 @@ public final class ProblemInitializer {
         reportStatus("Read Includes", in.getIncludes().size());
         int i = 0;
         for (String fileName : in.getIncludes()) {
-            KeYFile keyFile = new KeYFile(fileName, in.get(fileName), progMon, envInput.getProfile());
+            // RuleSource rs = fileRepo.getRuleSource(in.get(fileName));            // TODO:
+            //fileRepo.setJavaPath(Paths.get(envInput.readJavaPath()));
+            //fileRepo.setClassPath(envInput.readClassPath().get(0).toPath());        // TODO: multiple directories
+            //try {
+            //    fileRepo.setBootClassPath(envInput.readBootClassPath().toPath());
+            //}
+            //catch (IOException e) {
+            //    // TODO Auto-generated catch block
+            //    e.printStackTrace();
+            //}
+
+            RuleSource rs = fileRepo.getRuleSource(in.get(fileName).file().toPath());
+            KeYFile keyFile = new KeYFile(fileName, rs, progMon, envInput.getProfile());
             readEnvInput(keyFile, initConfig);
             setProgress(++i);
         }
@@ -278,7 +299,9 @@ public final class ProblemInitializer {
 
         //read Java source and classpath settings
         envInput.setInitConfig(initConfig);
+        //envInput.setFileRepo(fileRepo);
         final String javaPath = envInput.readJavaPath();
+        fileRepo.setJavaPath(Paths.get(javaPath));
         final List<File> classPath = envInput.readClassPath();
 
         final File bootClassPath;
@@ -293,6 +316,7 @@ public final class ProblemInitializer {
         //create Recoder2KeY, set classpath
         final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(),
                                            initConfig.namespaces());
+        //r2k.setFileRepository(envInput.getFileRepository()); xxx  // TODO:
         r2k.setClassPath(bootClassPath, classPath);
 
         //read Java (at least the library classes)
@@ -311,7 +335,7 @@ public final class ProblemInitializer {
         Vector<String> var = getClasses(javaPath);
         final String[] cus = var.toArray(new String[var.size()]);
             try {
-                r2k.readCompilationUnitsAsFiles(cus);
+                r2k.readCompilationUnitsAsFiles(cus, fileRepo);
             } catch (ParseExceptionInFile e) {
                 throw new ProofInputException(e);
             }
@@ -608,4 +632,7 @@ public final class ProblemInitializer {
       return warnings;
    }
 
+   public void setFileRepo(FileRepo fileRepo) {
+       this.fileRepo = fileRepo;
+   }
 }

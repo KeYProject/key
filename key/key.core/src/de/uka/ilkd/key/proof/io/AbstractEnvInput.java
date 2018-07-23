@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
 
 
@@ -37,6 +38,8 @@ public abstract class AbstractEnvInput implements EnvInput {
     
     protected InitConfig initConfig;
     
+    private FileRepo fileRepo;
+
 
     //-------------------------------------------------------------------------
     //constructors
@@ -112,5 +115,9 @@ public abstract class AbstractEnvInput implements EnvInput {
     @Override
     public Profile getProfile() {
         return profile;
+    }
+
+    public void setFileRepo(FileRepo fileRepo) {
+        this.fileRepo = fileRepo;
     }
 }

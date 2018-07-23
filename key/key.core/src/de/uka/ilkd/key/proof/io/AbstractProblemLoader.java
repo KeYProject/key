@@ -38,6 +38,8 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -171,6 +173,8 @@ public abstract class AbstractProblemLoader {
      * The {@link ReplayResult} if available or {@code null} otherwise.
      */
     private ReplayResult result;
+    
+    private FileRepo fileRepo;          // TODO: WP
 
     /**
      * Maps internal error codes of the parser to human readable strings.
@@ -233,8 +237,9 @@ public abstract class AbstractProblemLoader {
     public void load() throws ProofInputException, IOException, ProblemLoaderException {
             control.loadingStarted(this);
             // Read environment
-            envInput = createEnvInput();
-            problemInitializer = createProblemInitializer();
+            fileRepo = new DiskFileRepo("test123");
+            envInput = createEnvInput(fileRepo);
+            problemInitializer = createProblemInitializer(fileRepo);
             initConfig = createInitConfig();
             if (!problemInitializer.getWarnings().isEmpty()) {
                control.reportWarnings(problemInitializer.getWarnings());
@@ -336,12 +341,14 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Instantiates the {@link EnvInput} which represents the file to load.
+     * @param fileRepo 
      * @return The created {@link EnvInput}.
      * @throws IOException Occurred Exception.
      */
-    protected EnvInput createEnvInput() throws IOException {
+    protected EnvInput createEnvInput(FileRepo fileRepo) throws IOException {
 
         final String filename = file.getName();
+        fileRepo.setBaseDir(file.toPath());
 
         if (filename.endsWith(".java")) {
             // java file, probably enriched by specifications
@@ -356,7 +363,7 @@ public abstract class AbstractProblemLoader {
         else if (filename.endsWith(".key") || filename.endsWith(".proof")
               || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof
-            return new KeYUserProblemFile(filename, file, control,
+            return new KeYUserProblemFile(filename, file, fileRepo, control,
                         profileOfNewProofs, filename.endsWith(".proof.gz"));
         }
         else if (file.isDirectory()) {
@@ -381,12 +388,15 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Instantiates the {@link ProblemInitializer} to use.
+     * @param fileRepo 
      * @param registerProof Register loaded {@link Proof}
      * @return The {@link ProblemInitializer} to use.
      */
-    protected ProblemInitializer createProblemInitializer() {
+    protected ProblemInitializer createProblemInitializer(FileRepo fileRepo) {
         Profile profile = forceNewProfileOfNewProofs ? profileOfNewProofs : envInput.getProfile();
-        return new ProblemInitializer(control, new Services(profile), control);
+        ProblemInitializer pi = new ProblemInitializer(control, new Services(profile), control);
+        pi.setFileRepo(fileRepo);
+        return pi;        
     }
 
     /**
