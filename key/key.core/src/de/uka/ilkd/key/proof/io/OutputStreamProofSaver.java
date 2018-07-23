@@ -98,20 +98,20 @@ public class OutputStreamProofSaver {
         this.internalVersion = internalVersion;
     }
 
-    public StringBuffer writeLog(Proof p) {
+    public StringBuffer writeLog() {
         StringBuffer logstr = new StringBuffer();
         // Advance the Log entries
-        if (p.userLog == null)
-            p.userLog = new Vector<String>();
-        if (p.keyVersionLog == null)
-            p.keyVersionLog = new Vector<String>();
-        p.userLog.add(System.getProperty("user.name"));
-        p.keyVersionLog.add(internalVersion);
-        int s = p.userLog.size();
+        if (proof.userLog == null)
+            proof.userLog = new Vector<String>();
+        if (proof.keyVersionLog == null)
+            proof.keyVersionLog = new Vector<String>();
+        proof.userLog.add(System.getProperty("user.name"));
+        proof.keyVersionLog.add(internalVersion);
+        int s = proof.userLog.size();
         for (int i = 0; i < s; i++) {
             logstr.append("(keyLog \"" + i + "\" (keyUser \""
-                    + p.userLog.elementAt(i) + "\" ) (keyVersion \""
-                    + p.keyVersionLog.elementAt(i) + "\"))\n");
+                    + proof.userLog.elementAt(i) + "\" ) (keyVersion \""
+                    + proof.keyVersionLog.elementAt(i) + "\"))\n");
         }
         return logstr;
     }
@@ -213,9 +213,9 @@ public class OutputStreamProofSaver {
 
             // \proof
             ps.println("\\proof {");
-            ps.println(writeLog(proof));
+            ps.println(writeLog());
             ps.println("(autoModeTime \"" + proof.getAutoModeTime() + "\")\n");
-            ps.println(node2Proof(proof.root()));
+            node2Proof(proof.root(), ps);
             ps.println("}");
 
         }
@@ -323,52 +323,52 @@ public class OutputStreamProofSaver {
         return " (newnames \"" + s.substring(1) + "\")";
     }
 
-    private void printSingleNode(Node node, String prefix, StringBuffer tree) {
+    private void printSingleNode(Node node, String prefix, Appendable output) throws IOException {
 
         RuleApp appliedRuleApp = node.getAppliedRuleApp();
         if (appliedRuleApp == null && (proof.getGoal(node) != null)) { // open
                                                                        // goal
-            tree.append(prefix);
-            tree.append("(opengoal \"");
+            output.append(prefix);
+            output.append("(opengoal \"");
             LogicPrinter logicPrinter =
                     createLogicPrinter(proof.getServices(), false);
 
             logicPrinter.printSequent(node.sequent());
-            tree.append(escapeCharacters(printer.result().toString()
+            output.append(escapeCharacters(printer.result().toString()
                     .replace('\n', ' ')));
-            tree.append("\")\n");
+            output.append("\")\n");
             return;
         }
 
         if (appliedRuleApp instanceof TacletApp) {
-            tree.append(prefix);
-            tree.append("(rule \"");
-            tree.append(appliedRuleApp.rule().name());
-            tree.append("\"");
-            tree.append(posInOccurrence2Proof(node.sequent(),
+            output.append(prefix);
+            output.append("(rule \"");
+            output.append(appliedRuleApp.rule().name().toString());
+            output.append("\"");
+            output.append(posInOccurrence2Proof(node.sequent(),
                     appliedRuleApp.posInOccurrence()));
-            tree.append(newNames2Proof(node));
-            tree.append(getInteresting(((TacletApp) appliedRuleApp)
+            output.append(newNames2Proof(node));
+            output.append(getInteresting(((TacletApp) appliedRuleApp)
                     .instantiations()));
             ImmutableList<IfFormulaInstantiation> l =
                     ((TacletApp) appliedRuleApp).ifFormulaInstantiations();
             if (l != null)
-                tree.append(ifFormulaInsts(node, l));
-            tree.append("");
-            userInteraction2Proof(node, tree);
-            tree.append(")\n");
+                output.append(ifFormulaInsts(node, l));
+            output.append("");
+            userInteraction2Proof(node, output);
+            output.append(")\n");
         }
 
         if (appliedRuleApp instanceof IBuiltInRuleApp) {
-            tree.append(prefix);
-            tree.append("(builtin \"");
-            tree.append(appliedRuleApp.rule().name().toString());
-            tree.append("\"");
-            tree.append(posInOccurrence2Proof(node.sequent(),
+            output.append(prefix);
+            output.append("(builtin \"");
+            output.append(appliedRuleApp.rule().name().toString());
+            output.append("\"");
+            output.append(posInOccurrence2Proof(node.sequent(),
                     appliedRuleApp.posInOccurrence()));
 
-            tree.append(newNames2Proof(node));
-            tree.append(builtinRuleIfInsts(node,
+            output.append(newNames2Proof(node));
+            output.append(builtinRuleIfInsts(node,
                     ((IBuiltInRuleApp) appliedRuleApp).ifInsts()));
 
             if (appliedRuleApp.rule() instanceof UseOperationContractRule
@@ -383,9 +383,9 @@ public class OutputStreamProofSaver {
 
                 RuleJustificationBySpec ruleJustiBySpec =
                         (RuleJustificationBySpec) ruleJusti;
-                tree.append(" (contract \"");
-                tree.append(ruleJustiBySpec.getSpec().getName());
-                tree.append("\")");
+                output.append(" (contract \"");
+                output.append(ruleJustiBySpec.getSpec().getName());
+                output.append("\")");
             }
 
             if (appliedRuleApp instanceof MergeRuleBuiltInRuleApp) {
@@ -393,32 +393,32 @@ public class OutputStreamProofSaver {
                         (MergeRuleBuiltInRuleApp) appliedRuleApp;
                 MergeProcedure concreteRule = mergeApp.getConcreteRule();
 
-                tree.append(" (")
+                output.append(" (")
                         .append(ProofElementID.MERGE_PROCEDURE.getRawName())
                         .append(" \"");
-                tree.append(concreteRule.toString());
-                tree.append("\")");
+                output.append(concreteRule.toString());
+                output.append("\")");
 
-                tree.append(" (")
+                output.append(" (")
                         .append(ProofElementID.NUMBER_MERGE_PARTNERS
                                 .getRawName()).append(" \"");
-                tree.append(mergeApp.getMergePartners().size());
-                tree.append("\")");
+                output.append(Integer.toString(mergeApp.getMergePartners().size()));
+                output.append("\")");
 
-                tree.append(" (").append(ProofElementID.MERGE_ID.getRawName())
+                output.append(" (").append(ProofElementID.MERGE_ID.getRawName())
                         .append(" \"");
-                tree.append(mergeApp.getMergeNode().serialNr());
-                tree.append("\")");
+                output.append(Integer.toString(mergeApp.getMergeNode().serialNr()));
+                output.append("\")");
 
                 if (mergeApp.getDistinguishingFormula() != null) {
-                    tree.append(" (")
+                    output.append(" (")
                             .append(ProofElementID.MERGE_DIST_FORMULA
                                     .getRawName()).append(" \"");
-                    tree.append(escapeCharacters(printAnything(
+                    output.append(escapeCharacters(printAnything(
                             mergeApp.getDistinguishingFormula(),
                             proof.getServices(), false).toString().trim()
                             .replaceAll("(\\r|\\n|\\r\\n)+", "")));
-                    tree.append("\")");
+                    output.append("\")");
                 }
 
                 // Predicates for merges with predicate abstraction.
@@ -428,28 +428,30 @@ public class OutputStreamProofSaver {
                                 (MergeWithPredicateAbstraction) concreteRule)
                                 .getPredicates().size() > 0) {
 
-                    tree.append(" (")
+                    output.append(" (")
                             .append(ProofElementID.MERGE_ABSTRACTION_PREDICATES
                                     .getRawName()).append(" \"");
+                    boolean first = true;
                     for (Map.Entry<Sort, ArrayList<AbstractionPredicate>> predsForSorts : predAbstrRule
                             .getPredicates().entrySet()) {
                         for (AbstractionPredicate pred : predsForSorts
                                 .getValue()) {
-                            tree.append(
-                                    pred.toParseableString(proof.getServices()))
-                                    .append(", ");
+                            if(first) {
+                                first = false;
+                            } else {
+                                output.append(", ");
+                            }
+                            output.append(pred.toParseableString(proof.getServices()));
                         }
                     }
-                    // Delete the last ", ".
-                    tree.delete(tree.length() - 2, tree.length());
 
-                    tree.append("\")");
+                    output.append("\")");
 
-                    tree.append(" (")
+                    output.append(" (")
                             .append(ProofElementID.MERGE_PREDICATE_ABSTRACTION_LATTICE_TYPE
                                     .getRawName()).append(" \"");
-                    tree.append(predAbstrRule.getLatticeType().getName());
-                    tree.append("\")");
+                    output.append(predAbstrRule.getLatticeType().getName());
+                    output.append("\")");
 
                 }
 
@@ -458,13 +460,18 @@ public class OutputStreamProofSaver {
                             ((MergeWithLatticeAbstraction) concreteRule)
                                     .getUserChoices();
                     if (!userChoices.isEmpty()) {
-                        tree.append(" (")
+                        output.append(" (")
                                 .append(ProofElementID.MERGE_USER_CHOICES
                                         .getRawName()).append(" \"");
+                        boolean first = true;
                         for (final ProgramVariable v : userChoices.keySet()) {
-                            final AbstractDomainElement elem =
-                                    userChoices.get(v);
-                            tree.append("('")
+                            if(first) {
+                                first = false;
+                            } else {
+                                output.append("`), ");
+                            }
+                            final AbstractDomainElement elem = userChoices.get(v);
+                            output.append("('")
                                     .append(v.sort().toString())
                                     .append(" ")
                                     .append(v.toString())
@@ -472,10 +479,8 @@ public class OutputStreamProofSaver {
                                     .append(elem.toParseableString(proof
                                             .getServices())).append("`), ");
                         }
-                        // Delete the last ", ".
-                        tree.delete(tree.length() - 2, tree.length());
 
-                        tree.append("\")");
+                        output.append("\")");
                     }
                 }
             }
@@ -487,69 +492,66 @@ public class OutputStreamProofSaver {
                 // TODO (DS): There may be problems here if the merge node is
                 // pruned away. Need to test some cases and either check for
                 // null pointers at this place or find a better solution.
-                tree.append(" (").append(ProofElementID.MERGE_NODE.getRawName())
+                output.append(" (").append(ProofElementID.MERGE_NODE.getRawName())
                         .append(" \"");
-                tree.append(closeApp.getCorrespondingMergeNode().parent()
-                        .serialNr());
-                tree.append("\")");
+                output.append(Integer.toString(closeApp.getCorrespondingMergeNode().parent()
+                        .serialNr()));
+                output.append("\")");
             }
             
-            tree.append("");
-            userInteraction2Proof(node, tree);
+            output.append("");
+            userInteraction2Proof(node, output);
 
-            tree.append(")\n");
+            output.append(")\n");
         }
     }
 
-    private StringBuffer collectProof(Node node, String prefix,
-            StringBuffer tree) {
+    private void collectProof(Node node, String prefix,
+            Appendable output) throws IOException {
 
-        printSingleNode(node, prefix, tree);
+        printSingleNode(node, prefix, output);
         Iterator<Node> childrenIt = null;
 
         while (node.childrenCount() == 1) {
             childrenIt = node.childrenIterator();
             node = childrenIt.next();
-            printSingleNode(node, prefix, tree);
+            printSingleNode(node, prefix, output);
         }
 
         if (node.childrenCount() == 0)
-            return tree;
+            return;
 
         childrenIt = node.childrenIterator();
 
         while (childrenIt.hasNext()) {
             Node child = childrenIt.next();
-            tree.append(prefix);
+            output.append(prefix);
             String branchLabel = child.getNodeInfo().getBranchLabel();
 
             // The branchLabel is ignored when reading in the proof,
             // print it if we have it, ignore it otherwise. (MU)
             if (branchLabel == null) {
-                tree.append("(branch\n");
+                output.append("(branch\n");
             }
             else {
-                tree.append("(branch \"" + escapeCharacters(branchLabel)
+                output.append("(branch \"" + escapeCharacters(branchLabel)
                         + "\"\n");
             }
 
-            collectProof(child, prefix + "   ", tree);
-            tree.append(prefix + ")\n");
+            collectProof(child, prefix + "   ", output);
+            output.append(prefix + ")\n");
         }
-
-        return tree;
     }
 
-    private void userInteraction2Proof(Node node, StringBuffer tree) {
+    private void userInteraction2Proof(Node node, Appendable output) throws IOException {
         if (node.getNodeInfo().getInteractiveRuleApplication())
-            tree.append(" (userinteraction)");
+            output.append(" (userinteraction)");
     }
 
-    public String node2Proof(Node node) {
-        StringBuffer tree = new StringBuffer();
-        String s =
-                "(branch \"dummy ID\"\n" + collectProof(node, "", tree) + ")\n";
-        return s;
+    public void node2Proof(Node node, Appendable ps) throws IOException {
+        ps.append("(branch \"dummy ID\"\n");
+        collectProof(node, "", ps);
+        ps.append(")\n");
     }
 
     public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence pos) {
