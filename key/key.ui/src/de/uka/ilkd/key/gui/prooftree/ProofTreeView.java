@@ -748,8 +748,10 @@ public class ProofTreeView extends JPanel {
 		(tree, nodeText, sel, expanded, leaf, row, hasFocus);
 
         if(node.getNodeInfo().isExploration()) {
-            tree_cell.setBorder(BorderFactory.createLineBorder(DARK_PURPLE_COLOR, 1, true));
+
+            tree_cell.setBorder(BorderFactory.createLineBorder(DARK_PURPLE_COLOR, 2, true));
             tree_cell.setBackgroundNonSelectionColor(LIGHT_PURPLE_COLOR);
+            tree_cell.setToolTipText("Exploration Action Performed");
         }
         else {
             tree_cell.setBorder(null);

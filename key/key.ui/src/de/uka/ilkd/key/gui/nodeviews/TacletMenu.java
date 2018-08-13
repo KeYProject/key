@@ -19,6 +19,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.actions.exploration.AddFormulaToAntecedentAction;
 import de.uka.ilkd.key.gui.actions.exploration.AddFormulaToSuccedentAction;
+import de.uka.ilkd.key.gui.actions.exploration.DeleteFormulaAction;
 import de.uka.ilkd.key.gui.actions.exploration.EditFormulaAction;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
@@ -437,6 +438,7 @@ public class TacletMenu extends JMenu {
             menuExploration.add(new AddFormulaToAntecedentAction());
             menuExploration.add(new AddFormulaToSuccedentAction());
             menuExploration.add(new EditFormulaAction(pos));
+            menuExploration.add(new DeleteFormulaAction(pos));
             add(menuExploration);
         }
     }
