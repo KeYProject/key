@@ -47,8 +47,7 @@ public class EditFormulaAction extends ExplorationAction {
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
         Term term = pio.subTerm();
         Goal g = getMediator().getSelectedGoal();
-        g.node().getNodeInfo().setExploration(true);
-
+        //g.node().getNodeInfo().setExploration(true);
 
         Term newTerm = promptForTerm(mainWindow,
                 LogicPrinter.quickPrintTerm(term, getMediator().getServices()));
@@ -59,12 +58,12 @@ public class EditFormulaAction extends ExplorationAction {
 
         TacletApp app;
         boolean isSoundMode = getMediator().getExplorationModeModel().getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.SOUND_APPS;
-        if(isSoundMode){
+        //if(isSoundMode){
             app = soundChange(pio, term, newTerm);
-        } else {
-            app = changeFormula(pio, newTerm);
+        //} else {
+         //   app = changeFormula(pio, newTerm);
 
-        }
+        //}
         ImmutableList<Goal> result = g.apply(app);
         result.forEach(goal -> {
             goal.node().getNodeInfo().setExploration(true);
@@ -73,7 +72,7 @@ public class EditFormulaAction extends ExplorationAction {
         });
 
         //apply the weakening
-        if(isSoundMode){
+        //if(isSoundMode){
             FindTaclet tap;
             if(posInSeq.getPosInOccurrence().isInAntec()){
                 tap = (FindTaclet) getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("hide_left"));
@@ -92,30 +91,17 @@ public class EditFormulaAction extends ExplorationAction {
             } else {
                 goal.setEnabled(false);
             }});
-        }
+        //}
 
 
     }
 
     private TacletApp soundChange(PosInOccurrence pio, Term term, Term newTerm) {
         Taclet cut = getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
-//        TermBuilder tb = new TermBuilder(new TermFactory(new HashMap<>()), getMediator().getServices());
-//        Term concat = tb.equals(term, newTerm);
-//        Semisequent semisequent = new Semisequent(new SequentFormula(concat));
         Semisequent semisequent = new Semisequent(new SequentFormula(newTerm));
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
         app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), getMediator().getServices(), true);
-        /*if(antecedent){
-            Goal first = result.head();
-            if(first.node().getNodeInfo().getBranchLabel().endsWith("FALSE")){
-                first.setEnabled(false);
-                //TODO now hide the branch
-            } else {
-                Goal second = result.tail().head();
-                second.setEnabled(false);
-            }
-        }*/
         return app;
     }
 

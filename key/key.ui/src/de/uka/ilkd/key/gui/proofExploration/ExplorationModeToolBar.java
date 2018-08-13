@@ -84,7 +84,7 @@ public class ExplorationModeToolBar extends JToolBar {
         this.add(soundExploration);
 
         showSecondBranch = new JCheckBox("Show Second Branch");
-        showSecondBranch.setToolTipText("A sound exploration application is \noften done using a cut. Choose to hide\n " +
+        showSecondBranch.setToolTipText("Exploration actions are \noften done using a cut. Choose to hide\n " +
                 "the second cut-branches from the view \nto focus on the exploration. Uncheck to focus on these branches.");
         showSecondBranch.addItemListener(new ItemListener() {
             @Override
