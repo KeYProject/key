@@ -2,7 +2,7 @@ package org.key_project.key4eclipse.resources.io;
 
 /**
  * Represents an access reference for the ProofMetaReferences
- * @author Stefan Käsdorf
+ * @author Stefan Kaesdorf
  */
 public class ProofMetaReferenceAccess {
 
