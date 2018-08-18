@@ -238,14 +238,16 @@ public class ObjectVal {
 	/**
 	 * Objects with equal names are equal.
 	 */
-	public boolean equals(Object o){		
-		if(o instanceof ObjectVal){			
-			ObjectVal ov = (ObjectVal) o;
-			if (ov.name == null) return name == null;
-			return ov.name.equals(name);			
-		}		
-		return false;		
-	}
+	public boolean equals(Object o) {
+            if(o instanceof ObjectVal) {
+                ObjectVal ov = (ObjectVal) o;
+                if (ov.name == null) {
+                    return name == null;
+                }
+                return ov.name.equals(name);
+            }
+            return false;
+        }
 
 	public void setArrayValues(Map<Integer, String> newArrayValues) {
 		this.arrayValues = newArrayValues;
