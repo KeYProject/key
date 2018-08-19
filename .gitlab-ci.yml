@@ -16,6 +16,18 @@ compile:oraclejdk8:
     - javac -version
     - ant -f key/scripts/build.xml compileAll
 
+fatJar:oraclejdk8:
+  stage: secondary
+  image: key-dev-jdk8
+  script:
+    - javac -version
+    - ant -f key/scripts/build.xml fatJar
+  artifacts:
+    paths:
+      - key/deployment/*.jar
+    expire_in: 1 week
+
+
 compile:oraclejdk9:
   stage: primary
   image: key-dev-jdk9
@@ -89,6 +101,7 @@ checkstyle:
     - key/scripts/tools/checkstyle/publishAudit.py report.txt
   artifacts:
     name: "checkstyle-report-$CI_JOB_ID"
+    expire_in: 1 week
     when: always
     paths:
     - report.txt
