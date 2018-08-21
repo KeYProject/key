@@ -12,18 +12,31 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
+
+/**
+ * An action that enables toggling age heatmaps from the toolbar.
+ * @author jschiffl
+ */
 public class HeatmapToolbarAction extends MainWindowAction {
 
-    private static final Icon HEATMAP_ON_ICON = IconFactory.heatmapOnIcon(MainWindow.TOOLBAR_ICON_SIZE);
-    private static final Icon HEATMAP_OFF_ICON = IconFactory.heatmapOffIcon(MainWindow.TOOLBAR_ICON_SIZE);
+    /** ON Icon */
+    private static final Icon HEATMAP_ON_ICON =
+        IconFactory.heatmapOnIcon(MainWindow.TOOLBAR_ICON_SIZE);
+    /** OFF Icon */
+    private static final Icon HEATMAP_OFF_ICON =
+        IconFactory.heatmapOffIcon(MainWindow.TOOLBAR_ICON_SIZE);
 
     /**
      * version id
      */
     private static final long serialVersionUID = 5551666060738982540L;
 
-    private static final ViewSettings VS = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+    /** view settings */
+    private static final ViewSettings VS =
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
 
+    /** initialisation
+     * @param main the main window*/
     public HeatmapToolbarAction(MainWindow main) {
         super(main);
         putValue(NAME, "Enable/Disable Age Heatmaps");
@@ -34,7 +47,8 @@ public class HeatmapToolbarAction extends MainWindowAction {
         initListener();
     }
 
-    public void initListener() {
+    /** initialisation of the listener */
+    private void initListener() {
         final KeYSelectionListener selListener = new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
@@ -52,7 +66,8 @@ public class HeatmapToolbarAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        VS.setHeatmapOptions(!VS.isShowHeatmap(), VS.isHeatmapSF(), VS.isHeatmapNewest(), VS.getMaxAgeForHeatmap());
+        VS.setHeatmapOptions(!VS.isShowHeatmap(), VS.isHeatmapSF(),
+            VS.isHeatmapNewest(), VS.getMaxAgeForHeatmap());
         setIcon();
     }
 
