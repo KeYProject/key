@@ -105,6 +105,11 @@ public final class KeyStrokeManager {
         mapping.put(de.uka.ilkd.key.gui.actions.UnicodeToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_U,MULTI_KEY_MASK));
         mapping.put(IncreaseFontSizeAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, SHORTCUT_KEY_MASK));
         mapping.put(DecreaseFontSizeAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, SHORTCUT_KEY_MASK));
+
+        mapping.put(de.uka.ilkd.key.gui.actions.PruneProofAction.class,
+                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+        mapping.put(de.uka.ilkd.key.gui.actions.GoalBackAction.class,
+                KeyStroke.getKeyStroke(KeyEvent.VK_Z, SHORTCUT_KEY_MASK));
     }
     
     public static KeyStroke get (ProofMacro macro) {

@@ -64,14 +64,14 @@ public class StatisticsFile implements Serializable {
                return statistics.branches;
             }
 
-         }, new LongColumn("Overall time") {
+         }, new LongColumn("Overall time (ms)") {
 
             @Override
             long getLongValueFromStatistics(Statistics statistics) {
                return statistics.timeInMillis;
             }
 
-         }, new LongColumn("Automode time") {
+         }, new LongColumn("Automode time (ms)") {
 
             @Override
             long getLongValueFromStatistics(Statistics statistics) {
@@ -96,7 +96,7 @@ public class StatisticsFile implements Serializable {
                return new String[] { "" + sum, "" + avg };
             }
 
-         }, new Column<Double>("Time per step") {
+         }, new Column<Double>("Time per step (ms)") {
 
             @Override
             Double addEntry(Statistics statistics, File keyFile,
@@ -115,7 +115,7 @@ public class StatisticsFile implements Serializable {
                return new String[] { "" + sum, "" + avg };
             }
 
-         }, new LongColumn("Total Runtime Memory") {
+         }, new LongColumn("Total Runtime Memory (kB)") {
 
             @Override
             long getLongValueFromStatistics(Statistics statistics) {

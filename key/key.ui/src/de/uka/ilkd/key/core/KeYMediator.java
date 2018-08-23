@@ -229,15 +229,6 @@ public class KeYMediator {
     	return filterForInteractiveProving;
 	}
 
-    /** Undo.
-     * @author VK
-     */
-    public void setBack() {
-	if (ensureProofLoaded()) {
-	    setBack(getSelectedGoal());
-	}
-    }
-
     public void setBack(Node node) {
     	node.proof().pruneProof(node);
     	finishSetBack(node.proof());
