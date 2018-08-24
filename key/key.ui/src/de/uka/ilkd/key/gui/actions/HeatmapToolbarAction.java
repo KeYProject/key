@@ -1,15 +1,22 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.EventObject;
 
-import javax.swing.Icon;
+import javax.swing.JToggleButton;
+import javax.swing.Timer;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.HeatmapOptionsDialog;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.settings.ViewSettings;
 
 
@@ -17,14 +24,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
  * An action that enables toggling age heatmaps from the toolbar.
  * @author jschiffl
  */
-public class HeatmapToolbarAction extends MainWindowAction {
-
-    /** ON Icon */
-    private static final Icon HEATMAP_ON_ICON =
-        IconFactory.heatmapOnIcon(MainWindow.TOOLBAR_ICON_SIZE);
-    /** OFF Icon */
-    private static final Icon HEATMAP_OFF_ICON =
-        IconFactory.heatmapOffIcon(MainWindow.TOOLBAR_ICON_SIZE);
+public class HeatmapToolbarAction extends MainWindowAction implements MouseListener {
 
     /**
      * version id
@@ -35,25 +35,45 @@ public class HeatmapToolbarAction extends MainWindowAction {
     private static final ViewSettings VS =
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
 
+    /** Timer for menu */
+    private static Timer time;
+
+    /** The Button associated with this action */
+    JToggleButton toggleHeatmapButton;
+
     /** initialisation
-     * @param main the main window*/
-    public HeatmapToolbarAction(MainWindow main) {
+     * @param main the main window
+     * @param toggleHeatmapButton */
+    public HeatmapToolbarAction(MainWindow main, JToggleButton toggleHeatmapButton) {
         super(main);
-        setIcon(IconFactory.heatmapIcon(MainWindow.TOOLBAR_ICON_SIZE));
-//        setIcon();
-        putValue(SHORT_DESCRIPTION,
-                "Enable or disable age heatmaps in the sequent view.");
+        initTimer();
         initListener();
-        setEnabled(VS.isShowHeatmap());
+        this.toggleHeatmapButton = toggleHeatmapButton;
+        toggleHeatmapButton.setEnabled(getMediator().getSelectedProof() != null);
+        toggleHeatmapButton.setSelected(VS.isShowHeatmap());
+        toggleHeatmapButton.addMouseListener(this);
+    }
+
+    private void initTimer() {
+        time = new Timer(1000, new HeatmapSettingsAction(mainWindow));
     }
 
     /** initialisation of the listener */
     private void initListener() {
+        final SettingsListener setListener = new SettingsListener() {
+
+            @Override
+            public void settingsChanged(EventObject e) {
+                toggleHeatmapButton.setSelected(VS.isShowHeatmap());
+            }
+        };
+        VS.addSettingsListener(setListener);
+
         final KeYSelectionListener selListener = new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
                 final Proof proof = getMediator().getSelectedProof();
-                setEnabled(proof != null);
+                toggleHeatmapButton.setEnabled(proof != null);
             }
 
             @Override
@@ -68,15 +88,31 @@ public class HeatmapToolbarAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         VS.setHeatmapOptions(!VS.isShowHeatmap(), VS.isHeatmapSF(),
             VS.isHeatmapNewest(), VS.getMaxAgeForHeatmap());
-//        setIcon();
     }
 
-//    private void setIcon() {
-//        if (VS.isShowHeatmap()) {
-//            putValue(SMALL_ICON, HEATMAP_ON_ICON);
-//        } else {
-//            putValue(SMALL_ICON, HEATMAP_OFF_ICON);
-//        }
-//    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        time.start();
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        time.stop();
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        if (time.isRunning()) {
+            time.stop();
+        }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {}
+
+    @Override
+    public void mouseEntered(MouseEvent e) {}
+
 
 }

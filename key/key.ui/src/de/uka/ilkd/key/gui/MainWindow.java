@@ -411,8 +411,19 @@ public final class MainWindow extends JFrame  {
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this, false));
         toolBar.addSeparator();
-        toolBar.add(new JToggleButton(new HeatmapToolbarAction(this)));
+        toolBar.add(createHeatmapToggle());
+
         return toolBar;
+    }
+
+    private JToggleButton createHeatmapToggle() {
+        JToggleButton toggleHeatmapButton = new JToggleButton();
+        toggleHeatmapButton.setToolTipText("<html>Enable or disable age heatmaps in the sequent view.<br>"
+            + "Hold for 1 second to open Heatmap Options Dialog. </html>");
+        toggleHeatmapButton.setIcon(IconFactory.heatmapIcon(MainWindow.TOOLBAR_ICON_SIZE));
+        HeatmapToolbarAction heatmapToolbarAction = new HeatmapToolbarAction(this, toggleHeatmapButton);
+        toggleHeatmapButton.addActionListener(heatmapToolbarAction);
+        return toggleHeatmapButton;
     }
 
     private ComplexButton createSMTComponent() {
