@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.EventObject;
@@ -11,8 +10,6 @@ import javax.swing.Timer;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.HeatmapOptionsDialog;
-import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -26,9 +23,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
  */
 public class HeatmapToolbarAction extends MainWindowAction implements MouseListener {
 
-    /**
-     * version id
-     */
+    /** version id */
     private static final long serialVersionUID = 5551666060738982540L;
 
     /** view settings */
@@ -39,34 +34,30 @@ public class HeatmapToolbarAction extends MainWindowAction implements MouseListe
     private static Timer time;
 
     /** The Button associated with this action */
-    JToggleButton toggleHeatmapButton;
+    private static JToggleButton toggleHeatmapButton;
 
     /** initialisation
      * @param main the main window
-     * @param toggleHeatmapButton */
+     * @param toggleHeatmapButton The Button associated with this action */
     public HeatmapToolbarAction(MainWindow main, JToggleButton toggleHeatmapButton) {
         super(main);
-        initTimer();
-        initListener();
-        this.toggleHeatmapButton = toggleHeatmapButton;
+        time = new Timer(1000, new HeatmapSettingsAction(mainWindow));
+        initListeners();
+        HeatmapToolbarAction.toggleHeatmapButton = toggleHeatmapButton;
         toggleHeatmapButton.setEnabled(getMediator().getSelectedProof() != null);
         toggleHeatmapButton.setSelected(VS.isShowHeatmap());
         toggleHeatmapButton.addMouseListener(this);
     }
 
-    private void initTimer() {
-        time = new Timer(1000, new HeatmapSettingsAction(mainWindow));
-    }
-
-    /** initialisation of the listener */
-    private void initListener() {
+    /** initialisation of the listeners */
+    private void initListeners() {
         final SettingsListener setListener = new SettingsListener() {
-
             @Override
             public void settingsChanged(EventObject e) {
                 toggleHeatmapButton.setSelected(VS.isShowHeatmap());
             }
         };
+
         VS.addSettingsListener(setListener);
 
         final KeYSelectionListener selListener = new KeYSelectionListener() {
@@ -90,7 +81,6 @@ public class HeatmapToolbarAction extends MainWindowAction implements MouseListe
             VS.isHeatmapNewest(), VS.getMaxAgeForHeatmap());
     }
 
-
     @Override
     public void mousePressed(MouseEvent e) {
         time.start();
@@ -113,6 +103,4 @@ public class HeatmapToolbarAction extends MainWindowAction implements MouseListe
 
     @Override
     public void mouseEntered(MouseEvent e) {}
-
-
 }

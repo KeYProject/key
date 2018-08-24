@@ -418,10 +418,12 @@ public final class MainWindow extends JFrame  {
 
     private JToggleButton createHeatmapToggle() {
         JToggleButton toggleHeatmapButton = new JToggleButton();
-        toggleHeatmapButton.setToolTipText("<html>Enable or disable age heatmaps in the sequent view.<br>"
+        toggleHeatmapButton.setToolTipText("<html>Enable or disable "
+            + "age heatmaps in the sequent view.<br>"
             + "Hold for 1 second to open Heatmap Options Dialog. </html>");
         toggleHeatmapButton.setIcon(IconFactory.heatmapIcon(MainWindow.TOOLBAR_ICON_SIZE));
-        HeatmapToolbarAction heatmapToolbarAction = new HeatmapToolbarAction(this, toggleHeatmapButton);
+        HeatmapToolbarAction heatmapToolbarAction =
+            new HeatmapToolbarAction(this, toggleHeatmapButton);
         toggleHeatmapButton.addActionListener(heatmapToolbarAction);
         return toggleHeatmapButton;
     }
