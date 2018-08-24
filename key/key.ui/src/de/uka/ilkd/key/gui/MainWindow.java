@@ -411,7 +411,7 @@ public final class MainWindow extends JFrame  {
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this, false));
         toolBar.addSeparator();
-        toolBar.add(new HeatmapToolbarAction(this));
+        toolBar.add(new JToggleButton(new HeatmapToolbarAction(this)));
         return toolBar;
     }
 

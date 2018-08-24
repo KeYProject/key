@@ -39,12 +39,12 @@ public class HeatmapToolbarAction extends MainWindowAction {
      * @param main the main window*/
     public HeatmapToolbarAction(MainWindow main) {
         super(main);
-        putValue(NAME, "Enable/Disable Age Heatmaps");
-        setIcon();
+        setIcon(IconFactory.heatmapIcon(MainWindow.TOOLBAR_ICON_SIZE));
+//        setIcon();
         putValue(SHORT_DESCRIPTION,
                 "Enable or disable age heatmaps in the sequent view.");
-        setEnabled(false);
         initListener();
+        setEnabled(VS.isShowHeatmap());
     }
 
     /** initialisation of the listener */
@@ -68,15 +68,15 @@ public class HeatmapToolbarAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         VS.setHeatmapOptions(!VS.isShowHeatmap(), VS.isHeatmapSF(),
             VS.isHeatmapNewest(), VS.getMaxAgeForHeatmap());
-        setIcon();
+//        setIcon();
     }
 
-    private void setIcon() {
-        if (VS.isShowHeatmap()) {
-            putValue(SMALL_ICON, HEATMAP_ON_ICON);
-        } else {
-            putValue(SMALL_ICON, HEATMAP_OFF_ICON);
-        }
-    }
+//    private void setIcon() {
+//        if (VS.isShowHeatmap()) {
+//            putValue(SMALL_ICON, HEATMAP_ON_ICON);
+//        } else {
+//            putValue(SMALL_ICON, HEATMAP_OFF_ICON);
+//        }
+//    }
 
 }
