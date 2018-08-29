@@ -189,7 +189,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
         final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(null,
                 contract.getPlaceholderVariables(), services)
-        		.createAndRegister(selfTerm, false, contract.getBlock());
+                .createAndRegister(selfTerm, false, contract.getBlock());
         final LoopContract.Variables nextVariables
                 = new VariablesCreatorAndRegistrar(null, variables, services)
                         .createAndRegisterCopies("_NEXT");

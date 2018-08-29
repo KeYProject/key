@@ -405,7 +405,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                 = createAnonOutHeaps(heaps, contract, services, tb);
         final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(null,
                 contract.getPlaceholderVariables(), services)
-        		.createAndRegister(selfTerm, false, contract.getBlock());
+                .createAndRegister(selfTerm, false, contract.getBlock());
         final ProgramVariable exceptionParameter = KeYJavaASTFactory.localVariable(
                 services.getVariableNamer().getTemporaryNameProposal("e"),
                 variables.exception.getKeYJavaType());
