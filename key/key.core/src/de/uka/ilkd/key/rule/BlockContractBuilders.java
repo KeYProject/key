@@ -1090,7 +1090,7 @@ public final class BlockContractBuilders {
 
                 Term exactType = exactInstance(selfKJT.getSort(), self);
 
-                return or(notNull, created, exactType);
+                return and(notNull, created, exactType);
             } else {
                 return tt();
             }
