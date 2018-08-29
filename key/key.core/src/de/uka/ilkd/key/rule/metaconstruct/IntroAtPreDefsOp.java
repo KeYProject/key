@@ -114,6 +114,69 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         return tb.apply(atPreUpdate, target, null);
     }
 
+    /**
+     * Replace the placeholder variables
+     * (see {@link BlockSpecificationElement#getPlaceholderVariables()})
+     * of all block contracts for blocks in {@code blocks} by {@code atPreVars} and {@code atPreHeapVars}
+     * 
+     * @param blocks the blocks whose contracts to update.
+     * @param atPreVars all remembrance variables.
+     * @param atPreHeapVars all remembrance heaps.
+     * @param services services.
+     */
+    public void updateBlockAndLoopContracts(final ImmutableSet<StatementBlock> blocks,
+            Map<LocationVariable, LocationVariable> atPreVars,
+            Map<LocationVariable, LocationVariable> atPreHeapVars, Services services) {
+        for (StatementBlock block : blocks) {
+            ImmutableSet<BlockSpecificationElement> contracts = DefaultImmutableSet.nil();
+
+            for (BlockContract c : services.getSpecificationRepository().getBlockContracts(block)) {
+                contracts = contracts.add(c);
+            }
+            for (LoopContract c : services.getSpecificationRepository().getLoopContracts(block)) {
+                contracts = contracts.add(c);
+            }
+
+            for (BlockSpecificationElement contract : contracts) {
+                Map<LocationVariable, LocationVariable> nonHeapVars = new LinkedHashMap<>();
+                nonHeapVars.putAll(atPreVars);
+                atPreHeapVars.forEach((key, val) -> nonHeapVars.remove(key));
+                atPreHeapVars.remove(services.getTypeConverter().getHeapLDT().getSavedHeap());
+
+                final BlockSpecificationElement.Variables variables
+                        = contract.getPlaceholderVariables();
+                final BlockSpecificationElement.Variables newVariables
+                        = new BlockSpecificationElement.Variables(variables.self,
+                                variables.breakFlags, variables.continueFlags, variables.returnFlag,
+                                variables.result, variables.exception, variables.remembranceHeaps,
+                                variables.remembranceLocalVariables, atPreHeapVars, nonHeapVars,
+                                services);
+                final Map<LocationVariable, Term> newPreconditions
+                        = new LinkedHashMap<LocationVariable, Term>();
+                final Map<LocationVariable, Term> newPostconditions
+                        = new LinkedHashMap<LocationVariable, Term>();
+                final Map<LocationVariable, Term> newModifiesClauses
+                        = new LinkedHashMap<LocationVariable, Term>();
+
+                for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
+                        .getAllHeaps()) {
+                    if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
+                        continue;
+                    }
+
+                    newPreconditions.put(heap,
+                            contract.getPrecondition(heap, newVariables, services));
+                    newPostconditions.put(heap,
+                            contract.getPostcondition(heap, newVariables, services));
+                    newModifiesClauses.put(heap,
+                            contract.getModifiesClause(heap, newVariables.self, services));
+                }
+                updateBlockOrLoopContract(block, contract, newVariables, newPreconditions,
+                        newPostconditions, newModifiesClauses, services);
+            }
+        }
+    }
+
     private Term initAtPreUpdate(final String methodName, Map<LocationVariable, Term> atPres,
             Map<LocationVariable, LocationVariable> atPreVars,
             Map<LocationVariable, LocationVariable> atPreHeapVars, Services services,
@@ -444,59 +507,6 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
             services.getSpecificationRepository().removeLoopContract((LoopContract) contract);
             services.getSpecificationRepository().addLoopContract(newLoopContract, false);
-        }
-    }
-
-    private void updateBlockAndLoopContracts(final ImmutableSet<StatementBlock> blocks,
-            Map<LocationVariable, LocationVariable> atPreVars,
-            Map<LocationVariable, LocationVariable> atPreHeapVars, Services services) {
-        for (StatementBlock block : blocks) {
-            ImmutableSet<BlockSpecificationElement> contracts = DefaultImmutableSet.nil();
-
-            for (BlockContract c : services.getSpecificationRepository().getBlockContracts(block)) {
-                contracts = contracts.add(c);
-            }
-            for (LoopContract c : services.getSpecificationRepository().getLoopContracts(block)) {
-                contracts = contracts.add(c);
-            }
-
-            for (BlockSpecificationElement contract : contracts) {
-                Map<LocationVariable, LocationVariable> nonHeapVars = new LinkedHashMap<>();
-                nonHeapVars.putAll(atPreVars);
-                atPreHeapVars.forEach((key, val) -> nonHeapVars.remove(key));
-                atPreHeapVars.remove(services.getTypeConverter().getHeapLDT().getSavedHeap());
-
-                final BlockSpecificationElement.Variables variables
-                        = contract.getPlaceholderVariables();
-                final BlockSpecificationElement.Variables newVariables
-                        = new BlockSpecificationElement.Variables(variables.self,
-                                variables.breakFlags, variables.continueFlags, variables.returnFlag,
-                                variables.result, variables.exception, variables.remembranceHeaps,
-                                variables.remembranceLocalVariables, atPreHeapVars, nonHeapVars,
-                                services);
-                final Map<LocationVariable, Term> newPreconditions
-                        = new LinkedHashMap<LocationVariable, Term>();
-                final Map<LocationVariable, Term> newPostconditions
-                        = new LinkedHashMap<LocationVariable, Term>();
-                final Map<LocationVariable, Term> newModifiesClauses
-                        = new LinkedHashMap<LocationVariable, Term>();
-
-                for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
-                        .getAllHeaps()) {
-                    if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
-                        continue;
-                    }
-
-                    newPreconditions.put(heap,
-                            contract.getPrecondition(heap, newVariables, services));
-                    newPostconditions.put(heap,
-                            contract.getPostcondition(heap, newVariables, services));
-                    newModifiesClauses.put(heap,
-                            contract.getModifiesClause(heap, newVariables.self, services));
-                }
-                updateBlockOrLoopContract(block, contract, newVariables, newPreconditions,
-                        newPostconditions, newModifiesClauses, services);
-            }
         }
     }
 }
