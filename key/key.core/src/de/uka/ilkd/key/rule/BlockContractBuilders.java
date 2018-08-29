@@ -387,7 +387,7 @@ public final class BlockContractBuilders {
         public Variables createAndRegister(Term self, boolean existingPO) {
             return createAndRegister(self, existingPO, null);
         }
-        
+
         /**
         *
         * @param self
@@ -397,7 +397,7 @@ public final class BlockContractBuilders {
         *            {@code false} if we are creating a new proof obligation.
         * @param pe
         *              if {@code existingPO == false}, all contracts on blocks in this
-        *              program element  will have their remembrance variable replaced by
+        *              program element  will have their remembrance variables replaced by
         *              the one created here.
         * @return the registered variables.
         */
@@ -426,8 +426,11 @@ public final class BlockContractBuilders {
                 Map<LocationVariable, LocationVariable> outerRemembranceVariables =
                         createAndRegisterRemembranceVariables(
                                 placeholderVariables.outerRemembranceVariables);
-                
-                BlockContract.Variables result = new BlockContract.Variables(
+
+                replaceOuterRemembranceVarsInInnerContracts(
+                		pe, outerRemembranceHeaps, outerRemembranceVariables);
+
+                return new BlockContract.Variables(
                         self != null ? self.op(ProgramVariable.class) : null,
                         createAndRegisterFlags(placeholderVariables.breakFlags),
                         createAndRegisterFlags(placeholderVariables.continueFlags),
@@ -441,34 +444,6 @@ public final class BlockContractBuilders {
                         outerRemembranceHeaps,
                         outerRemembranceVariables,
                         services);
-                
-                ImmutableSet<StatementBlock> innerBlocks =
-                        new JavaASTVisitor(pe, services) {
-                            private ImmutableSet<StatementBlock> blocks = DefaultImmutableSet.nil();
-
-                            @Override
-                            protected void doDefaultAction(SourceElement node) {
-                                if (node instanceof StatementBlock) {
-                                    blocks = blocks.add((StatementBlock) node);
-                                }
-                            }
-
-                            public ImmutableSet<StatementBlock> run() {
-                                walk(root());
-                                return blocks;
-                            }
-                        }.run();
-                        
-                IntroAtPreDefsOp transformer = (IntroAtPreDefsOp)
-                        AbstractTermTransformer.INTRODUCE_ATPRE_DEFINITIONS;
-                final Map<LocationVariable, LocationVariable> atPreVars =
-                        new LinkedHashMap<LocationVariable, LocationVariable>();
-                atPreVars.putAll(outerRemembranceHeaps);
-                atPreVars.putAll(outerRemembranceVariables);
-                transformer.updateBlockAndLoopContracts(
-                        innerBlocks, atPreVars, outerRemembranceHeaps, services);
-
-                return result;
             }
         }
 
@@ -580,6 +555,45 @@ public final class BlockContractBuilders {
             } else {
                 return null;
             }
+        }
+        
+        /**
+         * Replace the outer remembrance variables of all contracts on blocks in {@code pe}.
+         * 
+         * @param pe the program elements.
+         * @param outerRemembranceHeaps the new outer remembrance heaps.
+         * @param outerRemembranceVariables the new outer remembrance variables.
+         * @see #createAndRegister(Term, boolean, ProgramElement)
+         */
+        private void replaceOuterRemembranceVarsInInnerContracts(
+        		ProgramElement pe,
+        		Map<LocationVariable, LocationVariable> outerRemembranceHeaps,
+        		Map<LocationVariable, LocationVariable> outerRemembranceVariables) {
+            ImmutableSet<StatementBlock> innerBlocks =
+                    new JavaASTVisitor(pe, services) {
+                        private ImmutableSet<StatementBlock> blocks = DefaultImmutableSet.nil();
+
+                        @Override
+                        protected void doDefaultAction(SourceElement node) {
+                            if (node instanceof StatementBlock) {
+                                blocks = blocks.add((StatementBlock) node);
+                            }
+                        }
+
+                        public ImmutableSet<StatementBlock> run() {
+                            walk(root());
+                            return blocks;
+                        }
+                    }.run();
+                    
+            IntroAtPreDefsOp transformer = (IntroAtPreDefsOp)
+                    AbstractTermTransformer.INTRODUCE_ATPRE_DEFINITIONS;
+            final Map<LocationVariable, LocationVariable> atPreVars =
+                    new LinkedHashMap<LocationVariable, LocationVariable>();
+            atPreVars.putAll(outerRemembranceHeaps);
+            atPreVars.putAll(outerRemembranceVariables);
+            transformer.updateBlockAndLoopContracts(
+                    innerBlocks, atPreVars, outerRemembranceHeaps, services);
         }
     }
 

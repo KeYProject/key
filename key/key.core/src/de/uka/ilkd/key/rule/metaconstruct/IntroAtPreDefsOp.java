@@ -119,7 +119,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
      * (see {@link BlockSpecificationElement#getPlaceholderVariables()})
      * of all block contracts for blocks in {@code blocks} by
      * {@code atPreVars} and {@code atPreHeapVars}
-     * 
+     *
      * @param blocks the blocks whose contracts to update.
      * @param atPreVars all remembrance variables.
      * @param atPreHeapVars all remembrance heaps.
