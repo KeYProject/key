@@ -1271,12 +1271,26 @@ public class LogicPrinter {
                     // in case arity > 1 we assume fieldName refers to a query (method call)
                     Term object = t.sub(1);
                     KeYJavaType keYJavaType = javaInfo.getKeYJavaType(object.sort());
-                    if (obs.isStatic()
-                            || ((obs instanceof IProgramMethod) && javaInfo.isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType))) {
-                        layouter.print(fieldName);
-                    } else {
-                        layouter.print("(" + t.op() + ")");
+                    String p;
+                    try {
+                        boolean canonical =
+                                obs.isStatic()
+                                || ((obs instanceof IProgramMethod)
+                                        && javaInfo.isCanonicalProgramMethod(
+                                                (IProgramMethod) obs,
+                                                keYJavaType));
+                        if (canonical) {
+                            p = fieldName;
+                        } else {
+                            p = "(" + t.op() + ")";
+                        }
+                    } catch (NullPointerException e) {
+                        // mu & mk: there are cases where this method fails.
+                        // (e.g. if the receiver of the observer happens to be replaced by "null").
+                        // better conservatively print empty String.
+                        p = "";
                     }
+                    layouter.print(p);
                 } else {
                     // in case arity == 1 we assume fieldName refers to an array
                     layouter.print(fieldName);
