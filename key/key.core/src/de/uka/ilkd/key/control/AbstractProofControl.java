@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.util.script.ScriptRecorderFacade;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -47,14 +48,14 @@ public abstract class AbstractProofControl implements ProofControl {
     * The default {@link ProverTaskListener} which will be added to all started {@link ApplyStrategy} instances.
     */
    private final ProverTaskListener defaultProverTaskListener;
-   
+
    /**
     * Contains all available {@link AutoModeListener}.
     */
    private final List<AutoModeListener> autoModeListener = new LinkedList<AutoModeListener>();
-   
+
    private boolean minimizeInteraction; // minimize user interaction
-   
+
    /**
     * Constructor.
     * @param defaultProverTaskListener The default {@link ProverTaskListener} which will be added to all started {@link ApplyStrategy} instances.
@@ -73,7 +74,7 @@ public abstract class AbstractProofControl implements ProofControl {
       this.ruleCompletionHandler = ruleCompletionHandler;
       this.defaultProverTaskListener = defaultProverTaskListener;
    }
-   
+
    /**
     * {@inheritDoc}
     */
@@ -91,7 +92,7 @@ public abstract class AbstractProofControl implements ProofControl {
    public void setMinimizeInteraction(boolean minimizeInteraction) {
       this.minimizeInteraction = minimizeInteraction;
    }
-   
+
    @Override
    public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos) {
         ImmutableList<BuiltInRule> rules = ImmutableSLList.<BuiltInRule>nil();
@@ -104,7 +105,7 @@ public abstract class AbstractProofControl implements ProofControl {
         }
         return rules;
     }
-    
+
 
 
     @Override
@@ -178,7 +179,7 @@ public abstract class AbstractProofControl implements ProofControl {
         }
         return result;
     }
-    
+
     @Override
     public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos) {
    final Services services = goal.proof().getServices();
@@ -235,12 +236,13 @@ public abstract class AbstractProofControl implements ProofControl {
         }
         return true;
     }
-    
+
 
     @Override
     public void applyInteractive(RuleApp app, Goal goal) {
        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
        goal.apply(app);
+       ScriptRecorderFacade.runRule(goal,app);
     }
 
 
@@ -300,18 +302,18 @@ public abstract class AbstractProofControl implements ProofControl {
 //if (result.size()==0) System.err.println("Available was "+fittingApps);
         return result;
     }
-    
+
     public TacletInstantiationModel[] completeAndApplyApp(java.util.List<TacletApp> apps, Goal goal) {
         TacletInstantiationModel[] origInstModels = new TacletInstantiationModel[apps.size()];
         LinkedList<TacletInstantiationModel> recentInstModels = new LinkedList<TacletInstantiationModel>();
 
         int appCounter = 0;
-        for (final TacletApp tA : apps) {            
+        for (final TacletApp tA : apps) {
             origInstModels[appCounter] = createModel(tA, goal);
 
             if (InstantiationFileHandler.hasInstantiationListsFor(tA
                     .taclet())) {
-                for (final List<String> instantiations : 
+                for (final List<String> instantiations :
                     InstantiationFileHandler.getInstantiationListsFor(tA.taclet())) {
                     int start = tA.instantiations().size();
 
@@ -345,14 +347,14 @@ public abstract class AbstractProofControl implements ProofControl {
 
     public TacletInstantiationModel createModel(TacletApp app, Goal goal) {
        final Proof proof = goal.proof();
-       
+
        return new TacletInstantiationModel(
             app, goal.sequent(),
                goal.getLocalNamespaces(),
               proof.abbreviations(),
        goal);
     }
-    
+
     @Override
     public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced) {
       assert goal != null;
@@ -374,8 +376,9 @@ public abstract class AbstractProofControl implements ProofControl {
       }
 
       if (app != null && app.rule() == rule) {
-         goal.apply(app);
-         return;
+          ScriptRecorderFacade.runBuiltIn(goal, rule, pos, forced);
+          goal.apply(app);
+          return;
       }
     }
 
@@ -438,9 +441,9 @@ public abstract class AbstractProofControl implements ProofControl {
 
         return result;
     }
-    
 
-    
+
+
     /**
      * {@inheritDoc}
      */
@@ -472,7 +475,7 @@ public abstract class AbstractProofControl implements ProofControl {
           }
        }
     }
-    
+
     /**
      * Default implementation of {@link RuleCompletionHandler#completeBuiltInRuleApp(IBuiltInRuleApp, Goal, boolean)}.
      */
@@ -489,7 +492,7 @@ public abstract class AbstractProofControl implements ProofControl {
     public boolean isAutoModeSupported(Proof proof) {
        return proof != null && !proof.isDisposed(); // All not disposed proofs are supported.
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -529,7 +532,7 @@ public abstract class AbstractProofControl implements ProofControl {
           aListenerList.autoModeStopped(e);
        }
     }
-        
+
     /**
      * {@inheritDoc}
      */
@@ -564,7 +567,7 @@ public abstract class AbstractProofControl implements ProofControl {
        stopAutoMode();
        waitWhileAutoMode();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -597,7 +600,7 @@ public abstract class AbstractProofControl implements ProofControl {
 
     private final class FocussedAutoModeTaskListener implements ProverTaskListener {
         private final Proof proof;
-        
+
         public FocussedAutoModeTaskListener(Proof proof) {
            this.proof = proof;
         }

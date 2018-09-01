@@ -10,6 +10,7 @@ import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
+import de.uka.ilkd.key.gui.interactionlog.InteractionLogView;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 
@@ -30,6 +31,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
      * the current proof tree
      */
     private final ProofTreeView proofTreeView;
+    private final InteractionLogView interactionLogView;
 
     public ProofTreeView getProofTreeView() {
         return proofTreeView;
@@ -81,6 +83,10 @@ public class MainWindowTabbedPane extends JTabbedPane {
         infoView = new InfoView(mediator, mainWindow);
         addTab("Info", null, infoView,
                 "Documentation on taclets and symbols");
+
+        // interaction log
+        interactionLogView = new InteractionLogView(mediator);
+        addTab("Interaction Log", null, interactionLogView);
 
         setSelectedIndex(0);
         setPreferredSize(new java.awt.Dimension(250, 440));

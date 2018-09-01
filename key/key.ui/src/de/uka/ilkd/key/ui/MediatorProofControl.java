@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 
+import de.uka.ilkd.key.util.script.ScriptRecorderFacade;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -75,6 +76,7 @@ public class MediatorProofControl extends AbstractProofControl {
      worker = new AutoModeWorker(proof, goals, ptl);
      ui.getMediator().stopInterface(true);
      ui.getMediator().setInteractive(false);
+       ScriptRecorderFacade.runAutoMode(proof, goals);
      worker.execute();
    }
 
@@ -210,6 +212,9 @@ public class MediatorProofControl extends AbstractProofControl {
       mediator.stopInterface(true);
       mediator.setInteractive(false);
       mediator.addInterruptedListener(worker);
+
+      ScriptRecorderFacade.runMacro(node, macro, posInOcc);
+
       worker.execute();
    }
 }
