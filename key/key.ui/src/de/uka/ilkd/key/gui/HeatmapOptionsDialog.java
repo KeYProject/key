@@ -123,6 +123,7 @@ public class HeatmapOptionsDialog extends JDialog {
     /** question mark icon */
     private static final Icon HELPICON = IconFactory
         .scaleIcon(IconFactory.getImage("images/questionIcon.png"), 20, 20);
+
     /**
      * Opens a dialog for choosing if and how to display heatmap highlighting.
      */
@@ -191,7 +192,7 @@ public class HeatmapOptionsDialog extends JDialog {
         textField.addActionListener(action);
 
         pack();
-        setLocationRelativeTo(null);
+        setLocation(123,122);
         setAlwaysOnTop(true);
         setVisible(true);
         setResizable(false);

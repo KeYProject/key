@@ -412,7 +412,7 @@ public final class MainWindow extends JFrame  {
         toolBar.add(new PruneProofAction(this, false));
         toolBar.addSeparator();
         toolBar.add(createHeatmapToggle());
-        toolBar.add(createHeatmapMenuOperner());
+        toolBar.add(createHeatmapMenuOpener());
 
         return toolBar;
     }
@@ -458,7 +458,7 @@ public final class MainWindow extends JFrame  {
         return toggleHeatmapButton;
     }
 
-    private JButton createHeatmapMenuOperner() {
+    private JButton createHeatmapMenuOpener() {
         JButton openMenuButton = new JButton();
         HeatmapSettingsAction a = new HeatmapSettingsAction(this);
         openMenuButton.addActionListener(a);
