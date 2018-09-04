@@ -156,9 +156,15 @@ public class HeatmapOptionsDialog extends JDialog {
         // Display the current settings
         loadSettings(radioButtons);
 
+        //save current settings in case the user escapes
+        boolean isShow = VS.isShowHeatmap();
+        boolean isSF = VS.isHeatmapSF();
+        boolean isNew = VS.isHeatmapNewest();
+        int age = VS.getMaxAgeForHeatmap();
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                VS.setHeatmapOptions(isShow, isSF, isNew, age);
                 dispose();
             }
         });
