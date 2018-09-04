@@ -103,8 +103,6 @@ public class IconFactory {
     private static Image testgenerationImage = getImage("images/toolbar/tg.png");
 
     private static Image heatmapImage = getImage("images/toolbar/heatmap.png");
-    private static Image heatmapOnImage = getImage("images/toolbar/heatmap-on.png");
-    private static Image heatmapOffImage = getImage("images/toolbar/heatmap-off.png");
 
     public static Image getImage(String s) {
 	ImageIcon ii=createImageIcon(IconFactory.class, s);
@@ -368,15 +366,6 @@ public class IconFactory {
     public static Icon heatmapIcon(int size) {
         return scaleIcon(heatmapImage, size, size);
     }
-
-    public static Icon heatmapOnIcon(int size) {
-        return scaleIcon(heatmapOnImage, size, size);
-    }
-
-    public static Icon heatmapOffIcon(int size) {
-        return scaleIcon(heatmapOffImage, size, size);
-    }
-
 
     public static class KeYFolderIcon extends FolderIcon16 {
 

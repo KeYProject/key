@@ -127,7 +127,7 @@ public class HeatmapOptionsDialog extends JDialog {
      * Opens a dialog for choosing if and how to display heatmap highlighting.
      */
     public HeatmapOptionsDialog() {
-        setTitle("Heatmap Options");
+        super(MainWindow.getInstance(), "Heatmap Options", true);
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
