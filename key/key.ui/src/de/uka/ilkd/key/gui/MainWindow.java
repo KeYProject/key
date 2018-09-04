@@ -412,20 +412,71 @@ public final class MainWindow extends JFrame  {
         toolBar.add(new PruneProofAction(this, false));
         toolBar.addSeparator();
         toolBar.add(createHeatmapToggle());
+        toolBar.add(createHeatmapMenuOperner());
 
         return toolBar;
     }
 
     private JToggleButton createHeatmapToggle() {
         JToggleButton toggleHeatmapButton = new JToggleButton();
-        toggleHeatmapButton.setToolTipText("<html>Enable or disable "
-            + "age heatmaps in the sequent view.<br>"
-            + "Hold for 1 second to open Heatmap Options Dialog. </html>");
-        toggleHeatmapButton.setIcon(IconFactory.heatmapIcon(MainWindow.TOOLBAR_ICON_SIZE));
-        HeatmapToolbarAction heatmapToolbarAction =
-            new HeatmapToolbarAction(this, toggleHeatmapButton);
-        toggleHeatmapButton.addActionListener(heatmapToolbarAction);
+        toggleHeatmapButton.setEnabled(getMediator().getSelectedProof() != null);
+        toggleHeatmapButton.setToolTipText("Enable or disable "
+            + "age heatmaps in the sequent view.");
+        toggleHeatmapButton.setIcon(IconFactory.heatmapIcon(TOOLBAR_ICON_SIZE));
+
+        de.uka.ilkd.key.settings.ViewSettings vs =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        final SettingsListener setListener = new SettingsListener() {
+            @Override
+            public void settingsChanged(EventObject e) {
+                toggleHeatmapButton.setSelected(vs.isShowHeatmap());
+            }
+        };
+        vs.addSettingsListener(setListener);
+
+        final KeYSelectionListener selListener = new KeYSelectionListener() {
+            @Override
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+                final Proof proof = getMediator().getSelectedProof();
+                toggleHeatmapButton.setEnabled(proof != null);
+            }
+
+            @Override
+            public void selectedProofChanged(KeYSelectionEvent e) {
+                selectedNodeChanged(e);
+            }
+        };
+        getMediator().addKeYSelectionListener(selListener);
+
+        toggleHeatmapButton.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                vs.setHeatmapOptions(!vs.isShowHeatmap(), vs.isHeatmapSF(),
+                    vs.isHeatmapNewest(), vs.getMaxAgeForHeatmap());
+            }
+        });
         return toggleHeatmapButton;
+    }
+
+    private JButton createHeatmapMenuOperner() {
+        JButton openMenuButton = new JButton();
+        HeatmapSettingsAction a = new HeatmapSettingsAction(this);
+        openMenuButton.addActionListener(a);
+        openMenuButton.setEnabled(getMediator().getSelectedProof() != null);
+        openMenuButton.setIcon(IconFactory.selectDecProcArrow(TOOLBAR_ICON_SIZE));
+        final KeYSelectionListener selListener = new KeYSelectionListener() {
+            @Override
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+                final Proof proof = getMediator().getSelectedProof();
+                openMenuButton.setEnabled(proof != null);
+            }
+            @Override
+            public void selectedProofChanged(KeYSelectionEvent e) {
+                selectedNodeChanged(e);
+            }
+        };
+        getMediator().addKeYSelectionListener(selListener);
+        return openMenuButton;
     }
 
     private ComplexButton createSMTComponent() {
