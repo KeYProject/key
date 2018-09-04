@@ -449,6 +449,11 @@ public final class MainWindow extends JFrame  {
         getMediator().addKeYSelectionListener(selListener);
 
         toggleHeatmapButton.addActionListener(new AbstractAction() {
+            /**
+             * version id
+             */
+            private static final long serialVersionUID = 8366752959467104985L;
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 vs.setHeatmapOptions(!vs.isShowHeatmap(), vs.isHeatmapSF(),
