@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof.io.consistency;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,7 +52,9 @@ public interface FileRepo {
      */
     public void saveProof(Path path, Proof proof) throws IOException;
     
-    public RuleSource getRuleSource(Path p);
+    //public RuleSource getRuleSource(Path p);
 
     public void setBaseDir(Path path);
+
+    //public File getOriginalFile(File file);
 }

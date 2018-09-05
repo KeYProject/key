@@ -8,16 +8,19 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 
 /**
@@ -26,9 +29,24 @@ import de.uka.ilkd.key.proof.io.RuleSourceFactory;
  * @author Wolfram Pfeifer
  */
 public class DiskFileRepo extends AbstractFileRepo {
-    protected final Path KEYPATH=Paths.get("/home/wolfram/Schreibtisch/Hiwi/KeY/key/key/key.core/bin/");
+    /**
+     * The path where KeY's built-in rules are stored.
+     * Needed to prevent built-in rules from getting cached.
+     */
+    protected static final Path KEYPATH=RuleSourceFactory.fromDefaultLocation("").file().toPath();
+
+    /**
+     * The temporary directory used as a cache.
+     */
     protected final Path tmpDir;
+
+    /**
+     * The base directory of the loaded proof (needed to calculate relative paths).
+     * If a .key/.proof file is loaded, this should be set to the path specified via "javaSource".
+     * If a directory is loaded, baseDir should be set to the path of the directory. 
+     */
     protected Path baseDir;
+
     /**
      * Stores for each requested path the mapping to its concrete path in temp dir. 
      */
@@ -61,9 +79,7 @@ public class DiskFileRepo extends AbstractFileRepo {
      *       add to root of tmp dir
      *       add to map
      */
-    
-    // TODO: adapt references to file ("\\includeFile") in .key/.proof files
-    // TODO: try to keep original directory structure?
+
     // TODO: care about links
     @Override
     public InputStream getFile(Path path) throws FileNotFoundException, IOException {
@@ -112,13 +128,15 @@ public class DiskFileRepo extends AbstractFileRepo {
            } else if (fs.getPathMatcher("glob:**.{key,proof}").matches(norm)) {  //.key/.proof
                Path newFile;
                final Path rel;
-               if (norm.startsWith(KEYPATH) || baseDir == null) {
-                   rel = KEYPATH.relativize(norm);
-                   newFile = tmpDir.resolve(rel);
-               } else {
-                   rel = baseDir.relativize(norm);
-                   newFile = tmpDir.resolve(rel);
+               if (isBuiltInRuleFile(norm) || baseDir == null) {            // don't cache
+                   System.out.println("        internal rule file (don't cache)!");
+                   map.put(path, path);
+                   return new FileInputStream(path.toFile());               // InputStream from original file!
                }
+               
+               rel = baseDir.relativize(norm);
+               newFile = tmpDir.resolve(rel);
+               
                System.out.println("Copying " + norm + " to " + newFile);
                if (!Files.exists(newFile.getParent())) {
                    Files.createDirectories(newFile.getParent());
@@ -126,7 +144,8 @@ public class DiskFileRepo extends AbstractFileRepo {
                Files.copy(norm, newFile);
                map.put(norm, newFile);
                files.add(newFile);
-               adaptFileRefs(newFile);     // TODO: currently only a stub
+               //adaptFileRefs(newFile);        // TODO: do this when saving proof
+               return new FileInputStream(newFile.toFile());
            }
        }
        return null;
@@ -142,28 +161,53 @@ public class DiskFileRepo extends AbstractFileRepo {
         }
     }
 
-    @Override
-    public RuleSource getRuleSource(Path p) {
-        try {
-            // file request to store the file with the given path in the repo
-            getFile(p);
-        }
-        catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        // create a new FileRuleSource pointing to the copy (!) in the FileRepo
-        return RuleSourceFactory.initRuleFile(map.get(p).toFile());
-    }
+//    @Override
+//    public RuleSource getRuleSource(Path p) {
+//        try {
+//            // file request to store the file with the given path in the repo
+//            getFile(p);
+//
+//            // create a new FileRuleSource pointing to the copy (!) in the FileRepo
+//            return RuleSourceFactory.initRuleFile(map.get(p).toFile());
+//        }
+//        catch (FileNotFoundException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//        catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//        
+//        return null;
+//    }
 
+    // TODO: this should be called when saving the proof
     private static void adaptFileRefs(Path path) {
         // TODO: search for "\\include", "\\includeFile", "\\javaSource", "\\classPath", "\\bootClassPath",
         //              "\\includeLDT", other?
         //    and replace them by correct references
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.{key,proof}");
+        if (matcher.matches(path)) {
+           
+            try {
+                Stream<String> lines = Files.lines(path);
+                List<String> rep = lines.map(
+                        l -> l.replaceAll("\\\\javaSource [^;\\n\\r]*;", "\\\\javaSource \"src\";"))
+                        .collect(Collectors.toList());
+                Files.write(path, rep);
+                lines.close();
+                System.out.println("new javaSource written!");
+            }
+            catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    private static boolean isBuiltInRuleFile(Path file) {
+        return file.normalize().startsWith(KEYPATH);
     }
 
     @Override
@@ -184,8 +228,14 @@ public class DiskFileRepo extends AbstractFileRepo {
         // save files to ZIP
         ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(path));
         Iterator<Path> it = files.iterator();
+        
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.{key,proof}");
+        
         while (it.hasNext()) {
             Path p = it.next();
+            if (matcher.matches(p)) {
+                adaptFileRefs(p);
+            }
             System.out.println("Writing " + tmpDir.relativize(p));
             zos.putNextEntry(new ZipEntry(tmpDir.relativize(p).toString()));
             Files.copy(p, zos);
@@ -215,14 +265,15 @@ public class DiskFileRepo extends AbstractFileRepo {
             
             System.out.println(Paths.get("demoFileRepo"));
             DiskFileRepo dfr = new DiskFileRepo("demoFileRepo");
-            dfr.setJavaPath(Paths.get("/home/wolfram/Schreibtisch/1457Highlight/"));
+            dfr.setJavaPath(Paths.get("/home/wolfram/Schreibtisch/Hiwi/1468Consistency/Test4/"));
             
             //printFile(dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/1457Highlight/Highlight.java")));
             //printFile(dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/1457Highlight/Second.java")));
             //printFile(dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/1457Highlight/Highlight.java")));
-            dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/1457Highlight/Highlight.java"));
-            dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/1457Highlight/Second.java"));
-            dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/1457Highlight/Highlight.java"));
+            dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/Hiwi/1468Consistency/Test4/Highlight.java"));
+            dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/Hiwi/1468Consistency/Test4/Second.java"));
+            dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/Hiwi/1468Consistency/Test4/subfolder1/test4.key"));
+            dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/Hiwi/1468Consistency/Test4/Highlight.java"));
             dfr.saveProof(Paths.get("/tmp/test" + System.currentTimeMillis()  + ".zip"), null);
             
             

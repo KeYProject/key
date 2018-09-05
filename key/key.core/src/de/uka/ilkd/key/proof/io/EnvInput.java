@@ -93,6 +93,4 @@ public interface EnvInput {
     File getInitialFile();
 
     void setFileRepo(FileRepo fileRepo);
-
-    // FileRepository getFileRepository();
 }

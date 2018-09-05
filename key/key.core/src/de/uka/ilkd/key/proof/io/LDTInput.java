@@ -200,20 +200,9 @@ public class LDTInput implements EnvInput {
        return null;
     }
 
-
     @Override
     public void setFileRepo(FileRepo fileRepo) {
         // TODO Auto-generated method stub
         
     }
-
-
-//    public FileRepository getFileRepository() {
-//        return fileRepository;
-//    }
-//
-//
-//    public void setFileRepository(FileRepository fileRepository) {
-//        this.fileRepository = fileRepository;
-//    }
 }

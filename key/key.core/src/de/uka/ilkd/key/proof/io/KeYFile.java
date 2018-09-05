@@ -101,6 +101,18 @@ public class KeYFile implements EnvInput {
         this.monitor = monitor;
         this.profile = profile;
     }
+    
+    /** creates a new representation for a given file by indicating a name
+     * and a RuleSource representing the physical source of the .key file.
+     */
+    public KeYFile(String name, 
+                   RuleSource file,
+                   ProgressMonitor monitor,
+                   Profile profile,
+                   FileRepo fileRepo) {
+        this(name, file, monitor, profile);
+        this.fileRepo = fileRepo;
+    }
 
         
     /** creates a new representation for a given file by indicating a name
@@ -160,9 +172,9 @@ public class KeYFile implements EnvInput {
                    Profile profile,
                    boolean compressed) {
         this(name,
-             compressed ? RuleSourceFactory.initRuleFile(file, compressed)
-                        : fileRepo.getRuleSource(file.toPath()),
+             RuleSourceFactory.initRuleFile(file, compressed),
              monitor, profile);
+        this.fileRepo = fileRepo;
     }
     
 
@@ -185,7 +197,18 @@ public class KeYFile implements EnvInput {
         if (!file.isAvailable()) {
             throw new FileNotFoundException("File/Resource " + file + " not found.");  
         } 
-        input = file.getNewStream();
+        //input = file.getNewStream();
+        System.out.println("trying to get new stream of " + file.file());
+        try {
+            if (fileRepo == null)
+                input = file.getNewStream();
+            else
+                input = fileRepo.getFile(file.file().toPath());
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return input;
     }
     
@@ -343,6 +366,7 @@ public class KeYFile implements EnvInput {
             if(javaPath != null) {
                 File cfile = new File(javaPath);
                 if (!cfile.isAbsolute()) { // test relative pathname
+                    //File parent = fileRepo.getOriginalFile(file.file()).getParentFile();
                     File parent=file.file().getParentFile();
                     cfile = new File(parent,javaPath).
                     getCanonicalFile().getAbsoluteFile();

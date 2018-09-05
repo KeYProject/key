@@ -198,8 +198,10 @@ public final class ProblemInitializer {
         for (String name : in.getLDTIncludes()) {
             
             System.out.println("LDT -----------------------------------------------------------------------------------------");
-            RuleSource rs = fileRepo.getRuleSource(in.get(name).file().toPath());           // TODO:
-            keyFile[i++] = new KeYFile(name, rs, progMon, initConfig.getProfile());
+            keyFile[i++] = new KeYFile(name, in.get(name), progMon, initConfig.getProfile(), fileRepo);
+            
+            //RuleSource rs = fileRepo.getRuleSource(in.get(name).file().toPath());           // TODO:
+            //keyFile[i++] = new KeYFile(name, rs, progMon, initConfig.getProfile());
 
             //keyFile[i++] = new KeYFile(name, in.get(name), progMon, initConfig.getProfile());
             setProgress(i);
@@ -246,8 +248,9 @@ public final class ProblemInitializer {
             //    e.printStackTrace();
             //}
 
-            RuleSource rs = fileRepo.getRuleSource(in.get(fileName).file().toPath());
-            KeYFile keyFile = new KeYFile(fileName, rs, progMon, envInput.getProfile());
+            //RuleSource rs = fileRepo.getRuleSource(in.get(fileName).file().toPath());
+            //KeYFile keyFile = new KeYFile(fileName, rs, progMon, envInput.getProfile());
+            KeYFile keyFile = new KeYFile(fileName, in.get(fileName), progMon, envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
             setProgress(++i);
         }
