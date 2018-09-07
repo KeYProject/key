@@ -1489,6 +1489,9 @@ public final class JavaInfo {
      * @param context
      *            the KeYJavaType.
      * @return whether the program method is canonical.
+     * @throws NullPointerException
+     *            e.g., if the receiver of the observer happens to be
+     *            replaced by "null".
      */
     public boolean isCanonicalProgramMethod(IProgramMethod method, KeYJavaType context)
             throws NullPointerException {

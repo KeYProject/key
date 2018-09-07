@@ -1285,8 +1285,8 @@ public class LogicPrinter {
                             p = "(" + t.op() + ")";
                         }
                     } catch (NullPointerException e) {
-                        // mu & mk: there are cases where this method fails.
-                        // (e.g. if the receiver of the observer happens to be replaced by "null").
+                        // MU & MK: There are cases where this method fails.
+                        // (e.g., if the receiver of the observer happens to be replaced by "null").
                         // better conservatively print empty String.
                         p = "";
                     }
