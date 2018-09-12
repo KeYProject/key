@@ -25,9 +25,9 @@ public class ExplorationModeToolBar extends JToolBar {
     private JComboBox<String> soundExploration;
 
     //label if only cuts should be used
-    public final String SOUND_APPLICATIONS = "Only sound changes";
+    public final String WHOLE_APPLICATIONS = "Changes with justification branch";
     //labels if not only cuts should be used
-    public final String UNSOUND_APPLICATIONS = "Allow unsound changes";
+    public final String SIMPLIFFIED_APPLIOCATIONS = "Changes without justification branch";
 
     /**
      * Create Explorationmode Toolbar
@@ -66,16 +66,16 @@ public class ExplorationModeToolBar extends JToolBar {
                 "Choosing \"sound rules\" only applies sound rules when doing exploration.\n " +
                 "This results in almost all the cases in a cut rule application.\n " +
                 "Choosing \"unsound\" the sequent can be changed freely and the changes may be unsound.");
-        soundExploration.addItem(SOUND_APPLICATIONS);
-        soundExploration.addItem(UNSOUND_APPLICATIONS);
+        soundExploration.addItem(WHOLE_APPLICATIONS);
+        soundExploration.addItem(SIMPLIFFIED_APPLIOCATIONS);
         soundExploration.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if(soundExploration.getSelectedItem() == SOUND_APPLICATIONS){
-                    explorationModeModel.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.SOUND_APPS);
+                if(soundExploration.getSelectedItem() == WHOLE_APPLICATIONS){
+                    explorationModeModel.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.WHOLE_APP);
                     showSecondBranch.setEnabled(true);
                 } else {
-                    explorationModeModel.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.UNSOUND_APPS);
+                    explorationModeModel.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.WHOLE_APP);
                     showSecondBranch.setEnabled(false);
                 }
             }
@@ -97,7 +97,7 @@ public class ExplorationModeToolBar extends JToolBar {
 
             }
         });
-        if(explorationModeModel.isExplorationModeSelected() && explorationModeModel.getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.SOUND_APPS) {
+        if(explorationModeModel.isExplorationModeSelected() && explorationModeModel.getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.WHOLE_APP) {
             showSecondBranch.setEnabled(true);
         } else {
             showSecondBranch.setEnabled(false);

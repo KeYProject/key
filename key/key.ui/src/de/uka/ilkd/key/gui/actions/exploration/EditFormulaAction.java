@@ -57,7 +57,7 @@ public class EditFormulaAction extends ExplorationAction {
         }
 
         TacletApp app;
-        boolean isSoundMode = getMediator().getExplorationModeModel().getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.SOUND_APPS;
+      //  boolean isSoundMode = getMediator().getExplorationModeModel().getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.SOUND_APPS;
         //if(isSoundMode){
             app = soundChange(pio, term, newTerm);
         //} else {
@@ -105,7 +105,7 @@ public class EditFormulaAction extends ExplorationAction {
         return app;
     }
 
-    public TacletApp changeFormula(PosInOccurrence pos, Term replaceWith) {
+    /*public TacletApp changeFormula(PosInOccurrence pos, Term replaceWith) {
         RewriteTacletBuilder changeBuilder = new RewriteTacletBuilder();
         changeBuilder.setName(new Name("change_formula"));
         changeBuilder.setFind(pos.subTerm());
@@ -124,5 +124,5 @@ public class EditFormulaAction extends ExplorationAction {
                     pos.sequentFormula().formula(), getMediator().getServices(), false);
         }
         return tacapp;
-    }
+    }*/
 }

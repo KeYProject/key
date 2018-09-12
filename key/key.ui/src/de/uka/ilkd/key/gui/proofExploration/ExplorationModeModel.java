@@ -4,7 +4,7 @@ public class ExplorationModeModel {
     /**
      * Mode which rules to use in exploration mode
      */
-    private ExplorationState ExplorationTacletAppState = ExplorationState.SOUND_APPS;
+    private ExplorationState ExplorationTacletAppState = ExplorationState.WHOLE_APP;
 
 
     /**
@@ -14,10 +14,10 @@ public class ExplorationModeModel {
     private boolean explorationModeSelected = false;
 
     /**
-     * State whether sound or unsound apps should be used
+     * State whether whole application (with shown second branch) or simplified with hidden branch app should be used
      */
     public enum ExplorationState{
-        SOUND_APPS, UNSOUND_APPS;
+        WHOLE_APP, SIMPLIFIED_APP;
     }
 
 

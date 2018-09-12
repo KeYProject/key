@@ -48,10 +48,10 @@ public class AddFormulaToSuccedentAction extends AddFormulaToSequentAction {
         Term t = promptForTerm(mainWindow, "");
         if (t == null) return;
         if(getMediator().getExplorationModeModel().getExplorationTacletAppState()
-                == ExplorationModeModel.ExplorationState.UNSOUND_APPS) {
-            super.unsoundAddition(t, false);
+                == ExplorationModeModel.ExplorationState.SIMPLIFIED_APP) {
+            super.soundAddition(t, false, false);
         } else {
-            super.soundAddition(t, false);
+            super.soundAddition(t, false, true);
         }
     }
 

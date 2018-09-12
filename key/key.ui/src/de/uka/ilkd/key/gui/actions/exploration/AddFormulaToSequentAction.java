@@ -43,7 +43,7 @@ public class AddFormulaToSequentAction extends ExplorationAction {
      * @param t
      * @param antecedent whether to add to antecedent
      */
-     void unsoundAddition(Term t, Boolean antecedent) {
+    /* void unsoundAddition(Term t, Boolean antecedent) {
         NoFindTacletBuilder builder = new NoFindTacletBuilder();
         Sequent addedFormula;
         if(antecedent) {
@@ -64,14 +64,14 @@ public class AddFormulaToSequentAction extends ExplorationAction {
         Goal g = getMediator().getSelectedGoal();
         ImmutableList<Goal> result = g.apply(NoPosTacletApp.createNoPosTacletApp(taclet));
         result.forEach(goal -> goal.node().getNodeInfo().setExploration(true));
-    }
+    }*/
 
     /**
      * Create a new Tacletapp that is sound i.e. make a cut
      * @param t
      * @param antecedent whether to add to antecedent
      */
-     void soundAddition(Term t, boolean antecedent){
+     void soundAddition(Term t, boolean antecedent, boolean showSecondBranch){
         Goal g = getMediator().getSelectedGoal();
         Taclet cut = getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
         Semisequent semisequent = new Semisequent(new SequentFormula(t));
@@ -85,7 +85,9 @@ public class AddFormulaToSequentAction extends ExplorationAction {
             Goal first = result.head();
             if(first.node().getNodeInfo().getBranchLabel().endsWith("FALSE")){
                 first.setEnabled(false);
-                //TODO now hide the branch
+                if(!showSecondBranch) {
+                    //TODO now hide the branch
+                }
             } else {
                 Goal second = result.tail().head();
                 second.setEnabled(false);

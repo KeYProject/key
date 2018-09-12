@@ -50,7 +50,7 @@ public class DeleteFormulaAction extends ExplorationAction {
         Goal g = getMediator().getSelectedGoal();
 
         TacletApp app;
-        boolean isSoundMode = getMediator().getExplorationModeModel().getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.SOUND_APPS;
+        boolean isSoundMode = getMediator().getExplorationModeModel().getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.WHOLE_APP;
         app = soundWeakening(pio, term);
         ImmutableList<Goal> result = g.apply(app);
         result.forEach(goal -> {
