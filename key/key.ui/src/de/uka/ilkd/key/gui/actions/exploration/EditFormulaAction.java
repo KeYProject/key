@@ -57,40 +57,47 @@ public class EditFormulaAction extends ExplorationAction {
         }
 
         TacletApp app;
-      //  boolean isSoundMode = getMediator().getExplorationModeModel().getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.SOUND_APPS;
+        //  boolean isSoundMode = getMediator().getExplorationModeModel().getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.SOUND_APPS;
         //if(isSoundMode){
-            app = soundChange(pio, term, newTerm);
+        app = soundChange(pio, term, newTerm);
         //} else {
-         //   app = changeFormula(pio, newTerm);
+        //   app = changeFormula(pio, newTerm);
 
         //}
         ImmutableList<Goal> result = g.apply(app);
         result.forEach(goal -> {
             goal.node().getNodeInfo().setExploration(true);
             String s = goal.node().getNodeInfo().getBranchLabel();
-            goal.node().getNodeInfo().setBranchLabel("ExplorationNode: "+s);
+            goal.node().getNodeInfo().setBranchLabel("ExplorationNode: " + s);
         });
 
         //apply the weakening
         //if(isSoundMode){
-            FindTaclet tap;
-            if(posInSeq.getPosInOccurrence().isInAntec()){
-                tap = (FindTaclet) getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("hide_left"));
-            } else {
-                tap = (FindTaclet) getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("hide_right"));
-            }
+        FindTaclet tap;
+
+        boolean inAntec = posInSeq.getPosInOccurrence().isInAntec();
+        if (inAntec) {
+            tap = (FindTaclet) getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("hide_left"));
+        } else {
+            tap = (FindTaclet) getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("hide_right"));
+        }
 
 
-            
-            TacletApp weakening = PosTacletApp.createPosTacletApp(tap, tap.getMatcher().matchFind(pio.subTerm(),
-                    MatchConditions.EMPTY_MATCHCONDITIONS,
-                    null), pio, getMediator().getServices());
-            result.forEach(goal -> {if(goal.node().getNodeInfo().getBranchLabel().contains("TRUE")){
+        TacletApp weakening = PosTacletApp.createPosTacletApp(tap, tap.getMatcher().matchFind(pio.subTerm(),
+                MatchConditions.EMPTY_MATCHCONDITIONS,
+                null), pio, getMediator().getServices());
+
+        String posToWeakening = inAntec? "TRUE" : "FALSE";
+
+        result.forEach(goal -> {
+
+            if (goal.node().getNodeInfo().getBranchLabel().contains(posToWeakening)) {
                 ImmutableList<Goal> apply = goal.apply(weakening);
                 //apply.forEach(goal1 -> goal1.node().getNodeInfo().setExploration(true));
             } else {
                 goal.setEnabled(false);
-            }});
+            }
+        });
         //}
 
 
@@ -99,9 +106,13 @@ public class EditFormulaAction extends ExplorationAction {
     private TacletApp soundChange(PosInOccurrence pio, Term term, Term newTerm) {
         Taclet cut = getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
         Semisequent semisequent = new Semisequent(new SequentFormula(newTerm));
+
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
+
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
+
         app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), getMediator().getServices(), true);
+
         return app;
     }
 
