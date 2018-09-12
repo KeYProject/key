@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
+ * Action to edit formulas in the exploration mode
  * @author Alexander Weigl
  * @author Sarah Grebing
  * @version 2 (25.05.18)
@@ -40,6 +41,12 @@ public class EditFormulaAction extends ExplorationAction {
         setEnabled(!pis.isSequent());
     }
 
+    /**
+     *
+     * If action is chosen in context menu
+     * If action is chosen in context menu
+     * @param e
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (posInSeq.isSequent()) return;

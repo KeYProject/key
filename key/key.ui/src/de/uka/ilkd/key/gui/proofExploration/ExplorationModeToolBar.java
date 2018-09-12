@@ -22,12 +22,12 @@ public class ExplorationModeToolBar extends JToolBar {
     /**
      * Combobox for choosing which kind of taclets to apply
      */
-    private JComboBox<String> soundExploration;
+    //private JComboBox<String> soundExploration;
 
     //label if only cuts should be used
-    public final String WHOLE_APPLICATIONS = "Changes with justification branch";
+    //public final String WHOLE_APPLICATIONS = "Changes with justification branch";
     //labels if not only cuts should be used
-    public final String SIMPLIFFIED_APPLIOCATIONS = "Changes without justification branch";
+    //public final String SIMPLIFFIED_APPLICATIONS = "Changes without justification branch";
 
     /**
      * Create Explorationmode Toolbar
@@ -52,24 +52,21 @@ public class ExplorationModeToolBar extends JToolBar {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     explorationModeModel.setExplorationModeSelected(true);
-                    soundExploration.setEnabled(true);
+                    //soundExploration.setEnabled(true);
                     showSecondBranch.setEnabled(true);
                 } else if (e.getStateChange() == ItemEvent.DESELECTED) {
                     explorationModeModel.setExplorationModeSelected(false);
-                    soundExploration.setEnabled(false);
+                    //soundExploration.setEnabled(true);
                 }
             }
         });
         this.add(explorationMode);
-        soundExploration = new JComboBox<>();
-        soundExploration.setToolTipText("Choose which rules to apply in exploration mode:\n" +
-                "Choosing \"sound rules\" only applies sound rules when doing exploration.\n " +
-                "This results in almost all the cases in a cut rule application.\n " +
-                "Choosing \"unsound\" the sequent can be changed freely and the changes may be unsound.");
-        soundExploration.addItem(WHOLE_APPLICATIONS);
-        soundExploration.addItem(SIMPLIFFIED_APPLIOCATIONS);
-        soundExploration.addItemListener(new ItemListener() {
-            @Override
+        //soundExploration = new JComboBox<>();
+        //soundExploration.setToolTipText("Some exploration rules need a justification branch to be sound. Choose whether to see this branch or hide it.");
+        //soundExploration.addItem(WHOLE_APPLICATIONS);
+        //soundExploration.addItem(SIMPLIFFIED_APPLICATIONS);
+        //soundExploration.addItemListener(new ItemListener() {
+        /*    @Override
             public void itemStateChanged(ItemEvent e) {
                 if(soundExploration.getSelectedItem() == WHOLE_APPLICATIONS){
                     explorationModeModel.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.WHOLE_APP);
@@ -79,9 +76,9 @@ public class ExplorationModeToolBar extends JToolBar {
                     showSecondBranch.setEnabled(false);
                 }
             }
-        });
-        soundExploration.setEnabled(false);
-        this.add(soundExploration);
+        });*/
+        //soundExploration.setEnabled(false);
+        //this.add(soundExploration);
 
         showSecondBranch = new JCheckBox("Show Second Branch");
         showSecondBranch.setToolTipText("Exploration actions are \noften done using a cut. Choose to hide\n " +
@@ -91,17 +88,19 @@ public class ExplorationModeToolBar extends JToolBar {
             public void itemStateChanged(ItemEvent e) {
                 if(e.getStateChange() == ItemEvent.SELECTED){
                     explorationModeModel.setShowSecondBranches(true);
+                    explorationModeModel.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.WHOLE_APP);
                 } else {
                     explorationModeModel.setShowSecondBranches(false);
+                    explorationModeModel.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.SIMPLIFIED_APP);
                 }
 
             }
         });
-        if(explorationModeModel.isExplorationModeSelected() && explorationModeModel.getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.WHOLE_APP) {
+        /*if(explorationModeModel.isExplorationModeSelected() && explorationModeModel.getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.WHOLE_APP) {
             showSecondBranch.setEnabled(true);
         } else {
             showSecondBranch.setEnabled(false);
-        }
+        }*/
         this.add(showSecondBranch);
         this.setEnabled(true);
 
