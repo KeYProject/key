@@ -490,8 +490,11 @@ public final class ProofManagementDialog extends JDialog {
         if (proof == null) {
             AbstractMediatorUserInterfaceControl ui = mediator.getUI();  
             
-            ProblemInitializer pi =
-                    new ProblemInitializer(ui, initConfig.getServices(), ui);
+            ProblemInitializer pi = new ProblemInitializer(ui, initConfig.getServices(), ui);
+
+            // enables to access the FileRepo created in AbstractProblemLoader
+            pi.setFileRepo(initConfig.getFileRepo());
+
             try {
                 final ProofAggregate pl = pi.startProver(initConfig, po);
                 

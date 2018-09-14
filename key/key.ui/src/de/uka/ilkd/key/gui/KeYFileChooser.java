@@ -53,6 +53,15 @@ public class KeYFileChooser {
         }
     };
 
+    private static final FileFilter PROOF_BUNDLE_FILTER = new FileFilter() {
+        public boolean accept(File f) {
+            return f.getName().endsWith(".zproof") || f.isDirectory();
+        }
+
+        public String getDescription() {
+            return "KeY proof bundles (.zproof)";
+        }
+    };
 
     private static KeYFileChooser INSTANCE;
 
@@ -64,6 +73,10 @@ public class KeYFileChooser {
 
     public boolean useCompression() {
         return getSelectedFile().getName().endsWith(".proof.gz");
+    }
+
+    public boolean isProofBundle() {
+        return getSelectedFile().getName().endsWith(".zproof");
     }
 
     private KeYFileChooser(File initDir) {
@@ -80,6 +93,7 @@ public class KeYFileChooser {
             }
         };
         fileChooser.addChoosableFileFilter(COMPRESSED_FILTER);
+        fileChooser.addChoosableFileFilter(PROOF_BUNDLE_FILTER);
         fileChooser.setFileFilter(FILTER);
     }
 
