@@ -241,6 +241,7 @@ public abstract class AbstractProblemLoader {
             envInput = createEnvInput(fileRepo);
             problemInitializer = createProblemInitializer(fileRepo);
             initConfig = createInitConfig();
+            initConfig.setFileRepo(fileRepo);
             if (!problemInitializer.getWarnings().isEmpty()) {
                control.reportWarnings(problemInitializer.getWarnings());
             }

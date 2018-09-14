@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof.io.consistency;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -38,47 +40,22 @@ public class DiskFileRepo extends AbstractFileRepo {
     /**
      * The temporary directory used as a cache.
      */
-    protected final Path tmpDir;
-
-    /**
-     * The base directory of the loaded proof (needed to calculate relative paths).
-     * If a .key/.proof file is loaded, this should be set to the path specified via "javaSource".
-     * If a directory is loaded, baseDir should be set to the path of the directory. 
-     */
-    protected Path baseDir;
+    protected Path tmpDir;
 
     /**
      * Stores for each requested path the mapping to its concrete path in temp dir. 
      */
-    protected final HashMap<Path,Path> map = new HashMap<Path,Path>();
+    protected HashMap<Path,Path> map = new HashMap<Path,Path>();
 
     /**
-     * Stores all files which have been requested to the repo.
+     * Stores paths of all files stored in the repo.
      */
-    protected final Set<Path> files = new HashSet<Path>();
+    protected Set<Path> files = new HashSet<Path>();        // TODO: set unnecessary?, list may be better
 
     public DiskFileRepo(String proofName) throws IOException {
         tmpDir = Files.createTempDirectory(proofName);
         System.out.println(tmpDir);
     }
-    
-    /*
-     * getFile:
-     * input: path (rel/abs) of a file
-     * 
-     * java file or key/proof file?
-     * java: already in map? -> yes: return from map
-     *       no:
-     *       match path to jp/cp/bcp
-     *       relativize path
-     *       add to tmp dir (jp/cp/bcp)
-     *       add to map
-     * key/proof:
-     *       already in map? -> yes: return from map
-     *       no:
-     *       add to root of tmp dir
-     *       add to map
-     */
 
     // TODO: care about links
     @Override
@@ -151,16 +128,6 @@ public class DiskFileRepo extends AbstractFileRepo {
        return null;
     }
 
-    @Override
-    public void setBaseDir(Path path) {
-        // path can be a file or a directory
-        if (Files.isDirectory(path)) {
-            baseDir = path.toAbsolutePath();
-        } else {
-            baseDir = path.getParent().toAbsolutePath();
-        }
-    }
-
 //    @Override
 //    public RuleSource getRuleSource(Path p) {
 //        try {
@@ -182,17 +149,25 @@ public class DiskFileRepo extends AbstractFileRepo {
 //        return null;
 //    }
 
-    // TODO: this should be called when saving the proof
+    // InputStream getInputStream(RuleSource rs) {
+    //      TODO: case distinction URL/File
+    // }
+
+    /**
+     * Rewrites the file references inside of .key/.proof files such that the point correctly to
+     * the copied files in the ZIP file.
+     * @param path the path of the file where the references are adapted
+     */
     private static void adaptFileRefs(Path path) {
         // TODO: search for "\\include", "\\includeFile", "\\javaSource", "\\classPath", "\\bootClassPath",
         //              "\\includeLDT", other?
         //    and replace them by correct references
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.{key,proof}");
         if (matcher.matches(path)) {
-           
-            try {
-                Stream<String> lines = Files.lines(path);
+            try (Stream<String> lines = Files.lines(path)) {
                 List<String> rep = lines.map(
+                        // TODO: line break removed here!
+                        // TODO: semicolon may be part of filename
                         l -> l.replaceAll("\\\\javaSource [^;\\n\\r]*;", "\\\\javaSource \"src\";"))
                         .collect(Collectors.toList());
                 Files.write(path, rep);
@@ -205,35 +180,26 @@ public class DiskFileRepo extends AbstractFileRepo {
             }
         }
     }
-    
+
     private static boolean isBuiltInRuleFile(Path file) {
+        // TODO: check for URL
         return file.normalize().startsWith(KEYPATH);
     }
 
     @Override
     public void saveProof(Path path, Proof proof) throws IOException {
-        // TODO: Create ZIP archive with all relevant files
-        // structure:
-        // ZIP_Proof
-        //      src/
-        //      classpath/
-        //      bootclasspath/
-        // .proof
-        // .key
-        
-        // create actual ZIP file
+        // create actual ZIP file (plus its directory if not existent)
         Files.createDirectories(path.getParent());
         Files.createFile(path);
         
-        // save files to ZIP
-        ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(path));
-        Iterator<Path> it = files.iterator();
-        
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.{key,proof}");
         
+        // write files to ZIP
+        ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(path));
+        Iterator<Path> it = files.iterator();
         while (it.hasNext()) {
             Path p = it.next();
-            if (matcher.matches(p)) {
+            if (matcher.matches(p)) {  // adapt file references to point to the copied files
                 adaptFileRefs(p);
             }
             System.out.println("Writing " + tmpDir.relativize(p));
@@ -244,43 +210,28 @@ public class DiskFileRepo extends AbstractFileRepo {
         zos.close();
     }
 
-    private static void printFile(InputStream is) {
-        int i = 0;
+    @Override
+    public void dispose() {
+        if (disposed) {
+            return;
+        }
+
         try {
-            i = is.read();
-            while (i != -1) {
-                System.out.print((char)i);
-                i = is.read();
-            }
-            is.close();
-            }
-            catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-    }
-   
-    public static void main(String[] args) {
-        try {
-            
-            System.out.println(Paths.get("demoFileRepo"));
-            DiskFileRepo dfr = new DiskFileRepo("demoFileRepo");
-            dfr.setJavaPath(Paths.get("/home/wolfram/Schreibtisch/Hiwi/1468Consistency/Test4/"));
-            
-            //printFile(dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/1457Highlight/Highlight.java")));
-            //printFile(dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/1457Highlight/Second.java")));
-            //printFile(dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/1457Highlight/Highlight.java")));
-            dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/Hiwi/1468Consistency/Test4/Highlight.java"));
-            dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/Hiwi/1468Consistency/Test4/Second.java"));
-            dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/Hiwi/1468Consistency/Test4/subfolder1/test4.key"));
-            dfr.getFile(Paths.get("/home/wolfram/Schreibtisch/Hiwi/1468Consistency/Test4/Highlight.java"));
-            dfr.saveProof(Paths.get("/tmp/test" + System.currentTimeMillis()  + ".zip"), null);
-            
-            
+            // delete the temporary directory with all contained files
+            Files.walk(baseDir)
+                .sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
+                .forEach(File::delete);
         }
         catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
+        // set every hold reference to null
+        tmpDir = null;
+        map = null;
+        files = null;
+        super.dispose();
     }
 }

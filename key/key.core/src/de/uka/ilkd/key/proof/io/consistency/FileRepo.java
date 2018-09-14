@@ -1,13 +1,11 @@
 package de.uka.ilkd.key.proof.io.consistency;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.RuleSource;
 
 /**
  * This interface provides access to files.
@@ -54,7 +52,27 @@ public interface FileRepo {
     
     //public RuleSource getRuleSource(Path p);
 
+    /**
+     * Sets the base directory of the proof, i.e. the main directory where the proof is loaded from.
+     * When loading Java sources this is the directory the loaded file resides in.
+     * When loading .key-Files this is the directory specified via "\\javaSource" or the directory
+     * of the .key-File, if no source directory is specified.
+     *
+     * This is needed by the FileRepo for resolving pathnames.
+     *
+     * @param path the path of the base directory
+     */
     public void setBaseDir(Path path);
 
-    //public File getOriginalFile(File file);
+    /**
+     * Gets the base directory.
+     * See JavaDoc of {@link #setBaseDir(Path)} for further explanation.
+     * @return the path of the base directory
+     */
+    public Path getBaseDir();
+
+    /**
+     * Clears all data in the FileRepo and marks it as disposed. 
+     */
+    public void dispose();
 }
