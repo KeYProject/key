@@ -19,8 +19,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Random;
 
-import de.uka.ilkd.key.util.net.NetworkUtils;
-
 
 public final class TipOfTheDay {
 

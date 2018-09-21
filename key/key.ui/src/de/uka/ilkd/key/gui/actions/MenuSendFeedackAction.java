@@ -7,10 +7,12 @@ import de.uka.ilkd.key.gui.MainWindow;
 
 public class MenuSendFeedackAction extends MainWindowAction {
    
-   public MenuSendFeedackAction(MainWindow mainWindow) {
-      super(mainWindow);
-      setName("Send Feedback");
-   }
+    private static final long serialVersionUID = 1L;
+
+    public MenuSendFeedackAction(MainWindow mainWindow) {
+        super(mainWindow);
+        setName("Send Feedback");
+    }
 
    /**
     * Re-using {@link SendFeedbackAction} from {@link ExceptionDialog} for this.

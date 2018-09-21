@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
  */
 public class SingletonProofCollectionUnit extends ProofCollectionUnit {
 
+   private static final long serialVersionUID = 1L;
    private final TestFile file;
    private final ProofCollectionSettings settings;
 

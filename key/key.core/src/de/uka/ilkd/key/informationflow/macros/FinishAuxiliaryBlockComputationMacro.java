@@ -19,7 +19,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
+import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -43,7 +43,7 @@ public class FinishAuxiliaryBlockComputationMacro
                 final Goal initiatingGoal = ((BlockExecutionPO)poForProof).getInitiatingGoal();
                 if (initiatingGoal.node().parent() != null) {
                     final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
-                    if (app instanceof BlockContractBuiltInRuleApp) {
+                    if (app instanceof BlockContractInternalBuiltInRuleApp) {
                         return true;
                     }
                 }
@@ -75,7 +75,8 @@ public class FinishAuxiliaryBlockComputationMacro
         // and we assume that before calling this method, the applicability of the macro was checked
         final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
 
-        final BlockContractBuiltInRuleApp blockRuleApp = (BlockContractBuiltInRuleApp)app;
+        final BlockContractInternalBuiltInRuleApp blockRuleApp =
+                (BlockContractInternalBuiltInRuleApp)app;
         final BlockContract contract = blockRuleApp.getContract();
         IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
         ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
@@ -111,7 +112,7 @@ public class FinishAuxiliaryBlockComputationMacro
      */
     private Taclet buildBlockInfFlowUnfoldTaclet(
             final Services services,
-            final BlockContractBuiltInRuleApp blockRuleApp,
+            final BlockContractInternalBuiltInRuleApp blockRuleApp,
             final BlockContract contract, IFProofObligationVars ifVars,
             final Term result) {
         final BlockInfFlowUnfoldTacletBuilder tacletBuilder =

@@ -96,6 +96,8 @@ public class ClassPreparationMethodBuilder
     	    result = ce.isCompileTimeConstant(spec.getInitializer()); 
     	} catch (java.lang.ArithmeticException t) {
     	    result = false;
+        } catch (NumberFormatException e) {
+            result = false;
     	}
     	
     	return result;

@@ -16,7 +16,6 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.io.File;
 
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
@@ -86,16 +85,17 @@ public class KeYFileChooser {
 
     public void prepare() {
         File selFile = fileChooser.getSelectedFile();
-        if ((selFile != null) && selFile.isFile()) { // present & not dir.
+        
+        if (selFile == null) {
+            if (fileChooser.getCurrentDirectory() == null) {
+                fileChooser.setCurrentDirectory(HOME_DIR);                
+            } 
+        } else if (selFile.isFile()) { // present & not dir.
             String filename = selFile.getAbsolutePath();
             if (!filename.endsWith(".proof"))
                 fileChooser.setSelectedFile(new File(filename+".proof"));
-        } else if (selFile == null) {
-            fileChooser.setSelectedFile(null);
-            fileChooser.setCurrentDirectory(HOME_DIR);
-        } else { // is directory
-            fileChooser.setSelectedFile(null);
-            fileChooser.setCurrentDirectory(selFile);
+        } else if (selFile.isDirectory()) {
+            fileChooser.setCurrentDirectory(selFile);                            
         }
     }
 
@@ -127,18 +127,41 @@ public class KeYFileChooser {
      * @return
      */
     public boolean showSaveDialog(Component parent, File originalFile, String extension) {
-        final String recDir = originalFile != null ?
-                        // if directory stay there, otherwise go to parent directory
-                        (originalFile.isDirectory()? originalFile.toString(): originalFile.getParent())
-                        : fileChooser.getCurrentDirectory().toString();
-        resetFile = (extension != null) ? new File(recDir, extension): originalFile;
+        File selectedFile;
+        if (originalFile == null) {
+            selectedFile = fileChooser.getCurrentDirectory();
+        } else {
+            selectedFile = originalFile.getAbsoluteFile();
+            if (selectedFile.isFile() || (!selectedFile.exists() && selectedFile.getName().contains("."))) {
+                selectedFile = selectedFile.getParentFile();
+            }
+        }
+        
+        if (extension != null) {
+            // the idea is to find the right place where to put a key vs. proof file
+            // we should actually have a project file containing that information in a more reliable way
+            File dirForExtension = selectedFile;
+            if (extension.endsWith(".key")) {
+                // serach for "src" folder; 
+                while (dirForExtension != null && !"src".equals(dirForExtension.getName())) {
+                    dirForExtension = dirForExtension.getParentFile();                    
+                }
+            }
+            // project structure for KeY would be the sane thing to do; avoid NPE at any cost
+            
+            resetFile = "src".equals(dirForExtension.getName()) && dirForExtension.getParentFile() != null ? 
+                    dirForExtension.getParentFile() : selectedFile;
+            
+            selectedFile = new File(resetFile, extension);             
+        } else {
+            resetFile = selectedFile;
+        }
+        
+        
         fileChooser.setSelectedFile(resetFile);
         setSaveDialog(true);
-        final String poDir = resetFile.getParent().endsWith("src") ?
-                             new File(resetFile.getParent()).getParent() : resetFile.getParent();
-        final String proofDir = resetFile.getParent();
-        originalFile = new File(extension.endsWith(".key") ? poDir : proofDir, resetFile.getName());
-        return showSaveDialog(parent, originalFile);
+        
+        return showSaveDialog(parent, selectedFile);
     }
 
     public boolean showSaveDialog(Component parent, File selectedFile) {

@@ -62,6 +62,7 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
+import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -606,6 +607,34 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     @Override
+    public ImmutableSet<LoopContract> extractLoopContracts(
+            final IProgramMethod method, final StatementBlock block)
+            throws SLTranslationException {
+        return createLoopContracts(method, new LinkedList<Label>(), block,
+                block.getComments());
+    }
+
+    @Override
+    public ImmutableSet<LoopContract> extractLoopContracts(
+            final IProgramMethod method, final LabeledStatement labeled)
+            throws SLTranslationException {
+        final List<Label> labels = new LinkedList<Label>();
+        labels.add(labeled.getLabel());
+        Statement nextNonLabeled = labeled.getBody();
+        while (nextNonLabeled instanceof LabeledStatement) {
+            final LabeledStatement currentLabeled = (LabeledStatement) nextNonLabeled;
+            labels.add(currentLabeled.getLabel());
+            nextNonLabeled = currentLabeled.getBody();
+        }
+        if (nextNonLabeled instanceof StatementBlock) {
+            return createLoopContracts(method, labels,
+                    (StatementBlock) nextNonLabeled, labeled.getComments());
+        } else {
+            return DefaultImmutableSet.nil();
+        }
+    }
+
+    @Override
     public ImmutableSet<MergeContract> extractMergeContracts(
             IProgramMethod method, MergePointStatement mps,
             ImmutableList<ProgramVariable> methodParams)
@@ -639,6 +668,28 @@ public final class JMLSpecExtractor implements SpecExtractor {
             final TextualJMLSpecCase specificationCase = (TextualJMLSpecCase) constructs[i];
             try {
                 result = result.union(jsf.createJMLBlockContracts(method,
+                        labels, block, specificationCase));
+            } catch (final SLWarningException exception) {
+                warnings = warnings.add(exception.getWarning());
+            }
+        }
+        return result;
+    }
+
+    private ImmutableSet<LoopContract> createLoopContracts(
+            final IProgramMethod method, final List<Label> labels,
+            final StatementBlock block, final Comment[] comments)
+            throws SLTranslationException {
+        ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
+        // For some odd reason every comment block appears twice; thus we remove
+        // duplicates.
+        final TextualJMLConstruct[] constructs = parseMethodLevelComments(
+                removeDuplicates(comments), getFileName(method));
+        for (int i = constructs.length - 1; i >= 0
+                && constructs[i] instanceof TextualJMLSpecCase; i--) {
+            final TextualJMLSpecCase specificationCase = (TextualJMLSpecCase) constructs[i];
+            try {
+                result = result.union(jsf.createJMLLoopContracts(method,
                         labels, block, specificationCase));
             } catch (final SLWarningException exception) {
                 warnings = warnings.add(exception.getWarning());

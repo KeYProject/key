@@ -122,7 +122,7 @@ termination: diamond" pathCondition="x &gt;  -1" pathConditionChanged="false" re
                </value>
             </variable>
             <callStackEntry path="/0"/>
-            <loopInvariant name="invariant: x &lt;= javaUnaryMinusInt(1);
+            <loopInvariant name="invariant: x &lt;= -1;
 variant: javaSubInt(0, x)
 mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid="true">
                <variable name="x" isArrayIndex="false">

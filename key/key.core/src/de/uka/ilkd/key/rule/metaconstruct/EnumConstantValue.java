@@ -57,7 +57,7 @@ public final class EnumConstantValue extends AbstractTermTransformer {
             int value;
 
             ProgramVariable pv = (ProgramVariable) op;
-            String varname = pv.getProgramElementName().getProgramName();
+            //String varname = pv.getProgramElementName().getProgramName();
 
             if (false){//varname.endsWith(ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE)) {//TODO
                 // <nextToCreate>

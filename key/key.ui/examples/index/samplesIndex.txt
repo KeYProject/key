@@ -11,8 +11,8 @@ firstTouch/02-Subset/README.txt
 heap/vstte10_01_SumAndMax/FIRSTTOUCH.txt
 # moved to competitions below
 # firstTouch/04-LinkedList/README.txt
-# 05 seems to be broken ... deactivated
-# firstTouch/05-ReverseArray/README.txt
+# 05 seems to be broken ... deactivated ... revived
+firstTouch/05-ReverseArray/README.txt
 firstTouch/06-BinarySearch/README.txt
 firstTouch/07-Cell/README.txt
 firstTouch/08-Java5/README.txt
@@ -21,6 +21,10 @@ firstTouch/09-Quicktour/README.txt
 firstTouch/10-SITA/README.txt
 firstTouch/11-StateMerging/README.txt
 
+heap/block_loop_contracts/Simple/README.txt
+heap/block_loop_contracts/Divide/README.txt
+heap/block_loop_contracts/InternalExternal/README.txt
+heap/block_loop_contracts/List/README.txt
 heap/SmansEtAl/README.txt
 heap/Transactions/README.txt
 heap/information_flow/README-ArrayList.txt

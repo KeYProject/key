@@ -18,8 +18,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import javax.swing.JPanel;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.TitledBorder;
 
 /**
  * Creates the layout for SequentViews.

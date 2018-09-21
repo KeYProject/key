@@ -277,6 +277,7 @@ methodlevel_element[ImmutableList<String> mods]
     |   result=nowarn_pragma[mods]
     |   result=debug_statement[mods]
     |   result=block_specification[mods]
+    |   result=block_loop_specification[mods]
 ;
 
 
@@ -739,6 +740,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
 	|   ps=measured_by_clause    { sc.addMeasuredBy(ps); }
+	|   ps=variant_function      { sc.addDecreases(ps); }
 	|   ps=name_clause           { sc.addName(ps); }
 	|   captures_clause
 	|   when_clause
@@ -828,6 +830,8 @@ assignable_keyword
 :
 	ASSIGNABLE
     |   ASSIGNABLE_RED
+    |   ASSIGNS
+    |   ASSIGNS_RED
     |   MODIFIABLE
     |   MODIFIABLE_RED
     |   MODIFIES
@@ -1463,6 +1467,8 @@ decreasing_keyword
     |   DECREASING_REDUNDANTLY
     |   DECREASES
     |   DECREASES_REDUNDANTLY
+    |   LOOP_VARIANT
+    |   LOOP_VARIANT_RED
 ;
 
 
@@ -1562,6 +1568,34 @@ block_specification[ImmutableList<String> mods]
 
     result=method_specification[mods]
 ;
+
+block_loop_specification[ImmutableList<String> mods]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
+	throws SLTranslationException
+@init {
+    list = ImmutableSLList.<TextualJMLConstruct>nil();
+    result = r;
+}
+@after { r = result; }
+:
+    (
+    loop_contract_keyword result=spec_case[mods]
+    (
+	options { greedy = true; }
+	:
+	(also_keyword)+ loop_contract_keyword list=spec_case[ImmutableSLList.<String>nil()]
+	{
+	    result = result.append(list);
+	}
+    )*)
+    {
+        for (TextualJMLConstruct construct : result) {
+            construct.setLoopContract(true);
+        }
+    }
+;
+
+loop_contract_keyword : LOOP_CONTRACT;
 
 
 assert_statement[ImmutableList<String> mods]

@@ -330,5 +330,20 @@ public final class PosInTerm {
         }
     }
 
-
+    /**
+     * Checks whether this pit is the prefix of a given pit.
+     * @param pit the given pit
+     * @return true if this is a prefix of the given pit
+     */
+    public boolean isPrefixOf(PosInTerm pit) {
+        if(size >= pit.size) {
+            return false;
+        }
+        for(int i = 0; i < size; i++) {
+            if (positions[i] != pit.positions[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

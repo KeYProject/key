@@ -26,7 +26,7 @@ public class ScriptResult {
     /**
      * The scriptcommand that lead to this result
      */
-    private ProofScriptCommandCall call;
+    private ProofScriptCommandCall<?> call;
 
     /**
      * The reference to the variableassingments for this result
@@ -78,11 +78,11 @@ public class ScriptResult {
         return this;
     }
 
-    public ProofScriptCommandCall getCall() {
+    public ProofScriptCommandCall<?> getCall() {
         return call;
     }
 
-    public ScriptResult setCall(ProofScriptCommandCall call) {
+    public ScriptResult setCall(ProofScriptCommandCall<?> call) {
         this.call = call;
         return this;
     }

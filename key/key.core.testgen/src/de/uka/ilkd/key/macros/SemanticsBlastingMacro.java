@@ -160,6 +160,7 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
 			allowedRulesNames.add("nonNull");
 			allowedRulesNames.add("nonNullZero");
 			allowedRulesNames.add("sub_literals");
+			allowedRulesNames.add("equal_literals");
 			//allowedRulesNames.add("applyEq");
 		}
 		@Override

@@ -17,7 +17,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.key4eclipse.starter.core;bundle-version="1.0.0",
  org.key_project.key4eclipse.common.ui;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8, JavaSE-10, JavaSE-9
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.monkey.product.ui.application,
  org.key_project.monkey.product.ui.batch,
@@ -27,3 +27,4 @@ Export-Package: org.key_project.monkey.product.ui.application,
  org.key_project.monkey.product.ui.provider,
  org.key_project.monkey.product.ui.util,
  org.key_project.monkey.product.ui.view
+Automatic-Module-Name: org.key_project.monkey.product.ui

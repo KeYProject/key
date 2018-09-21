@@ -6,7 +6,6 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -19,7 +18,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -58,7 +56,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
             ImmutableList<Term> termList, IProgramMethod pm) {
 
         Sort[] argSorts = new Sort[termList.size()];
-        ImmutableArray<Sort> pmSorts = pm.argSorts();
+        //ImmutableArray<Sort> pmSorts = pm.argSorts();
 
         int i = 0;
         for (final Term arg : termList) {
@@ -168,7 +166,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         }
 
         if (hasMby) {
-            // if the contract has a mesured by clause, then mbyAtPre is also
+            // if the contract has a measured by clause, then mbyAtPre is also
             // relevant
             relevantPreVars = relevantPreVars.append(poVars.pre.mbyAtPre);
         }

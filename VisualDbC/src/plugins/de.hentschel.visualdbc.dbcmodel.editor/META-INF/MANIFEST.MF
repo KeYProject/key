@@ -7,7 +7,7 @@ Bundle-ClassPath: .
 Bundle-Activator: de.hentschel.visualdbc.dbcmodel.presentation.DbCEditorPlugin$Implementation
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8, JavaSE-10, JavaSE-9
 Export-Package: de.hentschel.visualdbc.dbcmodel.presentation
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;visibility:=reexport,
@@ -16,3 +16,4 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.edit.ui;visibility:=reexport,
  org.eclipse.ui.ide;visibility:=reexport
 Bundle-ActivationPolicy: lazy
+Automatic-Module-Name: de.hentschel.visualdbc.dbcmodel.editor

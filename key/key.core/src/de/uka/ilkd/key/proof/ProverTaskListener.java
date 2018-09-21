@@ -31,7 +31,7 @@ public interface ProverTaskListener {
      * 
      * @param position
      *            indicates how much work has been done relative to the value of
-     *            {@code size} passed in {@link #taskStarted(String, int)}.
+     *            {@code size} passed in {@link #taskStarted(TaskStartedInfo)}.
      */
     void taskProgress ( int position );
     

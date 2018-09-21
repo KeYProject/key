@@ -59,9 +59,18 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
  * <p>
  * The {@link TermLabelManager} is responsible during prove to maintain term labels.
  * This means that labels of new {@link Term}s created during rule application are computed
- * via {@link TermLabelManager#instantiateLabels(de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.PosInOccurrence, Term, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.logic.JavaBlock)}
+ * via {@link TermLabelManager#instantiateLabels(
+ *         de.uka.ilkd.key.logic.label.TermLabelState, de.uka.ilkd.key.java.Services,
+ *         de.uka.ilkd.key.logic.PosInOccurrence, Term, de.uka.ilkd.key.rule.Rule,
+ *         de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator,
+ *         de.uka.ilkd.key.collection.ImmutableArray,
+ *         de.uka.ilkd.key.collection.ImmutableArray,
+ *         de.uka.ilkd.key.logic.JavaBlock)}
  * and of existing {@link Term}s are refactored (added or removed) via
- * {@link TermLabelManager#refactorGoal(de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.PosInOccurrence, Term, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Term)}.
+ * {@link TermLabelManager#refactorGoal(
+ *         de.uka.ilkd.key.logic.label.TermLabelState, de.uka.ilkd.key.java.Services,
+ *         de.uka.ilkd.key.logic.PosInOccurrence, Term, de.uka.ilkd.key.rule.Rule,
+ *         de.uka.ilkd.key.proof.Goal, Term)}.
  * </p>
  * <p>
  * Antecedent and succedent of a {@link Sequent} are sets. The equality check
@@ -122,8 +131,17 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
  *       is only called for newly created {@link Term}s labeled up to now. If
  *       your {@link TermLabelPolicy}, {@link TermLabelUpdate} or {@link TermLabelRefactoring}
  *       is not called on the right {@link Term}, it is your task to call
- *       {@link TermLabelManager#instantiateLabels(de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.logic.JavaBlock)} and
- *       {@link TermLabelManager#refactorLabels(de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Term)}
+ *       {@link TermLabelManager#instantiateLabels(
+ *           de.uka.ilkd.key.logic.label.TermLabelState, de.uka.ilkd.key.java.Services,
+ *           de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.rule.Rule,
+ *           de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator,
+ *           de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray,
+ *           de.uka.ilkd.key.logic.JavaBlock)}
+ *       and
+ *       {@link TermLabelManager#refactorLabels(
+ *           de.uka.ilkd.key.logic.label.TermLabelState, de.uka.ilkd.key.java.Services,
+ *           de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.rule.Rule,
+ *           de.uka.ilkd.key.proof.Goal, Term)}
  *       on the right place in the rule implementation.
  *    </li>
  * </ol>
@@ -143,9 +161,9 @@ public interface TermLabel extends Named {
      *            the number of the parameter to retrieve (
      *            {@code 0 <= i < getChildCount()})
      * @return the selected parameter
-     * @throw an {@link IndexOutOfBoundsException} if the given parameter number
-     *        <tt>i</tt> is negative or greater-or-equal the number of
-     *        parameters returned by {@link #getChildCount()}
+     * @throws IndexOutOfBoundsException if the given parameter number
+     *         <tt>i</tt> is negative or greater-or-equal the number of
+     *         parameters returned by {@link #getChildCount()}
      */
     public Object getChild(int i);
 

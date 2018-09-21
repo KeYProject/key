@@ -35,7 +35,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 /**
  * <p>
  * A {@link TermLabelUpdate} is used by
- * {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, Term, Term, Rule, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}
+ * {@link TermLabelManager#instantiateLabels(
+ *     TermLabelState, Services, PosInOccurrence, Term, Term, Rule, Goal,
+ *     Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}
  * to add or remove maintained {@link TermLabel}s which will be added to the new {@link Term}.
  * </p>
  * <p>
@@ -65,7 +67,8 @@ public interface TermLabelUpdate extends RuleSpecificTask {
     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
     * @param labels The {@link Set} of {@link TermLabel}s to modify.
     * @param state The {@link TermLabelState} of the current rule application.
-    * @return {@code true} keep {@link TermLabel} and add it to the new {@link Term}. {@code false} drop {@link TermLabel} and do not need it to the new {@link Term}.
+    * return {@code true} keep {@link TermLabel} and add it to the new {@link Term}.
+    *     {@code false} drop {@link TermLabel} and do not need it to the new {@link Term}.
     */
    public void updateLabels(TermLabelState state,
                             Services services,

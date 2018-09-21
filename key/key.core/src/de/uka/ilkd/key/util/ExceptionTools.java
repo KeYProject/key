@@ -3,6 +3,7 @@ package de.uka.ilkd.key.util;
 import org.antlr.runtime.RecognitionException;
 
 import de.uka.ilkd.key.java.ParseExceptionInFile;
+import de.uka.ilkd.key.java.PosConvertException;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.KeYSemanticException;
 import de.uka.ilkd.key.parser.Location;
@@ -11,6 +12,9 @@ import de.uka.ilkd.key.parser.proofjava.ParseException;
 import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import recoder.java.CompilationUnit;
+import recoder.kit.UnitKit;
+import recoder.service.UnresolvedReferenceException;
 
 /**
  * Various utility methods related to exceptions.
@@ -77,6 +81,17 @@ public final class ExceptionTools {
         } else if (exc instanceof ScriptException) {
             // may still be null ...
             location = ((ScriptException)exc).getLocation();
+        } else if (exc instanceof PosConvertException) {
+            Throwable cause = exc.getCause();
+            String file = "";
+            if (cause instanceof UnresolvedReferenceException) {
+                UnresolvedReferenceException ure = (UnresolvedReferenceException) cause;
+                CompilationUnit cu = UnitKit.getCompilationUnit(ure.getUnresolvedReference());
+                String dataloc = cu.getDataLocation().toString();
+                file = dataloc.substring(dataloc.indexOf(':') + 1);
+            }
+            location = new Location(file, ((PosConvertException) exc).getLine(),
+                                        ((PosConvertException) exc).getColumn());
         } 
     
         if (location == null && exc.getCause() != null) {

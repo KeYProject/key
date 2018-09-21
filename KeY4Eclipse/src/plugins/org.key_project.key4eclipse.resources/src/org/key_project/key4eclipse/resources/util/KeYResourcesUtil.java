@@ -16,14 +16,7 @@ package org.key_project.key4eclipse.resources.util;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -43,16 +36,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.ISourceRange;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.*;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuildJob;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.decorator.ProofFileLightweightLabelDecorator;
@@ -99,7 +83,7 @@ import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * @author Stefan Käsdorf
+ * @author Stefan Kaesdorf
  */
 public class KeYResourcesUtil {
    
@@ -604,7 +588,7 @@ public class KeYResourcesUtil {
     * @return the proof folder
     */
    public static IFolder getProofFolder(IProject project){
-      if(isKeYProject(project)){
+      if (isKeYProject(project)){
          return project.getFolder(PROOF_FOLDER_NAME);
       }
       return null;
@@ -1192,5 +1176,24 @@ public class KeYResourcesUtil {
          }
       }
       return null;
+   }
+
+
+   public static TreeSet<String> getAllTypesIn(IProject project) {
+       TreeSet<String> allTypes = new TreeSet<>();
+       IJavaProject javaProject = JavaCore.create(project);
+       try {
+           for (IPackageFragment pkgRoot : javaProject.getPackageFragments()) {
+               for (ICompilationUnit cu : pkgRoot.getCompilationUnits()) {
+                   for (IJavaElement e : cu.getAllTypes()) {
+                       allTypes.add(((IType)e).getFullyQualifiedName());
+                   }
+               }
+           }
+       }
+       catch (JavaModelException e) {
+           e.printStackTrace();
+       }
+       return allTypes;
    }
 }

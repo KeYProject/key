@@ -13,28 +13,65 @@
 
 package de.uka.ilkd.key.java;
 
+
+/**
+ * A convert exception enriched with a location within a file/source.
+ *
+ * The source's name itself is not captured.
+ */
 public class PosConvertException extends ConvertException {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 758453353495075586L;
-    int line;
-    int col;
-    
-    public PosConvertException(String m, int l, int c) {
-	super(m);
-	line=l;
-	col=c;
+
+    /** The line */
+    private final int line;
+
+    /** The column */
+    private int column;
+
+    /**
+     * Instantiates a new exception with position information.
+     *
+     * @param message the message, not null
+     * @param line the line to point to
+     * @param column the column to point to
+     */
+    public PosConvertException(String message, int line, int column) {
+        super(message);
+        this.line = line;
+        this.column = column;
     }
 
-    
+    /**
+     * Instantiates a new exception with position information.
+     *
+     * @param cause the exception causing this instance.
+     * @param line the line to point to
+     * @param column the column to point to
+     */
+    public PosConvertException(Throwable cause, int line, int column) {
+        super(cause);
+        this.line = line;
+        this.column = column;
+    }
+
+
+    /**
+     * Gets the line of the exception location.
+     *
+     * @return the line
+     */
     public int getLine() {
-	return line;
+        return line;
     }
 
+    /**
+     * Gets the column of the exception location.
+     *
+     * @return the column
+     */
     public int getColumn() {
-	return col;
+        return column;
     }
-    
+
 }

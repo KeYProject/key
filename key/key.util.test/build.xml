@@ -13,6 +13,7 @@
 	                <jvmarg value="-Xmx2048m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
 			<jvmarg value="-ea"/>
+			<jvmarg value="-Dkey.disregardSettings=true"/>
 			<classpath>
 				<pathelement location="${dist.dir}/key.util.jar"/>
 				<pathelement location="${ext.dir}/junit-4.12.jar"/>

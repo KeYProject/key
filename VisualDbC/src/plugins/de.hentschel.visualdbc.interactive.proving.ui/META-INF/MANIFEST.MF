@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.ui,
  de.hentschel.visualdbc.dbcmodel.diagram.custom;bundle-version="1.0.0",
  de.hentschel.visualdbc.dbcmodel.editor;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8, JavaSE-10, JavaSE-9
 Bundle-Vendor: Martin Hentschel
 Export-Package: de.hentschel.visualdbc.interactive.proving.ui.command,
  de.hentschel.visualdbc.interactive.proving.ui.finder,
@@ -23,3 +23,4 @@ Export-Package: de.hentschel.visualdbc.interactive.proving.ui.command,
  de.hentschel.visualdbc.interactive.proving.ui.job.event,
  de.hentschel.visualdbc.interactive.proving.ui.util,
  de.hentschel.visualdbc.interactive.proving.ui.util.event
+Automatic-Module-Name: de.hentschel.visualdbc.interactive.proving.ui
