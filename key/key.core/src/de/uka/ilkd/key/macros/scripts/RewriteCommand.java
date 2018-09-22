@@ -3,17 +3,14 @@ package de.uka.ilkd.key.macros.scripts;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
-import de.uka.ilkd.key.macros.scripts.meta.Varargs;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -22,10 +19,25 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * rewrite find="t1" replace="t2"; (mulbrich script syntax)
- * rewrite find=`t1` replace=`t2`; (psdbg)
+ * This class provides the command <code>rewrite</code>.
+ * <p>
+ * This command takes two parameters. A term to find, and a term
+ * as the substitutent. Parameter class is {@link RewriteCommand.Parameters}.
+ * <p>
+ *
+ * <p>Usage:
+ * <pre>
+ *     rewrite find="x+y" replace="y+x"; //(mulbrich script syntax)
+ *     rewrite find=`y+x` replace=`y+x`; //(psdbg)
+ * </pre>
+ * </p>
+ *
+ * @author lulong, grebing, weigl
  */
-public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
+public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
+    /**
+     * Constructs this rewrite command.
+     */
     public RewriteCommand() {
         super(Parameters.class);
     }
@@ -36,15 +48,16 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
     }
 
 
-    @Override public Parameters evaluateArguments(EngineState state,
-                                                              Map<String, String> arguments) throws Exception {
-        Parameters p = state.getValueInjector()
+    @Override
+    public Parameters evaluateArguments(EngineState state,
+                                        Map<String, String> arguments) throws Exception {
+        return state.getValueInjector()
                 .inject(this, new Parameters(), arguments);
-        return p;
     }
 
-    @Override public void execute(AbstractUserInterfaceControl uiControl,
-                                  Parameters args, EngineState state)
+    @Override
+    public void execute(AbstractUserInterfaceControl uiControl,
+                        Parameters args, EngineState state)
             throws ScriptException, InterruptedException {
         Proof proof = state.getProof();
         assert proof != null;
@@ -52,32 +65,24 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
         //get all Taclets
         ImmutableList<TacletApp> allApps = findAllTacletApps(args, state);
 
-        //filter only taclets on find, also sets allReplSucc to false if one replacement isn't successful
+        //filter only taclets on find, also sets allReplSucc to false
+        // if one replacement isn't successful
         //TODO: failPosInOcc only needed for different cut structures
         List<PosInOccurrence> failposInOccs = findAndExecReplacement(args, allApps, state);
 
         if (failposInOccs.size() >= 1) {
 
             System.out.println("Cut needed");
-           CutCommand cut = new CutCommand();
-           CutCommand.Parameters param = new CutCommand.Parameters();
-           param.formula = args.replace;
+            CutCommand cut = new CutCommand();
+            CutCommand.Parameters param = new CutCommand.Parameters();
+            param.formula = args.replace;
 
-           cut.execute(uiControl, param, state);
-           System.out.println("After final cut:"+ state.getFirstOpenGoal().sequent());
+            cut.execute(uiControl, param, state);
+            System.out.println("After final cut:" + state.getFirstOpenGoal().sequent());
 
 
         }
 
-    }
-
-    public static class Parameters {
-        @Option(value = "find", required = true)
-        public Term find;
-        @Option(value = "replace", required = true)
-        public Term replace;
-        @Option(value = "formula", required = false)
-        public Term formula;
     }
 
     /**
@@ -116,18 +121,19 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
         return allApps;
     }
 
- /**
- * Filter tacletapps: term = find && result = replace
- **/
- //TODO: probably void, except if we want the failed PosInOccs
-    private List<PosInOccurrence> findAndExecReplacement(Parameters p,
-                                       ImmutableList<TacletApp> list, EngineState state) {
+    /**
+     * Filter tacletapps: term = find && result = replace
+     **/
+    //TODO: probably void, except if we want the failed PosInOccs
+    //FIXME: should be rewritten into smaller pieces!
+    private List<PosInOccurrence> findAndExecReplacement(
+            Parameters p, ImmutableList<TacletApp> list, EngineState state) {
         //List of PosInOcc that haven't been  succ replaced
-        List<PosInOccurrence> failposInOccs = new ArrayList<PosInOccurrence>();
+        List<PosInOccurrence> failposInOccs = new ArrayList<>();
         System.out.println("Size = 0:" + failposInOccs.size());
 
         //List of PosInOcc that succ replaced
-        List<PosInOccurrence> succposInOccs = new ArrayList<PosInOccurrence>();
+        List<PosInOccurrence> succposInOccs = new ArrayList<>();
 
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp) {
@@ -137,38 +143,43 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
                         continue;
                     }
                     if (pta.posInOccurrence().subTerm().equals(p.find) && pta.complete()) {
-                        System.out.println("________________________________________");
-                        System.out.println("Tacletapp an der Stelle: " + tacletApp.posInOccurrence());
-                        System.out.println("Tacletname an der Stelle: " + pta.taclet().displayName());
+                        //System.out.println("________________________________________");
+                        //System.out.println("Tacletapp an der Stelle: "
+                        // + tacletApp.posInOccurrence());
+                        //System.out.println("Tacletname an der Stelle: "
+                        // + pta.taclet().displayName());
                         //if Term already succ replaced, the skip
                         if (succposInOccs.contains(pta.posInOccurrence())) {
                             System.out.println("Term already successfully replaced.");
                             continue;
                         }
 
-                        // TODO: if taclet transforms find to replace then execute and add to list, else null
+                        // TODO: if taclet transforms find to replace then execute
+                        // and add to list, else null
 
                         try {
                             System.out.println("Term NOT already successfully replaced.");
-
                             Goal goalold = state.getFirstOpenGoal();
 
                             //check the rewritten term
                             RewriteTaclet rw = (RewriteTaclet) pta.taclet();
-                            if(pta.complete()) {
+                            if (pta.complete()) {
                                 //for top level formulas -> TODO what about subterm replacements
-                                SequentFormula rewriteResult = rw.getExecutor().getRewriteResult(goalold, null, goalold.proof().getServices(), pta);
+                                SequentFormula rewriteResult = rw.getExecutor()
+                                        .getRewriteResult(goalold, null,
+                                                goalold.proof().getServices(), pta);
                                 System.out.println("Rewrite Result =" + rewriteResult.toString());
-                                if(rewriteResult.formula().equals(p.replace) ||
-                                        getTermAtPos(rewriteResult, pta.posInOccurrence()).equals(p.replace)){
+                                if (rewriteResult.formula().equals(p.replace) ||
+                                        getTermAtPos(rewriteResult, pta.posInOccurrence())
+                                                .equals(p.replace)) {
                                     failposInOccs.remove(pta.posInOccurrence());
                                     succposInOccs.add(pta.posInOccurrence());
                                     System.out.println("Sucessful Replacement, applying rule app");
                                     goalold.apply(pta);
                                     break;
                                 } else {
-
-                                    System.out.println("Unsucessful Replacement & already in failed list");
+                                    System.out.println("Unsucessful Replacement & " +
+                                            "already in failed list");
                                 }
                             }
                             /*//TODO: nicht immer an der gleichen pio
@@ -180,12 +191,14 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
                                 System.out.println("Sucessful Replacement");
                             } else {
                                 if (!failposInOccs.contains(pta.posInOccurrence())) {
-                                    System.out.println("Unsucessful Replacement & add to failed list:");
+                                    System.out.println("Unsucessful "+
+                                    "Replacement & add to failed list:");
                                     failposInOccs.add(pta.posInOccurrence());
                                     state.setGoal(goalold);
                                 } else {
                                     //prune
-                                    System.out.println("Unsucessful Replacement & already in failed list");
+                                    System.out.println("Unsucessful Replacement
+                                    & already in failed list");
                                     state.setGoal(goalold);
                                 }
                             }*/
@@ -193,12 +206,10 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
                             if (!failposInOccs.contains(pta.posInOccurrence())) {
                                 failposInOccs.add(pta.posInOccurrence());
                             }
+                            //FIXME not good design, no output on console
                             System.out.println("TacletApp not applicable");
                             e.printStackTrace();
-                            continue;
                         }
-
-
                     }
                 }
             }
@@ -207,20 +218,26 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
         return failposInOccs;
     }
 
-    public Term getTermAtPos(SequentFormula sf, PosInOccurrence pio){
-        if(pio.isTopLevel()){
+    private Term getTermAtPos(SequentFormula sf, PosInOccurrence pio) {
+        if (pio.isTopLevel()) {
             return sf.formula();
 
         } else {
             PosInTerm pit = pio.posInTerm();
-            Term t =getSubTerm(sf.formula(), pit.iterator());
-            return t;
+            return getSubTerm(sf.formula(), pit.iterator());
         }
 
     }
 
-    public Term getSubTerm(Term t, IntIterator pit){
-        if(pit.hasNext()) {
+    /**
+     * ...?
+     *
+     * @param t
+     * @param pit
+     * @return
+     */
+    private Term getSubTerm(Term t, IntIterator pit) {
+        if (pit.hasNext()) {
             int i = pit.next();
             return getSubTerm(t.sub(i), pit);
         } else {
@@ -228,8 +245,27 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters>{
         }
     }
 
-
-
-
+    /**
+     * Parameters for the {@link RewriteCommand}
+     *
+     * @author luong, grebing, weigl
+     */
+    public static class Parameters {
+        /**
+         * Term, which should be replaced
+         */
+        @Option(value = "find")
+        public Term find;
+        /**
+         * Substitutent
+         */
+        @Option(value = "replace")
+        public Term replace;
+        /**
+         * Formula, where to find {@see find}.
+         */
+        @Option(value = "formula", required = false)
+        public Term formula;
+    }
 }
 
