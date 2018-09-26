@@ -41,7 +41,9 @@ public class ValueInjector {
      * @throws ConversionException           an converter could not translate the given value in
      *                                       {@arguments}
      */
-    public static <T> T injection(ProofScriptCommand<?> command, T obj, Map<String, String> arguments)
+    public static <T> T injection(ProofScriptCommand<?> command,
+                                  T obj,
+                                  Map<String, String> arguments)
             throws ArgumentRequiredException, InjectionReflectionException,
             NoSpecifiedConverterException, ConversionException {
         return getInstance().inject(command, obj, arguments);
