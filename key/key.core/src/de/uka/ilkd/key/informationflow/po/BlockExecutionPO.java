@@ -251,8 +251,8 @@ public class BlockExecutionPO extends AbstractInfFlowPO
 
 
     @Override
-    public IFProofObligationVars getLeaveIFVars() {
-        return getChildPO().getLeaveIFVars();
+    public IFProofObligationVars getLeafIFVars() {
+        return getChildPO().getLeafIFVars();
     }
 
 

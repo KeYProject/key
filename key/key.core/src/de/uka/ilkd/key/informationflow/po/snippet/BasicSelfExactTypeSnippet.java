@@ -37,9 +37,10 @@ class BasicSelfExactTypeSnippet implements FactoryMethod {
             result = (poVars.pre.self == null || pm.isConstructor())
                     ? d.tb.tt() : d.tb.exactInstance(contractSort, poVars.pre.self);
         } else if (d.get(BasicSnippetData.Key.LOOP_INVARIANT_TERM) != null) {
-            final Sort loopInvSort= pm.sort();
+            final Sort loopInvSort = pm.sort();
             result = (poVars.pre.self == null || pm.isConstructor())
-                    ? d.tb.tt() : d.tb.exactInstance(loopInvSort, poVars.pre.self);
+                    ? d.tb.tt() :
+                        d.tb.exactInstance(loopInvSort, poVars.pre.self);
         }
         return result;
     }

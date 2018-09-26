@@ -258,7 +258,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO
 
 
     @Override
-    public IFProofObligationVars getLeaveIFVars() {
+    public IFProofObligationVars getLeafIFVars() {
         return getIFVars();
     }
 

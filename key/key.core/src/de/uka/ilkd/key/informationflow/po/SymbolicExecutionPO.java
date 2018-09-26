@@ -254,8 +254,8 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
 
 
     @Override
-    public IFProofObligationVars getLeaveIFVars() {
-        return getChildPO().getLeaveIFVars();
+    public IFProofObligationVars getLeafIFVars() {
+        return getChildPO().getLeafIFVars();
     }
 
 

@@ -6,7 +6,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 public interface InfFlowPO extends ProofOblInput {
 
-    public IFProofObligationVars getLeaveIFVars();
+    public IFProofObligationVars getLeafIFVars();
 
     public InfFlowProofSymbols getIFSymbols();
 
