@@ -149,6 +149,7 @@ class BasicSnippetData {
         this.tb = services.getTermBuilder();
 
         contractContents.put(Key.TARGET_METHOD, invariant.getTarget());
+        contractContents.put(Key.FOR_CLASS, invariant.getKJT());
         contractContents.put(Key.EXECUTION_CONTEXT, context);
         contractContents.put(Key.LOOP_INVARIANT, invariant);
         contractContents.put(Key.LOOP_INVARIANT_TERM, invariant.getInvariant(services));
@@ -156,7 +157,7 @@ class BasicSnippetData {
         contractContents.put(Key.MODALITY, Modality.BOX);
         contractContents.put(Key.INF_FLOW_SPECS, invariant.getInfFlowSpecs(services));
 
-        // add guard term to information flow specs (neccessary for soundness)
+        // add guard term to information flow specs (necessary for soundness)
         // and add the modified specs to the table
         ImmutableList<InfFlowSpec> infFlowSpecs =
                 invariant.getInfFlowSpecs(services);
