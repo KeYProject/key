@@ -144,8 +144,9 @@ public interface LoopSpecification extends SpecificationElement {
                                 ImmutableList<Term> localOuts,
                                 Map<LocationVariable,Term> atPres);
 
-    public LoopSpecification instantiate(Map<LocationVariable,Term> invariants, 
-    									Map<LocationVariable,Term> freeInvariants,Term variant);
+    public LoopSpecification instantiate(Map<LocationVariable,Term> invariants,
+                                         Map<LocationVariable,Term> freeInvariants,
+                                         Term variant);
 
     public LoopSpecification configurate(Map<LocationVariable,Term> invariants,
     								 Map<LocationVariable,Term> freeInvariants,
@@ -184,7 +185,10 @@ public interface LoopSpecification extends SpecificationElement {
     /**
      * Returns the invariant in pretty plain text format.
      */
-    public String getPlainText(Services services, Iterable<LocationVariable> heapContext, boolean usePrettyPrinting, boolean useUnicodeSymbols);
+    public String getPlainText(Services services,
+                               Iterable<LocationVariable> heapContext,
+                               boolean usePrettyPrinting,
+                               boolean useUnicodeSymbols);
 
     public String getUniqueName();
 

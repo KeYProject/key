@@ -42,7 +42,7 @@ public class ProofScriptEngine {
         ServiceLoader<ProofScriptCommand> loader = ServiceLoader
                 .load(ProofScriptCommand.class);
 
-        for (ProofScriptCommand cmd : loader) {
+        for (ProofScriptCommand<?> cmd : loader) {
             result.put(cmd.getName(), cmd);
         }
 
@@ -97,7 +97,7 @@ public class ProofScriptEngine {
                     throw new ScriptException("No command");
                 }
 
-                ProofScriptCommand command = COMMANDS.get(name);
+                ProofScriptCommand<Object> command = COMMANDS.get(name);
                 if (command == null) {
                     throw new ScriptException("Unknown command " + name);
                 }

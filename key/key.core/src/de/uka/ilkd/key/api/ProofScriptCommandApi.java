@@ -43,7 +43,7 @@ public class ProofScriptCommandApi {
      * @param name the non-null name of the search proof script command
      * @return the proof script command or null
      */
-    public ProofScriptCommand getScriptCommands(String name) {
+    public ProofScriptCommand<?> getScriptCommands(String name) {
         return commandMap.get(name);
     }
 }

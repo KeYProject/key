@@ -5,11 +5,16 @@ package de.uka.ilkd.key.macros.scripts.meta;
  * @version 1 (02.05.17)
  */
 public class InjectionReflectionException extends InjectionException {
-    public InjectionReflectionException(String message, ProofScriptArgument argument) {
+
+    private static final long serialVersionUID = -5062920998506967420L;
+
+    public InjectionReflectionException(String message,
+                                        ProofScriptArgument<?> argument) {
         super(message, argument);
     }
 
-    public InjectionReflectionException(String message, Throwable cause, ProofScriptArgument argument) {
+    public InjectionReflectionException(String message, Throwable cause,
+                                        ProofScriptArgument<?> argument) {
         super(message, cause, argument);
     }
 }

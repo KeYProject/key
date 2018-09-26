@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates and open the template in
- * the editor.
- */
 package de.uka.ilkd.key.informationflow.po;
 
 import java.io.IOException;
@@ -37,7 +33,7 @@ import de.uka.ilkd.key.speclang.InformationFlowContract;
  * @author christoph
  */
 public class InfFlowContractPO extends AbstractInfFlowPO
-        implements ContractPO, InfFlowLeavePO {
+        implements ContractPO, InfFlowLeafPO {
 
     private final InformationFlowContract contract;
 

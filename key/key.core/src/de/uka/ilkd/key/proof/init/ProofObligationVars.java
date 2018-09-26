@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.uka.ilkd.key.proof.init;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -108,7 +104,7 @@ public class ProofObligationVars {
         this.postfix = "";
         this.tb = services.getTermBuilder();
         this.exceptionParameter = buildExceptionParameter(services);
-        // formal parameters are need only for proof obligations
+        // formal parameters are needed only for proof obligations
         // of methods
         this.formalParams = null;
     }

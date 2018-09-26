@@ -7,7 +7,10 @@ package de.uka.ilkd.key.macros.scripts.meta;
  * @version 1 (02.05.17)
  */
 public class ArgumentRequiredException extends InjectionException {
-    public ArgumentRequiredException(String message, ProofScriptArgument meta) {
+
+    private static final long serialVersionUID = -5868248545891789842L;
+
+    public ArgumentRequiredException(String message, ProofScriptArgument<?> meta) {
         super(message, meta);
     }
 }
