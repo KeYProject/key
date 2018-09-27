@@ -189,7 +189,6 @@ import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.java.NonTerminalProgramElement;
-import recoder.java.SourceElement;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTList;
 
