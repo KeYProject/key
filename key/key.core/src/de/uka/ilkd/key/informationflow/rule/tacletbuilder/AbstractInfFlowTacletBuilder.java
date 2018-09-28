@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.Visitor;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
@@ -40,6 +41,9 @@ import de.uka.ilkd.key.util.MiscTools;
  * @author christoph
  */
 abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
+
+    private final Name EQUAL_LOCS = new Name("__EQUALS__LOCS__");
+    private final Name EQUAL_LOCS_POST = new Name("__EQUALS__LOCS__POST__");
 
     public AbstractInfFlowTacletBuilder(final Services services) {
         super(services.getTermFactory(), services);
@@ -120,6 +124,26 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
         return quantifiableVarsToSchemaVars;
     }
 
+    // -------------------------------------------------------------------------
+    // information flow operators
+    // -------------------------------------------------------------------------
+
+    public Term eqAtLocs(Services services, Term heap1, Term locset1,
+            Term heap2, Term locset2) {
+        return (locset1.equals(empty()) && locset2.equals(empty())) ? tt()
+                : func((Function) services.getNamespaces().functions()
+                        .lookup(EQUAL_LOCS),
+                        heap1, locset1, heap2, locset2);
+    }
+
+    public Term eqAtLocsPost(Services services, Term heap1_pre, Term heap1_post,
+            Term locset1, Term heap2_pre, Term heap2_post, Term locset2) {
+        return (locset1.equals(empty()) && locset2.equals(empty())) ? tt()
+                : func((Function) services.getNamespaces().functions()
+                        .lookup(EQUAL_LOCS_POST),
+                        heap1_pre, heap1_post, locset1, heap2_pre, heap2_post,
+                        locset2);
+    }
 
     class QuantifiableVariableVisitor implements Visitor {
 
