@@ -67,7 +67,6 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -1680,15 +1679,6 @@ public class TermBuilder {
     public Term label(Term term, ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty())) {
             return term;
-        } else if (labels.size() == 1
-                && (labels.contains(
-                        ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)
-                        || labels.contains(
-                                ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)
-                        || labels.contains(
-                                ParameterlessTermLabel.UNDEFINED_VALUE_LABEL))
-                && !WellDefinednessCheck.isOn()) {
-            return term; // FIXME: This case is only for SET Tests
         } else {
             return tf.createTerm(term.op(), term.subs(), term.boundVars(),
                     term.javaBlock(), labels);
@@ -1704,14 +1694,8 @@ public class TermBuilder {
     }
 
     public Term shortcut(Term term) {
-        if ((term.op().equals(Junctor.AND) || term.op().equals(Junctor.OR))
-                && WellDefinednessCheck.isOn()) { // FIXME: Last condition is
-                                                  // only for SET Tests
-            return addLabel(term,
-                    ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL);
-        } else {
-            return term;
-        }
+        return addLabel(term,
+                        ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL);
     }
 
     public Term unlabel(Term term) {

@@ -5,19 +5,19 @@
          <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: x &gt;  0 | x &lt; 0 | x = 0
 post: (   x &gt;  0
-   -&gt;   (exc_0 = null -&gt; result_0 = 1)
-      &amp; (   !exc_0 = null
+   -&gt;   ((exc_0 = null)&lt;&lt;impl&gt;&gt; -&gt; result_0 = 1)
+      &amp; (   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
          -&gt;   java.lang.Error::instance(exc_0) = TRUE
             |   java.lang.RuntimeException::instance(exc_0)
               = TRUE))
 &amp; (   x &lt; 0
-   -&gt;   (exc_0 = null -&gt; result_0 = -1)
-      &amp; (   !exc_0 = null
+   -&gt;   ((exc_0 = null)&lt;&lt;impl&gt;&gt; -&gt; result_0 = -1)
+      &amp; (   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
          -&gt;   java.lang.Error::instance(exc_0) = TRUE
             |   java.lang.RuntimeException::instance(exc_0)
               = TRUE))
 &amp; (   x = 0
-   -&gt; !exc_0 = null
+   -&gt; !(exc_0 = null)&lt;&lt;impl&gt;&gt;
    -&gt;   java.lang.Error::instance(exc_0) = TRUE
       |   java.lang.RuntimeException::instance(exc_0)
         = TRUE)
@@ -31,15 +31,15 @@ mod: \if (x &gt;  0 | x &lt; 0)
          \else (allLocs)
 \cap \if (x = 0)  \then (allLocs)  \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-            <branchCondition name="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null),or(gt(x,Z(0(#))),lt(x,Z(0(#))))))" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null),or(gt(x,Z(0(#))),lt(x,Z(0(#))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null),or(gt(x,Z(0(#))),lt(x,Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
-               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of LightweightOperationContractTest.main(x)&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null),or(gt(x,Z(0(#))),lt(x,Z(0(#))))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null),or(gt(x,Z(0(#))),lt(x,Z(0(#))))))">
-                  <termination name="&lt;end&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null),or(gt(x,Z(0(#))),lt(x,Z(0(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+            <branchCondition name="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(gt(x,Z(0(#))),lt(x,Z(0(#))))))" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(gt(x,Z(0(#))),lt(x,Z(0(#))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(gt(x,Z(0(#))),lt(x,Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of LightweightOperationContractTest.main(x)&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(gt(x,Z(0(#))),lt(x,Z(0(#))))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(gt(x,Z(0(#))),lt(x,Z(0(#))))))">
+                  <termination name="&lt;end&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(gt(x,Z(0(#))),lt(x,Z(0(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </branchCondition>
-            <branchCondition name="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(not(equals(exc_0,null)),equals(x,Z(0(#)))))" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(not(equals(exc_0,null)),equals(x,Z(0(#)))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(not(equals(exc_0,null)),equals(x,Z(0(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (magic)">
-               <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call LightweightOperationContractTest.main(x)&gt;&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(not(equals(exc_0,null)),equals(x,Z(0(#)))))" pathConditionChanged="false" methodReturnCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(not(equals(exc_0,null)),equals(x,Z(0(#)))))">
-                  <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(not(equals(exc_0,null)),equals(x,Z(0(#)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+            <branchCondition name="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),equals(x,Z(0(#)))))" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),equals(x,Z(0(#)))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),equals(x,Z(0(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (magic)">
+               <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call LightweightOperationContractTest.main(x)&gt;&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),equals(x,Z(0(#)))))" pathConditionChanged="false" methodReturnCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),equals(x,Z(0(#)))))">
+                  <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),equals(x,Z(0(#)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                   </termination>
                </exceptionalMethodReturn>
             </branchCondition>
