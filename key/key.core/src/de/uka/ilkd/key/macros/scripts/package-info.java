@@ -1,5 +1,5 @@
 /**
- * Proof scripts commands are a simple proof automation facility.
+ * Proof script commands are a simple proof automation facility.
  *
  * @see de.uka.ilkd.key.macros.scripts.ProofScriptCommand
  * @see de.uka.ilkd.key.macros.scripts.ProofScriptEngine

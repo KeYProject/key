@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates and open the template in
- * the editor.
- */
 package de.uka.ilkd.key.informationflow.po;
 
 import java.io.IOException;
@@ -254,8 +250,8 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
 
 
     @Override
-    public IFProofObligationVars getLeaveIFVars() {
-        return getChildPO().getLeaveIFVars();
+    public IFProofObligationVars getLeafIFVars() {
+        return getChildPO().getLeafIFVars();
     }
 
 

@@ -1482,19 +1482,23 @@ public final class JavaInfo {
         return inv;
     }
 
-    // This is used for pretty printing observer terms.
-    public boolean isCanonicalProgramMethod(IProgramMethod method, KeYJavaType context) {
+    /**
+     * This is used for pretty printing observer terms.
+     * @param method
+     *            the program method.
+     * @param context
+     *            the KeYJavaType.
+     * @return whether the program method is canonical.
+     * @throws NullPointerException
+     *            e.g., if the receiver of the observer happens to be
+     *            replaced by "null".
+     */
+    public boolean isCanonicalProgramMethod(IProgramMethod method, KeYJavaType context)
+            throws NullPointerException {
         String name = method.getName().toString();
         ImmutableArray<KeYJavaType> paramTypes = method.getParamTypes();
         IProgramMethod canonicalMethod;
-        try {
-            canonicalMethod = getProgramMethod(context, name, paramTypes, context);
-        } catch(NullPointerException ex) {
-            // MU: There are cases where this method fails.
-            // (e.g. if the receiver of the observer happens to be replaced by "null").
-            // better conservatively return false.
-            return false;
-        }
+        canonicalMethod = getProgramMethod(context, name, paramTypes, context);
         if (method.isPublic()) {
             /*
              * Canonical ProgramMmethod can be located in a supertype in case the method is public.

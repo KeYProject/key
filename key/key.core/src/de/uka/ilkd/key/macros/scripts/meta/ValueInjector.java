@@ -31,17 +31,19 @@ public class ValueInjector {
      * For more details see {@link #inject(ProofScriptCommand, Object, Map)}
      *
      * @param command   a proof script command
-     * @param obj       a paramter class with annotation
+     * @param obj       a parameter class with annotation
      * @param arguments a non-null map of string pairs
      * @param <T> an arbitrary type
      * @return the same object as {@code obj}
      * @throws ArgumentRequiredException     a required argument was not given in {@code arguments}
-     * @throws InjectionReflectionException  an access on some reflection methods occured
+     * @throws InjectionReflectionException  an access on some reflection methods occurred
      * @throws NoSpecifiedConverterException unknown type for the current converter map
-     * @throws ConversionException           an converter could not translage the given value in
+     * @throws ConversionException           an converter could not translate the given value in
      *                                       {@arguments}
      */
-    public static <T> T injection(ProofScriptCommand command, T obj, Map<String, String> arguments)
+    public static <T> T injection(ProofScriptCommand<?> command,
+                                  T obj,
+                                  Map<String, String> arguments)
             throws ArgumentRequiredException, InjectionReflectionException,
             NoSpecifiedConverterException, ConversionException {
         return getInstance().inject(command, obj, arguments);
@@ -94,14 +96,14 @@ public class ValueInjector {
      * @param <T>       type safety
      * @return the same object as {@code obj}
      * @throws ArgumentRequiredException     a required argument was not given in {@code arguments}
-     * @throws InjectionReflectionException  an access on some reflection methods occured
+     * @throws InjectionReflectionException  an access on some reflection methods occurred
      * @throws NoSpecifiedConverterException unknown type for the current converter map
-     * @throws ConversionException           an converter could not translage the given value
+     * @throws ConversionException           an converter could not translate the given value
      *                                       in {@arguments}
      * @see Option
      * @see Flag
      */
-    public <T> T inject(ProofScriptCommand command, T obj, Map<String, String> arguments)
+    public <T> T inject(ProofScriptCommand<?> command, T obj, Map<String, String> arguments)
             throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
             ArgumentRequiredException {
         List<ProofScriptArgument> meta = ArgumentsLifter
@@ -110,7 +112,7 @@ public class ValueInjector {
 
         List<String> usedKeys = new ArrayList<>();
 
-        for (ProofScriptArgument arg : meta) {
+        for (ProofScriptArgument<?> arg : meta) {
             if (arg.hasVariableArguments()) {
                 varArgs.add(arg);
             } else {
@@ -119,8 +121,8 @@ public class ValueInjector {
             }
         }
 
-        for (ProofScriptArgument vararg : varArgs) {
-            final Map map = getStringMap(obj, vararg);
+        for (ProofScriptArgument<?> vararg : varArgs) {
+            final Map<String, Object> map = getStringMap(obj, vararg);
             final int prefixLength = vararg.getName().length();
             for (Map.Entry<String, String> e : arguments.entrySet()) {
                 String k = e.getKey();
@@ -135,12 +137,12 @@ public class ValueInjector {
         return obj;
     }
 
-    private Map getStringMap(Object obj, ProofScriptArgument vararg)
+    private Map<String, Object> getStringMap(Object obj, ProofScriptArgument<?> vararg)
             throws InjectionReflectionException {
         try {
-            Map map = (Map) vararg.getField().get(obj);
+            Map<String, Object> map = (Map<String, Object>) vararg.getField().get(obj);
             if (map == null) {
-                map = new HashMap();
+                map = new HashMap<String, Object>();
                 vararg.getField().set(obj, map);
             }
             return map;
@@ -150,7 +152,7 @@ public class ValueInjector {
         }
     }
 
-    private void injectIntoField(ProofScriptArgument meta, Map<String, String> args, Object obj)
+    private void injectIntoField(ProofScriptArgument<?> meta, Map<String, String> args, Object obj)
             throws InjectionReflectionException, ArgumentRequiredException,
             ConversionException, NoSpecifiedConverterException {
         final String val = args.get(meta.getName());
@@ -167,7 +169,7 @@ public class ValueInjector {
             try {
                 //if (meta.getType() != value.getClass())
                 //    throw new ConversionException("The typed returned '" + val.getClass()
-                //            + "' from the converter mismtached with the
+                //            + "' from the converter mismatched with the
                 // type of the field " + meta.getType(), meta);
                 meta.getField().set(obj, value);
             } catch (IllegalAccessException e) {
@@ -177,10 +179,9 @@ public class ValueInjector {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private Object convert(ProofScriptArgument meta, String val)
+    private Object convert(ProofScriptArgument<?> meta, String val)
             throws NoSpecifiedConverterException, ConversionException {
-        StringConverter converter = getConverter(meta.getType());
+        StringConverter<?> converter = getConverter(meta.getType());
         if (converter == null) {
             throw new NoSpecifiedConverterException("No converter registered for class: " +
                     meta.getField().getType(), meta);

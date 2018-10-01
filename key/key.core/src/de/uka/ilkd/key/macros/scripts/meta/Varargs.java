@@ -5,6 +5,6 @@ package de.uka.ilkd.key.macros.scripts.meta;
  * @version 1 (02.05.17)
  */
 public @interface Varargs {
-    Class as() default String.class;
+    Class<?> as() default String.class;
     String prefix() default "";
 }

@@ -830,6 +830,8 @@ assignable_keyword
 :
 	ASSIGNABLE
     |   ASSIGNABLE_RED
+    |   ASSIGNS
+    |   ASSIGNS_RED
     |   MODIFIABLE
     |   MODIFIABLE_RED
     |   MODIFIES
@@ -1465,6 +1467,8 @@ decreasing_keyword
     |   DECREASING_REDUNDANTLY
     |   DECREASES
     |   DECREASES_REDUNDANTLY
+    |   LOOP_VARIANT
+    |   LOOP_VARIANT_RED
 ;
 
 

@@ -70,9 +70,7 @@ import de.uka.ilkd.key.util.Pair;
  * @author Wolfram Pfeifer
  */
 public final class SourceView extends JComponent {
-    /**
-     *
-     */
+
     private static final long serialVersionUID = -94424677425561025L;
 
     /**
