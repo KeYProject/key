@@ -69,7 +69,7 @@ public class AbstractKeYTest extends AbstractSetupTestCase {
     * </p>
     */
    public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
-   
+
    /**
     * The used temporary oracle directory.
     */
@@ -98,7 +98,7 @@ public class AbstractKeYTest extends AbstractSetupTestCase {
     * @throws IOException Occurred Exception.
     */
    protected static void createOracleFile(File oracleDirectory,
-                                          DbcModel model, 
+                                          DbcModel model,
                                           String expectedModelPathInBundle) throws IOException {
       // Create sub folder structure
       File oracleFile = new File(oracleDirectory, expectedModelPathInBundle);
@@ -111,7 +111,7 @@ public class AbstractKeYTest extends AbstractSetupTestCase {
       // Print message to the user.
       printOracleDirectory();
    }
-   
+
    /**
     * Prints {@link #oracleDirectory} to the user via {@link System#out}.
     */
@@ -129,12 +129,12 @@ public class AbstractKeYTest extends AbstractSetupTestCase {
          System.out.println(borderLines);
       }
    }
-   
+
    /**
-    * Executes a KeY connection test by extracting the test data in the 
+    * Executes a KeY connection test by extracting the test data in the
     * new created project. After that the connection is opened to the
     * startContainerPath and compared with the expected connection.
-    * Also a diagram is created from the opened key connection 
+    * Also a diagram is created from the opened key connection
     * and compared with the expected connection.
     * @param projectName The name of the project to create.
     * @param testDataInBundle The path in the bundle to the test data.
@@ -170,7 +170,7 @@ public class AbstractKeYTest extends AbstractSetupTestCase {
          TestCase.assertNotNull(paycardFolder);
          TestCase.assertTrue(paycardFolder.exists());
          // Open connection
-         File location = ResourceUtil.getLocation(paycardFolder); 
+         File location = ResourceUtil.getLocation(paycardFolder);
          TestCase.assertNotNull(location);
          TestCase.assertTrue(location.exists() && location.isDirectory());
          currentConnection = TestKeyUtil.createKeyConnection(location, packageManagement, logger);
