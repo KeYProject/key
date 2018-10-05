@@ -1281,7 +1281,6 @@ public class TestUtilsUtil {
        * {@inheritDoc}
        */
 //      @Override
-      @SuppressWarnings("unused")
       public SWTBotToolbarButton click(int stateMask) {
          log.debug(MessageFormat.format("Clicking on {0}", SWTUtils.getText(widget)));
          waitForEnabled();

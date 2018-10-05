@@ -84,6 +84,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 
@@ -889,18 +890,21 @@ public class ProofTreeView extends JPanel {
             this.add(macroMenu);
         }
 
-	    this.add(prune);
-	    if (branch != path) {
-		prune.addActionListener(this);
-		prune.setIcon(IconFactory.pruneLogo(ICON_SIZE));
-		prune.setEnabled(false);
-		if (proof != null) {
-		    if (proof.isGoal(invokedNode) ||
-		        proof.getSubtreeGoals(invokedNode).size()>0) {
-		        prune.setEnabled(true);
-		    }
-		}
-	    }
+        this.add(prune);
+        prune.setIcon(IconFactory.pruneLogo(ICON_SIZE));
+        prune.setEnabled(false);
+        if (proof != null) {
+            // disable pruning for goals and disable it for closed subtrees if the command line
+            // option "--no-pruning-closed" is set (saves memory)
+            if (!proof.isGoal(invokedNode)
+                && !proof.isClosedGoal(invokedNode)
+                && (proof.getSubtreeGoals(invokedNode).size() > 0
+                    || (!GeneralSettings.noPruningClosed
+                        && proof.getClosedSubtreeGoals(invokedNode).size() > 0))) {
+                prune.addActionListener(this);
+                prune.setEnabled(true);
+            }
+        }
 
 	    if(branch != path){
 	        delayedCut.addActionListener(this);

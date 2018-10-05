@@ -17,9 +17,9 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 /**
  * This class contains the set of four sets of ProofObligationVars necessary for
  * information flow proofs.
- * <p/>
+ *
  * @author christoph
- * <p/>
+ *
  */
 public class IFProofObligationVars {
 

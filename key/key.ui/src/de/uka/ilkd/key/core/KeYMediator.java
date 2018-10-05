@@ -38,7 +38,6 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -229,15 +228,6 @@ public class KeYMediator {
     	}
     	return filterForInteractiveProving;
 	}
-
-    /** Undo.
-     * @author VK
-     */
-    public void setBack() {
-	if (ensureProofLoaded()) {
-	    setBack(getSelectedGoal());
-	}
-    }
 
     public void setBack(Node node) {
     	node.proof().pruneProof(node);

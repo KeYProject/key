@@ -14,8 +14,8 @@ public class GreatestCommonDivisor {
     public static int ofWith(final int a, final int b)
     {
         /*@ normal_behavior
-          @ ensures a >= 0 && (a == \old(a) || a == -\old(a));
-          @ ensures b >= 0 && (b == \old(b) || b == -\old(b));
+          @ ensures a >= 0 && (a == \before(a) || a == -\before(a));
+          @ ensures b >= 0 && (b == \before(b) || b == -\before(b));
           @ assignable \nothing;
           @*/
         {

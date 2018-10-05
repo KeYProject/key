@@ -13,23 +13,8 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridBagLayout;
-import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.File;
 import java.util.Collection;
 import java.util.EventObject;
@@ -39,28 +24,11 @@ import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
-import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import javax.swing.event.MouseInputAdapter;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -68,57 +36,9 @@ import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
-import de.uka.ilkd.key.gui.actions.AboutAction;
-import de.uka.ilkd.key.gui.actions.AutoModeAction;
-import de.uka.ilkd.key.gui.actions.AutoSave;
-import de.uka.ilkd.key.gui.actions.CounterExampleAction;
-import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
-import de.uka.ilkd.key.gui.actions.ExitMainAction;
-import de.uka.ilkd.key.gui.actions.FontSizeAction;
-import de.uka.ilkd.key.gui.actions.GoalBackAction;
-import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
-import de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
-import de.uka.ilkd.key.gui.actions.LicenseAction;
-import de.uka.ilkd.key.gui.actions.MacroKeyBinding;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.actions.MenuSendFeedackAction;
-import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
-import de.uka.ilkd.key.gui.actions.OpenExampleAction;
-import de.uka.ilkd.key.gui.actions.OpenFileAction;
-import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
-import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
-import de.uka.ilkd.key.gui.actions.ProofManagementAction;
-import de.uka.ilkd.key.gui.actions.PruneProofAction;
-import de.uka.ilkd.key.gui.actions.QuickLoadAction;
-import de.uka.ilkd.key.gui.actions.QuickSaveAction;
-import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
-import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
-import de.uka.ilkd.key.gui.actions.SaveFileAction;
-import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
-import de.uka.ilkd.key.gui.actions.SearchInSequentAction;
-import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
-import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
-import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
-import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
-import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
-import de.uka.ilkd.key.gui.actions.SyntaxHighlightingToggleAction;
-import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
-import de.uka.ilkd.key.gui.actions.TermLabelMenu;
-import de.uka.ilkd.key.gui.actions.TestGenerationAction;
-import de.uka.ilkd.key.gui.actions.ToggleConfirmExitAction;
-import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
-import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
-import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
+import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
-import de.uka.ilkd.key.gui.nodeviews.EmptySequent;
-import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
-import de.uka.ilkd.key.gui.nodeviews.MainFrame;
-import de.uka.ilkd.key.gui.nodeviews.SequentView;
-import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
+import de.uka.ilkd.key.gui.nodeviews.*;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -126,6 +46,7 @@ import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SolverListener;
+import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
@@ -139,11 +60,7 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.KeYResourceManager;
-import de.uka.ilkd.key.util.PreferenceSaver;
-import de.uka.ilkd.key.util.ThreadUtilities;
+import de.uka.ilkd.key.util.*;
 
 public final class MainWindow extends JFrame  {
 
@@ -168,6 +85,9 @@ public final class MainWindow extends JFrame  {
     
     /** JScrollPane for displaying SequentViews*/
     private final MainFrame mainFrame;
+
+    /** the view to show source code and symbolic execution information */
+    private final JComponent sourceView;
 
     /** SequentView for the current goal */
     public final CurrentGoalView currentGoalView;
@@ -273,6 +193,7 @@ public final class MainWindow extends JFrame  {
         autoModeAction = new AutoModeAction(this);
         mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
+        sourceView = SourceView.getSourceView(this);
         proofList = new TaskTree(mediator);
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(mediator);
@@ -441,11 +362,15 @@ public final class MainWindow extends JFrame  {
 
         JPanel rightPane = new JPanel();
         rightPane.setLayout(new BorderLayout());
-	rightPane.add(mainFrame, BorderLayout.CENTER);
-	rightPane.add(sequentViewSearchBar,
-                BorderLayout.SOUTH);
+        rightPane.add(mainFrame, BorderLayout.CENTER);
+        rightPane.add(sequentViewSearchBar, BorderLayout.SOUTH);
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, rightPane);
+        JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourceView);
+        pane.setResizeWeight(0.5);
+        pane.setOneTouchExpandable(true);
+        pane.setName("split2");
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, pane);
         splitPane.setResizeWeight(0); // the right pane is more important
         splitPane.setOneTouchExpandable(true);
         splitPane.setName("splitPane");
@@ -495,7 +420,7 @@ public final class MainWindow extends JFrame  {
         toolBar.add(new TestGenerationAction(this));
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
-        toolBar.add(new PruneProofAction(this, false));
+        toolBar.add(new PruneProofAction(this));
         return toolBar;
     }
 
@@ -704,14 +629,20 @@ public final class MainWindow extends JFrame  {
         view.addSeparator();
         {
             JMenu fontSize = new JMenu("Font Size");
-            fontSize.add(new FontSizeAction(this, FontSizeAction.Mode.SMALLER));
-            fontSize.add(new FontSizeAction(this, FontSizeAction.Mode.LARGER));
+            fontSize.add(new DecreaseFontSizeAction(this));
+            fontSize.add(new IncreaseFontSizeAction(this));        
             view.add(fontSize);
         }
         view.add(new ToolTipOptionsAction(this));
 
         view.add(new ProofDiffFrame.Action(this));
-                
+
+        view.addSeparator();
+
+        JMenuItem hmItem = new JMenuItem("Heatmap Options");
+        hmItem.addActionListener(new HeatmapSettingsAction(this));
+        view.add(hmItem);
+
         return view;
     }
 
@@ -720,7 +651,27 @@ public final class MainWindow extends JFrame  {
         proof.setMnemonic(KeyEvent.VK_P);
 
         proof.add(autoModeAction);
-        proof.add(new UndoLastStepAction(this, true));
+        GoalBackAction goalBack = new GoalBackAction(this, true);
+        proof.addMenuListener(new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent e) {
+                /* we use this MenuListener to update the name only if the menu is shown since it
+                 * would be slower to update the name (which means scanning all open and closed
+                 * goals) at every selection change (via the KeYSelectionListener in GoalBackAction)
+                 */
+                goalBack.updateName();
+            }
+
+            @Override
+            public void menuDeselected(MenuEvent e) {
+            }
+
+            @Override
+            public void menuCanceled(MenuEvent e) {
+            }
+        });
+        proof.add(goalBack);
+        proof.add(new PruneProofAction(this));
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
         proof.add(new SearchInProofTreeAction(this));
@@ -870,7 +821,7 @@ public final class MainWindow extends JFrame  {
     public ProofTreeView getProofTreeView() {
         return mainWindowTabbedPane.getProofTreeView();
     }
-    
+
     /**
      * Returns the current goal view.
      */
@@ -1257,6 +1208,7 @@ public final class MainWindow extends JFrame  {
             currentComponent.dispatchEvent(new MouseEvent(currentComponent,
                     e.getID(),
                     e.getWhen(),
+                    // do not use as it freezes the stop button: e.getModifiersEx(),
                     e.getModifiers(),
                     componentPoint.x,
                     componentPoint.y,

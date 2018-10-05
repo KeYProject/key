@@ -20,6 +20,7 @@ import java.util.Properties;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -30,7 +31,9 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 /**
  * Provides the user interface independent logic to manage multiple proofs. This includes:
  * <ul>
- *    <li>Functionality to load files via {@link #load(Profile, File, List, File, Properties, boolean)}.</li>
+ *    <li>Functionality to load files via
+ *        {@link #load(Profile, File, List<File>, File, List<File>, Properties,
+ *                     boolean)}.</li>
  *    <li>Functionality to instantiate new {@link Proof}s via {@link #createProof(InitConfig, ProofOblInput)}.</li>
  *    <li>Functionality to register existing {@link Proof}s in the user interface via {@link #registerProofAggregate(ProofAggregate)}.</li>
  *    <li>Access to the {@link ProofControl} via {@link #getProofControl()}.</li>
@@ -58,13 +61,17 @@ public interface UserInterfaceControl {
      * <p>
      * <b>The loading is performed in the {@link Thread} of the caller!</b>
      * </p>
-     * @param profile An optional {@link Profile} to use. If it is {@code null} the default profile {@link KeYMediator#getDefaultProfile()} is used.
+     * @param profile An optional {@link Profile} to use. If it is {@code null}
+     *     the default profile {@link AbstractProfile#getDefaultProfile()} is used.
      * @param file The java file to open.
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
      * @param includes Optional includes to consider.
      * @param poPropertiesToForce Some optional {@link Properties} for the PO which extend or overwrite saved PO {@link Properties}.
-     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
+     * @param forceNewProfileOfNewProofs {@code} true
+     *     {@link AbstractProblemLoader#profileOfNewProofs} will be used as
+     *     {@link Profile} of new proofs, {@code false} {@link Profile}
+     *     specified by problem file will be used for new proofs.
      * @return The opened {@link AbstractProblemLoader}.
      * @throws ProblemLoaderException Occurred Exception.
      */

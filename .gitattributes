@@ -1,0 +1,50 @@
+# see: https://help.github.com/articles/dealing-with-line-endings/
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+# Special files that need to keep their line ending encodings
+# therefore ... binary
+*_DOS.txt  binary
+
+# Line endings for text files
+# Explicitly declare text files you want to always be normalized and converted
+# to native line endings on checkout.
+*.MF    text
+*.c     text
+*.css   text
+*.csv   text
+*.dfy   text
+*.g     text
+*.h     text
+*.htm*  text
+*.ini   text
+*.java  text
+*.jj    text
+*.jml   text
+*.jnlp  text
+*.json  text
+*.key   text
+*.md    text
+*.pl    text
+*.proof text
+*.properties text
+*.props text
+*.py    text
+*.script text
+*.sh    text
+*.txt   text
+*.xml   text
+*.yml   text
+.gitignore text
+README  text
+
+# Denote all files that are truly binary and should not be modified.
+*.class binary
+*.gz    binary
+*.ico   binary
+*.jpg   binary
+*.od*   binary
+*.pdf   binary
+*.png   binary
+*.tgz   binary
+*.zip   binary

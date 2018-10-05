@@ -6,7 +6,7 @@
          <statement name="y=3;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
             <blockContract name="main()) catch(exc_0)
-pre true
+pre measuredByEmpty
 post exc_0 = null
 mod {(null, BlockContractAssignableRequestedLocation::$x)}termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true">
                <callStackEntry path="/0"/>

@@ -87,7 +87,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl> extend
       StrategyProperties sp = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
       boolean methodTreatmentContract = StrategyProperties.METHOD_CONTRACT.equals(sp.get(StrategyProperties.METHOD_OPTIONS_KEY));
       boolean loopTreatmentInvariant = StrategyProperties.LOOP_INVARIANT.equals(sp.get(StrategyProperties.LOOP_OPTIONS_KEY));
-      boolean blockTreatmentContract = StrategyProperties.BLOCK_CONTRACT.equals(sp.get(StrategyProperties.BLOCK_OPTIONS_KEY));
+      boolean blockTreatmentContract = StrategyProperties.BLOCK_CONTRACT_INTERNAL.equals(sp.get(StrategyProperties.BLOCK_OPTIONS_KEY));
       boolean aliasChecks = StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY.equals(sp.get(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY));
       boolean nonExecutionBranchHidingSideProofs = StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(sp.get(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY));
       configureProofForSymbolicExecution(proof, maximalNumberOfNodesPerBranch, methodTreatmentContract, loopTreatmentInvariant, blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks);

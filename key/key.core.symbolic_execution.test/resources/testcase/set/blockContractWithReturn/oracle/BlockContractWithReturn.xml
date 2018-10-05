@@ -6,10 +6,10 @@
          <methodCall name="&lt;call BlockContractWithReturn.magic(x_3)&gt;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
             <blockContract name="result_0 = magic()) catch(exc_0)
-pre x_3 = 2
+pre measuredByEmpty &amp; x_3 = 2
 post returned = TRUE
 &amp; exc_0 = null
-&amp; (returned = TRUE -&gt; result_0 = javaUnaryMinusInt(2))
+&amp; (returned = TRUE -&gt; result_0 = -2)
 mod {}termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true">
                <callStackEntry path="/0/0/0"/>
                <callStackEntry path="/0"/>

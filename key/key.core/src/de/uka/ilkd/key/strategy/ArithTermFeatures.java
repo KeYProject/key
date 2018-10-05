@@ -5,7 +5,6 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
-import static de.uka.ilkd.key.strategy.StaticFeatureCollection.extendsTrans;
 import de.uka.ilkd.key.strategy.termfeature.ConstantTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 

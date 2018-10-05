@@ -49,6 +49,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> returns =
             ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> decreases =
+            ImmutableSLList.<PositionedString>nil();
 
     private ImmutableList<Triple<PositionedString,PositionedString,PositionedString>> abbreviations =
             ImmutableSLList.<Triple<PositionedString,PositionedString,PositionedString>>nil();
@@ -190,6 +192,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addMeasuredBy(ImmutableList<PositionedString> l) {
         measuredBy = measuredBy.append(l);
+    }
+
+    public void addDecreases(PositionedString ps) {
+        decreases = decreases.append(ps);
+        setPosition(ps);
+    }
+
+    public void addDecreases(ImmutableList<PositionedString> l) {
+        decreases = decreases.append(l);
     }
 
 
@@ -363,6 +374,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return measuredBy;
     }
 
+    public ImmutableList<PositionedString> getDecreases() {
+        return decreases;
+    }
 
     public ImmutableList<PositionedString> getAssignable() {
         return assignables.get(HeapLDT.BASE_HEAP_NAME.toString());

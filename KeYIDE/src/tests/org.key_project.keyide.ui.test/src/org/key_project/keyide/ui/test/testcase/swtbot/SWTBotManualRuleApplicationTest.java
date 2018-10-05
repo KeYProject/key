@@ -738,7 +738,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                StrategyProperties sp = ss.getActiveStrategyProperties();
                sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, useOperationContracts ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
                sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, useDependencyContracts ? StrategyProperties.DEP_ON : StrategyProperties.DEP_OFF);
-               sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, useBlockContracts ? StrategyProperties.BLOCK_CONTRACT : StrategyProperties.BLOCK_EXPAND);
+               sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, useBlockContracts ? StrategyProperties.BLOCK_CONTRACT_INTERNAL : StrategyProperties.BLOCK_EXPAND);
                SymbolicExecutionUtil.updateStrategySettings(proof, sp);
                proof.setActiveStrategy(proof.getInitConfig().getProfile().getDefaultStrategyFactory().create(proof, sp));
                keyEditor.getProofControl().startAndWaitForAutoMode(keyEditor.getCurrentProof());

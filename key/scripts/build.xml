@@ -34,7 +34,20 @@
 		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="compile" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
 	</target>
 
-	<target name="deployAll" description="Prepare KeY for shipping. Find results in directory 'deployment'. (Calls 'ant deploy' on production subprojects.)">
+        <target name="jarAll" description="Create jar files for each submodule">
+	  <!-- Create Jar archives -->
+	  <ant antfile="${key.dir}/key.util/build.xml" target="deploy" dir="${key.dir}/key.util" inheritall="false"/>
+	  <ant antfile="${key.dir}/key.core/build.xml" target="deploy" dir="${key.dir}/key.core" inheritall="false"/>
+	  <ant antfile="${key.dir}/key.core.testgen/build.xml" target="deploy" dir="${key.dir}/key.core.testgen" inheritall="false"/>
+	  <ant antfile="${key.dir}/key.ui/build.xml" target="deploy" dir="${key.dir}/key.ui" inheritall="false"/>
+	  <ant antfile="${key.dir}/key.core.symbolic_execution/build.xml" target="deploy" dir="${key.dir}/key.core.symbolic_execution" inheritall="false"/>
+	  <ant antfile="${key.dir}/key.core.proof_references/build.xml" target="deploy" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
+	  <ant antfile="${key.dir}/key.core.example/build.xml" target="deploy" dir="${key.dir}/key.core.example" inheritall="false"/>
+	  <ant antfile="${key.dir}/key.removegenerics/build.xml" target="deploy" dir="${key.dir}/key.removegenerics" inheritall="false"/>
+	  <ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="deploy" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
+        </target>
+
+	<target name="deployAll" description="Prepare KeY for shipping. Find results in directory 'deployment'. (Calls 'ant deploy' on production subprojects.)" depends="jarAll">
 		<!-- Update GIT revision s-->
 		<exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
 			<arg value="rev-parse"/>
@@ -44,17 +57,8 @@
 		<zip destfile="${key.dir}/deployment/key-src-${key.version}_${git.revision}.zip"
 		     basedir="${rep.dir}/"
 		     excludes="*-src-*,*.jnlp,**/deployment/**,**/bin/**,*~,**/oldStuff/**"
-		 />
-		<!-- Create Jar archives -->
-		<ant antfile="${key.dir}/key.util/build.xml" target="deploy" dir="${key.dir}/key.util" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core/build.xml" target="deploy" dir="${key.dir}/key.core" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.testgen/build.xml" target="deploy" dir="${key.dir}/key.core.testgen" inheritall="false"/>
-		<ant antfile="${key.dir}/key.ui/build.xml" target="deploy" dir="${key.dir}/key.ui" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.symbolic_execution/build.xml" target="deploy" dir="${key.dir}/key.core.symbolic_execution" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="deploy" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.example/build.xml" target="deploy" dir="${key.dir}/key.core.example" inheritall="false"/>
-		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="deploy" dir="${key.dir}/key.removegenerics" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="deploy" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
+		     />
+
 		<!-- Deploy license -->
 		<copy todir="${key.dir}/deployment">
 			<fileset file="${key.dir}/LICENSE.TXT"/>
@@ -69,6 +73,36 @@
 		     excludes="*-src-*,**/key*-*.zip,*.jnlp"
 		 />
 	</target>
+
+
+        <target name="fatJar" description="Builds a fat jar with all dependencies"
+                depends="jarAll">
+
+          <exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
+			<arg value="rev-parse"/>
+			<arg value="HEAD"/>
+	  </exec>
+
+          <jar jarfile="${key.dir}/deployment/key-${key.version}_${git.revision}-exe.jar"
+               basedir="${basedir}/KeY.jar"
+               manifest="${basedir}/KeY.jar/META-INF/MANIFEST.MF">
+
+            <zipgroupfileset dir="${key.dir}/deployment/components">
+              <include name="**/*.jar" />
+            </zipgroupfileset>
+
+            <zipgroupfileset dir="${key.dir}/deployment/libs">
+              <include name="**/*.jar" />
+            </zipgroupfileset>
+
+            <fileset dir="${key.dir}/deployment/">
+              <include name="**/*.txt" />
+            </fileset>
+
+            <fileset file="${key.dir}/LICENSE.TXT"/>
+          </jar>
+        </target>
+
 
 	<target name="cleanAll" description="Remove all generated files. (Clears deployment files and calls 'ant clean' on production subprojects.)">
 		<!-- Clean components -->

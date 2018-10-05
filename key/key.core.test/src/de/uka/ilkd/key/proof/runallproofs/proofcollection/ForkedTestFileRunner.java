@@ -17,6 +17,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
+import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.IOForwarder;
 
 /**
@@ -27,9 +28,11 @@ import de.uka.ilkd.key.util.IOForwarder;
  */
 public abstract class ForkedTestFileRunner implements Serializable {
 
-   private static final String FORK_TIMEOUT_KEY = "forkTimeout";
+    private static final long serialVersionUID = 1L;
 
-   private static final String FORK_DEBUG_PORT = "forkDebugPort";
+    private static final String FORK_TIMEOUT_KEY = "forkTimeout";
+
+    private static final String FORK_DEBUG_PORT = "forkDebugPort";
 
    private static Path getLocationOfSerializedTestFiles(Path tempDirectory) {
       return Paths.get(tempDirectory.toString(), "TestFiles.serialized");
@@ -93,7 +96,10 @@ public abstract class ForkedTestFileRunner implements Serializable {
                 testFiles.toArray(new TestFile[testFiles.size()]));
 
       ProcessBuilder pb = new ProcessBuilder(
-              "java", "-classpath", System.getProperty("java.class.path"));
+              "java", "-classpath", System.getProperty("java.class.path"),
+              // pass through the value of key.disregardSettings
+              "-D" + PathConfig.DISREGARD_SETTINGS_PROPERTY + "=" +
+              Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY));
       List<String> command = pb.command();
 
       // TODO make sure no injection happens here?

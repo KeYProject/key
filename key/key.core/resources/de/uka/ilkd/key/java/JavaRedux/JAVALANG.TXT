@@ -31,6 +31,7 @@ java.lang.Runnable
 java.lang.RuntimeException
 java.lang.String
 java.lang.StringBuffer
+java.lang.System
 java.lang.Thread
 java.lang.Throwable
 java.util.Collection
@@ -39,5 +40,9 @@ java.util.List
 java.util.ListIterator
 java.util.Map
 java.util.Set
+java.io.FilterOutputStream
+java.io.InputStream
 java.io.IOException
+java.io.OutputStream
+java.io.PrintStream
 java.io.Serializable

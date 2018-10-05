@@ -163,7 +163,7 @@ public class MediatorProofControl extends AbstractProofControl {
        @Override
        protected void done() {
            try {
-              ApplyStrategyInfo result = get();
+              get();
            } catch (final InterruptedException exception) {
                notifyException(exception);
            } catch (final ExecutionException exception) {

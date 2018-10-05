@@ -243,7 +243,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
 				if (statement != null) {
 					posInfo = statement.getPositionInfo();
 				}
-				if (SymbolicExecutionUtil.isBlockContract(node, node.getAppliedRuleApp())) {
+				if (SymbolicExecutionUtil.isBlockSpecificationElement(node, node.getAppliedRuleApp())) {
 				   if (node.childrenCount() >= 3 && node.child(1).isClosed()) {
 				      return KeYImages.getImage(KeYImages.BLOCK_CONTRACT);
 				   }

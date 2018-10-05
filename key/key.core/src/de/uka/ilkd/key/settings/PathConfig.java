@@ -32,6 +32,15 @@ import org.key_project.util.java.IOUtil;
  * </p>
  */
 public class PathConfig {
+
+    /**
+     * The Java system property used to indicate that the
+     * settings in the KeY directory should not be consulted
+     * at startup.
+     */
+    public static final String DISREGARD_SETTINGS_PROPERTY =
+            "key.disregardSettings";
+
     /**
      * The default name of the directory that contains KeY settings.
      */

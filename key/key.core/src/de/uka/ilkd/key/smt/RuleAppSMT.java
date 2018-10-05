@@ -108,8 +108,8 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
 			});
 		}
 
-		RuleAppSMT app = (RuleAppSMT) ruleApp;
-		//goal.node().getNodeInfo().setBranchLabel(app.getTitle());
+        //RuleAppSMT app = (RuleAppSMT) ruleApp;
+        //goal.node().getNodeInfo().setBranchLabel(app.getTitle());
 		ImmutableList<Goal> newGoals = goal.split(0);	
 
 		return newGoals;
