@@ -35,10 +35,14 @@ import java.util.Map;
  */
 public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
 
-    //List of PosInOcc that haven't been successfully replaced
+    /**
+     * List of PosInOcc that haven't been successfully replaced
+     */
     private List<PosInOccurrence> failposInOccs = new ArrayList<>();
 
-    //List of PosInOcc that successfully replaced
+    /**
+     * List of PosInOcc that successfully replaced
+     */
     private List<PosInOccurrence> succposInOccs = new ArrayList<>();
 
     /**
@@ -126,7 +130,8 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
     }
 
     /**
-     * Filter tacletapps: term = find && result = replace and execute taclet that matches the conditions
+     * Filter tacletapps: term = find && result = replace
+     * and execute taclet that matches the conditions
      **/
     private List<PosInOccurrence> findAndExecReplacement(
             Parameters p, ImmutableList<TacletApp> list, EngineState state) {
@@ -177,7 +182,8 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param goalold
      * @param rewriteResult
      */
-    private void executeRewriteTaclet(Parameters p, PosTacletApp pta, Goal goalold, SequentFormula rewriteResult) {
+    private void executeRewriteTaclet(Parameters p, PosTacletApp pta, Goal goalold,
+                                      SequentFormula rewriteResult) {
         if (rewriteResult.formula().equals(p.replace) ||
                 getTermAtPos(rewriteResult, pta.posInOccurrence())
                         .equals(p.replace)) {
@@ -186,7 +192,8 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
             goalold.apply(pta);
             return;
         } else {
-            throw new IllegalArgumentException("Unsuccessful application of rewrite taclet " + pta.taclet().displayName());
+            throw new IllegalArgumentException("Unsuccessful application of rewrite taclet "
+                    + pta.taclet().displayName());
         }
     }
 
@@ -197,8 +204,8 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param pio PosInOccurrence of the to be returned term
      * @return term at pio
      */
-    public Term getTermAtPos(SequentFormula sf, PosInOccurrence pio){
-        if(pio.isTopLevel()){
+    public Term getTermAtPos(SequentFormula sf, PosInOccurrence pio) {
+        if (pio.isTopLevel()) {
             return sf.formula();
 
         } else {
