@@ -426,6 +426,7 @@ public final class MainWindow extends JFrame  {
 
         de.uka.ilkd.key.settings.ViewSettings vs =
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        toggleHeatmapButton.setSelected(vs.isShowHeatmap());
         final SettingsListener setListener = new SettingsListener() {
             @Override
             public void settingsChanged(EventObject e) {
